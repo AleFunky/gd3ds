@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
 
 	returned = play_mp3("romfs:/songs/CantLetGo.mp3");
 
-	//printf("\x1b[8;1HUse dpad to move camera");
+	printf("\x1b[8;1HUse dpad to move camera");
 	// Main loop
 	while (aptMainLoop())
 	{
@@ -88,12 +88,12 @@ int main(int argc, char* argv[]) {
 		handle_col_triggers();
 		calculate_lbg();
 		
-		//printf("\x1b[1;1HSpriteCount: %d\x1b[K", sprite_count);
-		//printf("\x1b[2;1HCPU:        %6.2f%%\x1b[K", C3D_GetProcessingTime()*6.0f);
-		//printf("\x1b[3;1HGPU:        %6.2f%%\x1b[K", C3D_GetDrawingTime()*6.0f);
-		//printf("\x1b[4;1HCmdBuf:     %6.2f%%\x1b[K", C3D_GetCmdBufUsage()*100.0f);
-		//printf("\x1b[5;1HLinear:     %zu\x1b[K", (int)(linearSpaceFree()));
-		//printf("\x1b[6;1HTotalHeap:  %lu\x1b[K", envGetHeapSize());
+		printf("\x1b[1;1HSpriteCount: %d\x1b[K", sprite_count);
+		printf("\x1b[2;1HCPU:        %6.2f%%\x1b[K", C3D_GetProcessingTime()*6.0f);
+		printf("\x1b[3;1HGPU:        %6.2f%%\x1b[K", C3D_GetDrawingTime()*6.0f);
+		printf("\x1b[4;1HCmdBuf:     %6.2f%%\x1b[K", C3D_GetCmdBufUsage()*100.0f);
+		printf("\x1b[5;1HLinear:     %zu\x1b[K", (int)(linearSpaceFree()));
+		printf("\x1b[6;1HTotalHeap:  %lu\x1b[K", envGetHeapSize());
 
 		// Render the scene
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
