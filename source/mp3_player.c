@@ -142,10 +142,6 @@ void audio_thread(void *const file) {
 
         LightEvent_Wait(&soundEvent);
     }
-
-    threadId = NULL;
-    
-    audio_exit();
 }
 
 // Play an mp3 file defined by a path
@@ -199,7 +195,12 @@ void toggle_playback_mp3() {
 void stop_mp3() {
     if (!quit && threadId) {
         quit = true;
+        
+	    LightEvent_Signal(&soundEvent);
+        
         threadJoin(threadId, U64_MAX);
+        
         threadId = NULL;
+        audio_exit();
     }
 }

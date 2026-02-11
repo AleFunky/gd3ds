@@ -35,6 +35,9 @@ int main(int argc, char* argv[]) {
 	bgSheet = C2D_SpriteSheetLoad("romfs:/gfx/bg.t3x");
 	if (!bgSheet) svcBreak(USERBREAK_PANIC);
 	
+	groundSheet = C2D_SpriteSheetLoad("romfs:/gfx/grounds.t3x");
+	if (!groundSheet) svcBreak(USERBREAK_PANIC);
+	
 	// Load graphics
 	spriteSheet = C2D_SpriteSheetLoad("romfs:/gfx/sprites.t3x");
 	if (!spriteSheet) svcBreak(USERBREAK_PANIC);
@@ -42,18 +45,12 @@ int main(int argc, char* argv[]) {
 	spriteSheet2 = C2D_SpriteSheetLoad("romfs:/gfx/portals.t3x");
 	if (!spriteSheet2) svcBreak(USERBREAK_PANIC);
 
-	// BG
-	C2D_SpriteFromSheet(&bg, bgSheet, 0);
-	C2D_SpriteSetCenter(&bg, 0.5f, 0.5f);
-	C2D_SpriteSetPos(&bg, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-
-	C2D_ImageTint tint = { 0 };
 	C2D_SetTintMode(C2D_TintMult);
 
-	int returned = load_level("romfs:/CantLetGo.gmd");
+	int returned = load_level("romfs:/Clutterfunk.gmd");
 	if (returned) printf("\x1b[9;1HFailed %d", returned);
 
-	returned = play_mp3("romfs:/songs/CantLetGo.mp3");
+	returned = play_mp3("romfs:/songs/Clutterfunk.mp3");
 
 	printf("\x1b[8;1HUse dpad to move camera");
 	// Main loop
@@ -100,21 +97,21 @@ int main(int argc, char* argv[]) {
 		printf("\x1b[4;1HCmdBuf:     %6.2f%%\x1b[K", C3D_GetCmdBufUsage()*100.0f);
 		printf("\x1b[5;1HLinear:     %zu\x1b[K", (int)(linearSpaceFree()));
 		printf("\x1b[6;1HTotalHeap:  %lu\x1b[K", envGetHeapSize());
+		printf("\x1b[7;1HCamera:     %.2f %.2f\x1b[K", cam_x, cam_y);
 
 		// Render the scene
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 		C3D_RenderTargetClear(top, C3D_CLEAR_ALL, 0, 0);
 		C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ZERO);
 		C2D_SceneBegin(top);
+		
+		draw_background(cam_x / 8, -(cam_y / 8) + 200);
 
-		
-		Color col = channels[CHANNEL_BG].color;
-		C2D_PlainImageTint(&tint, C2D_Color32(col.r, col.g, col.b, 255), 1.f);
-		C2D_DrawSpriteTinted(&bg, &tint);
-		
-		
 		C2D_ViewScale(SCALE, SCALE);
+
 		draw_objects();
+
+		draw_ground(0, false);
 		C2D_ViewReset();
 
 		C3D_FrameEnd(0);
@@ -130,5 +127,6 @@ int main(int argc, char* argv[]) {
 	C3D_Fini();
 	gfxExit();
 	romfsExit();
+	ndspExit();
 	return 0;
 }

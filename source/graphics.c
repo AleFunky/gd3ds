@@ -9,7 +9,7 @@ int sprite_count = 0;
 C2D_SpriteSheet spriteSheet;
 C2D_SpriteSheet spriteSheet2;
 C2D_SpriteSheet bgSheet;
-C2D_Sprite bg;
+C2D_SpriteSheet groundSheet;
 
 static SortItem buf_a[MAX_SPRITES];
 static SortItem buf_b[MAX_SPRITES];
@@ -465,6 +465,88 @@ void get_fade_vars(Object *obj, float x, int *fade_x, int *fade_y, float *fade_s
     }
 }
 
+void change_blending(bool blending) {
+	if (blending) {
+		C2D_Flush();
+		C3D_AlphaBlend(
+			GPU_BLEND_ADD, GPU_BLEND_ADD,
+			GPU_SRC_ALPHA, GPU_ONE,
+			GPU_ONE, GPU_ZERO
+		);
+		C2D_Prepare();
+	} else {
+		C2D_Flush();
+		C3D_AlphaBlend(
+			GPU_BLEND_ADD, GPU_BLEND_ADD, 
+			GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, 
+			GPU_ONE, GPU_ZERO);
+		C2D_Prepare();
+	}
+}
+
+void draw_background(float x, float y) {
+	C2D_ImageTint tint = { 0 };
+	Color col = channels[CHANNEL_BG].color;
+	C2D_PlainImageTint(&tint, C2D_Color32(col.r, col.g, col.b, 255), 1.f);
+
+    float offset = 512 * BACKGROUND_SCALE;
+
+    float calc_x = fmodf(x, offset);
+    float calc_y = fmodf(y, offset);
+
+    for (int i = 0; i < 2; i++) {
+		C2D_Sprite bg = { 0 };
+		// Calculate position for each tile
+		float draw_x = -calc_x + i * offset;
+		float draw_y = -calc_y;
+		
+		C2D_SpriteFromSheet(&bg, bgSheet, 0);
+		C2D_SpriteSetPos(&bg, draw_x, draw_y);
+		C2D_SpriteSetScale(&bg, BACKGROUND_SCALE, BACKGROUND_SCALE);
+		C2D_DrawSpriteTinted(&bg, &tint);
+	}
+}
+
+void draw_ground(float y, bool is_ceiling) {
+    int mult = (is_ceiling ? -1 : 1);
+	
+	C2D_ImageTint tint = { 0 };
+	Color col = channels[CHANNEL_GROUND].color;
+	C2D_PlainImageTint(&tint, C2D_Color32(col.r, col.g, col.b, 255), 1.f);
+
+    // First draw the ground
+    float calc_x = 0 - fmodf(cam_x, GROUND_SIZE);
+    float calc_y = SCREEN_HEIGHT - ((y - cam_y));
+
+    for (float i = -GROUND_SIZE; i < (SCREEN_WIDTH / SCALE) + GROUND_SIZE; i += GROUND_SIZE) {
+		C2D_Sprite ground = { 0 };
+		C2D_SpriteFromSheet(&ground, groundSheet, 1);
+		C2D_SpriteSetPos(&ground, floorf(calc_x + i), floorf(calc_y));
+		C2D_SpriteSetScale(&ground, 1.f, mult);
+		C2D_DrawSpriteTinted(&ground, &tint);
+    }
+
+    // Then draw the line
+    if (channels[CHANNEL_LINE].blending) {
+        change_blending(true);
+    }
+
+	col = channels[CHANNEL_LINE].color;
+	C2D_PlainImageTint(&tint, C2D_Color32(col.r, col.g, col.b, 255), 1.f);
+
+	float line_offset = -((GROUND_SIZE / 2) - (LINE_HEIGHT / 2)) * mult;
+    C2D_Sprite line = { 0 };
+	C2D_SpriteFromSheet(&line, groundSheet, 0);
+	C2D_SpriteSetPos(&line, SCREEN_WIDTH / SCALE / 2, floorf((GROUND_SIZE / 2) + calc_y + line_offset));
+	C2D_SpriteSetCenter(&line, 0.5f, 0.5f);
+	C2D_DrawSpriteTinted(&line, &tint);
+
+    if (channels[CHANNEL_LINE].blending) {
+        change_blending(false);
+    }
+}
+
+
 void draw_objects() {
 	sprite_count = 0;
 
@@ -533,21 +615,10 @@ void draw_objects() {
 		}
 		
 		if (col.blending && !blend_enabled) {
-			C2D_Flush();
-			C3D_AlphaBlend(
-				GPU_BLEND_ADD, GPU_BLEND_ADD,
-				GPU_SRC_ALPHA, GPU_ONE,
-				GPU_ONE, GPU_ZERO
-			);
-			C2D_Prepare();
+        	change_blending(true);
 			blend_enabled = true;
 		} else if (!col.blending && blend_enabled) {
-			C2D_Flush();
-			C3D_AlphaBlend(
-				GPU_BLEND_ADD, GPU_BLEND_ADD, 
-				GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, 
-				GPU_ONE, GPU_ZERO);
-			C2D_Prepare();
+        	change_blending(false);
 			blend_enabled = false;
 		}
 

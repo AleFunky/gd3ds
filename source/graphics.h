@@ -7,6 +7,12 @@
 
 #define FADE_WIDTH 75
 
+#define BACKGROUND_SCALE 0.9f
+
+#define GROUND_SIZE 128
+#define LINE_WIDTH 444
+#define LINE_HEIGHT 2
+
 #define MAX_SPRITES   8192
 #define SCALE (SCREEN_HEIGHT / (11.f * 30))
 
@@ -57,6 +63,8 @@ extern int sprite_count;
 extern C2D_SpriteSheet spriteSheet;
 extern C2D_SpriteSheet spriteSheet2;
 extern C2D_SpriteSheet bgSheet;
-extern C2D_Sprite bg;
+extern C2D_SpriteSheet groundSheet;
 
 void draw_objects();
+void draw_background(float x, float y);
+void draw_ground(float y, bool is_ceiling);
