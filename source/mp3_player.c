@@ -14,6 +14,7 @@
 
 static u32 *audioBuffer;
 static LightEvent soundEvent;
+static LightLock decoderLock;
 
 static mpg123_handle* mh;
 static size_t buffSize;
@@ -116,7 +117,9 @@ void audio_thread(void *const file) {
             ndspWaveBuf *buf = &waveBuf[i];
 
             if (buf->status == NDSP_WBUF_DONE || buf->status == NDSP_WBUF_FREE) {
+                LightLock_Lock(&decoderLock);
                 size_t read = decode_mp3(buf->data_pcm16);
+                LightLock_Unlock(&decoderLock);
 
                 if (read == 0) {
                     lastbuf = true;
@@ -166,10 +169,13 @@ int play_mp3(char *path) {
 }
 
 void seek(u32 location) {
-    if(location > mpg123_length(mh)) {
-		return;
-	}
-	mpg123_seek(mh, location, SEEK_SET);
+    LightLock_Lock(&decoderLock);
+
+    if (location <= mpg123_length(mh)) {
+        mpg123_seek(mh, location, SEEK_SET);
+    }
+
+    LightLock_Unlock(&decoderLock);
 }
 
 // Set position in seconds

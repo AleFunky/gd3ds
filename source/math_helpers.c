@@ -1,3 +1,4 @@
+#include <math.h>
 #include "math_helpers.h"
 #include "color_channels.h"
 
@@ -6,6 +7,10 @@ float clampf(float d, float min, float max) {
     return t > max ? max : t;
 }
 
+float positive_fmodf(float n, float divisor) {
+    float value = fmodf(n, divisor);
+    return value + (value < 0 ? divisor : 0);
+}
 
 Color color_lerp(Color color1, Color color2, float fraction) {
     unsigned char r1 = color1.r;

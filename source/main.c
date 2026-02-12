@@ -79,10 +79,10 @@ int main(int argc, char* argv[]) {
 
 	C2D_SetTintMode(C2D_TintMult);
 
-	int returned = load_level("romfs:/xStep.gmd");
+	int returned = load_level("romfs:/Electroman.gmd");
 	if (returned) printf("\x1b[9;1HFailed %d", returned);
 
-	returned = play_mp3("romfs:/songs/xStep.mp3");
+	returned = play_mp3("romfs:/songs/Electroman.mp3");
 
 	printf("\x1b[8;1HUse dpad to move camera");
 	// Main loop

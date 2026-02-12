@@ -491,8 +491,8 @@ void draw_background(float x, float y) {
 
     float offset = 512 * BACKGROUND_SCALE;
 
-    float calc_x = fmodf(x, offset);
-    float calc_y = fmodf(y, offset);
+    float calc_x = positive_fmodf(x, offset);
+    float calc_y = positive_fmodf(y, offset);
 
     for (int i = 0; i < 2; i++) {
 		C2D_Sprite bg = { 0 };
@@ -515,7 +515,7 @@ void draw_ground(float y, bool is_ceiling) {
 	C2D_PlainImageTint(&tint, C2D_Color32(col.r, col.g, col.b, 255), 1.f);
 
     // First draw the ground
-    float calc_x = 0 - fmodf(cam_x, GROUND_SIZE);
+    float calc_x = 0 - positive_fmodf(cam_x, GROUND_SIZE);
     float calc_y = SCREEN_HEIGHT - ((y - cam_y));
 
     for (float i = -GROUND_SIZE; i < (SCREEN_WIDTH / SCALE) + GROUND_SIZE; i += GROUND_SIZE) {
