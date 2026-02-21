@@ -3,6 +3,9 @@
 #include "ui_image.h"
 #include "text.h"
 #include "fonts/bigFont.h"
+#include "ui_button.h"
+#include "easing.h"
+#include "math_helpers.h"
 
 static void ui_button_update(UIElement* e, touchPosition* touch) {
     if (!e->enabled || !e->visible) return;
@@ -18,17 +21,20 @@ static void ui_button_update(UIElement* e, touchPosition* touch) {
         e->button.hovered = true;
     }
     
+    EaseTypes bounce_type;
     // Animation
-    // TODO: replace with bounce in and bounce out
     if (e->button.hovered) {
-        e->button.hoverScale += 0.05f;
-        if (e->button.hoverScale > 1.1f)
-            e->button.hoverScale = 1.1f;
+        e->button.hoverTimer += 1 / 60.f;
+        bounce_type = BOUNCE_OUT;
     } else {
-        e->button.hoverScale -= 0.05f;
-        if (e->button.hoverScale < 1.0f)
-            e->button.hoverScale = 1.0f;
+        e->button.hoverTimer -= 1 / 60.f;
+        // As the animation plays in reverse, we just use bounce in
+        bounce_type = BOUNCE_IN;
     }
+
+    e->button.hoverTimer = clampf(e->button.hoverTimer, 0.f, BUTTON_HOVER_ANIM_TIME);
+    e->button.hoverScale = easeValue(bounce_type, 1.0f, BUTTON_HOVER_SCALE, e->button.hoverTimer, BUTTON_HOVER_ANIM_TIME, 0);
+
 
     // If released on button, do its action
     if (e->button.hovered && releasedTouch) {
@@ -87,7 +93,7 @@ UIElement ui_create_button(
 
     // Copy tag
     strncpy(e.tag, tag, 15);
-    
+
     // Copy text
     strncpy(e.button.text, text, 63);
 

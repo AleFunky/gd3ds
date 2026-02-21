@@ -24,6 +24,8 @@ typedef struct {
 
     bool hovered;
     bool pressed;
+    
+    float hoverTimer;
     float hoverScale;
 
     char text[64];
@@ -35,6 +37,8 @@ typedef struct {
     bool checked;
     bool hovered;
     bool pressed;
+
+    float hoverTimer;
     float hoverScale;
 } UICheckBoxData;
 

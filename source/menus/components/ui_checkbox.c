@@ -3,6 +3,9 @@
 #include "ui_image.h"
 #include "text.h"
 #include "fonts/bigFont.h"
+#include "easing.h"
+#include "math_helpers.h"
+#include "ui_checkbox.h"
 
 static void set_checkbox_texture(UIElement* e, bool enabled) {
     int tex = enabled ? 28 : 27;
@@ -35,17 +38,20 @@ static void ui_checkbox_update(UIElement* e, touchPosition* touch) {
         e->checkbox.hovered = true;
     }
     
+    EaseTypes bounce_type;
     // Animation
-    // TODO: replace with bounce in and bounce out
     if (e->checkbox.hovered) {
-        e->checkbox.hoverScale += 0.05f;
-        if (e->checkbox.hoverScale > 1.1f)
-            e->checkbox.hoverScale = 1.1f;
+        e->checkbox.hoverTimer += 1 / 60.f;
+        bounce_type = BOUNCE_OUT;
     } else {
-        e->checkbox.hoverScale -= 0.05f;
-        if (e->checkbox.hoverScale < 1.0f)
-            e->checkbox.hoverScale = 1.0f;
+        e->checkbox.hoverTimer -= 1 / 60.f;
+        // As the animation plays in reverse, we just use bounce in
+        bounce_type = BOUNCE_IN;
     }
+
+    e->checkbox.hoverTimer = clampf(e->checkbox.hoverTimer, 0.f, CHECKBOX_HOVER_ANIM_TIME);
+    
+    e->checkbox.hoverScale = easeValue(bounce_type, 1.0f, CHECKBOX_HOVER_SCALE, e->checkbox.hoverTimer, CHECKBOX_HOVER_ANIM_TIME, 0);
 
     // If released on checkbox, do its action
     if (e->checkbox.hovered && releasedTouch) {
