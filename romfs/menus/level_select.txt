@@ -5,6 +5,7 @@ image x=284 y=205 id=178 sx=-1.0
 checkbox x=160 y=100 tag="checky,win0"
 
 button x=160 y=140 id=104 action="open_win0" text="Open"
+textbox x=160 y=180 w=200 title="Input random text:"
 
 # Epic window
 window x=160 y=120 w=300 h=100 tag="win0" style=1

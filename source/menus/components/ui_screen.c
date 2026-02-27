@@ -6,6 +6,7 @@
 #include "ui_screen.h"
 #include "ui_checkbox.h"
 #include "ui_window.h"
+#include "ui_textbox.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -262,6 +263,9 @@ void ui_load_screen(UIScreen* screen,
                 split_tags(value, tag);
             } else if (strcmp(key, "checked") == 0) {
                 checked = get_bool(value);
+            } else if (strcmp(key, "title") == 0) {
+                strip_quotes(value);
+                strncpy(text, value, 63);
             }
         }
 
@@ -297,6 +301,12 @@ void ui_load_screen(UIScreen* screen,
             screen->elements[screen->count++] =
                 ui_create_window(
                     x, y, w, h, style,
+                    tag
+                );
+        } else if (strcmp(type, "textbox") == 0) {
+            screen->elements[screen->count++] =
+                ui_create_textbox(
+                    x, y, w, text,
                     tag
                 );
         }

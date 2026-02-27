@@ -11,7 +11,8 @@ typedef enum {
     UI_IMAGE,
     UI_LABEL,
     UI_CHECKBOX,
-    UI_WINDOW
+    UI_WINDOW,
+    UI_TEXTBOX
 } UIElementType;
 
 typedef struct {
@@ -48,9 +49,17 @@ typedef struct {
 
 typedef struct {
     C2D_Image atlas;
-
     int border;
 } UIWindowData;
+
+typedef struct {
+    C2D_Image atlas;
+
+    char title[64];
+    char text[128];
+    int character_limit;
+    int border;
+} UITextbox;
 
 typedef struct {
     char text[256];
@@ -84,6 +93,7 @@ struct UIElement {
         UILabelData label;
         UICheckBoxData checkbox;
         UIWindowData window;
+        UITextbox textbox;
     };
 
     char tag[TAGS_PER_ELEMENT][TAG_LENGTH];

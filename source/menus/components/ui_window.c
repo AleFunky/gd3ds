@@ -17,7 +17,7 @@ static void ui_window_update(UIElement* e, UIInput* touch) {
 }
 
 static void ui_window_draw(UIElement* e) {
-    draw_9_slice(e->window.atlas, e->x, e->y, e->w, e->h, e->window.border, C2D_Color32(255, 255, 255, 127));
+    draw_9_slice(e->window.atlas, e->x, e->y, e->w, e->h, e->window.border, C2D_Color32(255, 255, 255, 255));
 }
 
 UIElement ui_create_window(
