@@ -107,8 +107,6 @@ void action_open_level(void* data) {
 
 void handle_card_movement() {
 	if (scroll_dir != 0) {
-		new_offset = easeValue(ELASTIC_OUT, 0, 320, anim_time, ANIM_DURATION, 0.8f);
-		anim_time += 0.016666f;
 		if (anim_time > ANIM_DURATION) {
 			update_level_name(0);
 			update_level_stars(0);
@@ -122,6 +120,8 @@ void handle_card_movement() {
 			
 			scroll_dir = 0;
 		}
+		new_offset = easeValue(ELASTIC_OUT, 0, 320, anim_time, ANIM_DURATION, 0.8f);
+		anim_time += 0.016666f;
 	}
 }
 
@@ -209,7 +209,7 @@ void level_select_loop() {
     channels[0].color.b = GET_B(color);
 
 	scroll_dir = 0;
-	
+
 	gspWaitForVBlank();
 	GSPGPU_SetLcdForceBlack(0);
 
