@@ -1,0 +1,3 @@
+bggradient tag="gradient"
+window x=200 y=120 w=220 h=200 style=1
+image x=200 y=120 id=239 sx=2.0 sy=2.0 tag="level_face"

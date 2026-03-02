@@ -34,6 +34,21 @@ void ui_image_clear_tint(UIElement* e) {
     e->image.useTint = false;
 }
 
+void ui_image_set_image(UIElement *e, int sprite_index) {
+    if (e->type != UI_IMAGE) return;
+
+    C2D_SpriteFromSheet(&e->image.sprite, ui_sheet, sprite_index);
+
+    float even_sx = closest_even_mult(e->image.sprite.params.pos.w, e->image.scaleX);
+    float even_sy = closest_even_mult(e->image.sprite.params.pos.h, e->image.scaleY);
+
+    e->w = e->image.sprite.params.pos.w * even_sx;
+    e->h = e->image.sprite.params.pos.h * even_sy;
+
+    e->image.scaleX = even_sx;
+    e->image.scaleY = even_sy;
+}
+
 UIElement ui_create_image(int x, int y, int sprite_index, float sx, float sy, char (*tag)[TAG_LENGTH]) {
     UIElement e = {0};
 
@@ -43,19 +58,13 @@ UIElement ui_create_image(int x, int y, int sprite_index, float sx, float sy, ch
     e.enabled = true;
     e.image.useTint = false;
 
-    C2D_SpriteFromSheet(&e.image.sprite, ui_sheet, sprite_index);
+    e.image.scaleX = sx;
+    e.image.scaleY = sy;
 
     // Copy tag
     copy_tag_array(&e, tag);
 
-    float even_sx = closest_even_mult(e.image.sprite.params.pos.w, sx);
-    float even_sy = closest_even_mult(e.image.sprite.params.pos.h, sy);
-
-    e.w = e.image.sprite.params.pos.w * even_sx;
-    e.h = e.image.sprite.params.pos.h * even_sy;
-
-    e.image.scaleX = even_sx;
-    e.image.scaleY = even_sy;
+    ui_image_set_image(&e, sprite_index);
 
     e.update = ui_image_update;
     e.draw = ui_image_draw;
