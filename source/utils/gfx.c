@@ -132,3 +132,33 @@ void draw_9_slice(const C2D_Image atlas, const float x, const float y, const int
 }
 
 #undef TILE
+
+int fade_status = FADE_STATUS_NONE;
+float opacity = 0;
+
+bool handle_fading() {
+    if (!fade_status) return false;
+
+    if (fade_status == FADE_STATUS_OUT) {
+        opacity += FADE_SPEED * (1.f/60);
+        if (opacity >= 255) {
+            opacity = 255;
+            fade_status = FADE_STATUS_NONE;
+        }
+    } else if (fade_status == FADE_STATUS_IN) {
+        opacity -= FADE_SPEED * (1.f/60);
+        if (opacity <= 0) {
+            opacity = 0;
+            fade_status = FADE_STATUS_NONE;
+        }
+    }
+    return true;
+}
+
+void draw_fade() {
+    C2D_Fade(C2D_Color32(0, 0, 0, (int) opacity));
+}
+
+void set_fade_status(int status) {
+    fade_status = status;
+}

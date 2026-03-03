@@ -117,6 +117,7 @@ void update_level_face(int level) {
 }
 
 void action_open_level(void* data) { 
+	set_fade_status(FADE_STATUS_OUT);
 	start_level = true; 
 };
 
@@ -204,6 +205,7 @@ UIAction actions_top[] = {
 };
 
 void level_select_loop() {
+	start_level = false;
 	ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/level_select.txt");
 	ui_load_screen(&screen_top, actions_top, sizeof(actions_top) / sizeof(actions_top[0]), "romfs:/menus/level_select_top.txt");
 
@@ -238,6 +240,8 @@ void level_select_loop() {
 
 	scroll_dir = 0;
 
+	set_fade_status(FADE_STATUS_IN);
+
 		
 	// Set bg color
 	bg_gradient = ui_get_element_by_tag(&screen, "gradient");
@@ -256,11 +260,6 @@ void level_select_loop() {
 		}
 		if (kDown & (KEY_START | KEY_A)) {
 			action_open_level(NULL);
-		}
-        
-		if (start_level) {
-			game_state = STATE_GAME;
-			break;
 		}
 
 		if (exit_flag) {
@@ -286,21 +285,28 @@ void level_select_loop() {
 
 		ui_screen_update(&screen, &touch);
 		ui_screen_update(&screen_top, &touch);
+		do {
+			C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+			C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
+			C2D_SceneBegin(bot);
 
-		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-		C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
-        C2D_SceneBegin(bot);
+			ui_screen_draw(&screen);
+			draw_fade();
 
-		ui_screen_draw(&screen);
+			C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
+			C2D_SceneBegin(top);
 
-		C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
-        C2D_SceneBegin(top);
+			ui_screen_draw(&screen_top);
+			draw_fade();
+			
+			C3D_FrameEnd(0);
+		} while (handle_fading());
 
-		ui_screen_draw(&screen_top);
-		
-		C3D_FrameEnd(0);
+		if (start_level) {
+			game_state = STATE_GAME;
+			break;
+		}
 	}
 	stop_mp3();
 	C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
-	start_level = false;
 }

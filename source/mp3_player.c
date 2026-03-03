@@ -24,6 +24,7 @@ static int audio_channels;
 static volatile bool quit = false;
 static volatile bool looping = false;
 static volatile bool skip = false;
+static volatile bool paused = false;
 
 static Thread threadId = NULL;
 
@@ -66,6 +67,8 @@ void audio_init() {
     ndspChnSetRate(MUSIC_CHANNEL, samplerate_mp3());
     ndspChnSetFormat(MUSIC_CHANNEL, channels_mp3() == 2 ? NDSP_FORMAT_STEREO_PCM16 : NDSP_FORMAT_MONO_PCM16);
     ndspSetCallback(audioCallback, NULL);
+
+    if (paused) ndspChnSetPaused(MUSIC_CHANNEL, paused);
 
     for (int i = 0; i < NUM_BUFS; i++) {
         memset(&waveBuf[i], 0, sizeof(ndspWaveBuf));
@@ -198,8 +201,8 @@ void seek_mp3(float time) {
 
 // Pause or unpause playback
 void toggle_playback_mp3() {
-    bool paused = ndspChnIsPaused(MUSIC_CHANNEL);
-	ndspChnSetPaused(MUSIC_CHANNEL, !paused);
+    paused = !ndspChnIsPaused(MUSIC_CHANNEL);
+	ndspChnSetPaused(MUSIC_CHANNEL, paused);
 }
 
 // Stop playback

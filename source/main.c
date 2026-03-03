@@ -67,15 +67,22 @@ void no_dsp_firmware(void) {
 }
 
 void game_loop() {
+
 	int returned = load_level(main_levels[curr_level_id].gmd_path);
 	if (returned) printf("\x1b[9;1HFailed %d", returned);
 
 	returned = play_mp3(main_levels[curr_level_id].song_path, false);
+	toggle_playback_mp3();
 
 	printf("\x1b[8;1HUse dpad to move camera");
 	cam_x = 0;
     cam_y = 0;
 	current_fading_effect = FADE_NONE;
+
+	set_fade_status(FADE_STATUS_IN);
+
+	bool being_faded = true;
+	bool exiting = false;
 
 	// Main loop
 	while (aptMainLoop()) {
@@ -83,8 +90,10 @@ void game_loop() {
 
 		// Respond to user input
 		u32 kDown = hidKeysDown();
-		if (kDown & KEY_START)
-			break; // break in order to return to hbmenu
+		if (kDown & KEY_START) {
+			exiting = true;
+			set_fade_status(FADE_STATUS_OUT);
+		}
 			
 		if (kDown & KEY_SELECT)
 			seek_mp3(0);
@@ -123,24 +132,36 @@ void game_loop() {
 		printf("\x1b[7;1HCamera:     %.2f %.2f\x1b[K", cam_x, cam_y);
 
 		// Render the scene
-		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-		C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
-		C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ZERO);
-		C2D_SceneBegin(top);
-		
-		draw_background(cam_x / 8, -(cam_y / 8) + 200);
+		do {
+			C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+			C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
+			C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ZERO);
+			C2D_SceneBegin(top);
+			
+			draw_background(cam_x / 8, -(cam_y / 8) + 200);
 
-		C2D_ViewScale(SCALE, SCALE);
+			C2D_ViewScale(SCALE, SCALE);
 
-		draw_objects();
+			draw_objects();
 
-		draw_ground(0, false);
-		C2D_ViewReset();
+			draw_ground(0, false);
+			draw_fade();
+			C2D_ViewReset();
 
-		C2D_SceneBegin(bot);
-		C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
+			C2D_SceneBegin(bot);
+			C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
+			draw_fade();
+			C3D_FrameEnd(0);
+		} while (handle_fading());
 
-		C3D_FrameEnd(0);
+		if (being_faded) {
+			toggle_playback_mp3();
+			being_faded = false;
+		}
+
+		if (exiting) {
+			break;
+		}
 	}
 
 	unload_level();
