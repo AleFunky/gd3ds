@@ -271,6 +271,7 @@ void level_select_loop() {
 		}
 
 		if (kDown & KEY_X) {
+			gspWaitForVBlank();
 			if (++mode == 4) mode = 0;
 			switch (mode) {
 				case 0:
@@ -290,6 +291,7 @@ void level_select_loop() {
 					set_aa(true);
 					break;
 			}
+			gspWaitForVBlank();
 			reinitialize_screens();
 		}
 
