@@ -653,6 +653,9 @@ void draw_objects() {
 		}
 
 		C2D_SpriteMove(&obj->spr, fade_x, fade_y);
+
+		// Cull invisible objects
+		if ((col.color.r | col.color.g | col.color.b) == 0 && blend_enabled) continue;
 		
 		C2D_PlainImageTint(&tint, C2D_Color32(col.color.r, col.color.g, col.color.b, get_opacity(game_object, x) * opacity), 1.f);
 		C2D_DrawSpriteTinted(&obj->spr, &tint);

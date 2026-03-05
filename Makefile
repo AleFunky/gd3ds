@@ -14,7 +14,7 @@ endif
 include $(DEVKITARM)/3ds_rules
 
 # ip address of 3ds for hblauncher/fbi target.
-IP3DS := 192.168.1.142
+IP3DS := 192.168.1.141
 
 #---------------------------------------------------------------------------------
 # Directory Setup
@@ -46,7 +46,7 @@ RSF := $(TOPDIR)/$(RESOURCES)/template.rsf
 ARCH := -march=armv6k -mtune=mpcore -mfloat-abi=hard
 
 COMMON_FLAGS := -g -Wall -Wno-strict-aliasing -O2 -mword-relocations -fomit-frame-pointer \
-	-ffunction-sections -fdata-sections \
+	-ffunction-sections -fdata-sections -ffast-math \
 	$(ARCH) $(INCLUDE) -D__3DS__ $(BUILD_FLAGS) 
 CFLAGS := $(COMMON_FLAGS) -std=gnu11
 CXXFLAGS := $(COMMON_FLAGS) -std=gnu++11
