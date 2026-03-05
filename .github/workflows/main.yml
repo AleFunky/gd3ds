@@ -27,7 +27,11 @@ jobs:
       - name: Publish build to GH Actions
         uses: actions/upload-artifact@v4
         with:
-          name: gd3ds
-          path: |
-            out/3dsx/rom
-            out/cia/rom
+          name: upload-3dsx
+          path: out/3dsx/rom
+      - name: Publish build to GH Actions
+        uses: actions/upload-artifact@v4
+        with:
+          name: upload-cia
+          path: out/cia/rom
+            
