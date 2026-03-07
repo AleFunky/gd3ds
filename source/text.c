@@ -78,7 +78,7 @@ void draw_text(Charset font, C2D_SpriteSheet sheet, const float x, const float y
             int index = character->spriteIndex;
 
             float final_x = x + offset + xoffset - length * alignment;
-            float final_y = y + yoffset - floorf(19 * scale);
+            float final_y = y + yoffset - (int)(19 * scale);
 
             final_x = (scale == 1.0f) ? roundf(final_x) : final_x;
             final_y = (scale == 1.0f) ? roundf(final_y) : final_y;

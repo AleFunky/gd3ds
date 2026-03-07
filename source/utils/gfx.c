@@ -198,9 +198,7 @@ void set_fade_status(int status) {
 }
 
 void scale_view() {
-    if (aaEnabled && !wideEnabled)
-        C2D_ViewScale(2,2);
-    else if (aaEnabled && wideEnabled)
+    if (aaEnabled)
         C2D_ViewScale(2,2);
 }
 

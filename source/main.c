@@ -125,19 +125,10 @@ void game_loop() {
 		handle_triggers();
 		handle_col_triggers();
 		calculate_lbg();
-		
-		printf("\x1b[1;1HSpriteCount: %d\x1b[K", sprite_count);
-		printf("\x1b[2;1HCPU:        %6.2f%%\x1b[K", C3D_GetProcessingTime()*6.0f);
-		printf("\x1b[3;1HGPU:        %6.2f%%\x1b[K", C3D_GetDrawingTime()*6.0f);
-		printf("\x1b[4;1HCmdBuf:     %6.2f%%\x1b[K", C3D_GetCmdBufUsage()*100.0f);
-		printf("\x1b[5;1HLinear:     %zu\x1b[K", (int)(linearSpaceFree()));
-		printf("\x1b[6;1HTotalHeap:  %lu\x1b[K", envGetHeapSize());
-		printf("\x1b[7;1HCamera:     %.2f %.2f\x1b[K", cam_x, cam_y);
 
 		// Render the scene
 		do {
 			C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-			C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
 			C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ZERO);
 			C2D_SceneBegin(top);
 			scale_view();

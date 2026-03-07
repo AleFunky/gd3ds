@@ -150,8 +150,10 @@ void audio_thread(void *const file) {
         if (lastbuf)
             break;
 
-        if (ndspChnIsPaused(MUSIC_CHANNEL))
+        if (ndspChnIsPaused(MUSIC_CHANNEL)) {
+            LightEvent_Wait(&soundEvent);
             continue;
+        }
 
         LightEvent_Wait(&soundEvent);
     }

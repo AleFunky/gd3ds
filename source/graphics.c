@@ -62,11 +62,9 @@ static void spawn_sprite_c2d(
 ) {
     C2D_SpriteFromSheet(out, *sheet, texture);
     C2D_SpriteSetCenter(out, 0.5f, 0.5f);
-    C2D_SpriteSetPos(out, x, y);
+    C2D_SpriteSetPos(out, (int)x, (int)y);
     C2D_SpriteSetScale(out, scale_x, scale_y);
     C2D_SpriteSetRotation(out, C3D_AngleFromDegrees(rotation));
-	
-	C3D_TexSetFilter(out->image.tex, GPU_NEAREST, GPU_NEAREST);
 }
 
 int get_color_channel(int col_type, Object *obj, const GameObject *game_obj) {
@@ -120,24 +118,33 @@ void spawn_object_at(
 	float scale
 ) {
 	const GameObject* obj = &game_objects[id];
-	if (!obj)
-		return;
 
-	float cos_r = cosf(C3D_AngleFromDegrees(deg));
-	float sin_r = sinf(C3D_AngleFromDegrees(deg));
+	float rad = C3D_AngleFromDegrees(deg);
+	float cos_r = cosf(rad);
+	float sin_r = sinf(rad);
 
 	int flip_x_mult = (flip_x ? -1 : 1);
 	int flip_y_mult = (flip_y ? -1 : 1);
 
-	// Skip if no texture
-	if (obj->texture >= 0 && sprite_count < MAX_SPRITES - 1) {
-		C2D_Sprite root = { 0 };
+	float m00 = cos_r;
+	float m01 = sin_r;
+	float m10 = sin_r;
+	float m11 = -cos_r;
 
+	float sx = scale * flip_x_mult;
+	float sy = scale * flip_y_mult;
+
+	C2D_Sprite root;
+
+	if (sprite_count >= MAX_SPRITES - 1) return;
+
+	// Skip if no texture
+	if (obj->texture >= 0) {
 		float local_x = obj->x * flip_x_mult;
 		float local_y = obj->y * flip_y_mult;
 
-		float rot_x = local_x * cos_r + local_y * sin_r;
-		float rot_y = local_x * sin_r - local_y * cos_r;
+		float rot_x = local_x * m00 + local_y * m01;
+		float rot_y = local_x * m10 + local_y * m11;
 
 		float p_x = x + rot_x * scale;
 		float p_y = y + rot_y * scale;
@@ -149,35 +156,38 @@ void spawn_object_at(
 			&root,
 			sheet,
 			texture,
-			floorf(p_x),
-			floorf(p_y),
-			scale * flip_x_mult, 
-			scale * flip_y_mult,
+			p_x,
+			p_y,
+			sx, 
+			sy,
 			deg
 		);
+		
+		SpriteObject *vo = &viewable_objects[sprite_count];
 
-		viewable_objects[sprite_count].spr = root;
-		viewable_objects[sprite_count].obj = obj_game;
-		viewable_objects[sprite_count].layer = 0;
-		viewable_objects[sprite_count].col_type = obj->color_type;
-		viewable_objects[sprite_count].opacity = obj->opacity;
-		viewable_objects[sprite_count].col_channel = get_color_channel(obj->color_type, obj_game, obj);
-		viewable_objects_ptr[sprite_count] = &viewable_objects[sprite_count];
+		vo->spr = root;
+		vo->obj = obj_game;
+		vo->layer = 0;
+		vo->col_type = obj->color_type;
+		vo->opacity = obj->opacity;
+		vo->col_channel = get_color_channel(obj->color_type, obj_game, obj);
+		viewable_objects_ptr[sprite_count] = vo;
 		sprite_count++;
 	}
 
     // Render children
     for (int i = 0; i < obj->child_count; i++) {
         const ChildSprite* c = &obj->children[i];
-        C2D_Sprite rs = { 0 };
+		
+		if (sprite_count >= MAX_SPRITES - 1) return;
 		
 		// Skip if no texture
-		if (c->texture >= 0 && sprite_count < MAX_SPRITES - 1) {
+		if (c->texture >= 0) {
 			float c_local_x = c->x * flip_x_mult;
 			float c_local_y = c->y * flip_y_mult;
 
-			float c_rot_x = c_local_x * cos_r + c_local_y * sin_r;
-			float c_rot_y = c_local_x * sin_r - c_local_y * cos_r;
+			float c_rot_x = c_local_x * m00 + c_local_y * m01;
+			float c_rot_y = c_local_x * m10 + c_local_y * m11;
 
 			float c_x = x + c_rot_x * scale;
 			float c_y = y + c_rot_y * scale;
@@ -189,23 +199,25 @@ void spawn_object_at(
 			C2D_SpriteSheet *sheet = get_sprite_sheet(c->texture, &texture);
 
 			spawn_sprite_c2d(
-				&rs,
+				&root,
 				sheet,
 				texture,
-				floorf(c_x),
-				floorf(c_y),
-				c->scale_x * c_flip_x_mult * scale * flip_x_mult,
-				c->scale_y * c_flip_y_mult * scale * flip_y_mult,
+				c_x,
+				c_y,
+				c->scale_x * c_flip_x_mult * sx,
+				c->scale_y * c_flip_y_mult * sy,
 				c->rot + deg
 			);
+				
+			SpriteObject *vo = &viewable_objects[sprite_count];
 
-			viewable_objects[sprite_count].spr = rs;
-			viewable_objects[sprite_count].obj = obj_game;
-			viewable_objects[sprite_count].layer = i + 1;
-			viewable_objects[sprite_count].col_type = c->color_type;
-			viewable_objects[sprite_count].opacity = c->opacity;
-			viewable_objects[sprite_count].col_channel = get_color_channel(c->color_type, obj_game, obj);
-			viewable_objects_ptr[sprite_count] = &viewable_objects[sprite_count];
+			vo->spr = root;
+			vo->obj = obj_game;
+			vo->layer = i + 1;
+			vo->col_type = c->color_type;
+			vo->opacity = c->opacity;
+			vo->col_channel = get_color_channel(c->color_type, obj_game, obj);
+			viewable_objects_ptr[sprite_count] = vo;
 			sprite_count++;
 		}
     }
@@ -504,7 +516,7 @@ void draw_background(float x, float y) {
 		float draw_y = -calc_y;
 		
 		C2D_SpriteFromSheet(&bg, bgSheet, 0);
-		C2D_SpriteSetPos(&bg, draw_x, draw_y);
+		C2D_SpriteSetPos(&bg, (int)draw_x, (int)draw_y);
 		C2D_SpriteSetScale(&bg, BACKGROUND_SCALE, BACKGROUND_SCALE);
 		C2D_DrawSpriteTinted(&bg, &tint);
 	}
@@ -524,7 +536,7 @@ void draw_ground(float y, bool is_ceiling) {
     for (float i = -GROUND_SIZE; i < (SCREEN_WIDTH / SCALE) + GROUND_SIZE; i += GROUND_SIZE) {
 		C2D_Sprite ground = { 0 };
 		C2D_SpriteFromSheet(&ground, groundSheet, 1);
-		C2D_SpriteSetPos(&ground, floorf(calc_x + i), floorf(calc_y));
+		C2D_SpriteSetPos(&ground, (int)calc_x + i, (int)calc_y);
 		C2D_SpriteSetScale(&ground, 1.f, mult);
 		C2D_DrawSpriteTinted(&ground, &tint);
     }
@@ -540,7 +552,7 @@ void draw_ground(float y, bool is_ceiling) {
 	float line_offset = -((GROUND_SIZE / 2) - (LINE_HEIGHT / 2)) * mult;
     C2D_Sprite line = { 0 };
 	C2D_SpriteFromSheet(&line, groundSheet, 0);
-	C2D_SpriteSetPos(&line, SCREEN_WIDTH / SCALE / 2, floorf((GROUND_SIZE / 2) + calc_y + line_offset));
+	C2D_SpriteSetPos(&line, SCREEN_WIDTH / SCALE / 2, (int)((GROUND_SIZE / 2) + calc_y + line_offset));
 	C2D_SpriteSetCenter(&line, 0.5f, 0.5f);
 	C2D_DrawSpriteTinted(&line, &tint);
 

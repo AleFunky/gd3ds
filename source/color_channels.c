@@ -263,33 +263,31 @@ void run_trigger(Object *obj) {
 void handle_triggers() {
     int cam_sx = (int)((cam_x + SCREEN_WIDTH / 2) / SECTION_SIZE);
     
-    for (int x = -1; x < 2; x++) {
-        int section = cam_sx + x;
-        if (section < 0) continue;
+    int section = cam_sx;
+    if (section < 0) return;
 
-        Section *sec = get_or_create_section(section);
-        for (int i = 0; i < sec->object_count; i++) {
-            Object *obj = sec->objects[i];
-            
-            if (!obj->activated && !obj->touch_triggered) {
-                //if (obj->touch_triggered) {
-                //    // Try p1
-                //    if (intersect(
-                //        player->x, player->y, player->width, player->height, 0, 
-                //        *soa_x(obj), *soa_y(obj), obj->width, obj->height, obj->rotation
-                //    )) {
-                //        run_trigger(obj);
-                //    } else
-                //    // Try now p2
-                //    if (intersect(
-                //        player_2->x, player_2->y, player_2->width, player_2->height, 0, 
-                //        *soa_x(obj), *soa_y(obj), obj->width, obj->height, obj->rotation
-                //    )) {
-                //        run_trigger(obj);
-                //    }
-                if (obj->x < cam_x + SCREEN_WIDTH / 2) {
-                    run_trigger(obj);
-                }
+    Section *sec = get_or_create_section(section);
+    for (int i = 0; i < sec->object_count; i++) {
+        Object *obj = sec->objects[i];
+        
+        if (!obj->activated && !obj->touch_triggered) {
+            //if (obj->touch_triggered) {
+            //    // Try p1
+            //    if (intersect(
+            //        player->x, player->y, player->width, player->height, 0, 
+            //        *soa_x(obj), *soa_y(obj), obj->width, obj->height, obj->rotation
+            //    )) {
+            //        run_trigger(obj);
+            //    } else
+            //    // Try now p2
+            //    if (intersect(
+            //        player_2->x, player_2->y, player_2->width, player_2->height, 0, 
+            //        *soa_x(obj), *soa_y(obj), obj->width, obj->height, obj->rotation
+            //    )) {
+            //        run_trigger(obj);
+            //    }
+            if (obj->x < cam_x + SCREEN_WIDTH / 2) {
+                run_trigger(obj);
             }
         }
     }
