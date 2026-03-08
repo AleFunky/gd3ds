@@ -109,6 +109,10 @@ void handle_col_channel(int chan) {
     }
 }
 
+ColTriggerBuffer *get_buffer(int chan) {
+    return &col_trigger_buffer[chan];
+}
+
 void handle_col_triggers() {
     for (int chan = 1; chan < COL_CHANNEL_NUM; chan++) {
         handle_col_channel(chan);

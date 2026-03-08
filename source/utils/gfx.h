@@ -8,6 +8,12 @@
 inline float closest_even_mult(float value, float mult)
 {
     float r = value * mult;
+    int ri = (int)r;
+
+    if (!(ri & 1)) {
+        return mult;
+    }
+    
     int n = (int)roundf(r);
 
     if (n & 1)

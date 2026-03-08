@@ -34,13 +34,13 @@ void ui_image_clear_tint(UIElement* e) {
     e->image.useTint = false;
 }
 
-void ui_image_set_image(UIElement *e, int sprite_index) {
+void ui_image_set_image(UIElement *e, int sprite_index, int sheet) {
     if (e->type != UI_IMAGE) return;
 
-    C2D_SpriteFromSheet(&e->image.sprite, ui_sheet, sprite_index);
+    C2D_SpriteFromSheet(&e->image.sprite, *get_sheet(sheet), sprite_index);
 
-    float even_sx = closest_even_mult(e->image.sprite.params.pos.w, e->image.scaleX);
-    float even_sy = closest_even_mult(e->image.sprite.params.pos.h, e->image.scaleY);
+    float even_sx = closest_even_mult(e->button.image.sprite.image.subtex->width, e->image.scaleX);
+    float even_sy = closest_even_mult(e->button.image.sprite.image.subtex->height, e->image.scaleY);
 
     e->w = e->image.sprite.params.pos.w * even_sx;
     e->h = e->image.sprite.params.pos.h * even_sy;
@@ -49,7 +49,7 @@ void ui_image_set_image(UIElement *e, int sprite_index) {
     e->image.scaleY = even_sy;
 }
 
-UIElement ui_create_image(int x, int y, int sprite_index, float sx, float sy, char (*tag)[TAG_LENGTH]) {
+UIElement ui_create_image(int x, int y, int sprite_index, int sheet, float sx, float sy, char (*tag)[TAG_LENGTH]) {
     UIElement e = {0};
 
     e.type = UI_IMAGE;
@@ -64,7 +64,7 @@ UIElement ui_create_image(int x, int y, int sprite_index, float sx, float sy, ch
     // Copy tag
     copy_tag_array(&e, tag);
 
-    ui_image_set_image(&e, sprite_index);
+    ui_image_set_image(&e, sprite_index, sheet);
 
     e.update = ui_image_update;
     e.draw = ui_image_draw;

@@ -1,0 +1,5 @@
+button x=160 y=100 id=1 sheet=1 action="level_select"
+button x=60 y=120 id=79 action="none"
+button x=260 y=120 id=2 sheet=1 action="none"
+button x=100 y=200 id=102 action="none" text="Settings" action="none"
+button x=220 y=200 id=102 action="none" text="Credits" action="none"

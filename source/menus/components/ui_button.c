@@ -66,8 +66,8 @@ static void ui_button_update(UIElement* e, UIInput* touch) {
 static void ui_button_draw(UIElement* e) {
     float scale = e->button.hoverScale;
 
-    float even_sx = closest_even_mult(e->button.image.sprite.params.pos.w, scale * e->button.scaleX);
-    float even_sy = closest_even_mult(e->button.image.sprite.params.pos.h, scale * e->button.scaleY);
+    float even_sx = closest_even_mult(e->button.image.sprite.image.subtex->width, scale * e->button.scaleX);
+    float even_sy = closest_even_mult(e->button.image.sprite.image.subtex->height, scale * e->button.scaleY);
 
     C2D_SpriteSetCenter(&e->button.image.sprite, 0.5f, 0.5f);
     C2D_SpriteSetPos(&e->button.image.sprite, e->x, e->y);
@@ -89,7 +89,7 @@ static void ui_button_draw(UIElement* e) {
 }
 
 UIElement ui_create_button(
-    int x, int y, float sx, float sy, int sprite_index, 
+    int x, int y, float sx, float sy, int sprite_index, int sheet, 
     UIActionFn action,
     void *action_data,
     char *text,
@@ -112,7 +112,7 @@ UIElement ui_create_button(
     // Copy text
     strncpy(e.button.text, text, 63);
 
-    C2D_SpriteFromSheet(&e.button.image.sprite, ui_sheet, sprite_index);
+    C2D_SpriteFromSheet(&e.button.image.sprite, *get_sheet(sheet), sprite_index);
     
     e.button.hoverScale = 1.f;
     e.w = fabsf(e.button.image.sprite.params.pos.w * sx);

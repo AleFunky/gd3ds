@@ -79,3 +79,4 @@ void handle_triggers();
 void upload_color_to_buffer(int channel, u32 color, float seconds);
 void upload_to_buffer(Object *obj, int channel);
 int convert_one_point_nine_channel(int channel);
+ColTriggerBuffer *get_buffer(int chan);

@@ -522,7 +522,7 @@ void draw_background(float x, float y) {
 	}
 }
 
-void draw_ground(float y, bool is_ceiling) {
+void draw_ground(float cam_x, float cam_y, float y, bool is_ceiling, int screen_width) {
     int mult = (is_ceiling ? -1 : 1);
 	
 	C2D_ImageTint tint = { 0 };
@@ -533,7 +533,7 @@ void draw_ground(float y, bool is_ceiling) {
     float calc_x = 0 - positive_fmodf(cam_x, GROUND_SIZE);
     float calc_y = SCREEN_HEIGHT - ((y - cam_y));
 
-    for (float i = -GROUND_SIZE; i < (SCREEN_WIDTH / SCALE) + GROUND_SIZE; i += GROUND_SIZE) {
+    for (float i = -GROUND_SIZE; i < (screen_width / SCALE) + GROUND_SIZE; i += GROUND_SIZE) {
 		C2D_Sprite ground = { 0 };
 		C2D_SpriteFromSheet(&ground, groundSheet, 1);
 		C2D_SpriteSetPos(&ground, (int)calc_x + i, (int)calc_y);
@@ -552,7 +552,7 @@ void draw_ground(float y, bool is_ceiling) {
 	float line_offset = -((GROUND_SIZE / 2) - (LINE_HEIGHT / 2)) * mult;
     C2D_Sprite line = { 0 };
 	C2D_SpriteFromSheet(&line, groundSheet, 0);
-	C2D_SpriteSetPos(&line, SCREEN_WIDTH / SCALE / 2, (int)((GROUND_SIZE / 2) + calc_y + line_offset));
+	C2D_SpriteSetPos(&line, screen_width / SCALE / 2, (int)((GROUND_SIZE / 2) + calc_y + line_offset));
 	C2D_SpriteSetCenter(&line, 0.5f, 0.5f);
 	C2D_DrawSpriteTinted(&line, &tint);
 

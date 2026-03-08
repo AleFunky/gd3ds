@@ -13,14 +13,15 @@
 #include "color_channels.h"
 #include "mp3_player.h"
 #include "graphics.h"
+#include "level_select.h"
 
 #include "level/main_levels.h"
 
-UIScreen screen_top;
-UIScreen screen;
+static UIScreen screen_top;
+static UIScreen screen;
 
-bool start_level = false;
-bool exit_flag = false;
+static bool start_level = false;
+static bool exit_flag = false;
 
 int curr_level_id = 0;
 
@@ -47,8 +48,6 @@ UIElement *level_card_2_face = NULL;
 #define ANIM_DURATION 0.8f
 
 #define C2D_Color32Const(r, g, b, a) (r | (g << (u32)8) | (b << (u32)16) | (a << (u32)24))
-
-#define NUM_COLORS 9
 
 const u32 default_lvl_colors[] = {
     C2D_Color32Const(0, 0, 232, 255),
@@ -114,7 +113,7 @@ void update_level_face(int level) {
 	if (level < 0) level = MAIN_LEVELS_NUM-1;
 	if (level >= MAIN_LEVELS_NUM) level = 0;
 
-	ui_image_set_image(level_card_face, 239 + main_levels[level].difficulty);
+	ui_image_set_image(level_card_face, 239 + main_levels[level].difficulty, 0);
 }
 
 void action_open_level(void* data) { 
@@ -156,7 +155,7 @@ void action_move_right(void* data) {
 	ui_run_func_on_tag(&screen, "level_card_2", enable_card_2);
 	ui_run_func_on_tag(&screen, "level_card_2", level_card_move_right);
 	
-	upload_color_to_buffer(0, default_lvl_colors[curr_level_id % NUM_COLORS], ANIM_DURATION);
+	upload_color_to_buffer(0, default_lvl_colors[curr_level_id % NUM_MENU_COLORS], ANIM_DURATION);
 
 	update_level_name(curr_level_id - 1, 0);
 	update_level_stars(curr_level_id - 1, 0);
@@ -179,7 +178,7 @@ void action_move_left(void* data) {
 	ui_run_func_on_tag(&screen, "level_card_2", enable_card_2);
 	ui_run_func_on_tag(&screen, "level_card_2", level_card_move_left);
 
-	upload_color_to_buffer(0, default_lvl_colors[curr_level_id % NUM_COLORS], ANIM_DURATION);
+	upload_color_to_buffer(0, default_lvl_colors[curr_level_id % NUM_MENU_COLORS], ANIM_DURATION);
 
 	update_level_name(curr_level_id + 1, 0);
 	update_level_stars(curr_level_id + 1, 0);
@@ -192,16 +191,17 @@ void action_move_left(void* data) {
 
 void action_exit(void* data) {
 	exit_flag = true;
+	set_fade_status(FADE_STATUS_OUT);
 }
 
-UIAction actions[] = {
+static UIAction actions[] = {
     {"open_level", action_open_level},
     {"exit", action_exit},
     {"move_right", action_move_right},
     {"move_left", action_move_left}
 };
 
-UIAction actions_top[] = {
+static UIAction actions_top[] = {
 
 };
 
@@ -209,6 +209,7 @@ int mode = 0;
 
 void level_select_loop() {
 	start_level = false;
+	exit_flag = false;
 	ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/level_select.txt");
 	ui_load_screen(&screen_top, actions_top, sizeof(actions_top) / sizeof(actions_top[0]), "romfs:/menus/level_select_top.txt");
 
@@ -235,7 +236,7 @@ void level_select_loop() {
 	
 	ui_run_func_on_tag(&screen, "level_card_2", disable_card_2);
 
-	u32 color = default_lvl_colors[curr_level_id % NUM_COLORS];
+	u32 color = default_lvl_colors[curr_level_id % NUM_MENU_COLORS];
 
 	channels[0].color.r = GET_R(color);
     channels[0].color.g = GET_G(color);
@@ -244,13 +245,15 @@ void level_select_loop() {
 	scroll_dir = 0;
 
 	set_fade_status(FADE_STATUS_IN);
-
 		
 	// Set bg color
 	bg_gradient = ui_get_element_by_tag(&screen, "gradient");
 	bg_gradient_top = ui_get_element_by_tag(&screen_top, "gradient");
 
-	play_mp3("romfs:/songs/menuLoop.mp3", true);
+	if (!playing_menu_loop) {
+		play_mp3("romfs:/songs/menuLoop.mp3", true);
+		playing_menu_loop = true;
+	}
 
 	while (aptMainLoop()) {
 		hidScanInput();
@@ -261,13 +264,11 @@ void level_select_loop() {
 		if (kDown & KEY_RIGHT) {
 			action_move_right(NULL);
 		}
+		if (kDown & KEY_B) {
+			action_exit(NULL);
+		}
 		if (kDown & (KEY_START | KEY_A)) {
 			action_open_level(NULL);
-		}
-
-		if (exit_flag) {
-			game_state = STATE_EXIT;
-			break; // break in order to return to hbmenu
 		}
 
 		if (kDown & KEY_X) {
@@ -335,10 +336,15 @@ void level_select_loop() {
 		} while (handle_fading());
 
 		if (start_level) {
+			stop_mp3();
 			game_state = STATE_GAME;
 			break;
 		}
+
+		if (exit_flag) {
+			game_state = STATE_MAIN_MENU;
+			break;
+		}
 	}
-	stop_mp3();
 	C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
 }

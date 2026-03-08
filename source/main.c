@@ -17,6 +17,7 @@
 
 #include <curl/curl.h>
 
+#include "menus/main_menu.h"
 #include "menus/level_select.h"
 #include "menus/components/ui_screen.h"
 
@@ -26,7 +27,9 @@
 float cam_x = 0;
 float cam_y = 0;
 
-int game_state = STATE_LEVEL_SELECT;
+int game_state = STATE_MAIN_MENU;
+
+bool playing_menu_loop = false;
 
 PrintConsole console;
 
@@ -139,7 +142,7 @@ void game_loop() {
 
 			draw_objects();
 
-			draw_ground(0, false);
+			draw_ground(cam_x, cam_y, 0, false, SCREEN_WIDTH);
 			draw_fade();
 			C2D_ViewReset();
 
@@ -205,6 +208,9 @@ int main(int argc, char* argv[]) {
 	bool exit = false;
 	while (aptMainLoop() && !exit) {
 		switch (game_state) {
+			case STATE_MAIN_MENU:
+				main_menu_loop();
+				break;
 			case STATE_LEVEL_SELECT:
 				level_select_loop();
 				break;

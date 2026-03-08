@@ -18,15 +18,29 @@
 #include <citro2d.h>
 
 C2D_SpriteSheet ui_sheet;
+C2D_SpriteSheet ui_2_sheet;
 C2D_SpriteSheet window_sheet;
 C2D_SpriteSheet bigFont_sheet;
 C2D_SpriteSheet bg_gradient_sheet;
 
 void ui_assets_init() {
     ui_sheet = C2D_SpriteSheetLoad("romfs:/gfx/ui.t3x");
+    ui_2_sheet = C2D_SpriteSheetLoad("romfs:/gfx/ui_2.t3x");
     window_sheet = C2D_SpriteSheetLoad("romfs:/gfx/windows.t3x");
     bigFont_sheet = C2D_SpriteSheetLoad("romfs:/gfx/bigFont.t3x");
     bg_gradient_sheet = C2D_SpriteSheetLoad("romfs:/gfx/bg_gradient.t3x");
+}
+
+C2D_SpriteSheet *get_sheet(int sheet) {
+    switch (sheet) {
+        case 0:
+            return &ui_sheet;
+        case 1:
+            return &ui_2_sheet;
+        case 2:
+            return &window_sheet;
+    }
+    return NULL;
 }
 
 // Update all screen characters
@@ -244,6 +258,7 @@ void ui_load_screen(UIScreen* screen,
         float align = 0.f;
         bool checked = false;
         int style = 0;
+        int sheet = 0;
         int w = 0, h = 0;
         int limit = 16;
 
@@ -276,6 +291,8 @@ void ui_load_screen(UIScreen* screen,
                 id = atoi(value);
             else if (strcmp(key, "style") == 0)
                 style = atoi(value);
+            else if (strcmp(key, "sheet") == 0)
+                sheet = atoi(value);
             else if (strcmp(key, "sx") == 0)
                 sx = atof(value);
             else if (strcmp(key, "sy") == 0)
@@ -319,7 +336,7 @@ void ui_load_screen(UIScreen* screen,
         if (strcmp(type, "button") == 0) {
             screen->elements[screen->count++] =
                 ui_create_button(
-                    x, y, sx, sy, id,
+                    x, y, sx, sy, id, sheet,
                     ui_find_action(actions, actionCount, actionName),
                     NULL,
                     text,
@@ -327,7 +344,7 @@ void ui_load_screen(UIScreen* screen,
                 );
         } else if (strcmp(type, "image") == 0) {
             screen->elements[screen->count++] =
-                ui_create_image(x, y, id, sx, sy, tag);
+                ui_create_image(x, y, id, sheet, sx, sy, tag);
         } else if (strcmp(type, "label") == 0) {
             screen->elements[screen->count++] =
                 ui_create_label(x, y, scale, text, align, tag);

@@ -70,4 +70,4 @@ extern C2D_SpriteSheet groundSheet;
 
 void draw_objects();
 void draw_background(float x, float y);
-void draw_ground(float y, bool is_ceiling);
+void draw_ground(float cam_x, float cam_y, float y, bool is_ceiling, int screen_width);
