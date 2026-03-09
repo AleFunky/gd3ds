@@ -647,24 +647,26 @@ void draw_objects() {
         	change_blending(false);
 			blend_enabled = false;
 		}
-
-		Object *game_object = obj->obj;
 		
+		Object *game_object = obj->obj;
 		float x = ((game_object->x - cam_x));
-
-		int fade_x = 0;
-		int fade_y = 0;
-
-		float fade_scale = 1.f;
-
-		get_fade_vars(game_object, x, &fade_x, &fade_y, &fade_scale);
-
+		
 		float opacity = obj->opacity;
 		if (object_fades(game_object)) {
 			opacity *= get_fading_obj_fade(game_object, x, SCREEN_WIDTH / SCALE);
 		}
+		
+		if (game_object->transition_applied >= FADE_UP_SLOW) {
+			int fade_x = 0;
+			int fade_y = 0;
 
-		C2D_SpriteMove(&obj->spr, fade_x, fade_y);
+			float fade_scale = 1.f;
+
+			get_fade_vars(game_object, x, &fade_x, &fade_y, &fade_scale);
+
+
+			C2D_SpriteMove(&obj->spr, fade_x, fade_y);
+		}
 
 		// Cull invisible objects
 		if ((col.color.r | col.color.g | col.color.b) == 0 && blend_enabled) continue;

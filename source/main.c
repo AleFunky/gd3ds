@@ -133,6 +133,8 @@ void game_loop() {
 		do {
 			C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 			C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ZERO);
+			
+			// Top screen
 			C2D_SceneBegin(top);
 			scale_view();
 			
@@ -144,8 +146,9 @@ void game_loop() {
 
 			draw_ground(cam_x, cam_y, 0, false, SCREEN_WIDTH);
 			draw_fade();
-			C2D_ViewReset();
+			C2D_ViewScale(1/SCALE, 1/SCALE);
 
+			// Bottom screen
 			C2D_SceneBegin(bot);
 			C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
 			
@@ -153,6 +156,8 @@ void game_loop() {
 			draw_text(bigFont_fontCharset, bigFont_sheet, 0, 18, 0.5f, 0, "GPU: %6.2f%%", C3D_GetDrawingTime() * 6.25f);
 			draw_text(bigFont_fontCharset, bigFont_sheet, 0, 30, 0.5f, 0, "Usage: %6.2f%%", (C3D_GetProcessingTime() + C3D_GetDrawingTime()) * 6.25f);
 			draw_fade();
+			C2D_ViewReset();
+
 			C3D_FrameEnd(0);
 		} while (handle_fading());
 

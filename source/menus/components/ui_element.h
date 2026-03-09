@@ -15,7 +15,8 @@ typedef enum {
     UI_WINDOW,
     UI_TEXTBOX,
     UI_LIST,
-    UI_ACTION_AREA
+    UI_ACTION_AREA,
+    UI_DARKEN
 } UIElementType;
 
 typedef struct {
@@ -46,6 +47,8 @@ typedef struct {
     UIImageData image;
 
     bool checked;
+    u8 image_id;
+
     bool hovered;
     bool pressed;
 
@@ -85,6 +88,12 @@ typedef struct {
     bool interacted;
 } UIInput;
 
+typedef struct {
+    C2D_Sprite sprite;
+    C2D_ImageTint tint;
+    float opacity;
+} UIDarken;
+
 typedef struct UIElement UIElement;
 
 #define UI_LIST_MAX_ITEMS 64
@@ -100,7 +109,7 @@ typedef struct {
     bool dragging;
 } UIList;
 
-typedef void (*UIActionFn)(void* userdata);
+typedef void (*UIActionFn)(UIElement* e);
 
 struct UIElement {
     UIElementType type;
@@ -111,7 +120,6 @@ struct UIElement {
     bool enabled;
 
     UIActionFn action;
-    void* action_data;
 
     union {
         UIImageData image;
@@ -122,6 +130,7 @@ struct UIElement {
         UITextbox textbox;
         UIList list;
         UIActionAreaData action_area;
+        UIDarken darken;
     };
 
     char tag[TAGS_PER_ELEMENT][TAG_LENGTH];

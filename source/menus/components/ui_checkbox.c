@@ -66,8 +66,7 @@ static void ui_checkbox_update(UIElement* e, UIInput* touch) {
         e->checkbox.hoverTimer = 0.f;
         e->checkbox.hoverScale = 1.f;
         if (e->action)
-            e->action(e->action_data);
-        set_checkbox_texture(e, e->checkbox.checked);
+            e->action(e);
     }
     
     // Unpress the checkbox
@@ -79,6 +78,11 @@ static void ui_checkbox_update(UIElement* e, UIInput* touch) {
     if (inside) {
         touch->interacted = true;
         touch->did_something = true;
+    }
+
+    if (e->checkbox.checked != e->checkbox.image_id) {
+        set_checkbox_texture(e, e->checkbox.checked);
+        e->checkbox.image_id = e->checkbox.checked;
     }
 }
 
@@ -94,7 +98,6 @@ static void ui_checkbox_draw(UIElement* e) {
 UIElement ui_create_checkbox(
     int x, int y, bool enabled,
     UIActionFn action,
-    void *action_data,
     char (*tag)[TAG_LENGTH]
 ) {
     UIElement e = {
@@ -103,7 +106,6 @@ UIElement ui_create_checkbox(
         .w = 0, .h = 0,
         .enabled = true,
         .action = action,
-        .action_data = action_data,
         .update = ui_checkbox_update,
         .draw = ui_checkbox_draw
     };

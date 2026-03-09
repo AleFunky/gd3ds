@@ -1,0 +1,13 @@
+darken opacity=0.4
+button x=20 y=20 id=6 action="exit"
+window x=160 y=120 w=220 h=180 style=0
+
+# Checkboxes
+
+label x=160 y=55 text="Graphics" tag="page1" align=CENTER
+
+checkbox x=80 y=85 tag="page1,chk_wide" action="wide"
+label x=100 y=85 text="800px res" scale=0.7 tag="page1"
+
+checkbox x=80 y=125 tag="page1,chk_aa" action="aa"
+label x=100 y=125 text="AntiAliasing" scale=0.7 tag="page1"

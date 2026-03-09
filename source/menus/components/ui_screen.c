@@ -10,6 +10,7 @@
 #include "ui_list.h"
 #include "ui_bg_gradient.h"
 #include "ui_action_area.h"
+#include "ui_darken.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -271,6 +272,7 @@ void ui_load_screen(UIScreen* screen,
         int sheet = 0;
         int w = 0, h = 0;
         int limit = 16;
+        float opacity = 1.0f;
 
         // Some strings
         char actionName[64] = {0};
@@ -335,6 +337,8 @@ void ui_load_screen(UIScreen* screen,
                 strncpy(text, value, 63);
             } else if (strcmp(key, "limit") == 0) {
                 limit = atoi(value);
+            } else if (strcmp(key, "opacity") == 0) {
+                opacity = atof(value);
             }
         }
 
@@ -348,7 +352,6 @@ void ui_load_screen(UIScreen* screen,
                 ui_create_button(
                     x, y, sx, sy, id, sheet,
                     ui_find_action(actions, actionCount, actionName),
-                    NULL,
                     text,
                     tag
                 );
@@ -363,7 +366,6 @@ void ui_load_screen(UIScreen* screen,
                 ui_create_checkbox(
                     x, y, checked,
                     ui_find_action(actions, actionCount, actionName),
-                    NULL,
                     tag
                 );
         } else if (strcmp(type, "window") == 0) {
@@ -394,8 +396,12 @@ void ui_load_screen(UIScreen* screen,
                 ui_create_action_area(
                     x, y, w, h,
                     ui_find_action(actions, actionCount, actionName),
-                    NULL,
                     tag
+                );
+        } else if (strcmp(type, "darken") == 0) {
+            screen->elements[screen->count++] =
+                ui_create_darken(
+                    opacity, tag
                 );
         }
     }

@@ -117,7 +117,7 @@ void update_level_face(int level) {
 	ui_image_set_image(level_card_face, 239 + main_levels[level].difficulty, 0);
 }
 
-void action_open_level(void* data) { 
+void action_open_level(UIElement* e) { 
 	set_fade_status(FADE_STATUS_OUT);
 	start_level = true; 
 };
@@ -144,7 +144,7 @@ void handle_card_movement() {
 	}
 }
 
-void action_move_right(void* data) { 
+void action_move_right(UIElement* e) { 
 	curr_level_id++;
 	scroll_dir = -1;
 	scrolled = 0;
@@ -167,7 +167,7 @@ void action_move_right(void* data) {
 	update_level_stars(curr_level_id, 1);
 };
 
-void action_move_left(void* data) { 
+void action_move_left(UIElement* e) { 
 	curr_level_id--;
 	scroll_dir = 1;
 	scrolled = 0;
@@ -190,7 +190,7 @@ void action_move_left(void* data) {
 	update_level_stars(curr_level_id, 1);
 };
 
-void action_exit(void* data) {
+void action_exit(UIElement* e) {
 	exit_flag = true;
 	set_fade_status(FADE_STATUS_OUT);
 }
@@ -277,31 +277,6 @@ void level_select_loop() {
 			action_open_level(NULL);
 		}
 
-		if (kDown & KEY_X) {
-			gspWaitForVBlank();
-			if (++mode == 4) mode = 0;
-			switch (mode) {
-				case 0:
-					set_wide(false);
-					set_aa(false);
-					break;
-				case 1:
-					set_wide(true);
-					set_aa(false);
-					break;
-				case 2:
-					set_wide(false);
-					set_aa(true);
-					break;
-				case 3:
-					set_wide(true);
-					set_aa(true);
-					break;
-			}
-			gspWaitForVBlank();
-			reinitialize_screens();
-		}
-
 		UIInput touch;
 		touchPosition touchPos;
 		hidTouchRead(&touchPos);
@@ -323,28 +298,30 @@ void level_select_loop() {
 		ui_screen_update(&screen_top, &touch);
 		do {
 			C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+			
+			// Bottom screen
 			C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
 			C2D_SceneBegin(bot);
+			scale_view();
 
 			ui_screen_draw(&screen);
 			draw_fade();
 
+			// Top screen
 			C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
 			C2D_SceneBegin(top);
-			scale_view();
 
 			ui_screen_draw(&screen_top);
-			draw_text(bigFont_fontCharset, bigFont_sheet, 0, 6, 0.5f, 0, "Wide: %d", wideEnabled);
-			draw_text(bigFont_fontCharset, bigFont_sheet, 0, 18, 0.5f, 0, "AA: %d", aaEnabled);
 			draw_fade();
+
 			C2D_ViewReset();
-			
 			C3D_FrameEnd(0);
 		} while (handle_fading());
 
 		if (start_level) {
 			stop_mp3();
 			game_state = STATE_GAME;
+			playing_menu_loop = false;
 			break;
 		}
 

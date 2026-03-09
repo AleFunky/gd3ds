@@ -30,7 +30,7 @@ static void ui_action_area_update(UIElement* e, UIInput* touch) {
     if (e->action_area.hovered && releasedTouch) {
         e->action_area.pressed = false;
         if (e->action)
-            e->action(e->action_data);
+            e->action(e);
     }
     
     // Unpress the button
@@ -52,7 +52,6 @@ static void ui_action_area_draw(UIElement* e) {
 UIElement ui_create_action_area(
     int x, int y, float w, float h, 
     UIActionFn action,
-    void *action_data,
     char (*tag)[TAG_LENGTH]
 ) {
     UIElement e = {
@@ -61,7 +60,6 @@ UIElement ui_create_action_area(
         .w = 0, .h = 0,
         .enabled = true,
         .action = action,
-        .action_data = action_data,
         .update = ui_action_area_update,
         .draw = ui_action_area_draw
     };

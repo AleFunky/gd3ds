@@ -139,27 +139,30 @@ void draw_9_slice(const C2D_Image atlas, const float x, const float y, const int
                 GX_TRANSFER_IN_FORMAT(GX_TRANSFER_FMT_RGBA8) | GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGB8))
 
 C3D_RenderTarget* C2D_CreateScreenTargetExt(gfxScreen_t screen, gfx3dSide_t side, bool aa) {
+    u8 model;
+	CFGU_GetSystemModel(&model);
+    bool wide = wideEnabled && model != CFG_MODEL_2DS && !is_citra() && screen == GFX_TOP;
+
 	int height;
 	switch (screen)
 	{
 		default:
 		case GFX_BOTTOM:
-			height = GSP_SCREEN_HEIGHT_BOTTOM;
+			height = GSP_SCREEN_HEIGHT_BOTTOM * (aa ? 2 : 1);
 			break;
 		case GFX_TOP:
-			height = (wideEnabled || aa) ? GSP_SCREEN_HEIGHT_TOP_2X : GSP_SCREEN_HEIGHT_TOP;
+			height = (wide || aa) ? GSP_SCREEN_HEIGHT_TOP_2X : GSP_SCREEN_HEIGHT_TOP;
 			break;
 	}
     int width = aa ? 480 : 240;
 
     u32 transferFlags = DISPLAY_FLAGS;
-    if (aa && !wideEnabled)
+    if (aa && !wide)
         transferFlags |= GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_XY);
-    else if (aa && wideEnabled)
+    else if (aa && wide)
         transferFlags |= GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_X);
     else
         transferFlags |= GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_NO);
-
 
     C3D_RenderTarget* target = C3D_RenderTargetCreate(width, height, GPU_RB_RGBA8, GPU_RB_DEPTH16);
     if (target) C3D_RenderTargetSetOutput(target, screen, side, transferFlags);
@@ -206,7 +209,7 @@ void reinitialize_screens() {
     C3D_RenderTargetDelete(top);
     C3D_RenderTargetDelete(bot);
     top = C2D_CreateScreenTargetExt(GFX_TOP, GFX_LEFT, aaEnabled);
-    bot = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+    bot = C2D_CreateScreenTargetExt(GFX_BOTTOM, GFX_LEFT, aaEnabled);
 }
 
 void set_wide(bool wide) {

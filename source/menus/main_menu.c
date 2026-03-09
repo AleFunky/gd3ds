@@ -13,27 +13,36 @@
 #include "color_channels.h"
 #include "mp3_player.h"
 #include "graphics.h"
+
 #include "main_menu.h"
 #include "level_select.h"
+#include "settings.h"
 
 static UIScreen screen_top;
 static UIScreen screen;
-
 
 static int main_menu_color_index = 0;
 
 static int new_state = 0;
 static bool exit_flag = false;
 
+static bool in_settings = false;
+
 static float bg_scroll = 0;
 
-void action_open_level_select(void* data) {
+void action_open_level_select(UIElement* e) {
     new_state = STATE_LEVEL_SELECT;
     set_fade_status(FADE_STATUS_OUT);
 }
 
+void action_open_settings(UIElement* e) {
+    in_settings = true;
+    settings_init();
+}
+
 static UIAction actions[] = {
-    { "level_select", action_open_level_select }
+    { "level_select", action_open_level_select },
+    { "settings", action_open_settings },
 };
 
 static UIAction actions_top[] = {
@@ -68,6 +77,13 @@ void main_menu_loop() {
 		playing_menu_loop = true;
 	}
 
+	get_buffer(CHANNEL_BG)->active = false;
+	get_buffer(CHANNEL_GROUND)->active = false;
+	get_buffer(CHANNEL_LINE)->active = false;
+
+	bool old_wide = wideEnabled;
+	bool old_aa = aaEnabled;
+	
 	while (aptMainLoop()) {
 		hidScanInput();
 		u32 kDown = hidKeysDown();
@@ -99,21 +115,30 @@ void main_menu_loop() {
             main_menu_color_index++;
         }
 
-		ui_screen_update(&screen, &touch);
+		// Check for changes
+		if (aaEnabled != old_aa) {	
+			gspWaitForVBlank();
+			set_aa(aaEnabled);
+			gspWaitForVBlank();
+			reinitialize_screens();
+			old_aa = aaEnabled;
+		}
+
+		if (wideEnabled != old_wide) {		
+			gspWaitForVBlank();
+			set_wide(wideEnabled);
+			gspWaitForVBlank();
+			reinitialize_screens();
+			old_wide = wideEnabled;
+		}
+
+		if (!in_settings) ui_screen_update(&screen, &touch);
 		ui_screen_update(&screen_top, &touch);
 		do {
             bg_scroll += 5.19300155f;
 			C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-			C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
-			C2D_SceneBegin(bot);
-			scale_view();
-            draw_background(bg_scroll / 8, SCREEN_HEIGHT);
-            C2D_ViewScale(SCALE, SCALE);
-            draw_ground(bg_scroll, 0, 0, false, 320);
-            C2D_ViewReset();
-			ui_screen_draw(&screen);
-			draw_fade();
-
+			
+			// Top screen
 			C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
 			C2D_SceneBegin(top);
 			scale_view();
@@ -121,8 +146,27 @@ void main_menu_loop() {
             draw_background(-40 + (bg_scroll / 8), 0);
 			ui_screen_draw(&screen_top);
 			draw_fade();
-			C2D_ViewReset();
-			
+
+			// Bottom Screen
+			C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
+			C2D_SceneBegin(bot);
+
+            draw_background(bg_scroll / 8, SCREEN_HEIGHT);
+            C2D_ViewScale(SCALE, SCALE);
+            draw_ground(bg_scroll, 0, 0, false, 320);
+			C2D_ViewScale(1/SCALE, 1/SCALE);
+
+			ui_screen_draw(&screen);
+            if (in_settings) {
+                int returned = settings_loop();
+                if (returned) {
+                    in_settings = false;
+                }
+            }
+
+			draw_fade();
+            C2D_ViewReset();
+
 			C3D_FrameEnd(0);
 		} while (handle_fading());
 

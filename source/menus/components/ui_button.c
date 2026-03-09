@@ -48,7 +48,7 @@ static void ui_button_update(UIElement* e, UIInput* touch) {
         e->button.hoverTimer = 0.f;
         e->button.hoverScale = 1.f;
         if (e->action)
-            e->action(e->action_data);
+            e->action(e);
     }
     
     // Unpress the button
@@ -91,7 +91,6 @@ static void ui_button_draw(UIElement* e) {
 UIElement ui_create_button(
     int x, int y, float sx, float sy, int sprite_index, int sheet, 
     UIActionFn action,
-    void *action_data,
     char *text,
     char (*tag)[TAG_LENGTH]
 ) {
@@ -101,7 +100,6 @@ UIElement ui_create_button(
         .w = 0, .h = 0,
         .enabled = true,
         .action = action,
-        .action_data = action_data,
         .update = ui_button_update,
         .draw = ui_button_draw
     };
