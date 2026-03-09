@@ -35,8 +35,8 @@ UIElement ui_create_bg_gradient(char (*tag)[TAG_LENGTH]) {
     // Copy tag
     copy_tag_array(&e, tag);
 
-    e.w = e.image.sprite.params.pos.w * BG_GRADIENT_XSCALE;
-    e.h = e.image.sprite.params.pos.h * BG_GRADIENT_YSCALE;
+    e.w = e.image.sprite.image.subtex->width * BG_GRADIENT_XSCALE;
+    e.h = e.image.sprite.image.subtex->height * BG_GRADIENT_YSCALE;
 
     e.image.scaleX = BG_GRADIENT_XSCALE;
     e.image.scaleY = BG_GRADIENT_YSCALE;

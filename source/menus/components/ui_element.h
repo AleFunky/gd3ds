@@ -48,6 +48,9 @@ typedef struct {
 
     bool checked;
     u8 image_id;
+    
+    float scaleX;
+    float scaleY;
 
     bool hovered;
     bool pressed;

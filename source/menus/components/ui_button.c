@@ -113,8 +113,8 @@ UIElement ui_create_button(
     C2D_SpriteFromSheet(&e.button.image.sprite, *get_sheet(sheet), sprite_index);
     
     e.button.hoverScale = 1.f;
-    e.w = fabsf(e.button.image.sprite.params.pos.w * sx);
-    e.h = fabsf(e.button.image.sprite.params.pos.h * sy);
+    e.w = fabsf(e.button.image.sprite.image.subtex->width  * sx);
+    e.h = fabsf(e.button.image.sprite.image.subtex->height * sy);
 
     e.button.scaleX = sx;
     e.button.scaleY = sy;

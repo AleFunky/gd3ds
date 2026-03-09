@@ -6,7 +6,7 @@
 #define CHECKBOX_HOVER_ANIM_TIME BUTTON_HOVER_ANIM_TIME
 
 UIElement ui_create_checkbox(
-    int x, int y, bool enabled,
+    int x, int y, float sx, float sy, bool enabled,
     UIActionFn action,
     char (*tag)[TAG_LENGTH]
 );

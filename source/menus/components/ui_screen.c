@@ -309,9 +309,12 @@ void ui_load_screen(UIScreen* screen,
                 sx = atof(value);
             else if (strcmp(key, "sy") == 0)
                 sy = atof(value);
-            else if (strcmp(key, "scale") == 0)
-                scale = atof(value);
-            else if (strcmp(key, "action") == 0) {
+            else if (strcmp(key, "scale") == 0) {
+                float s = atof(value);
+                scale = s;
+                sx = s;
+                sy = s;
+            } else if (strcmp(key, "action") == 0) {
                 strip_quotes(value);
                 strncpy(actionName, value, 63);
             } else if (strcmp(key, "text") == 0) {
@@ -364,7 +367,7 @@ void ui_load_screen(UIScreen* screen,
         } else if (strcmp(type, "checkbox") == 0) {
             screen->elements[screen->count++] =
                 ui_create_checkbox(
-                    x, y, checked,
+                    x, y, sx, sy, checked,
                     ui_find_action(actions, actionCount, actionName),
                     tag
                 );

@@ -39,11 +39,11 @@ void ui_image_set_image(UIElement *e, int sprite_index, int sheet) {
 
     C2D_SpriteFromSheet(&e->image.sprite, *get_sheet(sheet), sprite_index);
 
-    float even_sx = closest_even_mult(e->button.image.sprite.image.subtex->width, e->image.scaleX);
-    float even_sy = closest_even_mult(e->button.image.sprite.image.subtex->height, e->image.scaleY);
+    float even_sx = closest_even_mult(e->image.sprite.image.subtex->width, e->image.scaleX);
+    float even_sy = closest_even_mult(e->image.sprite.image.subtex->height, e->image.scaleY);
 
-    e->w = e->image.sprite.params.pos.w * even_sx;
-    e->h = e->image.sprite.params.pos.h * even_sy;
+    e->w = e->image.sprite.image.subtex->width * even_sx;
+    e->h = e->image.sprite.image.subtex->height * even_sy;
 
     e->image.scaleX = even_sx;
     e->image.scaleY = even_sy;

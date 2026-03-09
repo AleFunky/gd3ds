@@ -1,13 +1,13 @@
 darken opacity=0.4
-button x=20 y=20 id=6 action="exit"
 window x=160 y=120 w=220 h=180 style=0
+button x=50 y=30 id=31 scale=0.8 action="exit"
 
 # Checkboxes
 
-label x=160 y=55 text="Graphics" tag="page1" align=CENTER
+label x=160 y=45 text="Graphics" tag="page1" scale=0.6 align=CENTER
 
-checkbox x=80 y=85 tag="page1,chk_wide" action="wide"
-label x=100 y=85 text="800px res" scale=0.7 tag="page1"
+checkbox x=75 y=85 tag="page1,chk_wide" scale=0.8 action="wide"
+label x=90 y=85 text="800px res" scale=0.4 tag="page1"
 
-checkbox x=80 y=125 tag="page1,chk_aa" action="aa"
-label x=100 y=125 text="AntiAliasing" scale=0.7 tag="page1"
+checkbox x=75 y=115 tag="page1,chk_aa" scale=0.8 action="aa"
+label x=90 y=115 text="AntiAliasing" scale=0.4 tag="page1"

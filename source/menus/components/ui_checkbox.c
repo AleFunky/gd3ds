@@ -12,8 +12,8 @@ static void set_checkbox_texture(UIElement* e, bool enabled) {
     int tex = enabled ? 28 : 27;
     C2D_SpriteFromSheet(&e->checkbox.image.sprite, ui_sheet, tex);
 
-    e->w = e->checkbox.image.sprite.params.pos.w;
-    e->h = e->checkbox.image.sprite.params.pos.h;
+    e->w = fabsf(e->checkbox.image.sprite.image.subtex->width * e->checkbox.scaleX);
+    e->h = fabsf(e->checkbox.image.sprite.image.subtex->height * e->checkbox.scaleY);
 }
 
 // Set checkbox checked state
@@ -89,14 +89,17 @@ static void ui_checkbox_update(UIElement* e, UIInput* touch) {
 static void ui_checkbox_draw(UIElement* e) {
     float scale = e->checkbox.hoverScale;
 
+    float even_sx = closest_even_mult(e->checkbox.image.sprite.image.subtex->width, scale * e->checkbox.scaleX);
+    float even_sy = closest_even_mult(e->checkbox.image.sprite.image.subtex->height, scale * e->checkbox.scaleY);
+
     C2D_SpriteSetCenter(&e->checkbox.image.sprite, 0.5f, 0.5f);
     C2D_SpriteSetPos(&e->checkbox.image.sprite, e->x, e->y);
-    C2D_SpriteSetScale(&e->checkbox.image.sprite, scale, scale);
+    C2D_SpriteSetScale(&e->checkbox.image.sprite, even_sx, even_sy);
     C2D_DrawSprite(&e->checkbox.image.sprite);
 }
 
 UIElement ui_create_checkbox(
-    int x, int y, bool enabled,
+    int x, int y, float sx, float sy, bool enabled,
     UIActionFn action,
     char (*tag)[TAG_LENGTH]
 ) {
@@ -112,6 +115,9 @@ UIElement ui_create_checkbox(
 
     // Copy tag
     copy_tag_array(&e, tag);
+
+    e.checkbox.scaleX = sx;
+    e.checkbox.scaleY = sy;
 
     set_checkbox_texture(&e, enabled);
 
