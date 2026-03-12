@@ -302,16 +302,15 @@ void level_select_loop() {
 			C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
 			C2D_SceneBegin(bot);
 			scale_view();
+			draw_fade();
 
 			ui_screen_draw(&screen);
-			draw_fade();
 
 			// Top screen
 			C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
 			C2D_SceneBegin(top);
 
 			ui_screen_draw(&screen_top);
-			draw_fade();
 
 			C2D_ViewReset();
 			C3D_FrameEnd(0);

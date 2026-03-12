@@ -148,10 +148,10 @@ void main_menu_loop() {
 			C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
 			C2D_SceneBegin(top);
 			scale_view();
+			draw_fade();
 
             draw_background(-40 + (bg_scroll / 8), 0);
 			ui_screen_draw(&screen_top);
-			draw_fade();
 
 			// Bottom Screen
 			C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
@@ -170,7 +170,6 @@ void main_menu_loop() {
                 }
             }
 
-			draw_fade();
             C2D_ViewReset();
 
 			C3D_FrameEnd(0);
