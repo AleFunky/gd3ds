@@ -70,8 +70,6 @@ void main_menu_loop() {
     col.g = GET_G(color);
     col.b = GET_B(color);
 
-    const Color white = { 255, 255, 255 };
-
     channels[CHANNEL_BG].color = col;
     channels[CHANNEL_GROUND].color = col;
     channels[CHANNEL_LINE].color = white;
