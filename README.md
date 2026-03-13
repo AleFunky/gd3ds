@@ -6,7 +6,8 @@ Geometry Dash and its respective resources are by RobTop Games.
 
 ## Current features
 * Main level viewing (freecam).
-* Epic level select menu.
+* A bunch of menus (title screen, level select, icon kit...).
+* Settings and icon/colors saving.
 
 ## Download
 You can download the .3dsx file for Homebrew Launcher here: [3dsx version](https://nightly.link/AleFunky/gd3ds/workflows/main/master/gd3ds-3dsx.zip)\
