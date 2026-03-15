@@ -6,6 +6,7 @@
 #include "level_loading.h"
 #include "main.h"
 #include "graphics.h"
+#include "player/collision.h"
 
 #include "state.h"
 
@@ -257,38 +258,42 @@ void run_trigger(int obj) {
         case COL_TRIGGER: // 2.0 color trigger
             upload_to_buffer(obj, objects.target_color_id[obj]);
             break;
+        default:
+            return;
     }
-    objects.activated[obj] = true;
+    SET_ACTIVATED(obj, true);
 }
 
 void handle_triggers() {
     int cam_sx = (int)((state.player.x) / SECTION_SIZE);
     
-    int section = cam_sx;
-    if (section < 0) return;
+    for (int sx = -1; sx < 1; sx++) {
+        int section = cam_sx + sx;
+        if (section < 0) continue;
 
-    Section *sec = get_or_create_section(section);
-    for (int i = 0; i < sec->object_count; i++) {
-        int obj = sec->objects[i];
-        
-        if (!objects.activated[obj] && !objects.touch_triggered[obj]) {
-            //if (obj->touch_triggered) {
-            //    // Try p1
-            //    if (intersect(
-            //        player->x, player->y, player->width, player->height, 0, 
-            //        *soa_x(obj), *soa_y(obj), obj->width, obj->height, obj->rotation
-            //    )) {
-            //        run_trigger(obj);
-            //    } else
-            //    // Try now p2
-            //    if (intersect(
-            //        player_2->x, player_2->y, player_2->width, player_2->height, 0, 
-            //        *soa_x(obj), *soa_y(obj), obj->width, obj->height, obj->rotation
-            //    )) {
-            //        run_trigger(obj);
-            //    }
-            if (objects.x[obj] < state.player.x) {
-                run_trigger(obj);
+        Section *sec = get_or_create_section(section);
+        for (int i = 0; i < sec->object_count; i++) {
+            int obj = sec->objects[i];
+            
+            if (!GET_ACTIVATED(obj)) {
+                if (objects.touch_triggered[obj]) {
+                // Try p1
+                if (intersect(
+                    state.player.x, state.player.y, state.player.width, state.player.height, 0, 
+                    objects.x[obj], objects.y[obj], 30, 30, objects.rotation[obj]
+                )) {
+                    run_trigger(obj);
+                } else
+                // Try now p2
+                if (intersect(
+                    state.player2.x, state.player2.y, state.player2.width, state.player2.height, 0, 
+                    objects.x[obj], objects.y[obj], 30, 30, objects.rotation[obj]
+                )) {
+                    run_trigger(obj);
+                }
+                } else if (objects.x[obj] < state.player.x) {
+                    run_trigger(obj);
+                }
             }
         }
     }

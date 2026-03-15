@@ -7,14 +7,14 @@
 #include "collision.h"
 
 
-const float player_speeds[4] = {
+const float player_speeds[SPEED_COUNT] = {
 	251.16007972276924,
 	311.580093712804,
 	387.42014039710523,
 	468.0001388338566
 };
 
-const float cube_jump_heights[4] = {
+const float cube_jump_heights[SPEED_COUNT] = {
     573.48,
     603.72,
     616.68,
@@ -70,7 +70,7 @@ void cube_gamemode(Player *player) {
     }*/
     //if ((slope_data.slope || player->on_ground) && (state.input.holdJump)) {
 
-    if (player->on_ground && (hidKeysHeld() & KEY_A)) {
+    if (player->on_ground && (state.input.holdJump)) {
         /*if (slope_data.slope) {
             // Slope jump
             int orient = grav_slope_orient(slope_data.slope, player);
@@ -89,7 +89,7 @@ void cube_gamemode(Player *player) {
         player->on_ground = false;
         player->buffering_state = BUFFER_END;
     
-        if (!(hidKeysDown() & KEY_A)) {
+        if (!(state.input.pressedJump)) {
             // This simulates the holding jump
             player->vel_y -= player->gravity * STEPS_DT;
         }
@@ -97,7 +97,7 @@ void cube_gamemode(Player *player) {
 }
 
 void run_player(Player *player) {
-    float scale = (player->mini) ? 0.6f : 1.f;
+    //float scale = (player->mini) ? 0.6f : 1.f;
     //trail.stroke = 10.f * scale;
     
     if (!player->left_ground) {
@@ -268,6 +268,30 @@ void run_player(Player *player) {
     if (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_WAVE) update_ship_rotation(player);
 */
     player->snap_rotation = false;
+}
+
+void handle_player(Player *player) {
+    if (state.input.holdJump) {
+        if (player->buffering_state == BUFFER_NONE) {
+            player->buffering_state = BUFFER_READY;
+        }
+    } else {
+        player->buffering_state = BUFFER_NONE;
+    }
+    
+    player->on_ground = false;
+    player->on_ceiling = false;
+
+    player->gravObj_id = -1;
+    
+    player->timeElapsed += STEPS_DT;
+
+    collide_with_objects(player);
+    
+    run_player(player);
+    
+    player->delta_y = player->y - state.old_player.y;
+
 }
 
 void draw_player(Player *player) {

@@ -920,7 +920,7 @@ bool init_arrays(int count) {
     objects.flippedV = malloc(sizeof(bool) * count);
     if (!objects.flippedV) return false;
     
-    objects.activated = malloc(sizeof(bool) * count);
+    objects.activated = malloc(sizeof(u8) * count);
     if (!objects.activated) return false;
 
     memset(objects.random,             0, sizeof(int) * count);
@@ -948,7 +948,7 @@ bool init_arrays(int count) {
     memset(objects.touch_triggered,    0, sizeof(bool) * count);
     memset(objects.flippedH,           0, sizeof(bool) * count);
     memset(objects.flippedV,           0, sizeof(bool) * count);
-    memset(objects.activated,          0, sizeof(bool) * count);
+    memset(objects.activated,          0, sizeof(u8) * count);
 
     return true;
 }

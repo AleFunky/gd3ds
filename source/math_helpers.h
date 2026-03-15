@@ -19,3 +19,4 @@ float positive_fmodf(float n, float divisor);
 Color color_lerp(Color color1, Color color2, float fraction);
 float map_range(float val, float min1, float max1, float min2, float max2);
 float ease_out(float current, float target, float smoothing);
+float adjust_angle(float angle, int flipX, int flipY);

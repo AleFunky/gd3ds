@@ -36,3 +36,22 @@ float ease_out(float current, float target, float smoothing) {
 float map_range(float val, float min1, float max1, float min2, float max2) {
     return min2 + ((max2 - min2) / (max1 - min1)) * (val - min1);
 }
+
+
+float adjust_angle(float angle, int flipX, int flipY) {
+    // Normalize to [0, 360)
+    angle = positive_fmodf(angle, 360);
+
+    if (flipX && flipY) {
+        angle = fmodf(angle + 180.0f, 360.0f);
+    } else if (flipX) {
+        angle = 180.0f - angle;
+    } else if (flipY) {
+        angle = -angle;
+    }
+
+    // Normalize again
+    angle = positive_fmodf(angle, 360);
+
+    return angle;
+}

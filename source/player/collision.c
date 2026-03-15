@@ -7,6 +7,225 @@
 #include "text.h"
 #include "fonts/bigFont.h"
 #include "menus/components/ui_screen.h"
+#include "math_helpers.h"
+
+const float jump_heights_table[SPEED_COUNT][JUMP_TYPES_COUNT][GAMEMODE_COUNT][2] = {
+    { // SLOW               CUBE                   SHIP                  BALL                    UFO                 WAVE   },
+    /* YELLOW PAD */ {{875.64,   691.2},    {432,      508.248},  {518.4,       414.72002},   {573.48,   458.784},  {0, 0} },
+    /* YELLOW ORB */ {{585.12,   458.784},  {573.48,   458.784},  {401.435993,  321.148795},  {573.48,   458.784},  {0, 0} },
+    /* BLUE PAD   */ {{-345.6,   -276.48},  {-229.392, -183.519}, {-160.574397, -128.463298}, {-229.392, -183.519}, {0, 0} },
+    /* BLUE ORB   */ {{-229.392, -183.519}, {-229.392, -183.519}, {-160.574397, -128.463298}, {-229.392, -183.519}, {0, 0} },
+    /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0} },
+    /* PINK ORB   */ {{412.884,  330.318},  {212.166,  169.776},  {309.090595,  247.287596},  {240.84,   192.672},  {0, 0} },
+    },
+    { // NORMAL
+    /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0} },
+    /* YELLOW ORB */ {{603.72,   482.976},  {603.72,   482.976},  {422.60399,   338.08319},   {603.72,   482.976},  {0, 0} },
+    /* BLUE PAD   */ {{-345.6,   -276.48},  {-345.6,   -276.48},  {-207.36001,  -165.88801},  {-345.6,   -276.48},  {0, 0} },
+    /* BLUE ORB   */ {{-241.488, -193.185}, {-241.488, -193.18},  {-169.04160,  -135.2295},   {-241.488, -193.185}, {0, 0} },
+    /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0} },
+    /* PINK ORB   */ {{434.7,    347.76},   {223.398,  178.686},  {325.42019,   260.3286},    {258.984,  207.198},  {0, 0} },
+    },
+    { // FAST
+    /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0} },
+    /* YELLOW ORB */ {{616.68,   481.734},  {616.68,   481.734},  {431.67599,   345.34079},   {616.68,   481.734},  {0, 0} },
+    /* BLUE PAD   */ {{-345.6,   -276.48},  {-345.6,   -276.48},  {-207.36001,  -165.88801},  {-345.6,   -276.48},  {0, 0} },
+    /* BLUE ORB   */ {{-246.672, -197.343}, {-246.672, -197.343}, {-172.6704,   -138.1401},   {-246.672, -197.343}, {0, 0} },
+    /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0} },
+    /* PINK ORB   */ {{443.988,  355.212},  {228.15,   182.52},   {332.37539,   265.923},     {258.984,  207.198},  {0, 0} },
+    },
+    { // FASTER
+    /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0} },
+    /* YELLOW ORB */ {{606.42,   485.136},  {606.42,   485.136},  {424.493993,  339.59519},   {606.42,   485.136},  {0, 0} },
+    /* BLUE PAD   */ {{-345.6,   -276.48},  {-345.6,   -276.48},  {-207.36001,  -165.88801},  {-345.6,   -276.48},  {0, 0} },
+    /* BLUE ORB   */ {{-242.568, -194.049}, {-242.568, -194.049}, {-169.7976,   -135.8343},   {-242.568, -194.049}, {0, 0} },
+    /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0} },
+    /* PINK ORB   */ {{436.644,  349.272},  {224.37,   179.496},  {326.85659,   261.5004},    {254.718,  203.742},  {0, 0} },
+    }
+};
+
+void flip_other_player(int current_player) {
+    if (state.dual && state.player.gamemode == state.player2.gamemode && state.player.upside_down == state.player2.upside_down) {
+        if (current_player == 0) {
+            state.player2.upside_down = !state.player.upside_down;
+            state.player2.vel_y /= -2;
+            state.player2.ceiling_inv_time = 0.1f;
+        } else {
+            state.player.upside_down = !state.player2.upside_down;
+            state.player.vel_y /= -2;
+            state.player.ceiling_inv_time = 0.1f;
+        }
+    }
+}
+
+void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
+    switch (objects.id[obj]) {
+        case YELLOW_PAD:
+            if (!GET_ACTIVATED(obj)) {
+                player->vel_y = jump_heights_table[state.speed][JUMP_YELLOW_PAD][player->gamemode][player->mini];
+                player->on_ground = false;
+                player->inverse_rotation = false;
+                player->left_ground = true;
+                SET_ACTIVATED(obj, true);
+            }
+            break;
+        case PINK_PAD:
+            if (!GET_ACTIVATED(obj)) {
+                player->vel_y = jump_heights_table[state.speed][JUMP_PINK_PAD][player->gamemode][player->mini];
+                player->on_ground = false;
+                player->inverse_rotation = false;
+                player->left_ground = true;
+                SET_ACTIVATED(obj, true);
+            }
+            break;
+        case BLUE_PAD:
+            if (GET_ACTIVATED(obj)) player->gravObj_id = obj;
+            else {
+                float rotation = adjust_angle(objects.rotation[obj], objects.flippedV[obj], objects.flippedH[obj]);
+                if ((rotation < 90 || rotation > 270) && player->upside_down)
+                    break;
+                    
+                if ((rotation > 90 && rotation < 270) && !player->upside_down)
+                    break;
+
+
+                player->left_ground = true;
+
+                player->gravObj_id = obj;
+
+                player->vel_y = jump_heights_table[state.speed][JUMP_BLUE_PAD][player->gamemode][player->mini];
+                player->upside_down ^= 1;
+                flip_other_player(state.current_player);
+                player->on_ground = false;
+                player->inverse_rotation = false;
+
+                SET_ACTIVATED(obj, true);
+            }
+            break;
+        case YELLOW_ORB:
+            if (!GET_ACTIVATED(obj) && (state.input.holdJump) && player->buffering_state == BUFFER_READY) {
+                player->vel_y = jump_heights_table[state.speed][JUMP_YELLOW_ORB][player->gamemode][player->mini];
+                
+                player->ball_rotation_speed = -1.f;
+                
+                player->on_ground = false;
+                player->on_ceiling = false;
+                player->inverse_rotation = false;
+                player->left_ground = true;
+                player->buffering_state = BUFFER_END;
+                
+                SET_ACTIVATED(obj, true);
+            } 
+            break;
+        case PINK_ORB:
+            if (!GET_ACTIVATED(obj) && (state.input.holdJump) && player->buffering_state == BUFFER_READY) {
+                player->vel_y = jump_heights_table[state.speed][JUMP_PINK_ORB][player->gamemode][player->mini];
+                
+                player->ball_rotation_speed = -1.f;
+                
+                player->on_ground = false;
+                player->on_ceiling = false;
+                player->inverse_rotation = false;
+                player->left_ground = true;
+                player->buffering_state = BUFFER_END;
+                
+                SET_ACTIVATED(obj, true);
+            } 
+            break;
+        case BLUE_ORB:
+            if (!GET_ACTIVATED(obj) && (state.input.holdJump) && player->buffering_state == BUFFER_READY) {    
+                player->gravObj_id = obj;
+                
+                player->vel_y = jump_heights_table[state.speed][JUMP_BLUE_ORB][player->gamemode][player->mini];
+                player->upside_down ^= 1;
+
+                flip_other_player(state.current_player);
+                
+                player->ball_rotation_speed = -1.f;
+                
+                player->on_ground = false;
+                player->on_ceiling = false;
+                player->inverse_rotation = false;
+                player->left_ground = true;
+                player->buffering_state = BUFFER_END;
+                player->ufo_last_y = player->y;
+
+                SET_ACTIVATED(obj, true);
+            } 
+            break;
+        case BLUE_GRAVITY_PORTAL:
+            player->gravObj_id = obj;
+            if (!GET_ACTIVATED(obj)) {
+                player->ceiling_inv_time = 0.1f;
+                if (player->upside_down) {
+                    player->vel_y /= -2;
+                    player->upside_down = false;
+                    player->inverse_rotation = false;
+                    player->snap_rotation = true;
+                    flip_other_player(state.current_player);
+                    player->left_ground = true;
+                }
+                SET_ACTIVATED(obj, true);
+            } 
+            break;
+        case YELLOW_GRAVITY_PORTAL:
+            player->gravObj_id = obj;
+            if (!GET_ACTIVATED(obj)) {
+                player->ceiling_inv_time = 0.1f;
+                if (!player->upside_down) {
+                    player->vel_y /= -2;
+                    player->upside_down = true;
+                    player->inverse_rotation = false;
+                    player->snap_rotation = true;
+                    flip_other_player(state.current_player);
+                    player->left_ground = true;
+                }
+                SET_ACTIVATED(obj, true);
+            } 
+            break;
+
+        case BIG_PORTAL:
+            if (!GET_ACTIVATED(obj)) {
+                set_mini(player, false);
+
+                SET_ACTIVATED(obj, true);
+            }
+            break;        
+
+        case MINI_PORTAL:
+            if (!GET_ACTIVATED(obj)) {
+                set_mini(player, true);
+
+                SET_ACTIVATED(obj, true);
+            }
+            break;
+
+        case SLOW_SPEED_PORTAL:
+            if (!GET_ACTIVATED(obj)) {
+                state.speed = SPEED_SLOW;
+                SET_ACTIVATED(obj, true);
+            }
+            break;
+        case NORMAL_SPEED_PORTAL:
+            if (!GET_ACTIVATED(obj)) {
+                state.speed = SPEED_NORMAL;
+                SET_ACTIVATED(obj, true);
+            }
+            break;
+        case FAST_SPEED_PORTAL:
+            if (!GET_ACTIVATED(obj)) {
+                state.speed = SPEED_FAST;
+                SET_ACTIVATED(obj, true);
+            }
+            break;
+        case FASTER_SPEED_PORTAL:
+            if (!GET_ACTIVATED(obj)) {
+                state.speed = SPEED_FASTER;
+                SET_ACTIVATED(obj, true);
+            }
+            break;
+    }
+}
 
 void get_corners(float cx, float cy, float w, float h, float angle, Vec2D out[4]) {
     float hw = w / 2.0f, hh = h / 2.0f;
@@ -233,7 +452,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
             state.dead = true;
             break;
         case HITBOX_SPECIAL:
-            //handle_special_hitbox(player, obj, hitbox);
+            handle_special_hitbox(player, obj, hitbox);
             break;
     }
 }

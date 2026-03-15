@@ -1,5 +1,6 @@
 #pragma once
 #include "objects.h"
+#include <3ds.h>
 
 #define MAX_GROUPS_PER_OBJECT 20
 
@@ -44,7 +45,7 @@ typedef struct {
     bool *touch_triggered;
     bool *flippedH, *flippedV;
 
-    bool *activated;
+    u8 *activated;
 } ObjectsArray;
 
 typedef struct {

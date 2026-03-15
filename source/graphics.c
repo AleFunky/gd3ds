@@ -435,15 +435,20 @@ void spawn_object_at(
 
             int c_flip_x_mult = (c->flip_x ? -1 : 1);
             int c_flip_y_mult = (c->flip_y ? -1 : 1);
-                
+
             vo->spr = sprite_templates[id].child_templates[i]; 
 
             float pulse_scale = get_object_pulse(amplitude, id, i + 2);
 
             C2D_SpriteSetPos(&vo->spr, c_x, c_y);
-            C2D_SpriteSetScale(&vo->spr, c->scale_x * c_flip_x_mult * sx * pulse_scale,
+            if (id < 15 || id > 17) {
+                C2D_SpriteSetScale(&vo->spr, c->scale_x * c_flip_x_mult * sx * pulse_scale,
                                           c->scale_y * c_flip_y_mult * sy * pulse_scale);
-            if (id < 15 || id > 17) C2D_SpriteSetRotation(&vo->spr, C3D_AngleFromDegrees(c->rot) + rad);
+                C2D_SpriteSetRotation(&vo->spr, C3D_AngleFromDegrees(c->rot) + rad);
+            } else {
+                C2D_SpriteSetScale(&vo->spr, fabsf(c->scale_x * c_flip_x_mult * sx * pulse_scale),
+                                          fabsf(c->scale_y * c_flip_y_mult * sy * pulse_scale));
+            }
 
             vo->obj = obj_game;
             vo->layer = i + 2;
@@ -763,13 +768,12 @@ void draw_background(float x, float y) {
     float offset = 512 * BACKGROUND_SCALE;
 
     float calc_x = positive_fmodf(x, offset);
-    float calc_y = positive_fmodf(y, offset);
+    float draw_y = -y;
 
     for (int i = 0; i < 2; i++) {
         C2D_Sprite bg = { 0 };
         // Calculate position for each tile
         float draw_x = -calc_x + i * offset;
-        float draw_y = -calc_y;
         
         C2D_SpriteFromSheet(&bg, bgSheet, 0);
         C3D_TexSetFilter(bg.image.tex, GPU_LINEAR, GPU_LINEAR);
@@ -951,6 +955,15 @@ void draw_objects() {
             
             C2D_PlainImageTint(&tint, C2D_Color32(col.color.r, col.color.g, col.color.b, get_opacity(game_object, x) * opacity), 1.f);
             C2D_DrawSpriteTinted(&obj->spr, &tint);
+/*
+            float calc_x = ((objects.x[game_object] - state.camera_x));
+            float calc_y = SCREEN_HEIGHT - ((objects.y[game_object] - state.camera_y));  
+            float width = objects.width[game_object];
+            float height = objects.height[game_object];
+
+            C2D_DrawRectSolid(calc_x - width/2, calc_y - height/2, 0, width, height, 
+                C2D_Color32(0, 0, 255, 255));
+*/
         }
     }
 }

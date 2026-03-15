@@ -4,7 +4,7 @@
 #include "player/player.h"
 #include "graphics.h"
 
-#define SCREEN_HEIGHT_AREA ((11*30)*SCALE)
+#define MAX_LEVEL_HEIGHT 2400.f
 
 typedef struct {
     float x;
@@ -14,6 +14,11 @@ typedef struct {
     float rotation;
     InternalHitbox internal_hitbox;
 } PlayerHitboxTrail;
+
+typedef struct {
+    u8 pressedJump:1;
+    u8 holdJump:1;
+} KeyInput;
 
 typedef struct {
     float camera_x;
@@ -71,12 +76,13 @@ typedef struct {
 
     int last_hitbox_trail;
     PlayerHitboxTrail hitbox_trail_players[2][HITBOX_TRAIL_SIZE];
-
-    KeyInput input;
     */
+    KeyInput input;
 } GameState;
 
 extern GameState state;
 
+void set_gamemode(Player *player, int gamemode);
+void set_mini(Player *player, bool mini);
 void init_variables();
 void run_camera();

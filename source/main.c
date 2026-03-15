@@ -112,28 +112,13 @@ void game_loop() {
             toggle_playback_mp3();
 
         u32 kHeld = hidKeysHeld();
-        
-        if (kHeld & KEY_UP) {
-            state.camera_y += CAM_SPEED;
-        }
-        
-        if (kHeld & KEY_DOWN) {
-            state.camera_y -= CAM_SPEED;
-        }
 
-        if (kHeld & KEY_RIGHT) {
-            state.camera_x += CAM_SPEED;
-        }
-        
-        if (kHeld & KEY_LEFT) {
-            state.camera_x -= CAM_SPEED;
-        }
+        state.input.pressedJump = (kDown & KEY_A) == true;
+        state.input.holdJump = (kHeld & KEY_A) == true;
 
         for (size_t i = 0; i < 4; i++) {
             state.old_player = state.player;
-            state.player.on_ground = false;
-            collide_with_objects(&state.player);
-            run_player(&state.player);
+            handle_player(&state.player);
             run_camera();
         }
 
@@ -148,6 +133,8 @@ void game_loop() {
             
             // Top screen
             C2D_SceneBegin(top);
+            C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
+            
             scale_view();
             
             draw_background(state.camera_x / 8, -(state.camera_y / 8) + 200);

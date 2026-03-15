@@ -81,7 +81,15 @@ enum BufferingState {
     BUFFER_END
 };
 
-extern const float player_speeds[4];
+enum PlayerSpeeds {
+    SPEED_SLOW,
+    SPEED_NORMAL,
+    SPEED_FAST,
+    SPEED_FASTER,
+    SPEED_COUNT
+};
+
+extern const float player_speeds[SPEED_COUNT];
 
 inline float getTop(Player *player)  { return player->y + player->height / 2; }
 inline float getBottom(Player *player)  { return player->y - player->height / 2; }
@@ -120,5 +128,6 @@ inline float obj_getLeft(int object)  {
 inline float obj_gravBottom(Player *player, int object) { return player->upside_down ? -obj_getTop(object) : obj_getBottom(object); }
 inline float obj_gravTop(Player *player, int object) { return player->upside_down ? -obj_getBottom(object) : obj_getTop(object); }
 
+void handle_player(Player *player);
 void draw_player(Player *player);
 void run_player(Player *player);

@@ -59,7 +59,7 @@ void run_camera() {
             state.camera_y = final_camera_y_wall + 3.f * random_float(-1, 1);
         }
     } else */if (player->gamemode == GAMEMODE_PLAYER && !state.dual) {
-        float distance = state.camera_y_lerp + (SCREEN_HEIGHT_AREA / 2) - player->y;
+        float distance = state.camera_y_lerp + (GSP_SCREEN_WIDTH * SCALE / 2) - player->y;
         float distance_abs = fabsf(distance);
 
         int mult = (distance >= 0 ? 1 : -1);
@@ -70,7 +70,7 @@ void run_camera() {
             float lerp_ratio = 0.1f;
             if (player->on_ground) {
                 // Slowly make player in bounds (60 units from player center)
-                state.camera_y_lerp = player->y + 60.f * mult - (SCREEN_HEIGHT_AREA / 2);
+                state.camera_y_lerp = player->y + 60.f * mult - (GSP_SCREEN_WIDTH * SCALE / 2);
                 lerp_ratio = 0.2f;
             } else {
                 // Move camera
@@ -83,7 +83,7 @@ void run_camera() {
         }
 
         if (state.intermediate_camera_y < 0) state.intermediate_camera_y = 0;
-        //if (state.camera_y_lerp > MAX_LEVEL_HEIGHT) state.camera_y_lerp = MAX_LEVEL_HEIGHT;
+        if (state.camera_y_lerp > MAX_LEVEL_HEIGHT) state.camera_y_lerp = MAX_LEVEL_HEIGHT;
 
         state.camera_y = ease_out(state.camera_y, state.intermediate_camera_y, 0.07f);
     } else {
@@ -92,7 +92,7 @@ void run_camera() {
         state.intermediate_camera_y = state.camera_y;
     }
 
-	state.camera_x = player->x - 125.0f;
+	state.camera_x = player->x - 125.0f/SCALE;
 }
 
 void set_hitbox_size(Player *player, int gamemode) {
@@ -119,7 +119,7 @@ void set_camera_x(float x) {
 
 void set_intended_ceiling() {
     float mid_point = (state.ground_y + state.ceiling_y) / 2;
-    state.camera_intended_y = mid_point - (SCREEN_HEIGHT_AREA / 2);
+    state.camera_intended_y = mid_point - (GSP_SCREEN_WIDTH * SCALE / 2);
 }
 
 void set_gamemode(Player *player, int gamemode) {
@@ -174,6 +174,9 @@ void init_variables() {
     player->vel_y = 0;
     state.ground_y = 0;
     state.ceiling_y = 999999;
+
+    state.current_player = 0;
+
     set_gamemode(player, GAMEMODE_PLAYER);//level_info.initial_gamemode);
     player->on_ground = true;
     player->on_ceiling = false;
