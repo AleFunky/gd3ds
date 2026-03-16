@@ -585,8 +585,6 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                 );
 
                 gravSnap = (!state.old_player.on_ground || player->ceiling_inv_time > 0) && internalCollidingBlock && obj_gravBottom(player, obj) - gravInternalBottom(player) <= clip;
-                
-                if (gravSnap) upload_color_to_buffer(CHANNEL_BG, C2D_Color32(255, 0, 0, 255), 0);
             }
             
             
