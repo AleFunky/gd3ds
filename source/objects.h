@@ -32,6 +32,7 @@ typedef struct {
     float scale_x, scale_y;
     int flip_x, flip_y;
     int z;
+    int z_layer_offset;
     float rot;
     int color_type;
     float opacity;

@@ -487,8 +487,10 @@ static inline uint32_t make_sort_key(const SpriteObject *s)
     int tex = game_obj->texture;
 
     if (s->layer > 1) {
-        child_z = game_obj->children[s->layer - 2].z - 1;
-        tex = game_obj->children[s->layer - 2].texture;
+        const ChildSprite *child = &game_obj->children[s->layer - 2];
+        child_z = child->z - 1;
+        tex = child->texture;
+        zlayer += child->z_layer_offset;
     }
     
     int sheet;
