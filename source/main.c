@@ -80,12 +80,15 @@ void no_dsp_firmware(void) {
 
 void game_loop() {
     int returned = load_level(main_levels[curr_level_id].gmd_path);
-    if (returned) printf("\x1b[9;1HFailed %d", returned);
+    if (returned) {
+        printf("\x1b[9;1HFailed %d", returned);
+        game_state = STATE_LEVEL_SELECT;
+        return;
+    }
 
     returned = play_mp3(main_levels[curr_level_id].song_path, false);
     toggle_playback_mp3();
 
-    printf("\x1b[8;1HUse dpad to move camera");
     state.camera_x = 0;
     state.camera_y = 0;
     current_fading_effect = FADE_NONE;
@@ -114,9 +117,6 @@ void game_loop() {
             exiting = true;
             set_fade_status(FADE_STATUS_OUT);
         }
-            
-        if (kDown & KEY_SELECT)
-            seek_mp3(0);
             
         if (kDown & KEY_X)
             state.noclip ^= 1;

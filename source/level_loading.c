@@ -809,7 +809,6 @@ int parse_gd_object(const char *objStr, int obj) {
 
     objects.random[obj] = rand();
 
-
     const ObjectHitbox *hitbox = game_object->hitbox;
     if (hitbox) {
         objects.width[obj] = hitbox->width;
@@ -995,7 +994,7 @@ bool init_arrays(int count) {
     memset(objects.flippedH,           0, sizeof(bool) * count);
     memset(objects.flippedV,           0, sizeof(bool) * count);
     memset(objects.activated,          0, sizeof(u8) * count);
-    memset(objects.collided,          0, sizeof(u8) * count);
+    memset(objects.collided,           0, sizeof(u8) * count);
 
     return true;
 }
