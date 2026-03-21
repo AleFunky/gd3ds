@@ -507,8 +507,8 @@ void handle_player(Player *player) {
 }
 
 void draw_player(Player *player) {
-    MotionTrail_Update(&trail, DT);
-    MotionTrail_UpdateWaveTrail(&wave_trail, DT);
+    MotionTrail_Update(&trail, delta);
+    MotionTrail_UpdateWaveTrail(&wave_trail, delta);
 
     change_blending(true);
     MotionTrail_Draw(&trail);

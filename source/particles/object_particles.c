@@ -54,12 +54,19 @@ static void remove_offscreen_object_particles() {
     }
 }
 
-void draw_object_particles() {
+void update_object_particles() {
     remove_offscreen_object_particles();
     for (size_t i = 0; i < MAX_OBJECT_PS; i++) {
         if (object_particle[i].occupied) {
             updateParticleSystem(&object_particle[i].ps, DT);
+        }
+    }
+}
 
+
+void draw_object_particles() {
+    for (size_t i = 0; i < MAX_OBJECT_PS; i++) {
+        if (object_particle[i].occupied) {
             int obj = object_particle[i].id;
             int fade_x = 0;
             int fade_y = 0;

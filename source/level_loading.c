@@ -23,17 +23,15 @@ GDColorChannel *colorChannels = NULL;
 
 LoadedLevelInfo level_info;
 
-static inline unsigned int section_hash_func(unsigned int x) {
-    x ^= x >> 16;
-    x *= 0x7feb352d;   // good mixing constant
-    return (uint32_t)((uint64_t)x * SECTION_HASH_SIZE >> 32);
+static inline unsigned int section_hash_func(unsigned int x, unsigned int y) {
+    return ((unsigned int)x * 73856093u ^ (unsigned int)y * 19349663u) % SECTION_HASH_SIZE;
 }
 
-Section *get_or_create_section(int x) {
-    unsigned int h = section_hash_func(x);
+Section *get_or_create_section(int x, int y) {
+    unsigned int h = section_hash_func(x, y);
     Section *sec = section_hash[h];
     while (sec) {
-        if (sec->x == x) return sec;
+        if (sec->x == x && sec->y == y) return sec;
         sec = sec->next;
     }
     sec = malloc(sizeof(Section));
@@ -41,6 +39,7 @@ Section *get_or_create_section(int x) {
     sec->object_count = 0;
     sec->object_capacity = 8;
     sec->x = x;
+    sec->y = y;
     sec->next = section_hash[h];
     section_hash[h] = sec;
     return sec;
@@ -61,7 +60,8 @@ void free_sections(void) {
 
 void assign_object_to_section(int obj) {
     int sx = (int)(objects.x[obj] / SECTION_SIZE);
-    Section *sec = get_or_create_section(sx);
+    int sy = (int)(objects.y[obj] / SECTION_SIZE);
+    Section *sec = get_or_create_section(sx, sy);
     if (sec->object_count >= sec->object_capacity) {
         sec->object_capacity *= 2;
         sec->objects = realloc(sec->objects, sizeof(int) * sec->object_capacity);

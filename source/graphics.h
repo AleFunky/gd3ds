@@ -37,6 +37,7 @@ typedef struct
 typedef struct
 {
     C2D_Sprite spr;
+    C2D_ImageTint tint;
     int obj;
     int layer;
     int col_type;
@@ -108,6 +109,7 @@ inline float normalize_angle(float a)
     return a;
 }
 
+void create_objects();
 void change_blending(bool blending);
 Color get_white_if_black(Color color);
 void draw_objects();

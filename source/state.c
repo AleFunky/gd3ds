@@ -10,6 +10,8 @@ GameState state;
 
 void run_camera() {
     Player *player = &state.player;
+    state.old_camera_x = state.camera_x;
+    state.old_camera_y = state.camera_y;
 
     //float calc_x = (player->x - state.camera_x);
 
@@ -98,7 +100,6 @@ void run_camera() {
         state.camera_y_lerp = state.camera_y;
         state.intermediate_camera_y = state.camera_y;
     }
-
 	state.camera_x = player->x - 125.0f/SCALE;
 }
 

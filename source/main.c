@@ -128,6 +128,11 @@ int output_log(const char *fmt, ...) {
 }
 
 float sprite_drawing_time = 0;
+float physics_calc_time = 0;
+float particle_calc_time = 0;
+float triggers_time = 0;
+
+float delta = 0;
 
 void game_loop() {
     int returned = load_level(main_levels[curr_level_id].gmd_path);
@@ -160,10 +165,12 @@ void game_loop() {
 
     float accumulator = 0.0f;
     u64 lastTime = svcGetSystemTick();
+    u64 start = svcGetSystemTick();
     bool fixed_dt = true;
 
     // Main loop
     while (aptMainLoop()) {
+        start = svcGetSystemTick();
         hidScanInput();
 
         // Respond to user input
@@ -176,24 +183,28 @@ void game_loop() {
         if (kDown & KEY_X)
             state.noclip ^= 1;
 
+        int steps = 0;
+
         u32 kHeld = hidKeysHeld();
         // Compare with true to store it in a single bit
         state.input.pressedJump = ((kDown & KEY_A) || (kDown & KEY_TOUCH)) == true;
         state.input.holdJump = (state.input.pressedJump || (kHeld & KEY_A) || (kHeld & KEY_TOUCH)) == true;
         if (state.death_timer <= 0 && !(kHeld & KEY_Y))  {
+            physics_calc_time = 0;
             u64 now = svcGetSystemTick();
-            float dt = (now - lastTime) / (CPU_TICKS_PER_MSEC * 1000);
+            delta = (now - lastTime) / (CPU_TICKS_PER_MSEC * 1000);
             lastTime = now;
-            if (dt > 0.5f) dt = STEPS_DT_UNMOD; // Avoid spiral of death
+            if (delta > 0.5f) delta = STEPS_DT_UNMOD; // Avoid spiral of death
             if (fixed_dt) {
-                dt = STEPS_DT_UNMOD;
+                delta = STEPS_DT_UNMOD;
                 if (!being_faded) fixed_dt = false;
             }
 
-            accumulator += dt;
+            accumulator += delta;
 
+            
             // Run simulation in fixed steps
-            while (accumulator >= STEPS_DT) {
+            while (accumulator >= STEPS_DT_UNMOD) {
                 u64 start_physics = svcGetSystemTick();
                 state.current_player = 0;
                 state.old_player = state.player;
@@ -226,10 +237,13 @@ void game_loop() {
                 if (physics_time >= STEPS_DT_UNMOD) {
                     frame_skipped = (int) (physics_time * STEPS_HZ);
                 }
-
                 else frame_skipped = 0;
+
+                physics_calc_time += physics_time;
+
                 run_camera();
                 accumulator -= STEPS_DT;
+                steps++;
             }
         }
 
@@ -250,17 +264,38 @@ void game_loop() {
             }
         }
 
-        updateParticleSystem(&drag_particles, DT);
-
+        u64 start_trig = svcGetSystemTick();
         handle_triggers();
         handle_col_triggers();
         calculate_lbg();
+        u64 end_trig = svcGetSystemTick();
+        u64 ticks_trig = end_trig - start_trig;
+        triggers_time = ticks_trig / CPU_TICKS_PER_MSEC;
+
+
+        u64 start_obj = svcGetSystemTick();
+        create_objects();
+        u64 end_obj = svcGetSystemTick();
+        u64 ticks_obj = end_obj - start_obj;
+        sprite_drawing_time = ticks_obj / CPU_TICKS_PER_MSEC;
+
+        u64 start_part = svcGetSystemTick();
+        updateParticleSystem(&drag_particles, DT);
+        update_object_particles();
+        u64 end_part = svcGetSystemTick();
+        u64 ticks_part = end_part - start_part;
+        particle_calc_time = ticks_part / CPU_TICKS_PER_MSEC;
+        
+        u64 end = svcGetSystemTick();
+        u64 ticks = end - start;
+
 
         // Render the scene
         do {
             C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
             C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ZERO);
-            
+            draw_fade();
+
             // Top screen
             C2D_SceneBegin(top);
             C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
@@ -269,11 +304,7 @@ void game_loop() {
 
             C2D_ViewScale(SCALE, SCALE);
 
-            u64 start = svcGetSystemTick();
             draw_objects();
-            u64 end = svcGetSystemTick();
-            u64 ticks = end - start;
-            sprite_drawing_time = ticks / CPU_TICKS_PER_MSEC;
 
             draw_ground(state.ground_x, state.camera_y, 0, false, SCREEN_WIDTH);
             
@@ -281,27 +312,30 @@ void game_loop() {
                 if (state.camera_y - CAMERA_Y_OFFSET + state.ground_y_gfx > 0) draw_ground(state.ground_x, state.camera_y, state.camera_y + state.ground_y_gfx - CAMERA_Y_OFFSET, false, SCREEN_WIDTH);
                 draw_ground(state.ground_x, state.camera_y, state.camera_y - CAMERA_Y_OFFSET + SCREEN_HEIGHT_AREA - state.ground_y_gfx, true, SCREEN_WIDTH);
             }
-            draw_fade();
             C2D_ViewScale(1/SCALE, 1/SCALE);
 
             // Bottom screen
             C2D_SceneBegin(bot);
             C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
-            
-            draw_text(bigFont_fontCharset, bigFont_sheet, 0, 6, 0.5f, 0, "CPU: %6.2f%%", C3D_GetProcessingTime() * 6);
-            draw_text(bigFont_fontCharset, bigFont_sheet, 0, 18, 0.5f, 0, "GPU: %6.2f%%", C3D_GetDrawingTime() * 6);
-            draw_text(bigFont_fontCharset, bigFont_sheet, 0, 30, 0.5f, 0, "Usage: %6.2f%%", (C3D_GetProcessingTime() + C3D_GetDrawingTime()) * 6);
 
+            float processingTime = ((ticks / CPU_TICKS_PER_MSEC)) * 6;
+            float drawingTime = C3D_GetDrawingTime() * 6;
+            
+            draw_text(bigFont_fontCharset, bigFont_sheet, 0, 6, 0.5f, 0, "CPU: %6.2f%% (%6.2f%% %6.2f%%)", (C3D_GetProcessingTime() * 6) + processingTime, C3D_GetProcessingTime() * 6, processingTime);
+            draw_text(bigFont_fontCharset, bigFont_sheet, 0, 18, 0.5f, 0, "GPU: %6.2f%%", drawingTime);
+
+            draw_text(bigFont_fontCharset, bigFont_sheet, 320-8, 42, 0.5f, 1.0, "%d steps", steps);
+            draw_text(bigFont_fontCharset, bigFont_sheet, 320-32, 54, 0.5f, 1.0, "%.2f%% Physics", physics_calc_time * 6);
+            draw_text(bigFont_fontCharset, bigFont_sheet, 320-32, 66, 0.5f, 1.0, "%.2f%% Particle", particle_calc_time * 6);
+            draw_text(bigFont_fontCharset, bigFont_sheet, 320-32, 78, 0.5f, 1.0, "%.2f%% Triggers", triggers_time * 6);
             draw_text(bigFont_fontCharset, bigFont_sheet, 0, 42, 0.5f, 0, "SprDraw:  %6.2f%%", (sprite_drawing_time) * 6);
-            draw_text(bigFont_fontCharset, bigFont_sheet, 0, 54, 0.5f, 0, "Creating: %6.2f%%", (object_creating_time) * 6);
-            draw_text(bigFont_fontCharset, bigFont_sheet, 0, 66, 0.5f, 0, "Sorting:  %6.2f%%", (object_sorting_time) * 6);
-            draw_text(bigFont_fontCharset, bigFont_sheet, 0, 78, 0.5f, 0, "Drawing:  %6.2f%%", (object_drawing_time) * 6);
+            draw_text(bigFont_fontCharset, bigFont_sheet, 0, 54, 0.5f, 0, " - Creating: %6.2f%%", (object_creating_time) * 6);
+            draw_text(bigFont_fontCharset, bigFont_sheet, 0, 66, 0.5f, 0, " - Sorting:  %6.2f%%", (object_sorting_time) * 6);
+            draw_text(bigFont_fontCharset, bigFont_sheet, 0, 90, 0.5f, 0, "Drawing:  %6.2f%%", (object_drawing_time) * 6);
 
             if (state.noclip) {
                 draw_text(bigFont_fontCharset, bigFont_sheet, 0, 234, 0.5f, 0, "Noclip Activated");
             }
-            
-            draw_fade();
             C2D_ViewReset();
 
             C3D_FrameEnd(0);

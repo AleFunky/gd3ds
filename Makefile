@@ -46,7 +46,7 @@ RSF := $(TOPDIR)/$(RESOURCES)/template.rsf
 ARCH := -march=armv6k -mtune=mpcore -mfloat-abi=hard
 
 COMMON_FLAGS := -g -Wall -Wno-strict-aliasing -O2 -mword-relocations -fomit-frame-pointer \
-	-ffunction-sections -fdata-sections -ffast-math \
+	-ffunction-sections -fdata-sections -ffast-math -flto \
 	$(ARCH) $(INCLUDE) -D__3DS__ $(BUILD_FLAGS) 
 CFLAGS := $(COMMON_FLAGS) -std=gnu11
 CXXFLAGS := $(COMMON_FLAGS) -std=gnu++11

@@ -6,6 +6,8 @@
 
 #define DT (1.f/60)
 
+extern float delta;
+
 #define SCREEN_WIDTH  400
 #define SCREEN_HEIGHT 240
 

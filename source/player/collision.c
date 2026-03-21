@@ -786,26 +786,29 @@ void collide_with_objects(Player *player) {
     //number_of_collisions_checks = 0;
 
     int sx = (int)(player->x / SECTION_SIZE);
+    int sy = (int)(player->y / SECTION_SIZE);
     
     for (int dx = -1; dx <= 1; dx++) {
-        Section *sec = get_or_create_section(sx + dx);
-        for (int i = 0; i < sec->object_count; i++) {
-            int obj = sec->objects[i];
-            const ObjectHitbox *hitbox = game_objects[objects.id[obj]].hitbox;
+        for (int dy = -1; dy <= 1; dy++) {
+            Section *sec = get_or_create_section(sx + dx, sy + dy);
+            for (int i = 0; i < sec->object_count; i++) {
+                int obj = sec->objects[i];
+                const ObjectHitbox *hitbox = game_objects[objects.id[obj]].hitbox;
 
-            if (!hitbox) continue;
-            
-            // Save some types to buffer, so they can be checked in a type order
-            if (hitbox->collision_type == HITBOX_SOLID) {
-                if (hitbox->type == COLLISION_SLOPE) {
-                    slope_buffer[slope_count++] = obj;
-                } else {
-                    block_buffer[block_count++] = obj;
+                if (!hitbox) continue;
+                
+                // Save some types to buffer, so they can be checked in a type order
+                if (hitbox->collision_type == HITBOX_SOLID) {
+                    if (hitbox->type == COLLISION_SLOPE) {
+                        slope_buffer[slope_count++] = obj;
+                    } else {
+                        block_buffer[block_count++] = obj;
+                    }
+                } else if (hitbox->collision_type == HITBOX_HAZARD) {
+                    hazard_buffer[hazard_count++] = obj;
+                } else { // HITBOX_SPECIAL
+                    collide_with_obj(player, obj);
                 }
-            } else if (hitbox->collision_type == HITBOX_HAZARD) {
-                hazard_buffer[hazard_count++] = obj;
-            } else { // HITBOX_SPECIAL
-                collide_with_obj(player, obj);
             }
         }
     }

@@ -71,7 +71,7 @@ typedef struct Section {
     int object_count;
     int object_capacity;
 
-    int x; // Section coordinates
+    int x, y; // Section coordinates
     struct Section *next; // For chaining in hash map
 } Section;
 
@@ -110,6 +110,6 @@ int load_level(char *path);
 void reload_level();
 void unload_level();
 
-Section *get_or_create_section(int x);
+Section *get_or_create_section(int x, int y);
 bool obj_has_main(const GameObject *obj);
 bool obj_has_detail(const GameObject *obj);
