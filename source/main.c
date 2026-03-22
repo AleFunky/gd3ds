@@ -206,7 +206,7 @@ void game_loop() {
 
             
             // Run simulation in fixed steps
-            while (accumulator >= STEPS_DT_UNMOD && steps < 4) {
+            while (accumulator >= STEPS_DT_UNMOD) {
                 u64 start_physics = svcGetSystemTick();
                 state.current_player = 0;
                 state.old_player = state.player;
@@ -248,18 +248,6 @@ void game_loop() {
                 accumulator -= STEPS_DT_UNMOD;
                 steps++;
                 level_frame++;
-            }
-
-            if (accumulator >= STEPS_DT_UNMOD) {
-                // Calculate how many steps we're behind
-                int missed_steps = (int)(accumulator / STEPS_DT_UNMOD);
-
-                frame_skipped = missed_steps;
-
-                // Fast-forward accumulator
-                accumulator -= missed_steps * STEPS_DT_UNMOD;
-            } else {
-                frame_skipped = 0;
             }
         }
         
