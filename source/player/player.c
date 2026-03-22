@@ -529,12 +529,13 @@ void spawn_p1_trail(Player *player) {
         case GAMEMODE_DART:
             trail_data->gamemode = player->gamemode;
             trail_data->scale = scale;
+            trail_data->upside_down = false;
             break;
         case GAMEMODE_SHIP:
         case GAMEMODE_BIRD:
             trail_data->gamemode = GAMEMODE_PLAYER;
             trail_data->scale = scale * 0.5f;
-
+            trail_data->upside_down = player->upside_down;
     }
 
     float end_scale = trail_data->scale * P1_TRAIL_END_SCALE;
@@ -595,7 +596,7 @@ void draw_p1_trail(Player *player) {
                     trail_data->gamemode, *current_icons[trail_data->gamemode], 
                     get_mirror_x(calc_x, state.mirror_factor), calc_y, 
                     trail_data->rot,  
-                    flip_x, player->upside_down,
+                    flip_x, trail_data->upside_down,
                     trail_data->scale,
                     color
                 );

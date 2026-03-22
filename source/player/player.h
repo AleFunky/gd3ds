@@ -47,6 +47,7 @@ typedef struct {
 
     float life;
 
+    bool upside_down;
     bool active;
 } P1Trail;
 
