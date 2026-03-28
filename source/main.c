@@ -59,8 +59,8 @@ void no_dsp_firmware(void) {
     printf("\x1b[01;00H/////////////////FATAL///ERROR////////////////////");
     printf("\x1b[03;00HNDSP could not be initalized.");
     printf("\x1b[05;00HThis is probably because your dspfirm is missing.");
-    printf("\x1b[07;00HExtract the ndsp firmware (nsdp.cdc) to sdmc:/3ds/");
-    printf("\x1b[09;00Hon your sd card.");
+    printf("\x1b[07;00HExtract the ndsp firmware (dspfirm.cdc) to");
+    printf("\x1b[09;00Hsdmc:/3ds/ on your sd card.");
     printf("\x1b[11;00HCitra/Azahar users only need the file to be there,");
     printf("\x1b[13;00Hit can be empty.");
     printf("\x1b[15;00HPress start to exit.");
