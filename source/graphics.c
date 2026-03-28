@@ -1013,6 +1013,8 @@ void draw_objects() {
             draw_object_particles();
             for (int i = 0; i < 2; i++) {
                 drawParticleSystem(&drag_particles[i], 0, 0, 1.f);
+                drawParticleSystem(&ship_fire_particles[i], 0, 0, 1.f);
+                drawParticleSystem(&ufo_secondary_particles[i], 0, 0, 1.f);
                 drawParticleSystem(&burst_particles[i], 0, 0, 1.f);
             }
             change_blending(false);
