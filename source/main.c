@@ -177,9 +177,12 @@ void game_loop() {
     initParticleSystem(&ship_fire_particles[0], &drag_effect);
     initParticleSystem(&ship_fire_particles[1], &drag_effect);
 
-    initParticleSystem(&ufo_secondary_particles[0], &drag_effect);
-    initParticleSystem(&ufo_secondary_particles[1], &drag_effect);
+    initParticleSystem(&secondary_particles[0], &ship_effect);
+    initParticleSystem(&secondary_particles[1], &ship_effect);
     
+    initParticleSystem(&ship_secondary_particles[0], &ship_effect);
+    initParticleSystem(&ship_secondary_particles[1], &ship_effect);
+
     initParticleSystem(&burst_particles[0], &burst_effect);
     initParticleSystem(&burst_particles[1], &burst_effect);
     
@@ -194,13 +197,21 @@ void game_loop() {
     burst_particles[0].cfg.startColorGreen = p1_not_white.g / 255.f;
     burst_particles[0].cfg.startColorBlue  = p1_not_white.b / 255.f;
 
-    ufo_secondary_particles[0].cfg.startColorRed   = p2_not_white.r / 255.f;
-    ufo_secondary_particles[0].cfg.startColorGreen = p2_not_white.g / 255.f;
-    ufo_secondary_particles[0].cfg.startColorBlue  = p2_not_white.b / 255.f;
+    secondary_particles[0].cfg.startColorRed   = p2_not_white.r / 255.f;
+    secondary_particles[0].cfg.startColorGreen = p2_not_white.g / 255.f;
+    secondary_particles[0].cfg.startColorBlue  = p2_not_white.b / 255.f;
 
-    ufo_secondary_particles[1].cfg.startColorRed   = p1_not_white.r / 255.f;
-    ufo_secondary_particles[1].cfg.startColorGreen = p1_not_white.g / 255.f;
-    ufo_secondary_particles[1].cfg.startColorBlue  = p1_not_white.b / 255.f;
+    secondary_particles[1].cfg.startColorRed   = p1_not_white.r / 255.f;
+    secondary_particles[1].cfg.startColorGreen = p1_not_white.g / 255.f;
+    secondary_particles[1].cfg.startColorBlue  = p1_not_white.b / 255.f;
+
+    ship_secondary_particles[0].cfg.startColorRed   = 255.f/ 255.f;
+    ship_secondary_particles[0].cfg.startColorGreen = 65.f / 255.f;
+    ship_secondary_particles[0].cfg.startColorBlue  = 0.f / 255.f;
+
+    ship_secondary_particles[1].cfg.startColorRed   = 255.f / 255.f;
+    ship_secondary_particles[1].cfg.startColorGreen = 65.f / 255.f;
+    ship_secondary_particles[1].cfg.startColorBlue  = 0.f/ 255.f;
 
     ship_fire_particles[0].cfg.startColorRed   = 255.f / 255.f;
     ship_fire_particles[0].cfg.startColorGreen = 65.f / 255.f;
@@ -276,7 +287,8 @@ void game_loop() {
                 drag_particles_2[i].stationary = true;
                 drag_particles_2[i].emitting = false;
                 ship_fire_particles[i].emitting = false;
-                ufo_secondary_particles[i].emitting = false;
+                secondary_particles[i].emitting = false;
+                ship_secondary_particles[i].emitting = false;
                 burst_particles[i].emitting = false;
             }
             
@@ -375,7 +387,8 @@ void game_loop() {
                 updateParticleSystem(&drag_particles[i], delta);
                 updateParticleSystem(&drag_particles_2[i], delta);
                 updateParticleSystem(&ship_fire_particles[i], delta);
-                updateParticleSystem(&ufo_secondary_particles[i], delta);
+                updateParticleSystem(&ship_secondary_particles[i], delta);
+                updateParticleSystem(&secondary_particles[i], delta);
                 updateParticleSystem(&burst_particles[i], delta);
             }
             update_object_particles();
@@ -485,13 +498,15 @@ void game_loop() {
     freeParticleData(&drag_particles[0].data);
     freeParticleData(&drag_particles_2[0].data);
     freeParticleData(&ship_fire_particles[0].data);
-    freeParticleData(&ufo_secondary_particles[0].data);
+    freeParticleData(&secondary_particles[0].data);
+    freeParticleData(&ship_secondary_particles[0].data);
     freeParticleData(&burst_particles[0].data);
 
     freeParticleData(&drag_particles[1].data);
     freeParticleData(&drag_particles_2[1].data);
     freeParticleData(&ship_fire_particles[1].data);
-    freeParticleData(&ufo_secondary_particles[1].data);
+    freeParticleData(&ship_secondary_particles[1].data);
+    freeParticleData(&secondary_particles[1].data);
     freeParticleData(&burst_particles[1].data);
     unload_level();
 

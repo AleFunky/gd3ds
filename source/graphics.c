@@ -1014,10 +1014,10 @@ void draw_objects() {
             for (int i = 0; i < 2; i++) {
                 drawParticleSystem(&drag_particles[i], 0, 0, 1.f);
                 drawParticleSystem(&ship_fire_particles[i], 0, 0, 1.f);
-                drawParticleSystem(&ufo_secondary_particles[i], 0, 0, 1.f);
+                drawParticleSystem(&ship_secondary_particles[i], 0, 0, 1.f);
+                drawParticleSystem(&secondary_particles[i], 0, 0, 1.f);
                 drawParticleSystem(&burst_particles[i], 0, 0, 1.f);
             }
-            change_blending(false);
             change_blending(false);
             blend_enabled = false;
             state.current_player = 0;
@@ -1026,19 +1026,20 @@ void draw_objects() {
             wave_trail = &wave_trail_p1;
 
             draw_player(&state.player);
-
+            
+            if (state.dual) {
+                state.current_player = 1;
+                trail = &trail_p2;
+                wave_trail = &wave_trail_p2;
+                draw_player(&state.player2);
+            }  
+                    
             change_blending(true);
             for (int i = 0; i < 2; i++) {
                 drawParticleSystem(&drag_particles_2[i], 0, 0, 1.f);
             }
             change_blending(false);
 
-            if (state.dual) {
-                state.current_player = 1;
-                trail = &trail_p2;
-                wave_trail = &wave_trail_p2;
-                draw_player(&state.player2);
-            }          
         }
     }
 

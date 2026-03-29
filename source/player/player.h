@@ -150,7 +150,8 @@ extern MotionTrail wave_trail_p2;
 extern ParticleSystem drag_particles[2];
 extern ParticleSystem drag_particles_2[2];
 extern ParticleSystem ship_fire_particles[2];
-extern ParticleSystem ufo_secondary_particles[2];
+extern ParticleSystem ship_secondary_particles[2];
+extern ParticleSystem secondary_particles[2];
 extern ParticleSystem burst_particles[2];
 
 extern const float player_speeds[SPEED_COUNT];

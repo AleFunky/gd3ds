@@ -26,7 +26,8 @@ MotionTrail wave_trail_p2;
 ParticleSystem drag_particles[2];
 ParticleSystem drag_particles_2[2];
 ParticleSystem ship_fire_particles[2];
-ParticleSystem ufo_secondary_particles[2];
+ParticleSystem ship_secondary_particles[2];
+ParticleSystem secondary_particles[2];
 ParticleSystem burst_particles[2];
 
 
@@ -186,6 +187,11 @@ void ship_gamemode(Player *player) {
     ship_fire_particles[state.current_player].gravityFlipped = player->upside_down;
     ship_fire_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
 
+    ship_secondary_particles[state.current_player].emitterX = x;
+    ship_secondary_particles[state.current_player].emitterY = y;
+    ship_secondary_particles[state.current_player].emitting = true;
+
+    ship_secondary_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
 
     drag_particles_2[state.current_player].emitterX = calc_x;
     drag_particles_2[state.current_player].emitterY = calc_y;
@@ -316,12 +322,11 @@ void ufo_gamemode(Player *player) {
     trail->positionR = (Vec2){x, y};  
     trail->startingPositionInitialized = true;
 
-    ufo_secondary_particles[state.current_player].emitterX = player->x;
-    ufo_secondary_particles[state.current_player].emitterY = fabsf(gravBottom(player)) + (player->upside_down ? -3 : 3);
-    ufo_secondary_particles[state.current_player].emitting = true;
+    secondary_particles[state.current_player].emitterX = player->x;
+    secondary_particles[state.current_player].emitterY = fabsf(gravBottom(player)) + (player->upside_down ? -6 : 6);
+    secondary_particles[state.current_player].emitting = true;
 
-    ufo_secondary_particles[state.current_player].gravityFlipped = player->upside_down;
-    ufo_secondary_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
+    secondary_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
 
     drag_particles_2[state.current_player].emitterX = calc_x;
     drag_particles_2[state.current_player].emitterY = calc_y;

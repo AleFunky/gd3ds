@@ -86,3 +86,5 @@ extern const ParticleDefinition boost_02_effect;
 extern const ParticleDefinition boost_03_effect;
 extern const ParticleDefinition boost_04_effect;
 extern const ParticleDefinition end_effect_portal;
+extern const ParticleDefinition ship_effect;
+extern const ParticleDefinition ship_fire_effect;
