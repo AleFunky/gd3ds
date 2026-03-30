@@ -294,6 +294,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             }
             break;
         case YELLOW_ORB:
+            if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], &orb_collide_effect, GFX_TOP);
             if (!GET_ACTIVATED(obj) && (state.input.holdJump) && player->buffering_state == BUFFER_READY) {
                 MotionTrail_ResumeStroke(trail);
                 player->vel_y = jump_heights_table[state.speed][JUMP_YELLOW_ORB][player->gamemode][player->mini];
@@ -313,6 +314,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             } 
             break;
         case PINK_ORB:
+            if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], &orb_collide_effect, GFX_TOP);
             if (!GET_ACTIVATED(obj) && (state.input.holdJump) && player->buffering_state == BUFFER_READY) {
                 MotionTrail_ResumeStroke(trail);
                 player->vel_y = jump_heights_table[state.speed][JUMP_PINK_ORB][player->gamemode][player->mini];
@@ -337,6 +339,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             } 
             break;
         case BLUE_ORB:
+            if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], &orb_collide_effect, GFX_TOP);
             if (!GET_ACTIVATED(obj) && (state.input.holdJump) && player->buffering_state == BUFFER_READY) {    
                 MotionTrail_ResumeStroke(trail);
                 if (player->gamemode == GAMEMODE_DART) MotionTrail_AddWavePoint(wave_trail);
@@ -473,24 +476,28 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         case SLOW_SPEED_PORTAL:
             if (!GET_ACTIVATED(obj)) {
                 state.speed = SPEED_SLOW;
+                add_use_effect(objects.x[obj], objects.y[obj], &orb_collide_effect, GFX_TOP);
                 SET_ACTIVATED(obj, true);
             }
             break;
         case NORMAL_SPEED_PORTAL:
             if (!GET_ACTIVATED(obj)) {
                 state.speed = SPEED_NORMAL;
+                add_use_effect(objects.x[obj], objects.y[obj], &orb_collide_effect, GFX_TOP);
                 SET_ACTIVATED(obj, true);
             }
             break;
         case FAST_SPEED_PORTAL:
             if (!GET_ACTIVATED(obj)) {
                 state.speed = SPEED_FAST;
+                add_use_effect(objects.x[obj], objects.y[obj], &orb_collide_effect, GFX_TOP);
                 SET_ACTIVATED(obj, true);
             }
             break;
         case FASTER_SPEED_PORTAL:
             if (!GET_ACTIVATED(obj)) {
                 state.speed = SPEED_FASTER;
+                add_use_effect(objects.x[obj], objects.y[obj], &orb_collide_effect, GFX_TOP);
                 SET_ACTIVATED(obj, true);
             }
             break;

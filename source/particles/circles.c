@@ -24,10 +24,10 @@ const UseEffectDefinition orb_use_effect = {
     .colorG = 1,
     .colorB = 0,
     .duration = 0.4f,
-    .start_opacity = 0.1f,
+    .start_opacity = 0.05f,
     .end_opacity = 1,
-    .start_rad = 28,
-    .end_rad = 3,
+    .start_rad = 32,
+    .end_rad = 3.2f,
     .hollow = false,
     .trifading = true,
     .start_opacity_ease = EASE_OUT,
@@ -40,7 +40,7 @@ const UseEffectDefinition portal_use_effect = {
     .colorG = 1,
     .colorB = 0,
     .duration = 0.4f,
-    .start_opacity = 0,
+    .start_opacity = 0.05f,
     .end_opacity = 1,
     .start_rad = 50,
     .end_rad = 5,
@@ -51,7 +51,22 @@ const UseEffectDefinition portal_use_effect = {
     .start_rad_ease = EASE_LINEAR,
     .end_rad_ease = EASE_LINEAR,
 };
-
+const UseEffectDefinition orb_collide_effect = {
+    .colorR = 1, 
+    .colorG = 1,
+    .colorB = 1,
+    .duration = 0.3f,
+    .start_opacity = 1,
+    .end_opacity = 0,
+    .start_rad = 5,
+    .end_rad = 60,
+    .hollow = true,
+    .trifading = false,
+    .start_opacity_ease = EASE_IN,
+    .end_opacity_ease = EASE_OUT,
+    .start_rad_ease = EASE_OUT,
+    .end_rad_ease = EASE_OUT,
+};
 UseEffect use_effects_top[MAX_USE_EFFECTS];
 UseEffect use_effects_bot[MAX_USE_EFFECTS];
 
