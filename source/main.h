@@ -20,7 +20,8 @@ extern unsigned int level_frame;
 
 extern bool exiting_level;
 
-extern ParticleSystem touch_particles;
+extern ParticleSystem touch_drag_particles;
+extern ParticleSystem touch_explosion_particles;
 
 #define SCREEN_WIDTH  400
 #define SCREEN_HEIGHT 240

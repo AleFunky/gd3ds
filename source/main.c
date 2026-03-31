@@ -53,7 +53,8 @@ SFX play_sound;
 SFX quit_sound;
 SFX explode_sound;
 
-ParticleSystem touch_particles;
+ParticleSystem touch_drag_particles;
+ParticleSystem touch_explosion_particles;
 
 bool is_citra() {
     s64 version = 0;
@@ -626,8 +627,11 @@ void game_assets_init() {
     trailSheet = C2D_SpriteSheetLoad("romfs:/gfx/trails.t3x");
     if (!trailSheet) svcBreak(USERBREAK_PANIC);
 
-    initParticleSystem(&touch_particles, &drag_effect);
-    touch_particles.relativeStationary = true;
+    initParticleSystem(&touch_drag_particles, &touch_drag_effect);
+    touch_drag_particles.relativeStationary = true;
+
+    initParticleSystem(&touch_explosion_particles, &touch_explosion_effect);
+    touch_explosion_particles.relativeStationary = true;
 }
 
 void load_sfx() {
@@ -675,9 +679,14 @@ int main(int argc, char* argv[]) {
         // Update color if changed menus
         Color p1_not_white = get_white_if_black(p1_color);
 
-        touch_particles.cfg.startColorRed   = p1_not_white.r / 255.f;
-        touch_particles.cfg.startColorGreen = p1_not_white.g / 255.f;
-        touch_particles.cfg.startColorBlue  = p1_not_white.b / 255.f;
+        touch_drag_particles.cfg.startColorRed   = p1_not_white.r / 255.f;
+        touch_drag_particles.cfg.startColorGreen = p1_not_white.g / 255.f;
+        touch_drag_particles.cfg.startColorBlue  = p1_not_white.b / 255.f;
+
+        touch_explosion_particles.cfg.startColorRed   = p1_not_white.r / 255.f;
+        touch_explosion_particles.cfg.startColorGreen = p1_not_white.g / 255.f;
+        touch_explosion_particles.cfg.startColorBlue  = p1_not_white.b / 255.f;
+
         switch (game_state) {
             case STATE_MAIN_MENU:
                 main_menu_loop();

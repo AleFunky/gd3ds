@@ -266,6 +266,6 @@ void handle_death() {
 
     explosion_particles[state.current_player].emitterX = player->x;
     explosion_particles[state.current_player].emitterY = player->y;
-    spawnMultipleParticles(&explosion_particles[state.current_player], 30);
+    spawnMultipleParticles(&explosion_particles[state.current_player], 90);
     
 }

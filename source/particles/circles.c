@@ -93,18 +93,34 @@ const UseEffectDefinition death_effect = {
     .colorG = 1,
     .colorB = 1,
     .duration = 0.5f,
-    .start_opacity = 1,
+    .start_opacity = 0.9f,
     .end_opacity = 0,
-    .start_rad = 4,
+    .start_rad = 8,
     .end_rad = 80,
     .hollow = false,
     .trifading = false,
-    .start_opacity_ease = EASE_LINEAR,
+    .start_opacity_ease = EASE_IN,
     .end_opacity_ease = EASE_LINEAR,
     .start_rad_ease = EASE_OUT,
     .end_rad_ease = EASE_OUT,
 };
 
+const UseEffectDefinition tap_effect = {
+    .colorR = 1, 
+    .colorG = 1,
+    .colorB = 0,
+    .duration = 0.25f,
+    .start_opacity = 1,
+    .end_opacity = 0,
+    .start_rad = 1,
+    .end_rad = 40,
+    .hollow = false,
+    .trifading = false,
+    .start_opacity_ease = EASE_IN,
+    .end_opacity_ease = EASE_LINEAR,
+    .start_rad_ease = EASE_OUT,
+    .end_rad_ease = EASE_OUT,
+};
 
 UseEffect use_effects_top[MAX_USE_EFFECTS];
 UseEffect use_effects_bot[MAX_USE_EFFECTS];

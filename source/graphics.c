@@ -1108,12 +1108,21 @@ void update_touch_effect(float delta) {
     u32 kDown = hidKeysDown();
     u32 kHeld = hidKeysHeld();
 
-    touch_particles.emitting = false;
+    touch_drag_particles.emitting = false;
 
     if ((kHeld & KEY_TOUCH) && !get_fade_status()) {
+        // Flip for particles
+        pos.py = SCREEN_HEIGHT - pos.py;
         // Use effect
         if (kDown & KEY_TOUCH) {
-            UseEffect *effect = add_use_effect(pos.px, pos.py, -1, &pad_use_effect, GFX_BOTTOM);
+            // Flip for particles
+            pos.py = SCREEN_HEIGHT - pos.py;
+            UseEffect *effect = add_use_effect(pos.px, pos.py, -1, &tap_effect, GFX_BOTTOM);    
+            // Flip for particles
+            pos.py = SCREEN_HEIGHT - pos.py;
+            touch_explosion_particles.emitterX = pos.px;
+            touch_explosion_particles.emitterY = pos.py;
+            spawnMultipleParticles(&touch_explosion_particles, 50);
             if (effect) {
                 Color p1_not_white = get_white_if_black(p1_color);
 
@@ -1123,20 +1132,21 @@ void update_touch_effect(float delta) {
             }
         }
 
-        // Flip for particles
-        pos.py = SCREEN_HEIGHT - pos.py;
+        touch_drag_particles.emitterX = pos.px;
+        touch_drag_particles.emitterY = pos.py;
+        touch_drag_particles.emitting = true;
+
         
-        touch_particles.emitterX = pos.px;
-        touch_particles.emitterY = pos.py;
-        touch_particles.emitting = true;
     }
     update_use_effects(delta, GFX_BOTTOM);
-    updateParticleSystem(&touch_particles, delta);
+    updateParticleSystem(&touch_explosion_particles, delta);
+    updateParticleSystem(&touch_drag_particles, delta);
 }
 
 void draw_touch_effect() {
     draw_use_effects(GFX_BOTTOM);
-    drawParticleSystem(&touch_particles, 0, 0, 1.f);
+    drawParticleSystem(&touch_drag_particles, 0, 0, 1.f);
+    drawParticleSystem(&touch_explosion_particles, 0, 0, 1.f);
 }
 
 void spawn_icon_at(
