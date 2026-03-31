@@ -50,6 +50,7 @@ typedef struct {
 extern const UseEffectDefinition pad_use_effect;
 extern const UseEffectDefinition orb_use_effect;
 extern const UseEffectDefinition orb_collide_effect;
+extern const UseEffectDefinition speed_collide_effect;
 extern const UseEffectDefinition portal_use_effect;
 extern const UseEffectDefinition death_effect;
 

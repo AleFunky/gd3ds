@@ -32,7 +32,7 @@ const UseEffectDefinition orb_use_effect = {
     .hollow = false,
     .trifading = true,
     .start_opacity_ease = EASE_OUT,
-    .end_opacity_ease = EASE_IN,
+    .end_opacity_ease = EASE_LINEAR,
     .start_rad_ease = EASE_IN,
     .end_rad_ease = EASE_LINEAR,
 };
@@ -43,7 +43,7 @@ const UseEffectDefinition portal_use_effect = {
     .duration = 0.4f,
     .start_opacity = 0.05f,
     .end_opacity = 1,
-    .start_rad = 50,
+    .start_rad = 55,
     .end_rad = 5,
     .hollow = false,
     .trifading = true,
@@ -69,6 +69,25 @@ const UseEffectDefinition orb_collide_effect = {
     .end_rad_ease = EASE_OUT,
     .line_thickness = 1.f
 };
+
+const UseEffectDefinition speed_collide_effect = {
+    .colorR = 1, 
+    .colorG = 1,
+    .colorB = 1,
+    .duration = 0.3f,
+    .start_opacity = 1,
+    .end_opacity = 0,
+    .start_rad = 5,
+    .end_rad = 70,
+    .hollow = true,
+    .trifading = false,
+    .start_opacity_ease = EASE_IN,
+    .end_opacity_ease = EASE_OUT,
+    .start_rad_ease = EASE_OUT,
+    .end_rad_ease = EASE_OUT,
+    .line_thickness = 2.5f
+};
+
 const UseEffectDefinition death_effect = {
     .colorR = 1, 
     .colorG = 1,
