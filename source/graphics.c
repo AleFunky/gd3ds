@@ -1079,6 +1079,12 @@ void draw_objects() {
 
         }
     }
+    if (!blend_enabled) change_blending(true);
+        drawParticleSystem(&slow_speed_particles, 0, 0, 1.f);
+        drawParticleSystem(&normal_speed_particles, 0, 0, 1.f);
+        drawParticleSystem(&fast_speed_particles, 0, 0, 1.f);
+        drawParticleSystem(&faster_speed_particles, 0, 0, 1.f);
+        change_blending(false);
 
     if (state.hitbox_display) {
         for (size_t s = 0; s < sprite_count; s++) {

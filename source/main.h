@@ -23,6 +23,11 @@ extern bool exiting_level;
 extern ParticleSystem touch_drag_particles;
 extern ParticleSystem touch_explosion_particles;
 
+extern float slow_speed_particles_timer;
+extern float normal_speed_particles_timer;
+extern float fast_speed_particles_timer;
+extern float faster_speed_particles_timer;
+
 #define SCREEN_WIDTH  400
 #define SCREEN_HEIGHT 240
 

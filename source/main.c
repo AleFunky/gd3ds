@@ -57,6 +57,12 @@ SFX explode_sound;
 ParticleSystem touch_drag_particles;
 ParticleSystem touch_explosion_particles;
 
+float slow_speed_particles_timer = 0.f;
+float normal_speed_particles_timer = 0.f;
+float fast_speed_particles_timer = 0.f;
+float faster_speed_particles_timer = 0.f;
+
+
 bool is_citra() {
     s64 version = 0;
     svcGetSystemInfo(&version, CITRA_TYPE, CITRA_VERSION);
@@ -221,7 +227,16 @@ void game_loop() {
 
     initParticleSystem(&brick_destroy_particles, &glass_destroy_01);
     initParticleSystem(&glitter_particles, &glitter_effect);
+    initParticleSystem(&slow_speed_particles, &speed_effect_slow);
+    initParticleSystem(&normal_speed_particles, &speed_effect_normal);
+    initParticleSystem(&fast_speed_particles, &speed_effect_fast);
+    initParticleSystem(&faster_speed_particles, &speed_effect_vfast);
     
+    slow_speed_particles.stationary = true;
+    normal_speed_particles.stationary = true;
+    fast_speed_particles.stationary = true;
+    faster_speed_particles.stationary = true;
+
     Color p1_not_white = get_white_if_black(p1_color);
     Color p2_not_white = get_white_if_black(p2_color);
 
@@ -297,6 +312,22 @@ void game_loop() {
     glitter_particles.cfg.finishColorGreen = p1_not_white.g / 255.f;
     glitter_particles.cfg.finishColorBlue  = p1_not_white.b / 255.f;
 
+    slow_speed_particles.cfg.startColorRed   = 255 / 255.f;
+    slow_speed_particles.cfg.startColorGreen = 255 / 255.f;
+    slow_speed_particles.cfg.startColorBlue  = 0 / 255.f;
+
+    normal_speed_particles.cfg.startColorRed   = 0 / 255.f;
+    normal_speed_particles.cfg.startColorGreen = 190 / 255.f;
+    normal_speed_particles.cfg.startColorBlue  = 255 / 255.f;
+
+    fast_speed_particles.cfg.startColorRed   = 0 / 255.f;
+    fast_speed_particles.cfg.startColorGreen = 255 / 255.f;
+    fast_speed_particles.cfg.startColorBlue  = 0 / 255.f;
+
+    faster_speed_particles.cfg.startColorRed   = 230 / 255.f;
+    faster_speed_particles.cfg.startColorGreen = 65 / 255.f;
+    faster_speed_particles.cfg.startColorBlue  = 255 / 255.f;
+
     exiting_level = false;
 
     float accumulator = 0.0f;
@@ -367,7 +398,7 @@ void game_loop() {
             
             brick_destroy_particles.emitting = false;
             glitter_particles.emitting = false;
-            
+
             u64 now = svcGetSystemTick();
             delta = (now - lastTime) / (CPU_TICKS_PER_MSEC * 1000);
             lastTime = now;
@@ -491,6 +522,43 @@ void game_loop() {
             }
             updateParticleSystem(&brick_destroy_particles, delta);
             updateParticleSystem(&glitter_particles, delta);
+            updateParticleSystem(&slow_speed_particles, delta);
+            updateParticleSystem(&normal_speed_particles, delta);
+            updateParticleSystem(&fast_speed_particles, delta);
+            updateParticleSystem(&faster_speed_particles, delta);
+
+            float calc_x_speed_particles = SCREEN_WIDTH_AREA;
+            float calc_y_speed_particles = (SCREEN_HEIGHT_AREA / 2);
+
+            slow_speed_particles.emitterX = calc_x_speed_particles;
+            slow_speed_particles.emitterY = calc_y_speed_particles;
+            slow_speed_particles.emitting = slow_speed_particles_timer > 0;
+            if (slow_speed_particles_timer > 0) {
+                slow_speed_particles_timer -= delta;
+            }
+
+            normal_speed_particles.emitterX = calc_x_speed_particles;
+            normal_speed_particles.emitterY = calc_y_speed_particles;
+            normal_speed_particles.emitting = normal_speed_particles_timer > 0;
+            if (normal_speed_particles_timer > 0) {
+                normal_speed_particles_timer -= delta;
+            }
+
+            fast_speed_particles.emitterX = calc_x_speed_particles;
+            fast_speed_particles.emitterY = calc_y_speed_particles;
+            fast_speed_particles.emitting = fast_speed_particles_timer > 0;
+            if (fast_speed_particles_timer > 0) {
+                fast_speed_particles_timer -= delta;
+            }
+
+            faster_speed_particles.emitterX = calc_x_speed_particles;
+            faster_speed_particles.emitterY = calc_y_speed_particles;
+            faster_speed_particles.emitting = faster_speed_particles_timer > 0;
+            if (faster_speed_particles_timer > 0) {
+                faster_speed_particles_timer -= delta;
+            }
+            
+
             update_use_effects(delta, GFX_TOP);
             update_object_particles();
             u64 end_part = svcGetSystemTick();
@@ -615,6 +683,11 @@ void game_loop() {
 
     freeParticleData(&brick_destroy_particles.data);
     freeParticleData(&glitter_particles.data);
+    freeParticleData(&slow_speed_particles.data);
+    freeParticleData(&normal_speed_particles.data);
+    freeParticleData(&fast_speed_particles.data);
+    freeParticleData(&faster_speed_particles.data);
+
     unload_level();
 
     game_state = (state.custom_level ? STATE_EXTERNAL_LEVELS : STATE_LEVEL_SELECT);

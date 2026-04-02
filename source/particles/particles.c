@@ -234,8 +234,6 @@ void updateParticleSystem(ParticleSystem* ps, float dt) {
         ps->emitCounter -= rate * emitCount;
 
         ps->elapsed += dt;
-        if (ps->duration > 0 && ps->elapsed > ps->duration)
-            ps->active = 0;
     }
 
     int count = d->count;

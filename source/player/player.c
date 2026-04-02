@@ -32,7 +32,10 @@ ParticleSystem burst_particles[2];
 ParticleSystem land_particles[2];
 ParticleSystem explosion_particles[2];
 ParticleSystem glitter_particles;
-
+ParticleSystem slow_speed_particles;
+ParticleSystem normal_speed_particles;
+ParticleSystem fast_speed_particles;
+ParticleSystem faster_speed_particles;
 
 int frame_skipped = 0;
 

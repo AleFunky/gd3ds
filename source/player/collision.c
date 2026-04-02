@@ -482,50 +482,64 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
 
         case SLOW_SPEED_PORTAL:
             if (!GET_ACTIVATED(obj)) {
-                state.speed = SPEED_SLOW;
+                SET_ACTIVATED(obj, true);
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &speed_collide_effect, GFX_TOP);
                 if (effect) {
                     effect->def.colorR = 255 / 255.f;
                     effect->def.colorG = 255 / 255.f;
                     effect->def.colorB = 0 / 255.f;
                 }
-                SET_ACTIVATED(obj, true);
+                if (state.speed != SPEED_SLOW) {
+                    state.speed = SPEED_SLOW;
+                    slow_speed_particles_timer = 0.7f;
+                };
             }
             break;
         case NORMAL_SPEED_PORTAL:
             if (!GET_ACTIVATED(obj)) {
-                state.speed = SPEED_NORMAL;
+                SET_ACTIVATED(obj, true);
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &speed_collide_effect, GFX_TOP);
                 if (effect) {
                     effect->def.colorR = 0 / 255.f;
                     effect->def.colorG = 190 / 255.f;
                     effect->def.colorB = 255 / 255.f;
                 }
-                SET_ACTIVATED(obj, true);
+                if (state.speed != SPEED_NORMAL) {
+                    state.speed = SPEED_NORMAL;
+                    normal_speed_particles_timer = 0.7f;
+                }
             }
             break;
         case FAST_SPEED_PORTAL:
             if (!GET_ACTIVATED(obj)) {
-                state.speed = SPEED_FAST;
+                SET_ACTIVATED(obj, true);
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &speed_collide_effect, GFX_TOP);
                 if (effect) {
                     effect->def.colorR = 0 / 255.f;
                     effect->def.colorG = 255 / 255.f;
                     effect->def.colorB = 0 / 255.f;
                 }
-                SET_ACTIVATED(obj, true);
+                if (state.speed != SPEED_FAST){
+                    state.speed = SPEED_FAST;
+                    fast_speed_particles_timer = 0.7f;
+                }
             }
             break;
         case FASTER_SPEED_PORTAL:
             if (!GET_ACTIVATED(obj)) {
-                state.speed = SPEED_FASTER;
+                SET_ACTIVATED(obj, true);
+
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &speed_collide_effect, GFX_TOP);
                 if (effect) {
                     effect->def.colorR = 230 / 255.f;
                     effect->def.colorG = 65  / 255.f;
                     effect->def.colorB = 255 / 255.f;
                 }
-                SET_ACTIVATED(obj, true);
+                
+                if (state.speed != SPEED_FASTER) {
+                    state.speed = SPEED_FASTER;
+                    faster_speed_particles_timer = 0.7f;
+                }
             }
             break;
         case CUBE_PORTAL: 
