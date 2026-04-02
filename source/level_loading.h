@@ -100,8 +100,8 @@ typedef struct {
 
 extern LoadedLevelInfo level_info;
 
-#define BG_COUNT 8
-#define G_COUNT 8
+#define BG_COUNT 7
+#define G_COUNT 7
 
 extern ObjectsArray objects;
 

@@ -89,7 +89,7 @@ void load_level_folder(char *folder) {
             }
         }
     } else {
-        texts[0] = ui_create_label(0, 0, 0.5f, "Sorry nothing", 0.5f, NULL);
+        texts[0] = ui_create_label(0, 0, 0.5f, "No levels", 0.5f, NULL);
         ui_list_add(list, &texts[0]);
     }
 
@@ -114,6 +114,13 @@ static UIAction actions[] = {
 };
 
 void external_levels_loop() {
+    C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+    C2D_SceneBegin(bot);
+    C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
+    C2D_Fade(0);
+    draw_text(bigFont_fontCharset, bigFont_sheet, 310, SCREEN_HEIGHT - 10, 0.5f, 1.0f, "Loading...");
+    C3D_FrameEnd(0);
+
     start_level = false;
     exit_flag = false;
     if (first_time_loaded) {

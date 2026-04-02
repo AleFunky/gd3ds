@@ -62,7 +62,7 @@ void exit_level() {
 void restart_level() {
     init_variables();
     reload_level(); 
-    seek_mp3(0);
+    seek_mp3(level_info.song_offset);
     unpause_game();
 }
 

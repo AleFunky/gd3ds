@@ -436,6 +436,8 @@ void spawn_object_at(
 
     // Skip if no glow frame
     if (glowEnabled && obj->glow_frame >= 0) {
+        if (sprite_count >= MAX_SPRITES - 1) return;
+
         SpriteObject *vo = &viewable_objects[sprite_count];
 
         vo->spr = sprite_templates[id].glow_template;
@@ -918,6 +920,11 @@ void create_objects() {
                 if (calc_x < -60 || calc_x >= (SCREEN_WIDTH / SCALE) + 60) continue;
                 if (calc_y < -60 || calc_y >= (SCREEN_HEIGHT / SCALE) + 60) continue;
 
+                // Skip invalid objects
+                if (objects.id[obj] > 745) {
+                    continue;
+                }
+
                 int fade_val = obj_edge_fade(calc_x, SCREEN_WIDTH / SCALE);
                 bool fade_edge = (fade_val == 255 || fade_val == 0);
 
@@ -1076,7 +1083,6 @@ void draw_objects() {
                 drawParticleSystem(&drag_particles_2[i], 0, 0, 1.f);
             }
             change_blending(false);
-
         }
     }
     if (!blend_enabled) change_blending(true);
@@ -1085,6 +1091,10 @@ void draw_objects() {
         drawParticleSystem(&fast_speed_particles, 0, 0, 1.f);
         drawParticleSystem(&faster_speed_particles, 0, 0, 1.f);
         change_blending(false);
+
+    if (!blend_enabled) change_blending(true);
+    drawParticleSystem(&slow_speed_particles, 0, 0, 1.f);
+    change_blending(false);
 
     if (state.hitbox_display) {
         for (size_t s = 0; s < sprite_count; s++) {

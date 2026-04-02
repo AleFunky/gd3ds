@@ -156,6 +156,13 @@ unsigned int frame_counter = 0;
 bool exiting_level = false;
 
 void game_loop() {
+    C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+    C2D_SceneBegin(top);
+    C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
+    C2D_Fade(0);
+    draw_text(bigFont_fontCharset, bigFont_sheet, SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10, 0.5f, 1.0f, "Loading...");
+    C3D_FrameEnd(0);
+    
     char *path;
 
     if (state.custom_level) {
@@ -634,6 +641,7 @@ void game_loop() {
                 draw_text(bigFont_fontCharset, bigFont_sheet, 0, 6,  DEBUG_TEXT_SCALE, 0, "CPU: %6.2f%% (%6.2f%% %6.2f%%)", (C3D_GetProcessingTime() * 6) + processingTime, C3D_GetProcessingTime() * 6, processingTime);
                 draw_text(bigFont_fontCharset, bigFont_sheet, 0, 18, DEBUG_TEXT_SCALE, 0, "GPU: %6.2f%%", drawingTime);
                 draw_text(bigFont_fontCharset, bigFont_sheet, 0, 30, DEBUG_TEXT_SCALE, 0, "Linear free: %d", linearSpaceFree());
+                draw_text(bigFont_fontCharset, bigFont_sheet, 180, 30, DEBUG_TEXT_SCALE, 0, "CMDBuf: %6.2f%%", C3D_GetCmdBufUsage()*100.0f);
 
                 draw_text(bigFont_fontCharset, bigFont_sheet, 180, 42,  DEBUG_TEXT_SCALE, 0, "%d steps", steps);
                 draw_text(bigFont_fontCharset, bigFont_sheet, 180, 54,  DEBUG_TEXT_SCALE, 0, "Particle: %6.2f%%", particle_calc_time * 6);
@@ -736,7 +744,7 @@ int main(int argc, char* argv[]) {
     // Init libs
     romfsInit();
     gfxInitDefault();
-    C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
+    C3D_Init(C3D_DEFAULT_CMDBUF_SIZE * 4);
     C2D_Init(MAX_SPRITES);
     C2D_Prepare();
     osSetSpeedupEnable(1);

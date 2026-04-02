@@ -934,7 +934,9 @@ int parse_gd_object(const char *objStr, int obj) {
             if (orientation < 0) orientation += 4;
 
             objects.orientation[obj] = orientation;
+        }
 
+        if (hitbox->collision_type == HITBOX_SOLID) {
             // Modify height and width depending on rotation
             if ((int) fabsf(objects.rotation[obj]) % 180 != 0) {
                 objects.width[obj] = hitbox->height;
