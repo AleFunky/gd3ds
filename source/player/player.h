@@ -164,6 +164,7 @@ extern ParticleSystem slow_speed_particles;
 extern ParticleSystem normal_speed_particles;
 extern ParticleSystem fast_speed_particles;
 extern ParticleSystem faster_speed_particles;
+extern ParticleSystem coin_pickup_particles;
 
 extern const float player_speeds[SPEED_COUNT];
 

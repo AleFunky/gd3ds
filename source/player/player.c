@@ -36,6 +36,7 @@ ParticleSystem slow_speed_particles;
 ParticleSystem normal_speed_particles;
 ParticleSystem fast_speed_particles;
 ParticleSystem faster_speed_particles;
+ParticleSystem coin_pickup_particles;
 
 int frame_skipped = 0;
 

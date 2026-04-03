@@ -763,6 +763,30 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 }
             }
             break;
+        case SECRET_COIN:
+            if (!GET_ACTIVATED(obj)) {
+                SET_ACTIVATED(obj, true);
+
+                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, GFX_TOP);
+                if (effect) {
+                    effect->def.colorR = 255 / 255.f;
+                    effect->def.colorG = 190 / 255.f;
+                    effect->def.colorB = 0 / 255.f;
+                }
+
+                UseEffect *effect2 = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, GFX_TOP);
+                if (effect2) {
+                    effect2->def.colorR = 255 / 255.f;
+                    effect2->def.colorG = 190 / 255.f;
+                    effect2->def.colorB = 0 / 255.f;
+                }
+                coin_pickup_particles.emitterX = objects.x[obj];
+                coin_pickup_particles.emitterY = objects.y[obj];
+                spawnMultipleParticles(&coin_pickup_particles, 40);
+            }
+
+            break;
+
     }
     if (!GET_COLLIDED(obj)) SET_HITBOX_COUNTER(obj, GET_HITBOX_COUNTER(obj) + 1); 
 }

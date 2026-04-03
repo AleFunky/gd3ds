@@ -242,6 +242,7 @@ void game_loop() {
     initParticleSystem(&normal_speed_particles, &speed_effect_normal);
     initParticleSystem(&fast_speed_particles, &speed_effect_fast);
     initParticleSystem(&faster_speed_particles, &speed_effect_vfast);
+    initParticleSystem(&coin_pickup_particles, &coin_pickup_effect);
     
     slow_speed_particles.stationary = true;
     normal_speed_particles.stationary = true;
@@ -338,6 +339,10 @@ void game_loop() {
     faster_speed_particles.cfg.startColorRed   = 230 / 255.f;
     faster_speed_particles.cfg.startColorGreen = 65 / 255.f;
     faster_speed_particles.cfg.startColorBlue  = 255 / 255.f;
+
+    coin_pickup_particles.cfg.startColorRed   = 255 / 255.f;
+    coin_pickup_particles.cfg.startColorGreen = 190 / 255.f;
+    coin_pickup_particles.cfg.startColorBlue  = 0 / 255.f;
 
     exiting_level = false;
 
@@ -537,7 +542,7 @@ void game_loop() {
             updateParticleSystem(&normal_speed_particles, delta);
             updateParticleSystem(&fast_speed_particles, delta);
             updateParticleSystem(&faster_speed_particles, delta);
-
+            updateParticleSystem(&coin_pickup_particles, delta);
             float calc_x_speed_particles = SCREEN_WIDTH_AREA;
             float calc_y_speed_particles = (SCREEN_HEIGHT_AREA / 2);
 
@@ -699,6 +704,7 @@ void game_loop() {
     freeParticleData(&normal_speed_particles.data);
     freeParticleData(&fast_speed_particles.data);
     freeParticleData(&faster_speed_particles.data);
+    freeParticleData(&coin_pickup_particles.data);
 
     unload_level();
 
