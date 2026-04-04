@@ -432,6 +432,12 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             if (!GET_ACTIVATED(obj)) {
                 state.intended_mirror_factor = 1.f;
                 state.intended_mirror_speed_factor = -1.f;
+                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
+                if (effect) {
+                    effect->def.colorR = 255 / 255.f;
+                    effect->def.colorG = 150 / 255.f;
+                    effect->def.colorB = 0 / 255.f;
+                }
                 SET_ACTIVATED(obj, true);
             }
             break;
@@ -454,13 +460,14 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         
         case BIG_PORTAL:
             if (!GET_ACTIVATED(obj)) {
-                set_mini(player, false);
-                
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
-                if (effect) {
-                    effect->def.colorR = 0 / 255.f;
-                    effect->def.colorG = 255 / 255.f;
-                    effect->def.colorB = 50 / 255.f;
+                if (player->mini) {
+                    set_mini(player, false);
+                    UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
+                    if (effect) {
+                        effect->def.colorR = 0 / 255.f;
+                        effect->def.colorG = 255 / 255.f;
+                        effect->def.colorB = 50 / 255.f;
+                    }
                 }
                 SET_ACTIVATED(obj, true);
             }
@@ -468,13 +475,14 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
 
         case MINI_PORTAL:
             if (!GET_ACTIVATED(obj)) {
-                set_mini(player, true);
-                
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
-                if (effect) {
-                    effect->def.colorR = 255 / 255.f;
-                    effect->def.colorG = 31 / 255.f;
-                    effect->def.colorB = 255 / 255.f;
+                if (!player->mini){
+                    set_mini(player, true);
+                    UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
+                    if (effect) {
+                        effect->def.colorR = 255 / 255.f;
+                        effect->def.colorG = 31 / 255.f;
+                        effect->def.colorB = 255 / 255.f;
+                    }
                 }
                 SET_ACTIVATED(obj, true);
             }
@@ -552,16 +560,15 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     }
 
                     if (player->gamemode == GAMEMODE_DART) player->vel_y *= 0.9f;
-                    
+                    if (state.dual) {
+                        set_dual_bounds();
+                    } 
                     player->ceiling_inv_time = CEILING_INVUL_TIME;
                     player->snap_rotation = true;
                     set_gamemode(player, GAMEMODE_PLAYER);
                     flip_other_player(state.current_player ^ 1);
                     update_rotation_direction(player);
                 }
-                if (state.dual) {
-                    set_dual_bounds();
-                } 
 
                 SET_ACTIVATED(obj, true);
             }
@@ -589,7 +596,9 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     } else if (player->vel_y > max) {
                         player->vel_y = max;
                     }
-
+                    if (state.dual) {
+                        set_dual_bounds();
+                    } 
                     UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
                     if (effect) {
                         effect->def.colorR = 255 / 255.f;
@@ -598,9 +607,6 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     }
                 }
 
-                if (state.dual) {
-                    set_dual_bounds();
-                } 
                 SET_ACTIVATED(obj, true);
             }
             break;
@@ -624,20 +630,21 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     }
                     
                     set_gamemode(player, GAMEMODE_PLAYER_BALL);
+                    if (state.dual) {
+                        set_dual_bounds();
+                    } 
                     player->inverse_rotation = false;
                     player->snap_rotation = true;
                     flip_other_player(state.current_player ^ 1);
+                    UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
+                    if (effect) {
+                        effect->def.colorG = 50 / 255.f;
+                        effect->def.colorB = 50 / 255.f;
+                        effect->def.colorR = 255 / 255.f;
+                    }
                 }
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
-                if (effect) {
-                    effect->def.colorR = 255 / 255.f;
-                    effect->def.colorG = 50 / 255.f;
-                    effect->def.colorB = 50 / 255.f;
-                }
-
-                if (state.dual) {
-                    set_dual_bounds();
-                } 
+                
+                
                 SET_ACTIVATED(obj, true);
             }
             break;
@@ -656,6 +663,10 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     player->snap_rotation = true;
                     flip_other_player(state.current_player ^ 1);
 
+                    if (state.dual) {
+                        set_dual_bounds();
+                    } 
+
                     if (state.old_player.gamemode == GAMEMODE_PLAYER || state.old_player.gamemode == GAMEMODE_SHIP || state.old_player.gamemode == GAMEMODE_DART) {
                         player->buffering_state = BUFFER_READY;
                     }
@@ -667,9 +678,6 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                         effect->def.colorB = 0 / 255.f;
                     }
                 }
-                if (state.dual) {
-                    set_dual_bounds();
-                } 
                 SET_ACTIVATED(obj, true);
             }
             break;
@@ -688,17 +696,16 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     wave_trail->positionR = (Vec2){player->x, player->y};  
                     wave_trail->startingPositionInitialized = true;
                     MotionTrail_AddWavePoint(wave_trail);
+                    UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
+                    if (effect) {
+                        effect->def.colorR = 0 / 255.f;
+                        effect->def.colorG = 200 / 255.f;
+                        effect->def.colorB = 255 / 255.f;
+                    }
                 }
 
                 if (state.dual) {
                     set_dual_bounds();
-                }
-
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
-                if (effect) {
-                    effect->def.colorR = 0 / 255.f;
-                    effect->def.colorG = 200 / 255.f;
-                    effect->def.colorB = 255 / 255.f;
                 }
 
                 SET_ACTIVATED(obj, true);
@@ -706,41 +713,33 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case DUAL_PORTAL:
             player->gravObj_id = obj;
-            if (!GET_ACTIVATED(obj) && !state.dual) {
-                player->ceiling_inv_time = CEILING_INVUL_TIME;
-                state.dual = true;
-                state.dual_portal_y = objects.y[obj];
-                setup_dual();
-
-                if (player->gamemode == GAMEMODE_DART) {
-                    MotionTrail_Init(&wave_trail_p2, 3.f, 3, 10.0f, true, get_white_if_black(p1_color), C2D_SpriteSheetGetImage(trailSheet, 0));   
-                    wave_trail_p2.positionR = (Vec2){state.player2.x, state.player2.y};  
-                    wave_trail_p2.startingPositionInitialized = true;
-                    MotionTrail_AddWavePoint(&wave_trail_p2);
+            if (!GET_ACTIVATED(obj)) {
+                if (!state.dual){
+                    player->ceiling_inv_time = CEILING_INVUL_TIME;
+                    state.dual = true;
+                    state.dual_portal_y = objects.y[obj];
+                    setup_dual();
+    
+                    if (player->gamemode == GAMEMODE_DART) {
+                        MotionTrail_Init(&wave_trail_p2, 3.f, 3, 10.0f, true, get_white_if_black(p1_color), C2D_SpriteSheetGetImage(trailSheet, 0));   
+                        wave_trail_p2.positionR = (Vec2){state.player2.x, state.player2.y};  
+                        wave_trail_p2.startingPositionInitialized = true;
+                        MotionTrail_AddWavePoint(&wave_trail_p2);
+                    }
+                    MotionTrail_Init(&trail_p2, 0.3f, 3, 10.0f, false, get_white_if_black(p1_color), C2D_SpriteSheetGetImage(trailSheet, 0));
                 }
-                MotionTrail_Init(&trail_p2, 0.3f, 3, 10.0f, false, get_white_if_black(p1_color), C2D_SpriteSheetGetImage(trailSheet, 0));
-                
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
-                if (effect) {
-                    effect->def.colorR = 255 / 255.f;
-                    effect->def.colorG = 127 / 255.f;
-                    effect->def.colorB = 0 / 255.f;
-                }
-                SET_ACTIVATED(obj, true);
+                SET_ACTIVATED(obj, true);                
             }
             break;
 
         case DIVORCE_PORTAL:
             if (!GET_ACTIVATED(obj)) {
-
-                state.dual = false;
-                SET_ACTIVATED(obj, true);
-
-                if (state.current_player == 1) {
-                    memcpy(&state.player, player, sizeof(Player));
-                }
-                
-                switch (state.player.gamemode) {
+                if (state.dual){
+                    state.dual = false;
+                    if (state.current_player == 1) {
+                        memcpy(&state.player, player, sizeof(Player));
+                    }
+                    switch (state.player.gamemode) {
                     case GAMEMODE_PLAYER:
                         state.ground_y = 0;
                         state.ceiling_y = 999999;
@@ -755,14 +754,18 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                         set_intended_ceiling();
                 }
 
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
-                if (effect) {
-                    effect->def.colorR = 56 / 255.f;
-                    effect->def.colorG = 200 / 255.f;
-                    effect->def.colorB = 255 / 255.f;
+                    UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
+                    if (effect) {
+                        effect->def.colorR = get_white_if_black(p1_color).r;
+                        effect->def.colorG = get_white_if_black(p1_color).g;
+                        effect->def.colorB = get_white_if_black(p1_color).b;
+                    }
+                    
                 }
+                SET_ACTIVATED(obj, true);
             }
             break;
+
         case SECRET_COIN:
             if (!GET_ACTIVATED(obj)) {
                 SET_ACTIVATED(obj, true);
@@ -784,7 +787,6 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 coin_pickup_particles.emitterY = objects.y[obj];
                 spawnMultipleParticles(&coin_pickup_particles, 40);
             }
-
             break;
 
     }
