@@ -3,7 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define SPRITESHEET2_START 818
+#define SPRITESHEET2_START 819
 
 typedef enum {
    COLLISION_NONE = 0,
@@ -60,7 +60,7 @@ typedef struct {
     const ObjectHitbox* hitbox;
 } GameObject;
 
-#define TEXTURE_COUNT 882
+#define TEXTURE_COUNT 883
 #define GAME_OBJECT_COUNT 1912
 
 extern const GameObject game_objects[GAME_OBJECT_COUNT];

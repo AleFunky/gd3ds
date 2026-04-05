@@ -70,18 +70,33 @@ void initParticle(ParticleSystem* ps, const ParticleDefinition* cfg, int i) {
     d->timeToLive[i] = life;
     d->totalTimeToLive[i] = life;
 
-    // Position
-    d->posx[i] = (ps->stationary ? 0 : ps->emitterX) +
-                 cfg->sourcePositionVariancex * rand_minus1_1() * ps->scale;
-
-    d->posy[i] = (ps->stationary ? 0 : ps->emitterY) +
-                 cfg->sourcePositionVariancey * rand_minus1_1() * ps->scale;
-
     // Angle and speed
     float angle = C3D_AngleFromDegrees(cfg->angle +
                   cfg->angleVariance * rand_minus1_1());
     
+                  // Position
+    if (ps->posVarRotates) {
+        float cosA = cosf(angle - C3D_AngleFromDegrees(90));
+        float sinA = sinf(angle - C3D_AngleFromDegrees(90));
 
+        float local_x = cfg->sourcePositionVariancex * rand_minus1_1();
+        float local_y = cfg->sourcePositionVariancey * rand_minus1_1();
+
+        float rotated_x = local_x * cosA - local_y * sinA;
+        float rotated_y = local_x * sinA + local_y * cosA;
+        
+
+        d->posx[i] = (ps->stationary ? 0 : ps->emitterX) + rotated_x * ps->scale;
+        d->posy[i] = (ps->stationary ? 0 : ps->emitterY) + rotated_y * ps->scale;
+    } else {
+        
+        d->posx[i] = (ps->stationary ? 0 : ps->emitterX) +
+                    cfg->sourcePositionVariancex * rand_minus1_1() * ps->scale;
+
+        d->posy[i] = (ps->stationary ? 0 : ps->emitterY) +
+                    cfg->sourcePositionVariancey * rand_minus1_1() * ps->scale;
+    }
+    
     float speed = (cfg->speed +
                   cfg->speedVariance * rand_minus1_1()) * ps->scale;
 
@@ -234,8 +249,6 @@ void updateParticleSystem(ParticleSystem* ps, float dt) {
         ps->emitCounter -= rate * emitCount;
 
         ps->elapsed += dt;
-        if (ps->duration > 0 && ps->elapsed > ps->duration)
-            ps->active = 0;
     }
 
     int count = d->count;

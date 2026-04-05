@@ -21,6 +21,7 @@ typedef enum {
     UI_COLOR_BUTTON,
     UI_WINDOW_BUTTON,
     UI_PROGRESS_BAR,
+    UI_EXTERNAL_LEVEL_CARD,
 } UIElementType;
 
 typedef struct {
@@ -169,9 +170,18 @@ typedef struct {
     bool useTint;
 } UIProgressBarData;
 
+typedef struct {
+    UIImageData icon;
+    UILabelData label;
+    UIButtonData button;
+    float button_w;
+    float button_h;
+    char path[256];
+} UIExternalLevelCard;
+
 typedef struct UIElement UIElement;
 
-#define UI_LIST_MAX_ITEMS 64
+#define UI_LIST_MAX_ITEMS 256
 
 typedef struct {
     UIElement* items[UI_LIST_MAX_ITEMS];
@@ -212,6 +222,7 @@ struct UIElement {
         UIColorData color;
         UIWindowButtonData window_button;
         UIProgressBarData progress_bar;
+        UIExternalLevelCard external_level_card;
     };
 
     char tag[TAGS_PER_ELEMENT][TAG_LENGTH];

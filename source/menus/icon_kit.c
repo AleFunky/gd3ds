@@ -222,7 +222,7 @@ void icon_kit_loop() {
     set_fade_status(FADE_STATUS_IN);
 
     if (!playing_menu_loop) {
-        play_mp3("romfs:/songs/menuLoop.mp3", true);
+        play_mp3("romfs:/songs/menuLoop.mp3", true, 0);
         playing_menu_loop = true;
     }
 

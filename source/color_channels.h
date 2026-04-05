@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include "level_loading.h"
 
+#define TRIGGER_BUFFER_SIZE 2048
+
 enum ColorChannelIDs {
     NONE,
     COL_1,

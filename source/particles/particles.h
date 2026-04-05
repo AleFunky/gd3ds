@@ -67,6 +67,8 @@ typedef struct {
     bool stationary;
     bool relativeStationary;
     bool gravityFlipped;
+    bool posVarRotates;
+    
     bool active;
     bool emitting;
 } ParticleSystem;

@@ -17,6 +17,8 @@
 
 #include "level/main_levels.h"
 
+#include "state.h"
+
 static UIScreen screen_top;
 static UIScreen screen;
 
@@ -216,6 +218,7 @@ int mode = 0;
 void level_select_loop() {
     start_level = false;
     exit_flag = false;
+    state.custom_level = false;
     ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/level_select.txt");
     ui_load_screen(&screen_top, actions_top, sizeof(actions_top) / sizeof(actions_top[0]), "romfs:/menus/level_select_top.txt");
 
@@ -257,7 +260,7 @@ void level_select_loop() {
     bg_gradient_top = ui_get_element_by_tag(&screen_top, "gradient");
 
     if (!playing_menu_loop) {
-        play_mp3("romfs:/songs/menuLoop.mp3", true);
+        play_mp3("romfs:/songs/menuLoop.mp3", true, 0);
         playing_menu_loop = true;
     }
 

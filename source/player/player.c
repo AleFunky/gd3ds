@@ -15,6 +15,8 @@
 
 #include "utils/gfx.h"
 
+inline float gravFloor(Player *player) { return player->upside_down ? -state.ceiling_y : state.ground_y; }
+
 MotionTrail *trail;
 MotionTrail trail_p1;
 MotionTrail trail_p2;
@@ -32,7 +34,11 @@ ParticleSystem burst_particles[2];
 ParticleSystem land_particles[2];
 ParticleSystem explosion_particles[2];
 ParticleSystem glitter_particles;
-
+ParticleSystem slow_speed_particles;
+ParticleSystem normal_speed_particles;
+ParticleSystem fast_speed_particles;
+ParticleSystem faster_speed_particles;
+ParticleSystem coin_pickup_particles;
 
 int frame_skipped = 0;
 
@@ -68,7 +74,8 @@ float player_get_vel(Player *player, float vel) {
     return vel * (player->upside_down ? -1 : 1);
 }
 
-void set_p_velocity(Player *player, float vel) {
+void set_p_velocity(Player *player, float vel, bool override) {
+    player->velocity_override = override;
     player->vel_y = vel * ((player->mini) ? 0.8 : 1);
 }
 
@@ -95,17 +102,29 @@ void cube_gamemode(Player *player) {
         player->rotation += 415.3848f * STEPS_DT * mult * (player->mini ? 1.2f : 1.f);
     }
 
+    bool jump = false;
+
     drag_particles[state.current_player].emitterX = getLeft(player);
     drag_particles[state.current_player].emitterY = fabsf(gravBottom(player)) + (player->upside_down ? -4 : 4);
     drag_particles[state.current_player].emitting = player->time_since_ground < DRAG_PARTICLES_FLOOR_DURATION;
 
     drag_particles[state.current_player].gravityFlipped = player->upside_down;
     drag_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
-    
+    if (state.input.holdJump) {
+        jump = true;
+    }
+
     if (player->on_ground) {
         MotionTrail_StopStroke(trail);
         update_rotation_direction(player);
+        player->buffering_state = BUFFER_END;
+
         if (player->slope_data.slope_id < 0) player->rotation = roundf(player->rotation / 90.0f) * 90.0f;
+    }
+
+    if (player->upside_down && state.input.holdJump && player->coyote_frames < 10) {
+        jump = true;
+        player->buffering_state = BUFFER_END;
     }
 
     SlopeData slope_data = player->slope_data;
@@ -115,29 +134,25 @@ void cube_gamemode(Player *player) {
         slope_data = player->coyote_slope;
     }
 
-    if ((slope_data.slope_id >= 0 || player->on_ground) && (state.input.holdJump)) {
+    if ((slope_data.slope_id >= 0 || player->on_ground) && jump) {
         if (slope_data.slope_id >= 0) {
             // Slope jump
             int orient = grav_slope_orient(slope_data.slope_id, player);
             if (orient == ORIENT_NORMAL_UP || orient == ORIENT_UD_UP) {
                 float time = clampf(10 * (player->timeElapsed - slope_data.elapsed), 0.4f, 1.0f);
-                set_p_velocity(player, 0.25f * time * slopeHeights[state.speed] + cube_jump_heights[state.speed]);
+                set_p_velocity(player, 0.25f * time * slopeHeights[state.speed] + cube_jump_heights[state.speed], state.old_input.holdJump);
             } else {
-                set_p_velocity(player, cube_jump_heights[state.speed]);
+                set_p_velocity(player, cube_jump_heights[state.speed], state.old_input.holdJump);
             }
         } else {
             // Normal jump
-            set_p_velocity(player, cube_jump_heights[state.speed]);
+            set_p_velocity(player, cube_jump_heights[state.speed], state.old_input.holdJump);
         }
         player->inverse_rotation = false;
     
         player->on_ground = false;
-        player->buffering_state = BUFFER_END;
     
         if (!(state.input.pressedJump)) {
-            // This simulates the holding jump
-            player->vel_y -= player->gravity * STEPS_DT;
-
             // This prevents drag particles on succesive jumps
             player->time_since_ground = DRAG_PARTICLES_FLOOR_DURATION;
         }
@@ -281,7 +296,8 @@ void ball_gamemode(Player *player) {
 
     int mult = (player->upside_down ? -1 : 1);
 
-    player->gravity = -1676.46672f;  
+    if (!state.old_player.velocity_override || state.old_player.slope_data.slope_id >= 0)
+        player->gravity = -1676.46672f;  
     
     if (player->on_ground || player->on_ceiling) {
         MotionTrail_StopStroke(trail);
@@ -297,12 +313,12 @@ void ball_gamemode(Player *player) {
     drag_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
 
     // Jump
-    if ((state.input.holdJump) && (player->on_ground || player->on_ceiling) && player->buffering_state == BUFFER_READY) {        
+    if ((state.input.holdJump) && (player->slope_data.slope_id >= 0 || player->on_ground || player->on_ceiling) && player->buffering_state == BUFFER_READY) {        
         float delta_y = player->vel_y;
 
         player->upside_down ^= 1;
 
-        set_p_velocity(player, ballJumpHeights[state.speed]);
+        set_p_velocity(player, ballJumpHeights[state.speed], state.old_player.buffering_state == BUFFER_READY);
 
         player->vel_y -= (delta_y < 0) ? 0 : delta_y;
         player->buffering_state = BUFFER_END;
@@ -368,6 +384,7 @@ void ufo_gamemode(Player *player) {
     if (player->buffering_state == BUFFER_READY && (state.input.pressedJump || buffering_check)) {
         player->vel_y = fmaxf(player->vel_y, player->mini ? 358.992 : 371.034);
         player->buffering_state = BUFFER_END;
+        player->velocity_override = true;
         player->ufo_last_y = player->y;
         player->burst_particle_timer = BURST_PARTICLES_DURATION;
     } else {
@@ -383,6 +400,10 @@ void ufo_gamemode(Player *player) {
             } else {
                 player->gravity = player->mini ? -1308.96 : -1117.56;
             }
+        }
+
+        if (player->on_ground) {
+            set_p_velocity(player, 0, true);
         }
     }
 
@@ -435,7 +456,7 @@ void wave_gamemode(Player *player) {
     player->gravity = 0;
 
     player->vel_y = (input * 2 - 1) * player_speeds[state.speed] * (player->mini ? 2 : 1);
-    if (player->vel_y != state.old_player.vel_y || player->on_ground != state.old_player.on_ground || player->on_ceiling != state.old_player.on_ceiling) {
+    if (state.old_input.holdJump != state.input.holdJump || player->on_ground != state.old_player.on_ground || player->on_ceiling != state.old_player.on_ceiling || player->mini != state.old_player.mini || player->upside_down != state.old_player.upside_down) {
         MotionTrail_AddWavePoint(wave_trail);
     }
 }
@@ -479,6 +500,15 @@ void run_player(Player *player) {
         spawnMultipleParticles(&land_particles[state.current_player], 10);
     }
 
+    // Coyote
+    if (gravBottom(&state.old_player) > gravFloor(&state.old_player) && player->upside_down == state.old_player.upside_down && !player->on_ground && player->vel_y <= 0) {
+		if (state.old_player.on_ground && !state.old_input.holdJump)
+			player->coyote_frames = 0;
+		player->coyote_frames++;
+	} else {
+		player->coyote_frames = INT32_MAX;
+	}
+
     switch (player->gamemode) {
         case GAMEMODE_PLAYER:
             cube_gamemode(player);
@@ -520,6 +550,24 @@ void run_player(Player *player) {
         }
     }
 
+    if (!player->velocity_override) {
+		float newVel = player->vel_y + player->gravity * STEPS_DT;
+
+		// Player will fall off blocks a frame faster than expected
+		if (!player->on_ground && state.old_player.on_ground && ((!state.input.holdJump && (state.old_input.pressedJump || state.input.pressedJump)) || player->buffering_state == BUFFER_READY) && gravBottom(&state.old_player) > gravFloor(&state.old_player) && player->mini == state.old_player.mini) {
+			player->y += grav(&state.old_player, state.old_player.gravity) * STEPS_DT * STEPS_DT;
+
+			if (player->vel_y == 0)
+				newVel += state.old_player.gravity * STEPS_DT;
+		}
+
+        player->vel_y = newVel;
+	}
+
+    if (player->gamemode != GAMEMODE_PLAYER_BALL) {
+        player->vel_y = player->vel_y;
+    }
+
     if (player->cutscene_timer > 0) return;
 
     player->rotation = normalize_angle(player->rotation);
@@ -538,11 +586,9 @@ void run_player(Player *player) {
         }
     }
     
-    player->vel_x = player_speeds[state.speed];
-    player->vel_y += player->gravity * STEPS_DT;
-    player->y += player_get_vel(player, player->vel_y) * STEPS_DT;
-    
+    player->vel_x = player_speeds[state.speed]; 
     player->x += player->vel_x * STEPS_DT;
+    player->y += player_get_vel(player, player->vel_y) * STEPS_DT;
 
     player->left_ground = false;
 
@@ -563,7 +609,7 @@ void run_player(Player *player) {
             clear_slope_data(player);
         }
         
-        if (player->gamemode != GAMEMODE_DART && grav(player, player->vel_y) <= 0) player->vel_y = 0;
+        if (player->gamemode != GAMEMODE_DART && grav(player, player->vel_y) <= 0) set_p_velocity(player, 0, player->gamemode == GAMEMODE_PLAYER_BALL);
         player->y = state.ground_y + (player->height / 2) + ((player->gamemode == GAMEMODE_DART) ? (player->mini ? 3 : 5) : 0);;
         player->snap_data.player_frame = 0;
     }
@@ -578,7 +624,7 @@ void run_player(Player *player) {
             clear_slope_data(player);
         }
         
-        if (player->gamemode != GAMEMODE_DART && grav(player, player->vel_y) >= 0) player->vel_y = 0;
+        if (player->gamemode != GAMEMODE_DART && grav(player, player->vel_y) >= 0) set_p_velocity(player, 0, player->gamemode == GAMEMODE_PLAYER_BALL);
         player->y = state.ceiling_y - (player->height / 2) - ((player->gamemode == GAMEMODE_DART) ? (player->mini ? 3 : 5) : 0);;
     } 
     
@@ -618,7 +664,10 @@ void handle_player(Player *player) {
     player->on_ground = false;
     player->on_ceiling = false;
 
+    player->velocity_override = false;
+
     player->gravObj_id = -1;
+    player->potentialSlope_id = -1;
     
     player->timeElapsed += STEPS_DT;
 
@@ -651,7 +700,6 @@ void handle_player(Player *player) {
     if (state.hitbox_display == 2) add_new_hitbox(player);
     handle_player_time += ticks / CPU_TICKS_PER_MSEC;
 }
-
 
 
 void spawn_p1_trail(Player *player) {
@@ -796,7 +844,7 @@ void draw_player(Player *player) {
             );
             break;
         case GAMEMODE_SHIP:
-            spawn_glow_layer_at(GAMEMODE_SHIP, selected_ship, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale, C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255));
+            if (player_glow_enabled) spawn_glow_layer_at(GAMEMODE_SHIP, selected_ship, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale, C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255));
             spawn_icon_at(GAMEMODE_PLAYER, selected_cube, player_glow_enabled, p_x, p_y, p_rot, flip_x, player->upside_down, scale * 0.5f, 
                 primary_color,
                 secondary_color,
@@ -816,7 +864,7 @@ void draw_player(Player *player) {
             );
             break;
         case GAMEMODE_BIRD:
-            spawn_glow_layer_at(GAMEMODE_BIRD, selected_ufo, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale, C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255));
+            if (player_glow_enabled) spawn_glow_layer_at(GAMEMODE_BIRD, selected_ufo, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale, C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255));
             spawn_icon_at(GAMEMODE_PLAYER, selected_cube, player_glow_enabled, p_x, p_y, p_rot, flip_x, player->upside_down, scale * 0.5f, 
                 primary_color,
                 secondary_color,
@@ -892,6 +940,7 @@ void draw_hitbox(int obj) {
     if (hitbox_type == HITBOX_SPECIAL) color = C2D_Color32(0x00, 0xff, 0x00, 0xff);
     
     if (obj == state.player.slope_data.slope_id || obj == state.player2.slope_data.slope_id) color = C2D_Color32(0x00, 0xff, 0x00, 0xff);
+    if (obj == state.player.snap_data.snapped_obj || obj == state.player2.snap_data.snapped_obj) color = C2D_Color32(0xff, 0xff, 0x00, 0xff);
 
     Vec2D rect[4];
     if (hitbox->type == COLLISION_SLOPE) {
@@ -923,10 +972,6 @@ void draw_player_hitbox(Player *player) {
     get_corners(player->x, player->y, internal.width, internal.height, 0, rect);
 
     draw_square(rect, C2D_Color32(0x00, 0x00, 0xff, 0xff));
-
-    // Circle hitbox
-    float calc_radius = (player->width / 2);
-    custom_circunference(calc_x_on_screen(player->x), calc_y_on_screen(player->y), calc_radius, C2D_Color32(0xff, 0x00, 0x00, 0xff), 2.f);
 
     // Unrotated hitbox
     get_corners(player->x, player->y, player->width, player->height, 0, rect);

@@ -156,7 +156,7 @@ float snap_player(Vec2D diff, Player *player) {
             break;
         default:
             memcpy(&stairs, &defaultSpeedSnaps, sizeof(Vec2D) * 3);
-            threshold = 2;
+            threshold = 1;
     }   
 
     // Check snaps
@@ -166,6 +166,7 @@ float snap_player(Vec2D diff, Player *player) {
             return threshold;
         }
     }
+    
     return 0;
 }
 
@@ -177,10 +178,12 @@ void trySnap(int block, Player *player) {
     float threshold = snap_player(diff, player);
     if (threshold > 0) {
         player->x = clampf(
-            player->x + diff.x,
+            objects.x[block] + player->snap_data.player_snap_diff,
             player->x - threshold,
             player->x + threshold
         );
+
+        player->snap_data.snapped_obj = block;
     }
 }
 
@@ -432,6 +435,12 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             if (!GET_ACTIVATED(obj)) {
                 state.intended_mirror_factor = 1.f;
                 state.intended_mirror_speed_factor = -1.f;
+                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
+                if (effect) {
+                    effect->def.colorR = 255 / 255.f;
+                    effect->def.colorG = 150 / 255.f;
+                    effect->def.colorB = 0 / 255.f;
+                }
                 SET_ACTIVATED(obj, true);
             }
             break;
@@ -454,13 +463,14 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         
         case BIG_PORTAL:
             if (!GET_ACTIVATED(obj)) {
-                set_mini(player, false);
-                
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
-                if (effect) {
-                    effect->def.colorR = 0 / 255.f;
-                    effect->def.colorG = 255 / 255.f;
-                    effect->def.colorB = 50 / 255.f;
+                if (player->mini) {
+                    set_mini(player, false);
+                    UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
+                    if (effect) {
+                        effect->def.colorR = 0 / 255.f;
+                        effect->def.colorG = 255 / 255.f;
+                        effect->def.colorB = 50 / 255.f;
+                    }
                 }
                 SET_ACTIVATED(obj, true);
             }
@@ -468,13 +478,14 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
 
         case MINI_PORTAL:
             if (!GET_ACTIVATED(obj)) {
-                set_mini(player, true);
-                
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
-                if (effect) {
-                    effect->def.colorR = 255 / 255.f;
-                    effect->def.colorG = 31 / 255.f;
-                    effect->def.colorB = 255 / 255.f;
+                if (!player->mini){
+                    set_mini(player, true);
+                    UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
+                    if (effect) {
+                        effect->def.colorR = 255 / 255.f;
+                        effect->def.colorG = 31 / 255.f;
+                        effect->def.colorB = 255 / 255.f;
+                    }
                 }
                 SET_ACTIVATED(obj, true);
             }
@@ -482,50 +493,64 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
 
         case SLOW_SPEED_PORTAL:
             if (!GET_ACTIVATED(obj)) {
-                state.speed = SPEED_SLOW;
+                SET_ACTIVATED(obj, true);
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &speed_collide_effect, GFX_TOP);
                 if (effect) {
                     effect->def.colorR = 255 / 255.f;
                     effect->def.colorG = 255 / 255.f;
                     effect->def.colorB = 0 / 255.f;
                 }
-                SET_ACTIVATED(obj, true);
+                if (state.speed != SPEED_SLOW) {
+                    state.speed = SPEED_SLOW;
+                    slow_speed_particles_timer = 0.7f;
+                };
             }
             break;
         case NORMAL_SPEED_PORTAL:
             if (!GET_ACTIVATED(obj)) {
-                state.speed = SPEED_NORMAL;
+                SET_ACTIVATED(obj, true);
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &speed_collide_effect, GFX_TOP);
                 if (effect) {
                     effect->def.colorR = 0 / 255.f;
                     effect->def.colorG = 190 / 255.f;
                     effect->def.colorB = 255 / 255.f;
                 }
-                SET_ACTIVATED(obj, true);
+                if (state.speed != SPEED_NORMAL) {
+                    state.speed = SPEED_NORMAL;
+                    normal_speed_particles_timer = 0.7f;
+                }
             }
             break;
         case FAST_SPEED_PORTAL:
             if (!GET_ACTIVATED(obj)) {
-                state.speed = SPEED_FAST;
+                SET_ACTIVATED(obj, true);
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &speed_collide_effect, GFX_TOP);
                 if (effect) {
                     effect->def.colorR = 0 / 255.f;
                     effect->def.colorG = 255 / 255.f;
                     effect->def.colorB = 0 / 255.f;
                 }
-                SET_ACTIVATED(obj, true);
+                if (state.speed != SPEED_FAST){
+                    state.speed = SPEED_FAST;
+                    fast_speed_particles_timer = 0.7f;
+                }
             }
             break;
         case FASTER_SPEED_PORTAL:
             if (!GET_ACTIVATED(obj)) {
-                state.speed = SPEED_FASTER;
+                SET_ACTIVATED(obj, true);
+
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &speed_collide_effect, GFX_TOP);
                 if (effect) {
                     effect->def.colorR = 230 / 255.f;
                     effect->def.colorG = 65  / 255.f;
                     effect->def.colorB = 255 / 255.f;
                 }
-                SET_ACTIVATED(obj, true);
+                
+                if (state.speed != SPEED_FASTER) {
+                    state.speed = SPEED_FASTER;
+                    faster_speed_particles_timer = 0.7f;
+                }
             }
             break;
         case CUBE_PORTAL: 
@@ -538,16 +563,15 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     }
 
                     if (player->gamemode == GAMEMODE_DART) player->vel_y *= 0.9f;
-                    
+                    if (state.dual) {
+                        set_dual_bounds();
+                    } 
                     player->ceiling_inv_time = CEILING_INVUL_TIME;
                     player->snap_rotation = true;
                     set_gamemode(player, GAMEMODE_PLAYER);
                     flip_other_player(state.current_player ^ 1);
                     update_rotation_direction(player);
                 }
-                if (state.dual) {
-                    set_dual_bounds();
-                } 
 
                 SET_ACTIVATED(obj, true);
             }
@@ -575,7 +599,9 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     } else if (player->vel_y > max) {
                         player->vel_y = max;
                     }
-
+                    if (state.dual) {
+                        set_dual_bounds();
+                    } 
                     UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
                     if (effect) {
                         effect->def.colorR = 255 / 255.f;
@@ -584,9 +610,6 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     }
                 }
 
-                if (state.dual) {
-                    set_dual_bounds();
-                } 
                 SET_ACTIVATED(obj, true);
             }
             break;
@@ -610,20 +633,21 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     }
                     
                     set_gamemode(player, GAMEMODE_PLAYER_BALL);
+                    if (state.dual) {
+                        set_dual_bounds();
+                    } 
                     player->inverse_rotation = false;
                     player->snap_rotation = true;
                     flip_other_player(state.current_player ^ 1);
+                    UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
+                    if (effect) {
+                        effect->def.colorG = 50 / 255.f;
+                        effect->def.colorB = 50 / 255.f;
+                        effect->def.colorR = 255 / 255.f;
+                    }
                 }
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
-                if (effect) {
-                    effect->def.colorR = 255 / 255.f;
-                    effect->def.colorG = 50 / 255.f;
-                    effect->def.colorB = 50 / 255.f;
-                }
-
-                if (state.dual) {
-                    set_dual_bounds();
-                } 
+                
+                
                 SET_ACTIVATED(obj, true);
             }
             break;
@@ -642,6 +666,10 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     player->snap_rotation = true;
                     flip_other_player(state.current_player ^ 1);
 
+                    if (state.dual) {
+                        set_dual_bounds();
+                    } 
+
                     if (state.old_player.gamemode == GAMEMODE_PLAYER || state.old_player.gamemode == GAMEMODE_SHIP || state.old_player.gamemode == GAMEMODE_DART) {
                         player->buffering_state = BUFFER_READY;
                     }
@@ -653,9 +681,6 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                         effect->def.colorB = 0 / 255.f;
                     }
                 }
-                if (state.dual) {
-                    set_dual_bounds();
-                } 
                 SET_ACTIVATED(obj, true);
             }
             break;
@@ -674,17 +699,16 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     wave_trail->positionR = (Vec2){player->x, player->y};  
                     wave_trail->startingPositionInitialized = true;
                     MotionTrail_AddWavePoint(wave_trail);
+                    UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
+                    if (effect) {
+                        effect->def.colorR = 0 / 255.f;
+                        effect->def.colorG = 200 / 255.f;
+                        effect->def.colorB = 255 / 255.f;
+                    }
                 }
 
                 if (state.dual) {
                     set_dual_bounds();
-                }
-
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
-                if (effect) {
-                    effect->def.colorR = 0 / 255.f;
-                    effect->def.colorG = 200 / 255.f;
-                    effect->def.colorB = 255 / 255.f;
                 }
 
                 SET_ACTIVATED(obj, true);
@@ -692,41 +716,33 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case DUAL_PORTAL:
             player->gravObj_id = obj;
-            if (!GET_ACTIVATED(obj) && !state.dual) {
-                player->ceiling_inv_time = CEILING_INVUL_TIME;
-                state.dual = true;
-                state.dual_portal_y = objects.y[obj];
-                setup_dual();
-
-                if (player->gamemode == GAMEMODE_DART) {
-                    MotionTrail_Init(&wave_trail_p2, 3.f, 3, 10.0f, true, get_white_if_black(p1_color), C2D_SpriteSheetGetImage(trailSheet, 0));   
-                    wave_trail_p2.positionR = (Vec2){state.player2.x, state.player2.y};  
-                    wave_trail_p2.startingPositionInitialized = true;
-                    MotionTrail_AddWavePoint(&wave_trail_p2);
+            if (!GET_ACTIVATED(obj)) {
+                if (!state.dual){
+                    player->ceiling_inv_time = CEILING_INVUL_TIME;
+                    state.dual = true;
+                    state.dual_portal_y = objects.y[obj];
+                    setup_dual();
+    
+                    if (player->gamemode == GAMEMODE_DART) {
+                        MotionTrail_Init(&wave_trail_p2, 3.f, 3, 10.0f, true, get_white_if_black(p1_color), C2D_SpriteSheetGetImage(trailSheet, 0));   
+                        wave_trail_p2.positionR = (Vec2){state.player2.x, state.player2.y};  
+                        wave_trail_p2.startingPositionInitialized = true;
+                        MotionTrail_AddWavePoint(&wave_trail_p2);
+                    }
+                    MotionTrail_Init(&trail_p2, 0.3f, 3, 10.0f, false, get_white_if_black(p1_color), C2D_SpriteSheetGetImage(trailSheet, 0));
                 }
-                MotionTrail_Init(&trail_p2, 0.3f, 3, 10.0f, false, get_white_if_black(p1_color), C2D_SpriteSheetGetImage(trailSheet, 0));
-                
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
-                if (effect) {
-                    effect->def.colorR = 255 / 255.f;
-                    effect->def.colorG = 127 / 255.f;
-                    effect->def.colorB = 0 / 255.f;
-                }
-                SET_ACTIVATED(obj, true);
+                SET_ACTIVATED(obj, true);                
             }
             break;
 
         case DIVORCE_PORTAL:
             if (!GET_ACTIVATED(obj)) {
-
-                state.dual = false;
-                SET_ACTIVATED(obj, true);
-
-                if (state.current_player == 1) {
-                    memcpy(&state.player, player, sizeof(Player));
-                }
-                
-                switch (state.player.gamemode) {
+                if (state.dual){
+                    state.dual = false;
+                    if (state.current_player == 1) {
+                        memcpy(&state.player, player, sizeof(Player));
+                    }
+                    switch (state.player.gamemode) {
                     case GAMEMODE_PLAYER:
                         state.ground_y = 0;
                         state.ceiling_y = 999999;
@@ -741,14 +757,41 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                         set_intended_ceiling();
                 }
 
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
-                if (effect) {
-                    effect->def.colorR = 56 / 255.f;
-                    effect->def.colorG = 200 / 255.f;
-                    effect->def.colorB = 255 / 255.f;
+                    UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
+                    if (effect) {
+                        effect->def.colorR = get_white_if_black(p1_color).r;
+                        effect->def.colorG = get_white_if_black(p1_color).g;
+                        effect->def.colorB = get_white_if_black(p1_color).b;
+                    }
+                    
                 }
+                SET_ACTIVATED(obj, true);
             }
             break;
+
+        case SECRET_COIN:
+            if (!GET_ACTIVATED(obj)) {
+                SET_ACTIVATED(obj, true);
+
+                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, GFX_TOP);
+                if (effect) {
+                    effect->def.colorR = 255 / 255.f;
+                    effect->def.colorG = 190 / 255.f;
+                    effect->def.colorB = 0 / 255.f;
+                }
+
+                UseEffect *effect2 = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, GFX_TOP);
+                if (effect2) {
+                    effect2->def.colorR = 255 / 255.f;
+                    effect2->def.colorG = 190 / 255.f;
+                    effect2->def.colorB = 0 / 255.f;
+                }
+                coin_pickup_particles.emitterX = objects.x[obj];
+                coin_pickup_particles.emitterY = objects.y[obj];
+                spawnMultipleParticles(&coin_pickup_particles, 40);
+            }
+            break;
+
     }
     if (!GET_COLLIDED(obj)) SET_HITBOX_COUNTER(obj, GET_HITBOX_COUNTER(obj) + 1); 
 }
@@ -781,31 +824,30 @@ static inline float dot_product(float ax, float ay, float bx, float by) {
 }
 
 static bool sat_overlap(const Vec2D a[4], const Vec2D b[4]) {
-    // Test 4 axes (only from shape A, due to rectangle symmetry)
-    for (int i = 0; i < 4; ++i) {
-        // Normal perpendicular to edge
-        float dx = a[(i+1) & 3].x - a[i].x;
-        float dy = a[(i+1) & 3].y - a[i].y;
-        float ax = -dy, ay = dx;
-        
-        // Fast min/max using arithmetic instead of conditionals
-        float p0 = dot_product(a[0].x, a[0].y, ax, ay);
-        float p1 = dot_product(a[1].x, a[1].y, ax, ay);
-        float p2 = dot_product(a[2].x, a[2].y, ax, ay);
-        float p3 = dot_product(a[3].x, a[3].y, ax, ay);
-        
-        float minA = fminf(fminf(p0, p1), fminf(p2, p3));
-        float maxA = fmaxf(fmaxf(p0, p1), fmaxf(p2, p3));
-        
-        float q0 = dot_product(b[0].x, b[0].y, ax, ay);
-        float q1 = dot_product(b[1].x, b[1].y, ax, ay);
-        float q2 = dot_product(b[2].x, b[2].y, ax, ay);
-        float q3 = dot_product(b[3].x, b[3].y, ax, ay);
-        
-        float minB = fminf(fminf(q0, q1), fminf(q2, q3));
-        float maxB = fmaxf(fmaxf(q0, q1), fmaxf(q2, q3));
-        
-        if (maxA <= minB || maxB <= minA) return false;
+    // Test all axes (normals of edges)
+    for (int shape = 0; shape < 2; ++shape) {
+        const Vec2D *verts = (shape == 0) ? a : b;
+        for (int i = 0; i < 4; ++i) {
+            // Edge from verts[i] to verts[(i+1)%4]
+            float dx = verts[(i+1)%4].x - verts[i].x;
+            float dy = verts[(i+1)%4].y - verts[i].y;
+            // Normal axis
+            float ax = -dy, ay = dx;
+
+            // Project both shapes onto axis
+            float minA = INFINITY, maxA = -INFINITY;
+            float minB = INFINITY, maxB = -INFINITY;
+            for (int j = 0; j < 4; ++j) {
+                float projA = a[j].x * ax + a[j].y * ay;
+                float projB = b[j].x * ax + b[j].y * ay;
+                if (projA < minA) minA = projA;
+                if (projA > maxA) maxA = projA;
+                if (projB < minB) minB = projB;
+                if (projB > maxB) maxB = projB;
+            }
+            // If projections do not overlap, there is a separating axis
+            if (maxA <= minB || maxB <= minA) return false;
+        }
     }
     return true;
 }
@@ -901,16 +943,24 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
         case HITBOX_SOLID: 
             bool gravSnap = false;
 
-            clip += fabsf(player->vel_y) * STEPS_DT;
+            clip += fabsf(state.old_player.vel_y) * delta;
+
+            float bottom = gravBottom(player);
             
             if (player->slope_data.slope_id >= 0) {
-                return;
+                    return;
             }
             
-            // Collide with slope if object is an slope
-            if (hitbox->type == COLLISION_SLOPE) {
-                slope_collide(obj, player);
-                break;
+            for (size_t i = 0; i < potential_slopes[state.current_player]; i++) {
+                int potential_slope = potential_slopes_buffer[state.current_player][i];
+
+                unsigned char orient = grav_slope_orient(potential_slope, player);
+                float block_comp = orient < 2 ? obj_gravTop(player, obj) : obj_gravBottom(player, obj);
+                float slope_comp = orient < 2 ? obj_gravBottom(player, potential_slope) : obj_gravTop(player, potential_slope);
+
+                if (block_comp - slope_comp < 2) {
+                    return;
+                }
             }
             
             if (player->gravObj_id >= 0 && GET_HITBOX_COUNTER(player->gravObj_id) == 1) {
@@ -922,24 +972,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
 
                 gravSnap = (!state.old_player.on_ground || player->ceiling_inv_time > 0) && internalCollidingBlock && obj_gravBottom(player, obj) - gravInternalBottom(player) <= clip;
             }
-            
-            
-            bool slope_height_check = false;
-            if (player->touching_slope) {
-                if (grav_slope_orient(player->potentialSlope_id, player) == ORIENT_NORMAL_DOWN) {
-                    slope_height_check = gravBottom(player) < grav(player, objects.y[player->potentialSlope_id]);
-                } else if (grav_slope_orient(player->potentialSlope_id, player) == ORIENT_UD_DOWN) {
-                    slope_height_check = gravTop(player) > grav(player, objects.y[player->potentialSlope_id]);
-                }
-            }
-            bool slope_condition = player->touching_slope && !slope_touching(player->potentialSlope_id, player) && slope_height_check && (objects.orientation[player->potentialSlope_id] == ORIENT_NORMAL_DOWN || objects.orientation[player->potentialSlope_id] == ORIENT_UD_DOWN);
 
-            // Snap the player to the potential slope when the player is touching the slope
-            if (player->touching_slope && slope_touching(player->potentialSlope_id, player) && slope_height_check) {
-                slope_collide(player->potentialSlope_id, player);
-                break;
-            }
-            
             bool safeZone = player->mini && ((obj_gravTop(player, obj) - gravBottom(player) <= clip) || (gravTop(player) - obj_gravBottom(player, obj) <= clip));
             
             if ((player->gamemode == GAMEMODE_DART || (!gravSnap && !safeZone)) && intersect(
@@ -957,7 +990,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                     state.dead = true;
                 }
             // Check snap for player bottom
-            } else if (obj_gravTop(player, obj) - gravBottom(player) <= clip && player->vel_y <= 0 && !slope_condition && player->gamemode != GAMEMODE_DART) {
+            } else if (obj_gravTop(player, obj) - bottom <= clip && player->vel_y <= 0 && player->gamemode != GAMEMODE_DART) {
                 player->y = grav(player, obj_gravTop(player, obj)) + grav(player, player->height / 2);
                 if (player->vel_y <= 0) player->vel_y = 0;
                 player->on_ground = true;
@@ -973,6 +1006,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
 
                     player->snap_data.player_frame = level_frame;
                     player->snap_data.object_id = obj;
+                    player->snap_data.player_snap_diff = player->x - objects.x[obj];
                 }
             // Check snap for player top
             } else if (player->gamemode != GAMEMODE_DART) {
@@ -982,7 +1016,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                 }
                 // Behave normally
                 if (player->gamemode != GAMEMODE_PLAYER || gravSnap) {
-                    if (((gravTop(player) - obj_gravBottom(player, obj) <= clip && player->vel_y >= 0) || gravSnap) && !slope_condition) {
+                    if (((gravTop(player) - obj_gravBottom(player, obj) <= clip && player->vel_y >= 0) || gravSnap)) {
                         if (!gravSnap) player->on_ceiling = true;
                         else player->vel_y = 0;
                         player->inverse_rotation = false;
@@ -1018,7 +1052,7 @@ void collide_with_obj(Player *player, int obj) {
 
     if (UNLIKELY(hitbox->type == COLLISION_CIRCLE)) {
         if (intersect_rect_circle(
-            player->x, player->y, player->width, player->height, player->rotation, 
+            player->x, player->y, player->width, player->height, 0, 
             x, y, hitbox->width
         )) {
             handle_collision(player, obj, hitbox);
@@ -1039,7 +1073,6 @@ void collide_with_obj(Player *player, int obj) {
         bool checkColl = intersect(
             player->x, player->y, player->width, player->height, rotation, 
             x, y, width, height, obj_rot
-            
         );
 
         // Rotated hitboxes must also collide with the unrotated hitbox
@@ -1072,7 +1105,6 @@ void collide_with_slope(Player *player, int obj, bool has_slope) {
         player->x, player->y, player->width, player->height, 0, 
         objects.x[obj], objects.y[obj], width, height, objects.rotation[obj]
     )) {
-        // The same check in handle_collision
         if (has_slope) {
             float bottom = gravBottom(player) + sinf(slope_angle(player->slope_data.slope_id, player)) * player->height / 2;
             if (obj_gravTop(player, obj) - bottom < 2)
@@ -1090,6 +1122,9 @@ int block_count = 0;
 
 int hazard_buffer[MAX_COLLIDED_OBJECTS];
 int hazard_count = 0;
+
+int potential_slopes_buffer[2][MAX_COLLIDED_OBJECTS];
+int potential_slopes[2];
 
 int number_of_collisions = 0;
 int number_of_collisions_checks = 0;
@@ -1110,12 +1145,18 @@ void collide_with_objects(Player *player) {
                 // Save some types to buffer, so they can be checked in a type order
                 if (hitbox->collision_type == HITBOX_SOLID) {
                     if (hitbox->type == COLLISION_SLOPE) {
-                        slope_buffer[slope_count++] = obj;
+                        if (slope_count < MAX_COLLIDED_OBJECTS) {
+                            slope_buffer[slope_count++] = obj;
+                        }
                     } else {
-                        block_buffer[block_count++] = obj;
+                        if (block_count < MAX_COLLIDED_OBJECTS) {
+                            block_buffer[block_count++] = obj;
+                        }
                     }
                 } else if (hitbox->collision_type == HITBOX_HAZARD) {
-                    hazard_buffer[hazard_count++] = obj;
+                    if (hazard_count < MAX_COLLIDED_OBJECTS) {
+                        hazard_buffer[hazard_count++] = obj;
+                    }
                 } else { // HITBOX_SPECIAL
                     collide_with_obj(player, obj);
                 }
@@ -1127,27 +1168,11 @@ void collide_with_objects(Player *player) {
         clear_slope_data(player);
     }
 
-    float closestDist = 999999.f;
-    // Detect if touching slope
-    for (int i = 0; i < slope_count; i++) {
-        int obj = slope_buffer[i];
-        if (intersect(
-            player->x, player->y, player->width, player->height, 0, 
-            objects.x[obj], objects.y[obj], objects.width[obj], objects.height[obj], objects.rotation[obj]
-        )) {
-            float dist = fabsf(objects.y[obj] - player->y);
-            if (dist < closestDist) {
-                player->touching_slope = true;
-                player->potentialSlope_id = obj;
-                closestDist = dist; 
-            }
-        }
-    }
-
     for (int i = 0; i < block_count; i++) {
         int obj = block_buffer[i];
         collide_with_obj(player, obj);
     }
+    potential_slopes[state.current_player] = 0;
 
     bool has_slope = player->slope_data.slope_id >= 0;
     for (int i = 0; i < slope_count; i++) {

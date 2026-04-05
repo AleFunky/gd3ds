@@ -32,6 +32,8 @@ typedef struct {
 typedef struct {
     int object_id;
     int player_frame;
+    float player_snap_diff;
+    int snapped_obj;
 } SnapData;
 
 typedef struct {
@@ -120,6 +122,10 @@ typedef struct {
     SlopeData slope_data;
 
     SnapData snap_data;
+
+    bool velocity_override;
+
+    float coyote_frames;
     
     int p1_trail_pos;
     P1Trail p1_trail_data[P1_TRAIL_LENGTH];
@@ -160,6 +166,11 @@ extern ParticleSystem burst_particles[2];
 extern ParticleSystem land_particles[2];
 extern ParticleSystem explosion_particles[2];
 extern ParticleSystem glitter_particles;
+extern ParticleSystem slow_speed_particles;
+extern ParticleSystem normal_speed_particles;
+extern ParticleSystem fast_speed_particles;
+extern ParticleSystem faster_speed_particles;
+extern ParticleSystem coin_pickup_particles;
 
 extern const float player_speeds[SPEED_COUNT];
 

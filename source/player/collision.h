@@ -81,7 +81,10 @@ extern int number_of_collisions_checks;
 #define ENABLE_TRAIL 32
 #define DISABLE_TRAIL 33
 
-#define MAX_COLLIDED_OBJECTS 256
+#define MAX_COLLIDED_OBJECTS 512
+
+extern int potential_slopes_buffer[2][MAX_COLLIDED_OBJECTS];
+extern int potential_slopes[2];
 
 void setup_dual();
 

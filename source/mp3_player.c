@@ -4,6 +4,8 @@
 #include <mpg123.h>
 #include <stdio.h>
 #include <string.h>
+#include "main.h"
+#include <unistd.h>
 
 #define THREAD_AFFINITY -1           // Execute thread on any core
 #define THREAD_STACK_SZ 32 * 1024    // 32kB stack for audio thread
@@ -14,6 +16,7 @@
 
 static u32 *audioBuffer;
 static LightEvent soundEvent;
+static LightEvent seekEvent;
 static LightLock decoderLock;
 
 static mpg123_handle* mh;
@@ -27,6 +30,8 @@ static volatile bool skip = false;
 static volatile bool paused = false;
 
 volatile float amplitude = 0;
+
+static volatile float seek_target = 0;
 
 static Thread threadId = NULL;
 
@@ -91,7 +96,7 @@ bool mp3_init(void *file) {
     int encoding = 0;
 
     if ((mh = mpg123_new(NULL, &err)) == NULL) {
-        printf("Couldn't new it\n");
+        output_log("Couldn't new it\n");
         return 0;
     }
 
@@ -104,12 +109,12 @@ bool mp3_init(void *file) {
     mpg123_format(mh, 48000, MPG123_MONO,   MPG123_ENC_SIGNED_16);
 
     if (mpg123_open(mh, file) != MPG123_OK) {
-        printf("Couldn't open file\n");
+        output_log("Couldn't open file\n");
         return 0;
     }
 
     if (mpg123_getformat(mh, &rate, &audio_channels, &encoding) != MPG123_OK) {
-        printf("Couldn't get format\n");
+        output_log("Couldn't get format\n");
         return 0;
     }
 
@@ -190,6 +195,11 @@ void audio_thread(void *const file) {
 
     audio_init();
 
+    if (seek_target > 0) {   
+        seek_mp3(seek_target);    
+        seek_target = -1;
+    }
+
     while (!quit && !skip) {
         for (int i = 0; i < NUM_BUFS; i++) {
             ndspWaveBuf *buf = &waveBuf[i];
@@ -233,6 +243,7 @@ void audio_thread(void *const file) {
         }
 
         LightEvent_Wait(&soundEvent);
+
     }
 
     while (amplitude > AMP_MIN && !quit) {
@@ -242,9 +253,17 @@ void audio_thread(void *const file) {
 }
 
 // Play an mp3 file defined by a path
-int play_mp3(char *path, bool loop) {
+int play_mp3(char *path, bool loop, float seek) {
+    // Not found
+    if (access(path, F_OK) != 0) {
+        return 0;
+    }
+
+    LightEvent_Init(&seekEvent, RESET_ONESHOT);
     quit = false;
     looping = loop;
+
+    seek_target = seek;
 
     int32_t priority = 0x30;
     svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
@@ -257,7 +276,9 @@ int play_mp3(char *path, bool loop) {
     threadId = threadCreate(audio_thread, path,
                                           THREAD_STACK_SZ, priority,
                                           THREAD_AFFINITY, true);
-    return 0;
+
+    if (seek > 0) LightEvent_Wait(&seekEvent);
+    return 1;
 }
 
 void seek(u32 location) {
@@ -273,7 +294,6 @@ void seek_mp3(float time) {
     int location = time * samplerate_mp3();
     if (!quit) {
         bool oldstate = ndspChnIsPaused(MUSIC_CHANNEL);
-        
         ndspChnSetPaused(MUSIC_CHANNEL, true); //Pause playback...
         
         LightLock_Lock(&decoderLock);
@@ -291,9 +311,10 @@ void seek_mp3(float time) {
             memset(&waveBuf[i], 0, sizeof(ndspWaveBuf));
             waveBuf[i].data_vaddr = audioBuffer + i * buffsize_mp3() * channels_mp3();
         }
-
         LightLock_Unlock(&decoderLock);
         ndspChnSetPaused(MUSIC_CHANNEL, oldstate); //once the seeking is done, playback can continue.
+
+        LightEvent_Signal(&seekEvent);
     }
 }
 

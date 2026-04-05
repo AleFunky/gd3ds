@@ -18,10 +18,19 @@ extern unsigned int frame_counter;
 
 extern unsigned int level_frame;
 
+extern bool song_loaded;
+
 extern bool exiting_level;
+
+extern bool alt_title_screen;
 
 extern ParticleSystem touch_drag_particles;
 extern ParticleSystem touch_explosion_particles;
+
+extern float slow_speed_particles_timer;
+extern float normal_speed_particles_timer;
+extern float fast_speed_particles_timer;
+extern float faster_speed_particles_timer;
 
 #define SCREEN_WIDTH  400
 #define SCREEN_HEIGHT 240
@@ -31,6 +40,7 @@ enum GameState {
     STATE_LEVEL_SELECT,
     STATE_ICON_KIT,
     STATE_GAME,
+    STATE_EXTERNAL_LEVELS,
     STATE_EXIT
 };
 

@@ -36,6 +36,8 @@ void cfg_init() {
     // Make the directories
     mkdir(CONFIG_PARENT, 0777);
     mkdir(CONFIG_ROOT, 0777);
+    mkdir(USER_LEVELS_DIR, 0777);
+    mkdir(USER_SONGS_DIR, 0777);
 
     config_load(&cfg, CONFIG_FILE);
 

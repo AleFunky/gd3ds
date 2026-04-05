@@ -80,10 +80,14 @@ typedef struct {
     float timer;
     float death_timer;
 
+    bool custom_level;
+    char custom_level_path[256];
+
     int last_hitbox_trail;
     PlayerHitboxTrail hitbox_trail_players[2][HITBOX_TRAIL_SIZE];
 
     KeyInput input;
+    KeyInput old_input;
 } GameState;
 
 #define CEILING_INVUL_TIME 0.15f

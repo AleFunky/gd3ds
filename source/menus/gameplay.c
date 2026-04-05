@@ -35,7 +35,7 @@ static UIElement *level_name;
 
 void pause_game() {
     game_paused = true;
-    pause_playback_mp3();
+    if (song_loaded) pause_playback_mp3();
     ui_run_func_on_tag(&screen_top, "pause_menu", ui_enable_element);
     ui_run_func_on_tag(&screen, "paused", ui_enable_element);
     ui_run_func_on_tag(&screen, "not_paused", ui_disable_element);
@@ -44,7 +44,7 @@ void pause_game() {
 
 void unpause_game() {
     game_paused = false;
-    if (state.death_timer <= 0) {
+    if (state.death_timer <= 0 && song_loaded) {
         unpause_playback_mp3();
     }
     ui_run_func_on_tag(&screen_top, "pause_menu", ui_disable_element);
@@ -62,7 +62,7 @@ void exit_level() {
 void restart_level() {
     init_variables();
     reload_level(); 
-    seek_mp3(0);
+    if (song_loaded) seek_mp3(level_info.song_offset);
     unpause_game();
 }
 

@@ -21,6 +21,8 @@
 #include "menus/settings.h"
 #include "menus/gameplay.h"
 
+#include "menus/components/ui_screen.h"
+
 const Color white = { 255, 255, 255 };
 
 int sprite_count = 0;
@@ -176,7 +178,7 @@ float mirror_angle(float angle, bool hflip, bool vflip)
 }
 
 inline int get_color_channel(int col_type, int obj, const GameObject *game_obj) {
-    int col_channel = 0;
+    int col_channel = game_obj->base_color;
     if (col_type == COLOR_TYPE_BLACK) col_channel = 0;
     else if (col_type == COLOR_TYPE_WHITE) col_channel = -1;
     else {
@@ -252,25 +254,31 @@ int get_glow_channel(int id) {
 }
 
 const int obj_9_random_layers[4] = {
-    585,
-    589,
+    586,
     590,
-    589
+    591,
+    590
 };
 
 const int obj_135_random_layers[4] = {
-    610,
     611,
     612,
-    613
+    613,
+    614
 };
 
 int get_obj_random_layer(int obj, int id) {
+    int tex = game_objects[id].texture;
     switch (id) {
         case 9:
-            return obj_9_random_layers[objects.random[obj] & 0b11];
+            int offset = objects.random[obj] & 0b11;
+            if (offset == 3) offset = 0;
+            
+            if (offset > 0) offset += 3;
+
+            return tex + offset;
         case 135:
-            return obj_135_random_layers[objects.random[obj] & 0b11];
+            return tex + (objects.random[obj] & 0b11);
     }
     return -1;
 }
@@ -436,6 +444,8 @@ void spawn_object_at(
 
     // Skip if no glow frame
     if (glowEnabled && obj->glow_frame >= 0) {
+        if (sprite_count >= MAX_SPRITES - 1) return;
+
         SpriteObject *vo = &viewable_objects[sprite_count];
 
         vo->spr = sprite_templates[id].glow_template;
@@ -448,7 +458,7 @@ void spawn_object_at(
 
         vo->obj = obj_game;
         vo->layer = 1;
-        vo->col_type = COLOR_TYPE_GLOW;
+        vo->col_type = COLOR_TYPE_BASE;
         vo->opacity = 0.5f;
         vo->col_channel = get_glow_channel(id);
         viewable_objects_ptr[sprite_count] = vo;
@@ -507,7 +517,7 @@ static inline uint32_t make_sort_key(SpriteObject *s)
     const int obj = s->obj;
 
     if (obj == -1) {
-        return ((5 + 8) << 17) | (0 << 16) | (0 << 8) | 0;
+        return ((5 + 8) << 18) | (0 << 16) | (0 << 8) | 0;
     }
 
     const int id = objects.id[obj];
@@ -518,9 +528,11 @@ static inline uint32_t make_sort_key(SpriteObject *s)
     // Blending makes zlayer one 
     int col_channel = objects.col_channel[obj];
 
+    bool blending = col_channel > 0 && (channels[col_channel].blending ^ ((zlayer & 1) == 0));
+
     if (s->layer == 1) {
         zlayer--;
-    } else if (col_channel > 0 && (channels[col_channel].blending ^ ((zlayer & 1) == 0))) {
+    } else if (blending) {
         zlayer--;
     }
 
@@ -550,12 +562,13 @@ static inline uint32_t make_sort_key(SpriteObject *s)
 
     s->zlayer = zlayer;
 
-    uint32_t zl = (uint32_t)(zlayer + 8);     // fits in 7 bits
+    uint32_t zl = (uint32_t)(zlayer + 8);     // fits in 6 bits
+    uint32_t zb = (uint32_t)(blending);       // fits in 1 bit
     uint32_t zs = (uint32_t)(sheet);          // fits in 1 bit
     uint32_t zo = (uint32_t)(zorder + 128);   // fits in 8 bits
     uint32_t cz = (uint32_t)(child_z + 128);  // fits in 8 bits
 
-    return (zl << 17) | (zs << 16) | (zo << 8) | cz;
+    return (zl << 18) | (zb << 17) | (zs << 16) | (zo << 8) | cz;
 }
 
 #define VIEW_OBJECTS (12 * 6)
@@ -664,6 +677,7 @@ float get_out_scale_fade(float x, int right_edge) {
 
 int get_obj_opacity(int obj, float x) {
     int opacity = obj_edge_fade(x, SCREEN_WIDTH / SCALE);
+    bool blending;
 
     switch (objects.id[obj]) {
         case 90:
@@ -675,23 +689,26 @@ int get_obj_opacity(int obj, float x) {
         case 96:
         case 309:
         case 311:
-        case 1747:
-        case 1748:
+        case 687:
+        case 688:
             if (objects.transition_applied[obj] == FADE_NONE) opacity = 255;
             break;
             
+        case 211:
+            blending = channels[objects.col_channel[obj]].blending;
+            if (!blending && objects.transition_applied[obj] == FADE_NONE) opacity = 255;
+            break;
         case 207:
         case 208:
         case 209:
         case 210:
-        case 211:
         case 212:
         case 213:
         case 693:
         case 694:
         case 331:
         case 333:
-            bool blending = channels[objects.detail_col_channel[obj]].blending;
+            blending = channels[objects.detail_col_channel[obj]].blending;
             if (!blending && objects.transition_applied[obj] == FADE_NONE) opacity = 255;
             break;
     }
@@ -854,6 +871,23 @@ void draw_ground(float cam_x, float cam_y, float y, bool is_ceiling, int screen_
         C2D_DrawSpriteTinted(&ground, &tint);
     }
 
+    C2D_PlainImageTint(&tint, C2D_Color32(0, 0, 0, 100), 1.f);
+    C2D_Sprite ground_shadow = { 0 };
+
+    C2D_SpriteFromSheet(&ground_shadow, ui_sheet, 361);
+    C3D_TexSetFilter(ground_shadow.image.tex, GPU_LINEAR, GPU_LINEAR);
+
+    // Left shadow
+    C2D_SpriteSetPos(&ground_shadow, 0, calc_y);
+    C2D_SpriteSetScale(&ground_shadow, 1.f, 1.f);
+    C2D_DrawSpriteTinted(&ground_shadow, &tint);
+
+    // Right shadow
+    C2D_SpriteSetPos(&ground_shadow, screen_width / SCALE, calc_y);
+    C2D_SpriteSetCenter(&ground_shadow, 1.f, 0.f);
+    C2D_SpriteSetScale(&ground_shadow, -1.f, 1.f);
+    C2D_DrawSpriteTinted(&ground_shadow, &tint);
+
     // Then draw the line
     if (channels[CHANNEL_LINE].blending) {
         change_blending(true);
@@ -917,6 +951,11 @@ void create_objects() {
                 float calc_y = SCREEN_HEIGHT - ((objects.y[obj] - state.camera_y));  
                 if (calc_x < -60 || calc_x >= (SCREEN_WIDTH / SCALE) + 60) continue;
                 if (calc_y < -60 || calc_y >= (SCREEN_HEIGHT / SCALE) + 60) continue;
+
+                // Skip invalid objects
+                if (objects.id[obj] > 745) {
+                    continue;
+                }
 
                 int fade_val = obj_edge_fade(calc_x, SCREEN_WIDTH / SCALE);
                 bool fade_edge = (fade_val == 255 || fade_val == 0);
@@ -1054,6 +1093,7 @@ void draw_objects() {
                 drawParticleSystem(&explosion_particles[i], 0, 0, 1.f);
             }
             drawParticleSystem(&brick_destroy_particles, 0, 0, 1.f);
+            drawParticleSystem(&coin_pickup_particles, 0, 0, 1.f);
             drawParticleSystem(&glitter_particles, 0, 0, 1.f);
             change_blending(false);
             blend_enabled = false;
@@ -1076,9 +1116,18 @@ void draw_objects() {
                 drawParticleSystem(&drag_particles_2[i], 0, 0, 1.f);
             }
             change_blending(false);
-
         }
     }
+    if (!blend_enabled) change_blending(true);
+        drawParticleSystem(&slow_speed_particles, 0, 0, 1.f);
+        drawParticleSystem(&normal_speed_particles, 0, 0, 1.f);
+        drawParticleSystem(&fast_speed_particles, 0, 0, 1.f);
+        drawParticleSystem(&faster_speed_particles, 0, 0, 1.f);
+        change_blending(false);
+
+    if (!blend_enabled) change_blending(true);
+    drawParticleSystem(&slow_speed_particles, 0, 0, 1.f);
+    change_blending(false);
 
     if (state.hitbox_display) {
         for (size_t s = 0; s < sprite_count; s++) {

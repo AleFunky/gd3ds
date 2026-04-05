@@ -1,0 +1,4 @@
+bggradient tag="gradient"
+
+list x=160 y=120 w=200 h=140 tag="list"
+button x=260 y=40 id=200 scale=0.5 action="go_back"

@@ -11,7 +11,7 @@
 extern volatile float amplitude;
 
 void audio_init();
-int play_mp3(char *path, bool loop);
+int play_mp3(char *path, bool loop, float seek);
 void seek_mp3(float time);
 void stop_mp3();
 void toggle_playback_mp3();

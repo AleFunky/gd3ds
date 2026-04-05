@@ -8,6 +8,8 @@
 #include "graphics.h"
 #include "player/collision.h"
 
+#include <stdlib.h>
+
 #include "state.h"
 
 Color p1_color;
@@ -266,7 +268,28 @@ void run_trigger(int obj) {
     SET_ACTIVATED(obj, true);
 }
 
+int compare_triggers(const void *a, const void *b) {
+    int ta = *((int*) a);
+    int tb = *((int*) b);
+    
+    float xa = objects.x[ta];
+    float xb = objects.x[tb];
+
+    if (xa != xb) {
+        return xa - xb;
+    }
+    
+    float ya = objects.y[ta];
+    float yb = objects.y[tb];
+
+    return yb - ya;
+}
+
+int triggers_buffer[TRIGGER_BUFFER_SIZE];
+int trigger_count;
+
 void handle_triggers() {
+    trigger_count = 0;
     int cam_sx = (int)((state.player.x) / SECTION_SIZE);
     
     for (int sx = -1; sx < 1; sx++) {
@@ -296,11 +319,19 @@ void handle_triggers() {
                             run_trigger(obj);
                         }
                     } else if (objects.x[obj] < state.player.x) {
-                        run_trigger(obj);
+                        if (trigger_count < TRIGGER_BUFFER_SIZE) {
+                            triggers_buffer[trigger_count++] = obj;
+                        }
                     }
                 }
             }
         }
+    }
+
+    qsort(triggers_buffer, trigger_count, sizeof(int), compare_triggers);
+
+    for (size_t i = 0; i < trigger_count; i++) {
+        run_trigger(triggers_buffer[i]);
     }
 }
 

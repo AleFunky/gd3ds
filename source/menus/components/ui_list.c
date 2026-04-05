@@ -10,6 +10,14 @@
 #include "ui_list.h"
 #include "utils/gfx.h"
 
+void ui_list_reset(UIElement *list) {
+    UIList* l = &list->list;
+    l->scrollY = 0;
+    l->itemCount = 0;
+    l->contentHeight = 0;
+    l->lastTouchY = 0;
+}
+
 void ui_list_add(UIElement* list, UIElement* item) {
     UIList* l = &list->list;
 
@@ -42,8 +50,8 @@ static void ui_list_update(UIElement* e, UIInput* touch) {
     bool inside = touch->touchPosition.px >= e->x - (e->w / 2) && touch->touchPosition.px < e->x + (e->w / 2) &&
                   touch->touchPosition.py >= e->y - (e->h / 2) && touch->touchPosition.py < e->y + (e->h / 2);
 
+    ui_list_forward_touch(e, touch);
     if (inside) {  
-        ui_list_forward_touch(e, touch);
         touch->did_something = true;
 
         // Exit if used something
@@ -70,10 +78,13 @@ static void ui_list_update(UIElement* e, UIInput* touch) {
     }
 
     // Clamp scrolling
-    if (l->scrollY > 0) l->scrollY = 0;
-
     int minScroll = e->h - l->contentHeight;
-    if (l->scrollY < minScroll) l->scrollY = minScroll;
+    if (l->contentHeight <= e->h) {
+        l->scrollY = 0;
+    } else {
+        if (l->scrollY > 0) l->scrollY = 0;
+        if (l->scrollY < minScroll) l->scrollY = minScroll;
+    }
 }
 
 static void ui_list_draw(UIElement* e) {
@@ -127,9 +138,8 @@ UIElement ui_create_list(
 
     e.update = ui_list_update;
     e.draw = ui_list_draw;
-
-    e.list.scrollY = 0;
-    e.list.itemCount = 0;
+    
+    ui_list_reset(&e);
 
     return e;
 }

@@ -21,6 +21,8 @@ UIElement ui_create_label(int x, int y, float scale, char *text, float alignment
     e.type = UI_LABEL;
     e.x = x;
     e.y = y;
+    e.w = 0;
+    e.h = 10;
     e.enabled = true;
     
     e.label.alignment = alignment;

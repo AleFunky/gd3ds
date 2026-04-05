@@ -5,3 +5,4 @@ UIElement ui_create_list(
     char (*tag)[TAG_LENGTH]
 );
 void ui_list_add(UIElement* list, UIElement* item);
+void ui_list_reset(UIElement *list);

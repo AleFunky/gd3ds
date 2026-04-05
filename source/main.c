@@ -36,6 +36,7 @@
 #include "player/player.h"
 #include "particles/circles.h"
 #include "menus/settings.h"
+#include "menus/external_levels.h"
 
 #define CITRA_TYPE 0x20000
 #define CITRA_VERSION 11
@@ -55,6 +56,13 @@ SFX explode_sound;
 
 ParticleSystem touch_drag_particles;
 ParticleSystem touch_explosion_particles;
+
+float slow_speed_particles_timer = 0.f;
+float normal_speed_particles_timer = 0.f;
+float fast_speed_particles_timer = 0.f;
+float faster_speed_particles_timer = 0.f;
+
+bool alt_title_screen;
 
 bool is_citra() {
     s64 version = 0;
@@ -148,18 +156,46 @@ unsigned int frame_counter = 0;
 
 bool exiting_level = false;
 
+bool song_loaded;
+
 void game_loop() {
-    // TODO: make this support external levels
-    int returned = load_level(main_levels[curr_level_id].gmd_path);
-    level_info.level_name = main_levels[curr_level_id].level_name;
-    if (returned) {
-        printf("\x1b[9;1HFailed %d", returned);
-        game_state = STATE_LEVEL_SELECT;
-        return;
+    C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+    C2D_SceneBegin(top);
+    C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
+    C2D_Fade(0);
+    draw_text(bigFont_fontCharset, bigFont_sheet, SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10, 0.5f, 1.0f, "Loading...");
+    C3D_FrameEnd(0);
+    
+    char *path;
+
+    if (state.custom_level) {
+        path = state.custom_level_path;
+    } else {
+        path = main_levels[curr_level_id].gmd_path;
+        level_info.level_name = main_levels[curr_level_id].level_name;
     }
 
-    returned = play_mp3(main_levels[curr_level_id].song_path, false);
-    pause_playback_mp3();
+    int returned = load_level(path);
+    if (returned) {
+        printf("\x1b[9;1HFailed %d", returned);
+        game_state = (state.custom_level ? STATE_EXTERNAL_LEVELS : STATE_LEVEL_SELECT);
+        return;
+    }
+    
+
+    if (level_info.custom_song_id >= 0) {
+        char full_path[273];
+        snprintf(full_path, sizeof(full_path), "%s/%d.mp3", USER_SONGS_DIR, level_info.custom_song_id);
+        song_loaded = play_mp3(full_path, false, level_info.song_offset);
+    } else {
+        if (state.custom_level) {
+            song_loaded = play_mp3(main_levels[level_info.song_id].song_path, false, level_info.song_offset);
+        } else {
+            song_loaded = play_mp3(main_levels[curr_level_id].song_path, false, 0);
+        }
+    }
+
+    if (song_loaded) pause_playback_mp3();
 
     state.camera_x = 0;
     state.camera_y = 0;
@@ -202,7 +238,17 @@ void game_loop() {
 
     initParticleSystem(&brick_destroy_particles, &glass_destroy_01);
     initParticleSystem(&glitter_particles, &glitter_effect);
+    initParticleSystem(&slow_speed_particles, &speed_effect_slow);
+    initParticleSystem(&normal_speed_particles, &speed_effect_normal);
+    initParticleSystem(&fast_speed_particles, &speed_effect_fast);
+    initParticleSystem(&faster_speed_particles, &speed_effect_vfast);
+    initParticleSystem(&coin_pickup_particles, &coin_pickup_effect);
     
+    slow_speed_particles.stationary = true;
+    normal_speed_particles.stationary = true;
+    fast_speed_particles.stationary = true;
+    faster_speed_particles.stationary = true;
+
     Color p1_not_white = get_white_if_black(p1_color);
     Color p2_not_white = get_white_if_black(p2_color);
 
@@ -278,6 +324,26 @@ void game_loop() {
     glitter_particles.cfg.finishColorGreen = p1_not_white.g / 255.f;
     glitter_particles.cfg.finishColorBlue  = p1_not_white.b / 255.f;
 
+    slow_speed_particles.cfg.startColorRed   = 255 / 255.f;
+    slow_speed_particles.cfg.startColorGreen = 255 / 255.f;
+    slow_speed_particles.cfg.startColorBlue  = 0 / 255.f;
+
+    normal_speed_particles.cfg.startColorRed   = 0 / 255.f;
+    normal_speed_particles.cfg.startColorGreen = 190 / 255.f;
+    normal_speed_particles.cfg.startColorBlue  = 255 / 255.f;
+
+    fast_speed_particles.cfg.startColorRed   = 0 / 255.f;
+    fast_speed_particles.cfg.startColorGreen = 255 / 255.f;
+    fast_speed_particles.cfg.startColorBlue  = 0 / 255.f;
+
+    faster_speed_particles.cfg.startColorRed   = 230 / 255.f;
+    faster_speed_particles.cfg.startColorGreen = 65 / 255.f;
+    faster_speed_particles.cfg.startColorBlue  = 255 / 255.f;
+
+    coin_pickup_particles.cfg.startColorRed   = 255 / 255.f;
+    coin_pickup_particles.cfg.startColorGreen = 190 / 255.f;
+    coin_pickup_particles.cfg.startColorBlue  = 0 / 255.f;
+
     exiting_level = false;
 
     float accumulator = 0.0f;
@@ -321,9 +387,10 @@ void game_loop() {
 
         bool in_bounds = touchPos.px < 320 - 30 || touchPos.py > 30;
         
-        bool buttonPressed = (yJump ? (kDown & KEY_Y) : (kDown & KEY_A));
-        bool buttonHeld = (yJump ? (kHeld & KEY_Y) : (kHeld & KEY_A));
+        bool buttonPressed = (yJump ? (kDown & KEY_Y) : (kDown & KEY_A)) || (kDown & KEY_UP);
+        bool buttonHeld = (yJump ? (kHeld & KEY_Y) : (kHeld & KEY_A)) || (kHeld & KEY_UP);
 
+        state.old_input = state.input;
         state.input.pressedJump = (buttonPressed || (in_bounds && (kDown & KEY_TOUCH))) == true;
         state.input.holdJump = (state.input.pressedJump || buttonHeld || (in_bounds && (kHeld & KEY_TOUCH))) == true;
         
@@ -348,7 +415,7 @@ void game_loop() {
             
             brick_destroy_particles.emitting = false;
             glitter_particles.emitting = false;
-            
+
             u64 now = svcGetSystemTick();
             delta = (now - lastTime) / (CPU_TICKS_PER_MSEC * 1000);
             lastTime = now;
@@ -439,7 +506,7 @@ void game_loop() {
                 if (state.death_timer <= 0.f) {
                     init_variables();
                     reload_level(); 
-                    unpause_playback_mp3();
+                    if (song_loaded) unpause_playback_mp3();
                     fixed_dt = true; 
                     state.dead = false;
                 }
@@ -472,6 +539,43 @@ void game_loop() {
             }
             updateParticleSystem(&brick_destroy_particles, delta);
             updateParticleSystem(&glitter_particles, delta);
+            updateParticleSystem(&slow_speed_particles, delta);
+            updateParticleSystem(&normal_speed_particles, delta);
+            updateParticleSystem(&fast_speed_particles, delta);
+            updateParticleSystem(&faster_speed_particles, delta);
+            updateParticleSystem(&coin_pickup_particles, delta);
+            float calc_x_speed_particles = SCREEN_WIDTH_AREA;
+            float calc_y_speed_particles = (SCREEN_HEIGHT_AREA / 2);
+
+            slow_speed_particles.emitterX = calc_x_speed_particles;
+            slow_speed_particles.emitterY = calc_y_speed_particles;
+            slow_speed_particles.emitting = slow_speed_particles_timer > 0;
+            if (slow_speed_particles_timer > 0) {
+                slow_speed_particles_timer -= delta;
+            }
+
+            normal_speed_particles.emitterX = calc_x_speed_particles;
+            normal_speed_particles.emitterY = calc_y_speed_particles;
+            normal_speed_particles.emitting = normal_speed_particles_timer > 0;
+            if (normal_speed_particles_timer > 0) {
+                normal_speed_particles_timer -= delta;
+            }
+
+            fast_speed_particles.emitterX = calc_x_speed_particles;
+            fast_speed_particles.emitterY = calc_y_speed_particles;
+            fast_speed_particles.emitting = fast_speed_particles_timer > 0;
+            if (fast_speed_particles_timer > 0) {
+                fast_speed_particles_timer -= delta;
+            }
+
+            faster_speed_particles.emitterX = calc_x_speed_particles;
+            faster_speed_particles.emitterY = calc_y_speed_particles;
+            faster_speed_particles.emitting = faster_speed_particles_timer > 0;
+            if (faster_speed_particles_timer > 0) {
+                faster_speed_particles_timer -= delta;
+            }
+            
+
             update_use_effects(delta, GFX_TOP);
             update_object_particles();
             u64 end_part = svcGetSystemTick();
@@ -547,6 +651,7 @@ void game_loop() {
                 draw_text(bigFont_fontCharset, bigFont_sheet, 0, 6,  DEBUG_TEXT_SCALE, 0, "CPU: %6.2f%% (%6.2f%% %6.2f%%)", (C3D_GetProcessingTime() * 6) + processingTime, C3D_GetProcessingTime() * 6, processingTime);
                 draw_text(bigFont_fontCharset, bigFont_sheet, 0, 18, DEBUG_TEXT_SCALE, 0, "GPU: %6.2f%%", drawingTime);
                 draw_text(bigFont_fontCharset, bigFont_sheet, 0, 30, DEBUG_TEXT_SCALE, 0, "Linear free: %d", linearSpaceFree());
+                draw_text(bigFont_fontCharset, bigFont_sheet, 180, 30, DEBUG_TEXT_SCALE, 0, "CMDBuf: %6.2f%%", C3D_GetCmdBufUsage()*100.0f);
 
                 draw_text(bigFont_fontCharset, bigFont_sheet, 180, 42,  DEBUG_TEXT_SCALE, 0, "%d steps", steps);
                 draw_text(bigFont_fontCharset, bigFont_sheet, 180, 54,  DEBUG_TEXT_SCALE, 0, "Particle: %6.2f%%", particle_calc_time * 6);
@@ -572,13 +677,13 @@ void game_loop() {
         } while (handle_fading());
 
         if (being_faded) {
-            unpause_playback_mp3();
+            if (song_loaded) unpause_playback_mp3();
             being_faded = false;
         }
 
         if (exiting_level) {
             game_paused = false;
-            unpause_playback_mp3();
+            if (song_loaded) unpause_playback_mp3();
             break;
         }
     }
@@ -596,9 +701,15 @@ void game_loop() {
 
     freeParticleData(&brick_destroy_particles.data);
     freeParticleData(&glitter_particles.data);
+    freeParticleData(&slow_speed_particles.data);
+    freeParticleData(&normal_speed_particles.data);
+    freeParticleData(&fast_speed_particles.data);
+    freeParticleData(&faster_speed_particles.data);
+    freeParticleData(&coin_pickup_particles.data);
+
     unload_level();
 
-    game_state = STATE_LEVEL_SELECT;
+    game_state = (state.custom_level ? STATE_EXTERNAL_LEVELS : STATE_LEVEL_SELECT);
 }
 
 void game_assets_init() {
@@ -644,7 +755,7 @@ int main(int argc, char* argv[]) {
     // Init libs
     romfsInit();
     gfxInitDefault();
-    C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
+    C3D_Init(C3D_DEFAULT_CMDBUF_SIZE * 4);
     C2D_Init(MAX_SPRITES);
     C2D_Prepare();
     osSetSpeedupEnable(1);
@@ -668,6 +779,8 @@ int main(int argc, char* argv[]) {
     load_sfx();
 
     srand(time(NULL));
+
+    alt_title_screen = (rand() & (128 - 1)) == 0;
 
     top = C2D_CreateScreenTargetExt(GFX_TOP, GFX_LEFT, false);
     bot = C2D_CreateScreenTargetExt(GFX_BOTTOM, GFX_LEFT, false);
@@ -699,6 +812,9 @@ int main(int argc, char* argv[]) {
                 break;
             case STATE_GAME:
                 game_loop();
+                break;
+            case STATE_EXTERNAL_LEVELS:
+                external_levels_loop();
                 break;
             case STATE_EXIT:
                 exit = true;

@@ -115,7 +115,7 @@ void spawn_object_particles(int obj) {
             if (!is_ps_already_loaded(obj)) {
                 index = load_object_particles(obj, &ring_effect, false);
                 if (index >= 0) {
-                    set_particle_color(&object_particle[index].ps.cfg, 0, 0.69f, 1);
+                    set_particle_color(&object_particle[index].ps.cfg, 0, 1, 1);
                     object_particle[index].ps.emitterX = objects.x[obj];
                     object_particle[index].ps.emitterY = objects.y[obj];
                 }
@@ -125,7 +125,7 @@ void spawn_object_particles(int obj) {
             if (!is_ps_already_loaded(obj)) {
                 index = load_object_particles(obj, &ring_effect, false);
                 if (index >= 0) {
-                    set_particle_color(&object_particle[index].ps.cfg, 1, 0.5f, 1);
+                    set_particle_color(&object_particle[index].ps.cfg, 1, 0, 1);
 
                     object_particle[index].ps.emitterX = objects.x[obj];
                     object_particle[index].ps.emitterY = objects.y[obj];
@@ -142,6 +142,7 @@ void spawn_object_particles(int obj) {
 
                     object_particle[index].ps.emitterX = objects.x[obj];
                     object_particle[index].ps.emitterY = objects.y[obj];
+                    object_particle[index].ps.posVarRotates = true;
                 }
             }
             break;
@@ -149,12 +150,13 @@ void spawn_object_particles(int obj) {
             if (!is_ps_already_loaded(obj)) {
                 index = load_object_particles(obj, &bump_effect, false);
                 if (index >= 0) {
-                    set_particle_color(&object_particle[index].ps.cfg, 0, 0.69f, 1);
+                    set_particle_color(&object_particle[index].ps.cfg, 0, 1, 1);
 
                     object_particle[index].ps.cfg.angle = 180.f - (adjust_angle_y(objects.rotation[obj], objects.flippedV[obj]) + 90.f);
 
                     object_particle[index].ps.emitterX = objects.x[obj];
                     object_particle[index].ps.emitterY = objects.y[obj];
+                    object_particle[index].ps.posVarRotates = true;
                 }
             }
             break;
@@ -162,12 +164,13 @@ void spawn_object_particles(int obj) {
             if (!is_ps_already_loaded(obj)) {
                 index = load_object_particles(obj, &bump_effect, false);
                 if (index >= 0) {
-                    set_particle_color(&object_particle[index].ps.cfg, 1, 0.5f, 1);
+                    set_particle_color(&object_particle[index].ps.cfg, 1, 0, 1);
 
                     object_particle[index].ps.cfg.angle = 180.f - (adjust_angle_y(objects.rotation[obj], objects.flippedV[obj]) + 90.f);
 
                     object_particle[index].ps.emitterX = objects.x[obj];
                     object_particle[index].ps.emitterY = objects.y[obj];
+                    object_particle[index].ps.posVarRotates = true;
                 }
             }
             break;
@@ -188,7 +191,7 @@ void spawn_object_particles(int obj) {
             if (!is_ps_already_loaded(obj)) {
                 index = load_object_particles(obj, &portal_effect_01, false);
                 if (index >= 0) {
-                    set_particle_color(&object_particle[index].ps.cfg, 0, 0.69f, 1);
+                    set_particle_color(&object_particle[index].ps.cfg, 0, 1, 1);
 
                     object_particle[index].ps.cfg.angle = -(adjust_angle_y(objects.rotation[obj], objects.flippedH[obj]));
 
@@ -214,7 +217,7 @@ void spawn_object_particles(int obj) {
             if (!is_ps_already_loaded(obj)) {
                 index = load_object_particles(obj, &portal_effect_01, false);
                 if (index >= 0) {
-                    set_particle_color(&object_particle[index].ps.cfg, 1, 0.5f, 1);
+                    set_particle_color(&object_particle[index].ps.cfg, 1, 0, 1);
 
                     object_particle[index].ps.cfg.angle = -(adjust_angle_y(objects.rotation[obj], objects.flippedH[obj]));
 
@@ -254,7 +257,7 @@ void spawn_object_particles(int obj) {
             if (!is_ps_already_loaded(obj)) {
                 index = load_object_particles(obj, &portal_effect_01, false);
                 if (index >= 0) {
-                    set_particle_color(&object_particle[index].ps.cfg, 0, 0.69f, 1);
+                    set_particle_color(&object_particle[index].ps.cfg, 0, 1, 1);
 
                     object_particle[index].ps.cfg.angle = -(adjust_angle_y(objects.rotation[obj], objects.flippedH[obj]));
 
@@ -364,6 +367,19 @@ void spawn_object_particles(int obj) {
                     object_particle[index].ps.cfg.angle = -(adjust_angle_y(objects.rotation[obj], objects.flippedH[obj]));
                     object_particle[index].ps.emitterX = objects.x[obj];
                     object_particle[index].ps.emitterY = objects.y[obj];
+                }
+            }
+            break;
+        case SECRET_COIN:
+            if (!is_ps_already_loaded(obj))
+            {
+                index = load_object_particles(obj, &coin_effect, false);
+                if (index >= 0)
+                {
+                    set_particle_color(&object_particle[index].ps.cfg, 1, 0.75f, 0);
+                    // object_particle[index].ps.cfg.angle = -(adjust_angle_y(objects.rotation[obj], objects.flippedH[obj]));
+                    object_particle[index].ps.emitterX = objects.x[obj];
+                    object_particle[index].ps.emitterY = objects.y[obj] - 15;
                 }
             }
             break;

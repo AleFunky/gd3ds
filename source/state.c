@@ -250,8 +250,10 @@ void init_variables() {
 
 void handle_death() {
     play_sfx(&explode_sound, 1);
-    pause_playback_mp3();
-    seek_mp3(0);
+    if (song_loaded) {
+        pause_playback_mp3();
+        seek_mp3(level_info.song_offset);
+    }
 
     Player *player = (state.current_player == 1) ? &state.player2 : &state.player;
 
@@ -262,10 +264,14 @@ void handle_death() {
         effect->def.colorR = color_not_white.r / 255.f;
         effect->def.colorG = color_not_white.g / 255.f;
         effect->def.colorB = color_not_white.b / 255.f;
+
+        effect->def.end_rad *= (player->mini ? 0.6 : 1.0f);
+        effect->def.start_rad *= (player->mini ? 0.6 : 1.0f);
     }
 
     explosion_particles[state.current_player].emitterX = player->x;
     explosion_particles[state.current_player].emitterY = player->y;
+    explosion_particles[state.current_player].scale = (player->mini ? 0.6 : 1.0f);
     spawnMultipleParticles(&explosion_particles[state.current_player], 90);
     
 }
