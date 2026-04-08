@@ -74,9 +74,9 @@ static void ui_external_level_card_update(UIElement* e, UIInput* touch) {
 static void ui_external_level_card_draw(UIElement* e) {
     float left_side = e->x - e->w / 2;
     float right_side = e->x + e->w / 2;
-    float icon_pos = left_side + 10;
-    float text_pos = icon_pos + 10;
-    float button_pos = right_side - 10;
+    float icon_pos = left_side + 15;
+    float text_pos = icon_pos + 14;
+    float button_pos = right_side - 15;
 
     // Draw icon
     C2D_SpriteSetCenter(&e->external_level_card.icon.sprite, 0.5f, 0.5f);
@@ -108,7 +108,7 @@ UIElement ui_create_external_level_card(int x, int y, int image, int sheet, char
     e.x = x;
     e.y = y;
     e.w = 200;
-    e.h = 20;
+    e.h = 28;
     e.enabled = true;
     e.action = action;
     
@@ -121,10 +121,10 @@ UIElement ui_create_external_level_card(int x, int y, int image, int sheet, char
     strncpy(e.external_level_card.label.text, text, 255);
     strncpy(e.external_level_card.path, level_path, 255);
 
-    e.external_level_card.icon.scaleX = 0.5f;
-    e.external_level_card.icon.scaleY = 0.5f;
+    e.external_level_card.icon.scaleX = 0.58f;
+    e.external_level_card.icon.scaleY = 0.58f;
 
-    e.external_level_card.label.scale = 0.5f;
+    e.external_level_card.label.scale = 0.54f;
     e.external_level_card.label.alignment = 0;
 
     // Button image
