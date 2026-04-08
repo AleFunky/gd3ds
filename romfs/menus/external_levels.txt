@@ -4,5 +4,8 @@ image x=36 y=205 id=178
 image x=284 y=205 id=178 sx=-1.0
 
 button x=20 y=20 id=8 action="exit"
-list x=160 y=120 w=200 h=140 tag="list"
-button x=260 y=40 id=200 scale=0.7 action="go_back"
+
+window x=180 y=120 w=240 h=200 style=6
+window x=180 y=130 w=220 h=160 style=7
+list x=180 y=130 w=210 h=150 tag="list"
+button x=290 y=30 id=200 scale=1 action="go_back"
