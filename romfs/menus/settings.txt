@@ -1,6 +1,6 @@
 darken opacity=0.4
 window x=160 y=120 w=220 h=180 style=0
-button x=50 y=30 id=31 scale=0.8 action="exit"
+button x=53 y=33 id=31 scale=0.8 action="exit"
 
 # Page switch
 

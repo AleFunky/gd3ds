@@ -8,6 +8,7 @@
 #include "menus/components/ui_textbox.h"
 #include "menus/components/ui_image.h"
 #include "fonts/bigFont.h"
+#include "fonts/chatFont.h"
 #include "main.h"
 #include "easing.h"
 #include "color_channels.h"
@@ -17,6 +18,7 @@
 #include "main_menu.h"
 #include "level_select.h"
 #include "settings.h"
+#include "credits.h"
 #include "external_levels.h"
 
 static UIScreen screen_top;
@@ -28,6 +30,7 @@ static int new_state = 0;
 static bool exit_flag = false;
 
 static bool in_settings = false;
+static bool in_credits = false;
 
 static float bg_scroll = 0;
 
@@ -50,11 +53,17 @@ void action_open_settings(UIElement* e) {
     settings_init();
 }
 
+void action_open_credits(UIElement* e) {
+    in_credits = true;
+    credits_init();
+}
+
 static UIAction actions[] = {
     { "level_select", action_open_level_select },
     { "extra_menu", action_open_extra_menu },
     { "settings", action_open_settings },
     { "icon_kit", action_open_icon_kit },
+    { "credits", action_open_credits }
 };
 
 static UIAction actions_top[] = {
@@ -138,7 +147,7 @@ void main_menu_loop() {
             old_wide = wideEnabled;
         }
 
-        if (!in_settings) ui_screen_update(&screen, &touch);
+        if (!in_settings && !in_credits) ui_screen_update(&screen, &touch);
         ui_screen_update(&screen_top, &touch);
         do {
             update_touch_effect(DT);
@@ -168,6 +177,13 @@ void main_menu_loop() {
                 int returned = settings_loop();
                 if (returned) {
                     in_settings = false;
+                }
+            }
+
+            if (in_credits) {
+                int returned = credits_loop();
+                if (returned) {
+                    in_credits = false;
                 }
             }
             change_blending(true);

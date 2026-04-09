@@ -16,6 +16,7 @@ typedef struct {
 extern C2D_SpriteSheet ui_sheet;
 extern C2D_SpriteSheet ui_2_sheet;
 extern C2D_SpriteSheet bigFont_sheet;
+extern C2D_SpriteSheet chatFont_sheet;
 extern C2D_SpriteSheet window_sheet;
 extern C2D_SpriteSheet bg_gradient_sheet;
 extern C2D_SpriteSheet bar_sheet;

@@ -28,6 +28,7 @@ C2D_SpriteSheet ui_sheet;
 C2D_SpriteSheet ui_2_sheet;
 C2D_SpriteSheet window_sheet;
 C2D_SpriteSheet bigFont_sheet;
+C2D_SpriteSheet chatFont_sheet;
 C2D_SpriteSheet bg_gradient_sheet;
 C2D_SpriteSheet bar_sheet;
 
@@ -36,6 +37,7 @@ void ui_assets_init() {
     ui_2_sheet = C2D_SpriteSheetLoad("romfs:/gfx/ui_2.t3x");
     window_sheet = C2D_SpriteSheetLoad("romfs:/gfx/windows.t3x");
     bigFont_sheet = C2D_SpriteSheetLoad("romfs:/gfx/bigFont.t3x");
+    chatFont_sheet = C2D_SpriteSheetLoad("romfs:/gfx/chatFont.t3x");
     bg_gradient_sheet = C2D_SpriteSheetLoad("romfs:/gfx/bg_gradient.t3x");
     bar_sheet = C2D_SpriteSheetLoad("romfs:/gfx/bars.t3x");
 }

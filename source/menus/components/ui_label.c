@@ -3,6 +3,7 @@
 #include "ui_image.h"
 #include "text.h"
 #include "fonts/bigFont.h"
+#include "fonts/chatFont.h"
 #include "ui_screen.h"
 
 static void ui_label_update(UIElement* e, UIInput* touch) {
