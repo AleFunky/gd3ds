@@ -9,6 +9,7 @@
 #include "menus/components/ui_image.h"
 #include "menus/components/ui_progress_bar.h"
 #include "menus/components/ui_label.h"
+#include "menus/components/ui_label_aller.h"
 #include "menus/components/ui_external_level_card.h"
 #include "fonts/bigFont.h"
 #include "main.h"
@@ -39,6 +40,7 @@ static UIScreen screen_top;
 static UIElement *bg_gradient;
 static UIElement *bg_gradient_top;
 static UIElement *list;
+static UIElement *path_label;
 
 UIElement texts[UI_LIST_MAX_ITEMS];
 
@@ -64,8 +66,12 @@ static void open_level(UIElement *e) {
 
 void load_level_folder(char *folder) {
     if (strncmp(last_path, current_path, 256) == 0) return;
-
     ui_list_reset(list);
+    path_label = ui_get_element_by_tag(&screen, "path");
+    char path[256];
+    strncpy(path, current_path, 256);
+    truncate_filename(path, 30);
+    strncpy(path_label->label_aller.text, path, 256);
     int count = 0;
     FileOrFolder *entries = load_folder(folder, &count);
     char level_name[256];
@@ -75,6 +81,7 @@ void load_level_folder(char *folder) {
             if (entry->is_dir) {
                 // Folder
                 char *name = strip_filename(entry->name);
+                truncate_filename(name, 16);
                 texts[i] = ui_create_external_level_card(0, 0, 320, 0, name, entry->name, open_folder, NULL);
                 ui_list_add(list, &texts[i]);
             } else {
@@ -104,6 +111,7 @@ static void action_go_back(UIElement *e) {
 static void open_folder(UIElement *e) {
     strncpy(current_path, e->external_level_card.path, 256);
     load_level_folder(current_path);
+
 }
 
 static UIAction actions[] = {

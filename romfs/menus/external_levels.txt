@@ -1,8 +1,8 @@
 bggradient tag="gradient"
 
 button x=20 y=28 id=8 action="exit"
-
 window x=180 y=120 w=270 h=230 style=6
 window x=180 y=128 w=250 h=194 style=7
 list x=180 y=128 w=240 h=184 tag="list"
+label_aller x=55 y=28 scale=0.9 text="" align=LEFT tag="path" 
 button x=302 y=18 id=200 scale=0.9 action="go_back"

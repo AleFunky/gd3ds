@@ -3,6 +3,7 @@
 #include "ui_button.h"
 #include "ui_image.h"
 #include "ui_label.h"
+#include "ui_label_aller.h"
 #include "ui_screen.h"
 #include "ui_checkbox.h"
 #include "ui_window.h"
@@ -389,6 +390,9 @@ void ui_load_screen(UIScreen* screen,
         } else if (strcmp(type, "label") == 0) {
             screen->elements[screen->count++] =
                 ui_create_label(x, y, scale, text, align, tag);
+        } else if (strcmp(type, "label_aller") == 0) {
+            screen->elements[screen->count++] =
+                ui_create_label_aller(x, y, scale, text, align, tag);
         } else if (strcmp(type, "checkbox") == 0) {
             screen->elements[screen->count++] =
                 ui_create_checkbox(
