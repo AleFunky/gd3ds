@@ -1,8 +1,11 @@
 bggradient tag="gradient"
 
-button x=20 y=28 id=8 action="exit"
-window x=180 y=120 w=270 h=230 style=6
-window x=180 y=128 w=250 h=194 style=7
-list x=180 y=128 w=240 h=184 tag="list"
-label_aller x=55 y=28 scale=0.9 text="" align=LEFT tag="path" 
-button x=302 y=18 id=200 scale=0.9 action="go_back"
+image x=36 y=205 id=178
+image x=284 y=205 id=178 sx=-1.0
+
+button x=20 y=20 id=8 action="exit"
+
+window x=180 y=120 w=240 h=200 style=6
+window x=180 y=130 w=220 h=160 style=7
+list x=180 y=130 w=210 h=150 tag="list"
+button x=290 y=30 id=200 scale=1 action="go_back"

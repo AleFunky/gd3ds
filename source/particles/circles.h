@@ -60,3 +60,4 @@ extern const UseEffectDefinition coin_radius_effect;
 UseEffect *add_use_effect(float x, float y, int obj, const UseEffectDefinition *def, int screen);
 void update_use_effects(float delta, int screen);
 void draw_use_effects(int screen);
+void clear_use_effects(int screen);

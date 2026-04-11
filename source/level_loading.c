@@ -12,6 +12,7 @@
 #include "graphics.h"
 #include "math_helpers.h"
 #include "utils/json_config.h"
+#include "state.h"
 
 #include "player/collision.h"
 
@@ -699,7 +700,8 @@ int convert_object(int id) {
 
         // User coin
         case 1329:
-            return SECRET_COIN;
+            if (state.custom_level) return 0;
+            else return SECRET_COIN;
 
         // Slopes
         case 1743:
@@ -870,6 +872,10 @@ bool obj_has_detail(const GameObject *obj) {
     return false;
 }
 
+bool is_valid_object(int id) {
+    return id >= 1 && id < 745;
+}
+
 int parse_gd_object(const char *objStr, int obj) {
     int count = 0;
     // Split object into each key
@@ -904,53 +910,55 @@ int parse_gd_object(const char *objStr, int obj) {
         }
     }
     
-    const GameObject *game_object = &game_objects[objects.id[obj]];
+    if (is_valid_object(objects.id[obj])) {
+        const GameObject *game_object = &game_objects[objects.id[obj]];
 
-    if (game_object->swap_base_detail) {
-        if (!obj_has_main(game_object)) {
-            if (!objects.col_channel[obj]) objects.col_channel[obj] = game_object->base_color;
-        } else {
-            if (!objects.detail_col_channel[obj]) objects.detail_col_channel[obj] = game_object->base_color;
-        }
-    } else {
-        if (!objects.col_channel[obj]) objects.col_channel[obj] = game_object->base_color;
-        if (!objects.detail_col_channel[obj]) objects.detail_col_channel[obj] = 1;
-    }
-
-    objects.random[obj] = rand();
-
-    const ObjectHitbox *hitbox = game_object->hitbox;
-    if (hitbox) {
-        objects.width[obj] = hitbox->width;
-        objects.height[obj] = hitbox->height;
-        
-        if (hitbox->type == COLLISION_SLOPE) {
-            int orientation = objects.rotation[obj] / 90;
-            if (objects.flippedH[obj] && objects.flippedV[obj]) orientation += 2;
-            else if (objects.flippedH[obj]) orientation += 1;
-            else if (objects.flippedV[obj]) orientation += 3;
-            
-            orientation = orientation % 4;
-            if (orientation < 0) orientation += 4;
-
-            objects.orientation[obj] = orientation;
-        }
-
-        if (hitbox->collision_type == HITBOX_SOLID) {
-            // Modify height and width depending on rotation
-            if ((int) fabsf(objects.rotation[obj]) % 180 != 0) {
-                objects.width[obj] = hitbox->height;
-                objects.height[obj] = hitbox->width;
+        if (game_object->swap_base_detail) {
+            if (!obj_has_main(game_object)) {
+                if (!objects.col_channel[obj]) objects.col_channel[obj] = game_object->base_color;
             } else {
-                objects.width[obj] = hitbox->width;
-                objects.height[obj] = hitbox->height;
+                if (!objects.detail_col_channel[obj]) objects.detail_col_channel[obj] = game_object->base_color;
+            }
+        } else {
+            if (!objects.col_channel[obj]) objects.col_channel[obj] = game_object->base_color;
+            if (!objects.detail_col_channel[obj]) objects.detail_col_channel[obj] = 1;
+        }
+
+        objects.random[obj] = rand();
+
+        const ObjectHitbox *hitbox = game_object->hitbox;
+        if (hitbox) {
+            objects.width[obj] = hitbox->width;
+            objects.height[obj] = hitbox->height;
+            
+            if (hitbox->type == COLLISION_SLOPE) {
+                int orientation = objects.rotation[obj] / 90;
+                if (objects.flippedH[obj] && objects.flippedV[obj]) orientation += 2;
+                else if (objects.flippedH[obj]) orientation += 1;
+                else if (objects.flippedV[obj]) orientation += 3;
+                
+                orientation = orientation % 4;
+                if (orientation < 0) orientation += 4;
+
+                objects.orientation[obj] = orientation;
+            }
+
+            if (hitbox->collision_type == HITBOX_SOLID) {
+                // Modify height and width depending on rotation
+                if ((int) fabsf(objects.rotation[obj]) % 180 != 0) {
+                    objects.width[obj] = hitbox->height;
+                    objects.height[obj] = hitbox->width;
+                } else {
+                    objects.width[obj] = hitbox->width;
+                    objects.height[obj] = hitbox->height;
+                }
             }
         }
-    }
 
-    // Modify level ending pos
-    if (objects.x[obj] > level_info.last_obj_x) {
-        level_info.last_obj_x = objects.x[obj];
+        // Modify level ending pos
+        if (objects.x[obj] > level_info.last_obj_x) {
+            level_info.last_obj_x = objects.x[obj];
+        }
     }
 
     free_string_array(tokens, count);
@@ -985,6 +993,7 @@ void free_arrays() {
     if (objects.touch_triggered)    { free(objects.touch_triggered);    objects.touch_triggered = NULL; }
     if (objects.flippedH)           { free(objects.flippedH);           objects.flippedH = NULL; }
     if (objects.flippedV)           { free(objects.flippedV);           objects.flippedV = NULL; }
+    if (objects.toggled)            { free(objects.toggled);            objects.toggled = NULL; }
     if (objects.activated)          { free(objects.activated);          objects.activated = NULL; }
     if (objects.collided)           { free(objects.collided);           objects.collided = NULL; }
 }
@@ -1071,6 +1080,9 @@ bool init_arrays(int count) {
     objects.flippedV = malloc(sizeof(bool) * count);
     if (!objects.flippedV) return false;
     
+    objects.toggled = malloc(sizeof(bool) * count);
+    if (!objects.toggled) return false;
+    
     objects.activated = malloc(sizeof(u8) * count);
     if (!objects.activated) return false;
     
@@ -1105,6 +1117,7 @@ bool init_arrays(int count) {
     memset(objects.touch_triggered,    0, sizeof(bool) * count);
     memset(objects.flippedH,           0, sizeof(bool) * count);
     memset(objects.flippedV,           0, sizeof(bool) * count);
+    memset(objects.toggled,            0, sizeof(bool) * count);
     memset(objects.activated,          0, sizeof(u8) * count);
     memset(objects.collided,           0, sizeof(u8) * count);
 
@@ -1335,7 +1348,7 @@ void reload_level() {
         objects.collided[i] = false;
         objects.hitbox_counter[i] = 0;
         objects.transition_applied[i] = FADE_NONE;
-        if (objects.id[i] == 0) objects.id[i] = BREAKABLE_BLOCK; 
+        objects.toggled[i] = false;
     }
 
     init_col_channels();

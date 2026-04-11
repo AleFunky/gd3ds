@@ -2,9 +2,9 @@ bggradient tag="gradient"
 
 button x=305 y=15 id=136 action="pause" tag="not_paused" opacity=0.4
 
-image x=20 y=20 id=34 tag="not_paused,coin_1" scale=1.1
-image x=48 y=20 id=34 tag="not_paused,coin_2" scale=1.1
-image x=78 y=20 id=34 tag="not_paused,coin_3" scale=1.1
+image x=20 y=20 id=34 tag="not_paused,coin_1" scale=1.25
+image x=50 y=20 id=34 tag="not_paused,coin_2" scale=1.25
+image x=80 y=20 id=34 tag="not_paused,coin_3" scale=1.25
 
 darken opacity=0.5 tag="paused"
 button x=45 y=60 id=127 scale=1 tag="paused" action="settings"

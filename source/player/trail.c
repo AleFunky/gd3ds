@@ -93,6 +93,8 @@ void MotionTrail_Init(MotionTrail* trail, float fade, float minSeg, float stroke
     trail->stroke = stroke;
     trail->displayedColor = color;
     trail->waveTrail = waveTrail;
+    trail->nuPoints = 0;
+    trail->previousNuPoints = 0;
     if (!waveTrail) trail->appendNewPoints = true;
 }
 

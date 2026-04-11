@@ -562,15 +562,17 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     }
 
                     if (player->gamemode == GAMEMODE_DART) player->vel_y *= 0.9f;
-                    if (state.dual) {
-                        set_dual_bounds();
-                    } 
+                    
                     player->ceiling_inv_time = CEILING_INVUL_TIME;
                     player->snap_rotation = true;
                     set_gamemode(player, GAMEMODE_PLAYER);
                     flip_other_player(state.current_player ^ 1);
                     update_rotation_direction(player);
                 }
+
+                if (state.dual) {
+                    set_dual_bounds();
+                } 
 
                 SET_ACTIVATED(obj, true);
             }
@@ -598,9 +600,6 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     } else if (player->vel_y > max) {
                         player->vel_y = max;
                     }
-                    if (state.dual) {
-                        set_dual_bounds();
-                    } 
                     UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
                     if (effect) {
                         effect->def.colorR = 255 / 255.f;
@@ -608,6 +607,10 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                         effect->def.colorB = 255 / 255.f;
                     }
                 }
+
+                if (state.dual) {
+                    set_dual_bounds();
+                } 
 
                 SET_ACTIVATED(obj, true);
             }
@@ -644,7 +647,10 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                         effect->def.colorR = 255 / 255.f;
                     }
                 }
-                
+
+                if (state.dual) {
+                    set_dual_bounds();
+                } 
                 
                 SET_ACTIVATED(obj, true);
             }
@@ -664,10 +670,6 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     player->snap_rotation = true;
                     flip_other_player(state.current_player ^ 1);
 
-                    if (state.dual) {
-                        set_dual_bounds();
-                    } 
-
                     if (state.old_player.gamemode == GAMEMODE_PLAYER || state.old_player.gamemode == GAMEMODE_SHIP || state.old_player.gamemode == GAMEMODE_DART) {
                         player->buffering_state = BUFFER_READY;
                     }
@@ -679,6 +681,10 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                         effect->def.colorB = 0 / 255.f;
                     }
                 }
+                if (state.dual) {
+                    set_dual_bounds();
+                } 
+
                 SET_ACTIVATED(obj, true);
             }
             break;
@@ -693,10 +699,6 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     player->inverse_rotation = false;
                     player->snap_rotation = true;
                     flip_other_player(state.current_player ^ 1);
-
-                    wave_trail->positionR = (Vec2){player->x, player->y};  
-                    wave_trail->startingPositionInitialized = true;
-                    MotionTrail_AddWavePoint(wave_trail);
                     UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
                     if (effect) {
                         effect->def.colorR = 0 / 255.f;
@@ -704,6 +706,10 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                         effect->def.colorB = 255 / 255.f;
                     }
                 }
+
+                wave_trail->positionR = (Vec2){player->x, player->y};  
+                wave_trail->startingPositionInitialized = true;
+                MotionTrail_AddWavePoint(wave_trail);
 
                 if (state.dual) {
                     set_dual_bounds();
@@ -719,15 +725,13 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     player->ceiling_inv_time = CEILING_INVUL_TIME;
                     state.dual = true;
                     state.dual_portal_y = objects.y[obj];
-                    setup_dual();
-    
-                    if (player->gamemode == GAMEMODE_DART) {
-                        MotionTrail_Init(&wave_trail_p2, 3.f, 3, 10.0f, true, get_white_if_black(p1_color), C2D_SpriteSheetGetImage(trailSheet, 0));   
-                        wave_trail_p2.positionR = (Vec2){state.player2.x, state.player2.y};  
-                        wave_trail_p2.startingPositionInitialized = true;
-                        MotionTrail_AddWavePoint(&wave_trail_p2);
-                    }
-                    MotionTrail_Init(&trail_p2, 0.3f, 3, 10.0f, false, get_white_if_black(p1_color), C2D_SpriteSheetGetImage(trailSheet, 0));
+                }
+                setup_dual();
+                if (state.player2.gamemode == GAMEMODE_DART) {
+                    MotionTrail_Init(&wave_trail_p2, 3.f, 3, 10.0f, true, get_white_if_black(p1_color), C2D_SpriteSheetGetImage(trailSheet, 0));   
+                    wave_trail_p2.positionR = (Vec2){state.player2.x, state.player2.y};  
+                    wave_trail_p2.startingPositionInitialized = true;
+                    MotionTrail_AddWavePoint(&wave_trail_p2);
                 }
                 SET_ACTIVATED(obj, true);                
             }
@@ -741,19 +745,19 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                         memcpy(&state.player, player, sizeof(Player));
                     }
                     switch (state.player.gamemode) {
-                    case GAMEMODE_PLAYER:
-                        state.ground_y = 0;
-                        state.ceiling_y = 999999;
-                        break;
-                    case GAMEMODE_SHIP:
-                    case GAMEMODE_BIRD:
-                        state.ceiling_y = state.ground_y + 300;
-                        set_intended_ceiling();
-                        break;
-                    case GAMEMODE_PLAYER_BALL:
-                        state.ceiling_y = state.ground_y + 240;
-                        set_intended_ceiling();
-                }
+                        case GAMEMODE_PLAYER:
+                            state.ground_y = 0;
+                            state.ceiling_y = 999999;
+                            break;
+                        case GAMEMODE_SHIP:
+                        case GAMEMODE_BIRD:
+                            state.ceiling_y = state.ground_y + 300;
+                            set_intended_ceiling();
+                            break;
+                        case GAMEMODE_PLAYER_BALL:
+                            state.ceiling_y = state.ground_y + 240;
+                            set_intended_ceiling();
+                    }
 
                     UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
                     if (effect) {
@@ -965,7 +969,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                     brick_destroy_particles.emitterX = objects.x[obj];
                     brick_destroy_particles.emitterY = objects.y[obj];
                     spawnMultipleParticles(&brick_destroy_particles, 25);
-                    objects.id[obj] = 0;
+                    objects.toggled[obj] = true;
                 } else {
                     // Not a brick, die
                     state.dead = true;
@@ -1044,7 +1048,7 @@ void collide_with_obj(Player *player, int obj) {
     int obj_id = objects.id[obj];
     const ObjectHitbox *hitbox = game_objects[obj_id].hitbox;
 
-    if (!hitbox) return;
+    if (!hitbox || objects.toggled[obj]) return;
 
     number_of_collisions_checks++;
 

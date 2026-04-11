@@ -58,11 +58,11 @@ static void remove_offscreen_object_particles() {
     }
 }
 
-void update_object_particles() {
+void update_object_particles(float dt) {
     remove_offscreen_object_particles();
     for (size_t i = 0; i < MAX_OBJECT_PS; i++) {
         if (object_particle[i].occupied) {
-            updateParticleSystem(&object_particle[i].ps, DT);
+            updateParticleSystem(&object_particle[i].ps, dt);
         }
     }
 }

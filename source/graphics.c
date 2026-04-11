@@ -953,7 +953,7 @@ void create_objects() {
                 if (calc_y < -60 || calc_y >= (SCREEN_HEIGHT / SCALE) + 60) continue;
 
                 // Skip invalid objects
-                if (objects.id[obj] > 745) {
+                if (!is_valid_object(objects.id[obj]) || objects.toggled[obj]) {
                     continue;
                 }
 
@@ -1095,19 +1095,23 @@ void draw_objects() {
             drawParticleSystem(&brick_destroy_particles, 0, 0, 1.f);
             drawParticleSystem(&coin_pickup_particles, 0, 0, 1.f);
             drawParticleSystem(&glitter_particles, 0, 0, 1.f);
+
+            draw_p1_trail(&state.player);
+            MotionTrail_Draw(&trail_p1);
+            MotionTrail_DrawWaveTrail(&wave_trail_p1);
+            if (state.dual) {
+                draw_p1_trail(&state.player2);
+                MotionTrail_Draw(&trail_p2);
+                MotionTrail_DrawWaveTrail(&wave_trail_p2);
+            }
+
             change_blending(false);
             blend_enabled = false;
             state.current_player = 0;
-            
-            trail = &trail_p1;
-            wave_trail = &wave_trail_p1;
-
             draw_player(&state.player);
             
             if (state.dual) {
                 state.current_player = 1;
-                trail = &trail_p2;
-                wave_trail = &wave_trail_p2;
                 draw_player(&state.player2);
             }  
                     

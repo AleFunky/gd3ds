@@ -183,7 +183,7 @@ void game_loop() {
     }
     
 
-    if (level_info.custom_song_id >= 0) {
+    if (level_info.custom_song_id > 0) {
         char full_path[273];
         snprintf(full_path, sizeof(full_path), "%s/%d.mp3", USER_SONGS_DIR, level_info.custom_song_id);
         song_loaded = play_mp3(full_path, false, level_info.song_offset);
@@ -577,7 +577,7 @@ void game_loop() {
             
 
             update_use_effects(delta, GFX_TOP);
-            update_object_particles();
+            update_object_particles(delta);
             u64 end_part = svcGetSystemTick();
             u64 ticks_part = end_part - start_part;
             particle_calc_time = ticks_part / CPU_TICKS_PER_MSEC;

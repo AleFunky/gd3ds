@@ -25,7 +25,7 @@ const UseEffectDefinition orb_use_effect = {
     .colorG = 1,
     .colorB = 0,
     .duration = 0.4f,
-    .start_opacity = 0.05f,
+    .start_opacity = 0.01f,
     .end_opacity = 1,
     .start_rad = 32,
     .end_rad = 3.2f,
@@ -229,6 +229,13 @@ void update_use_effects(float delta, int screen) {
                 effect->active = false;
             }
         }
+    }
+}
+
+void clear_use_effects(int screen) {
+    UseEffect *ptr = (screen == GFX_TOP) ? use_effects_top : use_effects_bot;
+    for (size_t i = 0; i < MAX_USE_EFFECTS; i++) {
+        ptr[i].active = false;
     }
 }
 

@@ -1,4 +1,4 @@
---atlas -f rgba8888 -z auto
+--atlas --border transparent -f rgba8888 -z auto
 title.png
 GJ_playBtn_001.png
 GJ_creatorBtn_001.png

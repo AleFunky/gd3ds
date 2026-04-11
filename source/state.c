@@ -159,6 +159,8 @@ void init_variables() {
     MotionTrail_StopStroke(&trail_p1);
     MotionTrail_StopStroke(&trail_p2);
 
+    clear_use_effects(GFX_TOP);
+
     state.camera_wall_timer = 0;
     state.camera_wall_initial_y = 0;
 

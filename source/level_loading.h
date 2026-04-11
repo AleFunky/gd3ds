@@ -48,6 +48,7 @@ typedef struct {
     bool *blending;
     bool *touch_triggered;
     bool *flippedH, *flippedV;
+    bool *toggled;
 
     u8 *activated;
     u8 *collided;
@@ -92,8 +93,6 @@ typedef struct {
     unsigned char initial_speed;
     bool initial_dual;
     bool initial_upsidedown;
-    bool level_is_empty;
-    bool level_is_custom;
 
     char *level_name;
 } LoadedLevelInfo;
@@ -115,6 +114,8 @@ void unload_level();
 Section *get_or_create_section(int x, int y);
 bool obj_has_main(const GameObject *obj);
 bool obj_has_detail(const GameObject *obj);
+
+bool is_valid_object(int id);
 
 char *get_level_name(char *data_ptr);
 char *load_user_song(int id, size_t *out_size); 

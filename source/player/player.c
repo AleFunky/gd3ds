@@ -117,14 +117,12 @@ void cube_gamemode(Player *player) {
     if (player->on_ground) {
         MotionTrail_StopStroke(trail);
         update_rotation_direction(player);
-        player->buffering_state = BUFFER_END;
 
         if (player->slope_data.slope_id < 0) player->rotation = roundf(player->rotation / 90.0f) * 90.0f;
     }
 
     if (player->upside_down && state.input.holdJump && player->coyote_frames < 10) {
         jump = true;
-        player->buffering_state = BUFFER_END;
     }
 
     SlopeData slope_data = player->slope_data;
@@ -149,6 +147,7 @@ void cube_gamemode(Player *player) {
             set_p_velocity(player, cube_jump_heights[state.speed], state.old_input.holdJump);
         }
         player->inverse_rotation = false;
+        player->buffering_state = BUFFER_END;
     
         player->on_ground = false;
     
@@ -456,7 +455,7 @@ void wave_gamemode(Player *player) {
     player->gravity = 0;
 
     player->vel_y = (input * 2 - 1) * player_speeds[state.speed] * (player->mini ? 2 : 1);
-    if (state.old_input.holdJump != state.input.holdJump || player->on_ground != state.old_player.on_ground || player->on_ceiling != state.old_player.on_ceiling || player->mini != state.old_player.mini || player->upside_down != state.old_player.upside_down) {
+    if (player->vel_y != state.old_player.vel_y || player->on_ground != state.old_player.on_ground || player->on_ceiling != state.old_player.on_ceiling || player->mini != state.old_player.mini || player->upside_down != state.old_player.upside_down) {
         MotionTrail_AddWavePoint(wave_trail);
     }
 }
@@ -585,10 +584,6 @@ void run_player(Player *player) {
             player->lerp_rotation = iSlerp(player->lerp_rotation, player->rotation, 0.2f, STEPS_DT);
         }
     }
-    
-    player->vel_x = player_speeds[state.speed]; 
-    player->x += player->vel_x * STEPS_DT;
-    player->y += player_get_vel(player, player->vel_y) * STEPS_DT;
 
     player->left_ground = false;
 
@@ -670,6 +665,10 @@ void handle_player(Player *player) {
     player->potentialSlope_id = -1;
     
     player->timeElapsed += STEPS_DT;
+
+    player->vel_x = player_speeds[state.speed]; 
+    player->x += player->vel_x * STEPS_DT;
+    player->y += player_get_vel(player, player->vel_y) * STEPS_DT;
 
     player->frame++;
 
@@ -786,13 +785,6 @@ void draw_p1_trail(Player *player) {
 }
 
 void draw_player(Player *player) {
-    change_blending(true);
-    draw_p1_trail(player);
-    MotionTrail_Draw(trail);
-    MotionTrail_DrawWaveTrail(wave_trail);
-
-    change_blending(false);
-
     // Don't draw player if dead
     if (state.dead) return;
 
@@ -807,7 +799,6 @@ void draw_player(Player *player) {
         primary_color = secondary_color;
         secondary_color = tmp;
     }
-
 
     float scale = (player->mini) ? 0.6f : 1.f;
 
