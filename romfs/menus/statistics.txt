@@ -1,0 +1,10 @@
+darken opacity=0.4
+window x=160 y=120 w=260 h=180 style=0
+button x=35 y=35 id=31 scale=0.8 action="exit"
+
+# Labelling
+
+label x=160 y=50 text="Statistics" scale=0.6 align=CENTER
+
+label x=160 y=120 text="This is not functional yet." scale=0.5 align=CENTER
+label x=160 y=140 text=":-(" scale=0.5 align=CENTER

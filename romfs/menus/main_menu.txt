@@ -1,5 +1,7 @@
 button x=160 y=100 id=1 sheet=1 action="level_select"
 button x=60 y=120 id=79 action="icon_kit"
-button x=260 y=120 id=2 sheet=1 action="extra_menu"
-button x=100 y=200 id=102 action="none" text="Settings" action="settings"
-button x=220 y=200 id=102 action="none" text="Credits" action="credits"
+button x=260 y=120 id=2 sheet=1 action="creator_menu"
+
+button x=100 y=200 id=11 sheet=1 action="none" text="" action="settings"
+button x=160 y=200 id=12 sheet=1 action="none" text="" action="statistics"
+button x=220 y=200 id=13 sheet=1 action="none" text="" action="credits"

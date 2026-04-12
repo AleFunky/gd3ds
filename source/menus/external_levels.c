@@ -68,8 +68,8 @@ void load_level_folder(char *folder) {
     if (strncmp(last_path, current_path, 256) == 0) return;
     ui_list_reset(list);
     path_label = ui_get_element_by_tag(&screen, "path");
-    char path[256];
-    strncpy(path, current_path, 256);
+    char path[261];
+    sprintf(path, "Root/%s", current_path);
     truncate_filename(path, 30);
     strncpy(path_label->label_aller.text, path, 256);
     int count = 0;
@@ -202,7 +202,7 @@ void external_levels_loop() {
         }
 
         if (exit_flag) {
-            game_state = STATE_MAIN_MENU;
+            game_state = STATE_CREATOR_MENU;
             break;
         }
     }

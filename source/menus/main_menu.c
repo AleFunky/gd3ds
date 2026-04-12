@@ -18,7 +18,9 @@
 #include "main_menu.h"
 #include "level_select.h"
 #include "settings.h"
+#include "statistics.h"
 #include "credits.h"
+#include "creator_menu.h"
 #include "external_levels.h"
 
 static UIScreen screen_top;
@@ -30,6 +32,7 @@ static int new_state = 0;
 static bool exit_flag = false;
 
 static bool in_settings = false;
+static bool in_statistics = false;
 static bool in_credits = false;
 
 static float bg_scroll = 0;
@@ -38,8 +41,9 @@ void action_open_level_select(UIElement* e) {
     new_state = STATE_LEVEL_SELECT;
     set_fade_status(FADE_STATUS_OUT);
 }
-void action_open_extra_menu(UIElement* e) {
-    new_state = STATE_EXTERNAL_LEVELS;
+void action_open_creator_menu(UIElement* e) {
+    //new_state = STATE_EXTERNAL_LEVELS;
+    new_state = STATE_CREATOR_MENU;
     set_fade_status(FADE_STATUS_OUT);
 }
 
@@ -53,6 +57,11 @@ void action_open_settings(UIElement* e) {
     settings_init();
 }
 
+void action_open_statistics(UIElement* e) {
+    in_statistics = true;
+    statistics_init();
+}
+
 void action_open_credits(UIElement* e) {
     in_credits = true;
     credits_init();
@@ -60,10 +69,11 @@ void action_open_credits(UIElement* e) {
 
 static UIAction actions[] = {
     { "level_select", action_open_level_select },
-    { "extra_menu", action_open_extra_menu },
+    { "creator_menu", action_open_creator_menu },
     { "settings", action_open_settings },
+    { "statistics", action_open_statistics },
     { "icon_kit", action_open_icon_kit },
-    { "credits", action_open_credits }
+    { "credits", action_open_credits },
 };
 
 static UIAction actions_top[] = {
@@ -147,7 +157,7 @@ void main_menu_loop() {
             old_wide = wideEnabled;
         }
 
-        if (!in_settings && !in_credits) ui_screen_update(&screen, &touch);
+        if (!in_settings && !in_credits && !in_statistics) ui_screen_update(&screen, &touch);
         ui_screen_update(&screen_top, &touch);
         do {
             update_touch_effect(DT);
@@ -177,6 +187,13 @@ void main_menu_loop() {
                 int returned = settings_loop();
                 if (returned) {
                     in_settings = false;
+                }
+            }
+
+            if (in_statistics) {
+                int returned = statistics_loop();
+                if (returned) {
+                    in_statistics = false;
                 }
             }
 

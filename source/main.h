@@ -41,6 +41,7 @@ enum GameState {
     STATE_ICON_KIT,
     STATE_GAME,
     STATE_EXTERNAL_LEVELS,
+    STATE_CREATOR_MENU,
     STATE_EXIT
 };
 

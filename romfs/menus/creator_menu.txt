@@ -1,0 +1,12 @@
+bggradient tag="gradient"
+
+image x=36 y=35 id=178 sy=-1.0
+image x=36 y=205 id=178
+
+button x=20 y=28 id=8 action="exit"
+
+button x=145 y=175 id=5 sheet=1 scale=1.02 action="external"
+button x=255 y=65 id=6 sheet=1 scale=1.02 action="statistics"
+button x=255 y=175 id=7 sheet=1 scale=1.02 action="statistics"
+button x=145 y=65 id=8 sheet=1 scale=1.02 action="statistics"
+

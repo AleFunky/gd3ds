@@ -36,6 +36,7 @@
 #include "player/player.h"
 #include "particles/circles.h"
 #include "menus/settings.h"
+#include "menus/creator_menu.h"
 #include "menus/external_levels.h"
 
 #define CITRA_TYPE 0x20000
@@ -812,6 +813,9 @@ int main(int argc, char* argv[]) {
                 break;
             case STATE_GAME:
                 game_loop();
+                break;
+           case STATE_CREATOR_MENU:
+                creator_menu_loop();
                 break;
             case STATE_EXTERNAL_LEVELS:
                 external_levels_loop();
