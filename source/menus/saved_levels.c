@@ -9,7 +9,6 @@
 #include "menus/components/ui_image.h"
 #include "menus/components/ui_progress_bar.h"
 #include "menus/components/ui_label.h"
-#include "menus/components/ui_external_level_card.h"
 #include "fonts/bigFont.h"
 #include "main.h"
 #include "easing.h"
@@ -22,8 +21,6 @@
 
 #include "settings.h"
 #include "saved_levels.h"
-#include "external_levels.h"
-#include "creator_menu.h"
 
 #include "gameplay.h"
 
@@ -31,7 +28,6 @@
 #include "utils/folders.h"
 #include "level_loading.h"
 
-static int new_state = 0;
 static bool exit_flag = false;
 
 static UIScreen screen;
@@ -44,23 +40,11 @@ static void action_exit(UIElement *e) {
     set_fade_status(FADE_STATUS_OUT);
 }
 
-static void action_open_external_menu(UIElement *e) {
-    new_state = STATE_EXTERNAL_LEVELS;
-    set_fade_status(FADE_STATUS_OUT);
-}
-
-static void action_open_saved_menu(UIElement *e) {
-    new_state = STATE_SAVED_LEVELS;
-    set_fade_status(FADE_STATUS_OUT);
-}
-
 static UIAction actions[] = {
     {"exit", action_exit },
-    {"external", action_open_external_menu},
-    {"saved", action_open_saved_menu}
 };
 
-void creator_menu_loop() {
+void saved_levels_loop() {
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
     C2D_SceneBegin(bot);
     C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
@@ -71,11 +55,10 @@ void creator_menu_loop() {
     C3D_FrameEnd(0);
 
     exit_flag = false;
-    new_state = STATE_CREATOR_MENU;
 
-    ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/creator_menu.txt");
+    ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/saved_levels.txt");
     bg_gradient = ui_get_element_by_tag(&screen, "gradient");
-    ui_load_screen(&screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/creator_menu_top.txt");
+    ui_load_screen(&screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/saved_levels_top.txt");
     bg_gradient_top = ui_get_element_by_tag(&screen_top, "gradient_top");
 
     ui_image_set_tint(bg_gradient, C2D_Color32(50, 110, 255, 255));
@@ -132,12 +115,7 @@ void creator_menu_loop() {
         } while (handle_fading());
 
         if (exit_flag) {
-            game_state = STATE_MAIN_MENU;
-            break;
-        }
-
-        if (new_state != STATE_CREATOR_MENU) {
-            game_state = new_state;
+            game_state = STATE_CREATOR_MENU;
             break;
         }
     }

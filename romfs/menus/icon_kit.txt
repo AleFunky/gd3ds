@@ -1,8 +1,7 @@
 bggradient tag="gradient"
 
-button x=20 y=20 id=8 action="exit"
-button x=20 y=60 id=130 action="palette"
-
+button x=24 y=28 id=8 action="exit"
+button x=20 y=70 id=130 action="palette"
 
 button x=80 y=65 id=341 tag="icon_buttons,cube" action="action_cube"
 button x=120 y=65 id=351 tag="icon_buttons,ship" action="action_ship"

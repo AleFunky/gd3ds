@@ -3,7 +3,7 @@ bggradient tag="gradient"
 image x=36 y=205 id=178
 image x=284 y=205 id=178 sx=-1.0
 
-button x=20 y=20 id=8 action="exit"
+button x=24 y=28 id=6 action="exit"
 
 window x=180 y=120 w=240 h=200 style=6
 window x=180 y=130 w=220 h=160 style=7

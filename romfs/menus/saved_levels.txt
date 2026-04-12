@@ -1,0 +1,15 @@
+bggradient tag="gradient"
+
+image x=36 y=205 id=178
+image x=284 y=205 id=178 sx=-1.0
+
+window x=160 y=120 w=240 h=160 style=0
+
+image x=160 y=120 id=14 sheet=1
+button x=24 y=28 id=6 action="exit"
+
+label x=160 y=38 text="Saved Levels" scale=0.6 align=CENTER
+
+label x=160 y=100 text="This is not" scale=0.6 align=CENTER
+label x=160 y=120 text="functional yet." scale=0.6 align=CENTER
+label x=160 y=140 text=":-(" scale=0.6 align=CENTER
