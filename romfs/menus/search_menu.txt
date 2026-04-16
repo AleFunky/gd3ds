@@ -1,0 +1,37 @@
+bggradient tag="gradient"
+
+button x=24 y=28 id=6 action="exit"
+
+image x=36 y=205 id=178
+image x=284 y=205 id=178 sx=-1.0
+
+window x=170 y=28 w=240 h=40 style=8
+textbox x=149 y=28 w=188 limit=20 title="Input random text:"
+
+button x=267 y=28 id=107 scale=0.9 action="disclaimer"
+#button x=240 y=28 id=106 scale=0.7 <-- profile button
+
+label x=160 y=60 text="Quick Search" scale=0.6 align=CENTER
+window x=160 y=105 w=260 h=66 style=8
+
+button x=95 y=90 text="Most Downloads   " id=104 scale=0.72 action="disclaimer"
+button x=225 y=90 text="Most Likes   " id=104 scale=0.72 action="disclaimer"
+
+button x=160 y=120 w=110 h=30 text="Recent   " id=105 scale=0.72 action="disclaimer"
+button x=75 y=120 w=110 h=30 text="Trending   " id=105 scale=0.72 action="disclaimer"
+button x=245 y=120 w=110 h=30 text="Magic   " id=105 scale=0.72 action="disclaimer"
+
+label x=160 y=153 text="Filters" scale=0.6 align=CENTER
+window x=160 y=185 w=260 h=40 style=8
+
+button x=45 y=185 id=251 scale=0.6
+button x=78 y=185 id=252 scale=0.6
+button x=111 y=185 id=253 scale=0.6
+button x=144 y=185 id=254 scale=0.6
+button x=176 y=185 id=255 scale=0.6
+button x=209 y=185 id=256 scale=0.6
+button x=242 y=185 id=258 scale=0.6
+button x=275 y=185 id=267 scale=0.6
+
+button x=160 y=223 text="Advanced Options" id=104 scale=0.72 action="disclaimer"
+

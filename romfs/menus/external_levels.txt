@@ -5,10 +5,10 @@ image x=284 y=205 id=178 sx=-1.0
 
 button x=24 y=28 id=6 action="exit"
 
-window x=180 y=120 w=240 h=200 style=6
-window x=180 y=130 w=220 h=160 style=7
-list x=180 y=130 w=210 h=150 tag="list"
+window x=175 y=120 w=250 h=200 style=6
+window x=175 y=130 w=230 h=160 style=7
+list x=175 y=130 w=220 h=150 tag="list"
 
-label x=70 y=45 font=1 scale=0.9 text="" align=LEFT tag="path"
+label x=60 y=45 font=1 scale=0.9 text="" align=LEFT tag="path"
 
 button x=290 y=30 id=200 scale=1 action="go_back"

@@ -9,7 +9,6 @@
 #include "menus/components/ui_image.h"
 #include "menus/components/ui_progress_bar.h"
 #include "menus/components/ui_label.h"
-#include "menus/components/ui_external_level_card.h"
 #include "fonts/bigFont.h"
 #include "main.h"
 #include "easing.h"
@@ -20,11 +19,8 @@
 #include "level_select.h"
 #include "state.h"
 
-#include "settings.h"
-#include "saved_levels.h"
-#include "external_levels.h"
+#include "generic_disclaimer.h"
 #include "search_menu.h"
-#include "creator_menu.h"
 
 #include "gameplay.h"
 
@@ -32,7 +28,7 @@
 #include "utils/folders.h"
 #include "level_loading.h"
 
-static int new_state = 0;
+static bool in_disclaimer = false;
 static bool exit_flag = false;
 
 static UIScreen screen;
@@ -45,35 +41,23 @@ static void action_exit(UIElement *e) {
     set_fade_status(FADE_STATUS_OUT);
 }
 
-static void action_open_external_menu(UIElement *e) {
-    new_state = STATE_EXTERNAL_LEVELS;
-    set_fade_status(FADE_STATUS_OUT);
-}
-
-static void action_open_saved_menu(UIElement *e) {
-    new_state = STATE_SAVED_LEVELS;
-    set_fade_status(FADE_STATUS_OUT);
-}
-
-static void action_open_search_menu(UIElement *e) {
-    new_state = STATE_SEARCH_MENU;
-    set_fade_status(FADE_STATUS_OUT);
+void action_open_disclaimer(UIElement* e) {
+    in_disclaimer = true;
+    disclaimer_init();
 }
 
 static UIAction actions[] = {
     {"exit", action_exit },
-    {"external", action_open_external_menu},
-    {"saved", action_open_saved_menu},
-    {"search", action_open_search_menu}
+    {"disclaimer", action_open_disclaimer }
 };
 
-void creator_menu_loop() {
-    exit_flag = false;
-    new_state = STATE_CREATOR_MENU;
+void search_menu_loop() {
 
-    ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/creator_menu.txt");
+    exit_flag = false;
+
+    ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/search_menu.txt");
     bg_gradient = ui_get_element_by_tag(&screen, "gradient");
-    ui_load_screen(&screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/creator_menu_top.txt");
+    ui_load_screen(&screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/search_menu_top.txt");
     bg_gradient_top = ui_get_element_by_tag(&screen_top, "gradient_top");
 
     ui_image_set_tint(bg_gradient, C2D_Color32(50, 110, 255, 255));
@@ -101,6 +85,7 @@ void creator_menu_loop() {
         touch.did_something = false;
         touch.interacted = false;
 
+        if (!in_disclaimer) ui_screen_update(&screen, &touch);
         ui_screen_update(&screen, &touch);
         
         do {
@@ -114,6 +99,13 @@ void creator_menu_loop() {
             draw_fade();
 
             ui_screen_draw(&screen);
+
+            if (in_disclaimer) {
+                int returned = disclaimer_loop();
+                if (returned) {
+                    in_disclaimer = false;
+                }
+            }
 
             change_blending(true);
             draw_touch_effect();
@@ -130,12 +122,7 @@ void creator_menu_loop() {
         } while (handle_fading());
 
         if (exit_flag) {
-            game_state = STATE_MAIN_MENU;
-            break;
-        }
-
-        if (new_state != STATE_CREATOR_MENU) {
-            game_state = new_state;
+            game_state = STATE_CREATOR_MENU;
             break;
         }
     }

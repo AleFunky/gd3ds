@@ -38,6 +38,7 @@
 #include "menus/settings.h"
 #include "menus/creator_menu.h"
 #include "menus/external_levels.h"
+#include "menus/search_menu.h"
 #include "menus/saved_levels.h"
 
 #define CITRA_TYPE 0x20000
@@ -817,6 +818,9 @@ int main(int argc, char* argv[]) {
                 break;
             case STATE_CREATOR_MENU:
                 creator_menu_loop();
+                break;
+            case STATE_SEARCH_MENU:
+                search_menu_loop();
                 break;
             case STATE_SAVED_LEVELS:
                 saved_levels_loop();

@@ -1,10 +1,10 @@
 bggradient tag="gradient"
 
-button x=305 y=15 id=136 action="pause" tag="not_paused" opacity=0.4
+button x=300 y=20 id=136 action="pause" tag="not_paused" scale=1.25 opacity=0.4
 
 image x=20 y=20 id=34 tag="not_paused,coin_1" scale=1.25
-image x=50 y=20 id=34 tag="not_paused,coin_2" scale=1.25
-image x=80 y=20 id=34 tag="not_paused,coin_3" scale=1.25
+image x=55 y=20 id=34 tag="not_paused,coin_2" scale=1.25
+image x=90 y=20 id=34 tag="not_paused,coin_3" scale=1.25
 
 darken opacity=0.5 tag="paused"
 button x=45 y=60 id=127 scale=1 tag="paused" action="settings"
@@ -12,4 +12,4 @@ button x=45 y=60 id=127 scale=1 tag="paused" action="settings"
 button x=260 y=180 id=139 scale=1.15 tag="paused" action="unpause"
 button x=178 y=180 id=111 scale=0.90 tag="paused" action="exit"
 button x=112 y=180 id=155 scale=0.90 tag="paused" action="restart"
-button x=45 y=180 id=146 scale=0.90 tag="paused" action="practice_mode"
+button x=45 y=180 id=146 scale=0.90 tag="paused" action="disclaimer"

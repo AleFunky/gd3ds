@@ -19,12 +19,14 @@
 #include "state.h"
 
 #include "settings.h"
+#include "generic_disclaimer.h"
 
 #include "gameplay.h"
 
 #include "save/config.h"
 
 bool game_paused = false;
+static bool in_disclaimer = false;
 static bool in_settings = false;
 
 static UIScreen screen;
@@ -66,6 +68,11 @@ void restart_level() {
     unpause_game();
 }
 
+void open_disclaimer() {
+    in_disclaimer = true;
+    disclaimer_init();
+}
+
 void open_settings() {
     in_settings = true;
     settings_init();
@@ -91,12 +98,17 @@ static void action_open_settings(UIElement *e) {
     open_settings();
 }
 
+static void action_open_disclaimer(UIElement *e) {
+    open_disclaimer();
+}
+
 static UIAction actions[] = {
     {"pause", action_pause },
     {"unpause", action_unpause },
     {"exit", action_exit },
     {"restart", action_restart },
     {"settings", action_open_settings },
+    {"disclaimer", action_open_disclaimer },
 };
 
 void gameplay_screen_init() {
@@ -148,7 +160,7 @@ int gameplay_screen_bot_loop() {
     touch.touchPosition = touchPos;
     touch.did_something = false;
     touch.interacted = false;
-    if (!in_settings) {
+    if (!in_settings && !in_disclaimer) {
         ui_screen_update(&screen, &touch);
         
         if ((kDown & KEY_B) && !exiting_level && game_paused) {
@@ -162,6 +174,13 @@ int gameplay_screen_bot_loop() {
         int returned = settings_loop();
         if (returned) {
             in_settings = false;
+        }
+    }
+
+    if (in_disclaimer) {
+        int returned = disclaimer_loop();
+        if (returned) {
+            in_disclaimer = false;
         }
     }
 
