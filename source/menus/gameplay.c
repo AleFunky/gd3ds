@@ -20,6 +20,7 @@
 
 #include "settings.h"
 #include "generic_disclaimer.h"
+#include "first_boot_disclaimer.h"
 
 #include "gameplay.h"
 
@@ -27,6 +28,7 @@
 
 bool game_paused = false;
 static bool in_disclaimer = false;
+static bool in_first_boot_disclaimer = false;
 static bool in_settings = false;
 
 static UIScreen screen;
@@ -71,6 +73,11 @@ void restart_level() {
 void open_disclaimer() {
     in_disclaimer = true;
     disclaimer_init();
+}
+
+void open_first_boot_disclaimer() {
+    in_first_boot_disclaimer = true;
+    first_boot_disclaimer_init();
 }
 
 void open_settings() {

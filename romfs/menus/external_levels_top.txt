@@ -9,5 +9,4 @@ image x=200 y=60 id=10 sheet=1
 
 window x=200 y=160 w=240 h=100 style=1
 
-label x=200 y=155 font=1 scale=0.9 text="This is where you can play your" align=CENTER
-label x=200 y=175 font=1 scale=0.9 text="your imported .gmd files!" align=CENTER  
+label x=200 y=168 font=1 scale=0.9 text="Play your imported .gmd files!" align=CENTER

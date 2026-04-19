@@ -1,14 +1,17 @@
 bggradient tag="gradient"
 
-image x=36 y=205 id=178
-image x=284 y=205 id=178 sx=-1.0
+button x=20 y=28 id=6 action="exit"
+window x=180 y=120 w=270 h=230 style=6
+window x=180 y=128 w=250 h=194 style=7
+list x=180 y=128 w=240 h=184 tag="list"
+label x=55 y=28 font=1 scale=0.9 text="" align=LEFT tag="path" 
+label x=180 y=64 font=0 scale=0.7 text="No levels found!" align=CENTER tag="no_levels" 
+label x=180 y=100 font=1 scale=0.7 text="To import levels, navigate to \3ds\gd3ds\" align=CENTER tag="no_levels" 
+label x=180 y=112 font=1 scale=0.7 text="on your SD card and copy the .gmd's" align=CENTER tag="no_levels" 
+label x=180 y=124 font=1 scale=0.7 text="of your choice along with their matching" align=CENTER tag="no_levels" 
+label x=180 y=136 font=1 scale=0.7 text="songs to \external_levels\ and" align=CENTER tag="no_levels"
+label x=180 y=148 font=1 scale=0.7 text="\custom_songs\ respectively." align=CENTER tag="no_levels"
+label x=180 y=174 font=1 scale=0.7 text="For more detailed instructions," align=CENTER tag="no_levels" 
+label x=180 y=186 font=1 scale=0.7 text="check the project's GitHub." align=CENTER tag="no_levels" 
 
-button x=24 y=28 id=6 action="exit"
-
-window x=175 y=120 w=250 h=200 style=6
-window x=175 y=130 w=230 h=160 style=7
-list x=175 y=130 w=220 h=150 tag="list"
-
-label x=60 y=45 font=1 scale=0.9 text="" align=LEFT tag="path"
-
-button x=290 y=30 id=200 scale=1 action="go_back"
+button x=302 y=18 id=200 scale=0.9 action="go_back"

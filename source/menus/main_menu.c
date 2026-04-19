@@ -22,6 +22,7 @@
 #include "credits.h"
 #include "creator_menu.h"
 #include "external_levels.h"
+#include "first_boot_disclaimer.h"
 
 static UIScreen screen_top;
 static UIScreen screen;
@@ -34,6 +35,7 @@ static bool exit_flag = false;
 static bool in_settings = false;
 static bool in_statistics = false;
 static bool in_credits = false;
+static bool in_first_boot_disclaimer = false;
 
 static float bg_scroll = 0;
 
@@ -81,6 +83,7 @@ static UIAction actions_top[] = {
 };
 
 
+
 void main_menu_loop() {
     exit_flag = false;
     new_state = 0;
@@ -118,6 +121,11 @@ void main_menu_loop() {
 
     bool old_wide = wideEnabled;
     
+    if (initialDisclaimerAccepted == false) {
+        in_first_boot_disclaimer = true;
+        first_boot_disclaimer_init();
+    }
+
     while (aptMainLoop()) {
         hidScanInput();
         u32 kDown = hidKeysDown();
@@ -157,7 +165,7 @@ void main_menu_loop() {
             old_wide = wideEnabled;
         }
 
-        if (!in_settings && !in_credits && !in_statistics) ui_screen_update(&screen, &touch);
+        if (!in_settings && !in_credits && !in_statistics && !in_first_boot_disclaimer) ui_screen_update(&screen, &touch);
         ui_screen_update(&screen_top, &touch);
         do {
             update_touch_effect(DT);
@@ -203,6 +211,14 @@ void main_menu_loop() {
                     in_credits = false;
                 }
             }
+
+            if (in_first_boot_disclaimer) {
+                int returned = first_boot_disclaimer_loop();
+                if (returned) {
+                    in_first_boot_disclaimer = false;
+                }
+            }
+
             change_blending(true);
             draw_touch_effect();
             change_blending(false);

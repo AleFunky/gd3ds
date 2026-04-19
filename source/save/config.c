@@ -10,10 +10,13 @@
 #include "utils/gfx.h"
 #include "menus/icon_kit.h"
 #include "menus/settings.h"
+#include "menus/first_boot_disclaimer.h"
 
 Config cfg;
 
 void init_values() {
+    config_init_bool(&cfg, CONFIG_FLAGS "initialDisclaimerAccepted", false);
+
     config_init_bool(&cfg, CONFIG_GRAPHICS_PATH "particlesDisabled", false);
     config_init_bool(&cfg, CONFIG_GRAPHICS_PATH "wideEnabled", false);
     config_init_bool(&cfg, CONFIG_GRAPHICS_PATH "glowEnabled", true);
@@ -43,6 +46,8 @@ void cfg_init() {
 
     init_values();
 
+    initialDisclaimerAccepted = config_get_bool(&cfg, CONFIG_FLAGS "initialDisclaimerAccepted", false);
+
     particlesDisabled = config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "particlesDisabled", false);
     set_wide(config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "wideEnabled", false));
     glowEnabled = config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "glowEnabled", true);
@@ -64,6 +69,8 @@ void cfg_init() {
 }
 
 void cfg_save() {
+    config_set_bool(&cfg, CONFIG_FLAGS "initialDisclaimerAccepted", initialDisclaimerAccepted);
+
     config_set_bool(&cfg, CONFIG_GRAPHICS_PATH "particlesDisabled", particlesDisabled);
     config_set_bool(&cfg, CONFIG_GRAPHICS_PATH "wideEnabled", wideEnabled);
     config_set_bool(&cfg, CONFIG_GRAPHICS_PATH "glowEnabled", glowEnabled);

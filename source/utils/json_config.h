@@ -7,6 +7,7 @@
 #define CONFIG_FILENAME "config.json"
 #define CONFIG_FILE CONFIG_ROOT CONFIG_FILENAME
 
+#define CONFIG_FLAGS "flags."
 #define CONFIG_GRAPHICS_PATH "graphics."
 #define CONFIG_INPUT_PATH "input."
 #define CONFIG_CUSTOMIZATION_PATH "custom."

@@ -86,7 +86,6 @@ void search_menu_loop() {
         touch.interacted = false;
 
         if (!in_disclaimer) ui_screen_update(&screen, &touch);
-        ui_screen_update(&screen, &touch);
         
         do {
             update_touch_effect(DT);

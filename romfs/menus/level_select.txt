@@ -11,23 +11,23 @@ label x=160 y=80 text="" align=CENTER tag="level_card,level_title"
 image x=260 y=50 id=408 tag="level_card"
 label x=250 y=50 text="" align=RIGHT scale=0.40 tag="level_card,level_stars"
 
-image x=220 y=110 id=34 tag="level_card,coin_1" scale=0.75
-image x=240 y=110 id=34 tag="level_card,coin_2" scale=0.75
-image x=260 y=110 id=34 tag="level_card,coin_3" scale=0.75
+image x=218 y=108 id=34 tag="level_card,coin_1" scale=0.75
+image x=238 y=108 id=34 tag="level_card,coin_2" scale=0.75
+image x=258 y=108 id=34 tag="level_card,coin_3" scale=0.75
 
 # current progress bar
 
 label x=160 y=132 text="Normal mode" scale=0.45 align=CENTER tag="level_card"
 progressbar x=160 y=147 max_value=100 style=0 scale=0.65 tag="level_card,normalprogress"
 
-label x=160 y=147 text="0%" scale=0.45 align=CENTER tag="level_card,normalprogressvalue"
+label x=160 y=147 text="0%" scale=0.4 align=CENTER tag="level_card,normalprogressvalue"
 
 # current practice bar 
 
 label x=160 y=167 text="Practice mode" scale=0.45 align=CENTER tag="level_card"
 progressbar x=160 y=182 max_value=100 style=0 scale=0.65 tag="level_card,practiceprogress"
 
-label x=160 y=182 text="0%" scale=0.45 align=CENTER tag="level_card,practiceprogressvalue"
+label x=160 y=182 text="0%" scale=0.4 align=CENTER tag="level_card,practiceprogressvalue"
 
 # duplicate menu
 
@@ -36,23 +36,23 @@ label x=160 y=80 text="" align=CENTER tag="level_card_2,level_title_2"
 image x=260 y=50 id=408 tag="level_card_2"
 label x=250 y=50 text="" align=RIGHT scale=0.40 tag="level_card_2,level_stars_2"
 
-image x=220 y=110 id=34 tag="level_card_2,coin_1" scale=0.75
-image x=240 y=110 id=34 tag="level_card_2,coin_2" scale=0.75
-image x=260 y=110 id=34 tag="level_card_2,coin_3" scale=0.75
+image x=218 y=108 id=34 tag="level_card_2,coin_1" scale=0.75
+image x=238 y=108 id=34 tag="level_card_2,coin_2" scale=0.75
+image x=258 y=108 id=34 tag="level_card_2,coin_3" scale=0.75
 
 # duplicate progress bar
  
 label x=160 y=132 text="Normal mode" scale=0.45 align=CENTER tag="level_card_2"
 progressbar x=160 y=147 max_value=100 style=0 scale=0.65 tag="level_card_2,normalprogress"
 
-label x=160 y=147 text="0%" scale=0.45 align=CENTER tag="level_card_2,normalprogressvalue"
+label x=160 y=147 text="0%" scale=0.4 align=CENTER tag="level_card_2,normalprogressvalue"
 
 # duplicate practice bar
 
 label x=160 y=167 text="Practice mode" scale=0.45 align=CENTER tag="level_card_2"
 progressbar x=160 y=182 max_value=100 style=0 scale=0.65 tag="level_card_2,practiceprogress"
 
-label x=160 y=182 text="0%" scale=0.45 align=CENTER tag="level_card_2,practiceprogressvalue"
+label x=160 y=182 text="0%" scale=0.4 align=CENTER tag="level_card_2,practiceprogressvalue"
 
 actionarea x=160 y=80 w=220 h=80 action="open_level"
 

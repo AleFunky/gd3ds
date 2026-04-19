@@ -67,6 +67,7 @@ void load_level_folder(char *folder) {
     if (strncmp(last_path, current_path, 256) == 0) return;
     ui_list_reset(list);
     path_label = ui_get_element_by_tag(&screen, "path");
+    ui_run_func_on_tag(&screen, "no_levels", ui_disable_element);
     char path[261];
     sprintf(path, "Root/%s", current_path);
     truncate_filename(path, 30);
@@ -93,8 +94,7 @@ void load_level_folder(char *folder) {
             }
         }
     } else {
-        texts[0] = ui_create_label(0, 0, 0.5f, "No levels", 0, 0.5f, NULL);
-        ui_list_add(list, &texts[0]);
+        ui_run_func_on_tag(&screen, "no_levels", ui_enable_element);
     }
 
     strncpy(last_path, current_path, 256);
