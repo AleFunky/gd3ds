@@ -3,9 +3,9 @@ window x=160 y=120 w=260 h=200 style=3
 button x=40 y=30 id=31 scale=0.8 action="exit"
 window x=160 y=70 w=200 h=40 style=2 tag="bg_window"
 
-windowbutton x=189 y=38 w=35 h=20 style=5 text="Col1" tag="color_buttons,p1" action="action_p1"
-windowbutton x=225 y=38 w=35 h=20 style=4 text="Col2" tag="color_buttons,p2" action="action_p2"
-windowbutton x=261 y=38 w=35 h=20 style=4 text="Glow" tag="color_buttons,glow" action="action_glow"
+windowbutton x=155 y=38 w=45 h=20 style=5 text="Col1" tag="color_buttons,p1" action="action_p1" textScale=0.4
+windowbutton x=203 y=38 w=45 h=20 style=4 text="Col2" tag="color_buttons,p2" action="action_p2" textScale=0.4
+windowbutton x=251 y=38 w=45 h=20 style=4 text="Glow" tag="color_buttons,glow" action="action_glow" textScale=0.4
 
 checkbox x=50 y=205 scale=0.5 action="glow" tag="glow_option,chk_glow" 
 label x=60 y=205 text="Glow" scale=0.4 tag="glow_option"

@@ -1,6 +1,6 @@
 bggradient tag="gradient"
 image x=160 y=13 id=198 sx=0.75 sy=0.75
-button x=24 y=28 id=6 action="exit"
+
 
 # level thingy
 
@@ -67,3 +67,5 @@ image x=160 y=211 id=0 sheet=6 sx=0.727272 sy=0.727272
 
 image x=36 y=205 id=178
 image x=284 y=205 id=178 sx=-1.0
+
+button x=24 y=28 id=6 action="exit"

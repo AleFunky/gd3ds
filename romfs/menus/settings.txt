@@ -12,18 +12,21 @@ button x=240 y=50 id=8 sx=-0.7 sy=0.7 action="right_page"
 label x=160 y=50 text="Graphics" tag="page1" scale=0.6 align=CENTER
 
 checkbox x=75 y=85 tag="page1,chk_wide" scale=0.75 action="wide"
+button x=62 y=72 action="wideinfo" id=90 scale=0.5 tag="page1"
 label x=90 y=85 text="800px res" scale=0.4 tag="page1"
 
 checkbox x=75 y=115 tag="page1,chk_particle" scale=0.75 action="particles"
 label x=90 y=115 text="Disable particles" scale=0.4 tag="page1"
 
 checkbox x=75 y=145 tag="page1,chk_glow" scale=0.75 action="glow"
-label x=90 y=145 text="Object glow" scale=0.4 tag="page1"
+label x=90 y=145 text="Enable object glow" scale=0.4 tag="page1"
 
 label x=160 y=50 text="Input" tag="page2" scale=0.6 align=CENTER
 
 checkbox x=75 y=85 tag="page2,chk_y_jump" scale=0.75 action="y_jump"
+button x=62 y=72 action="jumpinfo" id=90 scale=0.5 tag="page2"
 label x=90 y=85 text="Y to jump" scale=0.4 tag="page2"
 
 checkbox x=75 y=115 tag="page2,chk_touch_effect" scale=0.75 action="touch_effect"
-label x=90 y=115 text="Touch effect everywhere" scale=0.4 tag="page2"
+button x=62 y=102 action="tapinfo" id=90 scale=0.5 tag="page2"
+label x=90 y=115 text="Global tap effect" scale=0.4 tag="page2"

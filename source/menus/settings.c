@@ -16,6 +16,7 @@
 #include "main_menu.h"
 #include "level_select.h"
 #include "settings.h"
+#include "info_card.h"
 
 #include "save/config.h"
 
@@ -113,6 +114,18 @@ void action_right_page(UIElement *e) {
     switch_page(current_page);
 }
 
+void action_info_wide(UIElement *e) {
+    action_open_info_card(1);
+}
+
+void action_info_tap(UIElement *e) {
+    action_open_info_card(2);
+}
+
+void action_info_jump(UIElement *e) {
+    action_open_info_card(3);
+}
+
 static UIAction actions[] = {
     { "exit", exit_settings },
     { "wide", wide_settings },
@@ -122,6 +135,9 @@ static UIAction actions[] = {
     { "touch_effect", touch_effect_settings },
     { "left_page", action_left_page},
     { "right_page", action_right_page},
+    { "wideinfo", action_info_wide},
+    { "jumpinfo", action_info_jump},
+    { "tapinfo", action_info_tap}
 };
 
 void settings_init() {
@@ -151,7 +167,7 @@ int settings_loop() {
     touch.touchPosition = touchPos;
     touch.did_something = false;
     touch.interacted = false;
-    ui_screen_update(&screen, &touch);
+    if (!in_info_card) ui_screen_update(&screen, &touch);
 
     ui_screen_draw(&screen);
 

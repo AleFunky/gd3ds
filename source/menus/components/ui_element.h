@@ -147,6 +147,8 @@ typedef struct {
     float scaleY;
 
     char text[64];
+
+    float textScale;
 } UIWindowButtonData;
 
 typedef struct {

@@ -1,0 +1,8 @@
+
+image x=200 id=147 y=80 scale=0.8 align=CENTER tag="levelcomplete"
+image x=200 id=121 y=80 scale=0.8 align=CENTER tag="practicecomplete"
+
+
+image x=200 id=91 y=80 scale=0.8 align=CENTER tag=newbest
+label x=200 y=120 font=0 text="0%" scale=0.9 align=CENTER tag="bestpercent"
+

@@ -23,6 +23,7 @@
 #include "creator_menu.h"
 #include "external_levels.h"
 #include "first_boot_disclaimer.h"
+#include "info_card.h"
 
 static UIScreen screen_top;
 static UIScreen screen;
@@ -36,6 +37,7 @@ static bool in_settings = false;
 static bool in_statistics = false;
 static bool in_credits = false;
 static bool in_first_boot_disclaimer = false;
+bool in_info_card = false;
 
 static float bg_scroll = 0;
 
@@ -67,6 +69,25 @@ void action_open_statistics(UIElement* e) {
 void action_open_credits(UIElement* e) {
     in_credits = true;
     credits_init();
+}
+
+void action_open_info_card(int id, UIElement* e) {
+    info_card_init();
+    switch (id) {
+        case 1:
+            // wide mode info
+            set_info_content("Doubles the top screen's horizontal", "resolution.", true);
+            break;
+        case 2:
+            // global tap effect info
+            set_info_content("Plays the tap effect across all menus.", "", false);
+            break;
+        case 3:
+            // more jump buttons info
+            set_info_content("Swaps your jump input to Y.", "", false);
+            break;
+    }
+    in_info_card = true;
 }
 
 static UIAction actions[] = {
@@ -165,7 +186,7 @@ void main_menu_loop() {
             old_wide = wideEnabled;
         }
 
-        if (!in_settings && !in_credits && !in_statistics && !in_first_boot_disclaimer) ui_screen_update(&screen, &touch);
+        if (!in_settings && !in_credits && !in_statistics && !in_first_boot_disclaimer && !in_info_card) ui_screen_update(&screen, &touch);
         ui_screen_update(&screen_top, &touch);
         do {
             update_touch_effect(DT);
@@ -216,6 +237,13 @@ void main_menu_loop() {
                 int returned = first_boot_disclaimer_loop();
                 if (returned) {
                     in_first_boot_disclaimer = false;
+                }
+            }
+
+            if (in_info_card) {
+                int returned = info_card_loop();
+                if (returned) {
+                    in_info_card = false;
                 }
             }
 

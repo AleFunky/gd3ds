@@ -67,21 +67,25 @@ static void ui_window_button_update(UIElement* e, UIInput* touch) {
 
 static void ui_window_button_draw(UIElement* e) {
     float scale = e->window_button.hoverScale;
+    float text_scale;
 
     draw_9_slice(e->window_button.window.atlas, e->x, e->y, e->w * scale, e->h * scale, e->window_button.window.border, e->window_button.window.color);
 
-    // Get text length in pixels
-    float length = get_text_length(&bigFont_fontCharset, 1 / 0.85f, e->window_button.text);
-
-    // Resize it to fit the button bounds
-    float txt_scale;
-    if (e->w < length) {
-        txt_scale = scale * (e->w / length);
+    if (e->window_button.textScale == 1.0f){
+        // Get text length in pixels
+        float length = get_text_length(&bigFont_fontCharset, 1 / 0.85f, e->window_button.text);
+    
+        if (e->w < length) {
+            text_scale = scale * (e->w / length);
+        } else {
+            text_scale = scale * 0.85f;
+        }
     } else {
-        txt_scale = scale * 0.85f;
+        text_scale = (e->window_button.textScale * scale);
     }
+    
 
-    draw_text(&bigFont_fontCharset, &bigFont_sheet, e->x, e->y, txt_scale, 0.5f, "%s", e->window_button.text);
+    draw_text(&bigFont_fontCharset, &bigFont_sheet, e->x, e->y, text_scale, 0.5f, "%s", e->window_button.text);
 }
 
 void ui_window_button_set_style(UIElement *e, int style) {
@@ -96,7 +100,8 @@ UIElement ui_create_window_button(
     int x, int y, float w, float h, int style,
     UIActionFn action,
     char *text,
-    char (*tag)[TAG_LENGTH]
+    char (*tag)[TAG_LENGTH],
+    float textScale
 ){
     UIElement e = {
         .type = UI_WINDOW_BUTTON,
@@ -119,6 +124,8 @@ UIElement ui_create_window_button(
     ui_window_button_set_style(&e, style);
     
     e.window_button.hoverScale = 1.f;
+
+    e.window_button.textScale = textScale;
 
     return e;
 }

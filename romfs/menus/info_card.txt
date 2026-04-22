@@ -1,0 +1,12 @@
+darken opacity=0.4
+window x=160 y=120 w=260 h=120 style=1 tag=window
+# Labelling
+
+label x=160 y=90 font=2 text="Info" scale=0.9 align=CENTER
+
+label x=160 y=125 font=1 text="" scale=0.8 align=CENTER tag="content"
+label x=160 y=118 font=1 text="" scale=0.8 align=CENTER tag="content1"
+label x=160 y=132 font=1 text="" scale=0.8 align=CENTER tag="content2"
+
+windowbutton x=160 y=153 style=5 text="OK" id=104 w=52px h=30px scale=0.8 action="exit" textScale=0.7
+

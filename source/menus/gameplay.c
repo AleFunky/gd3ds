@@ -20,7 +20,6 @@
 
 #include "settings.h"
 #include "generic_disclaimer.h"
-#include "first_boot_disclaimer.h"
 
 #include "gameplay.h"
 
@@ -28,7 +27,6 @@
 
 bool game_paused = false;
 static bool in_disclaimer = false;
-static bool in_first_boot_disclaimer = false;
 static bool in_settings = false;
 
 static UIScreen screen;
@@ -40,6 +38,14 @@ static UIElement *level_name;
 void pause_game() {
     game_paused = true;
     if (song_loaded) pause_playback_mp3();
+    if (!state.custom_level){
+        ui_run_func_on_tag(&screen_top, "coin_1", ui_enable_element);
+        ui_run_func_on_tag(&screen_top, "coin_2", ui_enable_element);
+        ui_run_func_on_tag(&screen_top, "coin_3", ui_enable_element);
+        ui_run_func_on_tag(&screen, "coin_1", ui_disable_element);
+        ui_run_func_on_tag(&screen, "coin_2", ui_disable_element);
+        ui_run_func_on_tag(&screen, "coin_3", ui_disable_element);
+    }
     ui_run_func_on_tag(&screen_top, "pause_menu", ui_enable_element);
     ui_run_func_on_tag(&screen, "paused", ui_enable_element);
     ui_run_func_on_tag(&screen, "not_paused", ui_disable_element);
@@ -50,6 +56,14 @@ void unpause_game() {
     game_paused = false;
     if (state.death_timer <= 0 && song_loaded) {
         unpause_playback_mp3();
+    }
+    if (!state.custom_level){
+        ui_run_func_on_tag(&screen_top, "coin_1", ui_disable_element);
+        ui_run_func_on_tag(&screen_top, "coin_2", ui_disable_element);
+        ui_run_func_on_tag(&screen_top, "coin_3", ui_disable_element);
+        ui_run_func_on_tag(&screen, "coin_1", ui_enable_element);
+        ui_run_func_on_tag(&screen, "coin_2", ui_enable_element);
+        ui_run_func_on_tag(&screen, "coin_3", ui_enable_element);
     }
     ui_run_func_on_tag(&screen_top, "pause_menu", ui_disable_element);
     ui_run_func_on_tag(&screen, "paused", ui_disable_element);
@@ -73,11 +87,6 @@ void restart_level() {
 void open_disclaimer() {
     in_disclaimer = true;
     disclaimer_init();
-}
-
-void open_first_boot_disclaimer() {
-    in_first_boot_disclaimer = true;
-    first_boot_disclaimer_init();
 }
 
 void open_settings() {
@@ -134,7 +143,17 @@ void gameplay_screen_init() {
 
     strncpy(level_name->label.text, level_info.level_name, 255);
     
+    // hide coins if level is a custom level
+    if(state.custom_level == true){
+        ui_run_func_on_tag(&screen, "coin_1", ui_disable_element);
+        ui_run_func_on_tag(&screen, "coin_2", ui_disable_element);
+        ui_run_func_on_tag(&screen, "coin_3", ui_disable_element);
+    }
+    
     // Hide pause menu
+    ui_run_func_on_tag(&screen_top, "coin_1", ui_disable_element);
+    ui_run_func_on_tag(&screen_top, "coin_2", ui_disable_element);
+    ui_run_func_on_tag(&screen_top, "coin_3", ui_disable_element);
     ui_run_func_on_tag(&screen_top, "pause_menu", ui_disable_element);
     ui_run_func_on_tag(&screen, "paused", ui_disable_element);
 }

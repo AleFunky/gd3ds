@@ -29,6 +29,7 @@ C2D_SpriteSheet ui_2_sheet;
 C2D_SpriteSheet window_sheet;
 C2D_SpriteSheet bigFont_sheet;
 C2D_SpriteSheet chatFont_sheet;
+C2D_SpriteSheet goldFont_sheet;
 C2D_SpriteSheet bg_gradient_sheet;
 C2D_SpriteSheet bar_sheet;
 
@@ -38,6 +39,7 @@ void ui_assets_init() {
     window_sheet = C2D_SpriteSheetLoad("romfs:/gfx/windows.t3x");
     bigFont_sheet = C2D_SpriteSheetLoad("romfs:/gfx/bigFont.t3x");
     chatFont_sheet = C2D_SpriteSheetLoad("romfs:/gfx/chatFont.t3x");
+    goldFont_sheet = C2D_SpriteSheetLoad("romfs:/gfx/goldFont.t3x");
     bg_gradient_sheet = C2D_SpriteSheetLoad("romfs:/gfx/bg_gradient.t3x");
     bar_sheet = C2D_SpriteSheetLoad("romfs:/gfx/bars.t3x");
 }
@@ -298,6 +300,8 @@ void ui_load_screen(UIScreen* screen,
         char text[256] = {0};
         char tag[TAGS_PER_ELEMENT][TAG_LENGTH] = {0};
 
+        float textScale = 1.0f;
+
         // Parse element parameters
         while ((token = next_token(&cursor)) != NULL) {
             char* equal = strchr(token, '=');
@@ -371,6 +375,8 @@ void ui_load_screen(UIScreen* screen,
                 max_value = atoi(value);
             } else if (strcmp(key, "font") == 0) {
                 font = atoi(value);
+            } else if (strcmp(key, "textScale") == 0) {
+                textScale = atof(value);
             }
         }
 
@@ -455,7 +461,8 @@ void ui_load_screen(UIScreen* screen,
                     x, y, w, h, style,
                     ui_find_action(actions, actionCount, actionName),
                     text,
-                    tag
+                    tag,
+                    textScale
                 );
         } else if (strcmp(type, "progressbar") == 0) {
             screen->elements[screen->count++] =

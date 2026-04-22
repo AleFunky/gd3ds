@@ -7,8 +7,8 @@ label x=160 y=60 text="Notice:" scale=0.7 align=CENTER
 label x=160 y=95 text="This feature has NOT" scale=0.5 align=CENTER
 label x=160 y=110 text="been implemented yet!" scale=0.5 align=CENTER
 
-label x=160 y=145 font=1 text="Do not make an issue about" scale=0.7 align=CENTER
-label x=160 y=155 font=1 text="this on the GitHub." scale=0.7 align=CENTER
+label x=160 y=145 font=1 text="Do not make an issue about this" scale=0.7 align=CENTER
+label x=160 y=155 font=1 text="on GitHub." scale=0.7 align=CENTER
 
 button x=160 y=180 text="I understand" id=104 scale=0.8 action="exit"
 

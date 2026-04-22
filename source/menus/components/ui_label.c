@@ -4,6 +4,7 @@
 #include "text.h"
 #include "fonts/bigFont.h"
 #include "fonts/chatFont.h"
+#include "fonts/goldFont.h"
 #include "ui_screen.h"
 
 
@@ -21,6 +22,10 @@ static LabelFont fonts[] = {
         .charset = &chatFont_fontCharset,
         .sheet = &chatFont_sheet
     },
+    {
+        .charset = &goldFont_fontCharset,
+        .sheet = &goldFont_sheet
+    }
 };
 
 #define NUM_FONTS (sizeof(fonts) / sizeof(LabelFont))
