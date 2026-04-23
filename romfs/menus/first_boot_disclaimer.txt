@@ -2,7 +2,7 @@ darken opacity=0.4
 window x=160 y=120 w=260 h=180 style=1
 # Labelling
 
-label x=160 y=68 text="Notice" font=2 scale=0.9 align=CENTER
+label x=160 y=63 text="Notice" font=2 scale=0.9 align=CENTER
 
 label x=160 y=85 text="This port is a WIP!" scale=0.5 align=CENTER
 
