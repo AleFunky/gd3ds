@@ -2,7 +2,7 @@ darken opacity=0.4
 window x=160 y=120 w=260 h=180 style=1
 # Labelling
 
-label x=160 y=60 text="Notice:" scale=0.7 align=CENTER
+label x=160 y=68 text="Notice" font=2 scale=0.9 align=CENTER
 
 label x=160 y=95 text="This feature has NOT" scale=0.5 align=CENTER
 label x=160 y=110 text="been implemented yet!" scale=0.5 align=CENTER

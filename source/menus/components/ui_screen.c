@@ -391,7 +391,8 @@ void ui_load_screen(UIScreen* screen,
                     x, y, sx, sy, id, sheet, opacity,
                     ui_find_action(actions, actionCount, actionName),
                     text,
-                    tag
+                    tag,
+                    textScale
                 );
         } else if (strcmp(type, "image") == 0) {
             screen->elements[screen->count++] =

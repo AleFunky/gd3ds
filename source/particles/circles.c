@@ -151,6 +151,23 @@ const UseEffectDefinition coin_radius_effect = {
     .end_rad_ease = EASE_OUT,
     .line_thickness = 1.f
 };
+const UseEffectDefinition wave_radius_effect = {
+    .colorR = 1, 
+    .colorG = 1,
+    .colorB = 1,
+    .duration = 0.44f,
+    .start_opacity = .7f,
+    .end_opacity = 0,
+    .start_rad = 5,
+    .end_rad = 80,
+    .hollow = true,
+    .trifading = false,
+    .start_opacity_ease = EASE_IN,
+    .end_opacity_ease = EASE_OUT,
+    .start_rad_ease = EASE_OUT,
+    .end_rad_ease = EASE_OUT,
+    .line_thickness = 2.0f
+};
 
 UseEffect use_effects_top[MAX_USE_EFFECTS];
 UseEffect use_effects_bot[MAX_USE_EFFECTS];

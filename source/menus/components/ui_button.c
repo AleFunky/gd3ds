@@ -67,7 +67,7 @@ static void ui_button_update(UIElement* e, UIInput* touch) {
 
 static void ui_button_draw(UIElement* e) {
     float scale = e->button.hoverScale;
-
+    float text_scale = e->button.textScale;
     C2D_ImageTint tint;
 
     C2D_PlainImageTint(&tint, C2D_Color32f(1, 1, 1, e->opacity), 1.f);
@@ -80,15 +80,20 @@ static void ui_button_draw(UIElement* e) {
     // Get text length in pixels
     float length = get_text_length(&bigFont_fontCharset, 1 / 0.85f, e->button.text);
 
-    // Resize it to fit the button bounds
-    float txt_scale;
-    if (e->w < length) {
-        txt_scale = scale * (e->w / length);
+    if (e->button.textScale == 1.0f){
+        // Get text length in pixels
+        float length = get_text_length(&bigFont_fontCharset, 1 / 0.85f, e->button.text);
+    
+        if (e->w < length) {
+            text_scale = scale * (e->w / length);
+        } else {
+            text_scale = scale * 0.85f;
+        }
     } else {
-        txt_scale = scale * 0.85f;
+        text_scale = (e->button.textScale * scale);
     }
 
-    draw_text(&bigFont_fontCharset, &bigFont_sheet, e->x, e->y, txt_scale, 0.5f, "%s", e->button.text);
+    draw_text(&bigFont_fontCharset, &bigFont_sheet, e->x, e->y, text_scale, 0.5f, "%s", e->button.text);
 }
 
 void ui_button_set_image(UIElement *e, int sprite_index, int sheet) {
@@ -105,7 +110,8 @@ UIElement ui_create_button(
     int x, int y, float sx, float sy, int sprite_index, int sheet, float opacity,
     UIActionFn action,
     char *text,
-    char (*tag)[TAG_LENGTH]
+    char (*tag)[TAG_LENGTH],
+    float textScale
 ) {
     UIElement e = {
         .type = UI_BUTTON,
@@ -130,6 +136,8 @@ UIElement ui_create_button(
     ui_button_set_image(&e, sprite_index, sheet);
     
     e.button.hoverScale = 1.f;
+
+    e.button.textScale = textScale;
 
     return e;
 }
