@@ -59,6 +59,11 @@ SFX explode_sound;
 
 ParticleSystem touch_drag_particles;
 ParticleSystem touch_explosion_particles;
+ParticleSystem glitter_particles_bottom;
+ParticleSystem slow_speed_particles_bottom;
+ParticleSystem normal_speed_particles_bottom;
+ParticleSystem fast_speed_particles_bottom;
+ParticleSystem faster_speed_particles_bottom;
 
 float slow_speed_particles_timer = 0.f;
 float normal_speed_particles_timer = 0.f;
@@ -421,6 +426,11 @@ void game_loop() {
             
             brick_destroy_particles.emitting = false;
             glitter_particles.emitting = false;
+            glitter_particles_bottom.emitting = false;
+            slow_speed_particles_bottom.emitting = false;
+            normal_speed_particles_bottom.emitting = false;
+            fast_speed_particles_bottom.emitting = false;
+            faster_speed_particles_bottom.emitting = false;
 
             u64 now = svcGetSystemTick();
             delta = (now - lastTime) / (CPU_TICKS_PER_MSEC * 1000);
@@ -613,6 +623,7 @@ void game_loop() {
 
         // Render the scene
         do {
+            update_bottom_particles(delta);
             update_touch_effect(delta);
 
             C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
@@ -645,6 +656,7 @@ void game_loop() {
             gameplay_screen_bot_loop();
 
             change_blending(true);
+            draw_bottom_particles();
             draw_touch_effect();
             change_blending(false);
 
@@ -712,6 +724,11 @@ void game_loop() {
     freeParticleData(&fast_speed_particles.data);
     freeParticleData(&faster_speed_particles.data);
     freeParticleData(&coin_pickup_particles.data);
+    freeParticleData(&glitter_particles_bottom.data);
+    freeParticleData(&slow_speed_particles_bottom.data);
+    freeParticleData(&normal_speed_particles_bottom.data);
+    freeParticleData(&fast_speed_particles_bottom.data);
+    freeParticleData(&faster_speed_particles_bottom.data);
 
     unload_level();
 
@@ -749,6 +766,24 @@ void game_assets_init() {
 
     initParticleSystem(&touch_explosion_particles, &touch_explosion_effect);
     touch_explosion_particles.relativeStationary = true;
+
+    initParticleSystem(&glitter_particles_bottom, &glitter_effect);
+    glitter_particles_bottom.relativeStationary = true;
+    glitter_particles_bottom.cfg.startColorAlpha = 1.f;
+
+    initParticleSystem(&slow_speed_particles_bottom, &speed_effect_slow);
+    slow_speed_particles_bottom.relativeStationary = true;
+
+    initParticleSystem(&normal_speed_particles_bottom, &speed_effect_normal);
+    normal_speed_particles_bottom.relativeStationary = true;
+
+    initParticleSystem(&fast_speed_particles_bottom, &speed_effect_fast);
+    fast_speed_particles_bottom.relativeStationary = true;
+
+    initParticleSystem(&faster_speed_particles_bottom, &speed_effect_vfast);
+    faster_speed_particles_bottom.relativeStationary = true;
+
+    
 }
 
 void load_sfx() {
@@ -798,13 +833,36 @@ int main(int argc, char* argv[]) {
         // Update color if changed menus
         Color p1_not_white = get_white_if_black(p1_color);
 
-        touch_drag_particles.cfg.startColorRed   = p1_not_white.r / 255.f;
+        touch_drag_particles.cfg.startColorRed = p1_not_white.r / 255.f;
         touch_drag_particles.cfg.startColorGreen = p1_not_white.g / 255.f;
-        touch_drag_particles.cfg.startColorBlue  = p1_not_white.b / 255.f;
+        touch_drag_particles.cfg.startColorBlue = p1_not_white.b / 255.f;
 
-        touch_explosion_particles.cfg.startColorRed   = p1_not_white.r / 255.f;
+        touch_explosion_particles.cfg.startColorRed = p1_not_white.r / 255.f;
         touch_explosion_particles.cfg.startColorGreen = p1_not_white.g / 255.f;
-        touch_explosion_particles.cfg.startColorBlue  = p1_not_white.b / 255.f;
+        touch_explosion_particles.cfg.startColorBlue = p1_not_white.b / 255.f;
+
+        glitter_particles_bottom.cfg.startColorRed = get_white_if_black(p1_color).r / 255.f;
+        glitter_particles_bottom.cfg.startColorGreen = get_white_if_black(p1_color).g / 255.f;
+        glitter_particles_bottom.cfg.startColorBlue = get_white_if_black(p1_color).b / 255.f;
+        glitter_particles_bottom.cfg.finishColorRed = get_white_if_black(p1_color).r / 255.f;
+        glitter_particles_bottom.cfg.finishColorGreen = get_white_if_black(p1_color).g / 255.f;
+        glitter_particles_bottom.cfg.finishColorBlue = get_white_if_black(p1_color).b / 255.f;
+
+        slow_speed_particles_bottom.cfg.startColorRed = 255 / 255.f;
+        slow_speed_particles_bottom.cfg.startColorGreen = 255 / 255.f;
+        slow_speed_particles_bottom.cfg.startColorBlue = 0 / 255.f;
+
+        normal_speed_particles_bottom.cfg.startColorRed = 0 / 255.f;
+        normal_speed_particles_bottom.cfg.startColorGreen = 190 / 255.f;
+        normal_speed_particles_bottom.cfg.startColorBlue = 255 / 255.f;
+
+        fast_speed_particles_bottom.cfg.startColorRed = 0 / 255.f;
+        fast_speed_particles_bottom.cfg.startColorGreen = 255 / 255.f;
+        fast_speed_particles_bottom.cfg.startColorBlue = 0 / 255.f;
+
+        faster_speed_particles_bottom.cfg.startColorRed = 230 / 255.f;
+        faster_speed_particles_bottom.cfg.startColorGreen = 65 / 255.f;
+        faster_speed_particles_bottom.cfg.startColorBlue = 255 / 255.f;
 
         switch (game_state) {
             case STATE_MAIN_MENU:
@@ -852,6 +910,8 @@ int main(int argc, char* argv[]) {
     C2D_SpriteSheetFree(ui_2_sheet);
     C2D_SpriteSheetFree(groundSheet);
     C2D_SpriteSheetFree(bigFont_sheet);
+    C2D_SpriteSheetFree(chatFont_sheet);
+    C2D_SpriteSheetFree(goldFont_sheet);
     C2D_SpriteSheetFree(window_sheet);
     C2D_SpriteSheetFree(bar_sheet);
 

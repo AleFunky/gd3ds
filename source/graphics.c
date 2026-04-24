@@ -1197,6 +1197,50 @@ void draw_touch_effect() {
     drawParticleSystem(&touch_explosion_particles, 0, 0, 1.f);
 }
 
+void draw_bottom_particles() {
+    drawParticleSystem(&glitter_particles_bottom, 0, 0, 1.f);
+    drawParticleSystem(&slow_speed_particles_bottom, 0, 0, 1.f);
+    drawParticleSystem(&normal_speed_particles_bottom, 0, 0, 1.f);
+    drawParticleSystem(&fast_speed_particles_bottom, 0, 0, 1.f);
+    drawParticleSystem(&faster_speed_particles_bottom, 0, 0, 1.f);
+}
+
+void update_bottom_particles(float delta) {
+    glitter_particles_bottom.emitting = false;
+
+    bool flying_gamemode = (state.player.gamemode == GAMEMODE_SHIP || state.player.gamemode == GAMEMODE_BIRD || state.player.gamemode == GAMEMODE_DART);
+    if (state.dual) flying_gamemode = flying_gamemode || (state.player2.gamemode == GAMEMODE_SHIP || state.player2.gamemode == GAMEMODE_BIRD || state.player2.gamemode == GAMEMODE_DART);
+
+    if (((game_state == STATE_GAME && !game_paused)) && !get_fade_status()) {
+        if (flying_gamemode) {
+            glitter_particles_bottom.emitterX = 320/2;
+            glitter_particles_bottom.emitterY = 240/2;
+            glitter_particles_bottom.emitting = true;
+        };
+        slow_speed_particles_bottom.emitting = slow_speed_particles_timer > 0;
+        slow_speed_particles_bottom.emitterX = 320;
+        slow_speed_particles_bottom.emitterY = 240/2;
+
+        normal_speed_particles_bottom.emitting = normal_speed_particles_timer > 0;
+        normal_speed_particles_bottom.emitterX = 320;
+        normal_speed_particles_bottom.emitterY = 240/2;
+
+        fast_speed_particles_bottom.emitting = fast_speed_particles_timer > 0;
+        fast_speed_particles_bottom.emitterX = 320;
+        fast_speed_particles_bottom.emitterY = 240/2;
+        
+        faster_speed_particles_bottom.emitting = faster_speed_particles_timer > 0;
+        faster_speed_particles_bottom.emitterX = 320;
+        faster_speed_particles_bottom.emitterY = 240/2;
+    }
+
+    updateParticleSystem(&glitter_particles_bottom, delta);
+    updateParticleSystem(&slow_speed_particles_bottom, delta);
+    updateParticleSystem(&normal_speed_particles_bottom, delta);
+    updateParticleSystem(&fast_speed_particles_bottom, delta);
+    updateParticleSystem(&faster_speed_particles_bottom, delta);
+}
+
 void spawn_icon_at(
     int gamemode,
     int id,

@@ -161,3 +161,6 @@ float get_opacity(float opacity);
 
 void update_touch_effect(float delta);
 void draw_touch_effect();
+
+void update_bottom_particles(float delta);
+void draw_bottom_particles();
