@@ -24,6 +24,7 @@
 #include "gameplay.h"
 
 #include "save/config.h"
+#include "info_card.h"
 
 bool game_paused = false;
 static bool in_disclaimer = false;
@@ -186,7 +187,7 @@ int gameplay_screen_bot_loop() {
     touch.touchPosition = touchPos;
     touch.did_something = false;
     touch.interacted = false;
-    if (!in_settings && !in_disclaimer) {
+    if (!in_settings && !in_disclaimer && !in_info_card) {
         ui_screen_update(&screen, &touch);
         
         if ((kDown & KEY_B) && !exiting_level && game_paused) {
@@ -207,6 +208,13 @@ int gameplay_screen_bot_loop() {
         int returned = disclaimer_loop();
         if (returned) {
             in_disclaimer = false;
+        }
+    }
+
+    if (in_info_card) {
+        int returned = info_card_loop();
+        if (returned) {
+            in_info_card = false;
         }
     }
 

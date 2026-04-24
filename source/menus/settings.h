@@ -11,6 +11,10 @@ extern bool wideEnabled;
 extern bool glowEnabled; 
 extern bool yJump;
 extern bool touchEffectEverywhere;
+extern bool enableDebugBindings;
+extern bool hitboxesEnabled;
+extern bool hitboxTrail;
+extern bool hitboxesOnDeath;
 
 void settings_init();
 int settings_loop();

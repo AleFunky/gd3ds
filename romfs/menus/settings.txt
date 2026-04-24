@@ -30,3 +30,19 @@ label x=90 y=85 text="Y to jump" scale=0.4 tag="page2"
 checkbox x=75 y=115 tag="page2,chk_touch_effect" scale=0.75 action="touch_effect"
 button x=62 y=102 action="tapinfo" id=90 scale=0.5 tag="page2"
 label x=90 y=115 text="Global tap effect" scale=0.4 tag="page2"
+
+checkbox x=75 y=145 tag="page2,chk_debug_binds" scale=0.75 action="debug"
+button x=62 y=132 action="debuginfo" id=90 scale=0.5 tag="page2"
+label x=90 y=145 text="Enable debug keys" scale=0.4 tag="page2"
+
+label x=160 y=50 text="Misc" tag="page3" scale=0.6 align=CENTER
+
+checkbox x=75 y=85 tag="page3,chk_hitbox" scale=0.75 action="hitbox"
+button x=62 y=72 action="hitboxinfo" id=90 scale=0.5 tag="page3"
+label x=90 y=85 text="Show hitboxes" scale=0.4 tag="page3"
+
+checkbox x=75 y=115 tag="page3,chk_hitboxtrail" scale=0.75 action="hitbox_trail"
+label x=90 y=115 text="Enable hitbox trail" scale=0.4 tag="page3"
+
+checkbox x=75 y=145 tag="page3,chk_death_hitboxes" scale=0.75 action="death_hitboxes"
+label x=90 y=145 text="Show hitboxes on death" scale=0.4 tag="page3"

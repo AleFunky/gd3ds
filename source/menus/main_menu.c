@@ -86,6 +86,14 @@ void action_open_info_card(int id, UIElement* e) {
             // more jump buttons info
             set_info_content("Swaps your jump input to Y.", "", false);
             break;
+        case 4:
+            // hitboxes info
+            set_info_content("Shows object hitboxes while playing.", "WARNING: AFFECTS PERFORMANCE!", true);
+            break;
+        case 5:
+            // debug info
+            set_info_content("Enables debug key shortcuts.", "(L, R, X)", true);
+            break;
     }
     in_info_card = true;
 }

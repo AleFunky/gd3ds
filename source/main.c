@@ -381,16 +381,22 @@ void game_loop() {
             }
         }
 
-        if (kDown & KEY_X)
+        state.hitbox_display = 0;
+
+        if (kDown & KEY_X & enableDebugBindings)
             state.noclip ^= 1;
 
-        if (kDown & KEY_L)
+        if (kDown & KEY_L & enableDebugBindings)
             state.profiling ^= 1;
 
-        if (kDown & KEY_R) {
+        if (kDown & KEY_R & enableDebugBindings) {
             state.hitbox_display++;
             if (state.hitbox_display > 2) state.hitbox_display = 0;
         }      
+
+        if (hitboxesEnabled || hitboxesTempEnabled) state.hitbox_display = 1;
+        
+        if (hitboxTrail) state.hitbox_display = 2;
 
         int steps = 0;
 

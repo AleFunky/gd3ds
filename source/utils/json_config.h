@@ -11,6 +11,7 @@
 #define CONFIG_GRAPHICS_PATH "graphics."
 #define CONFIG_INPUT_PATH "input."
 #define CONFIG_CUSTOMIZATION_PATH "custom."
+#define CONFIG_MISC_PATH "misc."
 
 #define CONFIG_OBJECT_DELIMITER "."
 

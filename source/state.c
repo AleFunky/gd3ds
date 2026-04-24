@@ -7,8 +7,11 @@
 #include "player/collision.h"
 #include "particles/circles.h"
 #include "particles/particles.h"
+#include "menus/settings.h"
 
 GameState state;
+
+bool hitboxesTempEnabled = false;
 
 void run_camera() {
     Player *player = &state.player;
@@ -255,7 +258,8 @@ void init_variables() {
         calc_height = (SCREEN_HEIGHT_AREA - playable_height) / 2;
     }
 
-    state.ground_y_gfx = calc_height;   
+    state.ground_y_gfx = calc_height; 
+    hitboxesTempEnabled = false;
 }
 
 void handle_death() {
@@ -284,4 +288,7 @@ void handle_death() {
     explosion_particles[state.current_player].scale = (player->mini ? 0.6 : 1.0f);
     spawnMultipleParticles(&explosion_particles[state.current_player], 90);
     
+    if (hitboxesOnDeath) {
+        hitboxesTempEnabled = true;
+    }
 }

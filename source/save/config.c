@@ -23,6 +23,11 @@ void init_values() {
 
     config_init_bool(&cfg, CONFIG_INPUT_PATH "yButton", false);
     config_init_bool(&cfg, CONFIG_INPUT_PATH "touchEffectEverywhere", false);
+    config_init_bool(&cfg, CONFIG_INPUT_PATH "enableDebugBindings", false);
+
+    config_init_bool(&cfg, CONFIG_MISC_PATH "hitboxesEnabled", false);
+    config_init_bool(&cfg, CONFIG_MISC_PATH "hitboxTrail", false);
+    config_init_bool(&cfg, CONFIG_MISC_PATH "hitboxesOnDeath", false);
 
     config_init_int(&cfg, CONFIG_CUSTOMIZATION_PATH "cube", 1);
     config_init_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ship", 1);
@@ -52,6 +57,10 @@ void cfg_init() {
     set_wide(config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "wideEnabled", false));
     glowEnabled = config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "glowEnabled", true);
 
+    hitboxesEnabled = config_get_bool(&cfg, CONFIG_MISC_PATH "hitboxesEnabled", false);
+    hitboxTrail = config_get_bool(&cfg, CONFIG_MISC_PATH "hitboxTrail", false);
+    hitboxesOnDeath = config_get_bool(&cfg, CONFIG_MISC_PATH "hitboxesOnDeath", false);
+
     selected_cube = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "cube", 1);
     selected_ship = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ship", 1);
     selected_ball = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ball", 1);
@@ -64,6 +73,7 @@ void cfg_init() {
 
     yJump = config_get_bool(&cfg, CONFIG_INPUT_PATH "yButton", false);
     touchEffectEverywhere = config_get_bool(&cfg, CONFIG_INPUT_PATH "touchEffectEverywhere", false);
+    enableDebugBindings = config_get_bool(&cfg, CONFIG_INPUT_PATH "enableDebugBindings", false);
 
     config_save(&cfg);
 }
@@ -87,6 +97,11 @@ void cfg_save() {
 
     config_set_bool(&cfg, CONFIG_INPUT_PATH "yButton", yJump);
     config_set_bool(&cfg, CONFIG_INPUT_PATH "touchEffectEverywhere", touchEffectEverywhere);
+    config_set_bool(&cfg, CONFIG_INPUT_PATH "enableDebugBindings", enableDebugBindings);
+
+    config_set_bool(&cfg, CONFIG_MISC_PATH "hitboxesEnabled", hitboxesEnabled);
+    config_set_bool(&cfg, CONFIG_MISC_PATH "hitboxTrail", hitboxTrail);
+    config_set_bool(&cfg, CONFIG_MISC_PATH "hitboxesOnDeath", hitboxesOnDeath);
 
     config_save(&cfg);
 }

@@ -31,6 +31,10 @@ bool wideEnabled = false;
 bool glowEnabled = true;
 bool yJump = false;
 bool touchEffectEverywhere = false;
+bool enableDebugBindings = false;
+bool hitboxesEnabled = false;
+bool hitboxTrail = false;
+bool hitboxesOnDeath = false;
 
 static Setting settings[] = {
     {
@@ -48,6 +52,18 @@ static Setting settings[] = {
     {
         "chk_touch_effect", &touchEffectEverywhere
     },
+    {
+        "chk_debug_binds", &enableDebugBindings
+    },
+    {
+        "chk_hitbox", &hitboxesEnabled
+    },
+    {
+        "chk_hitboxtrail", &hitboxTrail
+    },
+    {
+        "chk_death_hitboxes", &hitboxesOnDeath
+    }
 };
 
 
@@ -56,7 +72,8 @@ static Setting settings[] = {
 
 const char *pages_tags[] = {
     "page1",
-    "page2"
+    "page2",
+    "page3"
 };
 
 #define NUMBER_PAGES (sizeof(pages_tags) / sizeof(char *))
@@ -96,6 +113,22 @@ void touch_effect_settings(UIElement* e) {
     touchEffectEverywhere = e->checkbox.checked;
 }
 
+void debug_settings(UIElement* e) {
+    enableDebugBindings = e->checkbox.checked;
+}
+
+void hitboxes_settings(UIElement* e) {
+    hitboxesEnabled = e->checkbox.checked;
+}
+
+void hitbox_trail_settings(UIElement* e) {
+    hitboxTrail = e->checkbox.checked;
+}
+
+void hitboxes_on_death_settings(UIElement* e) {
+    hitboxesOnDeath = e->checkbox.checked;
+}
+
 void action_left_page(UIElement *e) {
     current_page--;
     if (current_page < 0) {
@@ -126,6 +159,14 @@ void action_info_jump(UIElement *e) {
     action_open_info_card(3);
 }
 
+void action_info_hitboxes(UIElement *e) {
+    action_open_info_card(4);
+}
+
+void action_info_debug(UIElement *e) {
+    action_open_info_card(5);
+}
+
 static UIAction actions[] = {
     { "exit", exit_settings },
     { "wide", wide_settings },
@@ -133,11 +174,17 @@ static UIAction actions[] = {
     { "glow", glow_settings },
     { "y_jump", y_button_settings },
     { "touch_effect", touch_effect_settings },
+    { "debug", debug_settings },
+    { "hitbox", hitboxes_settings },
+    { "hitbox_trail", hitbox_trail_settings },
+    { "death_hitboxes", hitboxes_on_death_settings },
     { "left_page", action_left_page},
     { "right_page", action_right_page},
     { "wideinfo", action_info_wide},
     { "jumpinfo", action_info_jump},
-    { "tapinfo", action_info_tap}
+    { "tapinfo", action_info_tap},
+    { "hitboxinfo", action_info_hitboxes},
+    { "debuginfo", action_info_debug}
 };
 
 void settings_init() {

@@ -77,9 +77,6 @@ static void ui_button_draw(UIElement* e) {
     C2D_SpriteSetScale(&e->button.image.sprite, scale * e->button.scaleX, scale * e->button.scaleY);
     C2D_DrawSpriteTinted(&e->button.image.sprite, &tint);
 
-    // Get text length in pixels
-    float length = get_text_length(&bigFont_fontCharset, 1 / 0.85f, e->button.text);
-
     if (e->button.textScale == 1.0f){
         // Get text length in pixels
         float length = get_text_length(&bigFont_fontCharset, 1 / 0.85f, e->button.text);
