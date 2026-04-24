@@ -88,7 +88,7 @@ void action_open_info_card(int id, UIElement* e) {
             break;
         case 4:
             // hitboxes info
-            set_info_content("Shows object hitboxes while playing.", "WARNING: AFFECTS PERFORMANCE!", true);
+            set_info_content("Shows object hitboxes while in a level.", "WARNING: AFFECTS PERFORMANCE!", true);
             break;
         case 5:
             // debug info

@@ -730,11 +730,6 @@ void game_loop() {
     freeParticleData(&fast_speed_particles.data);
     freeParticleData(&faster_speed_particles.data);
     freeParticleData(&coin_pickup_particles.data);
-    freeParticleData(&glitter_particles_bottom.data);
-    freeParticleData(&slow_speed_particles_bottom.data);
-    freeParticleData(&normal_speed_particles_bottom.data);
-    freeParticleData(&fast_speed_particles_bottom.data);
-    freeParticleData(&faster_speed_particles_bottom.data);
 
     unload_level();
 
