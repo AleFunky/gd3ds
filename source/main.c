@@ -383,21 +383,27 @@ void game_loop() {
 
         state.hitbox_display = 0;
 
-        if (kDown & KEY_X & enableDebugBindings)
+        if (kDown & KEY_X && enableDebugBindings)
             state.noclip ^= 1;
 
-        if (kDown & KEY_L & enableDebugBindings)
+        if (kDown & KEY_L && enableDebugBindings)
             state.profiling ^= 1;
 
-        if (kDown & KEY_R & enableDebugBindings) {
-            state.hitbox_display++;
-            if (state.hitbox_display > 2) state.hitbox_display = 0;
+        if (kDown & KEY_R && enableDebugBindings) {
+            if (hitboxesEnabled && hitboxTrail) {
+                hitboxesEnabled = false;
+                hitboxTrail = false;
+            } else if (hitboxesEnabled && !hitboxTrail) {
+                hitboxTrail = true;
+            } else hitboxesEnabled = true;
         }      
 
         if (hitboxesEnabled || hitboxesTempEnabled) state.hitbox_display = 1;
         
-        if (hitboxTrail) state.hitbox_display = 2;
-
+        if (hitboxTrail) {
+            hitboxesEnabled = true;
+            state.hitbox_display = 2;
+        };
         int steps = 0;
 
         u32 kHeld = hidKeysHeld();
