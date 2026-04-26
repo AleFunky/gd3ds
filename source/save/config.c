@@ -69,7 +69,7 @@ void cfg_init() {
     showProgressBar = config_get_bool(&cfg, CONFIG_GAMEPLAY_PATH "showProgressBar", false);
     showProgressPercent = config_get_bool(&cfg, CONFIG_GAMEPLAY_PATH "showProgressPercent", false);
     decimalPercent = config_get_bool(&cfg, CONFIG_GAMEPLAY_PATH "decimalPercent", false);
-    decimalPercent = config_get_bool(&cfg, CONFIG_GAMEPLAY_PATH "ultraDecimalPercent", false);
+    ultraDecimalPercent = config_get_bool(&cfg, CONFIG_GAMEPLAY_PATH "ultraDecimalPercent", false);
 
     selected_cube = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "cube", 1);
     selected_ship = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ship", 1);
