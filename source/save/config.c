@@ -32,6 +32,7 @@ void init_values() {
     config_init_bool(&cfg, CONFIG_GAMEPLAY_PATH "showProgressBar", false);
     config_init_bool(&cfg, CONFIG_GAMEPLAY_PATH "showProgressPercent", false);
     config_init_bool(&cfg, CONFIG_GAMEPLAY_PATH "decimalPercent", false);
+    config_init_bool(&cfg, CONFIG_GAMEPLAY_PATH "ultraDecimalPercent", false);
 
     config_init_int(&cfg, CONFIG_CUSTOMIZATION_PATH "cube", 1);
     config_init_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ship", 1);
@@ -68,6 +69,7 @@ void cfg_init() {
     showProgressBar = config_get_bool(&cfg, CONFIG_GAMEPLAY_PATH "showProgressBar", false);
     showProgressPercent = config_get_bool(&cfg, CONFIG_GAMEPLAY_PATH "showProgressPercent", false);
     decimalPercent = config_get_bool(&cfg, CONFIG_GAMEPLAY_PATH "decimalPercent", false);
+    decimalPercent = config_get_bool(&cfg, CONFIG_GAMEPLAY_PATH "ultraDecimalPercent", false);
 
     selected_cube = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "cube", 1);
     selected_ship = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ship", 1);
@@ -114,6 +116,7 @@ void cfg_save() {
     config_set_bool(&cfg, CONFIG_GAMEPLAY_PATH "showProgressBar", showProgressBar);
     config_set_bool(&cfg, CONFIG_GAMEPLAY_PATH "showProgressPercent", showProgressPercent);
     config_set_bool(&cfg, CONFIG_GAMEPLAY_PATH "decimalPercent", decimalPercent);
+    config_set_bool(&cfg, CONFIG_GAMEPLAY_PATH "ultraDecimalPercent", ultraDecimalPercent);
 
     config_save(&cfg);
 }

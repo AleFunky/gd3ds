@@ -38,6 +38,7 @@ bool hitboxesOnDeath = false;
 bool showProgressBar = false;
 bool showProgressPercent = false;
 bool decimalPercent = false;
+bool ultraDecimalPercent = false;
 
 static Setting settings[] = {
     {
@@ -75,6 +76,9 @@ static Setting settings[] = {
     },
     {
         "chk_decimalpercent", &decimalPercent
+    },
+    {
+        "chk_ultradecimalpercent", &ultraDecimalPercent
     }
 };
 
@@ -154,6 +158,10 @@ void decimalpercent_settings(UIElement* e) {
     decimalPercent = e->checkbox.checked;
 }
 
+void ultradecimalpercent_settings(UIElement* e) {
+    ultraDecimalPercent = e->checkbox.checked;
+}
+
 void action_left_page(UIElement *e) {
     current_page--;
     if (current_page < 0) {
@@ -196,6 +204,10 @@ void action_info_decimal(UIElement *e) {
     action_open_info_card(6);
 }
 
+void action_info_ultra_decimal(UIElement *e) {
+    action_open_info_card(7);
+}
+
 static UIAction actions[] = {
     { "exit", exit_settings },
     { "wide", wide_settings },
@@ -210,6 +222,7 @@ static UIAction actions[] = {
     { "progressbar", progressbar_settings },
     { "progresspercent", progresspercent_settings },
     { "decimalPercent", decimalpercent_settings },
+    { "ultraDecimalPercent", ultradecimalpercent_settings },
     { "left_page", action_left_page},
     { "right_page", action_right_page},
     { "wideinfo", action_info_wide},
@@ -217,7 +230,8 @@ static UIAction actions[] = {
     { "tapinfo", action_info_tap},
     { "hitboxinfo", action_info_hitboxes},
     { "debuginfo", action_info_debug},
-    { "decimalinfo", action_info_decimal}
+    { "decimalinfo", action_info_decimal},
+    { "ultradecimalinfo", action_info_ultra_decimal}
 };
 
 void settings_init() {

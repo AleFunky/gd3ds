@@ -18,6 +18,7 @@ extern bool hitboxesOnDeath;
 extern bool showProgressBar;
 extern bool showProgressPercent;
 extern bool decimalPercent;
+extern bool ultraDecimalPercent;
 
 void settings_init();
 int settings_loop();

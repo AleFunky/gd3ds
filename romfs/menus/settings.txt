@@ -58,3 +58,8 @@ label x=90 y=115 text="Show level percentage" scale=0.4 tag="page4"
 checkbox x=75 y=145 tag="page4,chk_decimalpercent" scale=0.75 action="decimalPercent"
 button x=62 y=132 action="decimalinfo" id=90 scale=0.5 tag="page4"
 label x=90 y=145 text="Accurate percentage" scale=0.4 tag="page4"
+
+checkbox x=75 y=175 tag="page4,chk_ultradecimalpercent" scale=0.75 action="ultraDecimalPercent"
+button x=62 y=162 action="ultradecimalinfo" id=90 scale=0.5 tag="page4"
+label x=90 y=175 text="ULTRA percentage" scale=0.4 tag="page4"
+

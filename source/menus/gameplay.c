@@ -170,9 +170,10 @@ int gameplay_screen_top_loop() {
 
     decimal = 0;
     if (decimalPercent) decimal = 2;
+    if (ultraDecimalPercent) decimal = 20;
 
     progress_bar->progress_bar.value = state.level_progress;
-    snprintf(percent->label.text, 16, "%.*f%%", decimal, state.level_progress);
+    snprintf(percent->label.text, 32, "%.*f%%", decimal, state.level_progress);
 
     ui_run_func_on_tag(&screen_top, "progressalert", ui_disable_element);
     ui_run_func_on_tag(&screen_top, "percent", ui_disable_element);
