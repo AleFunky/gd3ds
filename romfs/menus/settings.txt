@@ -46,3 +46,15 @@ label x=90 y=115 text="Enable hitbox trail" scale=0.4 tag="page3"
 
 checkbox x=75 y=145 tag="page3,chk_death_hitboxes" scale=0.75 action="death_hitboxes"
 label x=90 y=145 text="Show hitboxes on death" scale=0.4 tag="page3"
+
+label x=160 y=50 text="Gameplay" tag="page4" scale=0.6 align=CENTER
+
+checkbox x=75 y=85 tag="page4,chk_progressbar" scale=0.75 action="progressbar"
+label x=90 y=85 text="Show progress bar" scale=0.4 tag="page4"
+
+checkbox x=75 y=115 tag="page4,chk_progresspercent" scale=0.75 action="progresspercent"
+label x=90 y=115 text="Show level percentage" scale=0.4 tag="page4"
+
+checkbox x=75 y=145 tag="page4,chk_decimalpercent" scale=0.75 action="decimalPercent"
+button x=62 y=132 action="decimalinfo" id=90 scale=0.5 tag="page4"
+label x=90 y=145 text="Accurate percentage" scale=0.4 tag="page4"

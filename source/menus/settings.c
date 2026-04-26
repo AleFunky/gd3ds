@@ -35,6 +35,9 @@ bool enableDebugBindings = false;
 bool hitboxesEnabled = false;
 bool hitboxTrail = false;
 bool hitboxesOnDeath = false;
+bool showProgressBar = false;
+bool showProgressPercent = false;
+bool decimalPercent = false;
 
 static Setting settings[] = {
     {
@@ -63,6 +66,15 @@ static Setting settings[] = {
     },
     {
         "chk_death_hitboxes", &hitboxesOnDeath
+    },
+    {
+        "chk_progressbar", &showProgressBar
+    },
+    {
+        "chk_progresspercent", &showProgressPercent
+    },
+    {
+        "chk_decimalpercent", &decimalPercent
     }
 };
 
@@ -73,7 +85,8 @@ static Setting settings[] = {
 const char *pages_tags[] = {
     "page1",
     "page2",
-    "page3"
+    "page3",
+    "page4"
 };
 
 #define NUMBER_PAGES (sizeof(pages_tags) / sizeof(char *))
@@ -129,6 +142,18 @@ void hitboxes_on_death_settings(UIElement* e) {
     hitboxesOnDeath = e->checkbox.checked;
 }
 
+void progressbar_settings(UIElement* e) {
+    showProgressBar = e->checkbox.checked;
+}
+
+void progresspercent_settings(UIElement* e) {
+    showProgressPercent = e->checkbox.checked;
+}
+
+void decimalpercent_settings(UIElement* e) {
+    decimalPercent = e->checkbox.checked;
+}
+
 void action_left_page(UIElement *e) {
     current_page--;
     if (current_page < 0) {
@@ -167,6 +192,10 @@ void action_info_debug(UIElement *e) {
     action_open_info_card(5);
 }
 
+void action_info_decimal(UIElement *e) {
+    action_open_info_card(6);
+}
+
 static UIAction actions[] = {
     { "exit", exit_settings },
     { "wide", wide_settings },
@@ -178,13 +207,17 @@ static UIAction actions[] = {
     { "hitbox", hitboxes_settings },
     { "hitbox_trail", hitbox_trail_settings },
     { "death_hitboxes", hitboxes_on_death_settings },
+    { "progressbar", progressbar_settings },
+    { "progresspercent", progresspercent_settings },
+    { "decimalPercent", decimalpercent_settings },
     { "left_page", action_left_page},
     { "right_page", action_right_page},
     { "wideinfo", action_info_wide},
     { "jumpinfo", action_info_jump},
     { "tapinfo", action_info_tap},
     { "hitboxinfo", action_info_hitboxes},
-    { "debuginfo", action_info_debug}
+    { "debuginfo", action_info_debug},
+    { "decimalinfo", action_info_decimal}
 };
 
 void settings_init() {

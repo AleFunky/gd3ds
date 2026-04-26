@@ -12,6 +12,7 @@
 #define CONFIG_INPUT_PATH "input."
 #define CONFIG_CUSTOMIZATION_PATH "custom."
 #define CONFIG_MISC_PATH "misc."
+#define CONFIG_GAMEPLAY_PATH "gameplay."
 
 #define CONFIG_OBJECT_DELIMITER "."
 

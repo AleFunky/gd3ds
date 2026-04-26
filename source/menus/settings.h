@@ -15,6 +15,9 @@ extern bool enableDebugBindings;
 extern bool hitboxesEnabled;
 extern bool hitboxTrail;
 extern bool hitboxesOnDeath;
+extern bool showProgressBar;
+extern bool showProgressPercent;
+extern bool decimalPercent;
 
 void settings_init();
 int settings_loop();

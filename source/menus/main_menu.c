@@ -94,6 +94,10 @@ void action_open_info_card(int id, UIElement* e) {
             // debug info
             set_info_content("Enables debug key shortcuts.", "(L, R, X)", true);
             break;
+        case 6:
+            // accurate percentage info
+            set_info_content("Shows level progress with 2 decimals.", "", false);
+            break;
     }
     in_info_card = true;
 }

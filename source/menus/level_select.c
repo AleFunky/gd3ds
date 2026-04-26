@@ -36,6 +36,7 @@ float anim_time = 0;
 static UIElement *bg_gradient = NULL;
 static UIElement *bg_gradient_top = NULL;
 static UIElement *level_card_window = NULL;
+static UIElement *level_card_title_top = NULL;
 
 static UIElement *level_card_title = NULL;
 static UIElement *level_card_stars = NULL;
@@ -87,6 +88,7 @@ void update_level_name(int level, int card) {
     if (level >= MAIN_LEVELS_NUM) level = 0;
 
     UIElement *e = (card) ? level_card_2_title : level_card_title;
+    level_card_title_top = ui_get_element_by_tag(&screen_top, "levelname");
     float length = get_text_length(&bigFont_fontCharset, 1 / 0.85f, main_levels[level].level_name);
 
     float txt_scale;
@@ -99,6 +101,7 @@ void update_level_name(int level, int card) {
     e->label.scale = txt_scale;
 
     strncpy(e->label.text, main_levels[level].level_name, 255);
+    strncpy(level_card_title_top->label.text, main_levels[level].level_name, 255);
 }
 
 void update_level_stars(int level, int card) {

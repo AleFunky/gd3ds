@@ -34,7 +34,10 @@ static UIScreen screen;
 static UIScreen screen_top;
 static UIElement *bg_gradient;
 static UIElement *progress_bar;
+static UIElement *percent;
 static UIElement *level_name;
+
+int decimal;
 
 void pause_game() {
     game_paused = true;
@@ -134,6 +137,7 @@ void gameplay_screen_init() {
 
     ui_load_screen(&screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/gameplay_top.txt");;
     progress_bar = ui_get_element_by_tag(&screen_top, "progressalert");
+    percent = ui_get_element_by_tag(&screen_top, "percent");
     level_name = ui_get_element_by_tag(&screen_top, "level_title");
 
     Color color = get_white_if_black(p1_color);
@@ -164,7 +168,26 @@ int gameplay_screen_top_loop() {
     touchPosition touchPos;
     hidTouchRead(&touchPos);
 
+    decimal = 0;
+    if (decimalPercent) decimal = 2;
+
     progress_bar->progress_bar.value = state.level_progress;
+    snprintf(percent->label.text, 16, "%.*f%%", decimal, state.level_progress);
+
+    ui_run_func_on_tag(&screen_top, "progressalert", ui_disable_element);
+    ui_run_func_on_tag(&screen_top, "percent", ui_disable_element);
+    ui_set_pos_on_tag(&screen_top, 200, 10, "percent");
+    percent->label.alignment = 0.5;
+
+    if (showProgressBar) {
+        ui_run_func_on_tag(&screen_top, "progressalert", ui_enable_element);
+        ui_set_pos_on_tag(&screen_top, 282, 10, "percent");
+        percent->label.alignment = 0;
+    }
+
+    if (showProgressPercent) {
+        ui_run_func_on_tag(&screen_top, "percent", ui_enable_element);
+    }
 
     ui_screen_update(&screen_top, &touch);
     ui_screen_draw(&screen_top);

@@ -1,4 +1,5 @@
 progressbar x=200 y=10 max_value=100 style=1 scale=0.75 tag="progressalert"
+label x=200 y=11 text="0%" scale=0.46 align=CENTER tag="percent"
 
 window x=200 y=120 w=380 h=220 style=2 tag="pause_menu,bgwindow"
 label x=200 y=40 text="Levle" scale=0.8 align=CENTER tag="pause_menu,level_title"

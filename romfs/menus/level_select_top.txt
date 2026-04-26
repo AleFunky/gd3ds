@@ -1,4 +1,10 @@
 bggradient tag="gradient"
-window x=250 y=120 w=220 h=200 style=1
+window x=250 y=120 w=220 h=150 style=1
+label x=250 y=79 font=2 text="Level Stats" scale=0.9 align=CENTER tag=""
+label x=250 y=112 font=1 text="Level Name" scale=0.8 align=CENTER tag="levelname"
+label x=250 y=126 font=1 text="Total Attempts:" scale=0.8 align=CENTER tag="totalattempts"
+label x=250 y=140 font=1 text="Total Jumps:" scale=0.8 align=CENTER tag="totaljumps"
+label x=250 y=154 font=1 text="Normal:" scale=0.8 align=CENTER tag="normalprogress"
+label x=250 y=168 font=1 text="Practice:" scale=0.8 align=CENTER tag="practiceprogress"
 window x=70 y=120 w=60 h=60 style=2 tag="face_card"
 image x=70 y=120 id=239 sx=1.0 sy=1.0 tag="level_face"
