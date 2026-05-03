@@ -410,8 +410,8 @@ void game_loop() {
 
         bool in_bounds = touchPos.px < 320 - 30 || touchPos.py > 30;
         
-        bool buttonPressed = (yJump ? (kDown & KEY_Y) : (kDown & KEY_A)) || (kDown & KEY_UP);
-        bool buttonHeld = (yJump ? (kHeld & KEY_Y) : (kHeld & KEY_A)) || (kHeld & KEY_UP);
+        bool buttonPressed = (yJump ? (kDown & KEY_Y) : (kDown & KEY_A)) || (kDown & KEY_UP) || (kDown & KEY_L && !enableDebugBindings) || (kDown & KEY_R && !enableDebugBindings);
+        bool buttonHeld = (yJump ? (kHeld & KEY_Y) : (kHeld & KEY_A)) || (kHeld & KEY_UP) || (kHeld & KEY_L && !enableDebugBindings) || (kHeld & KEY_R && !enableDebugBindings);
 
         state.old_input = state.input;
         state.input.pressedJump = (buttonPressed || (in_bounds && (kDown & KEY_TOUCH))) == true;
