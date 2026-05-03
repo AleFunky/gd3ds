@@ -511,7 +511,7 @@ void game_loop() {
             frame_counter++;
 
             if (state.dead && state.death_timer <= 0.f) {
-                state.death_timer = 1.f;
+                state.death_timer = (quickRetry ? 0.5f : 1.f);
                 handle_death();
             }
 

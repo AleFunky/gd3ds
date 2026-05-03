@@ -41,6 +41,8 @@ bool decimalPercent = false;
 bool ultraDecimalPercent = false;
 bool switchTrailColor = false;
 bool switchWaveTrailColor = false;
+bool quickRetry = false;
+
 
 static Setting settings[] = {
     {
@@ -88,6 +90,9 @@ static Setting settings[] = {
     {
         "chk_wavetrailcolor", &switchWaveTrailColor
     },
+    {
+        "chk_quickretry", &quickRetry
+    },
 };
 
 
@@ -100,6 +105,7 @@ const char *pages_tags[] = {
     "page3",
     "page4",
     "page5",
+    "page6",
 };
 
 #define NUMBER_PAGES (sizeof(pages_tags) / sizeof(char *))
@@ -174,8 +180,13 @@ void ultradecimalpercent_settings(UIElement* e) {
 void switchTrailColor_settings(UIElement* e) {
     switchTrailColor = e->checkbox.checked;
 }
+
 void switchWaveTrailColor_settings(UIElement* e) {
     switchWaveTrailColor = e->checkbox.checked;
+}
+
+void quickRetry_settings(UIElement* e) {
+    quickRetry = e->checkbox.checked;
 }
 
 void action_left_page(UIElement *e) {
@@ -232,6 +243,11 @@ void action_info_wave_trail(UIElement *e) {
     action_open_info_card(9);
 }
 
+void action_info_quick_retry(UIElement *e) {
+    action_open_info_card(10);
+}
+
+
 static UIAction actions[] = {
     { "exit", exit_settings },
     { "wide", wide_settings },
@@ -249,6 +265,7 @@ static UIAction actions[] = {
     { "ultraDecimalPercent", ultradecimalpercent_settings },
     { "switchTrailColor", switchTrailColor_settings},
     { "switchWaveTrailColor", switchWaveTrailColor_settings},
+    { "quickRetry", quickRetry_settings},
     { "left_page", action_left_page},
     { "right_page", action_right_page},
     { "wideinfo", action_info_wide},
@@ -260,6 +277,7 @@ static UIAction actions[] = {
     { "ultradecimalinfo", action_info_ultra_decimal},
     { "trailcolorinfo", action_info_trail},
     { "wavetrailcolorinfo", action_info_wave_trail},
+    { "quickretryinfo", action_info_quick_retry},
 };
 
 void settings_init() {

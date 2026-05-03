@@ -63,12 +63,20 @@ checkbox x=75 y=175 tag="page4,chk_ultradecimalpercent" scale=0.75 action="ultra
 button x=62 y=162 action="ultradecimalinfo" id=90 scale=0.5 tag="page4"
 label x=90 y=175 text="ULTRA percentage" scale=0.4 tag="page4"
 
-label x=160 y=50 text="Cosmetic" tag="page5" scale=0.6 align=CENTER
+# gameplay part 2
 
-checkbox x=75 y=85 tag="page5,chk_trailcolor" scale=0.75 action="switchTrailColor"
-button x=62 y=72 action="trailcolorinfo" id=90 scale=0.5 tag="page5"
-label x=90 y=85 text="Switch trail color" scale=0.4 tag="page5"
+label x=160 y=50 text="Gameplay" tag="page5" scale=0.6 align=CENTER
 
-checkbox x=75 y=115 tag="page5,chk_wavetrailcolor" scale=0.75 action="switchWaveTrailColor"
-button x=62 y=102 action="wavetrailcolorinfo" id=90 scale=0.5 tag="page5"
-label x=90 y=115 text="Switch wave trail color" scale=0.4 tag="page5"
+checkbox x=75 y=85 tag="page5,chk_quickretry" scale=0.75 action="quickRetry"
+button x=62 y=72 action="quickretryinfo" id=90 scale=0.5 tag="page5"
+label x=90 y=85 text="Quick retry" scale=0.4 tag="page5"
+
+label x=160 y=50 text="Cosmetic" tag="page6" scale=0.6 align=CENTER
+
+checkbox x=75 y=85 tag="page6,chk_trailcolor" scale=0.75 action="switchTrailColor"
+button x=62 y=72 action="trailcolorinfo" id=90 scale=0.5 tag="page6"
+label x=90 y=85 text="Switch trail color" scale=0.4 tag="page6"
+
+checkbox x=75 y=115 tag="page6,chk_wavetrailcolor" scale=0.75 action="switchWaveTrailColor"
+button x=62 y=102 action="wavetrailcolorinfo" id=90 scale=0.5 tag="page6"
+label x=90 y=115 text="Switch wave trail color" scale=0.4 tag="page6"
