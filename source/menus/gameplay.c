@@ -177,12 +177,12 @@ int gameplay_screen_top_loop() {
 
     ui_run_func_on_tag(&screen_top, "progressalert", ui_disable_element);
     ui_run_func_on_tag(&screen_top, "percent", ui_disable_element);
-    ui_set_pos_on_tag(&screen_top, 200, 10, "percent");
+    ui_set_pos_on_tag(&screen_top, 200, 11, "percent");
     percent->label.alignment = 0.5;
 
     if (showProgressBar) {
         ui_run_func_on_tag(&screen_top, "progressalert", ui_enable_element);
-        ui_set_pos_on_tag(&screen_top, 282, 10, "percent");
+        ui_set_pos_on_tag(&screen_top, 282, 11, "percent");
         percent->label.alignment = 0;
     }
 

@@ -2,14 +2,14 @@ darken opacity=0.4
 window x=160 y=120 w=260 h=180 style=1
 # Labelling
 
-label x=160 y=63 text="Notice" font=2 scale=0.9 align=CENTER
+label x=160 y=60 text="Notice" font=2 scale=0.9 align=CENTER
 
 label x=160 y=85 text="This port is a WIP!" scale=0.5 align=CENTER
 
-label x=160 y=107 font=1 text="Many things don't work yet and you might" scale=0.7 align=CENTER
-label x=160 y=119 font=1 text="find game-breaking bugs in various places." scale=0.7 align=CENTER
-label x=160 y=136 font=1 text="To report issues and download the latest" scale=0.7 align=CENTER
-label x=160 y=148 font=1 text="version, please visit the project's GitHub." scale=0.7 align=CENTER
+label x=160 y=104 font=1 text="Many things don't work yet and you might" scale=0.7 align=CENTER
+label x=160 y=116 font=1 text="find game-breaking bugs in various places." scale=0.7 align=CENTER
+label x=160 y=133 font=1 text="To report issues and download the latest" scale=0.7 align=CENTER
+label x=160 y=145 font=1 text="version, please visit the project's GitHub." scale=0.7 align=CENTER
 
 windowbutton x=160 y=180 style=5 text="I understand" scale=0.8 action="exit" font=2 w=140px h=30px
 
