@@ -232,8 +232,8 @@ void game_loop() {
     initParticleSystem(&ship_fire_particles[0], &drag_effect);
     initParticleSystem(&ship_fire_particles[1], &drag_effect);
 
-    initParticleSystem(&secondary_particles[0], &ship_effect);
-    initParticleSystem(&secondary_particles[1], &ship_effect);
+    initParticleSystem(&secondary_particles[0], &drag_effect);
+    initParticleSystem(&secondary_particles[1], &drag_effect);
     
     initParticleSystem(&ship_secondary_particles[0], &drag_effect);
     initParticleSystem(&ship_secondary_particles[1], &drag_effect);
@@ -290,27 +290,37 @@ void game_loop() {
     secondary_particles[0].cfg.startColorRed   = p2_not_white.r / 255.f;
     secondary_particles[0].cfg.startColorGreen = p2_not_white.g / 255.f;
     secondary_particles[0].cfg.startColorBlue  = p2_not_white.b / 255.f;
+    secondary_particles[0].cfg.finishColorAlpha = 1.f;
+    secondary_particles[0].cfg.maxParticles = 15;
+    secondary_particles[0].cfg.speed -= 30;
 
     secondary_particles[1].cfg.startColorRed   = p1_not_white.r / 255.f;
     secondary_particles[1].cfg.startColorGreen = p1_not_white.g / 255.f;
     secondary_particles[1].cfg.startColorBlue  = p1_not_white.b / 255.f;
+    secondary_particles[1].cfg.finishColorAlpha = 1.f;
+    secondary_particles[1].cfg.maxParticles = 15;
+    secondary_particles[1].cfg.speed -= 30;
 
     ship_secondary_particles[0].cfg.startColorRed   = 255.f/ 255.f;
-    ship_secondary_particles[0].cfg.startColorGreen = 65.f / 255.f;
-    ship_secondary_particles[0].cfg.startColorBlue  = 0.f / 255.f;
+    ship_secondary_particles[0].cfg.startColorGreen = 70.f / 255.f;
+    ship_secondary_particles[0].cfg.startColorBlue  = 10.f / 255.f;
+
+    ship_secondary_particles[0].cfg.finishColorRed   = 255.f/ 255.f;
+    ship_secondary_particles[0].cfg.finishColorGreen = 20.f / 255.f;
+    ship_secondary_particles[0].cfg.finishColorBlue  = 0.f / 255.f;
 
     ship_secondary_particles[1].cfg = ship_secondary_particles[0].cfg;
 
     ship_fire_particles[0].cfg.startColorRed   = 255.f / 255.f;
-    ship_fire_particles[0].cfg.startColorGreen = 127.f / 255.f;
-    ship_fire_particles[0].cfg.startColorBlue  = 0.f / 255.f;
+    ship_fire_particles[0].cfg.startColorGreen = 170.f / 255.f;
+    ship_fire_particles[0].cfg.startColorBlue  = 10.f / 255.f;
     
     ship_fire_particles[0].cfg.finishColorRed   = 255.f / 255.f;
     ship_fire_particles[0].cfg.finishColorGreen = 65.f / 255.f;
     ship_fire_particles[0].cfg.finishColorBlue  = 0.f / 255.f;
 
     ship_fire_particles[0].cfg.speed -= 30;
-
+    ship_fire_particles[0].cfg.maxRadius = 130;
     ship_fire_particles[1].cfg = ship_fire_particles[0].cfg;
 
     land_particles[0].cfg.startColorRed   = p1_not_white.r / 255.f;

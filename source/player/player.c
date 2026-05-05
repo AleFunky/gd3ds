@@ -368,7 +368,7 @@ void ufo_gamemode(Player *player) {
     trail->startingPositionInitialized = true;
 
     secondary_particles[state.current_player].emitterX = player->x;
-    secondary_particles[state.current_player].emitterY = fabsf(gravBottom(player)) + (player->upside_down ? -6 : 6);
+    secondary_particles[state.current_player].emitterY = fabsf(gravBottom(player)) + (player->upside_down ? -4 : 4);
     secondary_particles[state.current_player].emitting = true;
 
     secondary_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
