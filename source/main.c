@@ -80,14 +80,18 @@ bool is_citra() {
 
 void no_dsp_firmware(void) {
     consoleInit(GFX_TOP, NULL);
-    printf("\x1b[01;00H/////////////////FATAL///ERROR////////////////////");
-    printf("\x1b[03;00HNDSP could not be initalized.");
+    printf("\x1b[01;00H///////////////////FATAL///ERROR//////////////////");
+    printf("\x1b[03;00HNDSP could not be initalized!");
     printf("\x1b[05;00HThis is probably because your dspfirm is missing.");
-    printf("\x1b[07;00HExtract the ndsp firmware (dspfirm.cdc) to");
-    printf("\x1b[09;00Hsdmc:/3ds/ on your sd card.");
-    printf("\x1b[11;00HCitra/Azahar users only need the file to be there,");
-    printf("\x1b[13;00Hit can be empty.");
-    printf("\x1b[15;00HPress start to exit.");
+    printf("\x1b[07;00HFor 3DS users, open the Luma menu, go to");
+    printf("\x1b[08;00Hmiscellaneous options and press \"Dump DSP");
+    printf("\x1b[09;00Hfirmware\".");
+    printf("\x1b[11;00HFor Citra/Azahar users, open your emulator folder");
+    printf("\x1b[12;00Hand create a file named \"dspfirm.cdc\" in ");
+    printf("\x1b[13;00H/sdmc/3ds/. You only need the file to be there, ");
+    printf("\x1b[14;00Hit can be empty for all the emulator cares.");
+    printf("\x1b[16;00HFor more information, check the GitHub.");
+    printf("\x1b[18;00HPress start to exit.");
     printf("\x1b[30;00H//////////////////////////////////////////////////");
     while (aptMainLoop()) {
         gspWaitForVBlank();
