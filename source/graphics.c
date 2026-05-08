@@ -1156,13 +1156,13 @@ void draw_objects() {
             drawParticleSystem(&glitter_particles, 0, 0, 1.f);
 
             draw_p1_trail(&state.player, 0);
-            MotionTrail_Draw(&trail_p1);
+            if (!noPlayerTrail) MotionTrail_Draw(&trail_p1);
             MotionTrail_DrawWaveTrail(&wave_trail_p1);
             change_blending(true);
 
             draw_p1_trail(&state.player2, 1);
             
-            MotionTrail_Draw(&trail_p2);
+            if (!noPlayerTrail) MotionTrail_Draw(&trail_p2);
             MotionTrail_DrawWaveTrail(&wave_trail_p2);
             change_blending(false);
             state.current_player = 0;

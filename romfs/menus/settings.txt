@@ -84,3 +84,6 @@ label x=90 y=115 text="Switch wave trail color" scale=0.4 tag="page6"
 checkbox x=75 y=145 tag="page6,chk_solidwavetrail" scale=0.75 action="solidWaveTrail"
 button x=62 y=132 action="solidwavetrailinfo" id=90 scale=0.5 tag="page6"
 label x=90 y=145 text="Solid wave trail" scale=0.4 tag="page6"
+
+checkbox x=75 y=175 tag="page6,chk_noplayertrail" scale=0.75 action="noPlayerTrail"
+label x=90 y=175 text="Disable player trail" scale=0.4 tag="page6"

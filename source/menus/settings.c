@@ -43,6 +43,7 @@ bool switchTrailColor = false;
 bool switchWaveTrailColor = false;
 bool quickRetry = false;
 bool solidWaveTrail = false;
+bool noPlayerTrail = false;
 
 
 static Setting settings[] = {
@@ -96,6 +97,9 @@ static Setting settings[] = {
     },
     {
         "chk_solidwavetrail", &solidWaveTrail
+    },
+    {
+        "chk_noplayertrail", &noPlayerTrail
     },
 };
 
@@ -197,6 +201,10 @@ void solidWaveTrail_settings(UIElement* e) {
     solidWaveTrail = e->checkbox.checked;
 }
 
+void noPlayerTrail_settings(UIElement* e) {
+    noPlayerTrail = e->checkbox.checked;
+}
+
 void action_left_page(UIElement *e) {
     current_page--;
     if (current_page < 0) {
@@ -279,6 +287,7 @@ static UIAction actions[] = {
     { "switchWaveTrailColor", switchWaveTrailColor_settings},
     { "quickRetry", quickRetry_settings},
     { "solidWaveTrail", solidWaveTrail_settings},
+    { "noPlayerTrail", noPlayerTrail_settings},
     { "left_page", action_left_page},
     { "right_page", action_right_page},
     { "wideinfo", action_info_wide},

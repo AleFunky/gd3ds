@@ -23,6 +23,7 @@ extern bool switchTrailColor;
 extern bool switchWaveTrailColor;
 extern bool quickRetry;
 extern bool solidWaveTrail;
+extern bool noPlayerTrail;
 
 void settings_init();
 int settings_loop();
