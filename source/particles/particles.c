@@ -348,7 +348,8 @@ void updateParticleSystem(ParticleSystem* ps, float dt) {
 }
 
 static float* alloc_array(int count) {
-    return (float*)malloc(sizeof(float) * count);
+    if (count <= 0) return NULL;
+    return (float*)calloc(count, sizeof(float));
 }
 
 void initParticleData(ParticleData* d, int capacity) {
