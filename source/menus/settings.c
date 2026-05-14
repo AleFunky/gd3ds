@@ -44,7 +44,7 @@ bool switchWaveTrailColor = false;
 bool quickRetry = false;
 bool solidWaveTrail = false;
 bool noPlayerTrail = false;
-
+bool noWaveTrailBehind = false;
 
 static Setting settings[] = {
     {
@@ -101,6 +101,9 @@ static Setting settings[] = {
     {
         "chk_noplayertrail", &noPlayerTrail
     },
+    {
+        "chk_nowavetrailbehind", &noWaveTrailBehind
+    },
 };
 
 
@@ -114,6 +117,7 @@ const char *pages_tags[] = {
     "page4",
     "page5",
     "page6",
+    "page7",
 };
 
 #define NUMBER_PAGES (sizeof(pages_tags) / sizeof(char *))
@@ -205,6 +209,10 @@ void noPlayerTrail_settings(UIElement* e) {
     noPlayerTrail = e->checkbox.checked;
 }
 
+void noWaveTrailBehind_settings(UIElement* e) {
+    noWaveTrailBehind = e->checkbox.checked;
+}
+
 void action_left_page(UIElement *e) {
     current_page--;
     if (current_page < 0) {
@@ -267,6 +275,10 @@ void action_info_solid_wave_trail(UIElement *e) {
     action_open_info_card(11);
 }
 
+void action_info_no_wave_trail_behind(UIElement *e) {
+    action_open_info_card(12);
+}
+
 
 static UIAction actions[] = {
     { "exit", exit_settings },
@@ -288,6 +300,7 @@ static UIAction actions[] = {
     { "quickRetry", quickRetry_settings},
     { "solidWaveTrail", solidWaveTrail_settings},
     { "noPlayerTrail", noPlayerTrail_settings},
+    { "noWaveTrailBehind", noWaveTrailBehind_settings},
     { "left_page", action_left_page},
     { "right_page", action_right_page},
     { "wideinfo", action_info_wide},
@@ -301,6 +314,7 @@ static UIAction actions[] = {
     { "wavetrailcolorinfo", action_info_wave_trail},
     { "quickretryinfo", action_info_quick_retry},
     { "solidwavetrailinfo", action_info_solid_wave_trail},
+    { "nowavetrailbehindinfo", action_info_no_wave_trail_behind}
 };
 
 void settings_init() {

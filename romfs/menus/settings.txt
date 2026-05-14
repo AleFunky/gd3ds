@@ -87,3 +87,10 @@ label x=90 y=145 text="Solid wave trail" scale=0.4 tag="page6"
 
 checkbox x=75 y=175 tag="page6,chk_noplayertrail" scale=0.75 action="noPlayerTrail"
 label x=90 y=175 text="Disable player trail" scale=0.4 tag="page6"
+
+label x=160 y=52 text="Cosmetic" tag="page7" scale=0.6 align=CENTER
+
+checkbox x=75 y=85 tag="page7,chk_nowavetrailbehind" scale=0.75 action="noWaveTrailBehind"
+button x=62 y=72 action="nowavetrailbehindinfo" id=90 scale=0.5 tag="page7"
+label x=90 y=85 text="No wave trail behind" scale=0.4 tag="page7"
+

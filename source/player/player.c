@@ -14,7 +14,7 @@
 #include "main.h"
 
 #include "mp3_player.h"
-
+#include "menus/settings.h"
 #include "utils/gfx.h"
 
 inline float gravFloor(Player *player) { return player->upside_down ? -state.ceiling_y : state.ground_y; }
@@ -509,7 +509,7 @@ void clamp_player_ground(Player *player) {
 void run_player(Player *player) {
     float scale = (player->mini) ? 0.6f : 1.f;
     trail->stroke = 10.f * scale;
-    wave_trail->stroke = 15.f * map_range(amplitude, 0.f, 1.f, 0.1f, 1.f) * scale;
+    wave_trail->stroke = 18.f * map_range(amplitude, 0.f, 1.f, 0.1f, 1.f) * scale;
 
     if (!player->left_ground) {
         // Ground
@@ -580,7 +580,11 @@ void run_player(Player *player) {
             glitter_particles.emitterX = state.camera_x_middle;
             glitter_particles.emitterY = state.camera_y_middle;
             glitter_particles.emitting = true;
-            MotionTrail_ResumeStroke(trail);
+            if (noWaveTrailBehind) {
+                MotionTrail_StopStroke(trail);
+            } else {
+                MotionTrail_ResumeStroke(trail);
+            }
             wave_gamemode(player);
             break;
     } 

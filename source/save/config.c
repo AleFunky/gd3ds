@@ -39,6 +39,7 @@ void init_values() {
     config_init_bool(&cfg, CONFIG_COSMETIC_PATH "switchWaveTrailColor", false);
     config_init_bool(&cfg, CONFIG_COSMETIC_PATH "solidWaveTrail", false);
     config_init_bool(&cfg, CONFIG_COSMETIC_PATH "noPlayerTrail", false);
+    config_init_bool(&cfg, CONFIG_COSMETIC_PATH "noWaveTrailBehind", false);
 
     config_init_int(&cfg, CONFIG_CUSTOMIZATION_PATH "cube", 1);
     config_init_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ship", 1);
@@ -82,6 +83,7 @@ void cfg_init() {
     switchWaveTrailColor = config_get_bool(&cfg, CONFIG_COSMETIC_PATH "switchWaveTrailColor", false);
     solidWaveTrail = config_get_bool(&cfg, CONFIG_COSMETIC_PATH "solidWaveTrail", false);
     noPlayerTrail = config_get_bool(&cfg, CONFIG_COSMETIC_PATH "noPlayerTrail", false);
+    noWaveTrailBehind = config_get_bool(&cfg, CONFIG_COSMETIC_PATH "noWaveTrailBehind", false);
 
     selected_cube = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "cube", 1);
     selected_ship = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ship", 1);
@@ -135,6 +137,7 @@ void cfg_save() {
     config_set_bool(&cfg, CONFIG_COSMETIC_PATH "switchWaveTrailColor", switchWaveTrailColor);
     config_set_bool(&cfg, CONFIG_COSMETIC_PATH "solidWaveTrail", solidWaveTrail);
     config_set_bool(&cfg, CONFIG_COSMETIC_PATH "noPlayerTrail", noPlayerTrail);
+    config_set_bool(&cfg, CONFIG_COSMETIC_PATH "noWaveTrailBehind", noWaveTrailBehind);
 
     config_save(&cfg);
 }

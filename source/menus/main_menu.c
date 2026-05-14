@@ -104,11 +104,11 @@ void action_open_info_card(int id, UIElement* e) {
             break;
         case 8:
             // Switch trail color
-            set_info_content("Make the player trail use P1", "instead of P2.", true);
+            set_info_content("Makes the player trail use P1", "instead of P2.", true);
             break;
         case 9:
             // Switch wave trail color
-            set_info_content("Make the wave trail use P1", "instead of P2.", true);
+            set_info_content("Makes the wave trail use P1", "instead of P2.", true);
             break;
         case 10:
             // quick retry info
@@ -117,6 +117,10 @@ void action_open_info_card(int id, UIElement* e) {
         case 11:
             // solid trail info
             set_info_content("Disables blending for the wave trail.", "", false);
+            break;
+        case 12:
+            // no wave trail behind info
+            set_info_content("Disables player trail for the wave.", "", false);
             break;
     }
     in_info_card = true;
