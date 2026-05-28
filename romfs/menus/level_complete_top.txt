@@ -1,3 +1,24 @@
-window x=160 y=120 w=300 h=200 style=1 tag="window"
+darken x=200 y=120 w=280 h=180 opacity=0.6 tag="window"
 
-label x=160 y=88 font=2 text="peak" scale=0.9 align=CENTER tag="window"
+# chains (left, right)
+image x=80 y=-15 id=121 scale=1 sheet=3 tag="window"
+image x=320 y=-15 id=121 scale=1 sheet=3 tag="window"
+
+# main window
+
+image x=200 y=120 id=14 scale=1.2 sheet=1 tag="window"
+
+image x=200 y=65 id=91 scale=0.62 sheet=0 tag="window,levelcomplete"
+# image x=200 y=65 id=147 scale=0.68 sheet=0 tag="window,practicecomplete"
+ 
+
+
+label x=200 y=95 font=2 text="Attempts:" scale=0.67 align=CENTER tag="window"
+label x=200 y=113 font=2 text="Jumps:" scale=0.67 align=CENTER tag="window"
+label x=200 y=131 font=2 text="Time:" scale=0.67 align=CENTER tag="window"
+
+image x=150 y=170 id=23 scale=0.44 sheet=1 tag="window,coin1"
+image x=200 y=170 id=23 scale=0.44 sheet=1 tag="window,coin2"
+image x=250 y=170 id=23 scale=0.44 sheet=1 tag="window,coin3"
+
+# label x=200 y=175 font=0 text="That was kinda sloppy" scale=0.6 align=CENTER tag="window"

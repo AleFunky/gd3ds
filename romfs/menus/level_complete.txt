@@ -1,5 +1,4 @@
-window x=160 y=120 w=300 h=200 style=1 tag="window"
+darken opacity=0.6 x=160 y=120 w=320 h=244 tag="window"
 
-label x=160 y=88 font=2 text="Level complete" scale=0.9 align=CENTER tag="window"
-button x=178 y=180 id=111 scale=0.90 tag="paused" action="exit" tag="window"
-button x=112 y=180 id=155 scale=0.90 tag="paused" action="restart" tag="window"
+button x=100 y=120 id=111 scale=1 tag="paused" action="exit" tag="window"
+button x=220 y=120 id=155 scale=1 tag="paused" action="restart" tag="window"
