@@ -67,6 +67,7 @@ extern const UseEffectDefinition wave_radius_effect;
 extern const UseEffectDefinition size_change_big_effect;
 extern const UseEffectDefinition end_wall_filled_first;
 extern const UseEffectDefinition end_wall_filled_second;
+extern const UseEffectDefinition end_wall_filled_title;
 extern const UseEffectDefinition end_wall_firework_circle;
 extern const UseEffectDefinition end_wall_circunference;
 

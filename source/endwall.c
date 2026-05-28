@@ -97,13 +97,24 @@ int handle_wall_cutscene(float delta) {
                 effect->def.colorB = p1_white.b / 255.f;
             }
 
+            // Pop up circle
+            float calc_x = state.camera_x + (SCREEN_WIDTH_AREA / 2);
+            float calc_y = state.camera_y + (SCREEN_HEIGHT - (SCREEN_HEIGHT_AREA / 2));
+            UseEffect *effect2 = add_use_effect(calc_x, calc_y, USE_EFFECT_OBJ_NOTHING, &end_wall_filled_title, GFX_TOP_BUT_ABOVE_LEVEL);
+            if (effect2) {
+                Color p1_white = get_white_if_black(p1_color);
+                effect2->def.colorR = p1_white.r / 255.f;
+                effect2->def.colorG = p1_white.g / 255.f;
+                effect2->def.colorB = p1_white.b / 255.f;
+            }
+
             level_complete_effect_p1.emitterX = SCREEN_WIDTH_AREA / 2;
             level_complete_effect_p1.emitterY = SCREEN_HEIGHT_AREA / 2;
             level_complete_effect_p2.emitterX = SCREEN_WIDTH_AREA / 2;
             level_complete_effect_p2.emitterY = SCREEN_HEIGHT_AREA / 2;
 
-            spawnMultipleParticles(&level_complete_effect_p1, 100);
-            spawnMultipleParticles(&level_complete_effect_p2, 100);
+            spawnMultipleParticles(&level_complete_effect_p1, 200);
+            spawnMultipleParticles(&level_complete_effect_p2, 200);
         }
 
         // Fireworks
