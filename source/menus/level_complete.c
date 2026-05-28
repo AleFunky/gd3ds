@@ -7,6 +7,7 @@
 #include "menus/components/ui_window.h"
 #include "menus/components/ui_textbox.h"
 #include "menus/components/ui_image.h"
+#include "menus/components/ui_label.h"
 #include "fonts/bigFont.h"
 #include "fonts/chatFont.h"
 #include "fonts/goldFont.h"
@@ -18,6 +19,7 @@
 #include "main_menu.h"
 #include "level_select.h"
 #include "info_card.h"
+#include "state.h"
 
 #define ANIM_DURATION 1.f
 #define RESTART_ANIM_DURATION 0.5f
@@ -36,6 +38,10 @@ static float window_y_pos = 0;
 
 static UIScreen screen_top;
 static UIScreen screen;
+
+static UIElement *attempt_text;
+static UIElement *jumps_text;
+static UIElement *time_text;
 
 static void exit_level_complete(UIElement* e) {
     play_sfx(&quit_sound, 1);
@@ -65,13 +71,13 @@ static void run_start_animation(float delta) {
 
     ui_set_pos_on_tag(&screen, SCREEN_BOT_WIDTH / 2, window_y_pos, "window");
     ui_set_pos_on_tag(&screen_top, SCREEN_WIDTH / 2, window_y_pos, "window");
-    anim_time += delta;
 
     // Animation end
     if (anim_time >= ANIM_DURATION) {
         animating_down = false;
         anim_time = 0;
     }
+    anim_time += delta;
 }
 
 // This runs the animation that happens when you press "restart"
@@ -81,7 +87,7 @@ static void run_restart_animation(float delta) {
 
     ui_set_pos_on_tag(&screen, SCREEN_BOT_WIDTH / 2, window_y_pos, "window");
     ui_set_pos_on_tag(&screen_top, SCREEN_WIDTH / 2, window_y_pos, "window");
-    anim_time += delta;
+    
 
     // Animation end
     if (anim_time >= RESTART_ANIM_DURATION) {
@@ -89,6 +95,7 @@ static void run_restart_animation(float delta) {
         restart = true;
         anim_time = 0;
     }
+    anim_time += delta;
 }
 
 
@@ -96,6 +103,24 @@ void level_complete_init() {
     init = true;
     ui_load_screen(&screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/level_complete_top.txt");
     ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/level_complete.txt");
+
+    char attempts[64];
+    char jumps[64];
+    char time[64];
+
+    snprintf(attempts, sizeof(attempts), "Attempts: %d", state.current_data.attempts);
+    snprintf(jumps, sizeof(jumps), "Jumps: %d", 0);
+    snprintf(time, sizeof(time), "Time: %02d:%02d", 0, 0);
+
+    attempt_text = ui_get_element_by_tag(&screen_top, "attempts");
+    if (attempt_text) ui_label_set_text(attempt_text, attempts);
+
+    jumps_text = ui_get_element_by_tag(&screen_top, "jumps");
+    if (jumps_text) ui_label_set_text(jumps_text, jumps);
+
+    time_text = ui_get_element_by_tag(&screen_top, "time");
+    if (time_text) ui_label_set_text(time_text, time);
+
     yes_exit = false;
     restart = false;
     animating_down = true;

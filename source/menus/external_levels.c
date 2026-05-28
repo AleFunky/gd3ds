@@ -73,7 +73,8 @@ void load_level_folder(char *folder) {
     char path[320+5];
     sprintf(path, "Root/%s", current_path);
     truncate_filename_start(path, 30, sizeof(path));
-    strncpy(path_label->label.text, path, sizeof(path_label->label.text));
+    
+    ui_label_set_text(path_label,path);
 
     int count = 0;
     FileOrFolder *entries = load_folder(folder, &count);

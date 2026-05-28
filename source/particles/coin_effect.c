@@ -89,7 +89,7 @@ void draw_collect_effect() {
             
             C2D_SpriteFromSheet(&spr, spriteSheet2, index);
             C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
-            C2D_SpriteSetPos(&spr, calc_x, calc_y);
+            C2D_SpriteSetPos(&spr, get_mirror_x(calc_x, state.mirror_factor), calc_y);
             C2D_SpriteSetScale(&spr, state.mirror_mult, 1.f);
             C2D_DrawSpriteTinted(&spr, &tint);
         }

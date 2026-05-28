@@ -13,9 +13,9 @@ image x=200 y=65 id=91 scale=0.62 sheet=0 tag="window,levelcomplete"
  
 
 
-label x=200 y=95 font=2 text="Attempts:" scale=0.67 align=CENTER tag="window"
-label x=200 y=113 font=2 text="Jumps:" scale=0.67 align=CENTER tag="window"
-label x=200 y=131 font=2 text="Time:" scale=0.67 align=CENTER tag="window"
+label x=200 y=95 font=2 text="Attempts:" scale=0.67 align=CENTER tag="window,attempts"
+label x=200 y=113 font=2 text="Jumps:" scale=0.67 align=CENTER tag="window,jumps"
+label x=200 y=131 font=2 text="Time:" scale=0.67 align=CENTER tag="window,time"
 
 image x=150 y=170 id=23 scale=0.44 sheet=1 tag="window,coin1"
 image x=200 y=170 id=23 scale=0.44 sheet=1 tag="window,coin2"

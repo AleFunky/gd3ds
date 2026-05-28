@@ -765,6 +765,7 @@ void game_loop() {
                 // Restarting level
             } else if (status == 2) {
                 level_info.completing = false;
+                level_complete_destroy();
                 continue;
             }
         }  

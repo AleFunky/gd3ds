@@ -206,6 +206,8 @@ float get_text_length(const Charset *font, const float zoom_x, const char *text)
     return text_length;
 }
 
+#define SPACING 6.f
+
 void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const float y, const float scale, float alignment, const char *text, ...) {
     if (!text || !sheet) {
         return;
@@ -232,8 +234,8 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
 
     // Get total text height
     int line_count = count_lines(tmp) - 1;
-    float line_height = height * scale;
-    float total_height = line_count * line_height;
+    float line_height = (height * scale) + SPACING * scale;
+    float total_height = (line_count * line_height) - SPACING * scale;
 
     C2D_ImageTint tint = { 0 };
     u32 current_color = white;
@@ -246,8 +248,8 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
             if (read_tag(tmp, &i, tag, sizeof(tag))) {                
                 if (strcmp(tag, "p") == 0) {
                     offset_x = 0;
-
-                    offset_y += height * scale;
+                    
+                    offset_y += line_height;
 
                     // Measure next line
                     line_length = get_line_length(

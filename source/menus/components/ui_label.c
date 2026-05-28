@@ -19,6 +19,10 @@ static void ui_label_draw(UIElement* e) {
     draw_text(font->charset, font->sheet, e->x, e->y, e->label.scale, e->label.alignment, "%s", e->label.text);
 }
 
+void ui_label_set_text(UIElement *e, const char *text) {
+    strncpy(e->label.text, text, sizeof(e->label.text) - 1);
+}
+
 UIElement ui_create_label(int x, int y, float scale, char *text, int font, float alignment, char (*tag)[TAG_LENGTH]) {
     UIElement e = {0};
 

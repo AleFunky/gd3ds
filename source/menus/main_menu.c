@@ -77,51 +77,51 @@ void action_open_info_card(int id, UIElement* e) {
     switch (id) {
         case 1:
             // wide mode info
-            set_info_content("Doubles the top screen's horizontal", "resolution.", true);
+            set_info_content("Doubles the top screen's horizontal<p>resolution.");
             break;
         case 2:
             // global tap effect info
-            set_info_content("Plays the tap effect across all menus.", "", false);
+            set_info_content("Plays the tap effect across all menus.");
             break;
         case 3:
             // more jump buttons info
-            set_info_content("Swaps your jump input to Y.", "", false);
+            set_info_content("Swaps your jump input to Y.");
             break;
         case 4:
             // hitboxes info
-            set_info_content("Shows object hitboxes while in a level.", "WARNING: AFFECTS PERFORMANCE!", true);
+            set_info_content("Shows object hitboxes while in a level<p>WARNING: AFFECTS PERFORMANCE!");
             break;
         case 5:
             // debug info
-            set_info_content("Enables debug key shortcuts.", "(L, R, X)", true);
+            set_info_content("Enables debug key shortcuts.<p>(L, R, X)");
             break;
         case 6:
             // accurate percentage info
-            set_info_content("Shows level progress with 2 decimals.", "", false);
+            set_info_content("Shows level progress with 2 decimals.");
             break;
         case 7:
             // ULTRA accurate percentage info
-            set_info_content("But mom! I want more decimals!!!!", "(use at your own risk)", true);
+            set_info_content("But mom! I want more decimals!!!!<p>(use at your own risk)");
             break;
         case 8:
             // Switch trail color
-            set_info_content("Makes the player trail use P1", "instead of P2.", true);
+            set_info_content("Makes the player trail use P1<p>instead of P2.");
             break;
         case 9:
             // Switch wave trail color
-            set_info_content("Makes the wave trail use P1", "instead of P2.", true);
+            set_info_content("Makes the wave trail use P1<p>instead of P2.");
             break;
         case 10:
             // quick retry info
-            set_info_content("Restarts in 0,5 seconds instead of 1.", "", false);
+            set_info_content("Restarts in 0,5 seconds instead of 1.");
             break;
         case 11:
             // solid trail info
-            set_info_content("Disables blending for the wave trail.", "", false);
+            set_info_content("Disables blending for the wave trail.");
             break;
         case 12:
             // no wave trail behind info
-            set_info_content("Disables player trail for the wave.", "", false);
+            set_info_content("Disables player trail for the wave.");
             break;
     }
     in_info_card = true;

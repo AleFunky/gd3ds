@@ -8,6 +8,7 @@
 #include "menus/components/ui_textbox.h"
 #include "menus/components/ui_image.h"
 #include "menus/components/ui_progress_bar.h"
+#include "menus/components/ui_label.h"
 #include "fonts/bigFont.h"
 #include "main.h"
 #include "easing.h"
@@ -148,7 +149,7 @@ void gameplay_screen_init() {
     
     ui_window_set_tint(ui_get_element_by_tag(&screen_top, "bgwindow"), C2D_Color32(0, 0, 0, 127));
 
-    strncpy(level_name->label.text, level_info.level_name, 255);
+    ui_label_set_text(level_name, level_info.level_name);
     
     // hide coins if level is a custom level
     if(state.custom_level == true){

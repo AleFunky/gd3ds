@@ -109,8 +109,7 @@ void loading_screen_init() {
 
     char *text = splash_texts[text_index];
 
-    strncpy(splashtext->label.text, text, sizeof(splashtext->label.text) - 1);
-
+    ui_label_set_text(splashtext, text);
 }
 
 void loading_screen_update(float progress) {    

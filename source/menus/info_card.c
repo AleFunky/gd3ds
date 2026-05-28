@@ -7,6 +7,7 @@
 #include "menus/components/ui_window.h"
 #include "menus/components/ui_textbox.h"
 #include "menus/components/ui_image.h"
+#include "menus/components/ui_label.h"
 #include "fonts/bigFont.h"
 #include "fonts/chatFont.h"
 #include "fonts/goldFont.h"
@@ -23,8 +24,6 @@ static bool yes_exit = false;
 
 static UIScreen screen;
 static UIElement *content;
-static UIElement *content1;
-static UIElement *content2;
 
 void exit_info_card(UIElement* e) {
     yes_exit = true;
@@ -34,16 +33,9 @@ static UIAction actions[] = {
     { "exit", exit_info_card},
 };
 
-void set_info_content(char *text, char *text2, bool splitText) {
+void set_info_content(char *text) {
     content = ui_get_element_by_tag(&screen, "content");
-    content1 = ui_get_element_by_tag(&screen, "content1");
-    content2 = ui_get_element_by_tag(&screen, "content2");
-    if (splitText){
-        strncpy(content1->label.text, text, 255);
-        strncpy(content2->label.text, text2, 255);
-    } else {
-        strncpy(content->label.text, text, 255);
-    }
+    ui_label_set_text(content, text);
 }
 
 void info_card_init() {

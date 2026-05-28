@@ -1,4 +1,4 @@
-darken opacity=0.6 x=160 y=120 w=320 h=244 tag="window"
+darken opacity=0.6 x=160 y=120 w=320 h=240 tag="window"
 
 button x=100 y=120 id=111 scale=1 tag="paused" action="exit" tag="window"
 button x=220 y=120 id=155 scale=1 tag="paused" action="restart" tag="window"

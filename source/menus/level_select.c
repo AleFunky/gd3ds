@@ -7,6 +7,7 @@
 #include "menus/components/ui_window.h"
 #include "menus/components/ui_textbox.h"
 #include "menus/components/ui_image.h"
+#include "menus/components/ui_label.h"
 #include "fonts/bigFont.h"
 #include "main.h"
 #include "easing.h"
@@ -100,8 +101,8 @@ void update_level_name(int level, int card) {
 
     e->label.scale = txt_scale;
 
-    strncpy(e->label.text, main_levels[level].level_name, 255);
-    strncpy(level_card_title_top->label.text, main_levels[level].level_name, 255);
+    ui_label_set_text(e, main_levels[level].level_name);
+    ui_label_set_text(level_card_title_top, main_levels[level].level_name);
 }
 
 void update_level_stars(int level, int card) {
@@ -111,7 +112,7 @@ void update_level_stars(int level, int card) {
     UIElement *e = (card) ? level_card_2_stars : level_card_stars;
     char stars[10] = { 0 };
     snprintf(stars, 9, "%d", main_levels[level].stars);
-    strncpy(e->label.text, stars, 255);
+    ui_label_set_text(e, stars);
 }
 
 void update_level_face(int level) {
