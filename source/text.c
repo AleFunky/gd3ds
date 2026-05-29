@@ -328,10 +328,10 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
             
             float base_y = y - total_height / 2.f;
             float final_x = x + offset_x + xoffset - line_length * alignment;
-            float final_y = base_y + offset_y + yoffset - (int)(height * scale);
+            float final_y = base_y + offset_y + yoffset - height * scale;
 
-            final_x = (scale == 1.0f) ? roundf(final_x) : final_x;
-            final_y = (scale == 1.0f) ? roundf(final_y) : final_y;
+            final_x = final_x;
+            final_y = final_y;
 
             if (index >= 0) { 
                 // Draw glyph so its center is at (final_x, final_y)

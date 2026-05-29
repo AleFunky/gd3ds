@@ -1,4 +1,4 @@
---atlas --border transparent -f rgba8888 -z auto
+--atlas --border edge -f rgba8888 -z auto
 bigFont_glyphs/bigFont_glyph_33.png
 bigFont_glyphs/bigFont_glyph_34.png
 bigFont_glyphs/bigFont_glyph_35.png

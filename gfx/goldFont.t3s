@@ -1,4 +1,4 @@
---atlas --border transparent -f rgba8888 -z auto
+--atlas --border edge -f rgba8888 -z auto
 goldFont_glyphs/goldFont_glyph_33.png
 goldFont_glyphs/goldFont_glyph_34.png
 goldFont_glyphs/goldFont_glyph_35.png

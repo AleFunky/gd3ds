@@ -1,4 +1,4 @@
---atlas --border transparent -f rgba8888 -z auto
+--atlas --border edge -f rgba8888 -z auto
 chatFont_glyphs/chatFont_glyph_33.png
 chatFont_glyphs/chatFont_glyph_34.png
 chatFont_glyphs/chatFont_glyph_35.png
