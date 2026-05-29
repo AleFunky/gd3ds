@@ -281,7 +281,7 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
     // Get total text height
     int line_count = count_lines(tmp) - 1;
     float line_height = (height * scale) + SPACING * scale;
-    float total_height = (line_count * line_height) - SPACING * scale;
+    float total_height = (line_count * line_height);
 
     C2D_ImageTint tint = { 0 };
     u32 current_color = white;

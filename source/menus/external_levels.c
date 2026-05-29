@@ -98,6 +98,10 @@ void load_level_folder(char *folder) {
                 ui_list_add(list, &texts[i]);
             }
         }
+
+        if (count == 0) {
+            ui_run_func_on_tag(&screen, "no_levels", ui_enable_element);
+        }
     } else {
         ui_run_func_on_tag(&screen, "no_levels", ui_enable_element);
     }
