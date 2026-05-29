@@ -7,8 +7,7 @@ label x=160 y=64 text="Notice" font=2 scale=0.9 align=CENTER
 label x=160 y=95 text="This feature has NOT" scale=0.5 align=CENTER
 label x=160 y=110 text="been implemented yet!" scale=0.5 align=CENTER
 
-label x=160 y=134 font=1 text="Do not make an issue about this" scale=0.7 align=CENTER
-label x=160 y=144 font=1 text="on GitHub." scale=0.7 align=CENTER
+label x=160 y=139 font=1 text="Hang tight! It might be added<p> in the future." scale=0.7 align=CENTER
 
 windowbutton x=160 y=180 style=5 text="I understand" scale=0.8 action="exit" font=2 w=140px h=30px
 

@@ -9,5 +9,4 @@ image x=200 y=60 id=10 sheet=1
 
 window x=200 y=160 w=240 h=100 style=1
 
-label x=200 y=150 font=1 scale=0.9 text="Search for user-generated" align=CENTER
-label x=200 y=168 font=1 scale=0.9 text="levels online!" align=CENTER
+label x=200 y=157 font=1 scale=0.9 text="Search for user-generated<p>levels online!" align=CENTER

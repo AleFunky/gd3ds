@@ -26,6 +26,7 @@
 #include "external_levels.h"
 #include "search_menu.h"
 #include "creator_menu.h"
+#include "generic_disclaimer.h"
 #include "soggy.h"
 
 #include "gameplay.h"
@@ -36,6 +37,7 @@
 
 static int new_state = 0;
 static bool exit_flag = false;
+static bool in_disclaimer = false;
 
 static UIScreen screen;
 static UIScreen screen_top;
@@ -53,13 +55,19 @@ static void action_open_external_menu(UIElement *e) {
 }
 
 static void action_open_saved_menu(UIElement *e) {
-    new_state = STATE_SAVED_LEVELS;
-    set_fade_status(FADE_STATUS_OUT);
+    //disabled for release build
+    // new_state = STATE_SAVED_LEVELS;
+    // set_fade_status(FADE_STATUS_OUT);
+    in_disclaimer = true;
+    disclaimer_init();
 }
 
 static void action_open_search_menu(UIElement *e) {
-    new_state = STATE_SEARCH_MENU;
-    set_fade_status(FADE_STATUS_OUT);
+    // disabled for release build
+    // new_state = STATE_SEARCH_MENU;
+    // set_fade_status(FADE_STATUS_OUT);
+    in_disclaimer = true;
+    disclaimer_init();
 }
 
 static void action_open_soggy_menu(UIElement *e) {
@@ -100,9 +108,6 @@ void creator_menu_loop() {
     while (aptMainLoop()) {
         hidScanInput();
         u32 kDown = hidKeysDown();
-        if (kDown & KEY_B) {
-            action_exit(NULL);
-        }
 
         UIInput touch;
         touchPosition touchPos;
@@ -110,9 +115,15 @@ void creator_menu_loop() {
         touch.touchPosition = touchPos;
         touch.did_something = false;
         touch.interacted = false;
+        if (!in_disclaimer) {
+            ui_screen_update(&screen, &touch);
+            if (kDown & KEY_B) {
+                action_exit(NULL);
+            }
+        }
 
-        ui_screen_update(&screen, &touch);
         
+
         do {
             update_touch_effect(DT);
             
@@ -124,6 +135,13 @@ void creator_menu_loop() {
             draw_fade();
 
             ui_screen_draw(&screen);
+
+            if (in_disclaimer) {
+                int returned = disclaimer_loop();
+                if (returned) {
+                    in_disclaimer = false;
+                }
+            }
 
             change_blending(true);
             draw_touch_effect();

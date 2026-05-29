@@ -84,7 +84,7 @@ static void ui_external_level_card_draw(UIElement* e) {
     C2D_SpriteSetScale(&e->external_level_card.icon.sprite, e->external_level_card.icon.scaleX, e->external_level_card.icon.scaleY);
     C2D_DrawSprite(&e->external_level_card.icon.sprite);
 
-    draw_text(&bigFont_fontCharset, &bigFont_sheet, text_pos, e->y, e->external_level_card.label.scale, e->external_level_card.label.alignment, "%s", e->external_level_card.label.text);
+    draw_text(&bigFont_fontCharset, &bigFont_sheet, text_pos, e->y+1, e->external_level_card.label.scale, e->external_level_card.label.alignment, "%s", e->external_level_card.label.text);
 
     float scale = e->external_level_card.button.hoverScale;
 

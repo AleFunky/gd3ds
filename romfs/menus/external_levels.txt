@@ -4,14 +4,8 @@ button x=20 y=28 id=6 action="exit"
 window x=180 y=120 w=270 h=230 style=6
 window x=180 y=128 w=250 h=194 style=7
 list x=180 y=128 w=240 h=184 tag="list"
-label x=55 y=20 font=1 scale=0.9 text="" align=LEFT tag="path" 
+label x=55 y=21 font=1 scale=0.9 text="" align=LEFT tag="path" 
 label x=180 y=64 font=0 scale=0.7 text="No levels found!" align=CENTER tag="no_levels" 
-label x=180 y=92 font=1 scale=0.7 text="To import levels, navigate to \3ds\gd3ds\" align=CENTER tag="no_levels" 
-label x=180 y=104 font=1 scale=0.7 text="on your SD card and copy the .gmd's" align=CENTER tag="no_levels" 
-label x=180 y=116 font=1 scale=0.7 text="of your choice along with their matching" align=CENTER tag="no_levels" 
-label x=180 y=128 font=1 scale=0.7 text="songs to \external_levels\ and" align=CENTER tag="no_levels"
-label x=180 y=140 font=1 scale=0.7 text="\custom_songs\ respectively." align=CENTER tag="no_levels"
-label x=180 y=166 font=1 scale=0.7 text="For more detailed instructions," align=CENTER tag="no_levels" 
-label x=180 y=178 font=1 scale=0.7 text="check the project's GitHub." align=CENTER tag="no_levels" 
-
+label x=180 y=111 font=1 scale=0.7 text="To import levels, navigate to \3ds\gd3ds\<p>on your SD card and copy the .gmd's<p>of your choice along with their matching<p>songs to \external_levels\ and<p>\custom_songs\ respectively." align=CENTER tag="no_levels" 
+label x=180 y=166 font=1 scale=0.7 text="For more detailed instructions,<p>check the project's GitHub." align=CENTER tag="no_levels" 
 button x=302 y=18 id=200 scale=0.9 action="go_back"

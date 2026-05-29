@@ -72,7 +72,7 @@ void load_level_folder(char *folder) {
 
     char path[320+5];
     sprintf(path, "Root/%s", current_path);
-    truncate_filename_start(path, 30, sizeof(path));
+    truncate_filename_start(path, 27, sizeof(path));
     
     ui_label_set_text(path_label,path);
 

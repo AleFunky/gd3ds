@@ -3,30 +3,16 @@
 #include "menus/components/ui_element.h"
 #include "menus/components/ui_screen.h"
 #include "math_helpers.h"
-#include "menus/components/ui_list.h"
 #include "menus/components/ui_window.h"
 #include "menus/components/ui_textbox.h"
 #include "menus/components/ui_image.h"
-#include "menus/components/ui_progress_bar.h"
 #include "menus/components/ui_label.h"
-#include "fonts/bigFont.h"
 #include "main.h"
-#include "easing.h"
 #include "color_channels.h"
-#include "mp3_player.h"
 #include "graphics.h"
-#include "main_menu.h"
-#include "level_select.h"
-#include "state.h"
 
 #include "generic_disclaimer.h"
 #include "search_menu.h"
-
-#include "gameplay.h"
-
-#include "save/config.h"
-#include "utils/folders.h"
-#include "level_loading.h"
 
 static bool in_disclaimer = false;
 static bool exit_flag = false;
@@ -65,11 +51,6 @@ void search_menu_loop() {
 
 
     set_fade_status(FADE_STATUS_IN);
-
-    if (!playing_menu_loop) {
-        play_mp3("romfs:/songs/menuLoop.mp3", true, 0);
-        playing_menu_loop = true;
-    }
 
     while (aptMainLoop()) {
         hidScanInput();

@@ -34,7 +34,7 @@
 #include "particles/circles.h"
 
 #define DEATH_WAITING_TIME 0.5f
-#define OFFSCREEN_BUFFER 60
+#define OFFSCREEN_BUFFER 240
 
 static Player title_screen_player;
 static bool title_screen_player_hold = false;
@@ -197,7 +197,7 @@ void reset_players() {
     level_info.wall_x = 9999999999999999999.f;
     level_info.wall_y = 0;
     init_player(&title_screen_player);
-    title_screen_player.x = -60;
+    title_screen_player.x = -120;
     title_screen_player.upside_down = false;
     state.speed = random_int(0, SPEED_COUNT - 1);
     title_screen_player.rotation = 0;
