@@ -3,9 +3,9 @@ bggradient tag="gradient"
 image x=200 y=150 id=0 sheet=6 scale=0.75
 
 image x=385 y=15 id=184 scale=0.7
-label x=370 y=15 text="0" align=RIGHT scale=0.5 tag="star_text"
+label x=370 y=16 text="0" align=RIGHT scale=0.5 tag="star_text"
 image x=385 y=35 id=33 scale=0.7
-label x=370 y=35 text="0" align=RIGHT scale=0.5 tag="secretcoins_text"
+label x=370 y=36 text="0" align=RIGHT scale=0.5 tag="secretcoins_text"
 
 image x=36 y=35 id=178 sy=-1.0
 image x=36 y=205 id=178
