@@ -342,7 +342,7 @@ void init_variables() {
 
 void handle_death(Player *player) {
     play_sfx(&explode_sound, 1);
-    if (song_loaded) {
+    if (song_loaded && !playing_menu_loop) {
         pause_playback_mp3();
         seek_mp3(level_info.song_offset);
     }
