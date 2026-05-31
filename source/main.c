@@ -465,8 +465,11 @@ void game_loop() {
         }
     }
 
-    if (song_loaded) pause_playback_mp3();
-
+    if (song_loaded) {
+		pause_playback_mp3();
+		bool playing_menu_loop = false;
+	}
+	
     set_fade_status(FADE_STATUS_IN);
 
     bool being_faded = true;
