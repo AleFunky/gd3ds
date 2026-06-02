@@ -11,6 +11,7 @@ extern int selected_ship;
 extern int selected_ball;
 extern int selected_ufo;
 extern int selected_wave;
+extern int selected_trail;
 
 extern int selected_p1;
 extern int selected_p2;

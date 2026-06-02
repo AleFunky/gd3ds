@@ -41,12 +41,14 @@ static int current_ship_page = 0;
 static int current_ball_page = 0;
 static int current_ufo_page  = 0;
 static int current_wave_page = 0;
+static int current_trail_page = 0;
 
 int selected_cube = 1;
 int selected_ship = 1;
 int selected_ball = 1;
 int selected_ufo  = 1;
 int selected_wave = 1;
+int selected_trail = 1;
 
 int selected_p1 = 0;
 int selected_p2 = 0;
@@ -59,7 +61,8 @@ static const int gamemode_icon_count[GAMEMODE_COUNT] = {
     ICON_COUNT_SHIP,
     ICON_COUNT_PLAYER_BALL,
     ICON_COUNT_BIRD,
-    ICON_COUNT_DART
+    ICON_COUNT_DART,
+    ICON_COUNT_TRAIL
 };
 
 static int *current_pages[GAMEMODE_COUNT] = {
@@ -67,7 +70,8 @@ static int *current_pages[GAMEMODE_COUNT] = {
     &current_ship_page,
     &current_ball_page,
     &current_ufo_page,
-    &current_wave_page
+    &current_wave_page,
+    &current_trail_page
 };
 
 int *current_icons[GAMEMODE_COUNT] = {
@@ -75,7 +79,8 @@ int *current_icons[GAMEMODE_COUNT] = {
     &selected_ship,
     &selected_ball,
     &selected_ufo,
-    &selected_wave
+    &selected_wave,
+    &selected_trail
 };
 
 int *current_colors[3] = {
@@ -85,12 +90,13 @@ int *current_colors[3] = {
 };
 
 
-static const int button_images[5] = {
+static const int button_images[6] = {
     341,
     351,
     325,
     327,
-    329
+    329,
+    355
 };
 static int icon_counter = 1;
 
@@ -114,6 +120,7 @@ static void disable_all_icon_buttons() {
     ui_button_set_image(ui_get_element_by_tag(&screen, "ball"), button_images[2], 0);
     ui_button_set_image(ui_get_element_by_tag(&screen, "ufo"),  button_images[3], 0);
     ui_button_set_image(ui_get_element_by_tag(&screen, "dart"), button_images[4], 0);
+    ui_button_set_image(ui_get_element_by_tag(&screen, "trail"), button_images[5], 0);
 }
 
 static void set_cube_page(UIElement *e) {
@@ -149,6 +156,13 @@ static void set_wave_page(UIElement *e) {
     ui_button_set_image(e, button_images[4] + 1, 0);
     gamemode_page = 4;
     ui_run_func_on_tag(&screen, "icon", set_icon_index); 
+}
+
+static void set_trail_page(UIElement *e) {
+    disable_all_icon_buttons();
+    ui_button_set_image(e, button_images[5] + 1, 0);
+    gamemode_page = 5;
+    ui_run_func_on_tag(&screen, "wave", set_icon_index); 
 }
 
 static void action_exit(UIElement* e) {
@@ -192,6 +206,7 @@ static UIAction actions[] = {
     {"action_ball", set_ball_page },
     {"action_ufo",  set_ufo_page },
     {"action_dart", set_wave_page },
+    {"action_trail", set_trail_page },
     {"icons_left", move_index_left },
     {"icons_right", move_index_right },
     {"icon_selected", action_icon_selected },

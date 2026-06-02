@@ -48,6 +48,7 @@ void init_values() {
     config_init_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ball", 1);
     config_init_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ufo",  1);
     config_init_int(&cfg, CONFIG_CUSTOMIZATION_PATH "wave", 1);
+    config_init_int(&cfg, CONFIG_CUSTOMIZATION_PATH "trail", 1);
     config_init_int(&cfg, CONFIG_CUSTOMIZATION_PATH "p1",   DEFAULT_P1);
     config_init_int(&cfg, CONFIG_CUSTOMIZATION_PATH "p2",   DEFAULT_P2);
     config_init_int(&cfg, CONFIG_CUSTOMIZATION_PATH "glow", DEFAULT_GLOW);
@@ -93,6 +94,7 @@ void cfg_init() {
     selected_ball = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ball", 1);
     selected_ufo  = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ufo",  1);
     selected_wave = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "wave", 1);
+    selected_trail = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "trail", 1);
     selected_p1   = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "p1",   DEFAULT_P1);
     selected_p2   = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "p2",   DEFAULT_P2);
     selected_glow = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "glow", DEFAULT_GLOW);
@@ -118,6 +120,7 @@ void cfg_save() {
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ball", selected_ball);
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ufo",  selected_ufo );
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "wave", selected_wave);
+    config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "trail", selected_trail);
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "p1",   selected_p1  );
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "p2",   selected_p2  );
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "glow", selected_glow);

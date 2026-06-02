@@ -1,11 +1,12 @@
 darken opacity=0.4
 
-window x=160 y=120 w=256 h=176 style=0
-image x=160 y=120 id=21 sheet=1
+
+window x=160 y=120 w=256 h=176 style=0 scale=0.8
+image x=160 y=120 id=21 sheet=1 scale=0.9
 button x=24 y=28 id=6 action="exit"
 
 # Labelling
 
-label x=160 y=26 text="Stats" scale=0.67 align=CENTER
+label x=160 y=35 text="Stats" scale=0.67 align=CENTER
 
-label x=160 y=130 text="This is not functional yet.<p>:(" scale=0.5 align=CENTER
+label x=160 y=130 text="This is not functional yet.<p>:(" scale=0.4 align=CENTER
