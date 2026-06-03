@@ -332,8 +332,8 @@ void init_trails(int trail) {
     }
 
     C3D_TexSetFilter(img.tex, GPU_LINEAR, GPU_LINEAR);
-    MotionTrail_Init(&trail_p1, 0, config->fade, config->always_on, config->width, false, true, config->stationary, used_p1, img);
-    MotionTrail_Init(&trail_p2, 1, config->fade, config->always_on, config->width, false, true, config->stationary, used_p2, img);
+    MotionTrail_Init(&trail_p1, 0, config->fade, config->always_on, config->width, false, config->blending, config->stationary, used_p1, img);
+    MotionTrail_Init(&trail_p2, 1, config->fade, config->always_on, config->width, false, config->blending, config->stationary, used_p2, img);
 
     MotionTrail_StopStroke(&trail_p1);
     MotionTrail_StopStroke(&trail_p2);

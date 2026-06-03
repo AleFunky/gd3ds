@@ -13,7 +13,7 @@
 
 #include "main.h"
 
-#define FIRST_TRAIL_ID 380
+#define FIRST_TRAIL_ID 27
 
 static void ui_icon_update(UIElement* e, UIInput* touch) {
     bool pressedTouch = hidKeysDown() & KEY_TOUCH;
@@ -78,7 +78,7 @@ static void ui_icon_draw(UIElement* e) {
 
     if (e->icon.gamemode == TRAIL) {
         C2D_Sprite spr = { 0 };
-        C2D_SpriteFromSheet(&spr, ui_sheet, FIRST_TRAIL_ID + e->icon.index);
+        C2D_SpriteFromSheet(&spr, ui_2_sheet, FIRST_TRAIL_ID + e->icon.index);
         C3D_TexSetFilter(spr.image.tex, GPU_LINEAR, GPU_LINEAR);
         C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
         C2D_SpriteSetPos(&spr, e->x, y);

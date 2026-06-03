@@ -18,13 +18,23 @@
 #include "menus/settings.h"
 
 const MotionTrailConfig trail_properties[TRAIL_COUNT] = {
-    {. fade = 0.3f, .width = 10.f, .always_on = false, .colored = true,  .stationary = false},
-    {. fade = 0.3f, .width = 15.f, .always_on = false, .colored = false, .stationary = false},
-    {. fade = 0.3f, .width = 10.f, .always_on = false, .colored = true,  .stationary = false},
-    {. fade = 0.4f, .width = 10.f, .always_on = false, .colored = true,  .stationary = false},
-    {. fade = 0.5f, .width = 10.f, .always_on = true,  .colored = true,  .stationary = false},
-    {. fade = 0.8f, .width = 3.f,  .always_on = true,  .colored = true,  .stationary = true },
-    {. fade = 0.3f, .width = 10.f, .always_on = false, .colored = false, .stationary = false},
+    {. fade = 0.3f, .width = 10.f, .always_on = false, .colored = true,  .stationary = false, .blending = true},
+    {. fade = 0.3f, .width = 15.f, .always_on = false, .colored = false, .stationary = false, .blending = true},
+    {. fade = 0.3f, .width = 10.f, .always_on = false, .colored = true,  .stationary = false, .blending = true},
+    {. fade = 0.4f, .width = 10.f, .always_on = false, .colored = true,  .stationary = false, .blending = true},
+    {. fade = 0.5f, .width = 10.f, .always_on = true,  .colored = true,  .stationary = false, .blending = true},
+    {. fade = 0.8f, .width = 3.f,  .always_on = true,  .colored = true,  .stationary = true, .blending = true },
+    {. fade = 0.3f, .width = 10.f, .always_on = false, .colored = false, .stationary = false, .blending = true},
+    {. fade = 0.3f, .width = 15.f, .always_on = false, .colored = false, .stationary = false, .blending = true},
+    {. fade = 0.3f, .width = 15.f, .always_on = false, .colored = false, .stationary = false, .blending = true},
+    {. fade = 0.3f, .width = 15.f, .always_on = false, .colored = false, .stationary = false, .blending = true},
+    {. fade = 0.3f, .width = 15.f, .always_on = false, .colored = false, .stationary = false, .blending = true},
+    {. fade = 0.3f, .width = 15.f, .always_on = false, .colored = false, .stationary = false, .blending = true},
+    {. fade = 0.3f, .width = 15.f, .always_on = false, .colored = false, .stationary = false, .blending = false},
+    {. fade = 0.3f, .width = 15.f, .always_on = false, .colored = false, .stationary = false, .blending = false},
+    {. fade = 0.3f, .width = 15.f, .always_on = false, .colored = false, .stationary = false, .blending = true},
+    {. fade = 0.3f, .width = 15.f, .always_on = false, .colored = false, .stationary = false, .blending = true},
+    {. fade = 0.3f, .width = 15.f, .always_on = false, .colored = false, .stationary = false, .blending = false},
 };  
 
 void MotionTrail_UpdateStationaryUVs(MotionTrail* trail, float offset);

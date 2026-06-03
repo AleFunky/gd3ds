@@ -68,6 +68,7 @@ typedef struct {
     bool always_on;
     bool colored;
     bool stationary;
+    bool blending;
 } MotionTrailConfig;
 
 extern const MotionTrailConfig trail_properties[TRAIL_COUNT];

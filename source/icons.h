@@ -34,6 +34,6 @@ typedef enum {
 #define ICON_COUNT_PLAYER_BALL 43
 #define ICON_COUNT_BIRD 35
 #define ICON_COUNT_DART 35
-#define TRAIL_COUNT 7
+#define TRAIL_COUNT 17
 
 extern const Icon* icons[GAMEMODE_COUNT];

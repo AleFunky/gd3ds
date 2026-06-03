@@ -65,6 +65,7 @@ char *splash_texts[] = {
     "Pathfinder training",
     "Does this look possible to you?",
     "Bwomp",
+    "Trans rights are human rights",
 };
 
 #define NUM_SPLASH_TEXTS (sizeof(splash_texts) / sizeof(char *))
