@@ -30,6 +30,7 @@ void init_values() {
     config_init_bool(&cfg, CONFIG_MISC_PATH "hitboxesEnabled", false);
     config_init_bool(&cfg, CONFIG_MISC_PATH "hitboxTrail", false);
     config_init_bool(&cfg, CONFIG_MISC_PATH "hitboxesOnDeath", false);
+    config_init_bool(&cfg, CONFIG_MISC_PATH "doNot", false);
 
     config_init_bool(&cfg, CONFIG_GAMEPLAY_PATH "showProgressBar", false);
     config_init_bool(&cfg, CONFIG_GAMEPLAY_PATH "showProgressPercent", false);
@@ -76,6 +77,7 @@ void cfg_init() {
     hitboxesEnabled = config_get_bool(&cfg, CONFIG_MISC_PATH "hitboxesEnabled", false);
     hitboxTrail =     config_get_bool(&cfg, CONFIG_MISC_PATH "hitboxTrail", false);
     hitboxesOnDeath = config_get_bool(&cfg, CONFIG_MISC_PATH "hitboxesOnDeath", false);
+    doNot = config_get_bool(&cfg, CONFIG_MISC_PATH "doNot", false);
 
     showProgressBar =     config_get_bool(&cfg, CONFIG_GAMEPLAY_PATH "showProgressBar", false);
     showProgressPercent = config_get_bool(&cfg, CONFIG_GAMEPLAY_PATH "showProgressPercent", false);
@@ -133,6 +135,7 @@ void cfg_save() {
     config_set_bool(&cfg, CONFIG_MISC_PATH "hitboxesEnabled", hitboxesEnabled);
     config_set_bool(&cfg, CONFIG_MISC_PATH "hitboxTrail", hitboxTrail);
     config_set_bool(&cfg, CONFIG_MISC_PATH "hitboxesOnDeath", hitboxesOnDeath);
+    config_set_bool(&cfg, CONFIG_MISC_PATH "doNot", doNot);
 
     config_set_bool(&cfg, CONFIG_GAMEPLAY_PATH "showProgressBar", showProgressBar);
     config_set_bool(&cfg, CONFIG_GAMEPLAY_PATH "showProgressPercent", showProgressPercent);

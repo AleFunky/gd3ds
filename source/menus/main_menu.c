@@ -145,6 +145,10 @@ void action_open_info_card(int id, UIElement* e) {
             // no wave trail behind info
             set_info_content("Disables player trail for the wave.");
             break;
+        case 13:
+            // do not info
+            set_info_content("Doesn't do anything...<p>Well, nothing useful.");
+            break;
     }
     in_info_card = true;
 }

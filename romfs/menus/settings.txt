@@ -47,6 +47,10 @@ label x=90 y=115 text="Enable hitbox trail" scale=0.4 tag="page3"
 checkbox x=75 y=145 tag="page3,chk_death_hitboxes" scale=0.75 action="death_hitboxes"
 label x=90 y=145 text="Show hitboxes on death" scale=0.4 tag="page3"
 
+checkbox x=75 y=175 tag="page3,chk_donot" scale=0.75 action="doNot"
+button x=62 y=162 action="donotinfo" id=90 scale=0.5 tag="page3"
+label x=90 y=175 text="Do not" scale=0.4 tag="page3"
+
 label x=160 y=52 text="Gameplay" tag="page4" scale=0.6 align=CENTER
 
 checkbox x=75 y=85 tag="page4,chk_progressbar" scale=0.75 action="progressbar"

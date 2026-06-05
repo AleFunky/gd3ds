@@ -45,6 +45,7 @@ bool quickRetry = false;
 bool solidWaveTrail = false;
 bool noPlayerTrail = false;
 bool noWaveTrailBehind = false;
+bool doNot = false;
 
 static Setting settings[] = {
     {
@@ -103,6 +104,9 @@ static Setting settings[] = {
     },
     {
         "chk_nowavetrailbehind", &noWaveTrailBehind
+    },
+    {
+        "chk_donot", &doNot
     },
 };
 
@@ -213,6 +217,10 @@ void noWaveTrailBehind_settings(UIElement* e) {
     noWaveTrailBehind = e->checkbox.checked;
 }
 
+void doNot_settings(UIElement* e) {
+    doNot = e->checkbox.checked;
+}
+
 void action_left_page(UIElement *e) {
     current_page--;
     if (current_page < 0) {
@@ -279,6 +287,10 @@ void action_info_no_wave_trail_behind(UIElement *e) {
     action_open_info_card(12);
 }
 
+void action_info_do_not(UIElement *e) {
+    action_open_info_card(13);
+}
+
 
 static UIAction actions[] = {
     { "exit", exit_settings },
@@ -301,6 +313,7 @@ static UIAction actions[] = {
     { "solidWaveTrail", solidWaveTrail_settings},
     { "noPlayerTrail", noPlayerTrail_settings},
     { "noWaveTrailBehind", noWaveTrailBehind_settings},
+    { "doNot", doNot_settings},
     { "left_page", action_left_page},
     { "right_page", action_right_page},
     { "wideinfo", action_info_wide},
@@ -314,7 +327,8 @@ static UIAction actions[] = {
     { "wavetrailcolorinfo", action_info_wave_trail},
     { "quickretryinfo", action_info_quick_retry},
     { "solidwavetrailinfo", action_info_solid_wave_trail},
-    { "nowavetrailbehindinfo", action_info_no_wave_trail_behind}
+    { "nowavetrailbehindinfo", action_info_no_wave_trail_behind},
+    { "donotinfo", action_info_do_not}
 };
 
 void settings_init() {

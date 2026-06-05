@@ -25,6 +25,7 @@ extern bool quickRetry;
 extern bool solidWaveTrail;
 extern bool noPlayerTrail;
 extern bool noWaveTrailBehind;
+extern bool doNot;
 
 void settings_init();
 int settings_loop();
