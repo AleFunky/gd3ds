@@ -15,3 +15,5 @@ If you prefer having it in your home menu you can download the cia here: [cia ve
 
 # Discord
 You can come to our Discord server and get help (or talk if you want): [Discord](https://discord.gg/Yh6JrS7eSU)
+
+#
