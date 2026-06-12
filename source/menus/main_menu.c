@@ -339,11 +339,13 @@ void main_menu_loop() {
     wave_trail = &wave_trail_p1;
 
     bool old_wide = wideEnabled;
+
+    //disabled in preparation for release
     
-    if (initialDisclaimerAccepted == false) {
-        in_first_boot_disclaimer = true;
-        first_boot_disclaimer_init();
-    }
+    // if (initialDisclaimerAccepted == false) {
+    //     in_first_boot_disclaimer = true;
+    //     first_boot_disclaimer_init();
+    // }
 
     while (aptMainLoop()) {
         float delta = 1/60.f;
