@@ -18,22 +18,39 @@
 #include "menus/settings.h"
 
 const MotionTrailConfig trail_properties[TRAIL_COUNT] = {
+    //default trail
     {. fade = 0.3f, .width = 10.f, .always_on = false, .colored = true,  .stationary = false, .blending = true},
+    //rainbow trail
     {. fade = 0.3f, .width = 15.f, .always_on = false, .colored = false, .stationary = false, .blending = true},
+    //double line trail
     {. fade = 0.3f, .width = 10.f, .always_on = false, .colored = true,  .stationary = false, .blending = true},
+    //triangle trail 
     {. fade = 0.4f, .width = 10.f, .always_on = false, .colored = true,  .stationary = false, .blending = true},
+    //long line trail
     {. fade = 0.5f, .width = 10.f, .always_on = true,  .colored = true,  .stationary = false, .blending = true},
+    //dashed line trail
     {. fade = 0.8f, .width = 3.f,  .always_on = true,  .colored = true,  .stationary = true, .blending = true },
-    {. fade = 0.3f, .width = 10.f, .always_on = false, .colored = false, .stationary = false, .blending = true},
+    //fire trail
+    {. fade = 0.3f, .width = 12.f, .always_on = false, .colored = false, .stationary = false, .blending = true},
+    //pride flag trail
     {. fade = 0.3f, .width = 15.f, .always_on = false, .colored = false, .stationary = false, .blending = true},
+    //gay flag trail
+    {. fade = 0.3f, .width = 17.f, .always_on = false, .colored = false, .stationary = false, .blending = true},
+    //lesbian flag trail
     {. fade = 0.3f, .width = 15.f, .always_on = false, .colored = false, .stationary = false, .blending = true},
+    //bi flag trail
     {. fade = 0.3f, .width = 15.f, .always_on = false, .colored = false, .stationary = false, .blending = true},
+    //pan flag trail
     {. fade = 0.3f, .width = 15.f, .always_on = false, .colored = false, .stationary = false, .blending = true},
-    {. fade = 0.3f, .width = 15.f, .always_on = false, .colored = false, .stationary = false, .blending = true},
+    //aro flag trail
     {. fade = 0.3f, .width = 15.f, .always_on = false, .colored = false, .stationary = false, .blending = false},
+    //ace flag trail
     {. fade = 0.3f, .width = 15.f, .always_on = false, .colored = false, .stationary = false, .blending = false},
+    //aroace flag trail
     {. fade = 0.3f, .width = 15.f, .always_on = false, .colored = false, .stationary = false, .blending = true},
+    //trans flag trail
     {. fade = 0.3f, .width = 15.f, .always_on = false, .colored = false, .stationary = false, .blending = true},
+    //enby flag trail
     {. fade = 0.3f, .width = 15.f, .always_on = false, .colored = false, .stationary = false, .blending = false},
 };  
 

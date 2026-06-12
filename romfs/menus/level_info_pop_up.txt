@@ -1,15 +1,14 @@
 darken opacity=0.4
 
-window x=160 y=120 w=260 h=170 style=1 tag=window
-
-button x=35 y=40 id=31 scale=0.8 action="exit" keyBinds="B"
+window x=160 y=120 w=260 h=177 style=1 tag=window
 
 # Labelling
 
-label x=160 y=70 font=2 text="Level Name" scale=0.9 align=CENTER tag="levelname"
-label x=160 y=94 font=1 text="<#40e348>Total Attempts</>:" scale=0.8 align=CENTER tag="totalattempts"
-label x=160 y=108 font=1 text="<#60abef>Total Jumps</>:" scale=0.8 align=CENTER tag="totaljumps"
-label x=160 y=122 font=1 text="<#ff00ff>Normal</>:" scale=0.8 align=CENTER tag="normalprogressvalue"
-label x=160 y=136 font=1 text="<#ffa54b>Practice</>:" scale=0.8 align=CENTER tag="practiceprogressvalue"
+label x=160 y=66 font=2 text="Level Stats" scale=0.9 align=CENTER
+label x=160 y=90 font=1 text="<#f6ff06>Level Name</>" scale=0.8 align=CENTER tag="levelname"
+label x=160 y=104 font=1 text="<#40e348>Total Attempts</>:" scale=0.8 align=CENTER tag="totalattempts"
+label x=160 y=118 font=1 text="<#60abef>Total Jumps</>:" scale=0.8 align=CENTER tag="totaljumps"
+label x=160 y=132 font=1 text="<#ff00ff>Normal</>:" scale=0.8 align=CENTER tag="normalprogressvalue"
+label x=160 y=146 font=1 text="<#ffa54b>Practice</>:" scale=0.8 align=CENTER tag="practiceprogressvalue"
 
-windowbutton x=160 y=169 style=5 text="OK" w=52px h=30px scale=0.8 action="exit" font=2 textScale=0.9
+windowbutton x=160 y=177 style=5 text="OK" w=52px h=30px scale=0.8 action="exit" font=2 textScale=0.9 keyBinds="B"

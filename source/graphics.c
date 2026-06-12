@@ -59,6 +59,8 @@ int current_pulserod_ball_image = 0;
 
 SpriteTemplate sprite_templates[GAME_OBJECT_COUNT]; // global cache
 
+float touch_effect_drag_timer = 0.f;
+
 #define LUT_SIZE 256
 
 uint8_t opacityLUT[LUT_SIZE];
@@ -1433,11 +1435,15 @@ void update_touch_effect(float delta) {
                 effect->def.colorG = p1_not_white.g / 255.f;
                 effect->def.colorB = p1_not_white.b / 255.f;
             }
+            touch_effect_drag_timer = 0.08f;
         }
 
         touch_drag_particles.emitterX = pos.px;
         touch_drag_particles.emitterY = flipped_y;
-        touch_drag_particles.emitting = true;
+        touch_drag_particles.emitting = (touch_effect_drag_timer <= 0);
+        if (touch_effect_drag_timer > 0) {
+            touch_effect_drag_timer -= delta;
+        }
 
         
     }
