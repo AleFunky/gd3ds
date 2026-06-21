@@ -1,3 +1,4 @@
+#pragma once
 #include "ui_element.h"
 #include "particles/particle_definitions.h"
 

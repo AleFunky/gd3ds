@@ -33,8 +33,13 @@ static bool yes_exit = false;
 
 static bool in_infobox = false;
 
-static UIScreen screen_top;
-static UIScreen screen;
+static UIScreen screen_top = {
+    .open_anim = ANIM_ZOOM
+};
+static UIScreen screen = {
+    .isBottom = true,
+    .open_anim = ANIM_ZOOM
+};
 
 static UIElement *level_name;
 static UIElement *creator_name;

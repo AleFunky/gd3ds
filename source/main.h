@@ -77,6 +77,11 @@ typedef enum Cheats {
     CHEAT_COUNT
 } Cheats;
 
+typedef enum CurrentScreenTarget {
+    SCREEN_TOP,
+    SCREEN_BOTTOM
+} CurrentScreenTarget;
+
 extern bool cheats_used[CHEAT_COUNT];
 extern const char *cheat_names[CHEAT_COUNT];
 

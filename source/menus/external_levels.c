@@ -49,7 +49,9 @@ static bool first_time_loaded = true;
 
 static bool in_external_popup = false;
 
-static UIScreen screen;
+static UIScreen screen = {
+    .isBottom = true
+};
 static UIScreen screen_top;
 static UIElement *bg_gradient;
 static UIElement *bg_gradient_top;

@@ -15,7 +15,10 @@
 
 static bool yes_exit = false;
 
-static UIScreen screen;
+static UIScreen screen = {
+    .isBottom = true,
+    .open_anim = ANIM_ZOOM
+};
 
 static UIElement *name;
 

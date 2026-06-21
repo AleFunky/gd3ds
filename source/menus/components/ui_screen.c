@@ -18,6 +18,7 @@
 #include "ui_particle.h"
 #include "ui_use_effect.h"
 #include "particles/particle_definitions.h"
+#include "ui_pallete_icons.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -41,7 +42,9 @@ C2D_SpriteSheet goldFont_sheet;
 C2D_SpriteSheet bg_gradient_sheet;
 C2D_SpriteSheet bar_sheet;
 
-UIScreen default_screen;
+UIScreen default_screen = {
+    .isBottom = true
+};
 UIScreen default_screen_top;
 
 ParticleSystem *uiParticleSystems[UI_MAX_PARTICLE_SYSTEMS];
@@ -111,8 +114,40 @@ C2D_SpriteSheet *get_sheet(int sheet) {
     return NULL;
 }
 
+void run_animation_slide(UIScreen *screen, bool go_up) {
+    float fade_value = easeValue(EASE_IN_OUT, go_up ? 240 : 0, go_up ? 0 : 240, screen->open_anim_time, 0.5f, 2.0f);
+    float window_y_pos = -120 + fade_value;
+    
+    bool found_parent = false;
+    float movement_y = 0;
+    for (int i = 0; i < screen->count; i++) {
+        UIElement *e = &screen->elements[i];
+
+        if (!found_parent) {
+            found_parent = true;
+            movement_y = window_y_pos - e->y;
+        }
+
+        e->y += movement_y;
+    }
+
+    if(screen->open_anim_time >= 0.5f){
+        screen->open_anim_time = 0.5f;
+        screen->open_anim_done = true;
+    }
+}
+
 // Update all screen characters
 void ui_screen_update(UIScreen* s, UIInput* touch) {
+    if (s->open_anim_time >= 1.f) {
+        s->open_anim_time = 1.f;
+        s->open_anim_done = true;
+    }
+
+    if(!s->open_anim_done) s->open_anim_time += 1.f / 60.f;
+    
+    if(s->disable_element_update) return;
+
     for (int i = s->count - 1; i >= 0; i--) {
         UIElement *e = &s->elements[i];
         if (e->enabled) e->update(e, touch);
@@ -121,10 +156,52 @@ void ui_screen_update(UIScreen* s, UIInput* touch) {
 
 // Draw all screen characters
 void ui_screen_draw(UIScreen* s) {
+    C3D_Mtx originalMat;
+    C3D_Mtx newMat;
+    C2D_ViewSave(&originalMat);
+
+    float offX = 0.f;
+    float offY = 0.f;
+
+    if(!s->open_anim_done){
+        int width = s->isBottom ? 320 : 400;
+        int height = 240;
+
+        if(s->open_anim == ANIM_ZOOM) {
+            float scale_value = easeValue(ELASTIC_OUT, 0.f, 1.f, s->open_anim_time, 0.5f, 1.f);
+
+            float cx = width * 0.5f;
+            float cy = height * 0.5f;
+
+            C2D_ViewTranslate(cx, cy);
+            C2D_ViewScale(scale_value, scale_value);
+            C2D_ViewTranslate(-cx, -cy);
+        } else if(s->open_anim == ANIM_SLIDE_RIGHT) {
+            float slide_value = easeValue(ELASTIC_OUT, 0.f, 1.f, s->open_anim_time, 0.5f, 1.f);
+
+            offX = -(1.f - slide_value) * (width / 2.f);
+        }
+    }
+
+    C2D_ViewTranslate(offX, offY);
+
+    C2D_ViewSave(&newMat);
+
     for (int i = 0; i < s->count; i++) {
         UIElement *e = &s->elements[i];
+
+        if(e->type == UI_DARKEN) {
+            C2D_ViewRestore(&originalMat);
+        }
+
         if (e->enabled) e->draw(e);
+
+        if(e->type == UI_DARKEN){
+            C2D_ViewRestore(&newMat);
+        }
     }
+
+    C2D_ViewRestore(&originalMat);
 }
 
 // Find an action by its name
@@ -313,6 +390,10 @@ void ui_load_screen(UIScreen* screen,
     FILE* f = fopen(path, "r");
     if (!f) return;
 
+    screen->disable_element_update = false;
+    screen->open_anim_time = 0.f;
+    screen->open_anim_done = false;
+
     screen->count = 0;
 
     char line[512];
@@ -365,6 +446,8 @@ void ui_load_screen(UIScreen* screen,
         const ParticleDefinition *particleDef = &firework;
 
         u32 keyBinds = 0;
+
+        float darkenTime = 0.1f;
 
         // Parse element parameters
         while ((token = next_token(&cursor)) != NULL) {
@@ -506,6 +589,8 @@ void ui_load_screen(UIScreen* screen,
                         particleDef = particleDefNames[i].def;
                     }
                 }
+            } else if(strcmp(key, "darkenTime") == 0){
+                darkenTime = atof(value);
             }
         }
 
@@ -577,7 +662,7 @@ void ui_load_screen(UIScreen* screen,
             }
             screen->elements[screen->count++] =
                 ui_create_darken(
-                    x, y, w, h, opacity, tag
+                    x, y, w, h, opacity, darkenTime, tag
                 );
         } else if (strcmp(type, "icon") == 0) {
             screen->elements[screen->count++] =
@@ -619,6 +704,9 @@ void ui_load_screen(UIScreen* screen,
         } else if (strcmp(type, "useeffect") == 0) {
             screen->elements[screen->count++] =
                 ui_create_use_effect(tag);
+        } else if (strcmp(type, "palleteicons") == 0) {
+            screen->elements[screen->count++] =
+                ui_create_pallete_icons(tag);
         }
     }
 

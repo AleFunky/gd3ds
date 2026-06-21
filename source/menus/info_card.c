@@ -22,7 +22,9 @@
 
 static bool yes_exit = false;
 
-static UIScreen screen;
+static UIScreen screen = {
+    .isBottom = true
+};
 static UIElement *content;
 
 void exit_info_card(UIElement* e) {

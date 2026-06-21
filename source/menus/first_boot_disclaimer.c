@@ -22,7 +22,9 @@
 static bool yes_exit = false;
 bool initialDisclaimerAccepted = false;
 
-static UIScreen screen;
+static UIScreen screen = {
+    .isBottom = true
+};
 
 void exit_first_boot_disclaimer(UIElement* e) {
     initialDisclaimerAccepted = true;

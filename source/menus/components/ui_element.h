@@ -25,7 +25,8 @@ typedef enum {
     UI_EXTERNAL_LEVEL_CARD,
     UI_STATISTIC_CARD,
     UI_PARTICLE,
-    UI_USE_EFFECT
+    UI_USE_EFFECT,
+    UI_PALLETE_ICONS
 } UIElementType;
 
 typedef struct {
@@ -163,6 +164,10 @@ typedef struct {
 typedef struct {
     C2D_Sprite sprite;
     C2D_ImageTint tint;
+    float targetOpacity;
+    float darkenTime;
+    float darkenTimeElapsed;
+    bool darkenOver;
 } UIDarken;
 
 typedef struct {

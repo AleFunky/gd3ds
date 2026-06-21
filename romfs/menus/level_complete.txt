@@ -1,4 +1,4 @@
-darken opacity=0.0 x=160 y=120 w=320 h=240 tag="endDarken"
+darken opacity=0.0 x=160 y=120 w=320 h=240 tag="endDarken" darkenTime=0.0
 
 button x=100 y=120 id=155 scale=1 action="restart" tag="bottomWindow" keyBinds="X"
 button x=220 y=120 id=111 scale=1 action="exit" tag="bottomWindow" keyBinds="B"

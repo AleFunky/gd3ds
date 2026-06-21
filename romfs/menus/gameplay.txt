@@ -15,7 +15,7 @@ image x=90 y=20 id=15 sheet=1 tag="coin_3_full" scale=0.65
 button x=130 y=200 id=29 tag="practice_buttons,add_checkpoint,not_paused" action="add_check" keyBinds="LEFT,X"
 button x=200 y=200 id=154 tag="practice_buttons,remove_checkpoint,not_paused" action="remove_check" keyBinds="RIGHT,B"
 
-darken opacity=0.5 tag="paused"
+darken opacity=0.5 tag="paused" darkenTime=0.0
 button x=45 y=60 id=127 scale=1 tag="paused" action="settings" keyBinds="SELECT"
 
 button x=260 y=180 id=139 scale=1.15 tag="paused" action="unpause" keyBinds="A,START"

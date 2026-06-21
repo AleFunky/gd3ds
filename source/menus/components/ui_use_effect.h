@@ -1,3 +1,4 @@
+#pragma once
 #include "ui_element.h"
 #include <citro2d.h>
 #include "ui_screen.h"

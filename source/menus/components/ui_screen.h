@@ -5,9 +5,22 @@
 #define UI_MAX_ELEMENTS 128
 #define UI_MAX_PARTICLE_SYSTEMS 32
 
+typedef enum {
+    ANIM_NONE,
+    ANIM_ZOOM,
+    ANIM_SLIDE_RIGHT,
+
+    NUM_OPEN_ANIMS
+} ScreenOpenAnim;
+
 typedef struct {
     UIElement elements[UI_MAX_ELEMENTS];
     int count;
+    float open_anim_time;
+    bool open_anim_done;
+    ScreenOpenAnim open_anim;
+    bool isBottom;
+    bool disable_element_update;
 } UIScreen;
 
 typedef struct {
@@ -50,6 +63,8 @@ C2D_SpriteSheet *get_sheet(int sheet);
 void copy_tag_array(UIElement *e, char (*tag)[TAG_LENGTH]);
 void ui_load_screen(UIScreen* screen, const UIAction* actions, size_t count, const char* path);
 void ui_unload_screen(UIScreen *screen);
+
+void run_animation_slide(UIScreen *screen, bool go_up);
 
 void ui_screen_update(UIScreen* screen, UIInput* touch);
 void ui_screen_draw(UIScreen* screen);

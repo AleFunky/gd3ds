@@ -19,7 +19,9 @@
 
 static bool yes_exit = false;
 
-static UIScreen screen;
+static UIScreen screen = {
+    .isBottom = true
+};
 
 void exit_disclaimer(UIElement* e) {
     yes_exit = true;

@@ -1,4 +1,4 @@
-darken opacity=0.4
+darken x=0 y=0 opacity=0.4 darkenTime=0.5 tag="darken"
 
 # chains (left, right)
 image x=80 y=-4 id=121 scale=0.8 sheet=3 tag="window"

@@ -58,7 +58,9 @@ static bool playedRewardSFX;
 static bool showStars;
 
 static UIScreen screen_top;
-static UIScreen screen;
+static UIScreen screen = {
+    .isBottom = true
+};
 
 static UIElement *attempt_text;
 static UIElement *jumps_text;
@@ -126,6 +128,7 @@ static void exit_level_complete(UIElement* e) {
 static void restart_level(UIElement* e) {
     if (!animating_up) {
         ui_get_element_by_tag(&screen, "endDarken")->opacity = 0.f;
+        ui_get_element_by_tag(&screen_top, "endDarken")->opacity = 0.f;
         
         play_sfx(&play_sound, 1);
         animating_up = true;
@@ -155,6 +158,10 @@ static void run_start_animation(float delta) {
     UIElement *darken = ui_get_element_by_tag(&screen, "endDarken");
     darken->opacity = clampf(anim_time, 0.f, 0.6f);
     ui_darken_reset_opacity(darken);
+
+    UIElement *darken_top = ui_get_element_by_tag(&screen_top, "endDarken");
+    darken_top->opacity = clampf(anim_time, 0.f, 0.6f);
+    ui_darken_reset_opacity(darken_top);
 
     ui_run_func_on_tag(&screen, "bottomWindow", scale_bottom_buttons_anim);
     
@@ -462,6 +469,7 @@ void level_complete_init() {
     }
 
     ui_get_element_by_tag(&screen, "endDarken")->opacity = 0.f;
+    ui_get_element_by_tag(&screen_top, "endDarken")->opacity = 0.f;
 }
 
 int level_complete_loop(float delta) {

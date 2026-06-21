@@ -445,6 +445,7 @@ void game_loop() {
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
     C2D_SceneBegin(top);
     C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
+
     C2D_Fade(0);
     draw_text(&bigFont_fontCharset, &bigFont_sheet, SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10, 0.5f, 0.5f, 1.0f, "Loading...");
     C3D_FrameEnd(0);
@@ -889,7 +890,7 @@ void game_loop() {
             // Top screen
             C2D_SceneBegin(top);
             C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
-            
+
             draw_background(state.background_x / 8, -(state.camera_y / 8) + 200);
 
             C2D_ViewScale(SCALE, SCALE);

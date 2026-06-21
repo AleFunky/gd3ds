@@ -22,7 +22,10 @@
 
 static bool yes_exit = false;
 
-static UIScreen screen;
+static UIScreen screen = {
+    .isBottom = true,
+    .open_anim = ANIM_SLIDE_RIGHT
+};
 
 const u32 colors[] = {
     // Reds
@@ -266,16 +269,6 @@ int palette_kit_loop() {
     touch.interacted = false;
     ui_screen_update(&screen, &touch);
     ui_screen_draw(&screen);
-    bool glow_enabled = (player_glow_enabled || ((p1_color.r | p1_color.g | p1_color.b) == 0));
-    
-    for (size_t g = 0; g < GAMEMODE_COUNT; g++) {
-        spawn_icon_at(
-            g, *current_icons[g], glow_enabled, 90 + g * 35, 70, 0, 0, 0, 0.7f,
-            C2D_Color32(p1_color.r, p1_color.g, p1_color.b, 255),
-            C2D_Color32(p2_color.r, p2_color.g, p2_color.b, 255),
-            C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
-        );
-    }
 
     return false;
 }

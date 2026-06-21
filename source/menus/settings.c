@@ -24,7 +24,10 @@ static bool yes_exit = false;
 
 static int current_page = 0;
 
-static UIScreen screen;
+static UIScreen screen = {
+    .isBottom = true,
+    .open_anim = ANIM_ZOOM
+};
 
 bool particlesDisabled = false;
 bool wideEnabled = false;
