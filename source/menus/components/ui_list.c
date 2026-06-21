@@ -9,7 +9,7 @@
 #include "ui_screen.h"
 #include "ui_list.h"
 #include "utils/gfx.h"
-#include <math.h>
+#include <stdlib.h>
 
 void ui_list_reset(UIElement *list) {
     UIList* l = &list->list;
@@ -76,7 +76,7 @@ static void ui_list_update(UIElement* e, UIInput* touch) {
     circlePosition circlePad;
     //Joystick movement
     hidCircleRead(&circlePad);
-    if(fabs(circlePad.dy) > 48){
+    if(abs(circlePad.dy) > 48){
         l->scrollY += (circlePad.dy / 25);
     }
 
