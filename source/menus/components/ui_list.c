@@ -72,6 +72,36 @@ static void ui_list_update(UIElement* e, UIInput* touch) {
         l->lastTouchY = touch->touchPosition.py;
     }
 
+    circlePosition circlePad;
+    //Joystick movement
+    hidCircleRead(&circlePad);
+    l->scrollY += (circlePad.dy / 25.f);
+
+    if(hidKeysDown() & (KEY_UP | KEY_DOWN)){
+        l->dpadHeldTime = 0;
+    }
+
+    if(l->dpadHeldTime > 60){
+        l->dpadHeldTime = 60;
+    }
+
+    if(hidKeysHeld() & KEY_UP){
+        l->scrollY += 4;
+        if(l->dpadHeldTime >= 60){
+            l->scrollY += 4;
+        }
+
+        l->dpadHeldTime++;
+    }
+    if(hidKeysHeld() & KEY_DOWN){
+        l->scrollY -= 4;
+        if(l->dpadHeldTime >= 60){
+            l->scrollY -= 4;
+        }
+
+        l->dpadHeldTime++;
+    }
+
     // Handle releasing dragging
     if (hidKeysUp() & KEY_TOUCH) {
         l->dragging = false;

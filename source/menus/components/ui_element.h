@@ -216,6 +216,8 @@ typedef struct {
     int lastTouchY;
 
     bool dragging;
+
+    int dpadHeldTime;
 } UIList;
 
 typedef struct {
