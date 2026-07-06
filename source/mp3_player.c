@@ -33,6 +33,10 @@ static volatile bool restart_requested = false;
 
 volatile float amplitude = 0;
 
+static void *song_buf = NULL;
+static size_t song_sz = 0;
+static size_t song_pos = 0;
+
 static volatile float seek_target = 0;
 
 static Thread threadId = NULL;
@@ -95,6 +99,48 @@ void audio_exit() {
     mpg123_exit();
 }
 
+static ssize_t read_mem(void *handle, void *buf, size_t count) {
+    (void)handle;
+
+    if (!song_buf || song_pos >= song_sz) return 0;
+
+    size_t available = song_sz - song_pos;
+    size_t to_read = count < available ? count : available;
+
+    if (to_read > 0) {
+        memcpy(buf, (u8*)song_buf + song_pos, to_read);
+        song_pos += to_read;
+    }
+
+    return (ssize_t)to_read;
+}
+
+static off_t seek_mem(void *handle, off_t offset, int whence) {
+    (void)handle;
+
+    off_t new_pos;
+
+    switch (whence) {
+        case SEEK_SET:
+            new_pos = offset;
+            break;
+        case SEEK_CUR:
+            new_pos = (off_t)song_pos + offset;
+            break;
+        case SEEK_END:
+            new_pos = (off_t)song_sz + offset;
+            break;
+        default:
+            return -1;
+    }
+
+    if (new_pos < 0) new_pos = 0;
+    if ((size_t)new_pos > song_sz) new_pos = (off_t)song_sz;
+
+    song_pos = (size_t)new_pos;
+    return (off_t)song_pos;
+}
+
 bool mp3_init(void *file) {
     int err = 0;
     int encoding = 0;
@@ -112,9 +158,19 @@ bool mp3_init(void *file) {
     mpg123_format(mh, 48000, MPG123_STEREO, MPG123_ENC_SIGNED_16);
     mpg123_format(mh, 48000, MPG123_MONO,   MPG123_ENC_SIGNED_16);
 
-    if (mpg123_open(mh, file) != MPG123_OK) {
-        output_log("Couldn't open file\n");
-        return 0;
+    if (song_buf) {
+        song_pos = 0;
+        mpg123_replace_reader_handle(mh, read_mem, seek_mem, NULL);
+
+        if (mpg123_open_handle(mh, NULL) != MPG123_OK) {
+            output_log("Couldn't open memory stream\n");
+            return 0;
+        }
+    } else {
+        if (mpg123_open(mh, file) != MPG123_OK) {
+            output_log("Couldn't open file\n");
+            return 0;
+        }
     }
 
     if (mpg123_getformat(mh, &rate, &audio_channels, &encoding) != MPG123_OK) {
@@ -352,6 +408,40 @@ void fade_to_amplitude(float new_amplitude) {
     amplitude = calculate_amplitude(new_amplitude);
 }
 
+// Play an mp3 from a pre-loaded memory buffer
+int play_mp3_buf(void *buf, size_t sz, bool loop, float seek) {
+    if (!buf || sz == 0) return 0;
+
+    stop_mp3();
+
+    LightEvent_Init(&seekEvent, RESET_ONESHOT);
+    quit = false;
+    looping = loop;
+    seek_target = seek;
+
+    song_buf = buf;
+    song_sz = sz;
+    song_pos = 0;
+
+    int32_t priority = 0x30;
+    svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
+    priority -= 1;
+    priority = priority < 0x18 ? 0x18 : priority;
+    priority = priority > 0x3F ? 0x3F : priority;
+
+    threadId = threadCreate(audio_thread, NULL, THREAD_STACK_SZ, priority, THREAD_AFFINITY, true);
+    if (!threadId) {
+        free(song_buf);
+        song_buf = NULL;
+        song_sz = 0;
+        song_pos = 0;
+        return 0;
+    }
+
+    if (seek > 0) LightEvent_Wait(&seekEvent);
+    return 1;
+}
+
 // Stop playback
 void stop_mp3() {
     if (!quit && threadId) {
@@ -364,4 +454,11 @@ void stop_mp3() {
         threadId = NULL;
         audio_exit();
     }
+
+    if (song_buf) {
+        free(song_buf);
+        song_buf = NULL;
+    }
+    song_sz = 0;
+    song_pos = 0;
 }

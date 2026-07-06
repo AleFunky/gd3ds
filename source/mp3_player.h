@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stddef.h>
+
 #define AMP_MIN 0.1f
 #define AMP_MAX 1.0f
 
@@ -12,6 +14,7 @@ extern volatile float amplitude;
 
 void audio_init();
 int play_mp3(char *path, bool loop, float seek);
+int play_mp3_buf(void *buf, size_t sz, bool loop, float seek);
 void seek_mp3(float time);
 void stop_mp3();
 void toggle_playback_mp3();
