@@ -61,11 +61,10 @@ static void action_open_saved_menu(UIElement *e) {
 }
 
 static void action_open_search_menu(UIElement *e) {
-    // disabled for release build
-    // new_state = STATE_SEARCH_MENU;
-    // set_fade_status(FADE_STATUS_OUT);
-    in_disclaimer = true;
-    disclaimer_init();
+    
+    new_state = STATE_SEARCH_MENU;
+    set_fade_status(FADE_STATUS_OUT);
+    
 }
 
 static void action_open_soggy_menu(UIElement *e) {

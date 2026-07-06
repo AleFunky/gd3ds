@@ -134,7 +134,7 @@ static void ui_button_draw(UIElement* e) {
         text_scale = (e->button.textScale * scale);
     }
 
-    draw_text(font->charset, font->sheet, e->x, e->y, text_scale, 0.5f, 0.5f, "%s", e->button.text);
+    draw_text(font->charset, font->sheet, e->x, e->y, text_scale, text_scale, 0.5f, "%s", e->button.text);
 }
 
 void ui_button_set_image(UIElement *e, int sprite_index, int sheet) {
