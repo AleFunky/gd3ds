@@ -76,13 +76,18 @@ void saved_levels_loop() {
     list = ui_get_element_by_tag(&default_screen, "list");
 
     for (int i = 0; i < NUM_SAVED_LEVELS_ENTRIES; i++) {
-        char *name = saved_levels[i].name;
-        char *creator = saved_levels[i].creator;
-        char *song = saved_levels[i].song;
-        char *length = saved_levels[i].length;
+        char name[256];
+        char creator[256];
+        char song[256];
+        char length[256];
         int downloads = saved_levels[i].downloads;
         int likes = saved_levels[i].likes;
         int stars = saved_levels[i].stars;
+
+        strncpy(name, saved_levels[i].name, sizeof(name) - 1);
+        strncpy(creator, saved_levels[i].creator, sizeof(creator) - 1);
+        strncpy(song, saved_levels[i].song, sizeof(song) - 1);
+        strncpy(length, saved_levels[i].length, sizeof(length) - 1);
         entries1[i] = ui_create_online_level_card(0, 0, i & 1, name, creator, song, length, downloads, likes, stars, NULL);
         ui_list_add(list, &entries1[i]);
     }
