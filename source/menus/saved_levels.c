@@ -5,33 +5,45 @@
 #include "math_helpers.h"
 #include "menus/components/ui_list.h"
 #include "menus/components/ui_window.h"
-#include "menus/components/ui_textbox.h"
 #include "menus/components/ui_image.h"
-#include "menus/components/ui_progress_bar.h"
 #include "menus/components/ui_label.h"
+#include "menus/components/ui_online_level_card.h"
 #include "fonts/bigFont.h"
 #include "main.h"
-#include "easing.h"
-#include "color_channels.h"
 #include "mp3_player.h"
 #include "graphics.h"
-#include "main_menu.h"
-#include "level_select.h"
 #include "state.h"
-
 #include "settings.h"
 #include "saved_levels.h"
-
-#include "gameplay.h"
-
 #include "save/config.h"
-#include "utils/folders.h"
-#include "level_loading.h"
 
 static bool exit_flag = false;
 
 static UIElement *bg_gradient;
 static UIElement *bg_gradient_top;
+
+static UIElement *list;
+
+typedef struct SavedLevelsEntries {
+    char *name;
+    char *creator;
+    char *song;
+    char *length;
+    int downloads;
+    int likes;
+    int stars;
+} SavedLevelsEntries;
+
+
+static const SavedLevelsEntries saved_levels[] = {
+    { "Level 1", "Creator", "<#f982ff>Song", "Long", 111, 123, 10 },
+    { "hi i am a longer levelname", "superlongcreator", "<#f982ff>Lalalalalala", "Long", 111, 123, 9 },
+    { "revolution", "funnygame", "<#f982ff>Something Something Something", "Long", 111, 123, 2 },
+};
+
+#define NUM_SAVED_LEVELS_ENTRIES (sizeof(saved_levels) / sizeof(SavedLevelsEntries))
+
+UIElement entries1[NUM_SAVED_LEVELS_ENTRIES];
 
 static void action_exit(UIElement *e) {
     exit_flag = true;
@@ -61,6 +73,19 @@ void saved_levels_loop() {
     ui_image_set_tint(bg_gradient, C2D_Color32(50, 110, 255, 255));
     ui_image_set_tint(bg_gradient_top, C2D_Color32(50, 110, 255, 255));
 
+    list = ui_get_element_by_tag(&default_screen, "list");
+
+    for (int i = 0; i < NUM_SAVED_LEVELS_ENTRIES; i++) {
+        char *name = saved_levels[i].name;
+        char *creator = saved_levels[i].creator;
+        char *song = saved_levels[i].song;
+        char *length = saved_levels[i].length;
+        int downloads = saved_levels[i].downloads;
+        int likes = saved_levels[i].likes;
+        int stars = saved_levels[i].stars;
+        entries1[i] = ui_create_online_level_card(0, 0, i & 1, name, creator, song, length, downloads, likes, stars, NULL);
+        ui_list_add(list, &entries1[i]);
+    }
 
     set_fade_status(FADE_STATUS_IN);
 

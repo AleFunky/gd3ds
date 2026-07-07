@@ -20,7 +20,8 @@
 static bool yes_exit = false;
 
 static UIScreen screen = {
-    .isBottom = true
+    .isBottom = true,
+    .open_anim = ANIM_ZOOM
 };
 
 void exit_disclaimer(UIElement* e) {

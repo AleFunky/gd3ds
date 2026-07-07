@@ -127,8 +127,8 @@ static void ui_list_draw(UIElement* e) {
     float y = e->y - (e->h / 2);
 
     // Draw border
-    C2D_DrawRectSolid(x, y, 0, e->w, e->h,
-    C2D_Color32(40,40,40,255));
+    // C2D_DrawRectSolid(x, y, 0, e->w, e->h,
+    // C2D_Color32(40,40,40,255));
 
     // Enable clipping
     set_scissor(GPU_SCISSOR_NORMAL, x, y, e->w, e->h);

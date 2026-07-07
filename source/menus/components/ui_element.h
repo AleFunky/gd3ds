@@ -28,6 +28,7 @@ typedef enum {
     UI_USE_EFFECT,
     UI_PALLETE_ICONS,
     UI_SLIDER,
+    UI_ONLINE_LEVEL_CARD,
 } UIElementType;
 
 typedef struct {
@@ -211,6 +212,25 @@ typedef struct {
     bool swap_color;
 } UIStatisticCardData;
 
+typedef struct {
+    UILabelData name;
+    UILabelData creator;
+    UILabelData song;
+    UILabelData length;
+    int downloads;
+    int likes;
+    int stars;
+    bool swap_color;
+    UIWindowButtonData windowbutton;
+    float windowbutton_w;
+    float windowbutton_h;
+    UIImageData difficulty;
+    UIImageData stars_icon;
+    UIImageData downloads_icon;
+    UIImageData likes_icon;
+    UIImageData length_icon;
+} UIOnlineLevelCardData;
+
 typedef struct UIElement UIElement;
 
 #define UI_LIST_MAX_ITEMS 256
@@ -282,6 +302,7 @@ struct UIElement {
         UIProgressBarData progress_bar;
         UIExternalLevelCardData external_level_card;
         UIStatisticCardData statistic_card;
+        UIOnlineLevelCardData online_level_card; 
         UIParticleData particle;
         UIUseEffectData use_effect;
         UISliderData slider;
