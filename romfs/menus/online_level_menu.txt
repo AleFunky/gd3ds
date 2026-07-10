@@ -1,0 +1,22 @@
+bggradient tag="gradient"
+
+button x=20 y=28 id=6 action="exit" keyBinds="B"
+
+image x=36 y=205 id=178
+image x=284 y=205 id=178 sx=-1.0
+
+button x=160 y=80 id=139 sheet=0 scale=1 action="play" keyBinds="A,START"
+
+button x=290 y=80 id=89 sheet=0 scale=1 action="levelinfo"
+
+button x=290 y=30 id=49 sheet=0 scale=1 action="deletelevel"
+
+button x=25 y=215 id=90 sheet=0 scale=1 action="info"
+
+window x=160 y=185 w=216 h=60 style=0
+
+label x=61 y=172 text="Song Name Here" font=0 scale=0.55 align=LEFT tag="songname"
+label x=61 y=184 text="By: Song Artist" font=2 scale=0.55 align=LEFT tag="songartist"
+label x=61 y=202 text="SongID: 123456" font=0 scale=0.38 align=LEFT tag="songid"
+
+button x=246 y=192 id=57 sheet=0 scale=0.8 action="downloadsong"

@@ -11,10 +11,12 @@
 #include "main.h"
 #include "mp3_player.h"
 #include "graphics.h"
-#include "saved_levels.h"
 #include "utils/folders.h"
 
+
 static bool exit_flag = false;
+
+static int new_state;
 
 static UIImage *bg_gradient;
 static UIImage *bg_gradient_top;
@@ -45,8 +47,14 @@ static void action_exit(UIElement *e) {
     set_fade_status(FADE_STATUS_OUT);
 }
 
+void action_open_level_menu(UIElement* e) {
+    new_state = STATE_ONLINE_LEVEL;
+    set_fade_status(FADE_STATUS_OUT);
+}
+
 static UIAction actions[] = {
     {"exit", action_exit },
+    {"open_level_menu", action_open_level_menu },
 };
 
 void saved_levels_loop() {
@@ -58,6 +66,7 @@ void saved_levels_loop() {
     C2D_Fade(0);
     C3D_FrameEnd(0);
 
+    new_state = 0;
     exit_flag = false;
 
     ui_load_screen(&default_screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/saved_levels.txt");
@@ -86,9 +95,9 @@ void saved_levels_loop() {
             strncpy(length, saved_levels[i].length, sizeof(length) - 1);
 
             
-            truncate_filename(name, 14);
+            truncate_filename(name, 13);
             truncate_filename(creator, 20);
-            truncate_filename(song, 22);
+            truncate_filename(song, 25);
 
             float list_width = list->base.w * 0.5f;
 
@@ -238,7 +247,7 @@ void saved_levels_loop() {
 
                     ui_element_set_position((UIElement *) button, list_width - 32, 0);
                     ui_element_set_size((UIElement *) button, 48, 28);
-
+                    ui_element_set_action((UIElement *) button, action_open_level_menu);
                     ui_element_add_child(card, (UIElement *) button);
                 }
 
@@ -291,6 +300,11 @@ void saved_levels_loop() {
             C2D_ViewReset();
             C3D_FrameEnd(0);
         } while (handle_fading());
+
+        if (new_state) {
+            game_state = new_state;
+            break;
+        }
 
         if (exit_flag) {
             game_state = STATE_CREATOR_MENU;

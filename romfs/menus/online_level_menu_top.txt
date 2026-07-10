@@ -1,0 +1,25 @@
+bggradient tag="gradient_top"
+
+label x=200 y=22 text="Unknown" font=0 scale=0.9 align=CENTER tag="levelname"
+
+label x=200 y=46 text="By Unknown" scale=0.7 font=2 align=CENTER tag="creatorname"
+
+image id=251 sheet=0 x=200 y=92 scale=1 tag="difficultyface"
+
+label x=200 y=139 text="Normal mode" scale=0.45 align=CENTER tag="level_card"
+progressbar x=200 y=152 max_value=100 style=0 scale=0.65 tag="level_card,normalprogress"
+
+label x=200 y=153 text="0%" scale=0.4 align=CENTER tag="level_card,normalprogressvalue"
+
+label x=200 y=174 text="Practice mode" scale=0.45 align=CENTER tag=""
+progressbar x=200 y=187 max_value=100 style=0 scale=0.65 tag="practiceprogress"
+label x=200 y=188 text="0%" scale=0.4 align=CENTER tag="level_card,practiceprogressvalue"
+
+image id=58 x=75 y=218 scale=0.72
+label x=90 y=220 text="N/A" font=0 scale=0.65 align=LEFT tag="likecount"
+
+image id=97 x=175 y=219 scale=0.72 tag="likeimage"
+label x=190 y=220 text="N/A" font=0 scale=0.65 align=LEFT tag="likecount"
+
+image id=197 x=275 y=219 scale=0.76
+label x=290 y=220 text="N/A" font=0 scale=0.65 align=LEFT tag="length"

@@ -44,6 +44,7 @@
 #include "menus/saved_levels.h"
 #include "menus/loading_screen.h"
 #include "menus/level_complete.h"
+#include "menus/online_level_menu.h"
 
 #include "save/saving.h"
 
@@ -1262,6 +1263,9 @@ int main(int argc, char* argv[]) {
                 break;
             case STATE_SAVED_LEVELS:
                 saved_levels_loop();
+                break;
+            case STATE_ONLINE_LEVEL:
+                online_menu_loop();
                 break;
             case STATE_EXTERNAL_LEVELS:
                 external_levels_loop();
