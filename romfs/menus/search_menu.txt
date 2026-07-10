@@ -6,7 +6,7 @@ image x=36 y=205 id=178
 image x=284 y=205 id=178 sx=-1.0
 
 window x=170 y=28 w=240 h=40 style=8
-textbox x=149 y=28 w=188 limit=20 title="Input random text:"
+textbox x=149 y=28 w=188 limit=20 title="Search for a level or id:"
 
 button x=267 y=28 id=107 scale=0.9 action="disclaimer"
 #button x=240 y=28 id=106 scale=0.7 <-- profile button
@@ -14,12 +14,12 @@ button x=267 y=28 id=107 scale=0.9 action="disclaimer"
 label x=160 y=60 text="Quick Search" scale=0.6 align=CENTER
 window x=160 y=105 w=260 h=66 style=8
 
-button x=95 y=90 text="Most Downloads   " id=104 scale=0.72 action="disclaimer"
-button x=225 y=90 text="Most Likes   " id=104 scale=0.72 action="disclaimer"
+button x=95 y=90 text="Most Downloaded <i163s0> " id=104 scale=0.72 action="disclaimer"
+button x=225 y=90 text="Most Likes <i166s0> " id=104 scale=0.72 action="disclaimer"
 
-button x=160 y=120 w=110 h=30 text="Recent   " id=105 scale=0.72 action="disclaimer"
-button x=75 y=120 w=110 h=30 text="Trending   " id=105 scale=0.72 action="disclaimer"
-button x=245 y=120 w=110 h=30 text="Magic   " id=105 scale=0.72 action="disclaimer"
+button x=160 y=120 w=110 h=30 text="Recent <i169s0> " id=105 scale=0.72 action="disclaimer"
+button x=75 y=120 w=110 h=30 text="Trending <i171s0> " id=105 scale=0.72 action="disclaimer"
+button x=245 y=120 w=110 h=30 text="Magic <i167s0> " id=105 scale=0.72 action="disclaimer"
 
 label x=160 y=153 text="Filters" scale=0.6 align=CENTER
 window x=160 y=185 w=260 h=40 style=8
@@ -33,5 +33,7 @@ button x=209 y=185 id=256 scale=0.6
 button x=242 y=185 id=258 scale=0.6
 button x=275 y=185 id=267 scale=0.6
 
-button x=160 y=223 text="Advanced Options" id=104 scale=0.72 action="disclaimer"
+button x=140 y=223 id=144 scale=0.6 action="disclaimer"
+button x=180 y=223 id=31 scale=0.6 action="disclaimer"
+
 
