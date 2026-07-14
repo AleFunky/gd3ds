@@ -13,9 +13,11 @@
 #include "graphics.h"
 #include "utils/folders.h"
 #include "menus/external_level_infobox.h"
+#include "menus/online_level_comments.h"
 
 static bool exit_flag = false;
 static bool in_info_box = false;
+static bool in_comments = false;
 
 
 static UIImage *bg_gradient;
@@ -31,10 +33,16 @@ static void action_open_info(UIElement *e) {
     // external_level_infobox_init();
 }
 
+static void action_open_comments(UIElement *e) {
+    in_comments = true;
+    online_comments_init();
+}
+
 
 static UIAction actions[] = {
     {"exit", action_exit },
     {"info", action_open_info },
+    {"comments", action_open_comments },
 };
 
 void online_menu_loop() {
@@ -60,7 +68,7 @@ void online_menu_loop() {
         touch.did_something = false;
         touch.interacted = false;
 
-        if (!in_info_box) ui_screen_update(&default_screen, &touch);
+        if (!in_info_box && !in_comments) ui_screen_update(&default_screen, &touch);
         
         do {
             update_touch_effect(DT);
@@ -73,19 +81,24 @@ void online_menu_loop() {
             draw_fade();
 
             ui_screen_draw(&default_screen);
+            if (in_comments) online_comments_draw_bot();
 
             change_blending(true);
             draw_touch_effect();
             change_blending(false);
-
+            
             // Top screen
             C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
             C2D_SceneBegin(top);
             draw_fade();
-
+            
             ui_screen_draw(&default_screen_top);
+            if (in_comments) online_comments_draw_top();
+
             C2D_ViewReset();
             C3D_FrameEnd(0);
+
+
         } while (handle_fading());
 
         if (exit_flag) {
@@ -99,6 +112,15 @@ void online_menu_loop() {
             if (returned)
             {
                 in_info_box = false;
+            }
+        }
+
+        if (in_comments)
+        {
+            int returned = online_comments_loop();
+            if (returned)
+            {
+                in_comments = false;
             }
         }
     }

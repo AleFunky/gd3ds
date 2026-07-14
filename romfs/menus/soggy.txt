@@ -1,3 +1,3 @@
 image x=160 y=120 id=19 sheet=1
-button x=24 y=28 id=8 action="exit" keyBinds="B"
+button x=24 y=28 id=6 action="exit" keyBinds="B"
 actionarea x=130 y=107 w=57 h=21 action="boop"

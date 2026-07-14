@@ -1,15 +1,17 @@
 bggradient tag="gradient"
 
-button x=20 y=28 id=6 action="exit" keyBinds="B"
+button x=24 y=28 id=6 action="exit" keyBinds="B"
 
 image x=36 y=205 id=178
 image x=284 y=205 id=178 sx=-1.0
 
 button x=160 y=80 id=139 sheet=0 scale=1 action="play" keyBinds="A,START"
 
-button x=290 y=80 id=89 sheet=0 scale=1 action="levelinfo"
+button x=290 y=80 id=89 sheet=0 scale=1 action="comments"
 
 button x=290 y=30 id=49 sheet=0 scale=1 action="deletelevel"
+
+button x=232 y=25 id=323 sheet=0 scale=1 action="garage"
 
 button x=25 y=215 id=90 sheet=0 scale=1 action="info"
 

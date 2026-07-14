@@ -1,9 +1,9 @@
 bggradient tag="gradient"
 
-button x=20 y=28 id=6 action="exit" keyBinds="B"
+button x=24 y=28 id=6 action="exit" keyBinds="B"
 window x=180 y=120 w=270 h=230 style=6
 window x=180 y=128 w=250 h=194 style=7
-list x=180 y=128 w=240 h=184 tag="list" bgColor="75,75,75,255"
+list x=180 y=128 w=240 h=184 tag="list" bgColor="#2f2f2f"
 label x=55 y=21 font=1 scale=0.9 text="" align=LEFT tag="path" 
 label x=180 y=64 font=0 scale=0.7 text="No levels found!" align=CENTER tag="no_levels" 
 label x=180 y=111 font=1 scale=0.7 text="To import levels, navigate to \3ds\gd3ds\<p>on your SD card and copy the .gmd's<p>of your choice along with their matching<p>songs to \external_levels\ and<p>\custom_songs\ respectively." align=CENTER tag="no_levels" 

@@ -1,0 +1,21 @@
+darken opacity=0.4
+
+window x=160 y=120 w=280 h=200 style=0
+
+button x=24 y=25 id=31 action="exit" keyBinds="B"
+
+list w=216 h=150 x=160 y=130 tag="list" bgColor="#bf723e"
+
+image x=160 y=60 id=39
+image x=160 y=200 id=39 sy=-1.0
+
+image x=50 y=130 id=37 sy=4.0
+image x=270 y=130 id=37 sx=-1.0 sy=4.0
+
+label x=160 y=40 text="Comments" font=2 scale=0.9 align=CENTER
+
+button x=37 y=70 id=422 sheet=0 scale=0.55 action="sortlikes"
+button x=37 y=95 id=423 sheet=0 scale=0.55 action="sorttime"
+
+button x=283 y=38 id=90 sheet=0 scale=1 action="info"
+button x=296 y=215 id=202 sheet=0 scale=0.8 action="refresh"
