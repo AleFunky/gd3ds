@@ -157,6 +157,9 @@ void cube_gamemode(Player *player) {
 
     drag_particles[state.current_player].gravityFlipped = player->upside_down;
     drag_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
+
+    drag_particles[state.current_player].cfg.sourcePositionVariancey = (player->mini ? 4.f : 2.f);
+
     if (state.input.holdJump) {
         jump = true;
     } else if (player->on_ground) {
@@ -303,6 +306,8 @@ void ship_gamemode(Player *player) {
     ship_fire_particles[state.current_player].gravityFlipped = player->upside_down;
     ship_fire_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
 
+    ship_fire_particles[state.current_player].cfg.sourcePositionVariancey = (player->mini ? 4.f : 3.f);
+
     ship_secondary_particles[state.current_player].emitterX = x;
     ship_secondary_particles[state.current_player].emitterY = y;
     ship_secondary_particles[state.current_player].emitting = true;
@@ -310,12 +315,16 @@ void ship_gamemode(Player *player) {
     ship_secondary_particles[state.current_player].gravityFlipped = player->upside_down;
     ship_secondary_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
 
+    ship_secondary_particles[state.current_player].cfg.sourcePositionVariancey = (player->mini ? 4.5f : 2.f);
+
     drag_particles_2[state.current_player].emitterX = calc_x;
     drag_particles_2[state.current_player].emitterY = calc_y;
     drag_particles_2[state.current_player].emitting = player->on_ground;
 
     drag_particles_2[state.current_player].gravityFlipped = !player->upside_down;
     drag_particles_2[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
+
+
 
     if (state.dual) {
         // Make both dual players symmetric by using inverted ship gravity
@@ -385,6 +394,9 @@ void ball_gamemode(Player *player) {
 
     drag_particles[state.current_player].gravityFlipped = player->upside_down;
     drag_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
+
+    drag_particles[state.current_player].cfg.sourcePositionVariancey = (player->mini ? 4.f : 2.f);
+
     // If on ground (block or slope) and its buffering, do a jump
     if ((player->slope_data.slope_id >= 0 || player->on_ground || player->on_ceiling) && player->buffering_state == BUFFER_READY) {        
         player->upside_down ^= 1;
