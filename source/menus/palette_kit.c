@@ -252,18 +252,6 @@ static void reset_indices(){
     category_counter = 0;
     color_counter = 0;
 
-    //get selected category from selected color index
-    int current_index = *current_colors[color_page];
-
-    //9 is the number of categories
-    for(int i = 0; i < 9; i++){
-        if(current_index < category_counts[i]){
-            selected_category = i;
-            break;
-        }
-        current_index -= category_counts[i];
-    }
-
     //find first color index
     starting_color_index = 0;
     for(int i = 0; i < selected_category; i++){
@@ -277,9 +265,7 @@ static void reset_indices(){
 static void action_category_selected(UIElement *e){
     UIColor *color = (UIColor *) e;
 
-    //The index of the category color buttons does not correspond to col1/col2/glow, instead corresponding to its category
-    *current_colors[color_page] = category_colors[color->index];
-    update_player_colors();
+    selected_category = color->index;
 
     reset_indices();
 }
@@ -301,11 +287,26 @@ static void disable_all_color_buttons(UIElement *e) {
     ui_window_button_set_style((UIWindowButton *) e, 4);
 }
 
+static void reset_selected_category(){
+    //get selected category from selected color index
+    int current_index = *current_colors[color_page];
+
+    //9 is the number of categories
+    for(int i = 0; i < 9; i++){
+        if(current_index < category_counts[i]){
+            selected_category = i;
+            break;
+        }
+        current_index -= category_counts[i];
+    }
+}
+
 static void set_p1_page(UIElement *e) {    
     ui_run_func_on_tag(&screen, "color_buttons", disable_all_color_buttons);
     ui_window_button_set_style((UIWindowButton *) e, 5);
     color_page = 0;
     ui_run_func_on_tag(&screen, "glow_option", disable_glow_setting);
+    reset_selected_category();
     reset_indices();
 }
 
@@ -314,6 +315,7 @@ static void set_p2_page(UIElement *e) {
     ui_window_button_set_style((UIWindowButton *) e, 5);
     color_page = 1;
     ui_run_func_on_tag(&screen, "glow_option", disable_glow_setting);
+    reset_selected_category();
     reset_indices();
 }
 
@@ -322,6 +324,7 @@ static void set_glow_page(UIElement *e) {
     ui_window_button_set_style((UIWindowButton *) e, 5);
     color_page = 2;
     ui_run_func_on_tag(&screen, "glow_option", enable_glow_setting);
+    reset_selected_category();
     reset_indices();
 }
 
@@ -350,6 +353,7 @@ void palette_kit_init() {
 
     color_page = 0;
 
+    reset_selected_category();
     reset_indices();
 
     set_checkbox_enabled((UICheckBox *) ui_get_element_by_tag(&screen, "check_glow"), player_glow_enabled);
