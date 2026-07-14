@@ -25,7 +25,7 @@ const MotionTrailConfig trail_properties[TRAIL_COUNT] = {
     //double line trail
     {. fade = 0.3f, .width = 10.f, .always_on = false, .colored = true,  .stationary = false, .blending = true},
     //triangle trail 
-    {. fade = 0.4f, .width = 10.f, .always_on = false, .colored = true,  .stationary = false, .blending = true},
+    {. fade = 0.4f, .width = 11.5f, .always_on = false, .colored = true,  .stationary = false, .blending = true},
     //long line trail
     {. fade = 0.5f, .width = 10.f, .always_on = true,  .colored = true,  .stationary = false, .blending = true},
     //dashed line trail
