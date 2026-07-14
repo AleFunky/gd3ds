@@ -43,8 +43,6 @@ static void ui_color_button_draw(UIElement* e, UITransform *transform) {
 
 void ui_color_button_set_index(UIColor *e, int index, int color_index) {
     if (!e) return;
-
-    e->isSelected = *current_colors[index] == color_index,
     e->index = index;
     e->color_index = color_index;
 }

@@ -10,6 +10,7 @@
 #include "menus/components/ui_window_button.h"
 #include "graphics.h"
 #include "palette_kit.h"
+#include "menus/components/ui_checkbox.h"
 
 static bool yes_exit = false;
 
@@ -163,8 +164,56 @@ const u32 colors[] = {
 
 const size_t NUM_COLORS = ARRAY_LEN(colors);
 
+/*
+Categories:
+
+Red,
+Orange,
+Yellow,
+Green,
+Cyan,
+Blue,
+Purple,
+Magenta,
+Gray
+*/
+static int category_colors[] = {
+    3,
+    15,
+    26,
+    39,
+    51,
+    63,
+    78,
+    89,
+    103
+};
+
+//amount of colors in each category
+static int category_counts[] = {
+    12,
+    12,
+    12,
+    12,
+    12,
+    16,
+    12,
+    12,
+    7
+};
+
+static int selected_category;
+
+//the first color index in the selected category
+static int starting_color_index;
+
+//used to increment category color buttons during setup
+static int category_counter = 0;
+
+//used to increment color buttons during setup
 static int color_counter = 0;
 
+//color 1, 2, or glow
 static int color_page = 0;
 
 static void disable_glow_setting(UIElement *e) {
@@ -177,16 +226,71 @@ static void enable_glow_setting(UIElement *e) {
 
 static void set_color_index(UIElement *e) {
     UIColor *color = (UIColor *) e;
-    ui_color_button_set_index(color, color_page, color_counter);
+
+    int color_index = starting_color_index + color_counter;
+
+    ui_color_button_set_index(color, color_page, color_index);
+
+    color->isSelected = *current_colors[color_page] == color_index;
+
+    e->enabled = color_counter < category_counts[selected_category];
+
     color_counter++;
+}
+
+static void set_category_index(UIElement *e) {
+    UIColor *color = (UIColor *) e;
+    //rather than using the color index as col1/col2/glow, it's used as a category index for the button
+    ui_color_button_set_index(color, category_counter, category_colors[category_counter]);
+    
+    color->isSelected = selected_category == category_counter;
+    
+    category_counter++;
+}
+
+static void reset_indices(){
+    category_counter = 0;
+    color_counter = 0;
+
+    //get selected category from selected color index
+    int current_index = *current_colors[color_page];
+
+    //9 is the number of categories
+    for(int i = 0; i < 9; i++){
+        if(current_index < category_counts[i]){
+            selected_category = i;
+            break;
+        }
+        current_index -= category_counts[i];
+    }
+
+    //find first color index
+    starting_color_index = 0;
+    for(int i = 0; i < selected_category; i++){
+        starting_color_index += category_counts[i];
+    }
+
+    ui_run_func_on_tag(&screen, "category", set_category_index);
+    ui_run_func_on_tag(&screen, "color", set_color_index);
+}
+
+static void action_category_selected(UIElement *e){
+    UIColor *color = (UIColor *) e;
+
+    //The index of the category color buttons does not correspond to col1/col2/glow, instead corresponding to its category
+    *current_colors[color_page] = category_colors[color->index];
+    update_player_colors();
+
+    reset_indices();
 }
 
 static void action_color_selected(UIElement *e) {
     UIColor *color = (UIColor *) e;
+
     *current_colors[color_page] = color->color_index;
     update_player_colors();
-    color_counter = 0;
-    ui_run_func_on_tag(&screen, "color", set_color_index);
+
+    reset_indices();
 }
 
 void exit_palette_kit(UIElement* e) {
@@ -201,27 +305,24 @@ static void set_p1_page(UIElement *e) {
     ui_run_func_on_tag(&screen, "color_buttons", disable_all_color_buttons);
     ui_window_button_set_style((UIWindowButton *) e, 5);
     color_page = 0;
-    color_counter = 0;
     ui_run_func_on_tag(&screen, "glow_option", disable_glow_setting);
-    ui_run_func_on_tag(&screen, "color", set_color_index);
+    reset_indices();
 }
 
 static void set_p2_page(UIElement *e) {
     ui_run_func_on_tag(&screen, "color_buttons", disable_all_color_buttons);
     ui_window_button_set_style((UIWindowButton *) e, 5);
     color_page = 1;
-    color_counter = 0;
     ui_run_func_on_tag(&screen, "glow_option", disable_glow_setting);
-    ui_run_func_on_tag(&screen, "color", set_color_index);
+    reset_indices();
 }
 
 static void set_glow_page(UIElement *e) {
     ui_run_func_on_tag(&screen, "color_buttons", disable_all_color_buttons);
     ui_window_button_set_style((UIWindowButton *) e, 5);
     color_page = 2;
-    color_counter = 0;
     ui_run_func_on_tag(&screen, "glow_option", enable_glow_setting);
-    ui_run_func_on_tag(&screen, "color", set_color_index);
+    reset_indices();
 }
 
 void player_glow_settings(UIElement* e) {
@@ -235,7 +336,8 @@ static UIAction actions[] = {
     {"action_p1", set_p1_page},
     {"action_p2", set_p2_page},
     {"action_glow", set_glow_page},
-    {"glow", player_glow_settings}
+    {"glow", player_glow_settings},
+    {"category_selected", action_category_selected}
 };
 
 
@@ -244,11 +346,14 @@ void palette_kit_init() {
     ui_screen_open(&screen, ANIM_SLIDE_RIGHT);
     yes_exit = false;
     ui_window_set_tint((UIWindow *) ui_get_element_by_tag(&screen, "bg_window"), C2D_Color32(0, 0, 0, 64));
-    color_counter = 0;
+    ui_window_set_tint((UIWindow *) ui_get_element_by_tag(&screen, "color_window"), C2D_Color32(0, 0, 0, 64));
+
     color_page = 0;
-    ui_run_func_on_tag(&screen, "color", set_color_index);
+
+    reset_indices();
+
+    set_checkbox_enabled((UICheckBox *) ui_get_element_by_tag(&screen, "check_glow"), player_glow_enabled);
     ui_run_func_on_tag(&screen, "glow_option", disable_glow_setting);
-    ((UICheckBox *) ui_get_element_by_tag(&screen, "chk_glow"))->checked = player_glow_enabled;
 }
 
 int palette_kit_loop() {
