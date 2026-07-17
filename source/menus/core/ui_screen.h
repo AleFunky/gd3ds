@@ -8,6 +8,7 @@
 typedef enum {
     ANIM_NONE,
     ANIM_ZOOM,
+    ANIM_ZOOM_SUBTLE,
     ANIM_SLIDE_RIGHT,
     ANIM_SLIDE_DOWN,
 

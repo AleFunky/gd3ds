@@ -5,7 +5,7 @@ window x=160 y=120 w=260 h=177 style=1 tag=window
 # Labelling
 
 label x=160 y=66 font=2 text="Level Stats" scale=0.9 align=CENTER
-label x=160 y=90 font=1 text="<#f6ff06>Level Name</>" scale=0.8 align=CENTER tag="levelname"
+label x=160 y=90 font=1 text="Level Name" scale=0.8 align=CENTER tag="levelname"
 label x=160 y=104 font=1 text="<#40e348>Total Attempts</>:" scale=0.8 align=CENTER tag="totalattempts"
 label x=160 y=118 font=1 text="<#60abef>Total Jumps</>:" scale=0.8 align=CENTER tag="totaljumps"
 label x=160 y=132 font=1 text="<#ff00ff>Normal</>:" scale=0.8 align=CENTER tag="normalprogressvalue"

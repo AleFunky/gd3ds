@@ -1,25 +1,28 @@
 bggradient tag="gradient_top"
 
+image x=36 y=35 id=178 sy=-1.0
+image x=36 y=205 id=178
+image x=364 y=205 id=178 sx=-1.0
+image x=364 y=35 id=178 sx=-1.0 sy=-1.0
+
 label x=200 y=22 text="Unknown" font=0 scale=0.9 align=CENTER tag="levelname"
 
 label x=200 y=46 text="By Unknown" scale=0.7 font=2 align=CENTER tag="creatorname"
 
-image id=251 sheet=0 x=200 y=92 scale=1 tag="difficultyface"
+image id=251 sheet=0 x=165 y=92 scale=1 tag="difficultyface"
 
-label x=200 y=139 text="Normal mode" scale=0.45 align=CENTER tag="level_card"
-progressbar x=200 y=152 max_value=100 style=0 scale=0.65 tag="level_card,normalprogress"
+image id=58 x=205 y=72 scale=0.74
+label x=217 y=72 text="N/A" font=0 scale=0.5 align=LEFT tag="downloadcount"
 
-label x=200 y=153 text="0%" scale=0.4 align=CENTER tag="level_card,normalprogressvalue"
+image id=97 x=205 y=95 scale=0.74 tag="thumbsup"
+label x=217 y=95 text="N/A" font=0 scale=0.5 align=LEFT tag="likecount"
 
-label x=200 y=174 text="Practice mode" scale=0.45 align=CENTER tag=""
-progressbar x=200 y=187 max_value=100 style=0 scale=0.65 tag="practiceprogress"
-label x=200 y=188 text="0%" scale=0.4 align=CENTER tag="level_card,practiceprogressvalue"
+image id=197 x=205 y=118 scale=0.74
+label x=217 y=118 text="N/A" font=0 scale=0.5 align=LEFT tag="length"
 
-image id=58 x=75 y=218 scale=0.72
-label x=90 y=220 text="N/A" font=0 scale=0.65 align=LEFT tag="likecount"
+# Description 
 
-image id=97 x=175 y=219 scale=0.72 tag="likeimage"
-label x=190 y=220 text="N/A" font=0 scale=0.65 align=LEFT tag="likecount"
+window x=200 y=170 w=300 h=75 style=8
+label x=200 y=170 font=1 text="No description found." scale=0.8 align=CENTER tag="description"
 
-image id=197 x=275 y=219 scale=0.76
-label x=290 y=220 text="N/A" font=0 scale=0.65 align=LEFT tag="length"
+label x=345 y=197 font=1 text="<#78aaf0>ID: N/A</>" scale=0.8 align=RIGHT tag="levelid"

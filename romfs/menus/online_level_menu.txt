@@ -5,20 +5,30 @@ button x=24 y=28 id=6 action="exit" keyBinds="B"
 image x=36 y=205 id=178
 image x=284 y=205 id=178 sx=-1.0
 
-button x=160 y=80 id=139 sheet=0 scale=1 action="play" keyBinds="A,START"
+#Progress bars
 
-button x=290 y=80 id=89 sheet=0 scale=1 action="comments"
+label x=160 y=119 text="Normal mode" scale=0.45 align=CENTER tag="level_card"
+progressbar x=160 y=132 max_value=100 style=0 scale=0.65 tag="level_card,normalprogress"
+label x=160 y=133 text="0%" scale=0.4 align=CENTER tag="level_card,normalprogressvalue"
 
-button x=290 y=30 id=49 sheet=0 scale=1 action="deletelevel"
+label x=160 y=154 text="Practice mode" scale=0.45 align=CENTER tag=""
+progressbar x=160 y=167 max_value=100 style=0 scale=0.65 tag="practiceprogress"
+label x=160 y=168 text="0%" scale=0.4 align=CENTER tag="level_card,practiceprogressvalue"
 
-button x=232 y=25 id=323 sheet=0 scale=1 action="garage"
+button x=160 y=70 id=139 sheet=0 scale=1 action="play" keyBinds="A,START"
+
+button x=295 y=25 id=49 sheet=0 scale=1 action="deletelevel"
+button x=295 y=75 id=202 sheet=0 scale=1 action="reload"
+button x=295 y=125 id=24 sheet=0 scale=1 action="comments"
 
 button x=25 y=215 id=90 sheet=0 scale=1 action="info"
 
-window x=160 y=185 w=216 h=60 style=0
+#Song download
 
-label x=61 y=172 text="Song Name Here" font=0 scale=0.55 align=LEFT tag="songname"
-label x=61 y=184 text="By: Song Artist" font=2 scale=0.55 align=LEFT tag="songartist"
-label x=61 y=202 text="SongID: 123456" font=0 scale=0.38 align=LEFT tag="songid"
+window x=160 y=210 w=216 h=60 style=0
 
-button x=246 y=192 id=57 sheet=0 scale=0.8 action="downloadsong"
+label x=61 y=195 text="Song Name Here" font=0 scale=0.55 align=LEFT tag="songname"
+label x=61 y=207 text="By: Song Artist" font=2 scale=0.55 align=LEFT tag="songartist"
+label x=61 y=229 text="ID: 123456" font=0 scale=0.35 align=LEFT tag="songid"
+label x=230 y=229 text="Size: 0.00MB" font=0 scale=0.35 align=RIGHT tag="songsize"
+button x=245 y=215 id=57 sheet=0 scale=0.9 action="download"

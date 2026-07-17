@@ -300,8 +300,8 @@ void external_popup_init() {
     ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/external_pop_up.txt");
     ui_load_screen(&screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/external_pop_up_top.txt");
 
-    ui_screen_open(&screen, ANIM_ZOOM);
-    ui_screen_open(&screen_top, ANIM_ZOOM);
+    ui_screen_open(&screen, ANIM_ZOOM_SUBTLE);
+    ui_screen_open(&screen_top, ANIM_ZOOM_SUBTLE);
 
     level_name      = (UILabel *) ui_get_element_by_tag(&screen_top, "levelname");
     creator_name    = (UILabel *) ui_get_element_by_tag(&screen_top, "creatorname");

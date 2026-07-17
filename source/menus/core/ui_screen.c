@@ -337,6 +337,9 @@ void ui_screen_draw(UIScreen* s) {
     int width = s->isBottom ? 320 : 400;
     int height = 240;
 
+    float cx = width * 0.5f;
+    float cy = height * 0.5f;
+
     float slide_value = 0;
     float scale_value = 0;
 
@@ -350,8 +353,16 @@ void ui_screen_draw(UIScreen* s) {
             root.scaleX = scale_value;
             root.scaleY = scale_value;
 
-            float cx = width * 0.5f;
-            float cy = height * 0.5f;
+            root.x = cx * (1.f - scale_value);
+            root.y = cy * (1.f - scale_value);
+            break;
+        case ANIM_ZOOM_SUBTLE:
+            scale_value = easeValue(ELASTIC_OUT, 0.f, 1.f, s->transition.time, s->transition.duration / 1.5f, 1.6f);
+            
+            if (s->transition.state == UI_TRANSITION_CLOSING) scale_value = 1.f - scale_value;
+
+            root.scaleX = scale_value;
+            root.scaleY = scale_value;
 
             root.x = cx * (1.f - scale_value);
             root.y = cy * (1.f - scale_value);

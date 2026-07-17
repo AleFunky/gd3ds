@@ -557,7 +557,6 @@ void game_loop() {
         touchPosition touchPos;
         hidTouchRead(&touchPos);
 
-        // Respond to user input
         u32 kDown = hidKeysDown();
         u32 kHeld = hidKeysHeld();
         u32 kUp = hidKeysUp();

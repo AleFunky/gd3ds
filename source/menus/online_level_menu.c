@@ -14,6 +14,7 @@
 #include "utils/folders.h"
 #include "menus/external_level_infobox.h"
 #include "menus/online_level_comments.h"
+#include "menus/online_level_infobox.h"
 
 static bool exit_flag = false;
 static bool in_info_box = false;
@@ -29,8 +30,8 @@ static void action_exit(UIElement *e) {
 }
 
 static void action_open_info(UIElement *e) {
-    // in_info_box = true;
-    // external_level_infobox_init();
+    in_info_box = true;
+    online_level_infobox_init();
 }
 
 static void action_open_comments(UIElement *e) {
@@ -67,8 +68,6 @@ void online_menu_loop() {
         touch.touchPosition = touchPos;
         touch.did_something = false;
         touch.interacted = false;
-
-        if (!in_info_box && !in_comments) ui_screen_update(&default_screen, &touch);
         
         do {
             update_touch_effect(DT);
@@ -81,7 +80,8 @@ void online_menu_loop() {
             draw_fade();
 
             ui_screen_draw(&default_screen);
-            if (in_comments) online_comments_draw_bot();
+            if(in_info_box) online_level_infobox_draw_bot();
+            if(in_comments) online_comments_draw();
 
             change_blending(true);
             draw_touch_effect();
@@ -93,7 +93,7 @@ void online_menu_loop() {
             draw_fade();
             
             ui_screen_draw(&default_screen_top);
-            if (in_comments) online_comments_draw_top();
+            if(in_info_box) online_level_infobox_draw_top();
 
             C2D_ViewReset();
             C3D_FrameEnd(0);
@@ -106,9 +106,11 @@ void online_menu_loop() {
             break;
         }
 
+        if (!in_info_box && !in_comments) ui_screen_update(&default_screen, &touch);
+
         if (in_info_box)
         {
-            int returned = external_level_infobox_loop();
+            int returned = online_level_infobox_loop();
             if (returned)
             {
                 in_info_box = false;

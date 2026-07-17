@@ -17,5 +17,4 @@ label x=160 y=40 text="Comments" font=2 scale=0.9 align=CENTER
 button x=37 y=70 id=422 sheet=0 scale=0.55 action="sortlikes"
 button x=37 y=95 id=423 sheet=0 scale=0.55 action="sorttime"
 
-button x=283 y=38 id=90 sheet=0 scale=1 action="info"
 button x=296 y=215 id=202 sheet=0 scale=0.8 action="refresh"

@@ -1,0 +1,14 @@
+darken opacity=0.4
+
+window x=200 y=120 w=260 h=177 style=1 tag=window
+
+# Labelling
+
+label x=200 y=66 font=2 text="Level Info" scale=0.9 align=CENTER
+
+label x=200 y=97 font=1 text="Level Name" scale=0.8 align=CENTER tag="levelname"
+label x=200 y=111 font=1 text="<#ffff00>By Level Author</>" scale=0.8 align=CENTER tag="levelcreator"
+label x=200 y=125 font=1 text="Uploaded:" scale=0.8 align=CENTER tag="uploaddate"
+label x=200 y=139 font=1 text="Updated:" scale=0.8 align=CENTER tag="updatedate"
+label x=200 y=153 font=1 text="Stars Requested:" scale=0.8 align=CENTER tag="starsrequested"
+label x=200 y=167 font=1 text="Game Version:" scale=0.8 align=CENTER tag="gdversion"

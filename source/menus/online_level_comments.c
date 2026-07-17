@@ -8,15 +8,12 @@
 #include "menus/components/ui_image.h"
 #include "menus/components/ui_label.h"
 #include "menus/components/ui_rectangle.h"
-#include "menus/online_comments_infobox.h"
 #include "main.h"
 #include "utils/folders.h"
 
 #include "state.h"
 
 static bool yes_exit = false;
-
-static bool in_infobox = false;
 
 static UIList *list;
 
@@ -37,8 +34,6 @@ static const CommentEntries comments[] = {
 
 UIElement entries2[ARRAY_LEN(comments)];
 
-static UIScreen screen_top = {
-};
 static UIScreen screen = {
     .isBottom = true,
 };
@@ -47,23 +42,14 @@ void exit_comments(UIElement* e) {
     yes_exit = true;
 }
 
-
-static void open_info(UIElement *e) {
-    in_infobox = true;
-    online_comments_infobox_init();
-}
-
 static UIAction actions[] = {
-    { "exit", exit_comments },
-    { "info", open_info }
+    { "exit", exit_comments }
 };
 
 void online_comments_init() {
     ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_level_comments.txt");
-    ui_load_screen(&screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_level_comments_top.txt");
 
-    ui_screen_open(&screen, ANIM_ZOOM);
-    ui_screen_open(&screen_top, ANIM_ZOOM);
+    ui_screen_open(&screen, ANIM_ZOOM_SUBTLE);
 
     list = (UIList *) ui_get_element_by_tag(&screen, "list");
 
@@ -198,16 +184,13 @@ void online_comments_init() {
         }
     }
 
-
     yes_exit = false;
-    in_infobox = false;
 }
 
 int online_comments_loop() {
 
     if (yes_exit) {        
         ui_unload_screen(&screen);
-        ui_unload_screen(&screen_top);
         return true;
     }
     
@@ -217,23 +200,11 @@ int online_comments_loop() {
     touch.touchPosition = touchPos;
     touch.did_something = false;
     touch.interacted = false;
-    if (!in_infobox) ui_screen_update(&screen, &touch);
-    ui_screen_update(&screen_top, &touch);
-    
-    if (in_infobox) {
-        int returned = online_comments_infobox_loop();
-        if (returned) {
-            in_infobox = false;
-        }
-    } 
+    ui_screen_update(&screen, &touch);
+
     return false;
 }
 
-void online_comments_draw_top() {
-    ui_screen_draw(&screen_top);
-}
-
-void online_comments_draw_bot() {
+void online_comments_draw() {
     ui_screen_draw(&screen);
-    if (in_infobox) online_comments_infobox_draw();
 }
