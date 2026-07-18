@@ -8,8 +8,12 @@
 
 #include "generic_disclaimer.h"
 #include "search_menu.h"
+// #include "server_switcher.h"
+// #include "filters_menu.h"
 
 static bool in_disclaimer = false;
+static bool in_server_switcher = false;
+static bool in_filters = false;
 static bool exit_flag = false;
 
 static UIImage *bg_gradient;
@@ -25,9 +29,25 @@ void action_open_disclaimer(UIElement* e) {
     disclaimer_init();
 }
 
+void action_open_server_switcher(UIElement* e) {
+    // in_server_switcher = true;
+    // server_switcher_init();
+}
+
+void action_open_filters(UIElement* e) {
+    // in_filters = true;
+    // filters_init();
+}
+
+void action_clear_filters(UIElement* e) {
+}
+
 static UIAction actions[] = {
     {"exit", action_exit },
-    {"disclaimer", action_open_disclaimer }
+    {"disclaimer", action_open_disclaimer },
+    {"serverswitcher", action_open_server_switcher },
+    {"openfilters", action_open_filters },
+    {"clearfilters", action_clear_filters },
 };
 
 void search_menu_loop() {
