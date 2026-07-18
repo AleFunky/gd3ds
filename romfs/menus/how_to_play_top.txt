@@ -1,0 +1,19 @@
+darken opacity=0.4
+
+window x=200 y=120 w=300 h=130 style=0
+label x=200 y=75 text="Cube" scale=0.9 font=2 align=CENTER tag="page1"
+label x=200 y=75 text="Ship" scale=0.9 font=2 align=CENTER tag="page2"
+label x=200 y=75 text="Ball" scale=0.9 font=2 align=CENTER tag="page3"
+label x=200 y=75 text="Ufo" scale=0.9 font=2 align=CENTER tag="page4"
+label x=200 y=75 text="Wave" scale=0.9 font=2 align=CENTER tag="page5"
+label x=200 y=75 text="Orbs" scale=0.9 font=2 align=CENTER tag="page6"
+label x=200 y=75 text="Practice Mode" scale=0.9 font=2 align=CENTER tag="page7"
+label x=200 y=75 text="Practice Mode" scale=0.9 font=2 align=CENTER tag="page8"
+image w=305 h=91 y=130 x=200 scale=0.9 sheet=1 id=45 tag="page1"
+image w=305 h=91 y=130 x=200 scale=0.9 sheet=1 id=46 tag="page2"
+image w=305 h=91 y=130 x=200 scale=0.9 sheet=1 id=51 tag="page3"
+image w=305 h=91 y=130 x=200 scale=0.9 sheet=1 id=50 tag="page4"
+image w=305 h=91 y=130 x=200 scale=0.9 sheet=1 id=52 tag="page5"
+image w=305 h=91 y=130 x=200 scale=0.9 sheet=1 id=49 tag="page6"
+image w=305 h=91 y=130 x=200 scale=0.9 sheet=1 id=47 tag="page7"
+image w=305 h=91 y=130 x=200 scale=0.9 sheet=1 id=48 tag="page8"

@@ -16,9 +16,12 @@
 
 #include "main_menu.h"
 #include "level_select.h"
+#include "settings_hub.h"
 #include "settings.h"
 #include "statistics.h"
 #include "credits.h"
+#include "songs.h"
+#include "how_to_play.h"
 #include "first_boot_disclaimer.h"
 #include "info_card.h"
 #include "state.h"
@@ -46,11 +49,12 @@ static int main_menu_color_index = 0;
 static int new_state = 0;
 static bool exit_flag = false;
 
-static bool in_settings = false;
+static bool in_settings_hub = false;
 static bool in_statistics = false;
 static bool in_credits = false;
 static bool in_first_boot_disclaimer = false;
 bool in_info_card = false;
+bool in_songs = false;
 
 static float bg_scroll = 0;
 
@@ -71,8 +75,8 @@ void action_open_icon_kit(UIElement* e) {
 }
 
 void action_open_settings(UIElement* e) {
-    in_settings = true;
-    settings_init();
+    in_settings_hub = true;
+    settings_hub_init();
 }
 
 void action_open_statistics(UIElement* e) {
@@ -142,6 +146,11 @@ void action_open_info_card(int id) {
             break;
     }
     in_info_card = true;
+}
+
+void open_soundtrack() {
+    in_songs = true;
+    songs_init();
 }
 
 static UIAction actions[] = {
@@ -410,7 +419,7 @@ void main_menu_loop() {
             touch_x, touch_y, 9, 9, 0
         );
 
-        bool in_menu = in_settings || in_first_boot_disclaimer || in_statistics || in_credits || in_info_card;
+        bool in_menu = in_settings_hub || in_first_boot_disclaimer || in_statistics || in_songs || in_credits || in_info_card;
 
         // Ded
         if (kill && !state.dead && !in_menu) {
@@ -476,6 +485,8 @@ void main_menu_loop() {
             C2D_ViewScale(1/SCALE, 1/SCALE);
             ui_screen_draw(&default_screen_top);
 
+            if (in_how_to_play) draw_how_to_play_top();
+
             // Bottom Screen
             C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
             C2D_SceneBegin(bot);
@@ -497,10 +508,10 @@ void main_menu_loop() {
             C2D_ViewScale(1/SCALE, 1/SCALE);
 
             ui_screen_draw(&default_screen);
-            if (in_settings) {
-                int returned = settings_loop();
+            if (in_settings_hub) {
+                int returned = settings_hub_loop();
                 if (returned) {
-                    in_settings = false;
+                    in_settings_hub = false;
                 }
             }
 
@@ -508,6 +519,13 @@ void main_menu_loop() {
                 int returned = statistics_loop();
                 if (returned) {
                     in_statistics = false;
+                }
+            }
+
+            if (in_songs) {
+                int returned = songs_loop();
+                if (returned) {
+                    in_songs = false;
                 }
             }
 

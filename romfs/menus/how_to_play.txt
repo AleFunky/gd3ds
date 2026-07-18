@@ -1,0 +1,17 @@
+darken opacity=0.4
+
+
+window x=160 y=120 w=240 h=140 style=0
+{
+    button x=-115 y=-67 id=31 scale=0.8 action="exit" keyBinds="B"
+    label x=0 y=-16 text="<#00FF00>Tap</> the screen or<p><#00FF00>press</> A to jump.<p><p><#00FF00>Hold</> down to keep<p>jumping." tag="page1" scale=0.55 align=CENTER
+    label x=0 y=-16 text="<#00FF00>Hold</> to fly up.<p><p><#00FF00>Release</> to fly down." tag="page2" scale=0.55 align=CENTER
+    label x=0 y=-16 text="<#00FF00>Tap</> to switch gravity." tag="page3" scale=0.55 align=CENTER
+    label x=0 y=-16 text="<#00FF00>Tap</> to boost upwards." tag="page4" scale=0.55 align=CENTER
+    label x=0 y=-16 text="<#00FF00>Hold</> to move upwards.<p><p><#00FF00>Release</> to go back<p>down." tag="page5" scale=0.55 align=CENTER
+    label x=0 y=-16 text="Tap while touching <p>a <#FFFF00>Jump Orb</> to use<p>its effect." tag="page6" scale=0.55 align=CENTER
+    label x=0 y=-16 text="<#599cff>Practice mode</> lets<p>you place <#00FF00>checkpoints</>.<p><p>Enter it from the<p>pause menu." tag="page7" scale=0.55 align=CENTER
+    label x=0 y=-16 text="You can place them <p>manually, or use <p>the <#00FF00>auto-checkpoints</><p>feature." tag="page8" scale=0.55 align=CENTER
+    
+    windowbutton x=72 y=42 w=72 h=28 text="Next" action="next" tag="nextbutton" style=5 keyBinds="A" textScale=0.65
+}
