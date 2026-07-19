@@ -50,6 +50,8 @@ static void draw_bar(UISlider *e, UITransform *transform) {
         sub = select_box(&e->track.image, 0, 0, pixels, e->track.image.subtex->height);
         img = e->track.image; img.subtex = &sub;
 
+        C2D_SpriteFromSheet(&e->button, bar_sheet, 4 + e->dragging);
+        C3D_TexSetFilter(e->button.image.tex, GPU_LINEAR, GPU_LINEAR);
         C2D_SpriteFromImage(&spr, img);
         C2D_SpriteSetCenter(&spr, 0.f, 0.5f);
         C2D_SpriteSetPos(&spr, x, transform->y);
@@ -158,7 +160,7 @@ static void ui_slider_init_graphics(UISlider *e) {
     C2D_SpriteFromSheet(&e->track_frame, bar_sheet, 1);
     C3D_TexSetFilter(e->track_frame.image.tex, GPU_LINEAR, GPU_LINEAR);
 
-    C2D_SpriteFromSheet(&e->button, bar_sheet, 4 + e->dragging);
+    C2D_SpriteFromSheet(&e->button, bar_sheet, 4);
     C3D_TexSetFilter(e->button.image.tex, GPU_LINEAR, GPU_LINEAR);
 
     e->base.w = e->track.image.subtex->width;
