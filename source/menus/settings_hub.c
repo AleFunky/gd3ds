@@ -103,6 +103,7 @@ int settings_hub_loop() {
     // The screen is unloaded by the call to ui_screen_close
     if (!screen.loaded) {
         if (switch_to_soundtrack) open_soundtrack();
+        switch_to_soundtrack = false;
         return true;
     }
 

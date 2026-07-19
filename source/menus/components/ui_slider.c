@@ -14,9 +14,7 @@ static void draw_button(UISlider *e, UITransform *transform) {
     
     float percent = ui_slider_get_percent(e);
     int button_x = left_side + (int)(percent * width);
-    
-    C2D_SpriteFromSheet(&e->button, bar_sheet, 4 + e->dragging);
-    C3D_TexSetFilter(e->button.image.tex, GPU_LINEAR, GPU_LINEAR);
+
     C2D_SpriteSetCenter(&e->button, 0.5f, 0.5f);
     C2D_SpriteSetPos(&e->button, button_x, transform->y);
     C2D_SpriteSetScale(&e->button, transform->scaleX, transform->scaleY);
@@ -159,6 +157,9 @@ static void ui_slider_init_graphics(UISlider *e) {
 
     C2D_SpriteFromSheet(&e->track_frame, bar_sheet, 1);
     C3D_TexSetFilter(e->track_frame.image.tex, GPU_LINEAR, GPU_LINEAR);
+
+    C2D_SpriteFromSheet(&e->button, bar_sheet, 4 + e->dragging);
+    C3D_TexSetFilter(e->button.image.tex, GPU_LINEAR, GPU_LINEAR);
 
     e->base.w = e->track.image.subtex->width;
     e->base.h = e->track.image.subtex->height;
