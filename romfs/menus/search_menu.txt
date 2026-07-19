@@ -14,12 +14,32 @@ button x=267 y=28 id=107 scale=0.9 action="disclaimer"
 label x=160 y=60 text="Quick Search" scale=0.6 align=CENTER
 window x=160 y=105 w=260 h=66 style=8
 
-button x=95 y=90 text="Most Downloaded <i163s0> " id=104 scale=0.72 action="disclaimer"
-button x=225 y=90 text="Most Likes <i166s0> " id=104 scale=0.72 action="disclaimer"
+button x=95 y=90 text="" id=104 scale=0.72 action="disclaimer"
+{
+    label x=-77 y=0 text="Most Downloaded" scale=0.43 align=LEFT
+    image x=67 y=0 w=20 h=20 id=163
+}
+button x=225 y=90 text="" id=104 scale=0.72 action="disclaimer"
+{
+    label x=-76 y=0 text="Most Likes" scale=0.62 align=LEFT
+    image x=67 y=0 w=20 h=20 id=166
+}
 
-button x=160 y=120 w=110 h=30 text="Recent <i169s0> " id=105 scale=0.72 action="disclaimer"
-button x=75 y=120 w=110 h=30 text="Trending <i171s0> " id=105 scale=0.72 action="disclaimer"
-button x=245 y=120 w=110 h=30 text="Magic <i167s0> " id=105 scale=0.72 action="disclaimer"
+button x=160 y=120 w=110 h=30 text="" id=105 scale=0.72 action="disclaimer"
+{
+    label x=-50 y=0 text="Recent" scale=0.62 align=LEFT
+    image x=40 y=0 w=20 h=20 id=169
+}
+button x=75 y=120 w=110 h=30 text="" id=105 scale=0.72 action="disclaimer"
+{
+    label x=-50 y=0 text="Trending" scale=0.5 align=LEFT
+    image x=40 y=0 w=20 h=20 id=171
+}
+button x=245 y=120 w=110 h=30 text="" id=105 scale=0.72 action="disclaimer"
+{
+    label x=-50 y=0 text="Magic" scale=0.62 align=LEFT
+    image x=40 y=0 w=20 h=20 id=167
+}
 
 label x=160 y=153 text="Filters" scale=0.6 align=CENTER
 window x=160 y=185 w=260 h=40 style=8
@@ -33,7 +53,8 @@ button x=209 y=185 id=256 scale=0.6
 button x=242 y=185 id=258 scale=0.6
 button x=275 y=185 id=267 scale=0.6
 
-button x=140 y=223 id=144 scale=0.6 action="disclaimer"
-button x=180 y=223 id=31 scale=0.6 action="disclaimer"
+button x=130 y=223 id=144 scale=0.6 action="openfilters"
+button x=160 y=223 id=424 scale=0.6 action="serverswitcher"
+button x=190 y=223 id=31 scale=0.6 action="clearfilters"
 
 

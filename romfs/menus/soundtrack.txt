@@ -12,6 +12,6 @@ button x=24 y=28 id=8 action="exit" keyBinds="B"
 
 # Labelling
 
-label x=160 y=35 text="Stats" scale=0.67 align=CENTER
+label x=160 y=35 text="Soundtrack" scale=0.67 align=CENTER
 
 list x=160 y=121 w=222 h=144 tag="list"

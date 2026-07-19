@@ -1,0 +1,29 @@
+darken x=0 y=0 opacity=0.4 darkenTime=0.5 tag="darken"
+
+image x=160 y=120 id=21 sheet=1 scale=0
+
+# chains (left, right)
+image x=80 y=-4 id=121 scale=0.8 sheet=3 tag="window"
+image x=240 y=-4 id=121 scale=0.8 sheet=3 tag="window"
+
+# window x=160 y=120 w=256 h=176 style=0 scale=0.8
+darken x=160 y=121 w=222 h=144 opacity=0.7
+image x=160 y=120 id=21 sheet=1 scale=0.9
+{
+    windowbutton x=-55 y=-55 w=105 h=30 style=5 text="Options" action="settings" font=2
+    windowbutton x=55 y=-55 w=105 h=30 style=5 text="Guide" action="howtoplay" font=2
+    windowbutton x=-55 y=-15 w=105 h=30 style=5 text="Credits" action="credits" font=2
+    windowbutton x=55 y=-15 w=105 h=30 style=5 text="Songs" action="songs" font=2
+
+
+    label x=-90 y=15 text="Music" scale=0.5 tag=""
+    slider x=0 y=29 max_value=1 scale=1 tag="music_slider"
+
+    label x=-90 y=46 text="Sounds" scale=0.5 tag=""
+    slider x=0 y=60 max_value=1 scale=1 tag="sound_slider"
+}
+button x=24 y=28 id=8 action="exit" keyBinds="B"
+
+# Labelling
+
+label x=160 y=35 text="Settings" scale=0.67 align=CENTER

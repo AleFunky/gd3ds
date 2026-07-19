@@ -15,11 +15,14 @@
 #include "menus/external_level_infobox.h"
 #include "menus/online_level_comments.h"
 #include "menus/online_level_infobox.h"
+#include "menus/refresh_online_level.h"
+#include "menus/delete_online_level.h"
 
 static bool exit_flag = false;
 static bool in_info_box = false;
 static bool in_comments = false;
-
+static bool in_refresh = false;
+static bool in_delete = false;
 
 static UIImage *bg_gradient;
 static UIImage *bg_gradient_top;
@@ -39,15 +42,35 @@ static void action_open_comments(UIElement *e) {
     online_comments_init();
 }
 
+static void action_refresh_level(UIElement *e) {
+    in_refresh = true;
+    refresh_level_init();
+}
+
+static void action_delete_level(UIElement *e) {
+    in_delete = true;
+    delete_level_init();
+}
+
+void delete_level(){
+    exit_flag = true;
+    set_fade_status(FADE_STATUS_OUT);
+}
 
 static UIAction actions[] = {
     {"exit", action_exit },
     {"info", action_open_info },
     {"comments", action_open_comments },
+    {"reload", action_refresh_level },
+    {"deletelevel", action_delete_level },
 };
 
 void online_menu_loop() {
     exit_flag = false;
+    in_comments = false;
+    in_delete = false;
+    in_refresh = false;
+    in_info_box = false;
 
     ui_load_screen(&default_screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_level_menu.txt");
     ui_load_screen(&default_screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_level_menu_top.txt");
@@ -82,6 +105,8 @@ void online_menu_loop() {
             ui_screen_draw(&default_screen);
             if(in_info_box) online_level_infobox_draw_bot();
             if(in_comments) online_comments_draw();
+            if(in_delete) delete_level_draw_bot();
+            if(in_refresh) refresh_level_draw_bot();
 
             change_blending(true);
             draw_touch_effect();
@@ -106,7 +131,7 @@ void online_menu_loop() {
             break;
         }
 
-        if (!in_info_box && !in_comments) ui_screen_update(&default_screen, &touch);
+        if (!in_info_box && !in_comments && !in_delete && !in_refresh) ui_screen_update(&default_screen, &touch);
 
         if (in_info_box)
         {
@@ -123,6 +148,22 @@ void online_menu_loop() {
             if (returned)
             {
                 in_comments = false;
+            }
+        }
+        if (in_delete)
+        {
+            int returned = delete_level_loop();
+            if (returned)
+            {
+                in_delete = false;
+            }
+        }
+        if (in_refresh)
+        {
+            int returned = refresh_level_loop();
+            if (returned)
+            {
+                in_refresh = false;
             }
         }
     }
