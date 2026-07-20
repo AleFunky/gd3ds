@@ -10,6 +10,7 @@
 #include "utils/gfx.h"
 #include "menus/icon_kit.h"
 #include "menus/settings.h"
+#include "menus/search_filters.h"
 #include "menus/first_boot_disclaimer.h"
 #include "menus/soggy.h"
 
@@ -61,6 +62,14 @@ void init_values() {
     config_init_int(&cfg, CONFIG_CUSTOMIZATION_PATH "p2",   DEFAULT_P2);
     config_init_int(&cfg, CONFIG_CUSTOMIZATION_PATH "glow", DEFAULT_GLOW);
     config_init_bool(&cfg, CONFIG_CUSTOMIZATION_PATH "playerGlowEnabled", false);
+
+    config_init_bool(&cfg, CONFIG_FILTERS_PATH "uncompleted", false);
+    config_init_bool(&cfg, CONFIG_FILTERS_PATH "completed", false);
+    config_init_bool(&cfg, CONFIG_FILTERS_PATH "original", false);
+    config_init_bool(&cfg, CONFIG_FILTERS_PATH "unrated",  false);
+    config_init_bool(&cfg, CONFIG_FILTERS_PATH "featured", false);
+    config_init_bool(&cfg, CONFIG_FILTERS_PATH "song", false);
+    config_init_string(&cfg, CONFIG_FILTERS_PATH "songId", "");
 }
 
 void cfg_init() {
@@ -118,6 +127,14 @@ void cfg_init() {
     touchEffectEverywhere = config_get_bool(&cfg, CONFIG_INPUT_PATH "touchEffectEverywhere", false);
     enableDebugBindings =   config_get_bool(&cfg, CONFIG_INPUT_PATH "enableDebugBindings", false);
 
+    uncompletedFilter = config_get_bool(&cfg, CONFIG_FILTERS_PATH "uncompletedFilter", false);
+    completedFilter   = config_get_bool(&cfg, CONFIG_FILTERS_PATH "completedFilter", false);
+    originalFilter    = config_get_bool(&cfg, CONFIG_FILTERS_PATH "originalFilter", false);
+    unratedFilter     = config_get_bool(&cfg, CONFIG_FILTERS_PATH "unratedFilter", false);
+    featuredFilter    = config_get_bool(&cfg, CONFIG_FILTERS_PATH "featuredFilter", false);
+    songFilter        = config_get_bool(&cfg, CONFIG_FILTERS_PATH "songFilter", false);
+    strncpy(songFilterId, config_get_string(&cfg, CONFIG_FILTERS_PATH "songFilterId", ""), sizeof(songFilterId) - 1);
+
     config_save(&cfg);
 }
 
@@ -165,6 +182,14 @@ void cfg_save() {
     config_set_bool(&cfg, CONFIG_COSMETIC_PATH "solidWaveTrail", solidWaveTrail);
     config_set_bool(&cfg, CONFIG_COSMETIC_PATH "noPlayerTrail", noPlayerTrail);
     config_set_bool(&cfg, CONFIG_COSMETIC_PATH "noWaveTrailBehind", noWaveTrailBehind);
+
+    config_set_bool(&cfg, CONFIG_FILTERS_PATH "uncompletedFilter", uncompletedFilter);
+    config_set_bool(&cfg, CONFIG_FILTERS_PATH "completedFilter", completedFilter);
+    config_set_bool(&cfg, CONFIG_FILTERS_PATH "originalFilter", originalFilter);
+    config_set_bool(&cfg, CONFIG_FILTERS_PATH "unratedFilter", unratedFilter);
+    config_set_bool(&cfg, CONFIG_FILTERS_PATH "featuredFilter", featuredFilter);
+    config_set_bool(&cfg, CONFIG_FILTERS_PATH "songFilter", songFilter);
+    config_set_string(&cfg, CONFIG_FILTERS_PATH "songFilterId", songFilterId);
 
     config_save(&cfg);
 }

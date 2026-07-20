@@ -1,0 +1,33 @@
+darken opacity=0.4
+
+window x=160 y=120 w=260 h=180 style=0
+{
+    # column 1
+
+    button x=-127 y=-87 id=31 scale=0.8 action="exit" keyBinds="B"
+
+    label x=0 y=-68 font=2 text="Advanced Options" scale=0.9 align=CENTER
+    
+    checkbox x=-100 y=-36 tag="chk_uncompleted" scale=0.75 action="uncompleted"
+    label x=-85 y=-36 text="Uncompleted" scale=0.4 tag=""
+
+    checkbox x=-100 y=-6 tag="chk_completed" scale=0.75 action="completed"
+    label x=-85 y=-6 text="Completed" scale=0.4 tag=""
+
+    checkbox x=-100 y=24 tag="chk_original" scale=0.75 action="original"
+    label x=-85 y=24 text="Original" scale=0.4 tag=""
+
+    # column 2
+
+    checkbox x=30 y=-36 tag="chk_unrated" scale=0.75 action="unrated"
+    label x=45 y=-36 text="No Star" scale=0.4 tag=""
+
+    checkbox x=30 y=-6 tag="chk_featured" scale=0.75 action="featured"
+    label x=45 y=-6 text="Featured" scale=0.4 tag=""
+
+    checkbox x=30 y=24 tag="chk_song" scale=0.75 action="song"
+    label x=45 y=24 text="Song" scale=0.4 tag=""
+
+
+    textbox x=0 y=58 w=150 limit=8 title="Input song ID:" tag="songinput"
+}

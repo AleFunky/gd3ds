@@ -16,6 +16,7 @@
 #define CONFIG_MISC_PATH "misc."
 #define CONFIG_GAMEPLAY_PATH "gameplay."
 #define CONFIG_COSMETIC_PATH "cosmetic."
+#define CONFIG_FILTERS_PATH "filters."
 
 
 #define CONFIG_OBJECT_DELIMITER "."
@@ -44,6 +45,7 @@ void config_set_int(Config* cfg, const char* path, int value);
 void config_set_float(Config* cfg, const char* path, float value);
 void config_set_bool(Config* cfg, const char* path, int value);
 
+void config_init_string(Config* cfg, const char* path, char* def);
 void config_init_bool(Config* cfg, const char* path, bool def);
 void config_init_int(Config* cfg, const char* path, int def);
 void config_init_float(Config* cfg, const char* path, float def);
