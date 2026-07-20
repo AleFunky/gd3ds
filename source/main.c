@@ -82,6 +82,10 @@ const char *cheat_names[CHEAT_COUNT] = {
     "Hitboxes"
 };
 
+
+float accumulator = 0.f;
+bool fixed_dt = true;
+
 PrintConsole console;
 
 C3D_RenderTarget* top;
@@ -542,11 +546,10 @@ void game_loop() {
     clear_practice_mode();
 
     exiting_level = false;
+    fixed_dt = true;
 
-    float accumulator = 0.0f;
     u64 lastTime = svcGetSystemTick();
     u64 start = svcGetSystemTick();
-    bool fixed_dt = true;
     bool old_wide = wideEnabled;
 
     // Main loop
@@ -652,12 +655,12 @@ void game_loop() {
             faster_speed_particles_bottom.emitting = false;
             
             if (physics_delta > 0.5f) physics_delta = STEPS_DT_UNMOD; // Avoid spiral of death
-            if (fixed_dt) {
-                physics_delta = STEPS_DT_UNMOD;
-                if (!being_faded) fixed_dt = false;
-            }
 
             if (!game_paused) {
+                if (fixed_dt) {
+                    physics_delta = STEPS_DT_UNMOD;
+                    if (!being_faded) fixed_dt = false;
+                }
                 accumulator += physics_delta;
                 // Run simulation in fixed steps
                 while (accumulator >= STEPS_DT_UNMOD) {

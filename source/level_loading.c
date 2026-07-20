@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "color_channels.h"
+#include "main.h"
 #include "objects.h"
 #include "mp3_player.h"
 #include "graphics.h"
@@ -1400,6 +1401,9 @@ void reload_level() {
         objects.toggled[i] = false;
         objects.opacity[i] = 1.f;
     }
+
+    accumulator = 0.f;
+    fixed_dt = true;
 
     init_col_channels();
     set_color_channels();
