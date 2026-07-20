@@ -17,17 +17,20 @@ window x=160 y=120 w=260 h=180 style=0
     checkbox x=-100 y=24 tag="chk_original" scale=0.75 action="original"
     label x=-85 y=24 text="Original" scale=0.4 tag=""
 
+    button id=425 x=-100 y=54 action="length" scale=0.75
+    label x=-85 y=54 text="Length" scale=0.4
+
     # column 2
 
     checkbox x=30 y=-36 tag="chk_unrated" scale=0.75 action="unrated"
     label x=45 y=-36 text="No Star" scale=0.4 tag=""
 
-    checkbox x=30 y=-6 tag="chk_featured" scale=0.75 action="featured"
-    label x=45 y=-6 text="Featured" scale=0.4 tag=""
+    checkbox x=30 y=-6 tag="chk_rated" scale=0.75 action="rated"
+    label x=45 y=-6 text="Star" scale=0.4 tag=""
 
-    checkbox x=30 y=24 tag="chk_song" scale=0.75 action="song"
-    label x=45 y=24 text="Song" scale=0.4 tag=""
+    checkbox x=30 y=24 tag="chk_featured" scale=0.75 action="featured"
+    label x=45 y=24 text="Featured" scale=0.4 tag=""
 
-
-    textbox x=0 y=58 w=150 limit=8 title="Input song ID:" tag="songinput"
+    button id=425 x=30 y=54 action="song" scale=0.75
+    label x=45 y=54 text="Song" scale=0.4
 }

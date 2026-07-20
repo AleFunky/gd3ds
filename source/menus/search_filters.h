@@ -11,9 +11,12 @@ extern bool uncompletedFilter;
 extern bool completedFilter;
 extern bool originalFilter;
 extern bool unratedFilter;
+extern bool ratedFilter;
 extern bool featuredFilter;
 extern bool songFilter;
-extern char songFilterId[8];
+extern bool customSelected;
+extern int normalSongId;
+extern char songFilterId[127];
 
 void search_filters_init();
 int search_filters_loop();

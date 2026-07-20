@@ -7,24 +7,27 @@
 #include "save/saving.h"
 #include "save/config.h"
 #include "search_filters.h"
+// #include "length_filter.h"
+#include "song_filter.h"
 
 static bool yes_exit = false;
+static bool in_song_pop_up = false;
+static bool in_length_pop_up = false;
 
 bool uncompletedFilter = false;
 bool completedFilter = false;
 bool originalFilter = false;
 bool unratedFilter = false;
+bool ratedFilter = false;
 bool featuredFilter = false;
 bool songFilter = false;
-char songFilterId[8];
+bool customSelected = false;
+int normalSongId = 0;
+char songFilterId[127];
 
 static UIScreen screen = {
     .isBottom = true
 };
-static UIScreen screen_top = {
-};
-
-static UITextbox *song_input;
 
 static Filter filters[] = {
     {
@@ -40,10 +43,10 @@ static Filter filters[] = {
         "chk_unrated", &unratedFilter
     },
     {
-        "chk_featured", &featuredFilter
+        "chk_rated", &ratedFilter
     },
     {
-        "chk_song", &songFilter
+        "chk_featured", &featuredFilter
     },
 };
 
@@ -52,8 +55,11 @@ void reset_search_filters() {
     completedFilter = false;
     originalFilter = false;
     unratedFilter = false;
+    ratedFilter = false;
     featuredFilter = false;
     songFilter = false;
+    customSelected = false;
+    normalSongId = 0;
     strncpy(songFilterId, "", sizeof(songFilterId) - 1);
     yes_exit = true;
     cfg_save();
@@ -79,13 +85,24 @@ void unrated_filter(UIElement* e) {
     unratedFilter = ((UICheckBox *)e)->checked;
 }
 
+void rated_filter(UIElement* e) {
+    ratedFilter = ((UICheckBox *)e)->checked;
+}
+
 void featured_filter(UIElement* e) {
     featuredFilter = ((UICheckBox *)e)->checked;
 }
 
-void song_filter(UIElement* e) {
-    songFilter = ((UICheckBox *)e)->checked;
-    ui_run_func_on_tag(&screen, "songinput", songFilter ? ui_enable_element : ui_disable_element);
+void open_song(UIElement* e) {
+    in_song_pop_up = true;
+    song_filter_init();
+}
+
+void open_length(UIElement* e) {
+    // in_length_pop_up = true;
+    // song_filter_loop();
+    // songFilter = ((UICheckBox *)e)->checked;
+    // ui_run_func_on_tag(&screen, "songinput", songFilter ? ui_enable_element : ui_disable_element);
 }
 
 static UIAction actions[] = {
@@ -94,19 +111,18 @@ static UIAction actions[] = {
     { "completed", completed_filter },
     { "original", original_filter },
     { "unrated", unrated_filter },
+    { "rated", rated_filter },
     { "featured", featured_filter },
-    { "song", song_filter },
+    { "song", open_song },
+    { "length", open_length },
 };
 
 void search_filters_init() {
+    in_song_pop_up = false;
+    in_length_pop_up = false;
+
     ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/search_filters_pop_up.txt");
     ui_screen_open(&screen, ANIM_ZOOM);
-
-    ui_run_func_on_tag(&screen, "songinput", songFilter ? ui_enable_element : ui_disable_element);
-
-    song_input = (UITextbox *)ui_get_element_by_tag(&screen, "songinput");
-
-    strncpy(song_input->text, songFilterId, 8);
 
     for (int i = 0; i < ARRAY_LEN(filters); i++) {
         UICheckBox *checkbox = (UICheckBox *)ui_get_element_by_tag(&screen, filters[i].chk_name);
@@ -124,12 +140,9 @@ int search_filters_loop() {
         cfg_save();
 
         ui_unload_screen(&screen);
-        ui_unload_screen(&screen_top);
 
         return true;
     }
-
-    strncpy(songFilterId, song_input->text, 8);
 
     UIInput touch;
     touchPosition touchPos;
@@ -137,10 +150,23 @@ int search_filters_loop() {
     touch.touchPosition = touchPos;
     touch.did_something = false;
     touch.interacted = false;
-    ui_screen_update(&screen, &touch);
-    ui_screen_update(&screen_top, &touch);
+    if (!in_length_pop_up && !in_song_pop_up) ui_screen_update(&screen, &touch);
 
     ui_screen_draw(&screen);
+
+    if (in_length_pop_up) {
+        // int returned = length_filter_loop();
+        // if (returned) {
+        //     in_length_pop_up = false;
+        // }
+    }
+
+    if (in_song_pop_up) {
+        int returned = song_filter_loop();
+        if (returned) {
+            in_song_pop_up = false;
+        }
+    }
 
     return false;
 }
