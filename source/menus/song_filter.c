@@ -182,7 +182,9 @@ int song_filter_loop() {
     touch.interacted = false;
     ui_screen_update(&screen, &touch);
 
-    ui_screen_draw(&screen);
-
     return false;
+}
+
+void song_filter_draw(){
+    ui_screen_draw(&screen);
 }

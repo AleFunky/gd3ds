@@ -7,7 +7,7 @@
 #include "save/saving.h"
 #include "save/config.h"
 #include "search_filters.h"
-// #include "length_filter.h"
+#include "length_filter.h"
 #include "song_filter.h"
 
 static bool yes_exit = false;
@@ -21,6 +21,7 @@ bool unratedFilter = false;
 bool ratedFilter = false;
 bool featuredFilter = false;
 bool songFilter = false;
+bool lengthFilter = false;
 bool customSelected = false;
 int normalSongId = 0;
 char songFilterId[127];
@@ -99,10 +100,8 @@ void open_song(UIElement* e) {
 }
 
 void open_length(UIElement* e) {
-    // in_length_pop_up = true;
-    // song_filter_loop();
-    // songFilter = ((UICheckBox *)e)->checked;
-    // ui_run_func_on_tag(&screen, "songinput", songFilter ? ui_enable_element : ui_disable_element);
+    in_length_pop_up = true;
+    length_filter_init();
 }
 
 static UIAction actions[] = {
@@ -144,21 +143,11 @@ int search_filters_loop() {
         return true;
     }
 
-    UIInput touch;
-    touchPosition touchPos;
-    hidTouchRead(&touchPos);
-    touch.touchPosition = touchPos;
-    touch.did_something = false;
-    touch.interacted = false;
-    if (!in_length_pop_up && !in_song_pop_up) ui_screen_update(&screen, &touch);
-
-    ui_screen_draw(&screen);
-
     if (in_length_pop_up) {
-        // int returned = length_filter_loop();
-        // if (returned) {
-        //     in_length_pop_up = false;
-        // }
+        int returned = length_filter_loop();
+        if (returned) {
+            in_length_pop_up = false;
+        }
     }
 
     if (in_song_pop_up) {
@@ -168,5 +157,19 @@ int search_filters_loop() {
         }
     }
 
+    UIInput touch;
+    touchPosition touchPos;
+    hidTouchRead(&touchPos);
+    touch.touchPosition = touchPos;
+    touch.did_something = false;
+    touch.interacted = false;
+    if (!in_length_pop_up && !in_song_pop_up) ui_screen_update(&screen, &touch);
+
     return false;
+}
+
+void search_filters_draw() {
+    ui_screen_draw(&screen);
+    if (in_length_pop_up) length_filter_draw();
+    if (in_song_pop_up) song_filter_draw();
 }

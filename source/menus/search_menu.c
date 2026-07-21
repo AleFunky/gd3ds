@@ -11,6 +11,7 @@
 // #include "server_switcher.h"
 #include "search_filters.h"
 #include "clear_search_filters.h"
+#include "song_filter.h"
 
 static bool in_disclaimer = false;
 static bool in_server_switcher = false;
@@ -80,7 +81,15 @@ void search_menu_loop() {
         touch.interacted = false;
 
         if (!in_disclaimer && !in_server_switcher && !in_clear_search_filters && !in_filters) ui_screen_update(&default_screen, &touch);
+
+        if (in_filters) {
+            int returned = search_filters_loop();
+            if (returned) {
+                in_filters = false;
+            }
+        }
         
+
         do {
             update_touch_effect(DT);
             
@@ -92,18 +101,11 @@ void search_menu_loop() {
             draw_fade();
 
             ui_screen_draw(&default_screen);
-
+            
             if (in_disclaimer) {
                 int returned = disclaimer_loop();
                 if (returned) {
                     in_disclaimer = false;
-                }
-            }
-
-            if (in_filters) {
-                int returned = search_filters_loop();
-                if (returned) {
-                    in_filters = false;
                 }
             }
 
@@ -113,6 +115,8 @@ void search_menu_loop() {
                     in_clear_search_filters = false;
                 }
             }
+            
+            if (in_filters) search_filters_draw();
 
             change_blending(true);
             draw_touch_effect();

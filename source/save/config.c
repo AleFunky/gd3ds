@@ -69,6 +69,7 @@ void init_values() {
     config_init_bool(&cfg, CONFIG_FILTERS_PATH "unrated",  false);
     config_init_bool(&cfg, CONFIG_FILTERS_PATH "rated",  false);
     config_init_bool(&cfg, CONFIG_FILTERS_PATH "featured", false);
+    config_init_bool(&cfg, CONFIG_FILTERS_PATH "length", false);
     config_init_bool(&cfg, CONFIG_FILTERS_PATH "song", false);
     config_init_bool(&cfg, CONFIG_FILTERS_PATH "customSelected", false);
     config_init_int(&cfg, CONFIG_FILTERS_PATH "normalId", 0);
@@ -137,6 +138,7 @@ void cfg_init() {
     ratedFilter       = config_get_bool(&cfg, CONFIG_FILTERS_PATH "rated", false);
     featuredFilter    = config_get_bool(&cfg, CONFIG_FILTERS_PATH "featured", false);
     songFilter        = config_get_bool(&cfg, CONFIG_FILTERS_PATH "song", false);
+    lengthFilter        = config_get_bool(&cfg, CONFIG_FILTERS_PATH "length", false);
     customSelected    = config_get_bool(&cfg, CONFIG_FILTERS_PATH "customSelected", false);
     normalSongId      = config_get_int(&cfg, CONFIG_FILTERS_PATH "normalId", 0);
     strncpy(songFilterId, config_get_string(&cfg, CONFIG_FILTERS_PATH "songId", ""), sizeof(songFilterId) - 1);
@@ -195,6 +197,7 @@ void cfg_save() {
     config_set_bool(&cfg, CONFIG_FILTERS_PATH "unrated", unratedFilter);
     config_set_bool(&cfg, CONFIG_FILTERS_PATH "rated", ratedFilter);
     config_set_bool(&cfg, CONFIG_FILTERS_PATH "featured", featuredFilter);
+    config_set_bool(&cfg, CONFIG_FILTERS_PATH "length", lengthFilter);
     config_set_bool(&cfg, CONFIG_FILTERS_PATH "song", songFilter);
     config_set_bool(&cfg, CONFIG_FILTERS_PATH "customSelected", customSelected);
     config_set_int(&cfg, CONFIG_FILTERS_PATH "normalId", normalSongId);
