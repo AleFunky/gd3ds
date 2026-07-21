@@ -988,6 +988,17 @@ void game_loop() {
             C2D_SceneBegin(bot);
             C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
 
+            draw_background((state.background_x / 8) + 40,  200);
+
+            C2D_ViewScale(SCALE, SCALE);
+            C2D_ViewTranslate(0, CAM_Y_MTX_OFFSET);
+
+            draw_ground(state.ground_x + 40, 0.f, state.camera_y + state.ground_y_gfx - LEVEL_Y_OFFSET, false, SCREEN_BOT_WIDTH);
+            draw_ground(state.ground_x + 40, 0.f, state.camera_y + state.ground_y_gfx - LEVEL_Y_OFFSET, true, SCREEN_BOT_WIDTH);
+
+            C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
+            C2D_ViewScale(1/SCALE, 1/SCALE);
+
             gameplay_screen_bot_loop();
             draw_level_complete();
 

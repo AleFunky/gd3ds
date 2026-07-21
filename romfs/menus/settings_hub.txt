@@ -16,10 +16,10 @@ image x=160 y=120 id=21 sheet=1 scale=0.9
     windowbutton x=55 y=-15 w=105 h=30 style=5 text="Songs" action="songs" font=2
 
 
-    label x=-90 y=15 text="Music" scale=0.5 tag=""
+    label x=0 y=15 text="Music" scale=0.5 tag="" align=CENTER
     slider x=0 y=29 max_value=1 scale=1 tag="music_slider"
 
-    label x=-90 y=46 text="Sounds" scale=0.5 tag=""
+    label x=0 y=46 text="Sounds" scale=0.5 tag="" align=CENTER
     slider x=0 y=60 max_value=1 scale=1 tag="sound_slider"
 }
 button x=24 y=28 id=8 action="exit" keyBinds="B"
