@@ -37,6 +37,7 @@ const char *songs_tags[] = {
     "page15",
     "page16",
     "page17",
+    "page18",
 };
 
 
