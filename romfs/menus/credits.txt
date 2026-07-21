@@ -1,4 +1,4 @@
-darken opacity=0.4
+darken opacity=0.4 darkenTime=0.15
 window x=160 y=120 w=260 h=180 style=1
 button x=35 y=35 id=31 scale=0.8 action="exit" keyBinds="B"
 

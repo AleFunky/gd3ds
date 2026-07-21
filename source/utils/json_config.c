@@ -171,6 +171,10 @@ void config_init_float(Config* cfg, const char* path, float def) {
     config_set_float(cfg, path, config_get_float(cfg, path, def));
 }
 
+void config_init_string(Config* cfg, const char* path, char* def) {
+    config_set_string(cfg, path, config_get_string(cfg, path, def));
+}
+
 void config_free(Config* cfg) {
     json_object_put(cfg->root);
     cfg->root = NULL;

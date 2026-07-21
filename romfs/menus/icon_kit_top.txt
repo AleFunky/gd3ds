@@ -1,4 +1,4 @@
-bggradient tag="gradient"
+bggradient tag="gradient" 
 
 image x=200 y=150 id=0 sheet=6 scale=0.75
 

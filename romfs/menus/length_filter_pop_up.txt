@@ -1,0 +1,21 @@
+darken opacity=0.4 darkenTime=0.15
+
+window x=160 y=120 w=260 h=140 style=0
+{
+
+    button x=-127 y=-67 id=31 scale=0.8 action="exit" keyBinds="B"
+
+    label x=0 y=-48 font=2 text="Length Filter" scale=0.9 align=CENTER
+
+    checkbox x=-30 y=-15 tag="chk_length" scale=0.75 action="length"
+    label x=-15 y=-15 text="Enable" scale=0.4 tag=""
+
+    window x=0 y=25 w=230 h=40 style=2 color="#4f251262" tag="button"
+
+    label y=25 x=-104 align=LEFT scale=0.44 text="Tiny" tag="button"
+    label y=25 x=-66 align=LEFT scale=0.44 text="Short" tag="button"
+    label y=25 x=-15 align=LEFT scale=0.44 text="Medium" tag="button"
+    label y=25 x=42 align=LEFT scale=0.44 text="Long" tag="button"
+    label y=25 x=83 align=LEFT scale=0.44 text="XL" tag="button"
+
+}

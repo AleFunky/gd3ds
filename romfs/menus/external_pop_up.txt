@@ -1,4 +1,4 @@
-darken opacity=0.4
+darken opacity=0.4 darkenTime=0.15
 
 window x=160 y=120 w=280 h=200 style=0
 

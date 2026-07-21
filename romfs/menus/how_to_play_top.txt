@@ -1,4 +1,4 @@
-darken opacity=0.4
+darken opacity=0.4 darkenTime=0.15
 
 window x=200 y=120 w=300 h=130 style=0
 label x=200 y=75 text="Cube" scale=0.9 font=2 align=CENTER tag="page1"

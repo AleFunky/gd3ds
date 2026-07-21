@@ -1,4 +1,4 @@
-darken opacity=0.4
+darken opacity=0.4 darkenTime=0.15
 window x=160 y=120 w=260 h=180 style=1
 # Labelling
 

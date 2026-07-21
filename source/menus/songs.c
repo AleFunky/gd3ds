@@ -34,6 +34,7 @@ static const SongEntries songs[] = {
     { "Can't let Go", "DJVI" },
     { "Jumper", "Waterflame" },
     { "Time Machine", "Waterflame" },
+    { "Cycles", "DJVI" },
     { "xStep", "DJVI" },
     { "Clutterfunk", "Waterflame" },
     { "Theory of Everything", "DJ-Nate" },

@@ -9,11 +9,14 @@
 #include "generic_disclaimer.h"
 #include "search_menu.h"
 // #include "server_switcher.h"
-// #include "filters_menu.h"
+#include "search_filters.h"
+#include "clear_search_filters.h"
+#include "song_filter.h"
 
 static bool in_disclaimer = false;
 static bool in_server_switcher = false;
 static bool in_filters = false;
+static bool in_clear_search_filters = false;
 static bool exit_flag = false;
 
 static UIImage *bg_gradient;
@@ -35,11 +38,13 @@ void action_open_server_switcher(UIElement* e) {
 }
 
 void action_open_filters(UIElement* e) {
-    // in_filters = true;
-    // filters_init();
+    in_filters = true;
+    search_filters_init();
 }
 
 void action_clear_filters(UIElement* e) {
+    in_clear_search_filters = true;
+    clear_search_filters_init();
 }
 
 static UIAction actions[] = {
@@ -75,8 +80,16 @@ void search_menu_loop() {
         touch.did_something = false;
         touch.interacted = false;
 
-        if (!in_disclaimer) ui_screen_update(&default_screen, &touch);
+        if (!in_disclaimer && !in_server_switcher && !in_clear_search_filters && !in_filters) ui_screen_update(&default_screen, &touch);
+
+        if (in_filters) {
+            int returned = search_filters_loop();
+            if (returned) {
+                in_filters = false;
+            }
+        }
         
+
         do {
             update_touch_effect(DT);
             
@@ -88,13 +101,22 @@ void search_menu_loop() {
             draw_fade();
 
             ui_screen_draw(&default_screen);
-
+            
             if (in_disclaimer) {
                 int returned = disclaimer_loop();
                 if (returned) {
                     in_disclaimer = false;
                 }
             }
+
+            if (in_clear_search_filters) {
+                int returned = clear_search_filters_loop();
+                if (returned) {
+                    in_clear_search_filters = false;
+                }
+            }
+            
+            if (in_filters) search_filters_draw();
 
             change_blending(true);
             draw_touch_effect();
