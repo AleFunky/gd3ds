@@ -245,7 +245,8 @@ void gameplay_screen_init() {
 
     ui_progress_bar_set_tint(progress_bar, C2D_Color32(color.r, color.g, color.b, 255));
     
-    ui_window_set_tint((UIWindow *) ui_get_element_by_tag(&default_screen_top, "bgwindow"), C2D_Color32(0, 0, 0, 127));
+    ui_window_set_tint((UIWindow *) ui_get_element_by_tag(&default_screen_top, "bgwindow"), C2D_Color32(0, 0, 0, 150));
+    ui_window_set_tint((UIWindow *) ui_get_element_by_tag(&default_screen, "bgwindow"), C2D_Color32(0, 0, 0, 150));
 
     ui_label_set_text(level_name, level_info.level_name);
 
@@ -330,14 +331,6 @@ int gameplay_screen_bot_loop() {
     UIInput touch;
     touchPosition touchPos;
     hidTouchRead(&touchPos);
-
-    ColorChannel channel = channels[get_col_channel_index(CHANNEL_BG)];
-    // If flash is happening, use lbg
-    if (state.flash_data.use_lbg) channel = channels[get_col_channel_index(CHANNEL_LBG_NOLERP)];
-    
-    Color color = channel.color;
-
-    ui_image_set_tint(bg_gradient, C2D_Color32(color.r, color.g, color.b, 255));
 
     LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
 
