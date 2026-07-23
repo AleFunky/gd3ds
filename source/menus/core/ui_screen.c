@@ -1,9 +1,9 @@
 #include "menus/core/ui_screen.h"
 #include "main.h"
 #include "menus/core/common_setters.h"
+#include "ui_props.h"
 #include "ui_element.h"
 #include "ui_screen.h"
-#include "ui_props.h"
 
 #include "menus/components/ui_button.h"
 #include "menus/components/ui_image.h"
@@ -249,6 +249,8 @@ void ui_destroy_tree(UIElement *e) {
 
     if (e->userdata && e->userdata_destroy) e->userdata_destroy(e->userdata);
 
+    ui_destroy_proplist(&e->custom_properties);
+    
     e->destroy(e);
 }
 
@@ -414,19 +416,23 @@ static void trim_newline(char* s) {
         s[len - 1] = '\0';
 }
 
-// This strips a string surrounded by quotes and removes those
-static void strip_quotes(char* s) {
-    size_t len = strlen(s);
-    // Check if first char and last char is "
-    if (len >= 2 && s[0] == '"' && s[len - 1] == '"') {
-        // Get all but "
-        memmove(s, s + 1, len - 1);
-        s[len - 2] = '\0';
+// This strips any bracket or quote characters enclosing the value
+static void strip_enclosures(char* s) {
+    size_t length = strlen(s);
+
+    if (length < 2)
+        return;
+
+    if ((s[0] == '[' && s[length - 1] == ']') ||
+        (s[0] == '"' && s[length - 1] == '"'))
+    {
+        memmove(s, s + 1, length - 1);
+        s[length - 2] = '\0';
     }
 }
 
 // Searches for the next token
-static char* next_token(char** cursor) {
+char* next_token(char** cursor) {
     if (!*cursor) return NULL;
 
     char* s = *cursor;
@@ -442,14 +448,19 @@ static char* next_token(char** cursor) {
 
     char* start = s;
     bool inQuotes = false;
+    bool inBrackets = false;
 
-    // Search for quotes
+    // Search for quotes or brackets
     while (*s) {
         if (*s == '"') {
             inQuotes = !inQuotes;
+        } else if (!inQuotes && *s == '['){
+            inBrackets = true;
+        } else if (!inQuotes && *s == ']'){
+            inBrackets = false;
         }
-        // If not in quotes and found delimiter, no more iterating
-        else if ((*s == ' ' || *s == '\n' || *s == '\r') && !inQuotes) {
+        // If not in quotes or brackets and found delimiter, no more iterating
+        else if ((*s == ' ' || *s == '\n' || *s == '\r') && !(inQuotes || inBrackets)) {
             break;
         }
         s++;
@@ -635,6 +646,8 @@ void ui_element_apply_properties(UIElement *e, const UIContext *ctx, const UIPro
         ctx->screen->action_count,
         ui_prop_string(props, "action", "")
     );
+
+    e->custom_properties = ui_prop_list(props, "custom");
 }
 
 void ui_element_apply_default_properties(UIElement *e, const UIContext *ctx) {
@@ -720,6 +733,23 @@ bool ui_element_basic_bound_check(UIElement *e, UIInput *touch, UITransform *tra
            touch->touchPosition.py >= transform->y - height && touch->touchPosition.py < transform->y + height;
 }
 
+void collect_properties(UIPropertyList *props, char *token, char **cursor){
+    while ((token = next_token(cursor)) != NULL) {
+        char* equal = strchr(token, '=');
+        if (!equal) continue;
+
+        // This replaces the equal sign between key and value with a null character, dividing the string in two
+        *equal = '\0';
+
+        char* key = token;
+        char* value = equal + 1;
+
+        strip_enclosures(value);
+
+        ui_proplist_add(props, key, value);
+    }
+}
+
 #define MAX_NESTED_CHILDREN 32
 
 // Load a screen from its file, needs a pointer to the actions table and the action count
@@ -792,26 +822,10 @@ void ui_load_screen(UIScreen* screen,
         char type[16];
         strncpy(type, token, 15);
 
-        UIPropertyList props = { 0 };
+        UIPropertyList props = ui_create_proplist(MAX_ELEMENT_PROPERTIES, false);
 
         // Parse element parameters
-        while ((token = next_token(&cursor)) != NULL) {
-            char* equal = strchr(token, '=');
-            if (!equal) continue;
-
-            // This replaces the equal sign between key and value with a null character, dividing the string in two
-            *equal = '\0';
-
-            char* key = token;
-            char* value = equal + 1;
-            
-            strip_quotes(value);
-
-            props.properties[props.count++] = (UIProperty){
-                .key = key,
-                .value = value
-            };
-        }
+        collect_properties(&props, token, &cursor);
 
         // Execute the element constructor
         for (int i = 0; i < ARRAY_LEN(element_constructors); i++) {
@@ -830,6 +844,8 @@ void ui_load_screen(UIScreen* screen,
                 }
             }
         }
+
+        ui_destroy_proplist(&props);
     }
     
     fclose(f);

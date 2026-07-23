@@ -70,21 +70,6 @@ enum Fonts {
     NUM_FONTS
 };
 
-typedef struct {
-    const char *key;
-    const char *value;
-} UIProperty;
-
-typedef struct {
-    UIProperty properties[MAX_ELEMENT_PROPERTIES];
-    size_t count;
-} UIPropertyList;
-
-typedef struct {
-    const char *name;
-    u32 value;
-} UIBitfieldEntry;
-
 typedef void (*UIElementVisitor)(UIElement *element, void *userdata);
 typedef bool (*UIElementPredicate)(UIElement *, void *);
 typedef UIElement *(*UICreateFn)(const UIContext *ctx, const UIPropertyList *);
@@ -130,10 +115,12 @@ void ui_set_pos_on_tag(UIScreen *screen, float x, float y, const char *tag);
 void ui_enable_element(UIElement *e);
 void ui_disable_element(UIElement *e);
 
-
 void ui_element_set_userdata(UIElement *element, void *userdata);
 
 bool ui_element_basic_bound_check(UIElement *e, UIInput *touch, UITransform *transform);
+
+char* next_token(char** cursor);
+void collect_properties(UIPropertyList *props, char *token, char **cursor);
 
 UITransform ui_transform_combine(UITransform *parent, UIElement *e);
 
