@@ -507,8 +507,8 @@ void drawParticleSystem(ParticleSystem* ps, float x_offset, float y_offset, floa
         if (!ps->relativeStationary) {
             // If stationary, dont convert to screen space
             if (!ps->stationary) {
-                x = ((x - state.camera_x));
-                y = GSP_SCREEN_WIDTH - ((y - state.camera_y));  
+                if (!ps->dontApplyCamX) x = ((x - state.camera_x));
+                if (!ps->dontApplyCamY) y = GSP_SCREEN_WIDTH - ((y - state.camera_y));  
             } else {
                 x = d->relx[i] + ps->emitterX;
                 y = d->rely[i] + ps->emitterY;

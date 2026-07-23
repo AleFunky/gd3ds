@@ -1466,24 +1466,24 @@ void update_bottom_particles(float delta) {
     // If in game and not paused and not fading, update the particles spawning
     if (((game_state == STATE_GAME && !game_paused)) && !get_fade_status()) {
         if (flying_gamemode) {
-            glitter_particles_bottom.emitterX = 320/2;
+            glitter_particles_bottom.emitterX = state.camera_x_middle;
             glitter_particles_bottom.emitterY = 240/2;
             glitter_particles_bottom.emitting = true;
-        };
+        }
         slow_speed_particles_bottom.emitting = slow_speed_particles_timer > 0;
-        slow_speed_particles_bottom.emitterX = 320;
+        slow_speed_particles_bottom.emitterX = 320/SCALE;
         slow_speed_particles_bottom.emitterY = 240/2;
 
         normal_speed_particles_bottom.emitting = normal_speed_particles_timer > 0;
-        normal_speed_particles_bottom.emitterX = 320;
+        normal_speed_particles_bottom.emitterX = 320/SCALE;
         normal_speed_particles_bottom.emitterY = 240/2;
 
         fast_speed_particles_bottom.emitting = fast_speed_particles_timer > 0;
-        fast_speed_particles_bottom.emitterX = 320;
+        fast_speed_particles_bottom.emitterX = 320/SCALE;
         fast_speed_particles_bottom.emitterY = 240/2;
         
         faster_speed_particles_bottom.emitting = faster_speed_particles_timer > 0;
-        faster_speed_particles_bottom.emitterX = 320;
+        faster_speed_particles_bottom.emitterX = 320/SCALE;
         faster_speed_particles_bottom.emitterY = 240/2;
     }
 

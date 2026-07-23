@@ -995,20 +995,23 @@ void game_loop() {
 
             C2D_ViewScale(SCALE, SCALE);
             C2D_ViewTranslate(0, CAM_Y_MTX_OFFSET);
+            
+            change_blending(true);
+            draw_bottom_particles();
+            change_blending(false);
 
             draw_ground(state.ground_x + 52.5f, 0.f, -71.f, false, SCREEN_BOT_WIDTH);
             draw_ground(state.ground_x + 52.5f, 0.f, 210.f, true, SCREEN_BOT_WIDTH);
 
             C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
             C2D_ViewScale(1/SCALE, 1/SCALE);
+            
+            change_blending(true);
+            draw_touch_effect();
+            change_blending(false);
 
             gameplay_screen_bot_loop();
             draw_level_complete();
-
-            change_blending(true);
-            draw_bottom_particles();
-            draw_touch_effect();
-            change_blending(false);
 
             if (state.profiling) {
                 float processingTime = ((ticks / CPU_TICKS_PER_MSEC)) * 6;
@@ -1142,8 +1145,8 @@ void game_assets_init() {
     touch_explosion_particles.relativeStationary = true;
 
     initParticleSystem(&glitter_particles_bottom, &glitter_effect);
-    glitter_particles_bottom.relativeStationary = true;
     glitter_particles_bottom.cfg.startColorAlpha = 1.f;
+    glitter_particles_bottom.dontApplyCamY = true;
 
     initParticleSystem(&slow_speed_particles_bottom, &speed_effect_slow);
     slow_speed_particles_bottom.relativeStationary = true;

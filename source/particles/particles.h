@@ -72,6 +72,8 @@ typedef struct {
     bool relativeStationary;
     bool gravityFlipped;
     bool posVarRotates;
+    bool dontApplyCamX;
+    bool dontApplyCamY;
     
     bool active;
     bool emitting;
