@@ -733,7 +733,7 @@ bool ui_element_basic_bound_check(UIElement *e, UIInput *touch, UITransform *tra
            touch->touchPosition.py >= transform->y - height && touch->touchPosition.py < transform->y + height;
 }
 
-void collect_properties(UIPropertyList *props, char *token, char **cursor){
+void collect_properties(UIPropertyList *props, char *token, char **cursor, bool strip){
     while ((token = next_token(cursor)) != NULL) {
         char* equal = strchr(token, '=');
         if (!equal) continue;
@@ -825,7 +825,7 @@ void ui_load_screen(UIScreen* screen,
         UIPropertyList props = ui_create_proplist(MAX_ELEMENT_PROPERTIES, false);
 
         // Parse element parameters
-        collect_properties(&props, token, &cursor);
+        collect_properties(&props, token, &cursor, true);
 
         // Execute the element constructor
         for (int i = 0; i < ARRAY_LEN(element_constructors); i++) {

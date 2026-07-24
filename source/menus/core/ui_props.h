@@ -10,7 +10,6 @@ typedef struct {
 typedef struct {
     UIProperty *properties;
     size_t count;
-    size_t capacity;
     //This is used for UIPropertyLists whose properties should survive outside of the .txt file
     bool duplicate;
 } UIPropertyList;

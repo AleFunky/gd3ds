@@ -9,22 +9,17 @@ UIPropertyList ui_create_proplist(size_t capacity, bool duplicate) {
     UIPropertyList props;
     props.properties = malloc(sizeof(UIProperty) * capacity);
     props.count = 0;
-    props.capacity = capacity;
     props.duplicate = duplicate;
     return props;
 }
 
 void ui_proplist_add(UIPropertyList *props, char* key, char* value){
-    if(props->count++ > props->capacity){
-        return;
-    }
-
     if(props->duplicate){
         key = strdup(key);
         value = strdup(value);
     }
 
-    props->properties[props->count] = (UIProperty){
+    props->properties[props->count++] = (UIProperty){
         .key = key,
         .value = value
     };
@@ -135,18 +130,21 @@ UIPropertyList ui_prop_list(const UIPropertyList *props, const char *key){
 
     if(!value) return (UIPropertyList){ 0 };
 
-    char* cursor = value;
+    char *copy = strdup(value);
+
+    char* cursor = copy;
     char* token = NULL;
     size_t count = 0;
 
-    while ((token = next_token(&cursor)) != NULL) {
-        count++;
-    }
+    while ((token = next_token(&cursor)) != NULL)
+    count++;
+
+    free(copy);
 
     UIPropertyList property_list = ui_create_proplist(count, true);
 
     cursor = value;
-    collect_properties(&property_list, token, &cursor);
+    collect_properties(&property_list, token, &cursor, false);
 
     return property_list;
 }

@@ -120,7 +120,7 @@ void ui_element_set_userdata(UIElement *element, void *userdata);
 bool ui_element_basic_bound_check(UIElement *e, UIInput *touch, UITransform *transform);
 
 char* next_token(char** cursor);
-void collect_properties(UIPropertyList *props, char *token, char **cursor);
+void collect_properties(UIPropertyList *props, char *token, char **cursor, bool strip);
 
 UITransform ui_transform_combine(UITransform *parent, UIElement *e);
 
