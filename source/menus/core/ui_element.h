@@ -6,6 +6,8 @@
 #include "particles/circles.h"
 #include <malloc.h>
 
+#include "ui_props.h"
+
 #define TAGS_PER_ELEMENT 5
 #define TAG_LENGTH 32
 
@@ -70,10 +72,12 @@ struct UIElement {
 
     UIScreen *screen;
 
+    UIPropertyList custom_properties;
+
     // Useful for storing data inside an element
     void *userdata;
     void (*userdata_destroy)(void *);
-
+    
     struct UIElement *parent;
 
     struct UIElement *first_child;

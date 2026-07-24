@@ -12,6 +12,8 @@
 #include "search_filters.h"
 #include "clear_search_filters.h"
 #include "song_filter.h"
+#include "menus/components/ui_label.h"
+#include <stdlib.h>
 
 static bool in_disclaimer = false;
 static bool in_server_switcher = false;
@@ -52,7 +54,7 @@ static UIAction actions[] = {
     {"disclaimer", action_open_disclaimer },
     {"serverswitcher", action_open_server_switcher },
     {"openfilters", action_open_filters },
-    {"clearfilters", action_clear_filters },
+    {"clearfilters", action_clear_filters }
 };
 
 void search_menu_loop() {

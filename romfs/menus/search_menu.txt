@@ -56,5 +56,3 @@ button x=275 y=185 id=267 scale=0.6
 button x=130 y=223 id=144 scale=0.6 action="openfilters"
 button x=160 y=223 id=424 scale=0.6 action="serverswitcher"
 button x=190 y=223 id=31 scale=0.6 action="clearfilters"
-
-
