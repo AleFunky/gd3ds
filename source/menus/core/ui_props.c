@@ -137,14 +137,14 @@ UIPropertyList ui_prop_list(const UIPropertyList *props, const char *key){
     size_t count = 0;
 
     while ((token = next_token(&cursor)) != NULL)
-    count++;
+        count++;
 
     free(copy);
 
     UIPropertyList property_list = ui_create_proplist(count, true);
 
     cursor = value;
-    collect_properties(&property_list, token, &cursor, false);
+    collect_properties(&property_list, token, &cursor, true);
 
     return property_list;
 }
