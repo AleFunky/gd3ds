@@ -68,12 +68,14 @@ void soggy_menu_loop() {
             draw_touch_effect();
             change_blending(false);
 
-            // Top screen
-            C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
-            C2D_SceneBegin(top);
-            draw_fade();
+            // Top screen, drawn once per eye when 3D is on
+            for (int eye = 0; begin_top_eye(eye); eye++) {
+                draw_fade();
 
-            ui_screen_draw(&default_screen_top);
+                begin_eye_layer(DEPTH_UI);
+                ui_screen_draw(&default_screen_top);
+                end_eye_layer();
+            }
             C2D_ViewReset();
             C3D_FrameEnd(0);
         } while (handle_fading());

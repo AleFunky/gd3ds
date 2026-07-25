@@ -21,6 +21,7 @@ static UIScreen screen = {
 
 bool particlesDisabled = false;
 bool wideEnabled = false;
+bool stereoEnabled = true;
 bool glowEnabled = true;
 bool yJump = false;
 bool touchEffectEverywhere = false;
@@ -44,6 +45,9 @@ bool practiceMusicSync = false;
 static Setting settings[] = {
     {
         "chk_wide", &wideEnabled
+    },
+    {
+        "chk_stereo", &stereoEnabled
     },
     {
         "chk_particle", &particlesDisabled
@@ -133,8 +137,22 @@ void exit_settings(UIElement* e) {
     yes_exit = true;
 }
 
+// Wide and 3D both want the whole top screen, so only one of them gets it
+static void turn_off_setting(const char *chk_name, bool *var) {
+    *var = false;
+    set_checkbox_enabled((UICheckBox *)ui_get_element_by_tag(&screen, chk_name), false);
+}
+
 void wide_settings(UIElement* e) {
     wideEnabled = ((UICheckBox *)e)->checked;
+
+    if (wideEnabled) turn_off_setting("chk_stereo", &stereoEnabled);
+}
+
+void stereo_settings(UIElement* e) {
+    stereoEnabled = ((UICheckBox *)e)->checked;
+
+    if (stereoEnabled) turn_off_setting("chk_wide", &wideEnabled);
 }
 
 void particles_settings(UIElement* e) {
@@ -249,6 +267,10 @@ void action_info_wide(UIElement *e) {
     action_open_info_card(1);
 }
 
+void action_info_stereo(UIElement *e) {
+    action_open_info_card(14);
+}
+
 void action_info_tap(UIElement *e) {
     action_open_info_card(2);
 }
@@ -301,6 +323,7 @@ void action_info_do_not(UIElement *e) {
 static UIAction actions[] = {
     { "exit", exit_settings },
     { "wide", wide_settings },
+    { "stereo", stereo_settings },
     { "particles", particles_settings },
     { "glow", glow_settings },
     { "y_jump", y_button_settings },
@@ -324,6 +347,7 @@ static UIAction actions[] = {
     { "left_page", action_left_page},
     { "right_page", action_right_page},
     { "wideinfo", action_info_wide},
+    { "stereoinfo", action_info_stereo},
     { "jumpinfo", action_info_jump},
     { "tapinfo", action_info_tap},
     { "hitboxinfo", action_info_hitboxes},

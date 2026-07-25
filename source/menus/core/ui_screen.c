@@ -321,8 +321,8 @@ void ui_screen_update(UIScreen* s, UIInput* touch) {
 void ui_screen_draw(UIScreen* s) {
     if (!s->loaded) return;
 
-    // If fading, update without interacting
-    if (get_fade_status()) {
+    // If fading, update without interacting (only once, no matter how many eyes)
+    if (get_fade_status() && !is_extra_eye()) {
         UIInput touch;
         touch.did_something = true;
         touch.interacted = false;

@@ -239,10 +239,12 @@ void external_levels_loop() {
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
     C2D_SceneBegin(bot);
     C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
-    C2D_SceneBegin(top);
-    C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
     C2D_Fade(0);
-    draw_text(&bigFont_fontCharset, &bigFont_sheet, SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10, 0.5f, 0.5f, 1.0f, true, "Loading...");
+    for (int eye = 0; begin_top_eye(eye); eye++) {
+        begin_eye_layer(DEPTH_UI);
+        draw_text(&bigFont_fontCharset, &bigFont_sheet, SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10, 0.5f, 0.5f, 1.0f, true, "Loading...");
+        end_eye_layer();
+    }
     C3D_FrameEnd(0);
 
     external_start_level = false;
@@ -327,15 +329,18 @@ void external_levels_loop() {
             draw_touch_effect();
             change_blending(false);
 
-            // Top screen
-            C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
-            C2D_SceneBegin(top);
-            draw_fade();
+            // Top screen, drawn once per eye when 3D is on
+            for (int eye = 0; begin_top_eye(eye); eye++) {
+                draw_fade();
 
-            ui_screen_draw(&screen_top);
-            
-            if (in_external_popup) external_popup_draw_top();
+                begin_eye_layer(DEPTH_UI);
+                ui_screen_draw(&screen_top);
+                end_eye_layer();
 
+                begin_eye_layer(DEPTH_POPUP);
+                if (in_external_popup) external_popup_draw_top();
+                end_eye_layer();
+            }
             C2D_ViewReset();
             C3D_FrameEnd(0);
         } while (handle_fading());

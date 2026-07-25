@@ -28,6 +28,8 @@ void init_values() {
 
     config_init_bool(&cfg, CONFIG_GRAPHICS_PATH "particlesDisabled", false);
     config_init_bool(&cfg, CONFIG_GRAPHICS_PATH "wideEnabled", false);
+    // 3D comes on out of the box, unless this save already picked 800px mode
+    config_init_bool(&cfg, CONFIG_GRAPHICS_PATH "stereoEnabled", !config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "wideEnabled", false));
     config_init_bool(&cfg, CONFIG_GRAPHICS_PATH "glowEnabled", true);
 
     config_init_bool(&cfg, CONFIG_INPUT_PATH "yButton", false);
@@ -96,6 +98,7 @@ void cfg_init() {
 
     particlesDisabled = config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "particlesDisabled", false);
     set_wide(config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "wideEnabled", false));
+    stereoEnabled = config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "stereoEnabled", true);
     glowEnabled = config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "glowEnabled", true);
 
     hitboxesEnabled = config_get_bool(&cfg, CONFIG_MISC_PATH "hitboxesEnabled", false);
@@ -156,6 +159,7 @@ void cfg_save() {
 
     config_set_bool(&cfg, CONFIG_GRAPHICS_PATH "particlesDisabled", particlesDisabled);
     config_set_bool(&cfg, CONFIG_GRAPHICS_PATH "wideEnabled", wideEnabled);
+    config_set_bool(&cfg, CONFIG_GRAPHICS_PATH "stereoEnabled", stereoEnabled);
     config_set_bool(&cfg, CONFIG_GRAPHICS_PATH "glowEnabled", glowEnabled);
 
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "cube", selected_cube);
