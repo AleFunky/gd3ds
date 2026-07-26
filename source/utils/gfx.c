@@ -205,6 +205,25 @@ int get_fade_status() {
     return fade_status;
 }
 
+// How far apart both eyes get at most, in pixels
+#define MAX_EYE_SHIFT 6.f
+
+// Under this both eyes come out identical, so one of them is enough
+#define STEREO_DEADZONE (0.5f / MAX_EYE_SHIFT)
+
+// Wait a moment before freeing, so slider wiggles don't thrash VRAM
+#define STEREO_IDLE_FRAMES 60
+
+static int stereo_idle_frames = 0;
+
+// The slider, snapped to 0 where 3D wouldn't show up anyway
+static float get_stereo_slider() {
+    if (!stereoEnabled) return 0.f;
+
+    float slider = osGet3DSliderState();
+    return slider < STEREO_DEADZONE ? 0.f : slider;
+}
+
 void reinitialize_screens() {
     if (top) C3D_RenderTargetDelete(top);
     if (bot) C3D_RenderTargetDelete(bot);
@@ -213,8 +232,25 @@ void reinitialize_screens() {
     top = C2D_CreateScreenTargetExt(GFX_TOP, GFX_LEFT, false);
     bot = C2D_CreateScreenTargetExt(GFX_BOTTOM, GFX_LEFT, false);
 
-    // The second eye is only worth its VRAM while 3D is on
-    top_right = (stereoEnabled ? C2D_CreateScreenTargetExt(GFX_TOP, GFX_RIGHT, false) : NULL);
+    // The second eye only gets VRAM once the slider asks for it
+    top_right = (get_stereo_slider() > 0.f ? C2D_CreateScreenTargetExt(GFX_TOP, GFX_RIGHT, false) : NULL);
+    stereo_idle_frames = 0;
+}
+
+// Lends the right eye a target while the slider is up. Call outside a frame
+void update_stereo_target() {
+    if (get_stereo_slider() > 0.f) {
+        stereo_idle_frames = 0;
+        if (!top_right) top_right = C2D_CreateScreenTargetExt(GFX_TOP, GFX_RIGHT, false);
+        return;
+    }
+
+    if (!top_right) return;
+
+    if (++stereo_idle_frames < STEREO_IDLE_FRAMES) return;
+
+    C3D_RenderTargetDelete(top_right);
+    top_right = NULL;
 }
 
 void set_wide(bool wide) {
@@ -226,14 +262,22 @@ void set_wide(bool wide) {
     }
 }
 
+// Neither 2DS has a second eye, and Citra just draws twice for nothing
+bool stereo_supported() {
+    u8 model;
+    CFGU_GetSystemModel(&model);
+    return model != CFG_MODEL_2DS && model != CFG_MODEL_N2DSXL && !is_citra();
+}
+
 void set_stereo(bool stereo) {
-    stereoEnabled = stereo;
-    gfxSet3D(stereo);
+    stereoEnabled = stereo && stereo_supported();
+    gfxSet3D(stereoEnabled);
 }
 
 // Wide and 3D can't share the top screen, so the old one has to go first
 void apply_screen_modes() {
-    if (stereoEnabled) {
+    // A New 2DS XL keeps wide, so only give it up for real 3D
+    if (stereoEnabled && stereo_supported()) {
         set_wide(false);
         set_stereo(true);
     } else {
@@ -241,9 +285,6 @@ void apply_screen_modes() {
         set_wide(wideEnabled);
     }
 }
-
-// How far apart both eyes get at most, in pixels
-#define MAX_EYE_SHIFT 6.f
 
 // How deep begin_eye_layer() calls can be nested
 #define MAX_EYE_LAYERS 8
@@ -270,10 +311,10 @@ float get_depth_shift(float depth) {
 bool begin_top_eye(int eye) {
     // The slider only gets read once per frame so both eyes agree on the depth
     if (eye == EYE_LEFT) {
-        stereo_strength = (stereoEnabled && top_right) ? osGet3DSliderState() : 0.f;
+        stereo_strength = top_right ? get_stereo_slider() : 0.f;
     }
 
-    // One eye is enough with the slider all the way down
+    // One eye is enough with the slider down
     if (eye > (stereo_strength > 0.f ? EYE_RIGHT : EYE_LEFT)) {
         current_eye = EYE_LEFT;
         drawing_top_eye = false;

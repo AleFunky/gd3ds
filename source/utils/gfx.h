@@ -49,8 +49,10 @@ void set_wide(bool wide);
 void reinitialize_screens();
 
 // Stereoscopic 3D
+bool stereo_supported();
 void set_stereo(bool stereo);
 void apply_screen_modes();
+void update_stereo_target();
 bool begin_top_eye(int eye);
 bool is_extra_eye();
 bool is_stereo_active();

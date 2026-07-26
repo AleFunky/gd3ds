@@ -92,6 +92,9 @@ void online_menu_loop() {
         touch.did_something = false;
         touch.interacted = false;
         
+        // Frees a render target, so keep it out of the frame below
+        update_stereo_target();
+
         do {
             update_touch_effect(DT);
             

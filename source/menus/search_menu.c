@@ -92,6 +92,9 @@ void search_menu_loop() {
         }
         
 
+        // Frees a render target, so keep it out of the frame below
+        update_stereo_target();
+
         do {
             update_touch_effect(DT);
             

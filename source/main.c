@@ -940,6 +940,9 @@ void game_loop() {
             old_stereo = stereoEnabled;
         }
 
+        // Frees a render target, so keep it out of the frame below
+        update_stereo_target();
+
         // Handle level being completed
         if (level_info.completing) {
             int status = handle_wall_cutscene(delta);

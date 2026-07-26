@@ -463,6 +463,9 @@ void main_menu_loop() {
             old_stereo = stereoEnabled;
         }
 
+        // Frees a render target, so keep it out of the frame below
+        update_stereo_target();
+
         if (!in_menu) ui_screen_update(&default_screen, &touch);
         ui_screen_update(&default_screen_top, &touch);
         do {

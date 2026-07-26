@@ -10,6 +10,7 @@
 #include "mp3_player.h"
 #include "save/config.h"
 #include "state.h"
+#include "utils/gfx.h"
 
 static bool yes_exit = false;
 
@@ -152,7 +153,15 @@ void wide_settings(UIElement* e) {
 void stereo_settings(UIElement* e) {
     stereoEnabled = ((UICheckBox *)e)->checked;
 
-    if (stereoEnabled) turn_off_setting("chk_wide", &wideEnabled);
+    if (!stereoEnabled) return;
+
+    // No 3D on this console, so don't let the box stay ticked
+    if (!stereo_supported()) {
+        turn_off_setting("chk_stereo", &stereoEnabled);
+        return;
+    }
+
+    turn_off_setting("chk_wide", &wideEnabled);
 }
 
 void particles_settings(UIElement* e) {

@@ -567,6 +567,9 @@ void level_select_loop() {
         ui_screen_update(&default_screen, &touch);
         ui_screen_update(&default_screen_top, &touch);
         
+        // Frees a render target, so keep it out of the frame below
+        update_stereo_target();
+
         do {
             update_touch_effect(DT);
             
