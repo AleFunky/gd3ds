@@ -1342,6 +1342,7 @@ void draw_player_graphics() {
 
 void draw_objects() {
     u64 start = svcGetSystemTick();
+
     // Draw
     for (size_t s = 0; s < sprite_count; s++) {
         SpriteObject *obj = viewable_objects_ptr[s];

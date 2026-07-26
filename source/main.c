@@ -359,6 +359,17 @@ void init_particles(Color p1_color, Color p2_color) {
     coin_pickup_particles.depth = 0.6f;
     brick_destroy_particles.depth = 0.6f;
 
+    // Ambience sweeps past the player instead of sitting flat behind the level
+    glitter_particles.depth = 0.4f;
+
+    slow_speed_particles.depth = 0.6f;
+    normal_speed_particles.depth = 0.6f;
+    fast_speed_particles.depth = 0.6f;
+    faster_speed_particles.depth = 0.6f;
+
+    // The portal spits its particles out of the screen as they age
+    end_wall_particles.depth = 0.7f;
+
     end_wall_firework.depth = 0.8f;
     level_complete_effect_p1.depth = 0.8f;
     level_complete_effect_p2.depth = 0.8f;

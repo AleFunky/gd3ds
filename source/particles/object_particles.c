@@ -25,14 +25,51 @@ bool is_ps_already_loaded(int id) {
     return false;
 }
 
+// How far the particles an object gives off drift towards you before they die
+static float get_object_particle_depth(int id) {
+    switch (id) {
+        case YELLOW_PAD:
+        case BLUE_PAD:
+        case PINK_PAD:
+        case CUBE_PORTAL:
+        case SHIP_PORTAL:
+        case BALL_PORTAL:
+        case UFO_PORTAL:
+        case WAVE_PORTAL:
+        case BLUE_GRAVITY_PORTAL:
+        case YELLOW_GRAVITY_PORTAL:
+        case ORANGE_MIRROR_PORTAL:
+        case BLUE_MIRROR_PORTAL:
+        case BIG_PORTAL:
+        case MINI_PORTAL:
+        case SLOW_SPEED_PORTAL:
+        case NORMAL_SPEED_PORTAL:
+        case FAST_SPEED_PORTAL:
+        case FASTER_SPEED_PORTAL:
+        case DUAL_PORTAL:
+        case DIVORCE_PORTAL:
+            return 0.5f;
+        // Orbs and coins hang in mid air, so theirs carry a bit further
+        case YELLOW_ORB:
+        case BLUE_ORB:
+        case PINK_ORB:
+        case SECRET_COIN:
+            return 0.7f;
+    }
+    return 0.f;
+}
+
 int load_object_particles(int id, const ParticleDefinition *cfg, bool stationary) {
     for (size_t i = 0; i < MAX_OBJECT_PS; i++) {
         if (!object_particle[i].occupied) {
             object_particle[i].occupied = true;
             object_particle[i].id = id;
-            object_particle[i].ps.stationary = stationary; 
+            object_particle[i].ps.stationary = stationary;
             initParticleSystem(&object_particle[i].ps, cfg);
-            
+
+            // After the init, it resets the depth back to flat
+            object_particle[i].ps.depth = get_object_particle_depth(objects.id[id]);
+
             object_particle[i].ps.emitting = true;
             return i;
         }
