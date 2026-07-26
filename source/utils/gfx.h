@@ -53,6 +53,7 @@ void set_stereo(bool stereo);
 void apply_screen_modes();
 bool begin_top_eye(int eye);
 bool is_extra_eye();
+bool is_stereo_active();
 void begin_eye_layer(float depth);
 void end_eye_layer();
 float get_depth_shift(float depth);

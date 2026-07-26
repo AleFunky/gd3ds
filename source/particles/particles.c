@@ -493,6 +493,9 @@ void drawParticleSystem(ParticleSystem* ps, float x_offset, float y_offset, floa
     ParticleData* d = &ps->data;
     int count = d->count;
 
+    // Only worth checking per particle when there's actually 3D to show
+    bool use_depth = ps->depth && is_stereo_active();
+
     for (int i = 0; i < count; i++) {
         float x = d->posx[i];
         float y = d->posy[i];
@@ -528,7 +531,7 @@ void drawParticleSystem(ParticleSystem* ps, float x_offset, float y_offset, floa
         }
 
         // Drift out of the screen as the particle ages
-        if (ps->depth && d->totalTimeToLive[i] > 0) {
+        if (use_depth && d->totalTimeToLive[i] > 0) {
             float age = 1.f - (d->timeToLive[i] / d->totalTimeToLive[i]);
             x += get_depth_shift(ps->depth * age);
         }

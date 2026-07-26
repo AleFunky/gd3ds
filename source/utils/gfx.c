@@ -250,9 +250,16 @@ void apply_screen_modes() {
 
 static float stereo_strength = 0.f;
 static int current_eye = EYE_LEFT;
+static bool drawing_top_eye = false;
 
 static C3D_Mtx layer_views[MAX_EYE_LAYERS];
 static int layer_count = 0;
+
+// True only while the top screen is being drawn in 3D. Everything else bails out
+// early, so 2D and the bottom screen render exactly like they did before
+bool is_stereo_active() {
+    return drawing_top_eye && stereo_strength > 0.f;
+}
 
 // How much this eye moves something floating at the given depth
 float get_depth_shift(float depth) {
@@ -269,10 +276,12 @@ bool begin_top_eye(int eye) {
     // One eye is enough with the slider all the way down
     if (eye > (stereo_strength > 0.f ? EYE_RIGHT : EYE_LEFT)) {
         current_eye = EYE_LEFT;
+        drawing_top_eye = false;
         return false;
     }
 
     current_eye = eye;
+    drawing_top_eye = true;
 
     C3D_RenderTarget *target = (eye == EYE_RIGHT ? top_right : top);
 
@@ -287,15 +296,16 @@ bool is_extra_eye() {
     return current_eye != EYE_LEFT;
 }
 
-// Shifts everything drawn after this to the given depth, pair it with end_eye_layer()
+// Shifts everything drawn after this to the given depth, pair it with end_eye_layer().
+// Does nothing in 2D, touching the view would split the batch for no reason
 void begin_eye_layer(float depth) {
+    if (!is_stereo_active()) return;
+
     // Still count layers we have no room for, so the pairing keeps working
     if (layer_count++ >= MAX_EYE_LAYERS) return;
 
     C3D_Mtx *saved = &layer_views[layer_count - 1];
     C2D_ViewSave(saved);
-
-    if (stereo_strength <= 0.f) return;
 
     // The view can be scaled, so divide it out to keep the shift in screen pixels.
     // Whole pixels only, half pixel shifts get filtered and smear thin lines and text
@@ -304,6 +314,8 @@ void begin_eye_layer(float depth) {
 }
 
 void end_eye_layer() {
+    if (!is_stereo_active()) return;
+
     if (layer_count <= 0) return;
 
     if (--layer_count < MAX_EYE_LAYERS) C2D_ViewRestore(&layer_views[layer_count]);
