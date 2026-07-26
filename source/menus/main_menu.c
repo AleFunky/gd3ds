@@ -144,6 +144,10 @@ void action_open_info_card(int id) {
             // do not info
             set_info_content("Doesn't do anything...<p>Well, nothing useful.");
             break;
+        case 14:
+            // stereoscopic 3D info
+            set_info_content("Adds depth to the top screen.<p>Use the 3D slider, costs some FPS.");
+            break;
     }
     in_info_card = true;
 }
@@ -336,6 +340,7 @@ void main_menu_loop() {
     wave_trail = &wave_trail_p1;
 
     bool old_wide = wideEnabled;
+    bool old_stereo = stereoEnabled;
 
     //disabled in preparation for release
     
@@ -449,13 +454,17 @@ void main_menu_loop() {
             main_menu_color_index++;
         }
 
-        if (wideEnabled != old_wide) {        
+        if (wideEnabled != old_wide || stereoEnabled != old_stereo) {
             gspWaitForVBlank();
-            set_wide(wideEnabled);
+            apply_screen_modes();
             gspWaitForVBlank();
             reinitialize_screens();
             old_wide = wideEnabled;
+            old_stereo = stereoEnabled;
         }
+
+        // Frees a render target, so keep it out of the frame below
+        update_stereo_target();
 
         if (!in_menu) ui_screen_update(&default_screen, &touch);
         ui_screen_update(&default_screen_top, &touch);
@@ -465,27 +474,36 @@ void main_menu_loop() {
             bg_scroll += 5.19300155f;
             C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
             
-            // Top screen
-            C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
-            C2D_SceneBegin(top);
-            draw_fade();
+            // Top screen, drawn once per eye when 3D is on
+            for (int eye = 0; begin_top_eye(eye); eye++) {
+                draw_fade();
 
-            draw_background(-40 + (bg_scroll / 8), 0);
-            C2D_ViewScale(SCALE, SCALE);
-            state.camera_x = -((SCREEN_WIDTH_AREA - SCREEN_WIDTH_AREA_BOT)/2);
-            state.camera_y = SCREEN_HEIGHT_AREA;
+                begin_eye_layer(DEPTH_BACKGROUND);
+                draw_background(-40 + (bg_scroll / 8), 0);
+                end_eye_layer();
 
-            draw_player_effects();
-            change_blending(true);
-            draw_use_effects(get_use_effect_array_ptr(GFX_TOP));
+                C2D_ViewScale(SCALE, SCALE);
+                state.camera_x = -((SCREEN_WIDTH_AREA - SCREEN_WIDTH_AREA_BOT)/2);
+                state.camera_y = SCREEN_HEIGHT_AREA;
 
-            change_blending(false);
-            draw_player(&title_screen_player);
+                // Same trick as in game, the player floats in front of the screen
+                begin_eye_layer(DEPTH_LEVEL);
+                draw_player_effects();
+                change_blending(true);
+                draw_use_effects(get_use_effect_array_ptr(GFX_TOP));
 
-            C2D_ViewScale(1/SCALE, 1/SCALE);
-            ui_screen_draw(&default_screen_top);
+                change_blending(false);
+                draw_player(&title_screen_player);
+                end_eye_layer();
 
-            if (in_how_to_play) draw_how_to_play_top();
+                C2D_ViewScale(1/SCALE, 1/SCALE);
+
+                begin_eye_layer(DEPTH_UI);
+                ui_screen_draw(&default_screen_top);
+
+                if (in_how_to_play) draw_how_to_play_top();
+                end_eye_layer();
+            }
 
             // Bottom Screen
             C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));

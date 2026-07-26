@@ -298,6 +298,9 @@ void icon_kit_loop() {
 
         if (!in_palette_kit) ui_screen_update(&default_screen, &touch);
         ui_screen_update(&default_screen_top, &touch);
+        // Frees a render target, so keep it out of the frame below
+        update_stereo_target();
+
         do {
             update_touch_effect(DT);
             
@@ -321,19 +324,22 @@ void icon_kit_loop() {
             draw_touch_effect();
             change_blending(false);
 
-            // Top screen
-            C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
-            C2D_SceneBegin(top);
+            // Top screen, drawn once per eye when 3D is on
+            for (int eye = 0; begin_top_eye(eye); eye++) {
+                begin_eye_layer(DEPTH_UI);
+                ui_screen_draw(&default_screen_top);
+                end_eye_layer();
 
-            ui_screen_draw(&default_screen_top);
-
-            spawn_icon_at(
-                last_displayed_gamemode, *current_icons[last_displayed_gamemode], glow_enabled, 200, 120, 0, 0, 0, 2.f,
-                C2D_Color32(p1_color.r, p1_color.g, p1_color.b, 255),
-                C2D_Color32(p2_color.r, p2_color.g, p2_color.b, 255),
-                C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
-            );
-
+                // Let the icon float above everything else
+                begin_eye_layer(DEPTH_POPUP);
+                spawn_icon_at(
+                    last_displayed_gamemode, *current_icons[last_displayed_gamemode], glow_enabled, 200, 120, 0, 0, 0, 2.f,
+                    C2D_Color32(p1_color.r, p1_color.g, p1_color.b, 255),
+                    C2D_Color32(p2_color.r, p2_color.g, p2_color.b, 255),
+                    C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
+                );
+                end_eye_layer();
+            }
             C2D_ViewReset();
             C3D_FrameEnd(0);
         } while (handle_fading());

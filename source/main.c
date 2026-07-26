@@ -89,6 +89,7 @@ bool fixed_dt = true;
 PrintConsole console;
 
 C3D_RenderTarget* top;
+C3D_RenderTarget* top_right;
 C3D_RenderTarget* bot;
 
 SFX play_sound;
@@ -341,9 +342,26 @@ void init_particles(Color p1_color, Color p2_color) {
     faster_speed_particles.affectedByMirror = false;
 
     end_wall_firework.affectedByMirror = false;
-    
+
     level_complete_effect_p1.stationary = true;
     level_complete_effect_p2.stationary = true;
+
+    // One shot bursts fly towards you, the trails stay glued to the player
+    explosion_particles[0].depth = 1.f;
+    explosion_particles[1].depth = 1.f;
+
+    burst_particles[0].depth = 0.5f;
+    burst_particles[1].depth = 0.5f;
+
+    land_particles[0].depth = 0.35f;
+    land_particles[1].depth = 0.35f;
+
+    coin_pickup_particles.depth = 0.6f;
+    brick_destroy_particles.depth = 0.6f;
+
+    end_wall_firework.depth = 0.8f;
+    level_complete_effect_p1.depth = 0.8f;
+    level_complete_effect_p2.depth = 0.8f;
 
     Color p1_not_white = get_white_if_black(p1_color);
     Color p2_not_white = get_white_if_black(p2_color);
@@ -496,11 +514,13 @@ void game_loop() {
 #endif
 
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-    C2D_SceneBegin(top);
-    C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
 
     C2D_Fade(0);
-    draw_text(&bigFont_fontCharset, &bigFont_sheet, SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10, 0.5f, 0.5f, 1.0f, true, "Loading...");
+    for (int eye = 0; begin_top_eye(eye); eye++) {
+        begin_eye_layer(DEPTH_UI);
+        draw_text(&bigFont_fontCharset, &bigFont_sheet, SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10, 0.5f, 0.5f, 1.0f, true, "Loading...");
+        end_eye_layer();
+    }
     C3D_FrameEnd(0);
     
     char *path;
@@ -551,6 +571,7 @@ void game_loop() {
     u64 lastTime = svcGetSystemTick();
     u64 start = svcGetSystemTick();
     bool old_wide = wideEnabled;
+    bool old_stereo = stereoEnabled;
 
     // Main loop
     while (aptMainLoop()) {
@@ -909,14 +930,18 @@ void game_loop() {
             kHeldPaused = kHeld;
         }
         
-        // If the wide settings has been changed, reinitialize screens
-        if (wideEnabled != old_wide) {        
+        // If the wide or 3D settings have been changed, reinitialize screens
+        if (wideEnabled != old_wide || stereoEnabled != old_stereo) {
             gspWaitForVBlank();
-            set_wide(wideEnabled);
+            apply_screen_modes();
             gspWaitForVBlank();
             reinitialize_screens();
             old_wide = wideEnabled;
+            old_stereo = stereoEnabled;
         }
+
+        // Frees a render target, so keep it out of the frame below
+        update_stereo_target();
 
         // Handle level being completed
         if (level_info.completing) {
@@ -944,48 +969,62 @@ void game_loop() {
             C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ZERO);
             draw_fade();
 
-            // Top screen
-            C2D_SceneBegin(top);
-            C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
+            // Top screen, drawn once per eye when 3D is on
+            for (int eye = 0; begin_top_eye(eye); eye++) {
+                begin_eye_layer(DEPTH_BACKGROUND);
+                draw_background(state.background_x / 8, -(state.camera_y / 8) + 200);
+                end_eye_layer();
 
-            draw_background(state.background_x / 8, -(state.camera_y / 8) + 200);
+                C2D_ViewScale(SCALE, SCALE);
+                C2D_ViewTranslate(0, CAM_Y_MTX_OFFSET);
 
-            C2D_ViewScale(SCALE, SCALE);
-            C2D_ViewTranslate(0, CAM_Y_MTX_OFFSET);
+                // The level rides in front of the screen, the background stays way back
+                begin_eye_layer(DEPTH_LEVEL);
 
-            draw_objects();
+                draw_objects();
 
-            draw_end_wall(delta);
-            
-            draw_attempt_text();
+                draw_end_wall(delta);
 
-            draw_ground(state.ground_x, state.camera_y, 0, false, SCREEN_WIDTH);
-            
-            if (state.ground_y_gfx > 2) {
-                if (state.camera_y - LEVEL_Y_OFFSET + state.ground_y_gfx > 0) draw_ground(state.ground_x, state.camera_y, state.camera_y + state.ground_y_gfx - LEVEL_Y_OFFSET, false, SCREEN_WIDTH);
-                draw_ground(state.ground_x, state.camera_y, state.camera_y - LEVEL_Y_OFFSET + SCREEN_HEIGHT_AREA - state.ground_y_gfx, true, SCREEN_WIDTH);
-            }
+                draw_attempt_text();
 
-            change_blending(true);
-            draw_use_effects(get_use_effect_array_ptr(GFX_TOP_BUT_ABOVE_LEVEL));
+                draw_ground(state.ground_x, state.camera_y, 0, false, SCREEN_WIDTH);
 
-            if (level_info.wall_y > 0) {
-                drawParticleSystem(&end_wall_firework, 0, 0, 1);
-                drawParticleSystem(&level_complete_effect_p1, 0, 0, 1);
-                drawParticleSystem(&level_complete_effect_p2, 0, 0, 1);
+                if (state.ground_y_gfx > 2) {
+                    if (state.camera_y - LEVEL_Y_OFFSET + state.ground_y_gfx > 0) draw_ground(state.ground_x, state.camera_y, state.camera_y + state.ground_y_gfx - LEVEL_Y_OFFSET, false, SCREEN_WIDTH);
+                    draw_ground(state.ground_x, state.camera_y, state.camera_y - LEVEL_Y_OFFSET + SCREEN_HEIGHT_AREA - state.ground_y_gfx, true, SCREEN_WIDTH);
+                }
+
+                change_blending(true);
+                draw_use_effects(get_use_effect_array_ptr(GFX_TOP_BUT_ABOVE_LEVEL));
+
+                if (level_info.wall_y > 0) {
+                    drawParticleSystem(&end_wall_firework, 0, 0, 1);
+                    drawParticleSystem(&level_complete_effect_p1, 0, 0, 1);
+                    drawParticleSystem(&level_complete_effect_p2, 0, 0, 1);
+                }
+
+                end_eye_layer();
+
                 change_blending(false);
 
-                draw_level_complete_popup();
+                if (level_info.wall_y > 0) {
+                    begin_eye_layer(DEPTH_POPUP);
+                    draw_level_complete_popup();
+                    end_eye_layer();
+                }
+
+                begin_eye_layer(DEPTH_POPUP);
+                draw_new_best_popup();
+                end_eye_layer();
+
+                C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
+                C2D_ViewScale(1/SCALE, 1/SCALE);
+
+                begin_eye_layer(DEPTH_UI);
+                gameplay_screen_top_loop();
+                draw_level_complete_top();
+                end_eye_layer();
             }
-
-            change_blending(false);
-
-            draw_new_best_popup();
-
-            C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
-            C2D_ViewScale(1/SCALE, 1/SCALE);
-            gameplay_screen_top_loop();
-            draw_level_complete_top();
 
             // Bottom screen
             C2D_SceneBegin(bot);
@@ -1183,8 +1222,9 @@ int main(int argc, char* argv[]) {
 
     cfg_init();
 
-    top = C2D_CreateScreenTargetExt(GFX_TOP, GFX_LEFT, false);
-    bot = C2D_CreateScreenTargetExt(GFX_BOTTOM, GFX_LEFT, false);
+    // Sort out wide / 3D before making the targets, they need different sizes
+    apply_screen_modes();
+    reinitialize_screens();
 
     srand(time(NULL));
     alt_title_screen = (rand() & (128 - 1)) == 0;

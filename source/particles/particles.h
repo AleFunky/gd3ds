@@ -67,6 +67,9 @@ typedef struct {
 
     float scale;
 
+    // How far the particles fly towards you before they die (0 keeps them flat)
+    float depth;
+
     bool affectedByMirror;
     bool stationary;
     bool relativeStationary;

@@ -8,6 +8,7 @@ typedef struct {
 
 extern bool particlesDisabled;
 extern bool wideEnabled;
+extern bool stereoEnabled;
 extern bool glowEnabled; 
 extern bool yJump;
 extern bool touchEffectEverywhere;

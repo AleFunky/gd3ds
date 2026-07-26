@@ -205,11 +205,52 @@ int get_fade_status() {
     return fade_status;
 }
 
+// How far apart both eyes get at most, in pixels
+#define MAX_EYE_SHIFT 6.f
+
+// Under this both eyes come out identical, so one of them is enough
+#define STEREO_DEADZONE (0.5f / MAX_EYE_SHIFT)
+
+// Wait a moment before freeing, so slider wiggles don't thrash VRAM
+#define STEREO_IDLE_FRAMES 60
+
+static int stereo_idle_frames = 0;
+
+// The slider, snapped to 0 where 3D wouldn't show up anyway
+static float get_stereo_slider() {
+    if (!stereoEnabled) return 0.f;
+
+    float slider = osGet3DSliderState();
+    return slider < STEREO_DEADZONE ? 0.f : slider;
+}
+
 void reinitialize_screens() {
-    C3D_RenderTargetDelete(top);
-    C3D_RenderTargetDelete(bot);
+    if (top) C3D_RenderTargetDelete(top);
+    if (bot) C3D_RenderTargetDelete(bot);
+    if (top_right) C3D_RenderTargetDelete(top_right);
+
     top = C2D_CreateScreenTargetExt(GFX_TOP, GFX_LEFT, false);
     bot = C2D_CreateScreenTargetExt(GFX_BOTTOM, GFX_LEFT, false);
+
+    // The second eye only gets VRAM once the slider asks for it
+    top_right = (get_stereo_slider() > 0.f ? C2D_CreateScreenTargetExt(GFX_TOP, GFX_RIGHT, false) : NULL);
+    stereo_idle_frames = 0;
+}
+
+// Lends the right eye a target while the slider is up. Call outside a frame
+void update_stereo_target() {
+    if (get_stereo_slider() > 0.f) {
+        stereo_idle_frames = 0;
+        if (!top_right) top_right = C2D_CreateScreenTargetExt(GFX_TOP, GFX_RIGHT, false);
+        return;
+    }
+
+    if (!top_right) return;
+
+    if (++stereo_idle_frames < STEREO_IDLE_FRAMES) return;
+
+    C3D_RenderTargetDelete(top_right);
+    top_right = NULL;
 }
 
 void set_wide(bool wide) {
@@ -217,8 +258,108 @@ void set_wide(bool wide) {
     CFGU_GetSystemModel(&model);
     if (model != CFG_MODEL_2DS && !is_citra()) {
         wideEnabled = wide;
-        gfxSetWide(wide);    
+        gfxSetWide(wide);
     }
+}
+
+// Neither 2DS has a second eye, and Citra just draws twice for nothing
+bool stereo_supported() {
+    u8 model;
+    CFGU_GetSystemModel(&model);
+    return model != CFG_MODEL_2DS && model != CFG_MODEL_N2DSXL && !is_citra();
+}
+
+void set_stereo(bool stereo) {
+    stereoEnabled = stereo && stereo_supported();
+    gfxSet3D(stereoEnabled);
+}
+
+// Wide and 3D can't share the top screen, so the old one has to go first
+void apply_screen_modes() {
+    // A New 2DS XL keeps wide, so only give it up for real 3D
+    if (stereoEnabled && stereo_supported()) {
+        set_wide(false);
+        set_stereo(true);
+    } else {
+        set_stereo(false);
+        set_wide(wideEnabled);
+    }
+}
+
+// How deep begin_eye_layer() calls can be nested
+#define MAX_EYE_LAYERS 8
+
+static float stereo_strength = 0.f;
+static int current_eye = EYE_LEFT;
+static bool drawing_top_eye = false;
+
+static C3D_Mtx layer_views[MAX_EYE_LAYERS];
+static int layer_count = 0;
+
+// True only while the top screen is being drawn in 3D. Everything else bails out
+// early, so 2D and the bottom screen render exactly like they did before
+bool is_stereo_active() {
+    return drawing_top_eye && stereo_strength > 0.f;
+}
+
+// How much this eye moves something floating at the given depth
+float get_depth_shift(float depth) {
+    return (current_eye == EYE_LEFT ? 1.f : -1.f) * depth * MAX_EYE_SHIFT * stereo_strength;
+}
+
+// Sets the top screen up for one eye, returns false once every eye has been drawn
+bool begin_top_eye(int eye) {
+    // The slider only gets read once per frame so both eyes agree on the depth
+    if (eye == EYE_LEFT) {
+        stereo_strength = top_right ? get_stereo_slider() : 0.f;
+    }
+
+    // One eye is enough with the slider down
+    if (eye > (stereo_strength > 0.f ? EYE_RIGHT : EYE_LEFT)) {
+        current_eye = EYE_LEFT;
+        drawing_top_eye = false;
+        return false;
+    }
+
+    current_eye = eye;
+    drawing_top_eye = true;
+
+    C3D_RenderTarget *target = (eye == EYE_RIGHT ? top_right : top);
+
+    C2D_TargetClear(target, C2D_Color32(0, 0, 0, 255));
+    C2D_SceneBegin(target);
+
+    return true;
+}
+
+// True while redrawing the screen for another eye, so nothing gets updated twice
+bool is_extra_eye() {
+    return current_eye != EYE_LEFT;
+}
+
+// Shifts everything drawn after this to the given depth, pair it with end_eye_layer().
+// Does nothing in 2D, touching the view would split the batch for no reason
+void begin_eye_layer(float depth) {
+    if (!is_stereo_active()) return;
+
+    // Still count layers we have no room for, so the pairing keeps working
+    if (layer_count++ >= MAX_EYE_LAYERS) return;
+
+    C3D_Mtx *saved = &layer_views[layer_count - 1];
+    C2D_ViewSave(saved);
+
+    // The view can be scaled, so divide it out to keep the shift in screen pixels.
+    // Whole pixels only, half pixel shifts get filtered and smear thin lines and text
+    float scale = saved->r[0].x;
+    if (scale != 0.f) C2D_ViewTranslate(roundf(get_depth_shift(depth)) / scale, 0);
+}
+
+void end_eye_layer() {
+    if (!is_stereo_active()) return;
+
+    if (layer_count <= 0) return;
+
+    if (--layer_count < MAX_EYE_LAYERS) C2D_ViewRestore(&layer_views[layer_count]);
 }
 
 float get_mirror_x(float x, float factor) {
