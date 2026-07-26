@@ -21,6 +21,10 @@ label x=90 y=115 text="Disable particles" scale=0.4 tag="page1"
 checkbox x=75 y=145 tag="page1,chk_glow" scale=0.75 action="glow"
 label x=90 y=145 text="Enable object glow" scale=0.4 tag="page1"
 
+checkbox x=75 y=175 tag="page1,chk_stereo" scale=0.75 action="stereo"
+button x=62 y=162 action="stereoinfo" id=90 scale=0.5 tag="page1"
+label x=90 y=175 text="Stereoscopic 3D" scale=0.4 tag="page1"
+
 label x=160 y=52 text="Input" tag="page2" scale=0.6 align=CENTER
 
 checkbox x=75 y=85 tag="page2,chk_y_jump" scale=0.75 action="y_jump"

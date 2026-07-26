@@ -367,8 +367,9 @@ void init_particles(Color p1_color, Color p2_color) {
     fast_speed_particles.depth = 0.6f;
     faster_speed_particles.depth = 0.6f;
 
-    // The portal spits its particles out of the screen as they age
+    // Its particles spiral inwards, so they start at you and fall into the portal
     end_wall_particles.depth = 0.7f;
+    end_wall_particles.depthInwards = true;
 
     end_wall_firework.depth = 0.8f;
     level_complete_effect_p1.depth = 0.8f;

@@ -70,6 +70,9 @@ int load_object_particles(int id, const ParticleDefinition *cfg, bool stationary
             // After the init, it resets the depth back to flat
             object_particle[i].ps.depth = get_object_particle_depth(objects.id[id]);
 
+            // The small portals and orbs spiral their particles in, so the drift follows
+            object_particle[i].ps.depthInwards = (cfg == &portal_effect_01 || cfg == &ring_effect);
+
             object_particle[i].ps.emitting = true;
             return i;
         }
