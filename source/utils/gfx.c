@@ -262,11 +262,11 @@ void set_wide(bool wide) {
     }
 }
 
-// Neither 2DS has a second eye
+// Neither 2DS has a second eye, and Citra just draws twice for nothing
 bool stereo_supported() {
     u8 model;
     CFGU_GetSystemModel(&model);
-    return model != CFG_MODEL_2DS && model != CFG_MODEL_N2DSXL;
+    return model != CFG_MODEL_2DS && model != CFG_MODEL_N2DSXL && !is_citra();
 }
 
 void set_stereo(bool stereo) {

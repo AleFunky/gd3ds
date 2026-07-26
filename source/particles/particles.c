@@ -420,7 +420,6 @@ void initParticleSystem(ParticleSystem* ps, const ParticleDefinition* cfg) {
     ps->emitterY = cfg->sourcePositiony;
     ps->scale = 1.0f;
     ps->depth = 0.0f;
-    ps->depthInwards = false;
     ps->posVarRotates = false;
     ps->affectedByMirror = true;
 
@@ -531,10 +530,10 @@ void drawParticleSystem(ParticleSystem* ps, float x_offset, float y_offset, floa
             y = (GSP_SCREEN_WIDTH - y);
         }
 
-        // Drift out of the screen as the particle ages, or back into it if inverted
+        // Drift out of the screen as the particle ages
         if (use_depth && d->totalTimeToLive[i] > 0) {
-            float life = d->timeToLive[i] / d->totalTimeToLive[i];
-            x += get_depth_shift(ps->depth * (ps->depthInwards ? life : 1.f - life));
+            float age = 1.f - (d->timeToLive[i] / d->totalTimeToLive[i]);
+            x += get_depth_shift(ps->depth * age);
         }
 
         C2D_ImageTint tint = { 0 };
