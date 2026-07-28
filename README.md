@@ -6,9 +6,8 @@ Geometry Dash and its respective resources are by RobTop Games.
 <img width="1460" height="480" alt="imagen" src="https://github.com/user-attachments/assets/631a3a8b-1750-4f18-b534-9b7ce75e6746" />
 <img width="1460" height="480" alt="imagen" src="https://github.com/user-attachments/assets/d55b2434-4f4b-4136-bab8-668f5e8e62c7" />
 <img width="1460" height="480" alt="imagen" src="https://github.com/user-attachments/assets/7f6d7c17-071d-49a3-8433-6fe2ae13fe8a" />
-<img width="1460" height="480" alt="imagen" src="https://github.com/user-attachments/assets/847299c4-023c-4a30-8dfb-d7a06cac782d" />
+<img width="1460" height="480" alt="imagen" src="https://github.com/user-attachments/assets/6508e8d3-8114-4035-836e-675813fc13f1" />
 
-## Features
 - [x] Main levels up to Theory of Everything 2
 - [x] Gameplay
 - [x] Accurate physics
