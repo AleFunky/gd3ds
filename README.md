@@ -67,5 +67,5 @@ The short answer is no. The long answer is that it's simply too much work for so
 ### Can you add X feature / X gamemode / X level?
 Everything that's planned to be implemented is listed in the planned features section above - in short, anything major from updates above 1.9 will not be added. However, if you come up with an improvement, or a quality of life feature the game could use, you're welcome to suggest it in the Discord server.
 
-### 2.0 / 2.1 / 2.2 when????
-Get out.
+### Why not add 2.0 / 2.1 / 2.2 / whatever?
+Theoretically all features up to 2.1 ARE possible to implement, but they'd be a large undertaking to add in an adequately performant and accurate way. 2.2 only amplifies these concerns, not to mention it having some features that are fully impossible to have work faithfully on 3DS hardware (namely, shader triggers). Many 1.9 levels already struggle to run on the original 3DS, due to their high object counts, and future updates, with moving objects and much more decoration, exponentially worsen this issue. 
