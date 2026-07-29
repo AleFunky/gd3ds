@@ -31,7 +31,6 @@ Geometry Dash and its respective resources are by RobTop Games.
 - [ ] Online support
 - [ ] Start position support
 - [ ] Better bottom screen HUD
-- [ ] Online support
 
 ## Features that aren't planned but may be added either way
 - [ ] Achievements
