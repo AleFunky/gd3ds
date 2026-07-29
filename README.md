@@ -26,7 +26,9 @@ Geometry Dash and its respective resources are by RobTop Games.
 - [x] 1.9 Custom Level Importing (via SD Card)
 - [x] Bottom screen tap effects 
 - [x] Icons on the Title Screen
-- [x] Various in-game effects and UI animations
+- [x] Various in-game visual effects and UI animations
+- [ ] Auto-Checkpoints
+- [ ] Online support
 - [ ] Start position support
 - [ ] Better bottom screen HUD
 - [ ] Online support
