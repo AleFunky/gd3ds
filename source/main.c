@@ -56,6 +56,8 @@
 
 #include "math_helpers.h"
 
+#include "utils/precise_input.h"
+
 #ifdef DEBUG_LEAKS
 #include "utils/leaks_dbg.h"
 #endif
@@ -85,6 +87,11 @@ const char *cheat_names[CHEAT_COUNT] = {
 
 float accumulator = 0.f;
 bool fixed_dt = true;
+
+#define TARGET_FPS 60
+#define PI_SUBSTEP_BUCKETS (STEPS_HZ / TARGET_FPS)
+
+u32 pi_substep_presses[PI_SUBSTEP_BUCKETS];
 
 PrintConsole console;
 
@@ -519,6 +526,12 @@ void init_particles(Color p1_color, Color p2_color) {
     level_complete_effect_p2.cfg.finishColorBlue  = p2_not_white.b / 255.f;
 }
 
+// Empty on purpose: a stable target for `break cbf_click_hook` in GDB.
+// noinline keeps it a real call at -O2; the asm keeps the call from being elided.
+__attribute__((noinline)) void cbf_click_hook(u32 slot, u32 samples_ago, u32 pressed, u32 released) {
+    __asm__ volatile("" ::: "memory");
+}
+
 void game_loop() {
 #ifdef DEBUG_LEAKS
     current_generation++;
@@ -580,6 +593,10 @@ void game_loop() {
     exiting_level = false;
     fixed_dt = true;
 
+    pi_set_jump_keys((settingsState.yJump ? KEY_Y : KEY_A) | KEY_UP);
+    pi_reset();
+    memset(pi_substep_presses, 0, sizeof(pi_substep_presses));
+
     u64 lastTime = svcGetSystemTick();
     u64 start = svcGetSystemTick();
     bool old_wide = settingsState.wideEnabled;
@@ -589,6 +606,8 @@ void game_loop() {
     while (aptMainLoop()) {
         start = svcGetSystemTick();
         hidScanInput();
+
+        pi_poll();
         
         touchPosition touchPos;
         hidTouchRead(&touchPos);
@@ -651,9 +670,14 @@ void game_loop() {
         bool buttonPressed = (settingsState.yJump ? (kDown & KEY_Y) : (kDown & KEY_A)) || (kDown & KEY_UP);
         bool buttonHeld = (settingsState.yJump ? (kHeld & KEY_Y) : (kHeld & KEY_A)) || (kHeld & KEY_UP);
 
-        state.old_input = state.input;
-        state.input.pressedJump = (buttonPressed || (in_bounds && (kDown & KEY_TOUCH))) == true;
-        state.input.holdJump = (state.input.pressedJump || buttonHeld || (in_bounds && (kHeld & KEY_TOUCH))) == true;
+        bool touch_pressed = in_bounds && (kDown & KEY_TOUCH);
+        bool touch_held = in_bounds && (kHeld & KEY_TOUCH);
+
+        if (!pi_enabled) {
+            state.old_input = state.input;
+            state.input.pressedJump = (buttonPressed || touch_pressed) == true;
+            state.input.holdJump = (state.input.pressedJump || buttonHeld || touch_held) == true;
+        }
         
         for (int i = 0; i < 2; i++) {
             drag_particles[i].emitting = false;
@@ -668,6 +692,7 @@ void game_loop() {
 
         u64 now = svcGetSystemTick();
         delta = (now - lastTime) / (CPU_TICKS_PER_MSEC * 1000);
+        u64 frame_window_start = lastTime;
         lastTime = now;
 
         if (state.death_timer <= 0)  {
@@ -695,12 +720,27 @@ void game_loop() {
                     if (!being_faded) fixed_dt = false;
                 }
                 accumulator += physics_delta;
+
+                u32 planned = (u32)(accumulator / STEPS_DT_UNMOD);
+                pi_begin_frame((u32)frame_window_start, (u32)now, planned ? planned : 1);
+
                 // Run simulation in fixed steps
                 while (accumulator >= STEPS_DT_UNMOD) {
                     u64 start_physics = svcGetSystemTick();
+
+                    if (pi_enabled) {
+                        pi_apply_substep((u32)steps);
+                        state.old_input = state.input;
+                        state.input.pressedJump = (pi_pressed() || touch_pressed) == true;
+                        state.input.holdJump = (pi_hold() || state.input.pressedJump || touch_held) == true;
+                        if (pi_pressed()){
+                            pi_substep_presses[steps < PI_SUBSTEP_BUCKETS ? steps : PI_SUBSTEP_BUCKETS - 1]++;
+                        }
+                    }
+
                     state.current_player = 0;
                     state.old_player = state.player;
-                    
+
                     trail = &trail_p1;
                     wave_trail = &wave_trail_p1;
                     handle_player(&state.player);
@@ -820,7 +860,8 @@ void game_loop() {
                     }
 
                     if (song_loaded) unpause_playback_mp3();
-                    fixed_dt = true; 
+                    pi_reset();
+                    fixed_dt = true;
                     state.dead = false;
                     state.hitbox_display = 0;
                 }
@@ -1094,6 +1135,9 @@ void game_loop() {
 
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   114,  DEBUG_TEXT_SCALE, 0, true, "Touch:  %d, %d", touchPos.px, touchPos.py);
 
+                // im jut going to assume 60fps for this (4 buckets)
+                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   126,  DEBUG_TEXT_SCALE, 0, true, "InputTicks: %d|%d|%d|%d", (int)pi_substep_presses[0], (int)pi_substep_presses[1], (int)pi_substep_presses[2], (int)pi_substep_presses[3]);
+
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   138,  DEBUG_TEXT_SCALE, 0, true, "Player");
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   150,  DEBUG_TEXT_SCALE, 0, true, "- Tick: %d", state.player.frame);
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   162,  DEBUG_TEXT_SCALE, 0, true, "- X: %.2f", state.player.x);
@@ -1227,6 +1271,7 @@ int main(int argc, char* argv[]) {
     // Init libs
     romfsInit();
     gfxInitDefault();
+    consoleDebugInit(debugDevice_SVC);
     C3D_Init(C3D_DEFAULT_CMDBUF_SIZE * 4);
     C2D_Init(MAX_SPRITES);
     C2D_Prepare();

@@ -18,6 +18,7 @@
 #include "state.h"
 #include "utils/gfx.h"
 #include "utils/json_config.h"
+#include "utils/precise_input.h"
 
 static bool yes_exit = false;
 
@@ -115,11 +116,21 @@ Setting settings[] = {
         .id = "enableDebugBindings",
         .label = "Enable debug keys",
         .additionalInfo = "Enables debug key shortcuts.<p>(B + L, B + R, X)",
-        .page = PAGE_INPUT, 
+        .page = PAGE_INPUT,
 
         .defaultValue = false,
         .var = &settingsState.enableDebugBindings,
         .key = CONFIG_INPUT_PATH "enableDebugBindings"
+    },
+    {
+        .id = "preciseInput",
+        .label = "240Hz input (CBF)",
+        .additionalInfo = "Registers jumps on the exact 240Hz<p>physics tick they were pressed on.",
+        .page = PAGE_INPUT,
+
+        .defaultValue = false,
+        .var = &pi_enabled,
+        .key = CONFIG_INPUT_PATH "preciseInput"
     },
     {
         .id = "hitboxesEnabled",
