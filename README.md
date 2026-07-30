@@ -36,7 +36,7 @@ Geometry Dash and its respective resources are by RobTop Games.
 - [ ] Achievements
 - [ ] Touchscreen-less navigation options
 - [ ] Dual death effect
-- [ ] Size portal
+- [ ] Size portal lightning effect
 - [ ] Portal flash effect upon use
 - [ ] Gravity switch effect
 - [ ] Startpos switcher
