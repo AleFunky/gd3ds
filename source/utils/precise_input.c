@@ -28,7 +28,7 @@ static u32 frame_substeps;
 static vu32 *get_ring_buffer(void);
 static u32 sample_interval(u32 latest_tick, u32 prev_tick);
 static u32 reconstruct_tick(u32 newest_time, u32 samples_ago, u32 interval);
-static void push_event(u32 tick, bool down);
+static bool push_event(u32 tick, bool down);
 static PreciseInputEvent peek_event(void);
 static PreciseInputEvent pop_event(void);
 static void resync_from_ring(void);
@@ -96,7 +96,10 @@ void pi_poll(void) {
         bool jump = (pointer_to_ring_buffer[RING_ENTRY_WORDS * slot] & jump_keys) != 0;
         if(jump != last_sample_jump){
             u32 input_tick = reconstruct_tick(newest_time, i, interval);
-            push_event(input_tick, jump);
+            if(!push_event(input_tick, jump)){
+                resync_from_ring();
+                return;
+            }
         }
         last_sample_jump = jump;
     }
@@ -171,15 +174,16 @@ static u32 reconstruct_tick(u32 newest_time, u32 samples_ago, u32 interval) {
     return newest_time - (samples_ago * interval);
 }
 
-static void push_event(u32 tick, bool down) {
+static bool push_event(u32 tick, bool down) {
     if (queue_count >= INPUT_QUEUE_SIZE) {
-        return;
+        return false;
     }
     PreciseInputEvent pie;
     pie.down = down;
     pie.tick = tick;
     queue[(queue_head + queue_count) % INPUT_QUEUE_SIZE] = pie;
     queue_count++;
+    return true;
 }
 
 static PreciseInputEvent peek_event(void) {
@@ -202,6 +206,10 @@ static void resync_from_ring(void) {
     vu32 *pointer_to_ring_buffer = get_ring_buffer();
     hold_state = (pointer_to_ring_buffer[RING_ENTRY_WORDS * last_idx] & jump_keys) != 0;   // is a jump key down NOW?
     last_sample_jump = hold_state;
+
+    if(!hold_state){
+        suppress_hold_until_release = false;
+    }
 
     last_poll_tick = (u32)svcGetSystemTick();
 }
