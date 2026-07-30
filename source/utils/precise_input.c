@@ -4,6 +4,7 @@
 #define RING_BUFFER_ENTRIES 8
 #define RING_BUFFER_OFFSET 0x28
 #define RING_ENTRY_WORDS 4
+#define MAX_SAMPLE_INTERVAL_TICKS ((u32)(CPU_TICKS_PER_MSEC * 100))
 
 bool pi_enabled = false;
 
@@ -60,9 +61,9 @@ void pi_poll(void) {
 
     u32 interval = sample_interval(latest_tick, prev_tick);
 
-    // the lap ticks aren't initialized yet (cursor hasn't crossed slot 0), so we
-    // can't reconstruct timestamps, we resync instead
-    if (interval == 0) {
+    // the lap ticks aren't initialized yet (zero or only one stamp so far), so the
+    // interval is zero or its huge (garbage) and we can't reconstruct timestamps, we resync instead
+    if (interval == 0 || interval > MAX_SAMPLE_INTERVAL_TICKS) {
         resync_from_ring();
         return;
     }
