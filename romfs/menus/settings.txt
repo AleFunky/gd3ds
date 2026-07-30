@@ -1,109 +1,21 @@
 darken opacity=0.4 darkenTime=0.15
-window x=160 y=120 w=220 h=180 style=0
-button x=53 y=33 id=31 scale=0.8 action="exit" keyBinds="B"
 
-# Page switch
+window x=160 y=120 w=300 h=220 style=0
+{
+    # Categories
+    
+    windowbutton x=-102 y=-65 text="Graphics" w=110 h=30 style=5 scale=0.65 textScale=0.6 action="category" custom=[page=0] tag="category,graphics"
+    windowbutton x=-102 y=-40 text="Input" w=110 h=30 style=5 scale=0.65 textScale=0.6    action="category" custom=[page=1] tag="category,input"
+    windowbutton x=-102 y=-15 text="Misc" w=110 h=30 style=5 scale=0.65 textScale=0.6     action="category" custom=[page=2] tag="category,misc"
+    windowbutton x=-102 y=10 text="Gameplay" w=110 h=30 style=5 scale=0.65 textScale=0.6  action="category" custom=[page=3] tag="category,gameplay"
+    windowbutton x=-102 y=35 text="Cosmetic" w=110 h=30 style=5 scale=0.65 textScale=0.6  action="category" custom=[page=4] tag="category,cosmetic"
 
-button x=80 y=50 id=8 scale=0.7 action="left_page" keyBinds="LEFT,L,ZL"
-button x=240 y=50 id=8 sx=-0.7 sy=0.7 action="right_page" keyBinds="RIGHT,R,ZR"
+    # List
 
-# Checkboxes
+    window x=42 y=10 w=200 h=180 style=9
+    list w=190 h=170 x=42 y=10 tag="list" bgColor="#bf723e"
 
-label x=160 y=52 text="Graphics" tag="page1" scale=0.6 align=CENTER
+    label x=42 y=-92 scale=0.6 text="Graphics" tag="listlabel" align=CENTER
 
-checkbox x=75 y=85 tag="page1,chk_wide" scale=0.75 action="wide"
-button x=62 y=72 action="wideinfo" id=90 scale=0.5 tag="page1"
-label x=90 y=85 text="800px res" scale=0.4 tag="page1"
-
-checkbox x=75 y=115 tag="page1,chk_particle" scale=0.75 action="particles"
-label x=90 y=115 text="Disable particles" scale=0.4 tag="page1"
-
-checkbox x=75 y=145 tag="page1,chk_glow" scale=0.75 action="glow"
-label x=90 y=145 text="Enable object glow" scale=0.4 tag="page1"
-
-checkbox x=75 y=175 tag="page1,chk_stereo" scale=0.75 action="stereo"
-button x=62 y=162 action="stereoinfo" id=90 scale=0.5 tag="page1"
-label x=90 y=175 text="Stereoscopic 3D" scale=0.4 tag="page1"
-
-label x=160 y=52 text="Input" tag="page2" scale=0.6 align=CENTER
-
-checkbox x=75 y=85 tag="page2,chk_y_jump" scale=0.75 action="y_jump"
-button x=62 y=72 action="jumpinfo" id=90 scale=0.5 tag="page2"
-label x=90 y=85 text="Y to jump" scale=0.4 tag="page2"
-
-checkbox x=75 y=115 tag="page2,chk_touch_effect" scale=0.75 action="touch_effect"
-button x=62 y=102 action="tapinfo" id=90 scale=0.5 tag="page2"
-label x=90 y=115 text="Global tap effect" scale=0.4 tag="page2"
-
-checkbox x=75 y=145 tag="page2,chk_debug_binds" scale=0.75 action="debug"
-button x=62 y=132 action="debuginfo" id=90 scale=0.5 tag="page2"
-label x=90 y=145 text="Enable debug keys" scale=0.4 tag="page2"
-
-label x=160 y=52 text="Misc" tag="page3" scale=0.6 align=CENTER
-
-checkbox x=75 y=85 tag="page3,chk_hitbox" scale=0.75 action="hitbox"
-button x=62 y=72 action="hitboxinfo" id=90 scale=0.5 tag="page3"
-label x=90 y=85 text="Show hitboxes" scale=0.4 tag="page3"
-
-checkbox x=75 y=115 tag="page3,chk_hitboxtrail" scale=0.75 action="hitbox_trail"
-label x=90 y=115 text="Enable hitbox trail" scale=0.4 tag="page3"
-
-checkbox x=75 y=145 tag="page3,chk_death_hitboxes" scale=0.75 action="death_hitboxes"
-label x=90 y=145 text="Show hitboxes on death" scale=0.4 tag="page3"
-
-checkbox x=75 y=175 tag="page3,chk_donot" scale=0.75 action="doNot"
-button x=62 y=162 action="donotinfo" id=90 scale=0.5 tag="page3"
-label x=90 y=175 text="Do not" scale=0.4 tag="page3"
-
-label x=160 y=52 text="Gameplay" tag="page4" scale=0.6 align=CENTER
-
-checkbox x=75 y=85 tag="page4,chk_progressbar" scale=0.75 action="progressbar"
-label x=90 y=85 text="Show progress bar" scale=0.4 tag="page4"
-
-checkbox x=75 y=115 tag="page4,chk_progresspercent" scale=0.75 action="progresspercent"
-label x=90 y=115 text="Show level percentage" scale=0.4 tag="page4"
-
-checkbox x=75 y=145 tag="page4,chk_decimalpercent" scale=0.75 action="decimalPercent"
-button x=62 y=132 action="decimalinfo" id=90 scale=0.5 tag="page4"
-label x=90 y=145 text="Accurate percentage" scale=0.4 tag="page4"
-
-checkbox x=75 y=175 tag="page4,chk_ultradecimalpercent" scale=0.75 action="ultraDecimalPercent"
-button x=62 y=162 action="ultradecimalinfo" id=90 scale=0.5 tag="page4"
-label x=90 y=175 text="ULTRA percentage" scale=0.4 tag="page4"
-
-# gameplay part 2
-
-label x=160 y=52 text="Gameplay" tag="page5" scale=0.6 align=CENTER
-
-checkbox x=75 y=85 tag="page5,chk_quickretry" scale=0.75 action="quickRetry"
-button x=62 y=72 action="quickretryinfo" id=90 scale=0.5 tag="page5"
-label x=90 y=85 text="Quick retry" scale=0.4 tag="page5"
-
-checkbox x=75 y=115 tag="page5,chk_practicemusicsync" scale=0.75 action="practiceMusicSync"
-label x=90 y=115 text="Practice Music Sync" scale=0.4 tag="page5"
-
-# cosmetic page
-
-label x=160 y=52 text="Cosmetic" tag="page6" scale=0.6 align=CENTER
-
-checkbox x=75 y=85 tag="page6,chk_trailcolor" scale=0.75 action="switchTrailColor"
-button x=62 y=72 action="trailcolorinfo" id=90 scale=0.5 tag="page6"
-label x=90 y=85 text="Switch trail color" scale=0.4 tag="page6"
-
-checkbox x=75 y=115 tag="page6,chk_wavetrailcolor" scale=0.75 action="switchWaveTrailColor"
-button x=62 y=102 action="wavetrailcolorinfo" id=90 scale=0.5 tag="page6"
-label x=90 y=115 text="Switch wave trail color" scale=0.4 tag="page6"
-
-checkbox x=75 y=145 tag="page6,chk_solidwavetrail" scale=0.75 action="solidWaveTrail"
-button x=62 y=132 action="solidwavetrailinfo" id=90 scale=0.5 tag="page6"
-label x=90 y=145 text="Solid wave trail" scale=0.4 tag="page6"
-
-checkbox x=75 y=175 tag="page6,chk_noplayertrail" scale=0.75 action="noPlayerTrail"
-label x=90 y=175 text="Disable player trail" scale=0.4 tag="page6"
-
-label x=160 y=52 text="Cosmetic" tag="page7" scale=0.6 align=CENTER
-
-checkbox x=75 y=85 tag="page7,chk_nowavetrailbehind" scale=0.75 action="noWaveTrailBehind"
-button x=62 y=72 action="nowavetrailbehindinfo" id=90 scale=0.5 tag="page7"
-label x=90 y=85 text="No wave trail behind" scale=0.4 tag="page7"
-
+    button x=-140 y=-100 id=31 scale=0.8 action="exit" keyBinds="B"
+}

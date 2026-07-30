@@ -1,5 +1,11 @@
 #include <3ds.h>
 #include <citro2d.h>
+#include "main.h"
+#include "menus/components/ui_button.h"
+#include "menus/components/ui_label.h"
+#include "menus/components/ui_rectangle.h"
+#include "menus/components/ui_window_button.h"
+#include "menus/core/common_setters.h"
 #include "menus/core/ui_element.h"
 #include "menus/core/ui_screen.h"
 #include "menus/components/ui_checkbox.h"
@@ -11,6 +17,7 @@
 #include "save/config.h"
 #include "state.h"
 #include "utils/gfx.h"
+#include "utils/json_config.h"
 
 static bool yes_exit = false;
 
@@ -20,233 +27,318 @@ static UIScreen screen = {
     .isBottom = true
 };
 
-bool particlesDisabled = false;
-bool wideEnabled = false;
-bool stereoEnabled = true;
-bool glowEnabled = true;
-bool yJump = false;
-bool touchEffectEverywhere = false;
-bool enableDebugBindings = false;
-bool hitboxesEnabled = false;
-bool hitboxTrail = false;
-bool hitboxesOnDeath = false;
-bool showProgressBar = false;
-bool showProgressPercent = false;
-bool decimalPercent = false;
-bool ultraDecimalPercent = false;
-bool switchTrailColor = false;
-bool switchWaveTrailColor = false;
-bool quickRetry = false;
-bool solidWaveTrail = false;
-bool noPlayerTrail = false;
-bool noWaveTrailBehind = false;
-bool doNot = false;
-bool practiceMusicSync = false;
+SettingState settingsState;
 
-static Setting settings[] = {
-    {
-        "chk_wide", &wideEnabled
-    },
-    {
-        "chk_stereo", &stereoEnabled
-    },
-    {
-        "chk_particle", &particlesDisabled
-    },
-    {
-        "chk_glow", &glowEnabled
-    },
-    {
-        "chk_y_jump", &yJump
-    },
-    {
-        "chk_touch_effect", &touchEffectEverywhere
-    },
-    {
-        "chk_debug_binds", &enableDebugBindings
-    },
-    {
-        "chk_hitbox", &hitboxesEnabled
-    },
-    {
-        "chk_hitboxtrail", &hitboxTrail
-    },
-    {
-        "chk_death_hitboxes", &hitboxesOnDeath
-    },
-    {
-        "chk_progressbar", &showProgressBar
-    },
-    {
-        "chk_progresspercent", &showProgressPercent
-    },
-    {
-        "chk_decimalpercent", &decimalPercent
-    },
-    {
-        "chk_ultradecimalpercent", &ultraDecimalPercent
-    },
-    {
-        "chk_trailcolor", &switchTrailColor
-    },
-    {
-        "chk_wavetrailcolor", &switchWaveTrailColor
-    },
-    {
-        "chk_quickretry", &quickRetry
-    },
-    {
-        "chk_solidwavetrail", &solidWaveTrail
-    },
-    {
-        "chk_noplayertrail", &noPlayerTrail
-    },
-    {
-        "chk_nowavetrailbehind", &noWaveTrailBehind
-    },
-    {
-        "chk_donot", &doNot
-    },
-    {
-        "chk_practicemusicsync", &practiceMusicSync
-    }
+UIList *list;
+UILabel *category_name;
+
+bool request_list_reload = false;
+
+void wide_setting(bool checked);
+void stereo_setting(bool checked);
+void practiceMusicSync_setting(bool checked);
+
+const char *category_names[] = {
+    "Graphics",
+    "Input",
+    "Misc",
+    "Gameplay",
+    "Cosmetic"
 };
 
+Setting settings[] = {
+    {
+        .id = "wideEnabled",
+        .label = "800 px res",
+        .additionalInfo = "Doubles the top screen's horizontal<p>resolution.",
+        .page = PAGE_GRAPHICS, 
 
-const char *pages_tags[] = {
-    "page1",
-    "page2",
-    "page3",
-    "page4",
-    "page5",
-    "page6",
-    "page7",
+        .defaultValue = false,
+        .var = &settingsState.wideEnabled,
+        .key = CONFIG_GRAPHICS_PATH "wideEnabled",
+
+        .onChanged = wide_setting
+    },
+    {
+        .id = "stereoEnabled",
+        .label = "Stereoscopic 3D",
+        .additionalInfo = "Adds depth to the top screen.<p>Use the 3D slider, costs some FPS.",
+        .page = PAGE_GRAPHICS, 
+
+        .defaultValue = false,
+        .var = &settingsState.stereoEnabled,
+        .key = CONFIG_GRAPHICS_PATH "stereoEnabled",
+
+        .onChanged = stereo_setting
+    },
+    {
+        .id = "particlesDisabled",
+        .label = "Disable particles",
+        .additionalInfo = NULL,
+        .page = PAGE_GRAPHICS, 
+
+        .defaultValue = false,
+        .var = &settingsState.particlesDisabled,
+        .key = CONFIG_GRAPHICS_PATH "particlesDisabled"
+    },
+    {
+        .id = "glowEnabled",
+        .label = "Enable object glow",
+        .additionalInfo = NULL,
+        .page = PAGE_GRAPHICS, 
+
+        .defaultValue = true,
+        .var = &settingsState.glowEnabled,
+        .key = CONFIG_GRAPHICS_PATH "glowEnabled"
+    },
+    {
+        .id = "yButton",
+        .label = "Y to jump",
+        .additionalInfo = "Swaps your jump input to Y.",
+        .page = PAGE_INPUT, 
+
+        .defaultValue = false,
+        .var = &settingsState.yJump,
+        .key = CONFIG_INPUT_PATH "yButton"
+    },
+    {
+        .id = "touchEffectEverywhere",
+        .label = "Global tap effect",
+        .additionalInfo = "Plays the tap effect across all menus.",
+        .page = PAGE_INPUT, 
+
+        .defaultValue = false,
+        .var = &settingsState.touchEffectEverywhere,
+        .key = CONFIG_INPUT_PATH "touchEffectEverywhere"
+    },
+    {
+        .id = "enableDebugBindings",
+        .label = "Enable debug keys",
+        .additionalInfo = "Enables debug key shortcuts.<p>(B + L, B + R, X)",
+        .page = PAGE_INPUT, 
+
+        .defaultValue = false,
+        .var = &settingsState.enableDebugBindings,
+        .key = CONFIG_INPUT_PATH "enableDebugBindings"
+    },
+    {
+        .id = "hitboxesEnabled",
+        .label = "Show hitboxes",
+        .additionalInfo = "Shows object hitboxes while in a level.<p>WARNING: AFFECTS PERFOMANCE!",
+        .page = PAGE_MISC, 
+
+        .defaultValue = false,
+        .var = &settingsState.hitboxesEnabled,
+        .key = CONFIG_MISC_PATH "hitboxesEnabled"
+    },
+    {
+        .id = "hitboxTrail",
+        .label = "Enable hitbox trail",
+        .additionalInfo = NULL,
+        .page = PAGE_MISC, 
+
+        .defaultValue = false,
+        .var = &settingsState.hitboxTrail,
+        .key = CONFIG_MISC_PATH "hitboxTrail"
+    },
+    {
+        .id = "hitboxesOnDeath",
+        .label = "Show hitboxes<p>on death",
+        .additionalInfo = NULL,
+        .page = PAGE_MISC, 
+
+        .defaultValue = false,
+        .var = &settingsState.hitboxesOnDeath,
+        .key = CONFIG_MISC_PATH "hitboxesOnDeath"
+    },
+    {
+        .id = "doNot",
+        .label = "Do not",
+        .additionalInfo = "Doesn't do anything...<p>Well, nothing useful.",
+        .page = PAGE_MISC, 
+
+        .defaultValue = false,
+        .var = &settingsState.doNot,
+        .key = CONFIG_MISC_PATH "doNot"
+    },
+    {
+        .id = "practiceMusicSync",
+        .label = "Practice music sync",
+        .additionalInfo = "Plays the level's music in practice mode.",
+        .page = PAGE_MISC, 
+
+        .defaultValue = false,
+        .var = &settingsState.practiceMusicSync,
+        .key = CONFIG_MISC_PATH "practiceMusicSync",
+
+        .onChanged = practiceMusicSync_setting
+    },
+    {
+        .id = "showProgressBar",
+        .label = "Show progress bar",
+        .additionalInfo = NULL,
+        .page = PAGE_GAMEPLAY, 
+
+        .defaultValue = false,
+        .var = &settingsState.showProgressBar,
+        .key = CONFIG_GAMEPLAY_PATH "showProgressBar"
+    },
+    {
+        .id = "showProgressPercent",
+        .label = "Show level percentage",
+        .additionalInfo = NULL,
+        .page = PAGE_GAMEPLAY, 
+
+        .defaultValue = false,
+        .var = &settingsState.showProgressPercent,
+        .key = CONFIG_GAMEPLAY_PATH "showProgressPercent"
+    },
+    {
+        .id = "decimalPercent",
+        .label = "Accurate percentage",
+        .additionalInfo = "Shows level progress with 2 decimals.",
+        .page = PAGE_GAMEPLAY, 
+
+        .defaultValue = false,
+        .var = &settingsState.decimalPercent,
+        .key = CONFIG_GAMEPLAY_PATH "decimalPercent"
+    },
+    {
+        .id = "ultraDecimalPercent",
+        .label = "Ultra percentage",
+        .additionalInfo = "But mom, I want more decimals!!!!<p>(Why would you want to use this?)",
+        .page = PAGE_GAMEPLAY, 
+
+        .defaultValue = false,
+        .var = &settingsState.ultraDecimalPercent,
+        .key = CONFIG_GAMEPLAY_PATH "ultraDecimalPercent"
+    },
+    {
+        .id = "quickRetry",
+        .label = "Quick retry",
+        .additionalInfo = "Restarts in 0.5 seconds instead of 1.",
+        .page = PAGE_GAMEPLAY, 
+
+        .defaultValue = false,
+        .var = &settingsState.quickRetry,
+        .key = CONFIG_GAMEPLAY_PATH "quickRetry"
+    },
+    {
+        .id = "switchTrailColor",
+        .label = "Switch trail color",
+        .additionalInfo = "Makes the player trail use P1<p>instead of P2.",
+        .page = PAGE_COSMETIC, 
+
+        .defaultValue = false,
+        .var = &settingsState.switchTrailColor,
+        .key = CONFIG_COSMETIC_PATH "switchTrailColor"
+    },
+    {
+        .id = "switchWaveTrailColor",
+        .label = "Switch wave<p>trail color",
+        .additionalInfo = "Makes the wave trail use P1<p>instead of P2.",
+        .page = PAGE_COSMETIC, 
+
+        .defaultValue = false,
+        .var = &settingsState.switchWaveTrailColor,
+        .key = CONFIG_COSMETIC_PATH "switchWaveTrailColor"
+    },
+    {
+        .id = "solidWaveTrail",
+        .label = "Solid wave trail",
+        .additionalInfo = "Disables blending for the wave trail.",
+        .page = PAGE_COSMETIC, 
+
+        .defaultValue = false,
+        .var = &settingsState.solidWaveTrail,
+        .key = CONFIG_COSMETIC_PATH "solidWaveTrail"
+    },
+    {
+        .id = "noPlayerTrail",
+        .label = "Disable player trail",
+        .additionalInfo = NULL,
+        .page = PAGE_COSMETIC, 
+
+        .defaultValue = false,
+        .var = &settingsState.noPlayerTrail,
+        .key = CONFIG_COSMETIC_PATH "noPlayerTrail"
+    },
+    {
+        .id = "noWaveTrailBehind",
+        .label = "No wave trail behind",
+        .additionalInfo = "Disables player trail for the wave.",
+        .page = PAGE_COSMETIC, 
+
+        .defaultValue = false,
+        .var = &settingsState.noWaveTrailBehind,
+        .key = CONFIG_COSMETIC_PATH "noWaveTrailBehind"
+    },
 };
 
+typedef struct CheckboxData {
+    Setting *setting;
+} CheckboxData;
 
-void switch_page(int page) {
-    for (int i = 0; i < ARRAY_LEN(pages_tags); i++) {
-        if (i == page) {
-            ui_run_func_on_tag(&screen, pages_tags[page], ui_enable_element);
-        } else {
-            ui_run_func_on_tag(&screen, pages_tags[i], ui_disable_element);
-        }
-    }
-}
+typedef struct InfoButtonData {
+    const char *text;
+} InfoButtonData;
 
 void exit_settings(UIElement* e) {
     yes_exit = true;
 }
 
+UICheckBox *get_setting_checkbox_by_id(const char *id) {
+    if (list) {
+        // Iterate through list children
+        for (UIElement *rectangle = list->base.first_child; rectangle; rectangle = rectangle->next_sibling) {
+            // Find checkbox in the rectangle
+            UIElement *checkbox = ui_get_child_by_type(rectangle, UI_CHECKBOX);
+            if (checkbox) {
+                if (checkbox->userdata) {
+                    CheckboxData *data = checkbox->userdata;
+
+                    // Check if the ids match
+                    if (strcmp(id, data->setting->id) == 0) {
+                        return (UICheckBox *) checkbox;
+                    }
+                }
+            }
+        }
+    }
+
+    return NULL;
+}
+
 // Wide and 3D both want the whole top screen, so only one of them gets it
-static void turn_off_setting(const char *chk_name, bool *var) {
+static void turn_off_setting(const char *id, bool *var) {
     *var = false;
-    set_checkbox_enabled((UICheckBox *)ui_get_element_by_tag(&screen, chk_name), false);
+
+    UICheckBox *checkbox = get_setting_checkbox_by_id(id);
+
+    if (checkbox) ui_set_checkbox_checked(checkbox, false);
 }
 
-void wide_settings(UIElement* e) {
-    wideEnabled = ((UICheckBox *)e)->checked;
-
-    if (wideEnabled) turn_off_setting("chk_stereo", &stereoEnabled);
+void wide_setting(bool checked) {
+    if (checked) turn_off_setting("stereoEnabled", &settingsState.stereoEnabled);
 }
 
-void stereo_settings(UIElement* e) {
-    stereoEnabled = ((UICheckBox *)e)->checked;
-
-    if (!stereoEnabled) return;
+void stereo_setting(bool checked) {
+    if (!checked) return;
 
     // No 3D on this console, so don't let the box stay ticked
     if (!stereo_supported()) {
-        turn_off_setting("chk_stereo", &stereoEnabled);
+        turn_off_setting("stereoEnabled", &settingsState.stereoEnabled);
         return;
     }
 
-    turn_off_setting("chk_wide", &wideEnabled);
+    turn_off_setting("wideEnabled", &settingsState.wideEnabled);
 }
 
-void particles_settings(UIElement* e) {
-    particlesDisabled = ((UICheckBox *)e)->checked;
-}
-
-void glow_settings(UIElement* e) {
-    glowEnabled = ((UICheckBox *)e)->checked;
-}
-
-void y_button_settings(UIElement* e) {
-    yJump = ((UICheckBox *)e)->checked;
-}
-
-void touch_effect_settings(UIElement* e) {
-    touchEffectEverywhere = ((UICheckBox *)e)->checked;
-}
-
-void debug_settings(UIElement* e) {
-    enableDebugBindings = ((UICheckBox *)e)->checked;
-}
-
-void hitboxes_settings(UIElement* e) {
-    hitboxesEnabled = ((UICheckBox *)e)->checked;
-}
-
-void hitbox_trail_settings(UIElement* e) {
-    hitboxTrail = ((UICheckBox *)e)->checked;
-}
-
-void hitboxes_on_death_settings(UIElement* e) {
-    hitboxesOnDeath = ((UICheckBox *)e)->checked;
-}
-
-void progressbar_settings(UIElement* e) {
-    showProgressBar = ((UICheckBox *)e)->checked;
-}
-
-void progresspercent_settings(UIElement* e) {
-    showProgressPercent = ((UICheckBox *)e)->checked;
-}
-
-void decimalpercent_settings(UIElement* e) {
-    decimalPercent = ((UICheckBox *)e)->checked;
-}
-
-void ultradecimalpercent_settings(UIElement* e) {
-    ultraDecimalPercent = ((UICheckBox *)e)->checked;
-}
-
-void switchTrailColor_settings(UIElement* e) {
-    switchTrailColor = ((UICheckBox *)e)->checked;
-}
-
-void switchWaveTrailColor_settings(UIElement* e) {
-    switchWaveTrailColor = ((UICheckBox *)e)->checked;
-}
-
-void quickRetry_settings(UIElement* e) {
-    quickRetry = ((UICheckBox *)e)->checked;
-}
-
-void solidWaveTrail_settings(UIElement* e) {
-    solidWaveTrail = ((UICheckBox *)e)->checked;
-}
-
-void noPlayerTrail_settings(UIElement* e) {
-    noPlayerTrail = ((UICheckBox *)e)->checked;
-}
-
-void noWaveTrailBehind_settings(UIElement* e) {
-    noWaveTrailBehind = ((UICheckBox *)e)->checked;
-}
-
-void doNot_settings(UIElement* e) {
-    doNot = ((UICheckBox *)e)->checked;
-}
-
-void practiceMusicSync_settings(UIElement* e) {
-    practiceMusicSync = ((UICheckBox *)e)->checked;
-
+void practiceMusicSync_setting(bool checked) {
     // Enable song
     if (state.practice_mode) {
         stop_mp3();
-        if (practiceMusicSync) {
+        if (checked) {
             play_level_song(level_info.song_offset + state.player.timeElapsed);
         } else {
             play_practice_song();
@@ -254,121 +346,111 @@ void practiceMusicSync_settings(UIElement* e) {
     }
 }
 
-void action_left_page(UIElement *e) {
-    current_page--;
-    if (current_page < 0) {
-        current_page = ARRAY_LEN(pages_tags) - 1;
+static void checkbox_action(UIElement *e) {
+    CheckboxData *data = e->userdata;
+    bool checked = ((UICheckBox *)e)->checked;
+    if (data) {
+        *data->setting->var = checked;
+        if (data->setting->onChanged) data->setting->onChanged(checked);
     }
-
-    switch_page(current_page);
 }
 
-void action_right_page(UIElement *e) {
-    current_page++;
-    if (current_page >= ARRAY_LEN(pages_tags)) {
-        current_page = 0;
+static void info_action(UIElement *e) {
+    InfoButtonData *data = e->userdata;
+    if (data) {
+        action_open_info_card_text(data->text);
     }
-
-    switch_page(current_page);
 }
 
-void action_info_wide(UIElement *e) {
-    action_open_info_card(1);
+static void set_button_style(UIElement *e) {
+    UIWindowButton *button = (UIWindowButton *) e;
+    int page = ui_prop_int(&e->custom_properties, "page", 0);
+    ui_window_button_set_style(button, (page == current_page ? 10 : 5));
 }
 
-void action_info_stereo(UIElement *e) {
-    action_open_info_card(14);
+void action_category(UIElement *e) {
+    current_page = ui_prop_int(&e->custom_properties, "page", 0);
+    request_list_reload = true;
 }
 
-void action_info_tap(UIElement *e) {
-    action_open_info_card(2);
+
+void create_setting(Setting *setting, int id) {
+    if (list) {
+        float list_width = list->base.w * 0.5f;
+
+        UIElement *card = (UIElement *) ui_create_rectangle(&screen.ctx);
+
+        if (card) {
+            ui_rectangle_set_color((UIRectangle *) card, (id & 1 ? C2D_Color32(194,114,62,255) :  C2D_Color32(161,88,48,255)));
+            ui_element_set_size(card, 0, 28);
+
+            UICheckBox *checkbox = ui_create_checkbox(&screen.ctx);
+            if (checkbox) {
+                // Store in the user data
+                CheckboxData *data = malloc(sizeof(*data));
+                data->setting = setting;
+
+                ui_element_set_userdata((UIElement *) checkbox, data);
+
+                ui_element_set_position((UIElement *) checkbox, -list_width + 13, 0);
+                ui_element_set_scale((UIElement *) checkbox, 0.6f);
+                ui_element_set_action((UIElement *) checkbox, checkbox_action);
+
+                ui_set_checkbox_checked(checkbox, *setting->var);
+                ui_element_add_child(card, (UIElement *) checkbox);
+            }
+
+            UILabel *name = ui_create_label(&screen.ctx);
+            if (name) {
+                ui_label_set_text(name, setting->label);
+                ui_element_set_position((UIElement *) name, -list_width + 28, 0);
+                ui_element_set_scale((UIElement *) name, 0.38f);
+
+                ui_element_add_child(card, (UIElement *) name);
+            }
+
+            if (setting->additionalInfo) {
+                UIButton *info = ui_create_button(&screen.ctx);
+                if (info) {
+                    // Store the text pointer in the user data
+                    InfoButtonData *data = malloc(sizeof(*data));
+                    data->text = setting->additionalInfo;
+                    ui_element_set_userdata((UIElement *) info, data);
+
+                    ui_element_set_position((UIElement *) info, list_width -+ 13, 0);
+                    ui_element_set_scale((UIElement *) info, 0.5f);
+                    ui_element_set_action((UIElement *) info, info_action);
+
+                    ui_button_set_image(info, 90, 0);
+
+                    ui_element_add_child(card, (UIElement *) info);
+                }
+            }
+
+            ui_list_add(list, card);
+        }
+    }
 }
 
-void action_info_jump(UIElement *e) {
-    action_open_info_card(3);
-}
+void load_category(SettingPage page) {
+    ui_list_reset(list);
+    ui_label_set_text(category_name, category_names[page]);
+    ui_run_func_on_tag(&screen, "category", set_button_style);
 
-void action_info_hitboxes(UIElement *e) {
-    action_open_info_card(4);
-}
+    int count = 0;
+    for (int i = 0; i < ARRAY_LEN(settings); i++) {
+        Setting *setting = &settings[i];
 
-void action_info_debug(UIElement *e) {
-    action_open_info_card(5);
+        if (setting->page == page) {
+            create_setting(setting, count);
+            count++;
+        }
+    }
 }
-
-void action_info_decimal(UIElement *e) {
-    action_open_info_card(6);
-}
-
-void action_info_ultra_decimal(UIElement *e) {
-    action_open_info_card(7);
-}
-
-void action_info_trail(UIElement *e) {
-    action_open_info_card(8);
-}
-
-void action_info_wave_trail(UIElement *e) {
-    action_open_info_card(9);
-}
-
-void action_info_quick_retry(UIElement *e) {
-    action_open_info_card(10);
-}
-
-void action_info_solid_wave_trail(UIElement *e) {
-    action_open_info_card(11);
-}
-
-void action_info_no_wave_trail_behind(UIElement *e) {
-    action_open_info_card(12);
-}
-
-void action_info_do_not(UIElement *e) {
-    action_open_info_card(13);
-}
-
 
 static UIAction actions[] = {
     { "exit", exit_settings },
-    { "wide", wide_settings },
-    { "stereo", stereo_settings },
-    { "particles", particles_settings },
-    { "glow", glow_settings },
-    { "y_jump", y_button_settings },
-    { "touch_effect", touch_effect_settings },
-    { "debug", debug_settings },
-    { "hitbox", hitboxes_settings },
-    { "hitbox_trail", hitbox_trail_settings },
-    { "death_hitboxes", hitboxes_on_death_settings },
-    { "progressbar", progressbar_settings },
-    { "progresspercent", progresspercent_settings },
-    { "decimalPercent", decimalpercent_settings },
-    { "ultraDecimalPercent", ultradecimalpercent_settings },
-    { "switchTrailColor", switchTrailColor_settings},
-    { "switchWaveTrailColor", switchWaveTrailColor_settings},
-    { "quickRetry", quickRetry_settings},
-    { "solidWaveTrail", solidWaveTrail_settings},
-    { "noPlayerTrail", noPlayerTrail_settings},
-    { "noWaveTrailBehind", noWaveTrailBehind_settings},
-    { "doNot", doNot_settings},
-    { "practiceMusicSync" , practiceMusicSync_settings},
-    { "left_page", action_left_page},
-    { "right_page", action_right_page},
-    { "wideinfo", action_info_wide},
-    { "stereoinfo", action_info_stereo},
-    { "jumpinfo", action_info_jump},
-    { "tapinfo", action_info_tap},
-    { "hitboxinfo", action_info_hitboxes},
-    { "debuginfo", action_info_debug},
-    { "decimalinfo", action_info_decimal},
-    { "ultradecimalinfo", action_info_ultra_decimal},
-    { "trailcolorinfo", action_info_trail},
-    { "wavetrailcolorinfo", action_info_wave_trail},
-    { "quickretryinfo", action_info_quick_retry},
-    { "solidwavetrailinfo", action_info_solid_wave_trail},
-    { "nowavetrailbehindinfo", action_info_no_wave_trail_behind},
-    { "donotinfo", action_info_do_not}
+    {"category", action_category}
 };
 
 void settings_init() {
@@ -376,17 +458,12 @@ void settings_init() {
     ui_screen_open(&screen, ANIM_ZOOM);
     yes_exit = false;
 
-    for (int i = 0; i < ARRAY_LEN(settings); i++) {
-        UICheckBox *checkbox = (UICheckBox *)ui_get_element_by_tag(&screen, settings[i].chk_name);
-        if (checkbox) {
-            checkbox->checked = *settings[i].var;
-            set_checkbox_enabled(checkbox, checkbox->checked);
-        }
-    }
+    list = (UIList *) ui_get_element_by_tag(&screen, "list");
+    category_name = (UILabel *) ui_get_element_by_tag(&screen, "listlabel");
 
     current_page = 0;
 
-    switch_page(0);
+    load_category(current_page);
 }
 
 int settings_loop() {
@@ -395,6 +472,11 @@ int settings_loop() {
         
         ui_unload_screen(&screen);
         return true;
+    }
+
+    if (request_list_reload) {
+        load_category(current_page);
+        request_list_reload = false;
     }
 
     UIInput touch;

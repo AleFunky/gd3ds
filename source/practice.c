@@ -137,7 +137,7 @@ void restore_checkpoint() {
     current_fading_effect = check->current_fading_effect;
     p1_trail = check->p1_trail;
 
-    if (practiceMusicSync) seek_mp3(check->song_offset);
+    if (settingsState.practiceMusicSync) seek_mp3(check->song_offset);
     
     memcpy(channels, check->channels, sizeof(channels));
     memcpy(col_trigger_buffer, check->col_trigger_buffer, sizeof(col_trigger_buffer));
@@ -167,7 +167,7 @@ void start_practice_mode() {
     checkpoint_pointer = 0;
     state.practice_mode = true;
     
-    if (!practiceMusicSync) {
+    if (!settingsState.practiceMusicSync) {
         stop_mp3();
         play_practice_song();
     }
@@ -178,7 +178,7 @@ void exit_practice_mode() {
     init_variables();
     reload_level(); 
 
-    if (practiceMusicSync) {
+    if (settingsState.practiceMusicSync) {
         seek_mp3(level_info.song_offset);
     } else {
         stop_mp3();
@@ -192,11 +192,11 @@ void handle_practice_mode() {
     u32 kDown = hidKeysDown();
     u32 kHeld = hidKeysHeld();
 
-    if (((kDown & KEY_L) && !((kHeld & KEY_B) && enableDebugBindings)) || (kDown & KEY_ZL)) {
+    if (((kDown & KEY_L) && !((kHeld & KEY_B) && settingsState.enableDebugBindings)) || (kDown & KEY_ZL)) {
         new_checkpoint();
     }
 
-    if (((kDown & KEY_R) && !((kHeld & KEY_B) && enableDebugBindings)) || (kDown & KEY_ZR)) {
+    if (((kDown & KEY_R) && !((kHeld & KEY_B) && settingsState.enableDebugBindings)) || (kDown & KEY_ZR)) {
         delete_last_checkpoint();
     }
 }

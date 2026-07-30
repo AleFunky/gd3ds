@@ -327,11 +327,11 @@ void first_load_init_variables() {
 
 void init_wave_trails() {
     C2D_Image img = C2D_SpriteSheetGetImage(trailSheet, 0);
-    Color used_p1 = (switchWaveTrailColor ? p1_color : p2_color);
-    Color used_p2 = (switchWaveTrailColor ? p2_color : p1_color);
+    Color used_p1 = (settingsState.switchWaveTrailColor ? p1_color : p2_color);
+    Color used_p2 = (settingsState.switchWaveTrailColor ? p2_color : p1_color);
     
-    MotionTrail_Init(&wave_trail_p1, 0, 3.f, true, 10.0f, true, (used_p1.r | used_p1.g | used_p1.b && !solidWaveTrail), false, used_p1, img);
-    MotionTrail_Init(&wave_trail_p2, 1, 3.f, true, 10.0f, true, (used_p2.r | used_p2.g | used_p2.b && !solidWaveTrail), false, used_p2, img);
+    MotionTrail_Init(&wave_trail_p1, 0, 3.f, true, 10.0f, true, (used_p1.r | used_p1.g | used_p1.b && !settingsState.solidWaveTrail), false, used_p1, img);
+    MotionTrail_Init(&wave_trail_p2, 1, 3.f, true, 10.0f, true, (used_p2.r | used_p2.g | used_p2.b && !settingsState.solidWaveTrail), false, used_p2, img);
 }
 
 void init_trails(int trail) {
@@ -339,8 +339,8 @@ void init_trails(int trail) {
 
     C2D_Image img = C2D_SpriteSheetGetImage(trailSheet, trail);
 
-    Color used_p1 = (switchTrailColor ? p1_color : p2_color);
-    Color used_p2 = (switchTrailColor ? p2_color : p1_color);
+    Color used_p1 = (settingsState.switchTrailColor ? p1_color : p2_color);
+    Color used_p2 = (settingsState.switchTrailColor ? p2_color : p1_color);
 
     if (!config->colored) {
         used_p1 = white;
@@ -387,7 +387,7 @@ void handle_death(Player *player, bool pause_song) {
         if (!state.practice_mode) {
             pause_playback_mp3();
             seek_mp3(level_info.song_offset);
-        } else if (practiceMusicSync) {
+        } else if (settingsState.practiceMusicSync) {
             pause_playback_mp3();
         }
     }
@@ -410,7 +410,7 @@ void handle_death(Player *player, bool pause_song) {
     explosion_particles[state.current_player].scale = (player->mini ? 0.6 : 1.0f);
     spawnMultipleParticles(&explosion_particles[state.current_player], 90);
     
-    if (hitboxesOnDeath) {
+    if (settingsState.hitboxesOnDeath) {
         state.hitbox_enabled_when_dead = true;
     }
 }

@@ -89,6 +89,12 @@ void action_open_credits(UIElement* e) {
     credits_init();
 }
 
+void action_open_info_card_text(const char *text) {
+    info_card_init();
+    set_info_content(text);
+    in_info_card = true;
+}
+
 void action_open_info_card(int id) {
     info_card_init();
     switch (id) {
@@ -339,8 +345,8 @@ void main_menu_loop() {
     trail = &trail_p1;
     wave_trail = &wave_trail_p1;
 
-    bool old_wide = wideEnabled;
-    bool old_stereo = stereoEnabled;
+    bool old_wide = settingsState.wideEnabled;
+    bool old_stereo = settingsState.stereoEnabled;
 
     //disabled in preparation for release
     
@@ -454,13 +460,13 @@ void main_menu_loop() {
             main_menu_color_index++;
         }
 
-        if (wideEnabled != old_wide || stereoEnabled != old_stereo) {
+        if (settingsState.wideEnabled != old_wide || settingsState.stereoEnabled != old_stereo) {
             gspWaitForVBlank();
             apply_screen_modes();
             gspWaitForVBlank();
             reinitialize_screens();
-            old_wide = wideEnabled;
-            old_stereo = stereoEnabled;
+            old_wide = settingsState.wideEnabled;
+            old_stereo = settingsState.stereoEnabled;
         }
 
         // Frees a render target, so keep it out of the frame below

@@ -254,6 +254,16 @@ void ui_destroy_tree(UIElement *e) {
     e->destroy(e);
 }
 
+UIElement *ui_get_child_by_type(UIElement *parent, UIElementType type) {
+    for (UIElement *child = parent->first_child; child; child = child->next_sibling) {
+        if (child->type == type) {
+            return child;
+        }
+    }
+
+    return NULL;
+}
+
 
 // Starts the opening animation
 void ui_screen_open(UIScreen *screen, UIAnimation animation) {
@@ -726,6 +736,8 @@ void ui_element_set_userdata(UIElement *element, void *userdata) {
 }
 
 bool ui_element_basic_bound_check(UIElement *e, UIInput *touch, UITransform *transform) {
+    if (touch->touchPosition.px == 0 && touch->touchPosition.py == 0) return false;
+
     float width  = (e->w * 0.5f) * fabsf(transform->scaleX);
     float height = (e->h * 0.5f) * fabsf(transform->scaleY);
 

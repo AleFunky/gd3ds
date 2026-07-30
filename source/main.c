@@ -582,8 +582,8 @@ void game_loop() {
 
     u64 lastTime = svcGetSystemTick();
     u64 start = svcGetSystemTick();
-    bool old_wide = wideEnabled;
-    bool old_stereo = stereoEnabled;
+    bool old_wide = settingsState.wideEnabled;
+    bool old_stereo = settingsState.stereoEnabled;
 
     // Main loop
     while (aptMainLoop()) {
@@ -600,7 +600,7 @@ void game_loop() {
 
         state.hitbox_display = 0;
 
-        if (kDown & KEY_X && enableDebugBindings) {
+        if (kDown & KEY_X && settingsState.enableDebugBindings) {
             state.noclip ^= 1;
         }
 
@@ -609,30 +609,30 @@ void game_loop() {
             cheats_used[CHEAT_NOCLIP] = true;
         }
 
-        if ((kDown & KEY_L) && (kHeld & KEY_B) && enableDebugBindings)
+        if ((kDown & KEY_L) && (kHeld & KEY_B) && settingsState.enableDebugBindings)
             state.profiling ^= 1;
 
-        if ((kDown & KEY_R) && (kHeld & KEY_B) && enableDebugBindings) {
+        if ((kDown & KEY_R) && (kHeld & KEY_B) && settingsState.enableDebugBindings) {
             cheated = true;
             cheats_used[CHEAT_HITBOX_DISPLAY] = true;
-            if (hitboxesEnabled && hitboxTrail) {
-                hitboxesEnabled = false;
-                hitboxTrail = false;
-            } else if (hitboxesEnabled && !hitboxTrail) {
-                hitboxTrail = true;
-            } else hitboxesEnabled = true;
+            if (settingsState.hitboxesEnabled && settingsState.hitboxTrail) {
+                settingsState.hitboxesEnabled = false;
+                settingsState.hitboxTrail = false;
+            } else if (settingsState.hitboxesEnabled && !settingsState.hitboxTrail) {
+                settingsState.hitboxTrail = true;
+            } else settingsState.hitboxesEnabled = true;
         }      
 
-        if (hitboxesEnabled || state.hitbox_enabled_when_dead) {
+        if (settingsState.hitboxesEnabled || state.hitbox_enabled_when_dead) {
             state.hitbox_display = 1;
         }
         
-        if (hitboxTrail) {
-            hitboxesEnabled = true;
+        if (settingsState.hitboxTrail) {
+            settingsState.hitboxesEnabled = true;
             state.hitbox_display = 2;
         }
 
-        if (hitboxesEnabled || hitboxTrail) {
+        if (settingsState.hitboxesEnabled || settingsState.hitboxTrail) {
             cheated = true;
             cheats_used[CHEAT_HITBOX_DISPLAY] = true;
         }
@@ -648,8 +648,8 @@ void game_loop() {
         
         global_volume = get_volume_slider();
 
-        bool buttonPressed = (yJump ? (kDown & KEY_Y) : (kDown & KEY_A)) || (kDown & KEY_UP);
-        bool buttonHeld = (yJump ? (kHeld & KEY_Y) : (kHeld & KEY_A)) || (kHeld & KEY_UP);
+        bool buttonPressed = (settingsState.yJump ? (kDown & KEY_Y) : (kDown & KEY_A)) || (kDown & KEY_UP);
+        bool buttonHeld = (settingsState.yJump ? (kHeld & KEY_Y) : (kHeld & KEY_A)) || (kHeld & KEY_UP);
 
         state.old_input = state.input;
         state.input.pressedJump = (buttonPressed || (in_bounds && (kDown & KEY_TOUCH))) == true;
@@ -753,7 +753,7 @@ void game_loop() {
             frame_counter++;
 
             if (state.dead && state.death_timer <= 0.f) {
-                state.death_timer = (quickRetry ? 0.5f : 1.f);
+                state.death_timer = (settingsState.quickRetry ? 0.5f : 1.f);
                 bool had_new_best = false;
                 if (!cheated) {
                     LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
@@ -943,13 +943,13 @@ void game_loop() {
         }
         
         // If the wide or 3D settings have been changed, reinitialize screens
-        if (wideEnabled != old_wide || stereoEnabled != old_stereo) {
+        if (settingsState.wideEnabled != old_wide || settingsState.stereoEnabled != old_stereo) {
             gspWaitForVBlank();
             apply_screen_modes();
             gspWaitForVBlank();
             reinitialize_screens();
-            old_wide = wideEnabled;
-            old_stereo = stereoEnabled;
+            old_wide = settingsState.wideEnabled;
+            old_stereo = settingsState.stereoEnabled;
         }
 
         // Frees a render target, so keep it out of the frame below

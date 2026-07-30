@@ -142,7 +142,7 @@ void draw_9_slice(const C2D_Image atlas, const float x, const float y, const flo
 C3D_RenderTarget* C2D_CreateScreenTargetExt(gfxScreen_t screen, gfx3dSide_t side, bool aa) {
     u8 model;
     CFGU_GetSystemModel(&model);
-    bool wide = wideEnabled && model != CFG_MODEL_2DS && !is_citra() && screen == GFX_TOP;
+    bool wide = settingsState.wideEnabled && model != CFG_MODEL_2DS && !is_citra() && screen == GFX_TOP;
 
     int height;
     switch (screen)
@@ -218,7 +218,7 @@ static int stereo_idle_frames = 0;
 
 // The slider, snapped to 0 where 3D wouldn't show up anyway
 static float get_stereo_slider() {
-    if (!stereoEnabled) return 0.f;
+    if (!settingsState.stereoEnabled) return 0.f;
 
     float slider = osGet3DSliderState();
     return slider < STEREO_DEADZONE ? 0.f : slider;
@@ -257,7 +257,7 @@ void set_wide(bool wide) {
     u8 model;
     CFGU_GetSystemModel(&model);
     if (model != CFG_MODEL_2DS && !is_citra()) {
-        wideEnabled = wide;
+        settingsState.wideEnabled = wide;
         gfxSetWide(wide);
     }
 }
@@ -270,19 +270,19 @@ bool stereo_supported() {
 }
 
 void set_stereo(bool stereo) {
-    stereoEnabled = stereo && stereo_supported();
-    gfxSet3D(stereoEnabled);
+    settingsState.stereoEnabled = stereo && stereo_supported();
+    gfxSet3D(settingsState.stereoEnabled);
 }
 
 // Wide and 3D can't share the top screen, so the old one has to go first
 void apply_screen_modes() {
     // A New 2DS XL keeps wide, so only give it up for real 3D
-    if (stereoEnabled && stereo_supported()) {
+    if (settingsState.stereoEnabled && stereo_supported()) {
         set_wide(false);
         set_stereo(true);
     } else {
         set_stereo(false);
-        set_wide(wideEnabled);
+        set_wide(settingsState.wideEnabled);
     }
 }
 

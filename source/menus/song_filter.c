@@ -147,7 +147,7 @@ void song_filter_init() {
     UICheckBox *checkbox = (UICheckBox *)ui_get_element_by_tag(&screen, "chk_song");
     if (checkbox) {
             checkbox->checked = songFilter;
-            set_checkbox_enabled(checkbox, checkbox->checked);
+            ui_set_checkbox_checked(checkbox, checkbox->checked);
         }
 
     yes_exit = false;

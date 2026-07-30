@@ -15,8 +15,38 @@
 #include "menus/soggy.h"
 
 #include "save/saving.h"
+#include "utils/json_config.h"
 
 Config cfg;
+
+void init_user_config(Config *cfg) {
+    for (int i = 0; i < ARRAY_LEN(settings); i++) {
+        config_init_bool(cfg,
+            settings[i].key,
+            settings[i].defaultValue
+        );
+    }
+}
+
+void load_user_config(Config *cfg) {
+    for (int i = 0; i < ARRAY_LEN(settings); i++) {
+        *settings[i].var = 
+            config_get_bool(cfg,
+                settings[i].key,
+                settings[i].defaultValue
+            );
+    }
+}
+
+void save_user_config(Config *cfg) {
+    for (int i = 0; i < ARRAY_LEN(settings); i++) {
+        config_set_bool(
+            cfg,
+            settings[i].key,
+            *settings[i].var
+        );
+    }
+}
 
 void init_values() {
     config_init_bool(&cfg, CONFIG_FLAGS "initialDisclaimerAccepted", false);
@@ -26,33 +56,7 @@ void init_values() {
     config_init_float(&cfg, CONFIG_VALUES "music_volume", 1);
     config_init_float(&cfg, CONFIG_VALUES "sound_volume", 1);
 
-    config_init_bool(&cfg, CONFIG_GRAPHICS_PATH "particlesDisabled", false);
-    config_init_bool(&cfg, CONFIG_GRAPHICS_PATH "wideEnabled", false);
-    // 3D comes on out of the box, unless this save already picked 800px mode
-    config_init_bool(&cfg, CONFIG_GRAPHICS_PATH "stereoEnabled", !config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "wideEnabled", false));
-    config_init_bool(&cfg, CONFIG_GRAPHICS_PATH "glowEnabled", true);
-
-    config_init_bool(&cfg, CONFIG_INPUT_PATH "yButton", false);
-    config_init_bool(&cfg, CONFIG_INPUT_PATH "touchEffectEverywhere", false);
-    config_init_bool(&cfg, CONFIG_INPUT_PATH "enableDebugBindings", false);
-
-    config_init_bool(&cfg, CONFIG_MISC_PATH "hitboxesEnabled", false);
-    config_init_bool(&cfg, CONFIG_MISC_PATH "hitboxTrail", false);
-    config_init_bool(&cfg, CONFIG_MISC_PATH "hitboxesOnDeath", false);
-    config_init_bool(&cfg, CONFIG_MISC_PATH "doNot", false);
-    config_init_bool(&cfg, CONFIG_MISC_PATH "practiceMusicSync", false);
-
-    config_init_bool(&cfg, CONFIG_GAMEPLAY_PATH "showProgressBar", false);
-    config_init_bool(&cfg, CONFIG_GAMEPLAY_PATH "showProgressPercent", false);
-    config_init_bool(&cfg, CONFIG_GAMEPLAY_PATH "decimalPercent", false);
-    config_init_bool(&cfg, CONFIG_GAMEPLAY_PATH "ultraDecimalPercent", false);
-    config_init_bool(&cfg, CONFIG_GAMEPLAY_PATH "quickRetry", false);
-
-    config_init_bool(&cfg, CONFIG_COSMETIC_PATH "switchTrailColor", false);
-    config_init_bool(&cfg, CONFIG_COSMETIC_PATH "switchWaveTrailColor", false);
-    config_init_bool(&cfg, CONFIG_COSMETIC_PATH "solidWaveTrail", false);
-    config_init_bool(&cfg, CONFIG_COSMETIC_PATH "noPlayerTrail", false);
-    config_init_bool(&cfg, CONFIG_COSMETIC_PATH "noWaveTrailBehind", false);
+    init_user_config(&cfg);
 
     config_init_int(&cfg, CONFIG_CUSTOMIZATION_PATH "cube", 1);
     config_init_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ship", 1);
@@ -96,29 +100,8 @@ void cfg_init() {
     music_volume = config_get_float(&cfg, CONFIG_VALUES "music_volume", 1);
     sound_volume = config_get_float(&cfg, CONFIG_VALUES "sound_volume", 1);
 
-    particlesDisabled = config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "particlesDisabled", false);
-    set_wide(config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "wideEnabled", false));
-    stereoEnabled = config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "stereoEnabled", true);
-    glowEnabled = config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "glowEnabled", true);
-
-    hitboxesEnabled = config_get_bool(&cfg, CONFIG_MISC_PATH "hitboxesEnabled", false);
-    hitboxTrail =     config_get_bool(&cfg, CONFIG_MISC_PATH "hitboxTrail", false);
-    hitboxesOnDeath = config_get_bool(&cfg, CONFIG_MISC_PATH "hitboxesOnDeath", false);
-    doNot = config_get_bool(&cfg, CONFIG_MISC_PATH "doNot", false);
-    practiceMusicSync = config_get_bool(&cfg, CONFIG_MISC_PATH "practiceMusicSync", false);
-
-    showProgressBar =     config_get_bool(&cfg, CONFIG_GAMEPLAY_PATH "showProgressBar", false);
-    showProgressPercent = config_get_bool(&cfg, CONFIG_GAMEPLAY_PATH "showProgressPercent", false);
-    decimalPercent =      config_get_bool(&cfg, CONFIG_GAMEPLAY_PATH "decimalPercent", false);
-    ultraDecimalPercent = config_get_bool(&cfg, CONFIG_GAMEPLAY_PATH "ultraDecimalPercent", false);
-    quickRetry = config_get_bool(&cfg, CONFIG_GAMEPLAY_PATH "quickRetry", false);
-
-    switchTrailColor =     config_get_bool(&cfg, CONFIG_COSMETIC_PATH "switchTrailColor", false);
-    switchWaveTrailColor = config_get_bool(&cfg, CONFIG_COSMETIC_PATH "switchWaveTrailColor", false);
-    solidWaveTrail = config_get_bool(&cfg, CONFIG_COSMETIC_PATH "solidWaveTrail", false);
-    noPlayerTrail = config_get_bool(&cfg, CONFIG_COSMETIC_PATH "noPlayerTrail", false);
-    noWaveTrailBehind = config_get_bool(&cfg, CONFIG_COSMETIC_PATH "noWaveTrailBehind", false);
-
+    load_user_config(&cfg);
+    
     selected_cube = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "cube", 1);
     selected_ship = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ship", 1);
     selected_ball = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ball", 1);
@@ -129,10 +112,6 @@ void cfg_init() {
     selected_p2   = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "p2",   DEFAULT_P2);
     selected_glow = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "glow", DEFAULT_GLOW);
     player_glow_enabled = config_get_bool(&cfg, CONFIG_CUSTOMIZATION_PATH "playerGlowEnabled", false);
-
-    yJump =                 config_get_bool(&cfg, CONFIG_INPUT_PATH "yButton", false);
-    touchEffectEverywhere = config_get_bool(&cfg, CONFIG_INPUT_PATH "touchEffectEverywhere", false);
-    enableDebugBindings =   config_get_bool(&cfg, CONFIG_INPUT_PATH "enableDebugBindings", false);
 
     uncompletedFilter = config_get_bool(&cfg, CONFIG_FILTERS_PATH "uncompleted", false);
     completedFilter   = config_get_bool(&cfg, CONFIG_FILTERS_PATH "completed", false);
@@ -157,11 +136,6 @@ void cfg_save() {
     config_set_float(&cfg, CONFIG_VALUES "music_volume", music_volume);
     config_set_float(&cfg, CONFIG_VALUES "sound_volume", sound_volume);
 
-    config_set_bool(&cfg, CONFIG_GRAPHICS_PATH "particlesDisabled", particlesDisabled);
-    config_set_bool(&cfg, CONFIG_GRAPHICS_PATH "wideEnabled", wideEnabled);
-    config_set_bool(&cfg, CONFIG_GRAPHICS_PATH "stereoEnabled", stereoEnabled);
-    config_set_bool(&cfg, CONFIG_GRAPHICS_PATH "glowEnabled", glowEnabled);
-
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "cube", selected_cube);
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ship", selected_ship);
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ball", selected_ball);
@@ -173,27 +147,7 @@ void cfg_save() {
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "glow", selected_glow);
     config_set_bool(&cfg, CONFIG_CUSTOMIZATION_PATH "playerGlowEnabled", player_glow_enabled);
 
-    config_set_bool(&cfg, CONFIG_INPUT_PATH "yButton", yJump);
-    config_set_bool(&cfg, CONFIG_INPUT_PATH "touchEffectEverywhere", touchEffectEverywhere);
-    config_set_bool(&cfg, CONFIG_INPUT_PATH "enableDebugBindings", enableDebugBindings);
-
-    config_set_bool(&cfg, CONFIG_MISC_PATH "hitboxesEnabled", hitboxesEnabled);
-    config_set_bool(&cfg, CONFIG_MISC_PATH "hitboxTrail", hitboxTrail);
-    config_set_bool(&cfg, CONFIG_MISC_PATH "hitboxesOnDeath", hitboxesOnDeath);
-    config_set_bool(&cfg, CONFIG_MISC_PATH "doNot", doNot);
-    config_set_bool(&cfg, CONFIG_MISC_PATH "practiceMusicSync", practiceMusicSync);
-
-    config_set_bool(&cfg, CONFIG_GAMEPLAY_PATH "showProgressBar", showProgressBar);
-    config_set_bool(&cfg, CONFIG_GAMEPLAY_PATH "showProgressPercent", showProgressPercent);
-    config_set_bool(&cfg, CONFIG_GAMEPLAY_PATH "decimalPercent", decimalPercent);
-    config_set_bool(&cfg, CONFIG_GAMEPLAY_PATH "ultraDecimalPercent", ultraDecimalPercent);
-    config_set_bool(&cfg, CONFIG_GAMEPLAY_PATH "quickRetry", quickRetry);
-    
-    config_set_bool(&cfg, CONFIG_COSMETIC_PATH "switchTrailColor", switchTrailColor);
-    config_set_bool(&cfg, CONFIG_COSMETIC_PATH "switchWaveTrailColor", switchWaveTrailColor);
-    config_set_bool(&cfg, CONFIG_COSMETIC_PATH "solidWaveTrail", solidWaveTrail);
-    config_set_bool(&cfg, CONFIG_COSMETIC_PATH "noPlayerTrail", noPlayerTrail);
-    config_set_bool(&cfg, CONFIG_COSMETIC_PATH "noWaveTrailBehind", noWaveTrailBehind);
+    save_user_config(&cfg);
 
     config_set_bool(&cfg, CONFIG_FILTERS_PATH "uncompleted", uncompletedFilter);
     config_set_bool(&cfg, CONFIG_FILTERS_PATH "completed", completedFilter);

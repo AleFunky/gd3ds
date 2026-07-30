@@ -162,7 +162,7 @@ void draw_new_best_popup() {
     if (new_best_popup.active) {
         float scale = new_best_popup.scale;
 
-        if (doNot) {
+        if (settingsState.doNot) {
             char *text = new_best_text[new_best_popup.text_id];
 
             if (new_best_popup.text_id == DIED_TO_ID) {

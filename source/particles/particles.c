@@ -217,7 +217,7 @@ void initParticle(ParticleSystem* ps, const ParticleDefinition* cfg, int i) {
 }
 
 void spawnMultipleParticles(ParticleSystem* ps, int emitCount) {
-    if (particlesDisabled) return;
+    if (settingsState.particlesDisabled) return;
     
     if (!ps->active)
         return;
@@ -231,7 +231,7 @@ void spawnMultipleParticles(ParticleSystem* ps, int emitCount) {
 }
 
 void updateParticleSystem(ParticleSystem* ps, float dt) {
-    if (particlesDisabled) return;
+    if (settingsState.particlesDisabled) return;
     
     if (!ps->active)
         return;
@@ -486,7 +486,7 @@ void freeParticleData(ParticleData* d) {
 }
 
 void drawParticleSystem(ParticleSystem* ps, float x_offset, float y_offset, float opacity) {
-    if (particlesDisabled) return;
+    if (settingsState.particlesDisabled) return;
     
     C2D_Image img = C2D_SpriteSheetGetImage(particleSheet, ps->cfg.textureFileName);
     C3D_TexSetFilter(img.tex, GPU_LINEAR, GPU_LINEAR);

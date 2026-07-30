@@ -300,8 +300,8 @@ int gameplay_screen_top_loop() {
     hidTouchRead(&touchPos);
 
     decimal = 0;
-    if (decimalPercent) decimal = 2;
-    if (ultraDecimalPercent) decimal = MAX_DECIMAL_PERCENT;
+    if (settingsState.decimalPercent) decimal = 2;
+    if (settingsState.ultraDecimalPercent) decimal = MAX_DECIMAL_PERCENT;
 
     progress_bar->value = state.level_progress;
     snprintf(percent->text, 32, "%.*f%%", decimal, state.level_progress);
@@ -311,13 +311,13 @@ int gameplay_screen_top_loop() {
     ui_set_pos_on_tag(&default_screen_top, 200, 8, "percent");
     percent->alignment = 0.5;
 
-    if (showProgressBar) {
+    if (settingsState.showProgressBar) {
         ui_run_func_on_tag(&default_screen_top, "progressalert", ui_enable_element);
         ui_set_pos_on_tag(&default_screen_top, 282, 8, "percent");
         percent->alignment = 0;
     }
 
-    if (showProgressPercent) {
+    if (settingsState.showProgressPercent) {
         ui_run_func_on_tag(&default_screen_top, "percent", ui_enable_element);
     }
 

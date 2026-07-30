@@ -365,25 +365,25 @@ void level_complete_init() {
         int start_index = 0;
 
         // Skip the "Not 1 attempt" line
-        if (doNot) {
+        if (settingsState.doNot) {
             if (state.current_data.attempts == 1) start_index++;
         }
 
-        int text_index = random_int(start_index, (doNot ? ARRAY_LEN(do_not_completion_texts) : ARRAY_LEN(completion_texts))- 1);
+        int text_index = random_int(start_index, (settingsState.doNot ? ARRAY_LEN(do_not_completion_texts) : ARRAY_LEN(completion_texts))- 1);
 
-        if (doNot) {
+        if (settingsState.doNot) {
             // If exactly 2 attempts, say "Not 1 attempt"
             if (state.current_data.attempts == 2) text_index = 0;
 
             // If on story madness, reroll to not say the story madness line
             if (text_index == 1 && contains(level_info.level_name, "story madness")) {
                 do {
-                    text_index = random_int(start_index, (doNot ? ARRAY_LEN(do_not_completion_texts) : ARRAY_LEN(completion_texts))- 1);
+                    text_index = random_int(start_index, (settingsState.doNot ? ARRAY_LEN(do_not_completion_texts) : ARRAY_LEN(completion_texts))- 1);
                 } while(text_index == 1);
             }
         }
 
-        char *text = (doNot ? do_not_completion_texts[text_index] : completion_texts[text_index]);
+        char *text = (settingsState.doNot ? do_not_completion_texts[text_index] : completion_texts[text_index]);
 
         char tmp[512];
 
@@ -439,7 +439,7 @@ void level_complete_init() {
 
     if (state.practice_mode) {
         ui_run_func_on_tag(&screen_top, "levelcomplete", ui_disable_element);
-        if (doNot) {
+        if (settingsState.doNot) {
             UIImage *level_complete_text = (UIImage *) ui_get_element_by_tag(&screen_top, "practicecomplete");
             if (level_complete_text) {
                 ui_element_set_scale_x((UIElement *) level_complete_text, level_complete_text->base.scaleX * -1);
@@ -447,7 +447,7 @@ void level_complete_init() {
         }
     } else {
         ui_run_func_on_tag(&screen_top, "practicecomplete", ui_disable_element);
-        if (doNot) {
+        if (settingsState.doNot) {
             UIImage *level_complete_text = (UIImage *) ui_get_element_by_tag(&screen_top, "levelcomplete");
             if (level_complete_text) {
                 ui_element_set_scale_x((UIElement *) level_complete_text, level_complete_text->base.scaleX * -1);

@@ -7,4 +7,4 @@
 
 UICheckBox *ui_create_checkbox(const UIContext *ctx);
 UIElement *ui_create_checkbox_from_props(const UIContext *ctx, const UIPropertyList *props);
-void set_checkbox_enabled(UICheckBox *e, bool enabled);
+void ui_set_checkbox_checked(UICheckBox *e, bool enabled);

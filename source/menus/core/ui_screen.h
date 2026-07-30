@@ -134,5 +134,7 @@ void ui_element_remove(UIElement *element);
 void add_ui_particle_system(ParticleSystem *particle);
 void free_ui_particle_systems();
 
+UIElement *ui_get_child_by_type(UIElement *parent, UIElementType type);
+
 void ui_element_apply_default_properties(UIElement *e, const UIContext *ctx);
 void ui_element_apply_properties(UIElement *e, const UIContext *ctx, const UIPropertyList *props);
