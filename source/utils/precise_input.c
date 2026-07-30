@@ -215,9 +215,13 @@ static void resync_from_ring(void) {
     last_poll_tick = (u32)svcGetSystemTick();
 }
 
+// calculates the tick where substeps slice of the frame window ends (events are due at or before it)
 static u32 substep_cutoff(u32 substep) {
     u32 span = frame_end - frame_start;
     u32 slices_done = substep + 1;
+
+    // on a lag spike the window can reach 0.5s with slices_done up to ~120. that
+    // product overflows if the multiplication happens in u32, so we widen to u64 first
     u64 scaled_span = (u64)span * slices_done;
     u32 offset_into_frame = (u32)(scaled_span / frame_substeps);
     return frame_start + offset_into_frame;
