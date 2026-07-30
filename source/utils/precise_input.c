@@ -3,11 +3,13 @@
 
 #define INPUT_QUEUE_SIZE 16
 #define RING_BUFFER_ENTRIES 8
+#define RING_BUFFER_OFFSET 0x28
 
 bool pi_enabled = false;
 
 static u32 jump_keys;
 static bool pressed_edge;
+static bool last_sample_jump;
 
 static PreciseInputEvent queue[INPUT_QUEUE_SIZE];
 static u32 queue_count;
@@ -26,10 +28,13 @@ static u32 frame_substeps;
 
 static u32 sample_interval(u32 latest_tick, u32 prev_tick);
 static u32 reconstruct_tick(u32 newest_time, u32 samples_ago, u32 interval);
-static bool ring_lapped(void);
 static void push_event(u32 tick, bool down);
 static void resync_from_ring(void);
 static u32 substep_cutoff(u32 substep);
+
+static vu32 *get_ring_buffer(void) {
+    return (vu32*)((u8*)hidSharedMem + RING_BUFFER_OFFSET);
+}
 
 void pi_reset(void) {
     resync_from_ring();
@@ -62,31 +67,32 @@ void pi_poll(void) {
     u32 samples_elapsed = (elapsed_time + (interval / 2)) / interval;
 
     // data was overwritted, resync
-    if(samples_elapsed > 8){
+    if(samples_elapsed > RING_BUFFER_ENTRIES){
         resync_from_ring();
         return;
     }
 
     // if at 30fps, then idx_advanced == 0 will look the same as moving ahead 8 slots 
-    // (making a whole lap around the ring buffer), we must differentiate between idx 
+    // (making a whole lap around the ring buffer), we must differenciate between idx 
     // not advancing and doing a whole lap by looking at the number of samples elapsed 
     // since the last cpu tick
-    if(!idx_advanced && samples_elapsed >= 4){
-        idx_advanced = 8;
+    if(!idx_advanced && samples_elapsed >= (RING_BUFFER_ENTRIES / 2)){
+        idx_advanced = RING_BUFFER_ENTRIES;
     }
-
-    u32 ring_buffer_offset = 0x28;
-    vu32 *pointer_to_ring_buffer = (vu32*)((u8*)hidSharedMem + ring_buffer_offset);
+    vu32 *pointer_to_ring_buffer = get_ring_buffer();
 
     for(u32 i = idx_advanced; i-- > 0;){
         u32 slot = (current_idx - i) & 7;
-        hold_state = pointer_to_ring_buffer[(sizeof(u32) * slot)] & KEY_A;
-        u32 pressed = pointer_to_ring_buffer[1 + (sizeof(u32) * slot)] & KEY_A;
-        u32 released = pointer_to_ring_buffer[2 + (sizeof(u32) * slot)] & KEY_A;
-        if(pressed || released){
+        u32 held = pointer_to_ring_buffer[(sizeof(u32) * slot)] & jump_keys;
+        u32 pressed = pointer_to_ring_buffer[1 + (sizeof(u32) * slot)] & jump_keys;
+        u32 released = pointer_to_ring_buffer[2 + (sizeof(u32) * slot)] & jump_keys;
+        bool jump = (held & jump_keys);
+        if((pressed && jump != last_sample_jump) || (released && jump != last_sample_jump)){
             u32 input_tick = reconstruct_tick(newest_time, i, interval);
             push_event(input_tick, pressed);
         }
+        last_sample_jump = jump;
+        hold_state = held;
     }
     last_idx = current_idx;
     last_poll_tick = now;
@@ -96,22 +102,6 @@ void pi_begin_frame(u32 frame_start_tick, u32 frame_end_tick, u32 substeps) {
     frame_start = frame_start_tick;
     frame_end = frame_end_tick;
     frame_substeps = (substeps == 0) ? 1 : substeps;
-}
-
-void pi_apply_substep(u32 substep) {
-
-}
-
-static u32 sample_interval(u32 latest_tick, u32 prev_tick) {
-    return (latest_tick - prev_tick) / RING_BUFFER_ENTRIES;
-}
-
-static u32 reconstruct_tick(u32 newest_time, u32 samples_ago, u32 interval) {
-    return newest_time - (samples_ago * interval);
-}
-
-static bool ring_lapped(void) {
-    return false;
 }
 
 static void push_event(u32 tick, bool down) {
@@ -125,17 +115,78 @@ static void push_event(u32 tick, bool down) {
     queue_count++;
 }
 
+static PreciseInputEvent pop_event(void) {
+    PreciseInputEvent pie = queue[queue_head];
+    queue_head = (queue_head + 1) % INPUT_QUEUE_SIZE;
+    queue_count--;
+    return pie;
+}
+
+static PreciseInputEvent peek_event(void) {
+    PreciseInputEvent pie = queue[queue_head];
+    return pie;
+}
+
+void pi_apply_substep(u32 substep) {
+    pressed_edge = false;
+    u32 cutoff = substep_cutoff(substep);
+    bool final_substep = (substep + 1 >= frame_substeps);
+    bool pressed_this_substep = false;
+
+    while(queue_count > 0){
+        PreciseInputEvent pie = peek_event();
+
+        // if its the final substep before the frame ends, then we must process the clicks.
+        if(!final_substep && (s32)(pie.tick - cutoff) > 0){
+            break;
+        }
+        if(!final_substep && pressed_this_substep){
+            break;
+        }
+
+        pie = pop_event();
+
+        if(pie.down){
+            hold_state = true;
+            pressed_edge = true;
+            pressed_this_substep = true;
+        }else{
+            hold_state =false;
+            suppress_hold_until_release = false;
+        }
+    }
+
+    
+}
+
+// calculates the time of each sampled interval
+static u32 sample_interval(u32 latest_tick, u32 prev_tick) {
+    return (latest_tick - prev_tick) / RING_BUFFER_ENTRIES;
+}
+
+// calculates the exact time th click occured
+static u32 reconstruct_tick(u32 newest_time, u32 samples_ago, u32 interval) {
+    // get the newest time and subtract how long ago the click happened
+    return newest_time - (samples_ago * interval);
+}
+
 static void resync_from_ring(void) {
     queue_count = 0;
     queue_head = 0;
 
     last_idx = hidSharedMem[4];
 
+    vu32 *pointer_to_ring_buffer = get_ring_buffer();
+    hold_state = (pointer_to_ring_buffer[4 * last_idx] & jump_keys) != 0;   // is a jump key down NOW?
+    last_sample_jump = hold_state;
+
     last_poll_tick = (u32)svcGetSystemTick();
 }
 
 static u32 substep_cutoff(u32 substep) {
-    return 0;
+    u32 span = frame_end - frame_start;
+    u32 tick_per_frame = span / frame_substeps;
+    return frame_start + (tick_per_frame * (substep + 1));
 }
 
 void pi_set_jump_keys(u32 mask) {
