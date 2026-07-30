@@ -526,12 +526,6 @@ void init_particles(Color p1_color, Color p2_color) {
     level_complete_effect_p2.cfg.finishColorBlue  = p2_not_white.b / 255.f;
 }
 
-// Empty on purpose: a stable target for `break cbf_click_hook` in GDB.
-// noinline keeps it a real call at -O2; the asm keeps the call from being elided.
-__attribute__((noinline)) void cbf_click_hook(u32 slot, u32 samples_ago, u32 pressed, u32 released) {
-    __asm__ volatile("" ::: "memory");
-}
-
 void game_loop() {
 #ifdef DEBUG_LEAKS
     current_generation++;
@@ -1271,7 +1265,6 @@ int main(int argc, char* argv[]) {
     // Init libs
     romfsInit();
     gfxInitDefault();
-    consoleDebugInit(debugDevice_SVC);
     C3D_Init(C3D_DEFAULT_CMDBUF_SIZE * 4);
     C2D_Init(MAX_SPRITES);
     C2D_Prepare();
