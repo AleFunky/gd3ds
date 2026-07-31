@@ -21,6 +21,7 @@ static u32 last_poll_tick;
 
 static bool hold_state;
 static bool suppress_hold_until_release;
+static bool fake_press;
 
 static u32 frame_start;
 static u32 frame_end;
@@ -42,6 +43,7 @@ void pi_set_jump_keys(u32 mask) {
 void pi_reset(void) {
     resync_from_ring();
     suppress_hold_until_release = false;
+    fake_press = false;
 }
 
 void pi_suppress_until_release(void) {
@@ -115,7 +117,8 @@ void pi_begin_frame(u32 frame_start_tick, u32 frame_end_tick, u32 substeps) {
 }
 
 void pi_apply_substep(u32 substep) {
-    pressed_edge = false;
+    pressed_edge = fake_press;
+    fake_press = false;
     u32 cutoff = substep_cutoff(substep);
     bool final_substep = (substep + 1 >= frame_substeps);
     bool pressed_this_substep = false;
@@ -199,6 +202,8 @@ static PreciseInputEvent pop_event(void) {
 }
 
 static void resync_from_ring(void) {
+    bool was_holding = hold_state;
+
     queue_count = 0;
     queue_head = 0;
 
@@ -210,6 +215,13 @@ static void resync_from_ring(void) {
 
     if(!hold_state){
         suppress_hold_until_release = false;
+    }
+
+    // the press edge was overwritten by the lap, but the state change survived.
+    // was can create the edge from the evidencewe have. This makes the ufo work a low frame rates
+    // because ufo's require an edge to avoid continuous flapping while holding the button.
+    if(!was_holding && hold_state && !suppress_hold_until_release){
+        fake_press = true;
     }
 
     last_poll_tick = (u32)svcGetSystemTick();
