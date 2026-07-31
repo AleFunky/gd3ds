@@ -526,6 +526,12 @@ void init_particles(Color p1_color, Color p2_color) {
     level_complete_effect_p2.cfg.finishColorBlue  = p2_not_white.b / 255.f;
 }
 
+static bool touch_jump_filter(u16 px, u16 py) {
+    bool on_pause_button = px > 320 - 30 && py < 30;
+    bool on_practice_ui = state.practice_mode && (px > 92 && px < 222 && py > 175 && py < 222);
+    return !(on_pause_button || on_practice_ui);
+}
+
 void game_loop() {
 #ifdef DEBUG_LEAKS
     current_generation++;
@@ -588,6 +594,7 @@ void game_loop() {
     fixed_dt = true;
 
     pi_set_jump_keys((settingsState.yJump ? KEY_Y : KEY_A) | KEY_UP);
+    pi_set_touch_filter(touch_jump_filter);
     pi_reset();
     memset(pi_substep_presses, 0, sizeof(pi_substep_presses));
 
@@ -725,8 +732,8 @@ void game_loop() {
                     if (pi_enabled) {
                         pi_apply_substep((u32)steps);
                         state.old_input = state.input;
-                        state.input.pressedJump = (pi_pressed() || touch_pressed) == true;
-                        state.input.holdJump = (pi_hold() || state.input.pressedJump || touch_held) == true;
+                        state.input.pressedJump = pi_pressed() == true;
+                        state.input.holdJump = (pi_hold() || state.input.pressedJump) == true;
                         if (pi_pressed()){
                             pi_substep_presses[steps < PI_SUBSTEP_BUCKETS ? steps : PI_SUBSTEP_BUCKETS - 1]++;
                         }
