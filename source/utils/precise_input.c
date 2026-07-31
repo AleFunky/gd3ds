@@ -136,13 +136,14 @@ void pi_apply_substep(u32 substep) {
 
         pop_event();
 
+        suppress_hold_until_release = false;
+
         if(pie.down){
             hold_state = true;
             pressed_edge = true;
             pressed_this_substep = true;
         }else{
             hold_state =false;
-            suppress_hold_until_release = false;
         }
     }
 }
