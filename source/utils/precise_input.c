@@ -2,7 +2,7 @@
 
 #define INPUT_QUEUE_SIZE 16
 #define RING_BUFFER_ENTRIES 8
-#define RING_ENTRY_WORDS 4
+#define PAD_RING_ENTRY_WORDS 4
 
 #define TOUCH_RING_ENTRY_WORDS 2
 #define MAX_SAMPLE_INTERVAL_TICKS ((u32)(CPU_TICKS_PER_MSEC * 100))
@@ -68,6 +68,10 @@ static void apply_source(PreciseSource *src, u32 substep);
 static void resync_from_ring(PreciseSource *src);
 static u32 substep_cutoff(u32 substep);
 
+void pi_set_touch_filter(bool (*filter)(u16 px, u16 py)){
+    touch_filter = filter;
+}
+
 void pi_set_jump_keys(u32 mask) {
     jump_keys = mask;
 }
@@ -113,17 +117,25 @@ bool pi_pressed(void) {
     return pad.pressed_edge || touch.pressed_edge;
 }
 
-u32 pi_event_count(void) {
+u32 pi_pad_event_count(void) {
     return pad.queue_count;
 }
 
-PreciseInputEvent pi_event_get(u32 index) {
+u32 pi_touch_event_count(void) {
+    return touch.queue_count;
+}
+
+PreciseInputEvent pi_pad_event_get(u32 index) {
     return pad.queue[(pad.queue_head + index) % INPUT_QUEUE_SIZE];
+}
+
+PreciseInputEvent pi_touch_event_get(u32 index) {
+    return touch.queue[(touch.queue_head + index) % INPUT_QUEUE_SIZE];
 }
 
 static bool pad_sample_jump(u32 slot) {
     vu32 *pointer_to_ring_buffer = get_ring_buffer(&pad);
-    return (pointer_to_ring_buffer[RING_ENTRY_WORDS * slot] & jump_keys) != 0;
+    return (pointer_to_ring_buffer[PAD_RING_ENTRY_WORDS * slot] & jump_keys) != 0;
 }
 
 static bool touch_sample_jump(u32 slot) {

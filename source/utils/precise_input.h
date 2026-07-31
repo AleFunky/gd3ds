@@ -20,7 +20,7 @@ void pi_suppress_until_release(void);
 bool pi_hold(void);
 bool pi_pressed(void);
 
-u32 pi_event_count(void);
-PreciseInputEvent pi_event_get(u32 index);
+u32 pi_pad_event_count(void);
+PreciseInputEvent pi_pad_event_get(u32 index);
 u32 pi_touch_event_count(void);
 PreciseInputEvent pi_touch_event_get(u32 index);
