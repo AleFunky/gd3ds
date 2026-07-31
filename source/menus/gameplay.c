@@ -134,6 +134,7 @@ void pause_game() {
 void unpause_game() {
     game_paused = false;
     if (pi_enabled) {
+        pi_set_jump_keys((settingsState.yJump ? KEY_Y : KEY_A) | KEY_UP);
         pi_reset();
         pi_suppress_until_release();
     }
