@@ -49,7 +49,7 @@ typedef struct {
     bool practiceMusicSync;
 } SettingState;
 
-extern Setting settings[22];
+extern Setting settings[23];
 extern SettingState settingsState;
 
 void settings_init();

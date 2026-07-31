@@ -1,5 +1,6 @@
 #include <3ds.h>
 #include <citro2d.h>
+#include "utils/precise_input.h"
 #include "menus/core/common_setters.h"
 #include "menus/core/ui_element.h"
 #include "menus/core/ui_screen.h"
@@ -132,6 +133,10 @@ void pause_game() {
 
 void unpause_game() {
     game_paused = false;
+    if (pi_enabled) {
+        pi_reset();
+        pi_suppress_until_release();
+    }
     if (state.death_timer <= 0 && (song_loaded || state.practice_mode)) {
         unpause_playback_mp3();
     }
