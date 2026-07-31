@@ -232,7 +232,7 @@ static void run_rewards_animation(float delta){
             star_text->base.y = ((scale_value * 0.55f) * (up_y_start - 83 - center) + center);
 
             ui_element_set_scale((UIElement *) star, scale_value * 0.7f);
-            ui_element_set_scale_xy((UIElement *) star_text, scale_value * 0.55f, star_text->base.scaleY);
+            ui_element_set_scale_xy((UIElement *) star_text, scale_value * 0.55f, scale_value * 0.55f);
 
             ui_image_set_tint(star, C2D_Color32f(1, 1, 1, opacity_value));
             star_text->base.opacity = opacity_value;

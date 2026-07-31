@@ -12,7 +12,7 @@
 #include "main.h"
 #include "ui_slider.h"
 
-//if a button has been pressed with a keybind, no other button should be pressed after
+//prevents two or more buttons from being pressed at the exact same time
 static int pressedKey;
 
 void ui_button_update(UIElement* e, UIInput* touch, UITransform *transform) {
@@ -147,6 +147,8 @@ void ui_button_modify_transform(UIElement *e, UITransform *t) {
 static void ui_button_draw(UIElement* e, UITransform *transform) {
     UIButton *button = (UIButton *) e;
 
+    if(button->invisible) return;
+
     C2D_ImageTint tint;
 
     C2D_PlainImageTint(&tint, C2D_Color32f(1, 1, 1, e->opacity), 1.f);
@@ -180,10 +182,10 @@ void ui_button_set_text(UIButton *e, const char *text) {
 }
 
 void ui_button_set_image(UIButton *e, int sprite_index, int sheet) {
-    if (!e) return;
-
     C2D_SpriteFromSheet(&e->image.sprite, *get_sheet(sheet), sprite_index);
     C3D_TexSetFilter(e->image.sprite.image.tex, GPU_LINEAR, GPU_LINEAR);
+
+    if (!e || e->invisible) return;
 
     e->base.w = e->image.sprite.image.subtex->width;
     e->base.h = e->image.sprite.image.subtex->height;
@@ -223,6 +225,8 @@ UIElement *ui_create_button_from_props(const UIContext *ctx, const UIPropertyLis
 
     ui_element_apply_properties(&button->base, ctx, props);
 
+    button->invisible = ui_prop_bool(props, "invisible", false);
+
     ui_button_set_image(button, 
         ui_prop_int(props, "id", 0),
         ui_prop_int(props, "sheet", 0)
@@ -235,7 +239,7 @@ UIElement *ui_create_button_from_props(const UIContext *ctx, const UIPropertyLis
     button->textScale = ui_prop_float(props, "textScale", 0);
 
     button->hoverFactor = ui_prop_float(props, "hoverFactor", 1);
-
+    
     button->keyBinds = ui_prop_bitfield(props, "keyBinds", keybind_table, ARRAY_LEN(keybind_table));
     
     return &button->base;

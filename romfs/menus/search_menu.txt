@@ -14,26 +14,31 @@ button x=267 y=28 id=107 scale=0.9 action="disclaimer"
 label x=160 y=60 text="Quick Search" scale=0.6 align=CENTER
 window x=160 y=105 w=260 h=66 style=8
 
-button x=95 y=90 text="" id=104 scale=0.72 action="disclaimer"
+button x=75 y=90 text="" id=105 scale=0.72 action="disclaimer"
 {
-    label x=-77 y=0 text="Most Downloaded" scale=0.43 align=LEFT
-    image x=67 y=0 w=20 h=20 id=163
+    label x=-50 y=0 text="Featured" scale=0.5 align=LEFT
+    image x=40 y=0 w=20 h=20 id=170
 }
-button x=225 y=90 text="" id=104 scale=0.72 action="disclaimer"
+button x=160 y=90 text="" id=105 scale=0.72 action="disclaimer"
 {
-    label x=-76 y=0 text="Most Likes" scale=0.62 align=LEFT
-    image x=67 y=0 w=20 h=20 id=166
+    label x=-50 y=0 text="Downloads" scale=0.43 align=LEFT
+    image x=40 y=0 w=20 h=20 id=163
+}
+button x=245 y=90 text="" id=105 scale=0.72 action="disclaimer"
+{
+    label x=-50 y=0 text="Likes" scale=0.62 align=LEFT
+    image x=40 y=0 w=20 h=20 id=166
 }
 
-button x=160 y=120 w=110 h=30 text="" id=105 scale=0.72 action="disclaimer"
-{
-    label x=-50 y=0 text="Recent" scale=0.62 align=LEFT
-    image x=40 y=0 w=20 h=20 id=169
-}
 button x=75 y=120 w=110 h=30 text="" id=105 scale=0.72 action="disclaimer"
 {
     label x=-50 y=0 text="Trending" scale=0.5 align=LEFT
     image x=40 y=0 w=20 h=20 id=171
+}
+button x=160 y=120 w=110 h=30 text="" id=105 scale=0.72 action="disclaimer"
+{
+    label x=-50 y=0 text="Recent" scale=0.62 align=LEFT
+    image x=40 y=0 w=20 h=20 id=169
 }
 button x=245 y=120 w=110 h=30 text="" id=105 scale=0.72 action="disclaimer"
 {
@@ -41,20 +46,27 @@ button x=245 y=120 w=110 h=30 text="" id=105 scale=0.72 action="disclaimer"
     image x=40 y=0 w=20 h=20 id=167
 }
 
-label x=160 y=153 text="Filters" scale=0.6 align=CENTER
-window x=160 y=185 w=260 h=40 style=8
+window x=160 y=170 w=260 h=40 style=8
 
-button x=45 y=185 id=251 scale=0.6
-button x=78 y=185 id=252 scale=0.6
-button x=111 y=185 id=253 scale=0.6
-button x=144 y=185 id=254 scale=0.6
-button x=176 y=185 id=255 scale=0.6
-button x=209 y=185 id=256 scale=0.6
-button x=242 y=185 id=258 scale=0.6
-button x=275 y=185 id=267 scale=0.6
+# NA
+button x=45 y=170 id=251 scale=0.6
+# EASY
+button x=78 y=170 id=252 scale=0.6
+# NORMAL
+button x=111 y=170 id=253 scale=0.6
+# HARD
+button x=144 y=170 id=254 scale=0.6
+# HARDER
+button x=176 y=170 id=255 scale=0.6
+# INSANE
+button x=209 y=170 id=256 scale=0.6
+# DEMON
+button x=242 y=170 id=258 scale=0.6
+#AUTO
+button x=275 y=170 id=267 scale=0.6
 
-button x=130 y=223 id=144 scale=0.6 action="openfilters"
-button x=160 y=223 id=424 scale=0.6 action="serverswitcher"
-button x=190 y=223 id=31 scale=0.6 action="clearfilters"
+button x=120 y=215 id=144 scale=0.8 action="openfilters"
+button x=160 y=215 id=31 scale=0.8 action="clearfilters"
+button x=200 y=215 id=424 scale=0.8 action="serverswitcher"
 
 

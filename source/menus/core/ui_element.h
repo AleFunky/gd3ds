@@ -128,6 +128,8 @@ typedef struct {
 
     u32 keyBinds;
     int keyPressTimer;
+
+    bool invisible;
 } UIButton;
 
 typedef struct {
