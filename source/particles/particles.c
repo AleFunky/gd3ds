@@ -217,7 +217,7 @@ void initParticle(ParticleSystem* ps, const ParticleDefinition* cfg, int i) {
 }
 
 void spawnMultipleParticles(ParticleSystem* ps, int emitCount) {
-    if (particlesDisabled) return;
+    if (settingsState.particlesDisabled) return;
     
     if (!ps->active)
         return;
@@ -231,7 +231,7 @@ void spawnMultipleParticles(ParticleSystem* ps, int emitCount) {
 }
 
 void updateParticleSystem(ParticleSystem* ps, float dt) {
-    if (particlesDisabled) return;
+    if (settingsState.particlesDisabled) return;
     
     if (!ps->active)
         return;
@@ -419,6 +419,8 @@ void initParticleSystem(ParticleSystem* ps, const ParticleDefinition* cfg) {
     ps->emitterX = cfg->sourcePositionx;
     ps->emitterY = cfg->sourcePositiony;
     ps->scale = 1.0f;
+    ps->depth = 0.0f;
+    ps->depthInwards = false;
     ps->posVarRotates = false;
     ps->affectedByMirror = true;
 
@@ -484,13 +486,16 @@ void freeParticleData(ParticleData* d) {
 }
 
 void drawParticleSystem(ParticleSystem* ps, float x_offset, float y_offset, float opacity) {
-    if (particlesDisabled) return;
+    if (settingsState.particlesDisabled) return;
     
     C2D_Image img = C2D_SpriteSheetGetImage(particleSheet, ps->cfg.textureFileName);
     C3D_TexSetFilter(img.tex, GPU_LINEAR, GPU_LINEAR);
     
     ParticleData* d = &ps->data;
     int count = d->count;
+
+    // Only worth checking per particle when there's actually 3D to show
+    bool use_depth = ps->depth && is_stereo_active();
 
     for (int i = 0; i < count; i++) {
         float x = d->posx[i];
@@ -507,8 +512,8 @@ void drawParticleSystem(ParticleSystem* ps, float x_offset, float y_offset, floa
         if (!ps->relativeStationary) {
             // If stationary, dont convert to screen space
             if (!ps->stationary) {
-                x = ((x - state.camera_x));
-                y = GSP_SCREEN_WIDTH - ((y - state.camera_y));  
+                if (!ps->dontApplyCamX) x = ((x - state.camera_x));
+                if (!ps->dontApplyCamY) y = GSP_SCREEN_WIDTH - ((y - state.camera_y));  
             } else {
                 x = d->relx[i] + ps->emitterX;
                 y = d->rely[i] + ps->emitterY;
@@ -524,6 +529,12 @@ void drawParticleSystem(ParticleSystem* ps, float x_offset, float y_offset, floa
             // Flip
             x += x_offset;
             y = (GSP_SCREEN_WIDTH - y);
+        }
+
+        // Drift out of the screen as the particle ages, or back into it if inverted
+        if (use_depth && d->totalTimeToLive[i] > 0) {
+            float life = d->timeToLive[i] / d->totalTimeToLive[i];
+            x += get_depth_shift(ps->depth * (ps->depthInwards ? life : 1.f - life));
         }
 
         C2D_ImageTint tint = { 0 };

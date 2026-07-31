@@ -140,6 +140,9 @@ void rays_start_fade() {
 void draw_rays(float delta) {
     if (!started) return;
 
+    // The rays tick as they draw, so don't let extra eyes speed them up
+    if (is_extra_eye()) delta = 0;
+
     for (int i = 0; i < BEAM_COUNT; i++) {
         RayData *data = &ray_data[i];
 

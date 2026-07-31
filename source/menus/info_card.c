@@ -35,7 +35,7 @@ static UIAction actions[] = {
     { "exit", exit_info_card},
 };
 
-void set_info_content(char *text) {
+void set_info_content(const char *text) {
     content = (UILabel *) ui_get_element_by_tag(&screen, "content");
     ui_label_set_text(content, text);
 }

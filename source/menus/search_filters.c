@@ -127,7 +127,7 @@ void search_filters_init() {
         UICheckBox *checkbox = (UICheckBox *)ui_get_element_by_tag(&screen, filters[i].chk_name);
         if (checkbox) {
             checkbox->checked = *filters[i].var;
-            set_checkbox_enabled(checkbox, checkbox->checked);
+            ui_set_checkbox_checked(checkbox, checkbox->checked);
         }
     }
 

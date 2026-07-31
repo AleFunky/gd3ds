@@ -67,11 +67,19 @@ typedef struct {
 
     float scale;
 
+    // How far the particles fly towards you before they die (0 keeps them flat)
+    float depth;
+
+    // Flips the drift, so they start out at you and sink back in as they die
+    bool depthInwards;
+
     bool affectedByMirror;
     bool stationary;
     bool relativeStationary;
     bool gravityFlipped;
     bool posVarRotates;
+    bool dontApplyCamX;
+    bool dontApplyCamY;
     
     bool active;
     bool emitting;

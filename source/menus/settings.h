@@ -1,32 +1,56 @@
 #pragma once
+#include "main.h"
 #include <3ds.h>
 
+typedef enum {
+    PAGE_GRAPHICS,
+    PAGE_INPUT,
+    PAGE_MISC,
+    PAGE_GAMEPLAY,
+    PAGE_COSMETIC
+} SettingPage;
+
 typedef struct {
-    const char *chk_name;
+    const char *id;      
+    const char *label;
+    const char *additionalInfo;
+       
+    SettingPage page;
+
+    bool defaultValue;
     bool *var;
+    const char *key;
+
+    void (*onChanged)(bool);
 } Setting;
 
-extern bool particlesDisabled;
-extern bool wideEnabled;
-extern bool glowEnabled; 
-extern bool yJump;
-extern bool touchEffectEverywhere;
-extern bool enableDebugBindings;
-extern bool hitboxesEnabled;
-extern bool hitboxTrail;
-extern bool hitboxesOnDeath;
-extern bool showProgressBar;
-extern bool showProgressPercent;
-extern bool decimalPercent;
-extern bool ultraDecimalPercent;
-extern bool switchTrailColor;
-extern bool switchWaveTrailColor;
-extern bool quickRetry;
-extern bool solidWaveTrail;
-extern bool noPlayerTrail;
-extern bool noWaveTrailBehind;
-extern bool doNot;
-extern bool practiceMusicSync;
+typedef struct {
+    bool wideEnabled;
+    bool stereoEnabled;
+    bool particlesDisabled;
+    bool glowEnabled;
+    bool yJump;
+    bool touchEffectEverywhere;
+    bool enableDebugBindings;
+    bool hitboxesEnabled;
+    bool hitboxTrail;
+    bool hitboxesOnDeath;
+    bool showProgressBar;
+    bool showProgressPercent;
+    bool decimalPercent;
+    bool ultraDecimalPercent;
+    bool switchTrailColor;
+    bool switchWaveTrailColor;
+    bool quickRetry;
+    bool solidWaveTrail;
+    bool noPlayerTrail;
+    bool noWaveTrailBehind;
+    bool doNot;
+    bool practiceMusicSync;
+} SettingState;
+
+extern Setting settings[23];
+extern SettingState settingsState;
 
 void settings_init();
 int settings_loop();

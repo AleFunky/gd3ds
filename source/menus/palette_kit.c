@@ -356,7 +356,7 @@ void palette_kit_init() {
     reset_selected_category();
     reset_indices();
 
-    set_checkbox_enabled((UICheckBox *) ui_get_element_by_tag(&screen, "check_glow"), player_glow_enabled);
+    ui_set_checkbox_checked((UICheckBox *) ui_get_element_by_tag(&screen, "check_glow"), player_glow_enabled);
     ui_run_func_on_tag(&screen, "glow_option", disable_glow_setting);
 }
 

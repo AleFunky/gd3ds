@@ -1,5 +1,6 @@
 #include <3ds.h>
 #include <citro2d.h>
+#include "utils/precise_input.h"
 #include "menus/core/common_setters.h"
 #include "menus/core/ui_element.h"
 #include "menus/core/ui_screen.h"
@@ -132,6 +133,10 @@ void pause_game() {
 
 void unpause_game() {
     game_paused = false;
+    if (pi_enabled) {
+        pi_reset();
+        pi_suppress_until_release();
+    }
     if (state.death_timer <= 0 && (song_loaded || state.practice_mode)) {
         unpause_playback_mp3();
     }
@@ -245,7 +250,8 @@ void gameplay_screen_init() {
 
     ui_progress_bar_set_tint(progress_bar, C2D_Color32(color.r, color.g, color.b, 255));
     
-    ui_window_set_tint((UIWindow *) ui_get_element_by_tag(&default_screen_top, "bgwindow"), C2D_Color32(0, 0, 0, 127));
+    ui_window_set_tint((UIWindow *) ui_get_element_by_tag(&default_screen_top, "bgwindow"), C2D_Color32(0, 0, 0, 150));
+    ui_window_set_tint((UIWindow *) ui_get_element_by_tag(&default_screen, "bgwindow"), C2D_Color32(0, 0, 0, 150));
 
     ui_label_set_text(level_name, level_info.level_name);
 
@@ -299,8 +305,8 @@ int gameplay_screen_top_loop() {
     hidTouchRead(&touchPos);
 
     decimal = 0;
-    if (decimalPercent) decimal = 2;
-    if (ultraDecimalPercent) decimal = MAX_DECIMAL_PERCENT;
+    if (settingsState.decimalPercent) decimal = 2;
+    if (settingsState.ultraDecimalPercent) decimal = MAX_DECIMAL_PERCENT;
 
     progress_bar->value = state.level_progress;
     snprintf(percent->text, 32, "%.*f%%", decimal, state.level_progress);
@@ -310,17 +316,18 @@ int gameplay_screen_top_loop() {
     ui_set_pos_on_tag(&default_screen_top, 200, 8, "percent");
     percent->alignment = 0.5;
 
-    if (showProgressBar) {
+    if (settingsState.showProgressBar) {
         ui_run_func_on_tag(&default_screen_top, "progressalert", ui_enable_element);
         ui_set_pos_on_tag(&default_screen_top, 282, 8, "percent");
         percent->alignment = 0;
     }
 
-    if (showProgressPercent) {
+    if (settingsState.showProgressPercent) {
         ui_run_func_on_tag(&default_screen_top, "percent", ui_enable_element);
     }
 
-    ui_screen_update(&default_screen_top, &touch);
+    // Extra eyes only redraw, updating twice would run the animations at double speed
+    if (!is_extra_eye()) ui_screen_update(&default_screen_top, &touch);
     ui_screen_draw(&default_screen_top);
 
     return false;
@@ -330,14 +337,6 @@ int gameplay_screen_bot_loop() {
     UIInput touch;
     touchPosition touchPos;
     hidTouchRead(&touchPos);
-
-    ColorChannel channel = channels[get_col_channel_index(CHANNEL_BG)];
-    // If flash is happening, use lbg
-    if (state.flash_data.use_lbg) channel = channels[get_col_channel_index(CHANNEL_LBG_NOLERP)];
-    
-    Color color = channel.color;
-
-    ui_image_set_tint(bg_gradient, C2D_Color32(color.r, color.g, color.b, 255));
 
     LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
 

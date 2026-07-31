@@ -147,7 +147,7 @@ void song_filter_init() {
     UICheckBox *checkbox = (UICheckBox *)ui_get_element_by_tag(&screen, "chk_song");
     if (checkbox) {
             checkbox->checked = songFilter;
-            set_checkbox_enabled(checkbox, checkbox->checked);
+            ui_set_checkbox_checked(checkbox, checkbox->checked);
         }
 
     yes_exit = false;
@@ -173,7 +173,8 @@ int song_filter_loop() {
             ui_run_func_on_tag(&screen, songs_tags[i], ui_disable_element);
         }
     }
-    strncpy(songFilterId, song_input->text, 127);
+    strncpy(song_input->text, songFilterId, sizeof(song_input->text) - 1);
+    song_input->text[sizeof(song_input->text) - 1] = '\0';
 
     UIInput touch;
     touchPosition touchPos;

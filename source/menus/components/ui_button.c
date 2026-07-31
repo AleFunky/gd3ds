@@ -21,7 +21,7 @@ void ui_button_update(UIElement* e, UIInput* touch, UITransform *transform) {
     //Keybinds logic
     u32 validKeybinds = button->keyBinds;
 
-    if(enableDebugBindings && game_state == STATE_GAME && !game_paused && !in_level_complete){
+    if(settingsState.enableDebugBindings && game_state == STATE_GAME && !game_paused && !in_level_complete){
         validKeybinds &= ~(KEY_B | KEY_X | KEY_L | KEY_R);
     }
 

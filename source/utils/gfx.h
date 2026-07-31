@@ -13,6 +13,18 @@ enum FadeStatus {
     FADE_STATUS_OUT,
     FADE_STATUS_IN
 };
+
+enum StereoEye {
+    EYE_LEFT,
+    EYE_RIGHT
+};
+
+// Where each layer sits relative to the screen (negative goes into it, positive pops out)
+#define DEPTH_BACKGROUND (-1.f)
+#define DEPTH_LEVEL      (0.3f)
+// Text is the hardest thing to fuse, so the UI stays close to the screen
+#define DEPTH_UI         (0.5f)
+#define DEPTH_POPUP      (1.f)
 void draw_hitbox_line_inward(Vec2D rect[4], 
                              const float x1, const float y1,
                              const float x2, const float y2,
@@ -35,6 +47,18 @@ C3D_RenderTarget* C2D_CreateScreenTargetExt(gfxScreen_t screen, gfx3dSide_t side
 
 void set_wide(bool wide);
 void reinitialize_screens();
+
+// Stereoscopic 3D
+bool stereo_supported();
+void set_stereo(bool stereo);
+void apply_screen_modes();
+void update_stereo_target();
+bool begin_top_eye(int eye);
+bool is_extra_eye();
+bool is_stereo_active();
+void begin_eye_layer(float depth);
+void end_eye_layer();
+float get_depth_shift(float depth);
 
 float get_mirror_x(float x, float factor);
 

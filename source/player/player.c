@@ -651,7 +651,7 @@ void run_player(Player *player) {
             glitter_particles.emitterY = state.camera_y_middle;
             glitter_particles.emitting = true;
             if (!state.mirroring) {
-                if (noWaveTrailBehind) {
+                if (settingsState.noWaveTrailBehind) {
                     MotionTrail_StopStroke(trail);
                 } else {
                     MotionTrail_ResumeStroke(trail);

@@ -122,12 +122,16 @@ void loading_screen_update(float progress) {
     ui_screen_update(&default_screen_top, &touch);
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
     
-    // Top screen
-    C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
-    C2D_SceneBegin(top);
+    // Top screen, drawn once per eye when 3D is on
+    for (int eye = 0; begin_top_eye(eye); eye++) {
+        begin_eye_layer(DEPTH_BACKGROUND);
+        draw_background(0, -30);
+        end_eye_layer();
 
-    draw_background(0, -30);
-    ui_screen_draw(&default_screen_top);
+        begin_eye_layer(DEPTH_UI);
+        ui_screen_draw(&default_screen_top);
+        end_eye_layer();
+    }
 
     // Bottom Screen
     C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));

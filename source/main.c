@@ -56,6 +56,8 @@
 
 #include "math_helpers.h"
 
+#include "utils/precise_input.h"
+
 #ifdef DEBUG_LEAKS
 #include "utils/leaks_dbg.h"
 #endif
@@ -86,9 +88,15 @@ const char *cheat_names[CHEAT_COUNT] = {
 float accumulator = 0.f;
 bool fixed_dt = true;
 
+#define TARGET_FPS 60
+#define PI_SUBSTEP_BUCKETS (STEPS_HZ / TARGET_FPS)
+
+u32 pi_substep_presses[PI_SUBSTEP_BUCKETS];
+
 PrintConsole console;
 
 C3D_RenderTarget* top;
+C3D_RenderTarget* top_right;
 C3D_RenderTarget* bot;
 
 SFX play_sound;
@@ -341,9 +349,38 @@ void init_particles(Color p1_color, Color p2_color) {
     faster_speed_particles.affectedByMirror = false;
 
     end_wall_firework.affectedByMirror = false;
-    
+
     level_complete_effect_p1.stationary = true;
     level_complete_effect_p2.stationary = true;
+
+    // One shot bursts fly towards you, the trails stay glued to the player
+    explosion_particles[0].depth = 1.f;
+    explosion_particles[1].depth = 1.f;
+
+    burst_particles[0].depth = 0.5f;
+    burst_particles[1].depth = 0.5f;
+
+    land_particles[0].depth = 0.35f;
+    land_particles[1].depth = 0.35f;
+
+    coin_pickup_particles.depth = 0.6f;
+    brick_destroy_particles.depth = 0.6f;
+
+    // Ambience sweeps past the player instead of sitting flat behind the level
+    glitter_particles.depth = 0.4f;
+
+    slow_speed_particles.depth = 0.6f;
+    normal_speed_particles.depth = 0.6f;
+    fast_speed_particles.depth = 0.6f;
+    faster_speed_particles.depth = 0.6f;
+
+    // Its particles spiral inwards, so they start at you and fall into the portal
+    end_wall_particles.depth = 0.7f;
+    end_wall_particles.depthInwards = true;
+
+    end_wall_firework.depth = 0.8f;
+    level_complete_effect_p1.depth = 0.8f;
+    level_complete_effect_p2.depth = 0.8f;
 
     Color p1_not_white = get_white_if_black(p1_color);
     Color p2_not_white = get_white_if_black(p2_color);
@@ -496,11 +533,13 @@ void game_loop() {
 #endif
 
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-    C2D_SceneBegin(top);
-    C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
 
     C2D_Fade(0);
-    draw_text(&bigFont_fontCharset, &bigFont_sheet, SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10, 0.5f, 0.5f, 1.0f, true, "Loading...");
+    for (int eye = 0; begin_top_eye(eye); eye++) {
+        begin_eye_layer(DEPTH_UI);
+        draw_text(&bigFont_fontCharset, &bigFont_sheet, SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10, 0.5f, 0.5f, 1.0f, true, "Loading...");
+        end_eye_layer();
+    }
     C3D_FrameEnd(0);
     
     char *path;
@@ -548,14 +587,21 @@ void game_loop() {
     exiting_level = false;
     fixed_dt = true;
 
+    pi_set_jump_keys((settingsState.yJump ? KEY_Y : KEY_A) | KEY_UP);
+    pi_reset();
+    memset(pi_substep_presses, 0, sizeof(pi_substep_presses));
+
     u64 lastTime = svcGetSystemTick();
     u64 start = svcGetSystemTick();
-    bool old_wide = wideEnabled;
+    bool old_wide = settingsState.wideEnabled;
+    bool old_stereo = settingsState.stereoEnabled;
 
     // Main loop
     while (aptMainLoop()) {
         start = svcGetSystemTick();
         hidScanInput();
+
+        pi_poll();
         
         touchPosition touchPos;
         hidTouchRead(&touchPos);
@@ -567,7 +613,7 @@ void game_loop() {
 
         state.hitbox_display = 0;
 
-        if (kDown & KEY_X && enableDebugBindings) {
+        if (kDown & KEY_X && settingsState.enableDebugBindings) {
             state.noclip ^= 1;
         }
 
@@ -576,30 +622,30 @@ void game_loop() {
             cheats_used[CHEAT_NOCLIP] = true;
         }
 
-        if ((kDown & KEY_L) && (kHeld & KEY_B) && enableDebugBindings)
+        if ((kDown & KEY_L) && (kHeld & KEY_B) && settingsState.enableDebugBindings)
             state.profiling ^= 1;
 
-        if ((kDown & KEY_R) && (kHeld & KEY_B) && enableDebugBindings) {
+        if ((kDown & KEY_R) && (kHeld & KEY_B) && settingsState.enableDebugBindings) {
             cheated = true;
             cheats_used[CHEAT_HITBOX_DISPLAY] = true;
-            if (hitboxesEnabled && hitboxTrail) {
-                hitboxesEnabled = false;
-                hitboxTrail = false;
-            } else if (hitboxesEnabled && !hitboxTrail) {
-                hitboxTrail = true;
-            } else hitboxesEnabled = true;
+            if (settingsState.hitboxesEnabled && settingsState.hitboxTrail) {
+                settingsState.hitboxesEnabled = false;
+                settingsState.hitboxTrail = false;
+            } else if (settingsState.hitboxesEnabled && !settingsState.hitboxTrail) {
+                settingsState.hitboxTrail = true;
+            } else settingsState.hitboxesEnabled = true;
         }      
 
-        if (hitboxesEnabled || state.hitbox_enabled_when_dead) {
+        if (settingsState.hitboxesEnabled || state.hitbox_enabled_when_dead) {
             state.hitbox_display = 1;
         }
         
-        if (hitboxTrail) {
-            hitboxesEnabled = true;
+        if (settingsState.hitboxTrail) {
+            settingsState.hitboxesEnabled = true;
             state.hitbox_display = 2;
         }
 
-        if (hitboxesEnabled || hitboxTrail) {
+        if (settingsState.hitboxesEnabled || settingsState.hitboxTrail) {
             cheated = true;
             cheats_used[CHEAT_HITBOX_DISPLAY] = true;
         }
@@ -615,12 +661,17 @@ void game_loop() {
         
         global_volume = get_volume_slider();
 
-        bool buttonPressed = (yJump ? (kDown & KEY_Y) : (kDown & KEY_A)) || (kDown & KEY_UP);
-        bool buttonHeld = (yJump ? (kHeld & KEY_Y) : (kHeld & KEY_A)) || (kHeld & KEY_UP);
+        bool buttonPressed = (settingsState.yJump ? (kDown & KEY_Y) : (kDown & KEY_A)) || (kDown & KEY_UP);
+        bool buttonHeld = (settingsState.yJump ? (kHeld & KEY_Y) : (kHeld & KEY_A)) || (kHeld & KEY_UP);
 
-        state.old_input = state.input;
-        state.input.pressedJump = (buttonPressed || (in_bounds && (kDown & KEY_TOUCH))) == true;
-        state.input.holdJump = (state.input.pressedJump || buttonHeld || (in_bounds && (kHeld & KEY_TOUCH))) == true;
+        bool touch_pressed = in_bounds && (kDown & KEY_TOUCH);
+        bool touch_held = in_bounds && (kHeld & KEY_TOUCH);
+
+        if (!pi_enabled) {
+            state.old_input = state.input;
+            state.input.pressedJump = (buttonPressed || touch_pressed) == true;
+            state.input.holdJump = (state.input.pressedJump || buttonHeld || touch_held) == true;
+        }
         
         for (int i = 0; i < 2; i++) {
             drag_particles[i].emitting = false;
@@ -635,6 +686,7 @@ void game_loop() {
 
         u64 now = svcGetSystemTick();
         delta = (now - lastTime) / (CPU_TICKS_PER_MSEC * 1000);
+        u64 frame_window_start = lastTime;
         lastTime = now;
 
         if (state.death_timer <= 0)  {
@@ -662,12 +714,27 @@ void game_loop() {
                     if (!being_faded) fixed_dt = false;
                 }
                 accumulator += physics_delta;
+
+                u32 planned = (u32)(accumulator / STEPS_DT_UNMOD);
+                pi_begin_frame((u32)frame_window_start, (u32)now, planned ? planned : 1);
+
                 // Run simulation in fixed steps
                 while (accumulator >= STEPS_DT_UNMOD) {
                     u64 start_physics = svcGetSystemTick();
+
+                    if (pi_enabled) {
+                        pi_apply_substep((u32)steps);
+                        state.old_input = state.input;
+                        state.input.pressedJump = (pi_pressed() || touch_pressed) == true;
+                        state.input.holdJump = (pi_hold() || state.input.pressedJump || touch_held) == true;
+                        if (pi_pressed()){
+                            pi_substep_presses[steps < PI_SUBSTEP_BUCKETS ? steps : PI_SUBSTEP_BUCKETS - 1]++;
+                        }
+                    }
+
                     state.current_player = 0;
                     state.old_player = state.player;
-                    
+
                     trail = &trail_p1;
                     wave_trail = &wave_trail_p1;
                     handle_player(&state.player);
@@ -720,7 +787,7 @@ void game_loop() {
             frame_counter++;
 
             if (state.dead && state.death_timer <= 0.f) {
-                state.death_timer = (quickRetry ? 0.5f : 1.f);
+                state.death_timer = (settingsState.quickRetry ? 0.5f : 1.f);
                 bool had_new_best = false;
                 if (!cheated) {
                     LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
@@ -787,7 +854,8 @@ void game_loop() {
                     }
 
                     if (song_loaded) unpause_playback_mp3();
-                    fixed_dt = true; 
+                    pi_reset();
+                    fixed_dt = true;
                     state.dead = false;
                     state.hitbox_display = 0;
                 }
@@ -909,14 +977,18 @@ void game_loop() {
             kHeldPaused = kHeld;
         }
         
-        // If the wide settings has been changed, reinitialize screens
-        if (wideEnabled != old_wide) {        
+        // If the wide or 3D settings have been changed, reinitialize screens
+        if (settingsState.wideEnabled != old_wide || settingsState.stereoEnabled != old_stereo) {
             gspWaitForVBlank();
-            set_wide(wideEnabled);
+            apply_screen_modes();
             gspWaitForVBlank();
             reinitialize_screens();
-            old_wide = wideEnabled;
+            old_wide = settingsState.wideEnabled;
+            old_stereo = settingsState.stereoEnabled;
         }
+
+        // Frees a render target, so keep it out of the frame below
+        update_stereo_target();
 
         // Handle level being completed
         if (level_info.completing) {
@@ -944,60 +1016,88 @@ void game_loop() {
             C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ZERO);
             draw_fade();
 
-            // Top screen
-            C2D_SceneBegin(top);
-            C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
+            // Top screen, drawn once per eye when 3D is on
+            for (int eye = 0; begin_top_eye(eye); eye++) {
+                begin_eye_layer(DEPTH_BACKGROUND);
+                draw_background(state.background_x / 8, -(state.camera_y / 8) + 200);
+                end_eye_layer();
 
-            draw_background(state.background_x / 8, -(state.camera_y / 8) + 200);
+                C2D_ViewScale(SCALE, SCALE);
+                C2D_ViewTranslate(0, CAM_Y_MTX_OFFSET);
 
-            C2D_ViewScale(SCALE, SCALE);
-            C2D_ViewTranslate(0, CAM_Y_MTX_OFFSET);
+                // The level rides in front of the screen, the background stays way back
+                begin_eye_layer(DEPTH_LEVEL);
 
-            draw_objects();
+                draw_objects();
 
-            draw_end_wall(delta);
-            
-            draw_attempt_text();
+                draw_end_wall(delta);
 
-            draw_ground(state.ground_x, state.camera_y, 0, false, SCREEN_WIDTH);
-            
-            if (state.ground_y_gfx > 2) {
-                if (state.camera_y - LEVEL_Y_OFFSET + state.ground_y_gfx > 0) draw_ground(state.ground_x, state.camera_y, state.camera_y + state.ground_y_gfx - LEVEL_Y_OFFSET, false, SCREEN_WIDTH);
-                draw_ground(state.ground_x, state.camera_y, state.camera_y - LEVEL_Y_OFFSET + SCREEN_HEIGHT_AREA - state.ground_y_gfx, true, SCREEN_WIDTH);
-            }
+                draw_attempt_text();
 
-            change_blending(true);
-            draw_use_effects(get_use_effect_array_ptr(GFX_TOP_BUT_ABOVE_LEVEL));
+                draw_ground(state.ground_x, state.camera_y, 0, false, SCREEN_WIDTH);
 
-            if (level_info.wall_y > 0) {
-                drawParticleSystem(&end_wall_firework, 0, 0, 1);
-                drawParticleSystem(&level_complete_effect_p1, 0, 0, 1);
-                drawParticleSystem(&level_complete_effect_p2, 0, 0, 1);
+                if (state.ground_y_gfx > 2) {
+                    if (state.camera_y - LEVEL_Y_OFFSET + state.ground_y_gfx > 0) draw_ground(state.ground_x, state.camera_y, state.camera_y + state.ground_y_gfx - LEVEL_Y_OFFSET, false, SCREEN_WIDTH);
+                    draw_ground(state.ground_x, state.camera_y, state.camera_y - LEVEL_Y_OFFSET + SCREEN_HEIGHT_AREA - state.ground_y_gfx, true, SCREEN_WIDTH);
+                }
+
+                change_blending(true);
+                draw_use_effects(get_use_effect_array_ptr(GFX_TOP_BUT_ABOVE_LEVEL));
+
+                if (level_info.wall_y > 0) {
+                    drawParticleSystem(&end_wall_firework, 0, 0, 1);
+                    drawParticleSystem(&level_complete_effect_p1, 0, 0, 1);
+                    drawParticleSystem(&level_complete_effect_p2, 0, 0, 1);
+                }
+
+                end_eye_layer();
+
                 change_blending(false);
 
-                draw_level_complete_popup();
+                if (level_info.wall_y > 0) {
+                    begin_eye_layer(DEPTH_POPUP);
+                    draw_level_complete_popup();
+                    end_eye_layer();
+                }
+
+                begin_eye_layer(DEPTH_POPUP);
+                draw_new_best_popup();
+                end_eye_layer();
+
+                C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
+                C2D_ViewScale(1/SCALE, 1/SCALE);
+
+                begin_eye_layer(DEPTH_UI);
+                gameplay_screen_top_loop();
+                draw_level_complete_top();
+                end_eye_layer();
             }
-
-            change_blending(false);
-
-            draw_new_best_popup();
-
-            C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
-            C2D_ViewScale(1/SCALE, 1/SCALE);
-            gameplay_screen_top_loop();
-            draw_level_complete_top();
 
             // Bottom screen
             C2D_SceneBegin(bot);
             C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
 
-            gameplay_screen_bot_loop();
-            draw_level_complete();
+            draw_background((state.background_x / 8) + 40, 200);
 
+            C2D_ViewScale(SCALE, SCALE);
+            C2D_ViewTranslate(0, CAM_Y_MTX_OFFSET);
+            
             change_blending(true);
             draw_bottom_particles();
+            change_blending(false);
+
+            draw_ground(state.ground_x + 52.5f, 0.f, -71.f, false, SCREEN_BOT_WIDTH);
+            draw_ground(state.ground_x + 52.5f, 0.f, 210.f, true, SCREEN_BOT_WIDTH);
+
+            C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
+            C2D_ViewScale(1/SCALE, 1/SCALE);
+            
+            change_blending(true);
             draw_touch_effect();
             change_blending(false);
+
+            gameplay_screen_bot_loop();
+            draw_level_complete();
 
             if (state.profiling) {
                 float processingTime = ((ticks / CPU_TICKS_PER_MSEC)) * 6;
@@ -1028,6 +1128,9 @@ void game_loop() {
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   102,  DEBUG_TEXT_SCALE, 0, true, "Drawing:  %6.2f%%", (object_drawing_time) * 6);
 
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   114,  DEBUG_TEXT_SCALE, 0, true, "Touch:  %d, %d", touchPos.px, touchPos.py);
+
+                // im jut going to assume 60fps for this (4 buckets)
+                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   126,  DEBUG_TEXT_SCALE, 0, true, "InputTicks: %d|%d|%d|%d", (int)pi_substep_presses[0], (int)pi_substep_presses[1], (int)pi_substep_presses[2], (int)pi_substep_presses[3]);
 
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   138,  DEBUG_TEXT_SCALE, 0, true, "Player");
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   150,  DEBUG_TEXT_SCALE, 0, true, "- Tick: %d", state.player.frame);
@@ -1131,8 +1234,8 @@ void game_assets_init() {
     touch_explosion_particles.relativeStationary = true;
 
     initParticleSystem(&glitter_particles_bottom, &glitter_effect);
-    glitter_particles_bottom.relativeStationary = true;
     glitter_particles_bottom.cfg.startColorAlpha = 1.f;
+    glitter_particles_bottom.dontApplyCamY = true;
 
     initParticleSystem(&slow_speed_particles_bottom, &speed_effect_slow);
     slow_speed_particles_bottom.relativeStationary = true;
@@ -1169,8 +1272,9 @@ int main(int argc, char* argv[]) {
 
     cfg_init();
 
-    top = C2D_CreateScreenTargetExt(GFX_TOP, GFX_LEFT, false);
-    bot = C2D_CreateScreenTargetExt(GFX_BOTTOM, GFX_LEFT, false);
+    // Sort out wide / 3D before making the targets, they need different sizes
+    apply_screen_modes();
+    reinitialize_screens();
 
     srand(time(NULL));
     alt_title_screen = (rand() & (128 - 1)) == 0;

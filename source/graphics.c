@@ -583,7 +583,7 @@ void spawn_object_at(
     }
 
     // Skip if no glow frame
-    if (glowEnabled && obj->glow_frame >= 0) {
+    if (settingsState.glowEnabled && obj->glow_frame >= 0) {
         if (sprite_count >= MAX_SPRITES - 1) return;
 
         SpriteObject *vo = &viewable_objects[sprite_count];
@@ -1121,7 +1121,7 @@ void draw_attempt_text() {
     float calc_y = SCREEN_HEIGHT - ((state.attempt_text_pos.y - state.camera_y));  
 
     if (calc_x > -200) {
-        draw_text(&bigFont_fontCharset, &bigFont_sheet, get_mirror_x(calc_x, state.mirror_factor), calc_y, 1, (doNot ? -1 : 1), 0.5f, true, "Attempt %d", attempts);
+        draw_text(&bigFont_fontCharset, &bigFont_sheet, get_mirror_x(calc_x, state.mirror_factor), calc_y, 1, (settingsState.doNot ? -1 : 1), 0.5f, true, "Attempt %d", attempts);
     }
 }
 
@@ -1296,7 +1296,7 @@ void draw_player_effects() {
     drawParticleSystem(&coin_pickup_particles, 0, 0, 1.f);
     drawParticleSystem(&glitter_particles, 0, 0, 1.f);
     draw_p1_trail(&state.player, 0);
-    if (!noPlayerTrail) MotionTrail_Draw(&trail_p1);
+    if (!settingsState.noPlayerTrail) MotionTrail_Draw(&trail_p1);
     MotionTrail_DrawWaveTrail(&wave_trail_p1);
 }
 
@@ -1325,7 +1325,7 @@ void draw_player_graphics() {
 
     draw_p1_trail(&state.player2, 1);
     
-    if (!noPlayerTrail) MotionTrail_Draw(&trail_p2);
+    if (!settingsState.noPlayerTrail) MotionTrail_Draw(&trail_p2);
     MotionTrail_DrawWaveTrail(&wave_trail_p2);
     change_blending(false);
     state.current_player = 0;
@@ -1342,6 +1342,7 @@ void draw_player_graphics() {
 
 void draw_objects() {
     u64 start = svcGetSystemTick();
+
     // Draw
     for (size_t s = 0; s < sprite_count; s++) {
         SpriteObject *obj = viewable_objects_ptr[s];
@@ -1409,7 +1410,7 @@ void update_touch_effect(float delta) {
 
     touch_drag_particles.emitting = false;
 
-    if ((touchEffectEverywhere || (game_state == STATE_GAME && !game_paused)) && (kHeld & KEY_TOUCH) && !get_fade_status()) {
+    if ((settingsState.touchEffectEverywhere || (game_state == STATE_GAME && !game_paused)) && (kHeld & KEY_TOUCH) && !get_fade_status()) {
         // Flipped for particles
         float flipped_y = SCREEN_HEIGHT - pos.py;
 
@@ -1466,24 +1467,24 @@ void update_bottom_particles(float delta) {
     // If in game and not paused and not fading, update the particles spawning
     if (((game_state == STATE_GAME && !game_paused)) && !get_fade_status()) {
         if (flying_gamemode) {
-            glitter_particles_bottom.emitterX = 320/2;
+            glitter_particles_bottom.emitterX = state.camera_x_middle;
             glitter_particles_bottom.emitterY = 240/2;
             glitter_particles_bottom.emitting = true;
-        };
+        }
         slow_speed_particles_bottom.emitting = slow_speed_particles_timer > 0;
-        slow_speed_particles_bottom.emitterX = 320;
+        slow_speed_particles_bottom.emitterX = 320/SCALE;
         slow_speed_particles_bottom.emitterY = 240/2;
 
         normal_speed_particles_bottom.emitting = normal_speed_particles_timer > 0;
-        normal_speed_particles_bottom.emitterX = 320;
+        normal_speed_particles_bottom.emitterX = 320/SCALE;
         normal_speed_particles_bottom.emitterY = 240/2;
 
         fast_speed_particles_bottom.emitting = fast_speed_particles_timer > 0;
-        fast_speed_particles_bottom.emitterX = 320;
+        fast_speed_particles_bottom.emitterX = 320/SCALE;
         fast_speed_particles_bottom.emitterY = 240/2;
         
         faster_speed_particles_bottom.emitting = faster_speed_particles_timer > 0;
-        faster_speed_particles_bottom.emitterX = 320;
+        faster_speed_particles_bottom.emitterX = 320/SCALE;
         faster_speed_particles_bottom.emitterY = 240/2;
     }
 

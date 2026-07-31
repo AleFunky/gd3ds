@@ -23,7 +23,7 @@ static void set_checkbox_texture(UICheckBox* e, bool enabled) {
 }
 
 // Set checkbox checked state
-void set_checkbox_enabled(UICheckBox *e, bool enabled) {
+void ui_set_checkbox_checked(UICheckBox *e, bool enabled) {
     if (!e) return;
 
     set_checkbox_texture(e, enabled);
