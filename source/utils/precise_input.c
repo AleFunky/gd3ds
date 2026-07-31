@@ -3,6 +3,7 @@
 #define INPUT_QUEUE_SIZE 16
 #define RING_BUFFER_ENTRIES 8
 #define RING_ENTRY_WORDS 4
+
 #define TOUCH_RING_ENTRY_WORDS 2
 #define MAX_SAMPLE_INTERVAL_TICKS ((u32)(CPU_TICKS_PER_MSEC * 100))
 
@@ -73,17 +74,22 @@ void pi_set_jump_keys(u32 mask) {
 
 void pi_reset(void) {
     resync_from_ring(&pad);
+    resync_from_ring(&touch);
     pad.suppress_hold_until_release = false;
     pad.fake_press = false;
+    touch.suppress_hold_until_release = false;
+    touch.fake_press = false;
 }
 
 void pi_suppress_until_release(void) {
     pad.suppress_hold_until_release = true;
+    touch.suppress_hold_until_release = true;
 }
 
 // poll to find the times that the clicks occured and schdule them for later application
 void pi_poll(void) {
     poll_source(&pad);
+    poll_source(&touch);
 }
 
 void pi_begin_frame(u32 frame_start_tick, u32 frame_end_tick, u32 substeps) {
@@ -94,14 +100,17 @@ void pi_begin_frame(u32 frame_start_tick, u32 frame_end_tick, u32 substeps) {
 
 void pi_apply_substep(u32 substep) {
     apply_source(&pad, substep);
+    apply_source(&touch, substep);
 }
 
 bool pi_hold(void) {
-    return pad.hold_state && !pad.suppress_hold_until_release;
+    bool pad_hold = pad.hold_state && !pad.suppress_hold_until_release;
+    bool touch_hold = touch.hold_state && !touch.suppress_hold_until_release;
+    return pad_hold || touch_hold;
 }
 
 bool pi_pressed(void) {
-    return pad.pressed_edge;
+    return pad.pressed_edge || touch.pressed_edge;
 }
 
 u32 pi_event_count(void) {
@@ -120,7 +129,7 @@ static bool pad_sample_jump(u32 slot) {
 static bool touch_sample_jump(u32 slot) {
     vu32 *pointer_to_ring_buffer = get_ring_buffer(&touch);
     u32 position = pointer_to_ring_buffer[TOUCH_RING_ENTRY_WORDS * slot];
-    u32 valid = pointer_to_ring_buffer[TOUCH_RING_ENTRY_WORDS * slot + 1];
+    u32 valid = pointer_to_ring_buffer[(TOUCH_RING_ENTRY_WORDS * slot) + 1];
 
     if (!valid) {
         return false;
