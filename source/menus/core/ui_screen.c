@@ -25,6 +25,7 @@
 #include "menus/components/ui_palette_icons.h"
 #include "menus/components/ui_rectangle.h"
 
+#include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -806,19 +807,25 @@ void ui_load_screen(UIScreen* screen,
 
     // Iterate through lines (one element per line)
     while (fgets(line, sizeof(line), f)) {
-
         trim_newline(line);
 
+        char *p = line;
+
+        // Skip leading spaces
+        while (isspace((unsigned char) *p)) {
+            p++;
+        }
+        
         // Comment or empty
-        if (line[0] == '#' || line[0] == '\0')
+        if (p[0] == '#' || p[0] == '\0')
             continue;
 
         // Add last element to the stack
-        if (line[0] == '{') {
+        if (p[0] == '{') {
             if (stack_ptr < MAX_NESTED_CHILDREN) {
                 child_stack[stack_ptr++] = last_element;
             }
-        } else if (line[0] == '}') {
+        } else if (p[0] == '}') {
             if (stack_ptr > 0) {
                 stack_ptr--;
             }
