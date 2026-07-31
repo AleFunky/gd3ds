@@ -78,10 +78,10 @@ void pi_poll(void) {
     u32 elapsed_time = now - last_poll_tick;
     u32 samples_elapsed = (elapsed_time + (interval / 2)) / interval;
 
-    // data was overwritted, resync
+    // data was overwritten, but insted of resyncing immediatly we go through the survivors
+    // for any recent potential inputs
     if(samples_elapsed > RING_BUFFER_ENTRIES){
-        resync_from_ring();
-        return;
+        idx_advanced = RING_BUFFER_ENTRIES;
     }
 
     // if at 30fps, then idx_advanced == 0 will look the same as moving ahead 8 slots
