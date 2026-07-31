@@ -2,13 +2,14 @@
 
 #define INPUT_QUEUE_SIZE 16
 #define RING_BUFFER_ENTRIES 8
-#define RING_BUFFER_OFFSET 0x28
 #define RING_ENTRY_WORDS 4
+#define TOUCH_RING_ENTRY_WORDS 2
 #define MAX_SAMPLE_INTERVAL_TICKS ((u32)(CPU_TICKS_PER_MSEC * 100))
 
 bool pi_enabled = false;
 
 static u32 jump_keys;
+static bool (*touch_filter)(u16 px, u16 py);
 
 static u32 frame_start;
 static u32 frame_end;
@@ -17,6 +18,9 @@ static u32 frame_substeps;
 typedef struct {
     u32 tick_word;
     u32 idx_word;
+
+    u32 ring_buffer_offset;
+
     bool (*sample_jump)(u32 slot);
 
     PreciseInputEvent queue[INPUT_QUEUE_SIZE];
@@ -34,14 +38,25 @@ typedef struct {
 } PreciseSource;
 
 static bool pad_sample_jump(u32 slot);
+static bool touch_sample_jump(u32 slot);
 
+// https://www.3dbrew.org/wiki/HID_Shared_Memory#Offset_0x0
 static PreciseSource pad = {
     .tick_word = 0,
     .idx_word = 4,
+    .ring_buffer_offset = 0x28,
     .sample_jump = pad_sample_jump,
 };
 
-static vu32 *get_ring_buffer(void);
+// https://www.3dbrew.org/wiki/HID_Shared_Memory#Offset_0xA8
+static PreciseSource touch = {
+    .tick_word = 42,
+    .idx_word = 46,
+    .ring_buffer_offset = 0xA8 + 0x20,
+    .sample_jump = touch_sample_jump,
+};
+
+static vu32 *get_ring_buffer(PreciseSource* src);
 static u32 sample_interval(u32 latest_tick, u32 prev_tick);
 static u32 reconstruct_tick(u32 newest_time, u32 samples_ago, u32 interval);
 static bool push_event(PreciseSource *src, u32 tick, bool down);
@@ -98,12 +113,30 @@ PreciseInputEvent pi_event_get(u32 index) {
 }
 
 static bool pad_sample_jump(u32 slot) {
-    vu32 *pointer_to_ring_buffer = get_ring_buffer();
+    vu32 *pointer_to_ring_buffer = get_ring_buffer(&pad);
     return (pointer_to_ring_buffer[RING_ENTRY_WORDS * slot] & jump_keys) != 0;
 }
 
-static vu32 *get_ring_buffer(void) {
-    return (vu32*)((u8*)hidSharedMem + RING_BUFFER_OFFSET);
+static bool touch_sample_jump(u32 slot) {
+    vu32 *pointer_to_ring_buffer = get_ring_buffer(&touch);
+    u32 position = pointer_to_ring_buffer[TOUCH_RING_ENTRY_WORDS * slot];
+    u32 valid = pointer_to_ring_buffer[TOUCH_RING_ENTRY_WORDS * slot + 1];
+
+    if (!valid) {
+        return false;
+    }
+
+    if (touch_filter) {
+        u16 px = (u16)(position & 0xFFFF);
+        u16 py = (u16)(position >> 16);
+        return touch_filter(px, py);
+    }
+
+    return true;
+}
+
+static vu32 *get_ring_buffer(PreciseSource* src) {
+    return (vu32*)((u8*)hidSharedMem + src->ring_buffer_offset);
 }
 
 // calculates the duration between HID samples
