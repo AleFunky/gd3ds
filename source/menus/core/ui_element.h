@@ -26,7 +26,6 @@ typedef enum {
     UI_WINDOW,
     UI_TEXTBOX,
     UI_LIST,
-    UI_ACTION_AREA,
     UI_DARKEN,
     UI_ICON,
     UI_COLOR_BUTTON,
@@ -171,13 +170,6 @@ typedef struct {
     int font;
     bool parse_tags;
 } UILabel;
-
-typedef struct {
-    UIElement base;
-
-    bool hovered;
-    bool pressed;
-} UIActionArea;
 
 typedef struct {
     UIButton base;

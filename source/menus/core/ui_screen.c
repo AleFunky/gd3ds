@@ -13,7 +13,6 @@
 #include "menus/components/ui_textbox.h"
 #include "menus/components/ui_list.h"
 #include "menus/components/ui_bg_gradient.h"
-#include "menus/components/ui_action_area.h"
 #include "menus/components/ui_darken.h"
 #include "menus/components/ui_icon.h"
 #include "menus/components/ui_color_button.h"
@@ -67,7 +66,6 @@ static const UIElementConstructor element_constructors[] = {
     {"textbox",      ui_create_textbox_from_props },
     {"list",         ui_create_list_from_props },
     {"bggradient",   ui_create_bg_gradient_from_props },
-    {"actionarea",   ui_create_action_area_from_props },
     {"darken",       ui_create_darken_from_props },
     {"icon",         ui_create_icon_from_props },
     {"colorbutton",  ui_create_color_button_from_props },

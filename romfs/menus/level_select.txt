@@ -58,7 +58,7 @@ progressbar x=160 y=182 max_value=100 style=0 scale=0.65 tag="level_card_2,pract
 
 label x=160 y=183 text="0%" scale=0.4 align=CENTER tag="level_card_2,practiceprogressvalue_2"
 
-actionarea x=160 y=80 w=220 h=80 action="open_level"
+button x=160 y=80 w=220 h=80 invisible=1 action="open_level"
 
 button x=20 y=120 id=376 action="move_left" tag="left" sx=-1.0 keyBinds="L,ZL,LEFT,CSLEFT,CPLEFT"
 button x=300 y=120 id=376 action="move_right" tag="right" keyBinds="R,ZR,RIGHT,CSRIGHT,CPRIGHT"
