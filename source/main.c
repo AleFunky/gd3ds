@@ -733,6 +733,11 @@ void game_loop() {
                 }
                 accumulator += physics_delta;
 
+                // in case of merge conflicts: this needs to stay after the accumulator deposit above.
+                // planned is how many substeps this frame is about to run, so if we calculate it
+                // before the deposit, the accumulator only has the leftover from last frame and
+                // planned will always be 1, making every input land on a single substep like normal
+                // frame latching (no error, it will just silently get less precise)
                 u32 planned = (u32)(accumulator / STEPS_DT_UNMOD);
                 pi_begin_frame((u32)frame_window_start, (u32)now, planned ? planned : 1);
 
