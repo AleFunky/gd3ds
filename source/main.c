@@ -526,10 +526,23 @@ void init_particles(Color p1_color, Color p2_color) {
     level_complete_effect_p2.cfg.finishColorBlue  = p2_not_white.b / 255.f;
 }
 
+u32 jump_key_mask(void) {
+    return (settingsState.yJump ? KEY_Y : KEY_A) | KEY_UP;
+}
+
 static bool touch_jump_filter(u16 px, u16 py) {
     bool on_pause_button = px > 320 - 30 && py < 30;
     bool on_practice_ui = state.practice_mode && (px > 92 && px < 222 && py > 175 && py < 222);
     return !(on_pause_button || on_practice_ui);
+}
+
+void sync_precise_input(bool suppress_held) {
+    pi_set_jump_keys(jump_key_mask());
+    pi_set_touch_filter(touch_jump_filter);
+    pi_reset();
+    if (suppress_held) {
+        pi_suppress_until_release();
+    }
 }
 
 void game_loop() {
@@ -593,9 +606,7 @@ void game_loop() {
     exiting_level = false;
     fixed_dt = true;
 
-    pi_set_jump_keys((settingsState.yJump ? KEY_Y : KEY_A) | KEY_UP);
-    pi_set_touch_filter(touch_jump_filter);
-    pi_reset();
+    sync_precise_input(false);
     memset(pi_substep_presses, 0, sizeof(pi_substep_presses));
 
     u64 lastTime = svcGetSystemTick();
@@ -668,8 +679,8 @@ void game_loop() {
         
         global_volume = get_volume_slider();
 
-        bool buttonPressed = (settingsState.yJump ? (kDown & KEY_Y) : (kDown & KEY_A)) || (kDown & KEY_UP);
-        bool buttonHeld = (settingsState.yJump ? (kHeld & KEY_Y) : (kHeld & KEY_A)) || (kHeld & KEY_UP);
+        bool buttonPressed = (kDown & jump_key_mask()) != 0;
+        bool buttonHeld = (kHeld & jump_key_mask()) != 0;
 
         bool touch_pressed = in_bounds && (kDown & KEY_TOUCH);
         bool touch_held = in_bounds && (kHeld & KEY_TOUCH);
@@ -861,7 +872,7 @@ void game_loop() {
                     }
 
                     if (song_loaded) unpause_playback_mp3();
-                    pi_reset();
+                    sync_precise_input(false);
                     fixed_dt = true;
                     state.dead = false;
                     state.hitbox_display = 0;
