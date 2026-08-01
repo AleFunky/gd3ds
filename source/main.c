@@ -659,7 +659,7 @@ void game_loop() {
         
         int steps = 0;
 
-        bool in_bounds = !((touchPos.px > 320 - 30 && touchPos.py < 30) || (state.practice_mode && (touchPos.px > 92 && touchPos.px < 222 && touchPos.py > 175 && touchPos.py < 222)));
+        bool in_bounds = touch_jump_filter(touchPos.px, touchPos.py);
         
         kHeldPaused &= ~kUp;
         if(!game_paused){
