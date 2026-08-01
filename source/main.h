@@ -129,4 +129,7 @@ float get_volume_slider();
 
 int output_log(const char *fmt, ...);
 
+u32 jump_key_mask(void);
+void sync_precise_input(bool suppress_held);
+
 bool is_citra();

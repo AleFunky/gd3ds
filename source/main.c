@@ -526,6 +526,25 @@ void init_particles(Color p1_color, Color p2_color) {
     level_complete_effect_p2.cfg.finishColorBlue  = p2_not_white.b / 255.f;
 }
 
+u32 jump_key_mask(void) {
+    return (settingsState.yJump ? KEY_Y : KEY_A) | KEY_UP;
+}
+
+static bool touch_jump_filter(u16 px, u16 py) {
+    bool on_pause_button = px > 320 - 30 && py < 30;
+    bool on_practice_ui = state.practice_mode && (px > 92 && px < 222 && py > 175 && py < 222);
+    return !(on_pause_button || on_practice_ui);
+}
+
+void sync_precise_input(bool suppress_held) {
+    pi_set_jump_keys(jump_key_mask());
+    pi_set_touch_filter(touch_jump_filter);
+    pi_reset();
+    if (suppress_held) {
+        pi_suppress_until_release();
+    }
+}
+
 void game_loop() {
 #ifdef DEBUG_LEAKS
     current_generation++;
@@ -587,8 +606,7 @@ void game_loop() {
     exiting_level = false;
     fixed_dt = true;
 
-    pi_set_jump_keys((settingsState.yJump ? KEY_Y : KEY_A) | KEY_UP);
-    pi_reset();
+    sync_precise_input(false);
     memset(pi_substep_presses, 0, sizeof(pi_substep_presses));
 
     u64 lastTime = svcGetSystemTick();
@@ -652,7 +670,7 @@ void game_loop() {
         
         int steps = 0;
 
-        bool in_bounds = !((touchPos.px > 320 - 30 && touchPos.py < 30) || (state.practice_mode && (touchPos.px > 92 && touchPos.px < 222 && touchPos.py > 175 && touchPos.py < 222)));
+        bool in_bounds = touch_jump_filter(touchPos.px, touchPos.py);
         
         kHeldPaused &= ~kUp;
         if(!game_paused){
@@ -661,8 +679,8 @@ void game_loop() {
         
         global_volume = get_volume_slider();
 
-        bool buttonPressed = (settingsState.yJump ? (kDown & KEY_Y) : (kDown & KEY_A)) || (kDown & KEY_UP);
-        bool buttonHeld = (settingsState.yJump ? (kHeld & KEY_Y) : (kHeld & KEY_A)) || (kHeld & KEY_UP);
+        bool buttonPressed = (kDown & jump_key_mask()) != 0;
+        bool buttonHeld = (kHeld & jump_key_mask()) != 0;
 
         bool touch_pressed = in_bounds && (kDown & KEY_TOUCH);
         bool touch_held = in_bounds && (kHeld & KEY_TOUCH);
@@ -715,6 +733,11 @@ void game_loop() {
                 }
                 accumulator += physics_delta;
 
+                // in case of merge conflicts: this needs to stay after the accumulator deposit above.
+                // planned is how many substeps this frame is about to run, so if we calculate it
+                // before the deposit, the accumulator only has the leftover from last frame and
+                // planned will always be 1, making every input land on a single substep like normal
+                // frame latching (no error, it will just silently get less precise)
                 u32 planned = (u32)(accumulator / STEPS_DT_UNMOD);
                 pi_begin_frame((u32)frame_window_start, (u32)now, planned ? planned : 1);
 
@@ -725,8 +748,8 @@ void game_loop() {
                     if (pi_enabled) {
                         pi_apply_substep((u32)steps);
                         state.old_input = state.input;
-                        state.input.pressedJump = (pi_pressed() || touch_pressed) == true;
-                        state.input.holdJump = (pi_hold() || state.input.pressedJump || touch_held) == true;
+                        state.input.pressedJump = pi_pressed() == true;
+                        state.input.holdJump = (pi_hold() || state.input.pressedJump) == true;
                         if (pi_pressed()){
                             pi_substep_presses[steps < PI_SUBSTEP_BUCKETS ? steps : PI_SUBSTEP_BUCKETS - 1]++;
                         }
@@ -854,7 +877,7 @@ void game_loop() {
                     }
 
                     if (song_loaded) unpause_playback_mp3();
-                    pi_reset();
+                    sync_precise_input(false);
                     fixed_dt = true;
                     state.dead = false;
                     state.hitbox_display = 0;

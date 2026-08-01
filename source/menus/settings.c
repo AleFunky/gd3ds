@@ -125,7 +125,7 @@ Setting settings[] = {
     {
         .id = "preciseInput",
         .label = "240Hz input (CBF)",
-        .additionalInfo = "Registers jumps on the exact 240Hz<p>physics tick they were pressed on.",
+        .additionalInfo = "Registers jumps on the exact 240Hz<p>physics tick they were pressed on.<p>Precision is reduced below 30fps.",
         .page = PAGE_INPUT,
 
         .defaultValue = false,
