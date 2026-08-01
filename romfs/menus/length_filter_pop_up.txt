@@ -13,33 +13,33 @@ window x=160 y=120 w=260 h=140 style=0
     window x=0 y=25 w=230 h=40 style=2 color="#4f251262" tag="button"
 
     # TINY
-    button x=-104 y=25 w=25 h=8 tag="length_filter" tag="button"
+    button x=-88 y=25 w=35 h=11 invisible=1 tag="length_filter" tag="button"
     {
-        label x=0 y=0 align=CENTER scale=0.44 text="Tiny"
+        label x=0 y=0 align=CENTER scale=0.44 text="Tiny" tag="button"
     }
 
     # SHORT
-    button x=-66 y=25 w=25 h=8 tag="length_filter" tag="button"
+    button x=-43 y=25 w=45 h=11 invisible=1 tag="length_filter" tag="button"
     {
-        label x=0 y=0 align=CENTER scale=0.44 text="Short"
+        label x=0 y=0 align=CENTER scale=0.44 text="Short" tag="button"
     }
 
     # MEDIUM
-    button x=-15 y=25 w=25 h=8 tag="length_filter" tag="button"
+    button x=11 y=25 w=52 h=11 invisible=1 tag="length_filter" tag="button"
     {
-        label x=0 y=0 align=CENTER scale=0.44 text="Medium"
+        label x=0 y=0 align=CENTER scale=0.44 text="Medium" tag="button"
     }
 
     # LARGE
-    button x=42 y=25 w=25 h=8 tag="length_filter" tag="button"
+    button x=59 y=25 w=36 h=11 invisible=1 tag="length_filter" tag="button"
     {
-        label x=0 y=0 align=CENTER scale=0.44 text="Long"
+        label x=0 y=0 align=CENTER scale=0.44 text="Long" tag="button"
     }
 
     # XL
-    button x=83 y=25 w=25 h=8 tag="length_filter" tag="button"
+    button x=93 y=25 w=20 h=11 invisible=1 tag="length_filter" tag="button"
     {
-        label x=0 y=0 align=CENTER scale=0.44 text="XL"
+        label x=0 y=0 align=CENTER scale=0.44 text="XL" tag="button"
     }
 
 }
