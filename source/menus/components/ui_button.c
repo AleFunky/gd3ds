@@ -182,10 +182,10 @@ void ui_button_set_text(UIButton *e, const char *text) {
 }
 
 void ui_button_set_image(UIButton *e, int sprite_index, int sheet) {
+    if (!e || e->invisible) return;
+
     C2D_SpriteFromSheet(&e->image.sprite, *get_sheet(sheet), sprite_index);
     C3D_TexSetFilter(e->image.sprite.image.tex, GPU_LINEAR, GPU_LINEAR);
-
-    if (!e || e->invisible) return;
 
     e->base.w = e->image.sprite.image.subtex->width;
     e->base.h = e->image.sprite.image.subtex->height;
