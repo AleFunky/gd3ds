@@ -166,6 +166,8 @@ typedef struct {
     char text[512];
     float alignment;
 
+    float originalScale;
+
     int font;
     bool parse_tags;
 } UILabel;

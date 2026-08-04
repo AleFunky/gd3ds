@@ -414,7 +414,6 @@ void level_complete_init() {
         }
         
         ui_label_set_text(completion_text, text);
-        ui_label_set_scale_from_width(completion_text, text, COMPLETION_TEXT_MAX_WIDTH);
     } else {
         ui_run_func_on_tag(&screen_top, "funnytext", ui_disable_element);
 

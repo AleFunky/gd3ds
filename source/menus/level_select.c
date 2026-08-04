@@ -33,6 +33,7 @@ int curr_level_id = 0;
 
 s8 scroll_dir = 0;
 
+float anim_duration = 1.f;
 float anim_time = 0;
 
 static bool dragging;
@@ -190,7 +191,6 @@ void update_level_name(int level, int card) {
     ui_element_set_scale((UIElement *) e, 1.f);
 
     ui_label_set_text(e, main_levels[level].level_name);
-    ui_label_set_scale_from_width(e, main_levels[level].level_name, level_card_window->base.base.w * 0.85f);
 }
 
 void update_level_stars(int level, int card) {
@@ -245,7 +245,7 @@ void recenter(){
 
 void handle_card_movement() {
     if (!dragging) {
-        if (anim_time > ANIM_DURATION) {
+        if (anim_time > anim_duration) {
             update_level_name(curr_level_id, 0);
             update_level_stars(curr_level_id, 0);
             update_level_progress(curr_level_id, 0);
@@ -262,7 +262,7 @@ void handle_card_movement() {
         float start = (scroll_dir == 0) ? dragDistance : dragDistance * scroll_dir;
         float end = (scroll_dir == 0) ? 0 : 320;
 
-        float fade_value = easeValue(ELASTIC_OUT, start, end, anim_time, ANIM_DURATION, 0.6f);
+        float fade_value = easeValue(ELASTIC_OUT, start, end, anim_time, anim_duration, 0.6f);
 
         float value = (scroll_dir == 0) ? 160 + fade_value : 160 + fade_value * scroll_dir;
         anim_time += 0.016666f;
@@ -276,6 +276,7 @@ void action_move_right(UIElement* e) {
     curr_level_id++;
     scroll_dir = -1;
     anim_time = 0;
+    anim_duration = 1.f;
     
     if (curr_level_id >= MAIN_LEVELS_NUM) curr_level_id = 0;
     
@@ -301,6 +302,7 @@ void action_move_left(UIElement* e) {
     curr_level_id--;
     scroll_dir = 1;
     anim_time = 0;
+    anim_duration = 1.f;
 
     if (curr_level_id < 0) curr_level_id = MAIN_LEVELS_NUM-1;
 
@@ -527,7 +529,8 @@ void level_select_loop() {
                 if(abs(dragXDiff) > 10){
                     dragging = true;
                     scroll_dir = 0;
-                    anim_time = ANIM_DURATION;
+                    anim_duration = 1.f;
+                    anim_time = anim_duration;
                     dragDistance = 0;
                     dragDir = 0;
                     cardCorrection = true;
@@ -540,8 +543,10 @@ void level_select_loop() {
             if(dragging){
                 if(dragDir == -1){
                     action_move_left(NULL);
+                    anim_duration = 0.5f;
                 } else if(dragDir == 1){
                     action_move_right(NULL);
+                    anim_duration = 0.5f;
                 } else{
                     scroll_dir = 0;
                     anim_time = 0.f;

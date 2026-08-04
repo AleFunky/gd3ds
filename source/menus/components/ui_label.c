@@ -33,14 +33,12 @@ static void ui_label_destroy(UIElement* e) {
     }
 }
 
-void ui_label_set_text(UILabel *e, const char *text) {
+void ui_label_set_scale_from_width(UILabel *e, const char *text) {
     if (!e || !text) return;
 
-    strncpy(e->text, text, sizeof(e->text) - 1);
-}
+    int width = e->base.w;
 
-void ui_label_set_scale_from_width(UILabel *e, const char *text, float width) {
-    if (!e || !text) return;
+    if(width == 0) return;
 
     int font_id = e->font;
 
@@ -51,25 +49,38 @@ void ui_label_set_scale_from_width(UILabel *e, const char *text, float width) {
 
     float text_scale;
 
-    float scaleX = e->base.scaleX;
+    e->base.scaleX = e->originalScale;
+    e->base.scaleY = e->originalScale;
 
-    if (scaleX == 0) return;
+    float scale = e->originalScale;
+
+    if (scale == 0) return;
 
     // Get text length in pixels
-    float length = get_longest_line_length(font->charset, scaleX, text);
+    float length = get_longest_line_length(font->charset, scale, text);
 
     if (length == 0) return;
 
     if (width < length) {
-        text_scale = scaleX * (width / length);
+        text_scale = scale * (width / length);
     } else {
-        text_scale = scaleX;
+        text_scale = scale;
     }
 
-    float factor = text_scale / scaleX;
+    float factor = text_scale / scale;
 
     e->base.scaleX *= factor;
     e->base.scaleY *= factor;
+}
+
+void ui_label_set_text(UILabel *e, const char *text) {
+    if (!e || !text) return;
+
+    strncpy(e->text, text, sizeof(e->text) - 1);
+
+    if(e->base.w > 0){
+        ui_label_set_scale_from_width(e, text);
+    }
 }
 
 UILabel *ui_create_label(const UIContext *ctx) {
@@ -98,6 +109,8 @@ UIElement *ui_create_label_from_props(const UIContext *ctx, const UIPropertyList
     if (!label) return NULL;
 
     ui_element_apply_properties(&label->base, ctx, props);
+    
+    label->originalScale = ui_prop_float(props, "scale", 1.0f);
 
     ui_label_set_text(label, ui_prop_string(props, "text", ""));
     

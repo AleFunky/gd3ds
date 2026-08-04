@@ -20,11 +20,11 @@ bool originalFilter = false;
 bool unratedFilter = false;
 bool ratedFilter = false;
 bool featuredFilter = false;
-bool songFilter = false;
-bool lengthFilter = false;
-bool customSelected = false;
-int normalSongId = 0;
-char songFilterId[127];
+bool song_filter_enabled = false;
+bool length_filter_enabled = false;
+bool custom_song = false;
+int normal_song_id_selected = 0;
+char custom_song_id[127];
 
 static UIScreen screen = {
     .isBottom = true
@@ -58,10 +58,10 @@ void reset_search_filters() {
     unratedFilter = false;
     ratedFilter = false;
     featuredFilter = false;
-    songFilter = false;
-    customSelected = false;
-    normalSongId = 0;
-    strncpy(songFilterId, "", sizeof(songFilterId) - 1);
+    song_filter_enabled = false;
+    custom_song = false;
+    normal_song_id_selected = 0;
+    strncpy(custom_song_id, "", sizeof(custom_song_id) - 1);
     yes_exit = true;
     cfg_save();
 }

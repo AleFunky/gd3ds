@@ -28,9 +28,9 @@ void exit_length_filter(UIElement* e) {
 }
 
 void length_filter(UIElement *e) {
-    lengthFilter = ((UICheckBox *)e)->checked;
+    length_filter_enabled = ((UICheckBox *)e)->checked;
 
-    ui_run_func_on_tag(&screen, "button", lengthFilter ? ui_enable_element : ui_disable_element);
+    ui_run_func_on_tag(&screen, "button", length_filter_enabled ? ui_enable_element : ui_disable_element);
 }
 
 static UIAction actions[] = {
@@ -43,9 +43,9 @@ void length_filter_init() {
     ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/length_filter_pop_up.txt");
     ui_screen_open(&screen, ANIM_ZOOM);
     
-    ui_run_func_on_tag(&screen, "button", lengthFilter ? ui_enable_element : ui_disable_element);
+    ui_run_func_on_tag(&screen, "button", length_filter_enabled ? ui_enable_element : ui_disable_element);
 
-    if (!lengthFilter){
+    if (!length_filter_enabled){
         for (int i = 0; i < ARRAY_LEN(length_tags); i++)
         {
             ui_run_func_on_tag(&screen, length_tags[i], ui_disable_element);
@@ -54,7 +54,7 @@ void length_filter_init() {
 
     UICheckBox *checkbox = (UICheckBox *)ui_get_element_by_tag(&screen, "chk_length");
     if (checkbox) {
-            checkbox->checked = lengthFilter;
+            checkbox->checked = length_filter_enabled;
             ui_set_checkbox_checked(checkbox, checkbox->checked);
         }
 
@@ -70,7 +70,7 @@ int length_filter_loop() {
     };
 
     
-    if (!lengthFilter) {
+    if (!length_filter_enabled) {
         ui_run_func_on_tag(&screen, "button", ui_disable_element);
         for (int i = 0; i < ARRAY_LEN(length_tags); i++)
         {
