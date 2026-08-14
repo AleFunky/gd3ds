@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "3ds/env.h"
+#include "3ds/services/cfgu.h"
 #include "objects.h"
 #include "level_loading.h"
 #include "main.h"
@@ -1294,6 +1295,7 @@ int main(int argc, char* argv[]) {
     osSetSpeedupEnable(1);
 
     cfg_init();
+    cfguInit();
 
     // Sort out wide / 3D before making the targets, they need different sizes
     apply_screen_modes();

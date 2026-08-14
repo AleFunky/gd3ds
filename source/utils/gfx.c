@@ -325,9 +325,9 @@ bool begin_top_eye(int eye) {
     drawing_top_eye = true;
 
     C3D_RenderTarget *target = (eye == EYE_RIGHT ? top_right : top);
-
-    C2D_TargetClear(target, C2D_Color32(0, 0, 0, 255));
+    
     C2D_SceneBegin(target);
+    C2D_TargetClear(target, C2D_Color32(0, 0, 0, 255));
 
     return true;
 }
