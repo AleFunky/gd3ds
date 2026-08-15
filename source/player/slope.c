@@ -190,6 +190,7 @@ void slope_snap_y(int obj, Player *player) {
 
             player->time_since_ground = 0;
             player->on_ground = true;
+            player_non_flying_landing(player);
             
             if (player->vel_y < 0) {
                 player->vel_y = 0;
@@ -204,6 +205,7 @@ void slope_snap_y(int obj, Player *player) {
             
             player->time_since_ground = 0;
             player->on_ground = true;
+            player_non_flying_landing(player);
             
             if (player->vel_y < 0) {
                 player->vel_y = 0;

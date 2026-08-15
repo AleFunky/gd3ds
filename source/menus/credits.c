@@ -75,10 +75,10 @@ void credits_init() {
                 // Contibutor name
                 UILabel *name = ui_create_label(&screen.ctx);
                 if (name) {
+                    name->base.w = list->base.w - 12;
                     ui_label_set_text(name, contributor);
                     ui_element_set_position((UIElement *) name, -list_width + 3, 0);
                     ui_element_set_scale((UIElement *) name, 0.5f);
-                    ui_label_set_scale_from_width(name, contributor, list->base.w - 12);
                     
                     // name->font = 2;
 

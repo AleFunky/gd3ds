@@ -775,6 +775,8 @@ void game_loop() {
                     }
 
                     if (state.dead) break;
+                    
+                    handle_auto_checkpoints(STEPS_DT);
 
                     if (state.dual) {
                         // Run second player
@@ -790,7 +792,6 @@ void game_loop() {
                     run_camera();
                     handle_bg_flash();
                     handle_respawn_effect();
-                    handle_auto_checkpoints(STEPS_DT);
 
                     u64 end_physics = svcGetSystemTick();
                     float physics_time = (end_physics - start_physics) / (CPU_TICKS_PER_MSEC);
