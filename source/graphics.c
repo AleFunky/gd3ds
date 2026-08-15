@@ -963,6 +963,7 @@ void change_blending(bool blending) {
             GPU_ONE, GPU_ZERO
         );
 
+        C2D_Prepare();
         C3D_TexEnv *env = C3D_GetTexEnv(4);
         C3D_TexEnvInit(env);
         C3D_TexEnvSrc(env, C3D_Alpha, GPU_PREVIOUS, GPU_PREVIOUS, 0);
@@ -974,13 +975,10 @@ void change_blending(bool blending) {
             GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, 
             GPU_ONE, GPU_ZERO);
         
+        C2D_Prepare();
         C3D_TexEnv *env = C3D_GetTexEnv(4);
         C3D_TexEnvInit(env);
     }
-
-    // Draw dummy image for changes to apply
-    C2D_Image dummy = C2D_SpriteSheetGetImage(spriteSheet, 0);
-    C2D_DrawImageAt(dummy, 0, 0, 0, NULL, 0, 0);
 
     blending_state = blending;
 }

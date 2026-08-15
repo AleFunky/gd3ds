@@ -12,16 +12,19 @@ typedef enum {
 
 typedef struct {
     const char *id;      
-    const char *label;
-    const char *additionalInfo;
+    const char *label;          // Setting name
+    const char *additionalInfo; // Extra info popup message
        
     SettingPage page;
 
     bool defaultValue;
-    bool *var;
-    const char *key;
+    bool *var;       // Pointer to the value that will contain the setting's value
+    const char *key; // Config file key
 
     void (*onChanged)(bool);
+
+    bool disabledForceValue; // Value that will be forced upon the condition failing
+    bool (*condition)();
 } Setting;
 
 typedef struct {
@@ -47,9 +50,11 @@ typedef struct {
     bool noWaveTrailBehind;
     bool doNot;
     bool practiceMusicSync;
+    bool autoCheckpoints;
+    bool quickCheckpoints;
 } SettingState;
 
-extern Setting settings[23];
+extern Setting settings[25];
 extern SettingState settingsState;
 
 void settings_init();

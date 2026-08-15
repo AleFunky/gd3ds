@@ -1,5 +1,6 @@
 #include <3ds.h>
 #include <citro2d.h>
+#include "3ds/services/cfgu.h"
 #include "main.h"
 #include "menus/components/ui_button.h"
 #include "menus/components/ui_label.h"
@@ -19,6 +20,7 @@
 #include "utils/gfx.h"
 #include "utils/json_config.h"
 #include "utils/precise_input.h"
+#include "utils/utils.h"
 
 static bool yes_exit = false;
 
@@ -47,6 +49,20 @@ const char *category_names[] = {
     "Cosmetic"
 };
 
+// Conditions
+
+bool condition_supports_wide() {
+    u8 model = get_model();
+
+    return model != CFG_MODEL_2DS && !is_citra();
+}
+
+bool condition_supports_3D() {
+    u8 model = get_model();
+
+    return model != CFG_MODEL_2DS && model != CFG_MODEL_N2DSXL;
+}
+
 Setting settings[] = {
     {
         .id = "wideEnabled",
@@ -58,7 +74,10 @@ Setting settings[] = {
         .var = &settingsState.wideEnabled,
         .key = CONFIG_GRAPHICS_PATH "wideEnabled",
 
-        .onChanged = wide_setting
+        .onChanged = wide_setting,
+        
+        .disabledForceValue = false,
+        .condition = condition_supports_wide
     },
     {
         .id = "stereoEnabled",
@@ -66,11 +85,14 @@ Setting settings[] = {
         .additionalInfo = "Adds depth to the top screen.<p>Use the 3D slider, costs some FPS.",
         .page = PAGE_GRAPHICS, 
 
-        .defaultValue = false,
+        .defaultValue = true,
         .var = &settingsState.stereoEnabled,
         .key = CONFIG_GRAPHICS_PATH "stereoEnabled",
 
-        .onChanged = stereo_setting
+        .onChanged = stereo_setting,
+
+        .disabledForceValue = false,
+        .condition = condition_supports_3D
     },
     {
         .id = "particlesDisabled",
@@ -233,6 +255,26 @@ Setting settings[] = {
         .defaultValue = false,
         .var = &settingsState.quickRetry,
         .key = CONFIG_GAMEPLAY_PATH "quickRetry"
+    },
+    {
+        .id = "autoCheckpoints",
+        .label = "Auto checkpoints",
+        .additionalInfo = NULL,
+        .page = PAGE_GAMEPLAY, 
+
+        .defaultValue = false,
+        .var = &settingsState.autoCheckpoints,
+        .key = CONFIG_GAMEPLAY_PATH "autoCheckpoints"
+    },
+    {
+        .id = "quickCheckpoints",
+        .label = "Quick checkpoints",
+        .additionalInfo = "Makes auto checkpoints appear quicker.",
+        .page = PAGE_GAMEPLAY, 
+
+        .defaultValue = false,
+        .var = &settingsState.quickCheckpoints,
+        .key = CONFIG_GAMEPLAY_PATH "quickCheckpoints"
     },
     {
         .id = "switchTrailColor",
@@ -452,6 +494,11 @@ void load_category(SettingPage page) {
     int count = 0;
     for (int i = 0; i < ARRAY_LEN(settings); i++) {
         Setting *setting = &settings[i];
+
+        // Do not make this setting appear if the condition is false
+        if (setting->condition && !setting->condition()) {
+            continue;
+        }
 
         if (setting->page == page) {
             create_setting(setting, count);

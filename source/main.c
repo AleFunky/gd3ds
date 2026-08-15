@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "3ds/env.h"
+#include "3ds/services/cfgu.h"
 #include "objects.h"
 #include "level_loading.h"
 #include "main.h"
@@ -125,6 +126,7 @@ float faster_speed_particles_timer = 0.f;
 
 bool alt_title_screen;
 
+// Checks if the game is being emulated by citra/azahar
 bool is_citra() {
     s64 version = 0;
     svcGetSystemInfo(&version, CITRA_TYPE, CITRA_VERSION);
@@ -788,6 +790,7 @@ void game_loop() {
                     run_camera();
                     handle_bg_flash();
                     handle_respawn_effect();
+                    handle_auto_checkpoints(STEPS_DT);
 
                     u64 end_physics = svcGetSystemTick();
                     float physics_time = (end_physics - start_physics) / (CPU_TICKS_PER_MSEC);
@@ -1090,7 +1093,7 @@ void game_loop() {
                 C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
                 C2D_ViewScale(1/SCALE, 1/SCALE);
 
-                begin_eye_layer(DEPTH_UI);
+                begin_eye_layer(DEPTH_POPUP);
                 gameplay_screen_top_loop();
                 draw_level_complete_top();
                 end_eye_layer();
@@ -1294,6 +1297,7 @@ int main(int argc, char* argv[]) {
     osSetSpeedupEnable(1);
 
     cfg_init();
+    cfguInit();
 
     // Sort out wide / 3D before making the targets, they need different sizes
     apply_screen_modes();

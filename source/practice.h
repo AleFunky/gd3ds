@@ -1,5 +1,7 @@
 #pragma once
 
+#define AUTO_CHECKPOINT_TIME 1.f
+
 extern int checkpoint_count;
 extern int checkpoint_pointer;
 
@@ -13,3 +15,6 @@ void delete_last_checkpoint();
 void handle_practice_mode();
 void draw_checkpoints();
 void clear_practice_mode();
+
+void handle_auto_checkpoints(float delta);
+void set_checkpoint_timer(float timer);

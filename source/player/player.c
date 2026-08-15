@@ -92,6 +92,17 @@ const float cube_rotation_speed[2] = {
     540.f
 };
 
+bool player_gamemode_is_flying(Player *player) {
+    return player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_BIRD || player->gamemode == GAMEMODE_DART;
+}
+
+void player_non_flying_landing(Player *player) {
+    if (!player_gamemode_is_flying(player)) {
+        player->landed_from_jump = player->jumped;
+        player->jumped = false;
+    }
+}
+
 float player_get_vel(Player *player, float vel) {
     return vel * (player->upside_down ? -1 : 1);
 }
@@ -202,6 +213,7 @@ void cube_gamemode(Player *player) {
     
         player->on_ground = false;
         player->consecutive_jumps++;
+        player->jumped = true;
         
         state.current_data.jumps++;
     
@@ -413,6 +425,7 @@ void ball_gamemode(Player *player) {
         player->ball_rotation_speed = -BALL_SLOW_ROTATION;
 
         player->on_ground = false;
+        player->jumped = true;
     }
     
     player->rotation += player->ball_rotation_speed * get_ball_rotation_speed(player) * mult * STEPS_DT;
@@ -590,6 +603,7 @@ void run_player(Player *player) {
             } else {
                 player->on_ground = true;          
                 player->inverse_rotation = false;
+                player_non_flying_landing(player);
             }
             player->time_since_ground = 0; 
         } 
@@ -599,6 +613,7 @@ void run_player(Player *player) {
             if (player->upside_down) {
                 player->on_ground = true;
                 player->inverse_rotation = false;
+                player_non_flying_landing(player);
             } else {
                 player->on_ceiling = true;     
                 player->inverse_rotation = false;     
@@ -764,6 +779,7 @@ void handle_player(Player *player) {
     
     player->on_ground = false;
     player->on_ceiling = false;
+    player->landed_from_jump = false;
 
     player->velocity_override = false;
 

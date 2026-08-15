@@ -506,7 +506,9 @@ void main_menu_loop() {
 
                 begin_eye_layer(DEPTH_UI);
                 ui_screen_draw(&default_screen_top);
+                end_eye_layer();
 
+                begin_eye_layer(DEPTH_POPUP);
                 if (in_how_to_play) draw_how_to_play_top();
                 end_eye_layer();
             }

@@ -12,10 +12,34 @@ window x=160 y=120 w=260 h=140 style=0
 
     window x=0 y=25 w=230 h=40 style=2 color="#4f251262" tag="button"
 
-    label y=25 x=-104 align=LEFT scale=0.44 text="Tiny" tag="button"
-    label y=25 x=-66 align=LEFT scale=0.44 text="Short" tag="button"
-    label y=25 x=-15 align=LEFT scale=0.44 text="Medium" tag="button"
-    label y=25 x=42 align=LEFT scale=0.44 text="Long" tag="button"
-    label y=25 x=83 align=LEFT scale=0.44 text="XL" tag="button"
+    # TINY
+    button x=-88 y=25 w=35 h=11 invisible=1 tag="length_filter" tag="button"
+    {
+        label x=0 y=0 align=CENTER scale=0.44 text="Tiny" tag="button"
+    }
+
+    # SHORT
+    button x=-43 y=25 w=45 h=11 invisible=1 tag="length_filter" tag="button"
+    {
+        label x=0 y=0 align=CENTER scale=0.44 text="Short" tag="button"
+    }
+
+    # MEDIUM
+    button x=11 y=25 w=52 h=11 invisible=1 tag="length_filter" tag="button"
+    {
+        label x=0 y=0 align=CENTER scale=0.44 text="Medium" tag="button"
+    }
+
+    # LARGE
+    button x=59 y=25 w=36 h=11 invisible=1 tag="length_filter" tag="button"
+    {
+        label x=0 y=0 align=CENTER scale=0.44 text="Long" tag="button"
+    }
+
+    # XL
+    button x=93 y=25 w=20 h=11 invisible=1 tag="length_filter" tag="button"
+    {
+        label x=0 y=0 align=CENTER scale=0.44 text="XL" tag="button"
+    }
 
 }

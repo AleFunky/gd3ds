@@ -81,6 +81,7 @@ void songs_init() {
                     ui_label_set_text(song, title);
                     ui_element_set_position((UIElement *) song, -list_width + 6, - 5);
                     ui_element_set_scale((UIElement *) song, 0.54f);
+                    ui_label_set_scale_from_width(song, title, list->base.w - 12);
                     
                     // song->font = 2;
 

@@ -175,6 +175,8 @@ static void restart_level() {
     if (state.practice_mode) {
         if (checkpoint_count > 0) {
             restore_checkpoint();
+        } else {
+            seek_mp3(level_info.song_offset);
         }
     } else if (song_loaded) seek_mp3(level_info.song_offset);
 
