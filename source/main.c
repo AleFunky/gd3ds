@@ -1093,7 +1093,7 @@ void game_loop() {
                 C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
                 C2D_ViewScale(1/SCALE, 1/SCALE);
 
-                begin_eye_layer(DEPTH_UI);
+                begin_eye_layer(DEPTH_POPUP);
                 gameplay_screen_top_loop();
                 draw_level_complete_top();
                 end_eye_layer();

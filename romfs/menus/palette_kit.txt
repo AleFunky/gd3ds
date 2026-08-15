@@ -1,6 +1,6 @@
 darken opacity=0.4 darkenTime=0.15
 window x=160 y=120 w=260 h=200 style=3
-button x=40 y=30 id=31 scale=0.8 action="exit" keyBinds="B"
+button x=33 y=24 id=31 scale=0.8 action="exit" keyBinds="B"
 window x=160 y=70 w=200 h=40 style=2 tag="bg_window"
 
 windowbutton x=92 y=38 w=65 h=20 style=5 text="Color 1" hoverFactor=0.5 tag="color_buttons,p1" action="action_p1" textScale=0.4

@@ -471,7 +471,7 @@ void create_setting(Setting *setting, int id) {
                     ui_element_set_userdata((UIElement *) info, data);
 
                     ui_element_set_position((UIElement *) info, list_width -+ 13, 0);
-                    ui_element_set_scale((UIElement *) info, 0.5f);
+                    ui_element_set_scale((UIElement *) info, 0.6f);
                     ui_element_set_action((UIElement *) info, info_action);
 
                     ui_button_set_image(info, 90, 0);
