@@ -1,6 +1,6 @@
 #pragma once
 
-#define AUTO_CHECKPOINT_TIME 2.f
+#define AUTO_CHECKPOINT_TIME 1.f
 
 extern int checkpoint_count;
 extern int checkpoint_pointer;
