@@ -34,7 +34,7 @@ void load_user_config(Config *cfg) {
 
         // Ensure the default value if the condition is false
         if (setting->condition && !setting->condition()) {
-            *setting->var = setting->defaultValue;
+            *setting->var = setting->disabledForceValue;
         } else {
             *setting->var = 
                 config_get_bool(cfg,
@@ -54,7 +54,7 @@ void save_user_config(Config *cfg) {
             config_set_bool(
                 cfg,
                 setting->key,
-                setting->defaultValue
+                setting->disabledForceValue
             );
         } else {
             config_set_bool(

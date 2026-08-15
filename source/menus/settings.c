@@ -75,6 +75,8 @@ Setting settings[] = {
         .key = CONFIG_GRAPHICS_PATH "wideEnabled",
 
         .onChanged = wide_setting,
+        
+        .disabledForceValue = false,
         .condition = condition_supports_wide
     },
     {
@@ -83,11 +85,13 @@ Setting settings[] = {
         .additionalInfo = "Adds depth to the top screen.<p>Use the 3D slider, costs some FPS.",
         .page = PAGE_GRAPHICS, 
 
-        .defaultValue = false,
+        .defaultValue = true,
         .var = &settingsState.stereoEnabled,
         .key = CONFIG_GRAPHICS_PATH "stereoEnabled",
 
         .onChanged = stereo_setting,
+
+        .disabledForceValue = false,
         .condition = condition_supports_3D
     },
     {
