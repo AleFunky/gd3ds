@@ -268,7 +268,11 @@ static void set_song_id(char *gmd) {
             snprintf(tmp, sizeof(tmp), "Using song: %d.mp3 (NOT FOUND)", custom_song_id);
         }
     } else {
-        snprintf(tmp, sizeof(tmp), "Using song: %s", main_levels[song_id].level_name);
+        char *song_name = "Unknown";
+        if (song_id < MAIN_LEVELS_NUM) {
+            song_name = main_levels[song_id].level_name;
+        }
+        snprintf(tmp, sizeof(tmp), "Using song: %s", song_name);
     }
 
     ui_label_set_text(song_label, tmp);
