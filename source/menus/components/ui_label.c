@@ -26,10 +26,10 @@ static void ui_label_draw(UIElement* e, UITransform *transform) {
 
     float scale = transform->scaleX;
 
-    int width = e->w * transform->scaleX;
+    int width = e->w;
 
-    if(width > 0){
-        float length = get_longest_line_length(font->charset, scale, label->text);
+    if (width > 0){
+        float length = get_longest_line_length(font->charset, e->scaleX, label->text);
 
         if (width < length && length > 0) {
             scale *= (width / length);

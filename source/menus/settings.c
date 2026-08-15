@@ -413,7 +413,7 @@ void create_setting(Setting *setting, int id) {
 
             UILabel *name = ui_create_label(&screen.ctx);
             if (name) {
-                name->base.w = 130;
+                name->base.w = list->base.w - 60;
                 ui_label_set_text(name, setting->label);
                 ui_element_set_position((UIElement *) name, -list_width + 28, 0);
                 ui_element_set_scale((UIElement *) name, 0.38f);
