@@ -4,6 +4,7 @@
 #include "main.h"
 #include "state.h"
 #include "menus/settings.h"
+#include "utils/utils.h"
 
 void set_scissor(GPU_SCISSORMODE mode, int x, int y, int width, int height) {
     int screen_width = GSP_SCREEN_HEIGHT_BOTTOM;
@@ -140,8 +141,7 @@ void draw_9_slice(const C2D_Image atlas, const float x, const float y, const flo
                 GX_TRANSFER_IN_FORMAT(GX_TRANSFER_FMT_RGBA8) | GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGB8))
 
 C3D_RenderTarget* C2D_CreateScreenTargetExt(gfxScreen_t screen, gfx3dSide_t side, bool aa) {
-    u8 model;
-    CFGU_GetSystemModel(&model);
+    u8 model = getModel();
     bool wide = settingsState.wideEnabled && model != CFG_MODEL_2DS && !is_citra() && screen == GFX_TOP;
 
     int height;
@@ -254,8 +254,7 @@ void update_stereo_target() {
 }
 
 void set_wide(bool wide) {
-    u8 model;
-    CFGU_GetSystemModel(&model);
+    u8 model = getModel();
     if (model != CFG_MODEL_2DS && !is_citra()) {
         settingsState.wideEnabled = wide;
         gfxSetWide(wide);
@@ -264,8 +263,7 @@ void set_wide(bool wide) {
 
 // Neither 2DS has a second eye
 bool stereo_supported() {
-    u8 model;
-    CFGU_GetSystemModel(&model);
+    u8 model = getModel();
     return model != CFG_MODEL_2DS && model != CFG_MODEL_N2DSXL;
 }
 

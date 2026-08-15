@@ -126,6 +126,7 @@ float faster_speed_particles_timer = 0.f;
 
 bool alt_title_screen;
 
+// Checks if the game is being emulated by citra/azahar
 bool is_citra() {
     s64 version = 0;
     svcGetSystemInfo(&version, CITRA_TYPE, CITRA_VERSION);

@@ -1,5 +1,6 @@
 #include <3ds.h>
 #include <citro2d.h>
+#include "3ds/services/cfgu.h"
 #include "main.h"
 #include "menus/components/ui_button.h"
 #include "menus/components/ui_label.h"
@@ -19,6 +20,7 @@
 #include "utils/gfx.h"
 #include "utils/json_config.h"
 #include "utils/precise_input.h"
+#include "utils/utils.h"
 
 static bool yes_exit = false;
 
@@ -47,6 +49,20 @@ const char *category_names[] = {
     "Cosmetic"
 };
 
+// Conditions
+
+bool conditionSupportsWide() {
+    u8 model = getModel();
+
+    return model != CFG_MODEL_2DS && !is_citra();
+}
+
+bool conditionSupports3D() {
+    u8 model = getModel();
+
+    return model != CFG_MODEL_2DS && model != CFG_MODEL_N2DSXL;
+}
+
 Setting settings[] = {
     {
         .id = "wideEnabled",
@@ -58,7 +74,8 @@ Setting settings[] = {
         .var = &settingsState.wideEnabled,
         .key = CONFIG_GRAPHICS_PATH "wideEnabled",
 
-        .onChanged = wide_setting
+        .onChanged = wide_setting,
+        .condition = conditionSupportsWide
     },
     {
         .id = "stereoEnabled",
@@ -70,7 +87,8 @@ Setting settings[] = {
         .var = &settingsState.stereoEnabled,
         .key = CONFIG_GRAPHICS_PATH "stereoEnabled",
 
-        .onChanged = stereo_setting
+        .onChanged = stereo_setting,
+        .condition = conditionSupports3D
     },
     {
         .id = "particlesDisabled",
@@ -451,6 +469,11 @@ void load_category(SettingPage page) {
     int count = 0;
     for (int i = 0; i < ARRAY_LEN(settings); i++) {
         Setting *setting = &settings[i];
+
+        // Do not make this setting appear if the condition is false
+        if (setting->condition && !setting->condition()) {
+            continue;
+        }
 
         if (setting->page == page) {
             create_setting(setting, count);

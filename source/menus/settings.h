@@ -22,6 +22,7 @@ typedef struct {
     const char *key;
 
     void (*onChanged)(bool);
+    bool (*condition)();
 } Setting;
 
 typedef struct {

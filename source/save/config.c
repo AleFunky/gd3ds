@@ -30,21 +30,39 @@ void init_user_config(Config *cfg) {
 
 void load_user_config(Config *cfg) {
     for (int i = 0; i < ARRAY_LEN(settings); i++) {
-        *settings[i].var = 
-            config_get_bool(cfg,
-                settings[i].key,
-                settings[i].defaultValue
-            );
+        Setting *setting = &settings[i];
+
+        // Ensure the default value if the condition is false
+        if (setting->condition && !setting->condition()) {
+            *setting->var = setting->defaultValue;
+        } else {
+            *setting->var = 
+                config_get_bool(cfg,
+                    setting->key,
+                    setting->defaultValue
+                );
+        }
     }
 }
 
 void save_user_config(Config *cfg) {
     for (int i = 0; i < ARRAY_LEN(settings); i++) {
-        config_set_bool(
-            cfg,
-            settings[i].key,
-            *settings[i].var
-        );
+        Setting *setting = &settings[i];
+        
+        // Ensure the default value if the condition is false
+        if (setting->condition && !setting->condition()) {
+            config_set_bool(
+                cfg,
+                setting->key,
+                setting->defaultValue
+            );
+        } else {
+            config_set_bool(
+                cfg,
+                setting->key,
+                *setting->var
+            );
+        }
     }
 }
 
