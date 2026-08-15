@@ -3,7 +3,7 @@
 This is a demake of the popular mobile game **Geometry Dash** for the **Nintendo 3DS**.
 
 Geometry Dash and its respective resources are by RobTop Games.
-<img width="1460" height="480" alt="Main Menu" src="https://github.com/user-attachments/assets/6653aa04-c45b-4f02-b64a-3e15167386ea" />
+<img width="1460" height="480" alt="Main Menu" src="https://github.com/user-attachments/assets/d802266b-2eb9-4115-870c-0073ed5a50ff" />
 <img width="1460" height="480" alt="Icon Kit" src="https://github.com/user-attachments/assets/d55b2434-4f4b-4136-bab8-668f5e8e62c7" />
 <img width="1460" height="480" alt="Gameplay" src="https://github.com/user-attachments/assets/cec39d8a-0326-4924-a8f0-20c90dc403fa" />
 <img width="1460" height="480" alt="Pause Menu" src="https://github.com/user-attachments/assets/05b43079-c36e-4ce9-a433-61bd6dbfb9c8" />
