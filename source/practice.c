@@ -170,7 +170,7 @@ void restore_checkpoint() {
     memcpy(col_trigger_buffer, check->col_trigger_buffer, sizeof(col_trigger_buffer));
 
     update_attempt_text_pos();
-    
+
     set_checkpoint_timer(AUTO_CHECKPOINT_TIME);
 }
 
@@ -218,7 +218,7 @@ void exit_practice_mode() {
 
 void handle_auto_checkpoints(float delta) {
     // Exit if not in practice mode with autocheckpoints enabled
-    if (!(state.practice_mode && settingsState.autoCheckpoints)) return;
+    if (!(state.practice_mode && settingsState.autoCheckpoints) || state.end_wall_anim_playing) return;
     
     if (checkpoint_timer <= 0) {
         switch (state.player.gamemode) {
