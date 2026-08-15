@@ -85,7 +85,7 @@ Setting settings[] = {
         .additionalInfo = "Adds depth to the top screen.<p>Use the 3D slider, costs some FPS.",
         .page = PAGE_GRAPHICS, 
 
-        .defaultValue = true,
+        .defaultValue = false,
         .var = &settingsState.stereoEnabled,
         .key = CONFIG_GRAPHICS_PATH "stereoEnabled",
 
