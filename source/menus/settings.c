@@ -51,14 +51,14 @@ const char *category_names[] = {
 
 // Conditions
 
-bool conditionSupportsWide() {
-    u8 model = getModel();
+bool condition_supports_wide() {
+    u8 model = get_model();
 
     return model != CFG_MODEL_2DS && !is_citra();
 }
 
-bool conditionSupports3D() {
-    u8 model = getModel();
+bool condition_supports_3D() {
+    u8 model = get_model();
 
     return model != CFG_MODEL_2DS && model != CFG_MODEL_N2DSXL;
 }
@@ -75,7 +75,7 @@ Setting settings[] = {
         .key = CONFIG_GRAPHICS_PATH "wideEnabled",
 
         .onChanged = wide_setting,
-        .condition = conditionSupportsWide
+        .condition = condition_supports_wide
     },
     {
         .id = "stereoEnabled",
@@ -88,7 +88,7 @@ Setting settings[] = {
         .key = CONFIG_GRAPHICS_PATH "stereoEnabled",
 
         .onChanged = stereo_setting,
-        .condition = conditionSupports3D
+        .condition = condition_supports_3D
     },
     {
         .id = "particlesDisabled",
