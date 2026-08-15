@@ -2,6 +2,6 @@ button x=160 y=100 id=1 sheet=1 action="level_select" keyBinds="A,START"
 button x=60 y=120 id=79 action="icon_kit" keyBinds="X"
 button x=260 y=120 id=2 sheet=1 action="creator_menu" keyBinds="Y"
 
-button x=190 y=208 id=11 sheet=1 text="" action="settings"
-button x=130 y=208 id=12 sheet=1 text="" action="statistics"
+button x=190 y=208 id=12 sheet=1 text="" action="statistics"
+button x=130 y=208 id=11 sheet=1 text="" action="settings"
 # button x=220 y=208 id=13 sheet=1 text="" action="credits"
