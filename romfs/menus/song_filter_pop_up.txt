@@ -16,24 +16,7 @@ window x=160 y=120 w=260 h=140 style=0
 
     textbox x=0 y=40 w=120 limit=6 title="Input song ID:" tag="songinput"
 
-    label y=40 x=0 align=CENTER scale=0.55 text="01. Stereo Madness" tag="page1"
-    label y=40 x=0 align=CENTER scale=0.55 text="02. Back on Track" tag="page2"
-    label y=40 x=0 align=CENTER scale=0.6 text="03. Polargeist" tag="page3"
-    label y=40 x=0 align=CENTER scale=0.6 text="04. Dry Out" tag="page4"
-    label y=40 x=0 align=CENTER scale=0.5 text="05. Base after Base" tag="page5"
-    label y=40 x=0 align=CENTER scale=0.6ś text="06. Cant let Go" tag="page6"
-    label y=40 x=0 align=CENTER scale=0.6 text="07. Jumper" tag="page7"
-    label y=40 x=0 align=CENTER scale=0.6 text="08. Time Machine" tag="page8"
-    label y=40 x=0 align=CENTER scale=0.6 text="09. Cycles" tag="page9"
-    label y=40 x=0 align=CENTER scale=0.6 text="10. xStep" tag="page10"
-    label y=40 x=0 align=CENTER scale=0.42 text="11. Clutterfunk" tag="page11"
-    label y=40 x=0 align=CENTER scale=0.42 text="12. Theory of Everything" tag="page12"
-    label y=40 x=0 align=CENTER scale=0.42 text="13. Electroman Adventures" tag="page13"
-    label y=40 x=0 align=CENTER scale=0.6 text="14. Clubstep" tag="page14"
-    label y=40 x=0 align=CENTER scale=0.55 text="15. Electrodynamix" tag="page15"
-    label y=40 x=0 align=CENTER scale=0.6 text="16. Hexagon Force" tag="page16"
-    label y=40 x=0 align=CENTER scale=0.5 text="17. Blast Processing" tag="page17"
-    label y=40 x=0 align=CENTER scale=0.41 text="18. Theory of Everything 2" tag="page18"
+    label y=40 x=0 align=CENTER text="01. Stereo Madness" tag="normal_song_text" w=180 scale=0.6
 
     button id=300 x=-110 y=40 action="left" tag="songselector"
     button id=304 x=110 y=40 action="right" tag="songselector"

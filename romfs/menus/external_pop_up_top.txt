@@ -2,7 +2,7 @@ darken opacity=0.4 darkenTime=0.15
 
 window x=200 y=120 w=320 h=160 style=0
 
-label x=55 y=65 text="Unknown" font=0 scale=0.9 align=LEFT tag="levelname"
+label x=55 y=65 text="Unknown" font=0 scale=0.9 align=LEFT tag="levelname" w=200
 
 label x=55 y=87 text="By Unknown" scale=0.7 font=2 align=LEFT tag="creatorname"
 
@@ -15,10 +15,10 @@ label x=200 y=145 font=1 text="No description found." scale=0.8 align=CENTER tag
 label x=345 y=180 font=1 text="<#3F2215>ID: N/A</>" scale=0.8 align=RIGHT tag="levelid"
 
 image id=97 x=75 y=218 scale=0.72 tag="likeimage"
-label x=90 y=220 text="N/A" font=0 scale=0.65 align=LEFT tag="likecount"
+label x=90 y=220 text="N/A" font=0 scale=0.65 align=LEFT tag="likecount" w=60
 
 image id=58 x=175 y=219 scale=0.72
-label x=190 y=220 text="N/A" font=0 scale=0.65 align=LEFT tag="downloadcount"
+label x=190 y=220 text="N/A" font=0 scale=0.65 align=LEFT tag="downloadcount" w=60
 
 image id=184 x=275 y=219 scale=0.76
-label x=290 y=220 text="N/A" font=0 scale=0.65 align=LEFT tag="stars"
+label x=290 y=220 text="N/A" font=0 scale=0.65 align=LEFT tag="stars" w=60

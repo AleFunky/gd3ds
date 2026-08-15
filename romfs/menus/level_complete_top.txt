@@ -32,4 +32,4 @@ image x=150 y=170 id=402 scale=0.44 sheet=0 tag="window,coin1full,coinfull"
 image x=200 y=170 id=402 scale=0.44 sheet=0 tag="window,coin2full,coinfull"
 image x=250 y=170 id=402 scale=0.44 sheet=0 tag="window,coin3full,coinfull"
 
-label x=200 y=173 font=0 text="That was kinda sloppy" scale=0.6 align=CENTER tag="window,funnytext"
+label x=200 y=173 font=0 text="That was kinda sloppy" scale=0.6 align=CENTER tag="window,funnytext" w=250

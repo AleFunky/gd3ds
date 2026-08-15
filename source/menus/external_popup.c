@@ -74,10 +74,7 @@ const int difficulty_stars[MAX_STARS + 1] = {
     DEMON_FACE
 };
 
-#define MAX_NAME_WIDTH 200
 #define MAX_DESCRIPTION_WIDTH 300
-#define MAX_DOWNLOADS_WIDTH 60
-#define MAX_LIKES_WIDTH 60
 
 void external_popup_enter_from_level();
 
@@ -110,7 +107,6 @@ static UIAction actions[] = {
 static void set_name_creator(char *gmd) {
     char *name = extract_gmd_key((const char *) gmd, "k2", "s");
     if (name) {
-        ui_label_set_scale_from_width(level_name, name, MAX_NAME_WIDTH);
         ui_label_set_text(level_name, name);
         snprintf(level_info.level_name, sizeof(level_info.level_name), "%s", name);
         free(name);
@@ -189,8 +185,6 @@ static void set_downloads_likes(char *gmd) {
     if (downloads) {
         snprintf(tmp, sizeof(tmp), "%s", downloads);
         free(downloads);
-        
-        ui_label_set_scale_from_width(downloads_label, tmp, MAX_DOWNLOADS_WIDTH);
 
         ui_label_set_text(downloads_label, tmp);
     }
@@ -198,8 +192,6 @@ static void set_downloads_likes(char *gmd) {
     char *likes = extract_gmd_key((const char *) gmd, "k22", "i");
     if (likes) {
         snprintf(tmp, sizeof(tmp), "%s", likes);
-
-        ui_label_set_scale_from_width(likes_label, tmp, MAX_LIKES_WIDTH);
 
         ui_label_set_text(likes_label, tmp);
 

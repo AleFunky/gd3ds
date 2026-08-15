@@ -23,7 +23,20 @@ static void ui_label_draw(UIElement* e, UITransform *transform) {
     if (font_id >= NUM_FONTS) font_id = 0;
 
     const LabelFont *font = &fonts[font_id];
-    draw_text(font->charset, font->sheet, transform->x, transform->y, transform->scaleX, transform->scaleY, label->alignment, label->parse_tags, "%s", label->text);
+
+    float scale = transform->scaleX;
+
+    int width = e->w;
+
+    if (width > 0){
+        float length = get_longest_line_length(font->charset, e->scaleX, label->text);
+
+        if (width < length && length > 0) {
+            scale *= (width / length);
+        }
+    }
+
+    draw_text(font->charset, font->sheet, transform->x, transform->y, scale, scale, label->alignment, label->parse_tags, "%s", label->text);
 }
 
 static void ui_label_destroy(UIElement* e) {
@@ -37,39 +50,6 @@ void ui_label_set_text(UILabel *e, const char *text) {
     if (!e || !text) return;
 
     strncpy(e->text, text, sizeof(e->text) - 1);
-}
-
-void ui_label_set_scale_from_width(UILabel *e, const char *text, float width) {
-    if (!e || !text) return;
-
-    int font_id = e->font;
-
-    // Set to pusab if invalid
-    if (font_id >= NUM_FONTS) font_id = 0;
-
-    const LabelFont *font = &fonts[font_id];
-
-    float text_scale;
-
-    float scaleX = e->base.scaleX;
-
-    if (scaleX == 0) return;
-
-    // Get text length in pixels
-    float length = get_longest_line_length(font->charset, scaleX, text);
-
-    if (length == 0) return;
-
-    if (width < length) {
-        text_scale = scaleX * (width / length);
-    } else {
-        text_scale = scaleX;
-    }
-
-    float factor = text_scale / scaleX;
-
-    e->base.scaleX *= factor;
-    e->base.scaleY *= factor;
 }
 
 UILabel *ui_create_label(const UIContext *ctx) {

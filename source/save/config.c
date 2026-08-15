@@ -137,11 +137,11 @@ void cfg_init() {
     unratedFilter     = config_get_bool(&cfg, CONFIG_FILTERS_PATH "unrated", false);
     ratedFilter       = config_get_bool(&cfg, CONFIG_FILTERS_PATH "rated", false);
     featuredFilter    = config_get_bool(&cfg, CONFIG_FILTERS_PATH "featured", false);
-    songFilter        = config_get_bool(&cfg, CONFIG_FILTERS_PATH "song", false);
-    lengthFilter        = config_get_bool(&cfg, CONFIG_FILTERS_PATH "length", false);
-    customSelected    = config_get_bool(&cfg, CONFIG_FILTERS_PATH "customSelected", false);
-    normalSongId      = config_get_int(&cfg, CONFIG_FILTERS_PATH "normalId", 0);
-    strncpy(songFilterId, config_get_string(&cfg, CONFIG_FILTERS_PATH "songId", ""), sizeof(songFilterId) - 1);
+    song_filter_enabled        = config_get_bool(&cfg, CONFIG_FILTERS_PATH "song", false);
+    length_filter_enabled        = config_get_bool(&cfg, CONFIG_FILTERS_PATH "length", false);
+    custom_song    = config_get_bool(&cfg, CONFIG_FILTERS_PATH "customSelected", false);
+    normal_song_id_selected      = config_get_int(&cfg, CONFIG_FILTERS_PATH "normalId", 0);
+    strncpy(custom_song_id, config_get_string(&cfg, CONFIG_FILTERS_PATH "songId", ""), sizeof(custom_song_id) - 1);
 
     config_save(&cfg);
 }
@@ -173,11 +173,11 @@ void cfg_save() {
     config_set_bool(&cfg, CONFIG_FILTERS_PATH "unrated", unratedFilter);
     config_set_bool(&cfg, CONFIG_FILTERS_PATH "rated", ratedFilter);
     config_set_bool(&cfg, CONFIG_FILTERS_PATH "featured", featuredFilter);
-    config_set_bool(&cfg, CONFIG_FILTERS_PATH "length", lengthFilter);
-    config_set_bool(&cfg, CONFIG_FILTERS_PATH "song", songFilter);
-    config_set_bool(&cfg, CONFIG_FILTERS_PATH "customSelected", customSelected);
-    config_set_int(&cfg, CONFIG_FILTERS_PATH "normalId", normalSongId);
-    config_set_string(&cfg, CONFIG_FILTERS_PATH "songId", songFilterId);
+    config_set_bool(&cfg, CONFIG_FILTERS_PATH "length", length_filter_enabled);
+    config_set_bool(&cfg, CONFIG_FILTERS_PATH "song", song_filter_enabled);
+    config_set_bool(&cfg, CONFIG_FILTERS_PATH "customSelected", custom_song);
+    config_set_int(&cfg, CONFIG_FILTERS_PATH "normalId", normal_song_id_selected);
+    config_set_string(&cfg, CONFIG_FILTERS_PATH "songId", custom_song_id);
 
     config_save(&cfg);
 }
