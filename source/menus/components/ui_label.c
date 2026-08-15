@@ -23,7 +23,20 @@ static void ui_label_draw(UIElement* e, UITransform *transform) {
     if (font_id >= NUM_FONTS) font_id = 0;
 
     const LabelFont *font = &fonts[font_id];
-    draw_text(font->charset, font->sheet, transform->x, transform->y, transform->scaleX, transform->scaleY, label->alignment, label->parse_tags, "%s", label->text);
+
+    float scale = transform->scaleX;
+
+    int width = e->w * transform->scaleX;
+
+    if(width > 0){
+        float length = get_longest_line_length(font->charset, scale, label->text);
+
+        if (width < length && length > 0) {
+            scale *= (width / length);
+        }
+    }
+
+    draw_text(font->charset, font->sheet, transform->x, transform->y, scale, scale, label->alignment, label->parse_tags, "%s", label->text);
 }
 
 static void ui_label_destroy(UIElement* e) {
@@ -33,54 +46,10 @@ static void ui_label_destroy(UIElement* e) {
     }
 }
 
-void ui_label_set_scale_from_width(UILabel *e, const char *text) {
-    if (!e || !text) return;
-
-    int width = e->base.w;
-
-    if(width == 0) return;
-
-    int font_id = e->font;
-
-    // Set to pusab if invalid
-    if (font_id >= NUM_FONTS) font_id = 0;
-
-    const LabelFont *font = &fonts[font_id];
-
-    float text_scale;
-
-    e->base.scaleX = e->originalScale;
-    e->base.scaleY = e->originalScale;
-
-    float scale = e->originalScale;
-
-    if (scale == 0) return;
-
-    // Get text length in pixels
-    float length = get_longest_line_length(font->charset, scale, text);
-
-    if (length == 0) return;
-
-    if (width < length) {
-        text_scale = scale * (width / length);
-    } else {
-        text_scale = scale;
-    }
-
-    float factor = text_scale / scale;
-
-    e->base.scaleX *= factor;
-    e->base.scaleY *= factor;
-}
-
 void ui_label_set_text(UILabel *e, const char *text) {
     if (!e || !text) return;
 
     strncpy(e->text, text, sizeof(e->text) - 1);
-
-    if(e->base.w > 0){
-        ui_label_set_scale_from_width(e, text);
-    }
 }
 
 UILabel *ui_create_label(const UIContext *ctx) {
@@ -109,8 +78,6 @@ UIElement *ui_create_label_from_props(const UIContext *ctx, const UIPropertyList
     if (!label) return NULL;
 
     ui_element_apply_properties(&label->base, ctx, props);
-    
-    label->originalScale = ui_prop_float(props, "scale", 1.0f);
 
     ui_label_set_text(label, ui_prop_string(props, "text", ""));
     

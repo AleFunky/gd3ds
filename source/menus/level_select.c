@@ -555,7 +555,7 @@ void level_select_loop() {
             dragging = false;
             dragDir = 0;
         }
-
+        
         handle_card_movement();
 
         //Buttons can't be tapped while dragging, left/right buttons cannot be pressed with keybinds while dragging

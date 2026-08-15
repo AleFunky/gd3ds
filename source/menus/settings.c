@@ -413,6 +413,7 @@ void create_setting(Setting *setting, int id) {
 
             UILabel *name = ui_create_label(&screen.ctx);
             if (name) {
+                name->base.w = 130;
                 ui_label_set_text(name, setting->label);
                 ui_element_set_position((UIElement *) name, -list_width + 28, 0);
                 ui_element_set_scale((UIElement *) name, 0.38f);
@@ -429,7 +430,7 @@ void create_setting(Setting *setting, int id) {
                     ui_element_set_userdata((UIElement *) info, data);
 
                     ui_element_set_position((UIElement *) info, list_width -+ 13, 0);
-                    ui_element_set_scale((UIElement *) info, 0.5f);
+                    ui_element_set_scale((UIElement *) info, 0.7f);
                     ui_element_set_action((UIElement *) info, info_action);
 
                     ui_button_set_image(info, 90, 0);

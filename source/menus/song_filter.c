@@ -85,6 +85,7 @@ void select_normal() {
 void select_custom() {
     ui_window_button_set_style(custom_button, 10);
     ui_window_button_set_style(normal_button, 5);
+    strncpy(song_input->text, custom_song_id, sizeof(custom_song_id) - 1);
     ui_run_func_on_tag(&screen, "songselector", ui_disable_element);
     ui_run_func_on_tag(&screen, "normal_song_text", ui_disable_element);
     ui_run_func_on_tag(&screen, "songinput", ui_enable_element);
@@ -155,9 +156,6 @@ int song_filter_loop() {
 
         return true;
     };
-
-    strncpy(song_input->text, custom_song_id, sizeof(song_input->text) - 1);
-    song_input->text[sizeof(song_input->text) - 1] = '\0';
 
     UIInput touch;
     touchPosition touchPos;
