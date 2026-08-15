@@ -253,6 +253,26 @@ Setting settings[] = {
         .key = CONFIG_GAMEPLAY_PATH "quickRetry"
     },
     {
+        .id = "autoCheckpoints",
+        .label = "Auto checkpoints",
+        .additionalInfo = NULL,
+        .page = PAGE_GAMEPLAY, 
+
+        .defaultValue = false,
+        .var = &settingsState.autoCheckpoints,
+        .key = CONFIG_GAMEPLAY_PATH "autoCheckpoints"
+    },
+    {
+        .id = "quickCheckpoints",
+        .label = "Quick checkpoints",
+        .additionalInfo = "Makes auto checkpoints appear quicker.",
+        .page = PAGE_GAMEPLAY, 
+
+        .defaultValue = false,
+        .var = &settingsState.quickCheckpoints,
+        .key = CONFIG_GAMEPLAY_PATH "quickCheckpoints"
+    },
+    {
         .id = "switchTrailColor",
         .label = "Switch trail color",
         .additionalInfo = "Makes the player trail use P1<p>instead of P2.",

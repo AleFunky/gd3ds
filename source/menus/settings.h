@@ -48,9 +48,11 @@ typedef struct {
     bool noWaveTrailBehind;
     bool doNot;
     bool practiceMusicSync;
+    bool autoCheckpoints;
+    bool quickCheckpoints;
 } SettingState;
 
-extern Setting settings[23];
+extern Setting settings[25];
 extern SettingState settingsState;
 
 void settings_init();

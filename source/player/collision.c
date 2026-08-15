@@ -1,6 +1,7 @@
 #include "collision.h"
 #include "player.h"
 #include <math.h>
+#include "practice.h"
 #include "state.h"
 #include <citro3d.h>
 #include "graphics.h"
@@ -694,6 +695,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     player->ceiling_inv_time = CEILING_INVUL_TIME;
                     player->snap_rotation = true;
                     set_gamemode(player, GAMEMODE_PLAYER);
+                    set_checkpoint_timer(0);
                     flip_other_player(state.current_player ^ 1);
                     update_rotation_direction(player);
                 }
@@ -716,6 +718,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     player->vel_y /= (player->gamemode == GAMEMODE_BIRD || player->gamemode == GAMEMODE_DART) ? 4 : 2;
                     
                     set_gamemode(player, GAMEMODE_SHIP);
+                    set_checkpoint_timer(AUTO_CHECKPOINT_TIME);
                     player->inverse_rotation = false;
                     player->snap_rotation = true;
                     flip_other_player(state.current_player ^ 1);
@@ -762,6 +765,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                             break;
                     }
                     set_gamemode(player, GAMEMODE_PLAYER_BALL);
+                    set_checkpoint_timer(0);
 
                     if (state.input.holdJump && state.old_player.gamemode == GAMEMODE_SHIP) {
                         player->buffering_state = BUFFER_READY;
@@ -795,6 +799,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     if (player->gamemode == GAMEMODE_DART) player->vel_y *= 0.9f;
                     player->vel_y /= (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_DART) ? 4 : 2;
                     set_gamemode(player, GAMEMODE_BIRD);
+                    set_checkpoint_timer(AUTO_CHECKPOINT_TIME);
                     player->inverse_rotation = false;
                     player->rotation = 0;
                     flip_other_player(state.current_player ^ 1);
@@ -825,6 +830,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
 
                 if (player->gamemode != GAMEMODE_DART) {
                     set_gamemode(player, GAMEMODE_DART);
+                    set_checkpoint_timer(AUTO_CHECKPOINT_TIME);
                     player->inverse_rotation = false;
                     player->snap_rotation = true;
                     flip_other_player(state.current_player ^ 1);
@@ -1187,6 +1193,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                 player->on_ground = true;
                 player->inverse_rotation = false;
                 player->time_since_ground = 0;
+                player_non_flying_landing(player);
 
                 if (player->gamemode == GAMEMODE_PLAYER) {
                     // Check for x snap

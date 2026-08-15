@@ -146,6 +146,9 @@ typedef struct {
 
     bool velocity_override;
 
+    bool jumped;
+    bool landed_from_jump;
+
     float coyote_frames;
 
     IconsDrawing player_icons;
@@ -255,3 +258,6 @@ void update_rotation_direction(Player *player);
 void push_player_action(void (*func)(Player *));
 
 float convert_to_closest_rotation(float rotation, float angle);
+
+bool player_gamemode_is_flying(Player *player);
+void player_non_flying_landing(Player *player);

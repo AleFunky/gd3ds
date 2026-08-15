@@ -1,7 +1,9 @@
 #include "practice.h"
+#include "icons.h"
 #include "level_loading.h"
 #include "main.h"
 #include "graphics.h"
+#include "player/player.h"
 #include "state.h"
 #include "mp3_player.h"
 #include "math_helpers.h"
@@ -55,8 +57,22 @@ typedef struct CheckpointData {
 CheckpointData checkpoints[MAX_CHECKPOINTS];
 int checkpoint_count = 0;
 int checkpoint_pointer = 0;
+float checkpoint_timer = 0;
+bool pseudo_checkpoint_exists = false;
 
 // static const int checkpoint_size = sizeof(checkpoints);
+
+void set_checkpoint_timer(float timer) {
+    if (state.practice_mode && settingsState.autoCheckpoints) {
+        // Set auto checkpoints timer
+        checkpoint_timer = timer;
+
+        // Quick checkpoints halves the timer
+        if (settingsState.quickCheckpoints) {
+            checkpoint_timer /= 2;
+        }
+    }
+}
 
 void new_checkpoint() {
     if (state.dead) return;
@@ -103,10 +119,21 @@ void new_checkpoint() {
 
     memcpy(check->channels, channels, sizeof(channels));
     memcpy(check->col_trigger_buffer, col_trigger_buffer, sizeof(col_trigger_buffer));
+
+    set_checkpoint_timer(AUTO_CHECKPOINT_TIME);
 }
 
 void restore_checkpoint() {
+    // If auto checkpoints and flying gamemode, remove the pseudo checkpoint
+    if (settingsState.autoCheckpoints && player_gamemode_is_flying(&state.old_player) && pseudo_checkpoint_exists) {
+        if (checkpoint_count > 1 && checkpoint_pointer-- == 0) {
+            checkpoint_pointer = MAX_CHECKPOINTS - 1;
+        }
+        pseudo_checkpoint_exists = false;
+    }
+
     CheckpointData *check = &checkpoints[checkpoint_pointer];
+
     state.camera_x = check->camera_x;
     state.camera_y = check->camera_y;
 
@@ -143,6 +170,8 @@ void restore_checkpoint() {
     memcpy(col_trigger_buffer, check->col_trigger_buffer, sizeof(col_trigger_buffer));
 
     update_attempt_text_pos();
+    
+    set_checkpoint_timer(AUTO_CHECKPOINT_TIME);
 }
 
 void delete_last_checkpoint() {
@@ -165,6 +194,7 @@ void clear_practice_mode() {
 void start_practice_mode() {
     checkpoint_count = 0;
     checkpoint_pointer = 0;
+    pseudo_checkpoint_exists = false;
     state.practice_mode = true;
     
     if (!settingsState.practiceMusicSync) {
@@ -183,6 +213,34 @@ void exit_practice_mode() {
     } else {
         stop_mp3();
         play_level_song(level_info.song_offset);
+    }
+}
+
+void handle_auto_checkpoints(float delta) {
+    // Exit if not in practice mode with autocheckpoints enabled
+    if (!(state.practice_mode && settingsState.autoCheckpoints)) return;
+    
+    if (checkpoint_timer <= 0) {
+        switch (state.player.gamemode) {
+            case GAMEMODE_PLAYER:
+            case GAMEMODE_PLAYER_BALL:
+                if (state.player.landed_from_jump) {
+                    new_checkpoint();
+                }
+                break;
+
+            case GAMEMODE_SHIP:
+            case GAMEMODE_BIRD:
+            case GAMEMODE_DART:
+                new_checkpoint();
+                pseudo_checkpoint_exists = true;
+                break;
+
+            default:
+                break;
+        }
+    } else {
+        checkpoint_timer -= delta;
     }
 }
 
@@ -215,7 +273,12 @@ static void draw_checkpoint(float x, float y) {
 void draw_checkpoints() {
     if (!state.practice_mode) return;
 
-    for (u32 checkpoint = 0; checkpoint < checkpoint_count; checkpoint++) {
+    int start = 0;
+
+    if (settingsState.autoCheckpoints && player_gamemode_is_flying(&state.player) && pseudo_checkpoint_exists)
+        start++;
+
+    for (u32 checkpoint = start; checkpoint < checkpoint_count; checkpoint++) {
         // Obtain buffer index
         s32 index = WRAP((s32) (checkpoint_pointer - checkpoint), 0, MAX_CHECKPOINTS);
         CheckpointData *curr_checkpoint = &checkpoints[index];
