@@ -309,6 +309,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->on_ground = false;
                 player->inverse_rotation = false;
                 player->left_ground = true;
+                player->jumped = true;
                 SET_ACTIVATED(obj, true);
                 update_rotation_direction(player);
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &pad_use_effect, get_use_effect_array_ptr(GFX_TOP));
@@ -326,6 +327,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->on_ground = false;
                 player->inverse_rotation = false;
                 player->left_ground = true;
+                player->jumped = true;
                 SET_ACTIVATED(obj, true);
                 update_rotation_direction(player);
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &pad_use_effect, get_use_effect_array_ptr(GFX_TOP));
@@ -363,6 +365,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->on_ground = false;
                 player->inverse_rotation = false;
                 player->ceiling_inv_time = CEILING_INVUL_TIME;
+                player->jumped = true;
 
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &pad_use_effect, get_use_effect_array_ptr(GFX_TOP));
                 if (effect) {
@@ -387,6 +390,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->inverse_rotation = false;
                 player->left_ground = true;
                 player->buffering_state = BUFFER_END;
+                player->jumped = true;
                 update_rotation_direction(player);
                 
                 state.current_data.jumps++;
@@ -414,6 +418,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->inverse_rotation = false;
                 player->left_ground = true;
                 player->buffering_state = BUFFER_END;
+                player->jumped = true;
                 update_rotation_direction(player);
 
                 state.current_data.jumps++;
@@ -451,6 +456,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->left_ground = true;
                 player->buffering_state = BUFFER_END;
                 player->ceiling_inv_time = CEILING_INVUL_TIME;
+                player->jumped = true;
                 
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, get_use_effect_array_ptr(GFX_TOP));
                 if (effect) {

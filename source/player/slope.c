@@ -190,7 +190,6 @@ void slope_snap_y(int obj, Player *player) {
 
             player->time_since_ground = 0;
             player->on_ground = true;
-            player_non_flying_landing(player);
             
             if (player->vel_y < 0) {
                 player->vel_y = 0;
@@ -205,7 +204,6 @@ void slope_snap_y(int obj, Player *player) {
             
             player->time_since_ground = 0;
             player->on_ground = true;
-            player_non_flying_landing(player);
             
             if (player->vel_y < 0) {
                 player->vel_y = 0;
@@ -289,6 +287,7 @@ void slope_calc(int obj, Player *player) {
             player->slope_slide_coyote_time = 2;
 
             player->new_vel_y = vel;// + player->gravity * STEPS_DT;
+            player->jumped = true;
             
             //output_log("Tick %d - Time %.2f PElapsed %.4f SElapsed %.4f Exit vel %.2f\n", player->frame, time, player->timeElapsed, player->slope_data.elapsed, player->new_vel_y);
             
@@ -646,7 +645,10 @@ void slope_collide(int obj, Player *player) {
             }
 
             if (orient >= ORIENT_UD_DOWN) player->on_ceiling = true;
-            else player->on_ground = true;
+            else {
+                player->on_ground = true;
+                player_non_flying_landing(player);
+            }
             
             player->inverse_rotation = false;
             player->slope_data.slope_id = obj;
