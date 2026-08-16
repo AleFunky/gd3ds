@@ -126,9 +126,7 @@ void new_checkpoint() {
 void restore_checkpoint() {
     // If auto checkpoints and flying gamemode, remove the pseudo checkpoint
     if (settingsState.autoCheckpoints && player_gamemode_is_flying(&state.death_player) && pseudo_checkpoint_exists) {
-        if (checkpoint_count > 1 && checkpoint_pointer-- == 0) {
-            checkpoint_pointer = MAX_CHECKPOINTS - 1;
-        }
+        delete_last_checkpoint();
         pseudo_checkpoint_exists = false;
     }
 
