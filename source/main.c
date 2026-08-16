@@ -588,7 +588,9 @@ void game_loop() {
 
     play_level_song(level_info.song_offset);
 
-    if (song_loaded) pause_playback_mp3();
+    if (song_loaded) {
+        pause_playback_mp3();
+    }
 
     set_fade_status(FADE_STATUS_IN);
 

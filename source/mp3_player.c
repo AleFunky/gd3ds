@@ -328,6 +328,7 @@ int play_mp3(char *path, bool loop, float seek) {
 
     LightEvent_Init(&seekEvent, RESET_ONESHOT);
     quit = false;
+    paused = false;
     looping = loop;
 
     seek_target = seek;
@@ -352,6 +353,7 @@ void seek(u32 location) {
     if (location <= mpg123_length(mh)) {
         mpg123_seek(mh, location, SEEK_SET);
     } else {
+        level_info.song_offset = 0;
         mpg123_seek(mh, 0, SEEK_SET);
     }
 }

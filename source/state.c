@@ -479,10 +479,14 @@ void play_level_song(float seek) {
             song_loaded = false;
         }
     } else {
-        if (state.custom_level) {
-            song_loaded = play_mp3(main_levels[level_info.song_id].song_path, false, seek);
+        int song_id = curr_level_id;
+
+        if (state.custom_level) song_id = level_info.song_id;
+
+        if (song_id < MAIN_LEVELS_NUM) {
+            song_loaded = play_mp3(main_levels[song_id].song_path, false, seek);
         } else {
-            song_loaded = play_mp3(main_levels[curr_level_id].song_path, false, seek);
+            song_loaded = false;
         }
     }
 }
