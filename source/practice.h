@@ -1,9 +1,12 @@
 #pragma once
 
+#include <3ds.h>
+
 #define AUTO_CHECKPOINT_TIME 1.f
 
 extern int checkpoint_count;
 extern int checkpoint_pointer;
+extern bool pseudo_checkpoint_exists;
 
 void start_practice_mode();
 void exit_practice_mode();

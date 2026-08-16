@@ -702,6 +702,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     player->snap_rotation = true;
                     set_gamemode(player, GAMEMODE_PLAYER);
                     set_checkpoint_timer(0);
+                    pseudo_checkpoint_exists = false;
                     flip_other_player(state.current_player ^ 1);
                     update_rotation_direction(player);
                 }
@@ -723,6 +724,11 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     if (player->gamemode == GAMEMODE_DART) player->vel_y *= 0.9f;
                     player->vel_y /= (player->gamemode == GAMEMODE_BIRD || player->gamemode == GAMEMODE_DART) ? 4 : 2;
                     
+                    // No pseudo checkpoint if coming from non flying gamemode
+                    if (!player_gamemode_is_flying(player)) {
+                        pseudo_checkpoint_exists = false;
+                    }
+
                     set_gamemode(player, GAMEMODE_SHIP);
                     set_checkpoint_timer(AUTO_CHECKPOINT_TIME);
                     player->inverse_rotation = false;
@@ -772,6 +778,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     }
                     set_gamemode(player, GAMEMODE_PLAYER_BALL);
                     set_checkpoint_timer(0);
+                    pseudo_checkpoint_exists = false;
 
                     if (state.input.holdJump && state.old_player.gamemode == GAMEMODE_SHIP) {
                         player->buffering_state = BUFFER_READY;
@@ -804,6 +811,12 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 if (player->gamemode != GAMEMODE_BIRD) {
                     if (player->gamemode == GAMEMODE_DART) player->vel_y *= 0.9f;
                     player->vel_y /= (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_DART) ? 4 : 2;
+                    
+                    // No pseudo checkpoint if coming from non flying gamemode
+                    if (!player_gamemode_is_flying(player)) {
+                        pseudo_checkpoint_exists = false;
+                    }
+
                     set_gamemode(player, GAMEMODE_BIRD);
                     set_checkpoint_timer(AUTO_CHECKPOINT_TIME);
                     player->inverse_rotation = false;
@@ -835,6 +848,11 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 set_intended_ceiling();
 
                 if (player->gamemode != GAMEMODE_DART) {
+                    // No pseudo checkpoint if coming from non flying gamemode
+                    if (!player_gamemode_is_flying(player)) {
+                        pseudo_checkpoint_exists = false;
+                    }
+                    
                     set_gamemode(player, GAMEMODE_DART);
                     set_checkpoint_timer(AUTO_CHECKPOINT_TIME);
                     player->inverse_rotation = false;
