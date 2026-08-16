@@ -382,6 +382,7 @@ void init_variables() {
 }
 
 void handle_death(Player *player, bool pause_song) {
+    state.death_player = state.player;
     play_sfx(&explode_sound, 1);
     if (song_loaded && pause_song) {
         if (!state.practice_mode) {

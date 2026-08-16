@@ -113,6 +113,7 @@ typedef struct {
     unsigned char current_player;
 
     Player old_player;
+    Player death_player;
 
     StateLevelData current_data;
 

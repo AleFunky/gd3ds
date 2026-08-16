@@ -125,7 +125,7 @@ void new_checkpoint() {
 
 void restore_checkpoint() {
     // If auto checkpoints and flying gamemode, remove the pseudo checkpoint
-    if (settingsState.autoCheckpoints && player_gamemode_is_flying(&state.old_player) && pseudo_checkpoint_exists) {
+    if (settingsState.autoCheckpoints && player_gamemode_is_flying(&state.death_player) && pseudo_checkpoint_exists) {
         if (checkpoint_count > 1 && checkpoint_pointer-- == 0) {
             checkpoint_pointer = MAX_CHECKPOINTS - 1;
         }
@@ -251,6 +251,11 @@ void handle_practice_mode() {
     u32 kHeld = hidKeysHeld();
 
     if (((kDown & KEY_L) && !((kHeld & KEY_B) && settingsState.enableDebugBindings)) || (kDown & KEY_ZL)) {
+        
+        if (settingsState.autoCheckpoints  && player_gamemode_is_flying(&state.player) && pseudo_checkpoint_exists) {
+            pseudo_checkpoint_exists = false;
+            delete_last_checkpoint();
+        }
         new_checkpoint();
     }
 
