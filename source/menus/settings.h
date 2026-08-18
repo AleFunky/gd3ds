@@ -42,6 +42,7 @@ typedef struct {
     bool showProgressPercent;
     bool decimalPercent;
     bool ultraDecimalPercent;
+    bool defaultMiniIcon;
     bool switchTrailColor;
     bool switchWaveTrailColor;
     bool quickRetry;
