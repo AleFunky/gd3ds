@@ -396,6 +396,7 @@ void practiceMusicSync_setting(bool checked) {
         } else {
             play_practice_song();
         }
+        pause_playback_mp3();
     }
 }
 

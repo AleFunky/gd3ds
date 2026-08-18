@@ -1223,6 +1223,8 @@ void game_loop() {
 
     unload_level();
 
+    clear_practice_mode();
+
     clear_respawn_effect();
 
     level_complete_destroy();
