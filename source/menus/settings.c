@@ -279,7 +279,7 @@ Setting settings[] = {
     {
         .id = "defaultMiniIcon",
         .label = "Default mini icon",
-        .additionalInfo = "Uses default player icon in<p>mini mode",
+        .additionalInfo = "Uses default player icon in<p>mini mode.",
         .page = PAGE_COSMETIC, 
 
         .defaultValue = false,
