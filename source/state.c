@@ -418,7 +418,7 @@ void handle_death(Player *player, bool pause_song) {
     explosion_particles[state.current_player].scale = (player->mini ? 0.6 : 1.0f);
     spawnMultipleParticles(&explosion_particles[state.current_player], 90);
 
-    start_shake(0.15f, 1.f);
+    if (!state.practice_mode) start_shake(0.15f, 1.f);
     
     if (settingsState.hitboxesOnDeath) {
         state.hitbox_enabled_when_dead = true;
