@@ -277,6 +277,16 @@ Setting settings[] = {
         .key = CONFIG_GAMEPLAY_PATH "quickCheckpoints"
     },
     {
+        .id = "defaultMiniIcon",
+        .label = "Default mini icon",
+        .additionalInfo = "Uses default player icon in<p>mini mode",
+        .page = PAGE_COSMETIC, 
+
+        .defaultValue = false,
+        .var = &settingsState.defaultMiniIcon,
+        .key = CONFIG_COSMETIC_PATH "defaultMiniIcon"
+    },
+    {
         .id = "switchTrailColor",
         .label = "Switch trail color",
         .additionalInfo = "Makes the player trail use P1<p>instead of P2.",
