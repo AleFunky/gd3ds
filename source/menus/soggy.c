@@ -6,25 +6,60 @@
 #include "main.h"
 #include "mp3_player.h"
 #include "graphics.h"
+#include "utils/network.h"
+#include "menus/components/ui_label.h"
+#include "level_loading.h"
 
 #include "save/config.h"
 
 static bool exit_flag = false;
-
+char *query = "bloodbath"; 
 bool gotSogged = false;
+char *outdata;
+
+static UILabel *label;
+static UILabel *label2;
+
 
 static void action_exit(UIElement *e) {
     exit_flag = true;
     set_fade_status(FADE_STATUS_OUT);
 }
 
-static void action_boop(UIElement *e) {
-    play_sfx(&honk, 1);
+// static void action_boop(UIElement *e) {
+//     play_sfx(&honk, 1);
+// }
+
+static void action_search(UIElement *e) {
+    int result = get_search_results(&outdata, query, 0);
+    label = (UILabel*)ui_get_element_by_tag(&default_screen_top, "label");
+    label2 = (UILabel*)ui_get_element_by_tag(&default_screen_top, "label2");
+
+    if (outdata) {
+        output_log(outdata);
+    };
+    char tmp_value[16];
+
+                    snprintf(tmp_value, sizeof(tmp_value), "%d", result);
+    ui_label_set_text(label, tmp_value);
+
+    int initialStringCount = 0;
+    int levelStringCount = 0;
+    int levelKeyCount = 0;
+
+    char **initialStrings = split_string(outdata, '#', &initialStringCount);
+
+    char **levelsStrings = split_string(initialStrings[0], '|', &levelStringCount);
+
+    char **levelKeys = split_string(levelsStrings[0], ':', &levelKeyCount);
+
+    ui_label_set_text(label, levelKeys[4]);
 }
 
 static UIAction actions[] = {
     {"exit", action_exit },
-    {"boop", action_boop},
+    // {"boop", action_boop},
+    {"search", action_search},
 };
 
 void soggy_menu_loop() {
@@ -38,7 +73,7 @@ void soggy_menu_loop() {
     set_fade_status(FADE_STATUS_IN);
 
     stop_mp3();
-    play_mp3("romfs:/songs/SogLoop.mp3", true, 0);
+    // play_mp3("romfs:/songs/SogLoop.mp3", true, 0);
 
     while (aptMainLoop()) {
         hidScanInput();

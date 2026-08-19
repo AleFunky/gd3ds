@@ -1,3 +1,4 @@
-image x=160 y=120 id=19 sheet=1
+# image x=160 y=120 id=19 sheet=1
 button x=24 y=28 id=6 action="exit" keyBinds="B"
-button x=130 y=107 w=57 h=21 invisible=1 action="boop"
+# button x=130 y=107 w=57 h=21 invisible=1 action="boop"
+windowbutton x=160 y=120 w=100 h=50 style=1 text="get" action="search" 

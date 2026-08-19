@@ -92,14 +92,58 @@ int get_level_from_id(char **out_data, int id) {
         curl_easy_cleanup(curl);
 
         if (code) {
-            return 1;
+            return code;
         }
 
         printf("(code %d) Response (%d): %s\n", code, chunk.size, chunk.memory);
 
-        if (chunk.memory[0] == '-') {
-            return atoi(chunk.memory);
+        // if (chunk.memory[0] == '-') {
+        //     return atoi(chunk.memory);
+        // }
+        
+        *out_data = chunk.memory;
+
+        return 0;
+    }
+    return 2;
+}
+
+int get_search_results(char **out_data, char *query, int type) {
+    // Init
+    CURL *curl = curl_easy_init();
+    struct curl_slist *headers = NULL;
+
+    if (curl) {
+        struct MemoryStruct chunk;
+        chunk.memory = malloc(1);
+        chunk.size = 0;
+        headers = curl_slist_append(headers,
+            "Content-Type: application/x-www-form-urlencoded");
+
+        curl_easy_setopt(curl, CURLOPT_URL, "http://www.boomlings.com/database/getGJLevels21.php");
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, "");
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+
+        char data[64];
+        snprintf(data, 63, "type=%d&str=%s&secret=Wmfd2893gb7", type, query);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
+
+        CURLcode code = curl_easy_perform(curl);
+        
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+
+        if (code) {
+            return code;
         }
+
+        printf("(code %d) Response (%d): %s\n", code, chunk.size, chunk.memory);
+
+        // if (chunk.memory[0] == '-') {
+        //     return atoi(chunk.memory);
+        // }
         
         *out_data = chunk.memory;
 

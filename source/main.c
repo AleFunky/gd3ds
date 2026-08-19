@@ -20,6 +20,7 @@
 #include "save/config.h"
 
 #include <curl/curl.h>
+#include "utils/network.h"
 
 #include "menus/main_menu.h"
 #include "menus/level_select.h"
@@ -1299,6 +1300,7 @@ int main(int argc, char* argv[]) {
     C2D_Init(MAX_SPRITES);
     C2D_Prepare();
     osSetSpeedupEnable(1);
+    soc_init();
 
     cfg_init();
     cfguInit();
