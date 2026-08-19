@@ -291,7 +291,11 @@ static void set_progress() {
 }
 
 static void set_difficulty() {
-    ui_image_set_image(difficulty_face, difficulty_stars[stars_num], 0);
+    int face = difficulty_stars[0];
+    if (stars_num >= 0 || stars_num < ARRAY_LEN(difficulty_stars)) {
+        face = difficulty_stars[stars_num];
+    }
+    ui_image_set_image(difficulty_face, face, 0);
 }
 
 void external_popup_enter_from_level() {
