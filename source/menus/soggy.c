@@ -53,7 +53,7 @@ static void action_search(UIElement *e) {
 
     char **levelKeys = split_string(levelsStrings[0], ':', &levelKeyCount);
 
-    ui_label_set_text(label, levelKeys[4]);
+    ui_label_set_text(label2, levelKeys[3]);
 }
 
 static UIAction actions[] = {
