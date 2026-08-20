@@ -37,10 +37,13 @@ static UIAction actions[] = {
 
 void populate_online_info() {
     SearchEntry *curr_entry = &search_entries[curr_search_id];  
-    ui_label_set_text(level_name, curr_entry->name);
+
+    char tmp_name[34] = "";
+    snprintf(tmp_name, 34, "<#ffff00>%s</>", curr_entry->name);
+    ui_label_set_text(level_name, tmp_name);
 
     char tmp_creator[48] = "";
-    snprintf(tmp_creator, 48, "<#ffff00>By: %s</>", creator_entries[curr_entry[curr_search_id].creatorIndex].creatorName);
+    snprintf(tmp_creator, 48, "By: <#ffff00>%s</>", creator_entries[curr_entry[curr_search_id].creatorIndex].creatorName);
     ui_label_set_text(level_creator, tmp_creator);
 
     char tmp_upload[156] = "";
@@ -51,12 +54,12 @@ void populate_online_info() {
     snprintf(tmp_update, 156, "Updated: <#ffff00>%s ago</>", level_entry->updateDate);
     ui_label_set_text(updated_ago, tmp_update);
 
-    char tmp_reqstars[24] = "";
-    snprintf(tmp_reqstars, 24, "Stars Requested: %d", curr_entry->reqStars);
+    char tmp_reqstars[32] = "";
+    snprintf(tmp_reqstars, 32, "Stars Requested: <#ffff00>%d</>", curr_entry->reqStars);
     ui_label_set_text(requested_stars, tmp_reqstars);
 
-    char tmp_gjver[24] = "";
-    snprintf(tmp_gjver, 24, "Game Version: %.1f", derive_gj_version(curr_entry->gameVersion));
+    char tmp_gjver[32] = "";
+    snprintf(tmp_gjver, 32, "Game Version: <#ffff00>%.1f</>", derive_gj_version(curr_entry->gameVersion));
     ui_label_set_text(game_ver, tmp_gjver);
 
     // ui_label_set_text(attempts, );
