@@ -65,7 +65,7 @@ static UIAction actions[] = {
     {"deletelevel", action_delete_level },
 };
 
-void online_menu_loop() {
+void online_level_menu_loop() {
     exit_flag = false;
     in_comments = false;
     in_delete = false;
@@ -134,7 +134,7 @@ void online_menu_loop() {
         } while (handle_fading());
 
         if (exit_flag) {
-            game_state = STATE_SAVED_LEVELS;
+            game_state = STATE_ONLINE;
             break;
         }
 

@@ -98,9 +98,9 @@ int get_level_from_id(char **out_data, int id) {
 
         printf("(code %d) Response (%d): %s\n", code, chunk.size, chunk.memory);
 
-        // if (chunk.memory[0] == '-') {
-        //     return atoi(chunk.memory);
-        // }
+        if (chunk.memory[0] == '-') {
+            return atoi(chunk.memory);
+        }
         
         *out_data = chunk.memory;
 
@@ -109,7 +109,7 @@ int get_level_from_id(char **out_data, int id) {
     return 2;
 }
 
-int get_search_results(char **out_data, char *query, int type) {
+int get_search_results(char **out_data, char *query, int type, int page) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -129,7 +129,7 @@ int get_search_results(char **out_data, char *query, int type) {
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
 
         char data[64];
-        snprintf(data, 63, "type=%d&str=%s&secret=Wmfd2893gb7", type, query);
+        snprintf(data, 63, "page=%d&type=%d&str=%s&secret=Wmfd2893gb7", page, type, query);
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
 
         CURLcode code = curl_easy_perform(curl);
@@ -143,9 +143,9 @@ int get_search_results(char **out_data, char *query, int type) {
 
         printf("(code %d) Response (%d): %s\n", code, chunk.size, chunk.memory);
 
-        // if (chunk.memory[0] == '-') {
-        //     return atoi(chunk.memory);
-        // }
+        if (chunk.memory[0] == '-') {
+            return atoi(chunk.memory);
+        }
         
         *out_data = chunk.memory;
 

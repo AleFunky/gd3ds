@@ -6,9 +6,9 @@ image x=36 y=205 id=178
 image x=284 y=205 id=178 sx=-1.0
 
 window x=170 y=28 w=240 h=40 style=8
-textbox x=149 y=28 w=188 limit=20 title="Search for a level or id:"
+textbox x=149 y=28 w=188 limit=20 title="Search for a level or id:" tag="searchbox"
 
-button x=267 y=28 id=107 scale=0.9 action="disclaimer"
+button x=267 y=28 id=107 scale=0.9 action="search"
 #button x=240 y=28 id=106 scale=0.7 <-- profile button
 
 label x=160 y=60 text="Quick Search" scale=0.6 align=CENTER
