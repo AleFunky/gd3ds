@@ -1,5 +1,6 @@
 #include <3ds.h>
 #include "mp3_player.h"
+#include "level_loading.h"
 #include "math_helpers.h"
 #include <mpg123.h>
 #include <stdio.h>
@@ -44,18 +45,15 @@ static Thread threadId = NULL;
 
 static ndspWaveBuf waveBuf[NUM_BUFS];
 
-static inline u32 samplerate_mp3(void)
-{
+static inline u32 samplerate_mp3(void) {
     return rate;
 }
 
-static inline u32 buffsize_mp3(void)
-{
+static inline u32 buffsize_mp3(void) {
     return buffSize;
 }
 
-static inline u32 channels_mp3(void)
-{
+static inline u32 channels_mp3(void) {
     return audio_channels;
 }
 
@@ -191,7 +189,7 @@ u32 decode_mp3(void* buffer) {
 }
 
 float calculate_amplitude(float power) {
-    if (state.practice_mode && !settingsState.practiceMusicSync) return 0.0f;
+    if (state.practice_mode && !settingsState.practiceMusicSync) return 0.f;
     if (game_state == STATE_MAIN_MENU) return 0.5f;
 
     static float prev = 0.0f;
@@ -205,12 +203,12 @@ float calculate_amplitude(float power) {
     // Low-pass filter the delta
     avg_delta = avg_delta + ((abs_delta - avg_delta) * 0.1f);
 
-    // Detect note change: large RMS increase indicates a new note
+    // Detect note change, large RMS increase indicates a new note
     float rms_delta = power - prev_power;
     float abs_rms_delta = fabsf(rms_delta);
     float rms_thresh = avg_delta * POWER_THRESH_MULTIPLIER;
 
-    if (abs_rms_delta > rms_thresh && rms_delta > 0.0f) {
+    if (abs_rms_delta > rms_thresh && rms_delta > 0.f) {
         // Note changed, do pulse
         pulse = AMP_MAX;
     }
@@ -245,9 +243,15 @@ float calculate_power(int16_t *samples, size_t frames, int channels) {
         count++;
     }
 
-    if (count == 0) return 0.0f;
+    if (count == 0) return 0.f;
 
-    return ((float)sum_squares / count) / (32768.0f * 32768.0f);
+    return ((float)sum_squares / count) / (32768.f * 32768.f);
+}
+
+static float get_song_length() {
+    if (samplerate_mp3() <= 0.f) return 0.f; // Shouldn't happen but just in case
+
+    return (float) mpg123_length(mh) / samplerate_mp3();
 }
 
 void audio_thread(void *const file) {
@@ -258,6 +262,18 @@ void audio_thread(void *const file) {
 
     audio_init();
 
+    // If song offset greater than the length, start at 0
+    if (level_info.song_offset >= get_song_length()) {
+        level_info.song_offset = 0;
+    }
+    
+    // Do the same with seek target
+    if (seek_target >= get_song_length()) {
+        seek_target = 0;
+        LightEvent_Signal(&seekEvent);
+    }
+
+    // Do initial seek
     if (seek_target > 0) {   
         seek_mp3(seek_target);    
         seek_target = -1;
@@ -282,6 +298,7 @@ void audio_thread(void *const file) {
                     amplitude = calculate_amplitude(rms);
                 }
 
+                // Check for the end of song
                 if (read == 0) {
                     if (looping) {
                         seek_mp3(0);
@@ -297,7 +314,9 @@ void audio_thread(void *const file) {
             }
         }
 
+        // Handle song end
         if (lastbuf) {
+            // Wait for either song restart or level quit, while waiting, make pulses scale to 0
             while (!restart_requested && !quit) {
                 amplitude = calculate_amplitude(0);
                 svcSleepThread((long) 1.666666666666e+7);
@@ -345,17 +364,13 @@ int play_mp3(char *path, bool loop, float seek) {
                                           THREAD_STACK_SZ, priority,
                                           THREAD_AFFINITY, true);
 
+    // Wait for seek to finish
     if (seek > 0) LightEvent_Wait(&seekEvent);
     return 1;
 }
 
 void seek(u32 location) {
-    if (location <= mpg123_length(mh)) {
-        mpg123_seek(mh, location, SEEK_SET);
-    } else {
-        level_info.song_offset = 0;
-        mpg123_seek(mh, 0, SEEK_SET);
-    }
+    mpg123_seek(mh, location, SEEK_SET);
 }
 
 // Set position in seconds

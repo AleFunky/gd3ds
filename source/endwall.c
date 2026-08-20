@@ -61,7 +61,7 @@ int handle_wall_cutscene(float delta) {
             return 0;
         }
 
-        state.completion_shake = true;
+        start_shake(FIREWORK_SPAWN_TIME, 3);
         
         UseEffect *effect = add_use_effect(level_info.wall_x, level_info.wall_y, USE_EFFECT_OBJ_NOTHING, &end_wall_filled_first, get_use_effect_array_ptr(GFX_TOP));
         if (effect) {
@@ -150,8 +150,6 @@ int handle_wall_cutscene(float delta) {
             
             fireworks_spawned++;
         }
-        
-        state.completion_shake = false;
     }
 
     // End the level!

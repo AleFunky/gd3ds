@@ -892,6 +892,7 @@ void game_loop() {
             }
 
             handle_practice_mode();
+            handle_shake(delta);
 
             u64 start_trig = svcGetSystemTick();
             handle_triggers();

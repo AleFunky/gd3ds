@@ -138,6 +138,12 @@ void restore_checkpoint() {
     state.player = check->p1;
     state.player2 = check->p2;
 
+    state.player.buffering_state = (state.input.holdJump ? BUFFER_READY : BUFFER_NONE);
+    state.player2.buffering_state = (state.input.holdJump ? BUFFER_READY : BUFFER_NONE);
+
+    state.player.buffer_ufo = true;
+    state.player2.buffer_ufo = true;
+
     state.camera_intended_y = check->camera_intended_y;
 
     state.ground_y = check->ground_y;

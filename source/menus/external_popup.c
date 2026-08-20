@@ -15,6 +15,7 @@
 #include "save/saving.h"
 
 #include "fonts/chatFont.h"
+#include "utils/string_helpers.h"
 
 #include "state.h"
 
@@ -165,26 +166,32 @@ static void set_description(char *gmd) {
 }
 
 static void set_downloads_likes(char *gmd) {
-    char tmp[512];
-
     char *downloads = extract_gmd_key((const char *) gmd, "k11", "i");
     if (downloads) {
-        snprintf(tmp, sizeof(tmp), "%s", downloads);
+        int download_count = atoi(downloads);
+        char *truncated_downloads = truncate_number(download_count);
         free(downloads);
 
-        ui_label_set_text(downloads_label, tmp);
+        if (!truncated_downloads) return;
+
+        ui_label_set_text(downloads_label, truncated_downloads);    
+        free(truncated_downloads);
     }
 
     char *likes = extract_gmd_key((const char *) gmd, "k22", "i");
     if (likes) {
-        snprintf(tmp, sizeof(tmp), "%s", likes);
+        int like_count = atoi(likes);
+        char *truncated_likes = truncate_number(like_count);
+        free(likes);
 
-        ui_label_set_text(likes_label, tmp);
+        if (!truncated_likes) return;
 
-        if (atoi(likes) < 0) {
+        ui_label_set_text(likes_label, truncated_likes);
+
+        if (like_count < 0) {
             ui_image_set_image(like_image, DISLIKE_ICON, 0);
         }
-        free(likes);
+        free(truncated_likes);
     }
 }
 
@@ -270,7 +277,11 @@ static void set_progress() {
 }
 
 static void set_difficulty() {
-    ui_image_set_image(difficulty_face, difficulty_stars[stars_num], 0);
+    int face = difficulty_stars[0];
+    if (stars_num >= 0 || stars_num < ARRAY_LEN(difficulty_stars)) {
+        face = difficulty_stars[stars_num];
+    }
+    ui_image_set_image(difficulty_face, face, 0);
 }
 
 void external_popup_enter_from_level() {

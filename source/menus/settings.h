@@ -55,7 +55,7 @@ typedef struct {
     bool quickCheckpoints;
 } SettingState;
 
-extern Setting settings[25];
+extern Setting settings[26];
 extern SettingState settingsState;
 
 void settings_init();

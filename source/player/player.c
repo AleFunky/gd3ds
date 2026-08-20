@@ -479,7 +479,7 @@ void ufo_gamemode(Player *player) {
     drag_particles_2[state.current_player].gravityFlipped = !player->upside_down;
     drag_particles_2[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
 
-    bool buffering_check = ((state.old_player.gamemode == GAMEMODE_PLAYER || state.old_player.gamemode == GAMEMODE_SHIP || state.old_player.gamemode == GAMEMODE_DART) && (state.input.holdJump));
+    bool buffering_check = ((state.old_player.gamemode == GAMEMODE_PLAYER || state.old_player.gamemode == GAMEMODE_SHIP || state.old_player.gamemode == GAMEMODE_DART || player->buffer_ufo) && (state.input.holdJump));
     // If buffering, jump
     if (player->buffering_state == BUFFER_READY && (state.input.pressedJump || buffering_check)) {
         player->vel_y = fmaxf(player->vel_y, player->mini ? 358.992 : 371.034);
@@ -759,6 +759,8 @@ void run_player(Player *player) {
     if (player->gamemode == GAMEMODE_BIRD) rotate_fly(player, 0.07f);
 
     player->snap_rotation = false;
+
+    player->buffer_ufo = false;
 }
 
 float collision_time = 0;

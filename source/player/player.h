@@ -149,6 +149,8 @@ typedef struct {
     bool jumped;
     bool landed_from_jump;
 
+    bool buffer_ufo;
+
     float coyote_frames;
 
     IconsDrawing player_icons;
