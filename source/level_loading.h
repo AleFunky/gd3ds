@@ -132,3 +132,6 @@ char *get_level_name(char *data_ptr);
 char *load_user_song(int id, size_t *out_size); 
 bool check_song(int id);
 char *extract_gmd_key(const char *data, const char *key, const char *type);
+
+char **split_string(const char *str, char delimiter, int *outCount, bool ignoreZeroLength);
+void free_string_array(char **arr, int count);

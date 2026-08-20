@@ -20,6 +20,7 @@
 #include "save/config.h"
 
 #include <curl/curl.h>
+#include "utils/network.h"
 
 #include "menus/main_menu.h"
 #include "menus/level_select.h"
@@ -47,6 +48,7 @@
 #include "menus/loading_screen.h"
 #include "menus/level_complete.h"
 #include "menus/online_level_menu.h"
+#include "menus/online_menu.h"
 
 #include "save/saving.h"
 
@@ -1300,6 +1302,7 @@ int main(int argc, char* argv[]) {
     C2D_Init(MAX_SPRITES);
     C2D_Prepare();
     osSetSpeedupEnable(1);
+    soc_init();
 
     cfg_init();
     cfguInit();
@@ -1424,10 +1427,13 @@ int main(int argc, char* argv[]) {
                 saved_levels_loop();
                 break;
             case STATE_ONLINE_LEVEL:
-                online_menu_loop();
+                online_level_menu_loop();
                 break;
             case STATE_EXTERNAL_LEVELS:
                 external_levels_loop();
+                break;
+            case STATE_ONLINE:
+                online_menu_loop();
                 break;
             case STATE_SOGGY: // Sog
                 soggy_menu_loop();

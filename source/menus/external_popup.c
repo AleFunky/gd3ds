@@ -10,6 +10,7 @@
 #include "main.h"
 #include "external_level_infobox.h"
 #include "menus/external_levels.h"
+#include "external_popup.h"
 
 #include "save/saving.h"
 
@@ -48,19 +49,6 @@ static UILabel *practice_progress_val;
 
 static int stars_num = 0;
 
-#define MAX_STARS 10
-
-#define NA_FACE     251
-#define AUTO_FACE   267
-#define EASY_FACE   252
-#define NORMAL_FACE 253
-#define HARD_FACE   254
-#define HARDER_FACE 255
-#define INSANE_FACE 256
-#define DEMON_FACE  258
-
-#define DISLIKE_ICON 56
-
 const int difficulty_stars[MAX_STARS + 1] = {
     NA_FACE,
     AUTO_FACE,
@@ -74,8 +62,6 @@ const int difficulty_stars[MAX_STARS + 1] = {
     INSANE_FACE,
     DEMON_FACE
 };
-
-#define MAX_DESCRIPTION_WIDTH 300
 
 void external_popup_enter_from_level();
 

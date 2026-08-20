@@ -350,7 +350,7 @@ char *decompress_level(char *data) {
     return decompressed;
 }
 
-char **split_string(const char *str, char delimiter, int *outCount) {
+char **split_string(const char *str, char delimiter, int *outCount, bool ignoreZeroLength) {
     char **result = NULL;
     int count = 0;
     const char *start = str;
@@ -359,7 +359,7 @@ char **split_string(const char *str, char delimiter, int *outCount) {
     while (*ptr) {
         if (*ptr == delimiter) {
             int len = ptr - start;
-            if (len > 0) {
+            if (len > (ignoreZeroLength ? -1 : 0)) {
                 char *token = (char *)malloc(len + 1);
                 strncpy(token, start, len);
                 token[len] = '\0';
@@ -392,7 +392,7 @@ void free_string_array(char **arr, int count) {
 void parse_color_channel(GDColorChannel *channels, int i, char *channel_string) {
     GDColorChannel channel = {0};  // Zero-initialize
     int kvCount = 0;
-    char **kvs = split_string(channel_string, '_', &kvCount);
+    char **kvs = split_string(channel_string, '_', &kvCount, false);
 
     for (int j = 0; j + 1 < kvCount; j += 2) {
         int key = atoi(kvs[j]);
@@ -611,7 +611,7 @@ int parse_color_channels(const char *colorString, GDColorChannel **outArray) {
 
     int count = 0;
     // Split string into each channel
-    char **entries = split_string(colorString, '|', &count);
+    char **entries = split_string(colorString, '|', &count, false);
     if (!entries) return 0;
 
     GDColorChannel *channels = malloc(sizeof(GDColorChannel) * count);
@@ -880,7 +880,7 @@ bool is_valid_object(int id) {
 int parse_gd_object(const char *objStr, int obj) {
     int count = 0;
     // Split object into each key
-    char **tokens = split_string(objStr, ',', &count);
+    char **tokens = split_string(objStr, ',', &count, false);
     if (count < 1) {
         free_string_array(tokens, count);
         return 0;
@@ -1156,7 +1156,7 @@ int parse_string(const char *levelString) {
     int sectionCount = 0;
 
     // Split the string in object sections
-    char **sections = split_string(levelString, ';', &sectionCount);
+    char **sections = split_string(levelString, ';', &sectionCount, false);
 
     if (sectionCount < 1) {
         output_log("Level string missing sections!\n");

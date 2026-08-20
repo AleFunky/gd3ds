@@ -125,7 +125,7 @@ void loading_screen_update(float progress) {
     // Top screen, drawn once per eye when 3D is on
     for (int eye = 0; begin_top_eye(eye); eye++) {
         begin_eye_layer(DEPTH_BACKGROUND);
-        draw_background(0, -30);
+        draw_background(-20, -30);
         end_eye_layer();
 
         begin_eye_layer(DEPTH_UI);
@@ -137,7 +137,7 @@ void loading_screen_update(float progress) {
     C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
     C2D_SceneBegin(bot);
 
-    draw_background(0, SCREEN_HEIGHT-30);
+    draw_background(-20, SCREEN_HEIGHT-30);
     C2D_ViewScale(SCALE, SCALE);
     draw_fade();
 

@@ -77,6 +77,7 @@ enum GameState {
     STATE_CREATOR_MENU,
     STATE_SEARCH_MENU,
     STATE_SOGGY,
+    STATE_ONLINE,
     STATE_EXIT
 };
 

@@ -17,6 +17,7 @@
 #include "utils/server_utils.h"
 #include "utils/string_helpers.h"
 #include "fonts/goldFont.h"
+#include "search_menu.h"
 
 static bool exit_flag = false;
 
@@ -29,7 +30,7 @@ static UIImage *bg_gradient_top;
 
 static UIList *list;
 
-const char *lengths[] = {
+const char *level_lengths[] = {
     "Tiny",
     "Small",
     "Medium",
@@ -37,7 +38,7 @@ const char *lengths[] = {
     "XL",
 };
 
-const char *main_songs[] = {
+const char *main_level_songs[] = {
     "Stereo Madness",
     "Back on Track",
     "Polargeist",
@@ -63,17 +64,17 @@ static void action_exit(UIElement *e) {
     set_fade_status(FADE_STATUS_OUT);
 }
 
-void action_open_level_menu(UIElement* e) {
+void action_open_online_level_menu(UIElement* e) {
     new_state = STATE_ONLINE_LEVEL;
     set_fade_status(FADE_STATUS_OUT);
 }
 
 static UIAction actions[] = {
     {"exit", action_exit },
-    {"open_level_menu", action_open_level_menu },
+    {"open_level_menu", action_open_online_level_menu },
 };
 
-void saved_levels_loop() {
+void online_menu_loop() {
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
     C2D_SceneBegin(bot);
     C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
@@ -85,19 +86,17 @@ void saved_levels_loop() {
     new_state = 0;
     exit_flag = false;
 
-    char *query = "heatwave";
-
     ui_load_screen(&default_screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/saved_levels.txt");
-    bg_gradient = (UIImage *) ui_get_element_by_tag(&default_screen, "gradient");
     ui_load_screen(&default_screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/saved_levels_top.txt");
+    bg_gradient = (UIImage *) ui_get_element_by_tag(&default_screen, "gradient");
     bg_gradient_top = (UIImage *) ui_get_element_by_tag(&default_screen_top, "gradient_top");
-
     ui_image_set_tint(bg_gradient, C2D_Color32(50, 110, 255, 255));
     ui_image_set_tint(bg_gradient_top, C2D_Color32(50, 110, 255, 255));
-    int search_result = search_levels(query, 0, 0);
-
     list = (UIList *) ui_get_element_by_tag(&default_screen, "list");
     error_label = (UILabel *)ui_get_element_by_tag(&default_screen, "errorLabel");
+
+    int search_result = search_levels(search_query, 0, 0);
+    
     if (search_result == 7 || search_result == 6) 
     {
         ui_label_set_text(error_label, "No<p><#599cff>Internet</> connection!");
@@ -119,7 +118,7 @@ void saved_levels_loop() {
 
             strncpy(tmp_name, search_entries[i].name, sizeof(tmp_name) - 1);
             strncpy(tmp_creator, creator_entries[search_entries[i].creatorIndex].creatorName, sizeof(tmp_creator) - 1);
-            snprintf(tmp_song, sizeof(tmp_song) - 1, "%s%s", (search_entries[i].songId != 0) ? "<#f982ff>" : "<#27d2ff>", (search_entries[i].songId != 0) ?song_entries[search_entries[i].songIndex].songTitle : main_songs[search_entries[i].mainSongId]);
+            snprintf(tmp_song, sizeof(tmp_song) - 1, "%s%s", (search_entries[i].songId != 0) ? "<#f982ff>" : "<#27d2ff>", (search_entries[i].songId != 0) ?song_entries[search_entries[i].songIndex].songTitle : main_level_songs[search_entries[i].mainSongId]);
 
             truncate_filename(tmp_song, 35);
 
@@ -193,7 +192,7 @@ void saved_levels_loop() {
                 if (length_label)
                 {
 
-                    ui_label_set_text(length_label, lengths[search_entries[i].lengthNum]);
+                    ui_label_set_text(length_label, level_lengths[search_entries[i].lengthNum]);
                     ui_element_set_position((UIElement *)length_label, -list_width + 60, 19.3f);
                     ui_element_set_scale((UIElement *)length_label, 0.35f);
                     
@@ -314,7 +313,7 @@ void saved_levels_loop() {
 
                     ui_element_set_position((UIElement *)button, list_width - 32, 0);
                     ui_element_set_size((UIElement *)button, 48, 28);
-                    ui_element_set_action((UIElement *)button, action_open_level_menu);
+                    ui_element_set_action((UIElement *)button, action_open_online_level_menu);
                     ui_element_add_child(card, (UIElement *)button);
                 }
 
@@ -378,7 +377,7 @@ void saved_levels_loop() {
         }
 
         if (exit_flag) {
-            game_state = STATE_CREATOR_MENU;
+            game_state = STATE_SEARCH_MENU;
             break;
         }
     }
