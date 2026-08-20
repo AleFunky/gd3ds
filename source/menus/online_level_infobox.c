@@ -88,7 +88,7 @@ void online_level_infobox_init() {
     normal_percent = (UILabel *) ui_get_element_by_tag(&screen, "normalprogressvalue");
     practice_percent = (UILabel *) ui_get_element_by_tag(&screen, "practiceprogressvalue");
 
-    populate_online_info();
+    if (level_entry) populate_online_info();
 
     yes_exit = false;
 }

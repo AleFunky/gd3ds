@@ -1,5 +1,6 @@
 #include <3ds.h>
 #include <citro2d.h>
+#include <stdlib.h>
 #include "menus/core/ui_element.h"
 #include "menus/core/ui_screen.h"
 #include "menus/components/ui_image.h"
@@ -13,8 +14,6 @@
 #include "clear_search_filters.h"
 #include "song_filter.h"
 #include "menus/components/ui_label.h"
-#include <stdlib.h>
-
 static int new_state = 0;
 
 static bool in_disclaimer = false;
@@ -22,6 +21,7 @@ static bool in_server_switcher = false;
 static bool in_filters = false;
 static bool in_clear_search_filters = false;
 static bool exit_flag = false;
+bool search_needs_refresh = true;
 
 char search_query[129];
 
@@ -55,6 +55,8 @@ void action_clear_filters(UIElement* e) {
 }
 
 void action_search(UIElement* e) {
+    strncpy(search_query, search_input->text, sizeof(search_query) - 1);
+    search_needs_refresh = true;
     new_state = STATE_ONLINE;
     set_fade_status(FADE_STATUS_OUT);
 }
@@ -72,7 +74,7 @@ void search_menu_loop() {
 
     exit_flag = false;
     new_state = STATE_SEARCH_MENU;
-
+    
     ui_load_screen(&default_screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/search_menu.txt");
     bg_gradient = (UIImage *) ui_get_element_by_tag(&default_screen, "gradient");
     ui_load_screen(&default_screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/search_menu_top.txt");
@@ -158,8 +160,6 @@ void search_menu_loop() {
         }
 
         if (new_state != STATE_SEARCH_MENU) {
-            //search_query = search_input->text;
-            strncpy(search_query, search_input->text, sizeof(search_query) - 1);
             game_state = new_state;
             break;
         }

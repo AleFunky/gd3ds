@@ -137,7 +137,7 @@ void populate_list() {
             UIImage *high_object_icon = ui_create_image(&default_screen.ctx);
             if (high_object_icon && (entry->objCount >= 44000)) {
                 ui_image_set_image(high_object_icon, 362, 0);
-                ui_element_set_position((UIElement *)high_object_icon, -list_width + 48 + get_text_length(&goldFont_fontCharset, 0.45f, false, tmp_creator) + 10 + ((entry->originalId != 0) ? 23 : 0), -4.5f);
+                ui_element_set_position((UIElement *)high_object_icon, -list_width + 48 + get_text_length(&goldFont_fontCharset, 0.45f, false, tmp_creator) + 10 + ((entry->originalId != 0) ? 11 : 0), -4.5f);
                 ui_element_set_scale((UIElement *)high_object_icon, 0.7f);
 
                 ui_element_add_child(card, (UIElement *)high_object_icon);
@@ -294,8 +294,14 @@ void populate_list() {
 
 void handle_errors(int code) {
     char temp[54];
-
     switch (code) {
+        case -2:
+            ui_label_set_text(error_label, "An unknown error has<p> occured.");
+            break;
+
+        case -1:
+            break;
+
         case 6:
         case 7:   
             ui_label_set_text(error_label, "No<p><#599cff>Internet</> connection!");
@@ -304,6 +310,7 @@ void handle_errors(int code) {
         default:
             snprintf(temp, sizeof(temp) - 1, "An unknown error has<p>occurred.<p><p>Error code: %d", code);
             ui_label_set_text(error_label, temp);
+
     }
 }
 
@@ -319,8 +326,8 @@ void online_menu_loop() {
     new_state = 0;
     exit_flag = false;
 
-    ui_load_screen(&default_screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/saved_levels.txt");
-    ui_load_screen(&default_screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/saved_levels_top.txt");
+    ui_load_screen(&default_screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_levels.txt");
+    ui_load_screen(&default_screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_levels_top.txt");
 
     bg_gradient = (UIImage *) ui_get_element_by_tag(&default_screen, "gradient");
     bg_gradient_top = (UIImage *) ui_get_element_by_tag(&default_screen_top, "gradient_top");
@@ -331,12 +338,18 @@ void online_menu_loop() {
     list = (UIList *) ui_get_element_by_tag(&default_screen, "list");
     error_label = (UILabel *)ui_get_element_by_tag(&default_screen, "errorLabel");
 
-    int search_result = search_levels(search_query, 0, 0);
-    
+    int search_result = -2;
+
+    if (search_needs_refresh) {
+        search_result = search_levels(search_query, 0, 0);
+    }
+   
     // Handle result
-    if (search_result != 0) handle_errors(search_result);
-    else if (list) { // No errors
+    if (search_result != 0 && search_needs_refresh) {
+        handle_errors(search_result);
+    } else if (list) { // No errors
         populate_list();
+        search_needs_refresh = false;
     }
 
     set_fade_status(FADE_STATUS_IN);

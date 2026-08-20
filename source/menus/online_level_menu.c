@@ -22,21 +22,26 @@
 #include "menus/online_menu.h"
 #include "menus/external_popup.h"
 #include "fonts/chatFont.h"
+#include "fonts/goldFont.h"
 #include "songs.h"
-
-
+#include "online_level_errorbox.h"
 
 static bool exit_flag = false;
 static bool in_info_box = false;
 static bool in_comments = false;
 static bool in_refresh = false;
 static bool in_delete = false;
+static bool in_errorbox = false;
+
+int result = -2;
 
 static UIImage *bg_gradient;
 static UIImage *bg_gradient_top;
 
 static UILabel *level_name;
 static UILabel *level_creator;
+static UIImage *high_obj_icon;
+static UIImage *collab_icon;
 static UILabel *downloads;
 static UILabel *likes;
 static UILabel *length;
@@ -59,13 +64,17 @@ static void action_exit(UIElement *e) {
 }
 
 static void action_open_info(UIElement *e) {
-    in_info_box = true;
-    online_level_infobox_init();
+    if (result == 0){
+        in_info_box = true;
+        online_level_infobox_init();
+    }
 }
 
 static void action_open_comments(UIElement *e) {
-    in_comments = true;
-    online_comments_init();
+    if (result == 0){
+        in_comments = true;
+        online_comments_init();
+    }
 }
 
 static void action_refresh_level(UIElement *e) {
@@ -146,7 +155,11 @@ void populate_level_info() {
     char tmp_starcount[4];
     snprintf(tmp_starcount, 4, "%d", entry_srch->stars);
     ui_label_set_text(stars, tmp_starcount);
-    if (entry_srch->stars == 0) ui_run_func_on_tag(&default_screen_top, "star", ui_disable_element);
+    if (entry_srch->stars == 0) {
+        ui_run_func_on_tag(&default_screen_top, "star", ui_disable_element);
+        ui_element_set_position((UIElement *) featured_glow, 165, 97.65);
+        ui_element_set_position((UIElement *) difficulty_face, 165, 93);
+    }
 
     ui_label_set_text(level_name, entry_srch->name);
     
@@ -171,9 +184,20 @@ void populate_level_info() {
 
     char tmp_songid[16] = "";
     snprintf(tmp_songid, 16, "SongID: %d", (entry_srch->songId == 0) ? entry_srch->mainSongId : entry_sng->ngSongId);
-
+    
     ui_label_set_text(song_id, tmp_songid);
     ui_label_set_text(song_artist, tmp_songartist2);
+
+    bool high_obj_count = entry_srch->objCount >= 42000;
+    bool is_copy = entry_srch->originalId != 0;
+
+    if (is_copy) {
+        ui_element_set_position((UIElement *)collab_icon, 200 + get_text_length(&goldFont_fontCharset, 0.7f, false, tmp_creator) / 2 + 8, collab_icon->base.y);
+    } else ui_disable_element((UIElement *)collab_icon);
+    if (high_obj_count) {
+        ui_element_set_position((UIElement *)high_obj_icon, 200 + get_text_length(&goldFont_fontCharset, 0.7f, false, tmp_creator) / 2 + 8 + ((is_copy) ? 13 : 0), high_obj_icon->base.y);
+    } else ui_disable_element((UIElement *)high_obj_icon);
+
 }
 
 void online_level_menu_loop() {
@@ -193,6 +217,9 @@ void online_level_menu_loop() {
 
     level_name = (UILabel *) ui_get_element_by_tag(&default_screen_top, "levelname");
     level_creator = (UILabel *) ui_get_element_by_tag(&default_screen_top, "creatorname");
+
+    collab_icon = (UIImage *) ui_get_element_by_tag(&default_screen_top, "collab");
+    high_obj_icon = (UIImage *) ui_get_element_by_tag(&default_screen_top, "highobj");
 
     downloads = (UILabel *) ui_get_element_by_tag(&default_screen_top, "downloadcount");
     likes = (UILabel *) ui_get_element_by_tag(&default_screen_top, "likecount");
@@ -218,21 +245,34 @@ void online_level_menu_loop() {
     ui_image_set_tint(bg_gradient, C2D_Color32(50, 110, 255, 255));
     ui_image_set_tint(bg_gradient_top, C2D_Color32(50, 110, 255, 255));
 
-    // uncomment this to bypass getting levelobject 
-    // int result = 0;
-
-    int result = get_level_data(search_entries[curr_search_id].levelId);
     populate_level_info();
 
-    if (result == 0){
-        //idk do something i don't have a use for the data in here within this menu
-    }
-    else
+    result = get_level_data(search_entries[curr_search_id].levelId);
+
+    // Handle result
+    if (result != 0)
     {
-        char tmp[16];
-        snprintf(tmp, 16, "%d", result);
-        ui_label_set_text(level_name, tmp);
-    }
+        char error_message[64] = "";
+        switch (result)
+        {
+        case -2: 
+            snprintf(error_message, 64 - 1, "%s", "An unknown error has occured.");
+            break;
+        case -1:
+            snprintf(error_message, 64 - 1, "%s", "Failed to download level!<p>Please try again later.");
+            break;
+        case 6:
+        case 7:
+            snprintf(error_message, 64 - 1, "No Internet connection!");
+            break;
+
+        default:
+            snprintf(error_message, 64 - 1, "An unknown error has occurred.<p>Error code: %d", result);
+            break;
+        }
+        in_errorbox = true;
+        online_errorbox_init(error_message);
+    };
 
     set_fade_status(FADE_STATUS_IN);
     while (aptMainLoop()) {
@@ -263,6 +303,7 @@ void online_level_menu_loop() {
             if(in_comments) online_comments_draw();
             if(in_delete) delete_level_draw_bot();
             if(in_refresh) refresh_level_draw_bot();
+            if(in_errorbox) online_errorbox_draw_bot();
 
             change_blending(true);
             draw_touch_effect();
@@ -291,7 +332,7 @@ void online_level_menu_loop() {
             break;
         }
 
-        if (!in_info_box && !in_comments && !in_delete && !in_refresh) ui_screen_update(&default_screen, &touch);
+        if (!in_info_box && !in_comments && !in_delete && !in_refresh && !in_errorbox) ui_screen_update(&default_screen, &touch);
 
         if (in_info_box)
         {
@@ -324,6 +365,14 @@ void online_level_menu_loop() {
             if (returned)
             {
                 in_refresh = false;
+            }
+        }
+        if (in_errorbox)
+        {
+            int returned = online_errorbox_loop();
+            if (returned)
+            {
+                in_errorbox = false;
             }
         }
     }

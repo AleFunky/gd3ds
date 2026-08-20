@@ -2,7 +2,7 @@ darken opacity=0.4 darkenTime=0.15
 window x=160 y=120 w=260 h=120 style=1 tag=window
 # Labelling
 
-label x=160 y=88 font=2 text="Info" scale=0.9 align=CENTER
+label x=160 y=88 font=2 text="Info" scale=0.9 align=CENTER tag="title"
 
 label x=160 y=116 font=1 text="" scale=0.8 align=CENTER tag="content"
 
