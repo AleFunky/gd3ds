@@ -23,7 +23,7 @@ static bool in_filters = false;
 static bool in_clear_search_filters = false;
 static bool exit_flag = false;
 
-char *search_query;
+char search_query[128];
 
 static UIImage *bg_gradient;
 static UIImage *bg_gradient_top;
@@ -158,8 +158,8 @@ void search_menu_loop() {
         }
 
         if (new_state != STATE_SEARCH_MENU) {
-            search_query = search_input->text;
-            // strncpy(search_query, search_input->text, 21 - 1);
+            //search_query = search_input->text;
+            strncpy(search_query, search_input->text, sizeof(search_query) - 1);
             game_state = new_state;
             break;
         }
