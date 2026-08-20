@@ -21,9 +21,13 @@ SearchEntry *search_entries;
 CreatorEntry *creator_entries;
 SongEntry *song_entries;
 
+LevelEntry *level_entry;
+
 int searchEntriesLength = 0;
 int creatorEntriesLength = 0;
 int songEntriesLength = 0;
+
+int levelEntryLength = 0;
 
 static void fill_creator_entries(char **creatorStrings, int creatorStringCount) {
     for (int i = 0; i < creatorStringCount; i++) {
@@ -80,7 +84,7 @@ static void fill_level_entries(char **levelsStrings, int songStringCount, int cr
 
         for (int j = 0; j + 1 < levelKeyCount; j += 2) {
             int key = atoi(levelKeys[j]);
-            const char *valStr = levelKeys[j + 1];
+            char *valStr = levelKeys[j + 1];
 
             switch (key) {
                 case 1:
@@ -93,7 +97,12 @@ static void fill_level_entries(char **levelsStrings, int songStringCount, int cr
                     break;
                 case 3:
                     // level description
-                    // base64_decode(valStr, search_entries[i].description);
+                    fix_base64_url(valStr);
+                    search_entries[i].description = malloc(strlen(valStr) + 1);
+                    int decoded_len = base64_decode(valStr, (unsigned char *)search_entries[i].description);
+                    if (decoded_len > 0) {
+                        search_entries[i].description[decoded_len] = '\0';
+                    };
                     break;
                 case 5:
                     // level version
@@ -158,6 +167,10 @@ static void fill_level_entries(char **levelsStrings, int songStringCount, int cr
                     // newgrounds song id
                     search_entries[i].songId = atoi(valStr);
                     break;
+                case 39: 
+                    // stars requested
+                    search_entries[i].reqStars = atoi(valStr);
+                    break;
                 case 45:
                     // object count, caps at 65535
                     search_entries[i].objCount = atoi(valStr);
@@ -186,6 +199,41 @@ static void fill_level_entries(char **levelsStrings, int songStringCount, int cr
         search_entries[i].creatorIndex = creator_index;
         search_entries[i].songIndex = song_index;
     }
+}
+
+static void fill_level_entry(char **levelStrings, int levelStringsCount) {
+        int levelKeyCount = 0;
+
+        char **levelKeys = split_string(levelStrings[0], ':', &levelKeyCount, true);
+        output_log("hey i made it to thje level entry processor");
+        // output_log(levelStrings[0]);
+        for (int j = 0; j + 1 < levelKeyCount; j += 2) {
+            int key = atoi(levelKeys[j]);
+            char *valStr = levelKeys[j + 1];;
+            switch (key) {
+                case 1:
+                    // level id
+                    // output_log(valStr);
+                    level_entry[0].levelId = atoi(valStr);
+                    break;
+                case 4:
+                    // base64 encoded probably compressed level string
+                    // output_log(valStr);
+                    level_entry[0].levelString = strdup(valStr);
+                    break;
+                case 28:
+                    // level upload date
+                    // output_log(valStr);
+                    strncpy(level_entry[0].uploadDate, valStr, sizeof(level_entry[0].uploadDate) - 1);
+                    break;
+                case 29:
+                    // date of last update
+                    // output_log(valStr);
+                    strncpy(level_entry[0].updateDate, valStr, sizeof(level_entry[0].updateDate) - 1);
+                    break;
+            }
+        }
+        free_string_array(levelKeys, levelKeyCount);
 }
 
 int search_levels(char *query, int type, int page) {
@@ -226,5 +274,62 @@ int search_levels(char *query, int type, int page) {
     creatorEntriesLength = creatorStringCount;
     songEntriesLength = songStringCount;
     searchEntriesLength = levelStringCount;
+    return 0;
+}
+
+int get_level_data(int id) {
+    char *outdata;
+    int result = get_level_from_id(&outdata, id);
+    // output_log(outdata);
+
+    if (result != 0) return result;
+
+    int initialStringCount = 0;
+
+    char **initialStrings = split_string(outdata, '#', &initialStringCount, true);
+
+    level_entry = malloc(initialStringCount * sizeof(LevelEntry));
+
+    fill_level_entry(initialStrings, 1);
+    
+    // output_log(initialStrings[0]);
+
+    free_string_array(initialStrings, initialStringCount);
+
+    levelEntryLength = initialStringCount;
+    return 0;
+}
+
+float derive_gj_version(int version)
+{
+    switch (version)
+    {
+    case 1:
+        return 1.0;
+    case 2:
+        return 1.1;
+    case 3:
+        return 1.2;
+    case 4:
+        return 1.3;
+    case 5:
+        return 1.4;
+    case 6:
+        return 1.5;
+    case 7:
+        return 1.6;
+    case 10:
+        return 1.7;
+    case 18:
+        return 1.8;
+    case 19:
+        return 1.9;
+    case 20:
+        return 2.0;
+    case 21:
+        return 2.1;
+    case 22:
+        return 2.2;
+    };
     return 0;
 }

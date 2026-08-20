@@ -25,6 +25,7 @@
 static bool exit_flag = false;
 
 static int new_state;
+int curr_search_id;
 
 static UILabel *error_label;
 
@@ -33,12 +34,18 @@ static UIImage *bg_gradient_top;
 
 static UIList *list;
 
+typedef struct {
+    int entryId;
+} OnlineCardData;
+
 static void action_exit(UIElement *e) {
     exit_flag = true;
     set_fade_status(FADE_STATUS_OUT);
 }
 
 void action_open_online_level_menu(UIElement* e) {
+    OnlineCardData *entry = e->userdata;
+    curr_search_id = entry->entryId;
     new_state = STATE_ONLINE_LEVEL;
     set_fade_status(FADE_STATUS_OUT);
 }
@@ -263,6 +270,11 @@ void populate_list() {
 
             UIWindowButton *button = ui_create_window_button(&default_screen.ctx);
             if (button) {
+                // Store in the user data
+                OnlineCardData *data = malloc(sizeof(*data));
+
+                data->entryId = i;
+
                 ui_window_button_set_style(button, 5);
                 ui_button_set_text((UIButton *)button, "View");
 
@@ -271,6 +283,7 @@ void populate_list() {
                 ui_element_set_position((UIElement *)button, list_width - 32, 0);
                 ui_element_set_size((UIElement *)button, 48, 28);
                 ui_element_set_action((UIElement *)button, action_open_online_level_menu);
+                ui_element_set_userdata((UIElement *) button, data);
                 ui_element_add_child(card, (UIElement *)button);
             }
 
