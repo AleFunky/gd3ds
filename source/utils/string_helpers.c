@@ -5,6 +5,7 @@
 #include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // WHY DOESN'T C STANDARD CONTAIN STRCASESTR
 bool contains(const char *first, const char *second) {
@@ -54,4 +55,17 @@ char *truncate_number(int number) {
     }
 
     return buffer;
+}
+
+void strip_character(char* s, char character) {
+    size_t length = strlen(s);
+
+    if (length < 2)
+        return;
+
+    if ((s[0] == character && s[length - 1] == character))
+    {
+        memmove(s, s + 1, length - 1);
+        s[length - 2] = '\0';
+    }
 }
