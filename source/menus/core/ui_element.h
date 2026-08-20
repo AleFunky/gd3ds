@@ -285,6 +285,7 @@ typedef struct {
     UIImage base;
 
     float rotation_speed;
+    bool blending;
 } UISpinner;
 /*
 typedef struct {
