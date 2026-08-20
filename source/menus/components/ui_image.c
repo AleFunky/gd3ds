@@ -4,14 +4,14 @@
 #include "menus/core/ui_props.h"
 #include "math_helpers.h"
 
-static void ui_image_update(UIElement* e, UIInput* touch, UITransform *transform) {
+void ui_image_update(UIElement* e, UIInput* touch, UITransform *transform) {
     bool inside = ui_element_basic_bound_check(e, touch, transform);
     
     // Mask background elements
     if (inside) touch->did_something = true;
 }
 
-static void ui_image_draw(UIElement* e, UITransform *transform) {
+void ui_image_draw(UIElement* e, UITransform *transform) {
     UIImage *image = (UIImage *) e;
 
     C2D_SpriteSetCenter(&image->image.sprite, 0.5f, 0.5f);

@@ -280,6 +280,12 @@ typedef struct {
 
     u32 color;
 } UIRectangle;
+
+typedef struct {
+    UIImage base;
+
+    float rotation_speed;
+} UISpinner;
 /*
 typedef struct {
     

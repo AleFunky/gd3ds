@@ -1,5 +1,6 @@
 #include "menus/core/ui_screen.h"
 #include "main.h"
+#include "menus/components/ui_spinner.h"
 #include "menus/core/common_setters.h"
 #include "ui_props.h"
 #include "ui_element.h"
@@ -76,6 +77,7 @@ static const UIElementConstructor element_constructors[] = {
     {"paletteicons", ui_create_palette_icons_from_props },
     {"slider",       ui_create_slider_from_props },
     {"rectangle",    ui_create_rectangle_from_props },
+    {"spinner",      ui_create_spinner_from_props },
 };
 
 const UIBitfieldEntry keybind_table[] = {
@@ -632,8 +634,8 @@ void ui_element_apply_properties(UIElement *e, const UIContext *ctx, const UIPro
     if (!e || !ctx || !props) return;
 
     ui_element_set_position(e, 
-        ui_prop_int(props, "x", e->x), 
-        ui_prop_int(props, "y", e->y));
+        ui_prop_float(props, "x", e->x), 
+        ui_prop_float(props, "y", e->y));
 
     ui_element_set_size(e, 
         ui_prop_int(props, "w", e->w), 
