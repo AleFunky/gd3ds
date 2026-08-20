@@ -10,6 +10,7 @@
 #include "menus/components/ui_label.h"
 
 #include "save/saving.h"
+#include "songs.h"
 
 static bool yes_exit = false;
 static bool exiting = false;
@@ -20,18 +21,13 @@ static UIScreen screen = {
 
 static UIList *list;
 
-typedef struct SongEntries {
-    char *title;
-    char *artist;
-} SongEntries;
-
-static const SongEntries songs[] = {
+const SongEntries main_songs[] = {
     { "Stereo Madness", "ForeverBound" },
     { "Back on Track", "DJVI" },
     { "Polargeist", "Step" }, 
     { "Dry Out", "DJVI"},
     { "Base after Base", "DJVI" },
-    { "Can't let Go", "DJVI" },
+    { "Cant let Go", "DJVI" },
     { "Jumper", "Waterflame" },
     { "Time Machine", "Waterflame" },
     { "Cycles", "DJVI" },
@@ -64,9 +60,9 @@ void songs_init() {
     if (list) {
         float list_width = list->base.w * 0.5f;
 
-        for (int i = 0; i < ARRAY_LEN(songs); i++) {
-            char *title = songs[i].title;
-            char *artist = songs[i].artist;
+        for (int i = 0; i < ARRAY_LEN(main_songs); i++) {
+            char *title = main_songs[i].title;
+            char *artist = main_songs[i].artist;
 
             UIElement *card = (UIElement *) ui_create_rectangle(&screen.ctx);
 

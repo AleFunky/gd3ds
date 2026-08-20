@@ -25,6 +25,7 @@
 #define UNUSED __attribute__((unused)) 
 
 #define ARRAY_LEN(arr) (sizeof(arr) / sizeof(arr[0]))
+#define IN_BOUNDS(index, arr) (index >= 0 && index < ARRAY_LEN(arr))
 
 typedef struct {
     float x, y;

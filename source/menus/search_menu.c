@@ -23,7 +23,7 @@ static bool in_filters = false;
 static bool in_clear_search_filters = false;
 static bool exit_flag = false;
 
-char search_query[128];
+char search_query[129];
 
 static UIImage *bg_gradient;
 static UIImage *bg_gradient_top;

@@ -25,50 +25,28 @@ int searchEntriesLength = 0;
 int creatorEntriesLength = 0;
 int songEntriesLength = 0;
 
-int search_levels(char *query, int type, int page) {
-    char *outdata;
-    int result = get_search_results(&outdata, query, type, page);
+static void fill_creator_entries(char **creatorStrings, int creatorStringCount) {
+    for (int i = 0; i < creatorStringCount; i++) {
+        int stringCount;
+        char **creatorString = split_string(creatorStrings[i], ':', &stringCount, true);
+        creator_entries[i].accountId = atoi(creatorString[0]);
+        strncpy(creator_entries[i].creatorName, creatorString[1], sizeof(creator_entries[i].creatorName) - 1);
+        creator_entries[i].userId = atoi(creatorString[2]);
+    }
+}
 
-    if (result != 0) return result;
+static void fill_song_entries(char **songStrings, int songStringCount) {
+    for (int i = 0; i < songStringCount; i++) {
+        int songKeyCount = 0;
 
-    int initialStringCount = 0;
+        char **songKeys = split_string(songStrings[i], '|', &songKeyCount, true);
 
-    int levelStringCount = 0;
-    int creatorStringCount = 0;
-    int songStringCount = 0;
-
-    char **initialStrings = split_string(outdata, '#', &initialStringCount, true);
-
-    char **levelsStrings = split_string(initialStrings[0], '|', &levelStringCount, true);
-    char **creatorStrings = split_string(initialStrings[1], '|', &creatorStringCount, true);
-    char **songStrings = split_string(initialStrings[2], ':', &songStringCount, true);
-    search_entries = malloc(levelStringCount*sizeof(SearchEntry));
-    creator_entries = malloc(creatorStringCount*sizeof(CreatorEntry));
-    song_entries = malloc(songStringCount*sizeof(SongEntry));
-
-    for (int i = 0; i < creatorStringCount; i++)
-        {
-            int stringCount;
-            char **creatorString = split_string(creatorStrings[i], ':', &stringCount, true);
-            creator_entries[i].accountId = atoi(creatorString[0]);
-            strncpy(creator_entries[i].creatorName, creatorString[1], sizeof(creator_entries[i].creatorName) - 1);
-            creator_entries[i].userId = atoi(creatorString[2]);
-        }
-
-    for (int i = 0; i < songStringCount; i++)
-        {
-            int songKeyCount = 0;
-
-            char **songKeys = split_string(songStrings[i], '|', &songKeyCount, true);
-
-            for (int j = 0; j + 1 < songKeyCount; j += 2)
-            {
-                strip_character(songKeys[j], '~');
-                int key = atoi(songKeys[j]);
-                char *valStr = songKeys[j + 1];
-                strip_character(valStr, '~');
-                switch (key)
-                {
+        for (int j = 0; j + 1 < songKeyCount; j += 2) {
+            strip_character(songKeys[j], '~');
+            int key = atoi(songKeys[j]);
+            char *valStr = songKeys[j + 1];
+            strip_character(valStr, '~');
+            switch (key) {
                 case 1:
                     // song id
                     song_entries[i].ngSongId = atoi(valStr);
@@ -89,25 +67,22 @@ int search_levels(char *query, int type, int page) {
                     // song link
                     strncpy(song_entries[i].songLink, valStr, sizeof(song_entries[i].songLink) - 1);
                     break;
-                }
             }
-            free_string_array(songKeys, songKeyCount);
         }
-    
-    for (int i = 0; i < levelStringCount; i++)
-        {
-            int levelKeyCount = 0;
-            int song_index;
-            int creator_index;
-            char **levelKeys = split_string(levelsStrings[i], ':', &levelKeyCount, true);
+        free_string_array(songKeys, songKeyCount);
+    }
+}
 
-            for (int j = 0; j + 1 < levelKeyCount; j += 2)
-            {
-                int key = atoi(levelKeys[j]);
-                const char *valStr = levelKeys[j + 1];
+static void fill_level_entries(char **levelsStrings, int songStringCount, int creatorStringCount, int levelStringCount) {
+    for (int i = 0; i < levelStringCount; i++) {
+        int levelKeyCount = 0;
+        char **levelKeys = split_string(levelsStrings[i], ':', &levelKeyCount, true);
 
-                switch (key)
-                {
+        for (int j = 0; j + 1 < levelKeyCount; j += 2) {
+            int key = atoi(levelKeys[j]);
+            const char *valStr = levelKeys[j + 1];
+
+            switch (key) {
                 case 1:
                     // level id
                     search_entries[i].levelId = atoi(valStr);
@@ -152,7 +127,6 @@ int search_levels(char *query, int type, int page) {
                     // level length
                     search_entries[i].lengthNum = atoi(valStr);
                     break;
-
                 case 16:
                     // level dislikes, we have no use for this (formula is dislikes - likes)
                     break;
@@ -188,32 +162,67 @@ int search_levels(char *query, int type, int page) {
                     // object count, caps at 65535
                     search_entries[i].objCount = atoi(valStr);
                     break;
-                }
             }
-            free_string_array(levelKeys, levelKeyCount);
-
-            for (song_index = 0; song_index < songStringCount; song_index++)
-            {
-                if (search_entries[i].songId == song_entries[song_index].ngSongId) {
-                    break;
-                }
-            }
-
-            for (creator_index = 0; creator_index < creatorStringCount; creator_index++)
-            {
-                if (search_entries[i].creatorId == creator_entries[creator_index].accountId) {
-                    break;
-                }
-            }
-
-            search_entries[i].creatorIndex = creator_index;
-            search_entries[i].songIndex = song_index;
         }
+        free_string_array(levelKeys, levelKeyCount);
+
+        int song_index;
+        int creator_index;
+        
+        // Find the song
+        for (song_index = 0; song_index < songStringCount; song_index++) {
+            if (search_entries[i].songId == song_entries[song_index].ngSongId) {
+                break;
+            }
+        }
+
+        // Find the creator
+        for (creator_index = 0; creator_index < creatorStringCount; creator_index++) {
+            if (search_entries[i].creatorId == creator_entries[creator_index].accountId) {
+                break;
+            }
+        }
+
+        search_entries[i].creatorIndex = creator_index;
+        search_entries[i].songIndex = song_index;
+    }
+}
+
+int search_levels(char *query, int type, int page) {
+    char *outdata;
+    int result = get_search_results(&outdata, query, type, page);
+
+    if (result != 0) return result;
+
+    int initialStringCount = 0;
+
+    int levelStringCount = 0;
+    int creatorStringCount = 0;
+    int songStringCount = 0;
+
+    char **initialStrings = split_string(outdata, '#', &initialStringCount, true);
+
+    char **levelsStrings = split_string(initialStrings[0], '|', &levelStringCount, true);
+    char **creatorStrings = split_string(initialStrings[1], '|', &creatorStringCount, true);
+    char **songStrings = split_string(initialStrings[2], ':', &songStringCount, true);
+    search_entries = malloc(levelStringCount * sizeof(SearchEntry));
+    creator_entries = malloc(creatorStringCount * sizeof(CreatorEntry));
+    song_entries = malloc(songStringCount * sizeof(SongEntry));
+
+    // Fill creators
+    fill_creator_entries(creatorStrings, creatorStringCount);
+
+    // Fill songs
+    fill_song_entries(songStrings, songStringCount);
+    
+    // Fill levels
+    fill_level_entries(levelsStrings, songStringCount, creatorStringCount, levelStringCount);
    
     free_string_array(levelsStrings, levelStringCount);
     free_string_array(creatorStrings, creatorStringCount);
     free_string_array(songStrings, songStringCount);    
     free_string_array(initialStrings, initialStringCount);
+
     creatorEntriesLength = creatorStringCount;
     songEntriesLength = songStringCount;
     searchEntriesLength = levelStringCount;

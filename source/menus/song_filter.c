@@ -1,10 +1,12 @@
 #include <3ds.h>
 #include <citro2d.h>
+#include <stdio.h>
 #include "menus/core/ui_element.h"
 #include "menus/core/ui_screen.h"
 #include "menus/components/ui_label.h"
 #include "menus/components/ui_checkbox.h"
 #include "menus/components/ui_window_button.h"
+#include "menus/songs.h"
 #include "save/saving.h"
 #include "save/config.h"
 #include "search_filters.h"
@@ -19,39 +21,19 @@ static UITextbox *song_input;
 static UIWindowButton *custom_button;
 static UIWindowButton *normal_button;
 
-const char *song_names[] = {
-    "01. Stereo Madness",
-    "02. Back on Track",
-    "03. Polargeist",
-    "04. Dry Out",
-    "05. Base After Base",
-    "06. Cant Let Go",
-    "07. Jumper",
-    "08. Time Machine",
-    "09. Cycles",
-    "10. XStep",
-    "11. Clutterfunk",
-    "12. Theory of Everything",
-    "13. Electroman Adventures",
-    "14. Clubstep",
-    "15. Electrodynamix",
-    "16. Hexagon Force",
-    "17. Blast Processing",
-    "18. Theory of Everything 2",
-};
-
-
 void switch_song(int song) {
     UILabel *label = (UILabel *)ui_get_element_by_tag(&screen, "normal_song_text");
     if(label){
-        ui_label_set_text(label, song_names[song]);
+        char tmp[64];
+        snprintf(tmp, sizeof(tmp) - 1, "%02d. %s\n", song + 1, main_songs[song].title);
+        ui_label_set_text(label, tmp);
     }
 }
 
 void action_left_song(UIElement *e) {
     normal_song_id_selected--;
     if (normal_song_id_selected < 0) {
-        normal_song_id_selected = ARRAY_LEN(song_names) - 1;
+        normal_song_id_selected = ARRAY_LEN(main_songs) - 1;
     }
 
     switch_song(normal_song_id_selected);
@@ -59,7 +41,7 @@ void action_left_song(UIElement *e) {
 
 void action_right_song(UIElement *e) {
     normal_song_id_selected++;
-    if (normal_song_id_selected >= ARRAY_LEN(song_names)) {
+    if (normal_song_id_selected >= ARRAY_LEN(main_songs)) {
         normal_song_id_selected = 0;
     }
 

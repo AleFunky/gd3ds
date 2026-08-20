@@ -222,7 +222,7 @@ static void show_error_message() {
 
     int message_id = level_result - 1;
     char *message = "Ultra unknown error.";
-    if (message_id < ARRAY_LEN(error_strings)) {
+    if (IN_BOUNDS(message_id, error_strings)) {
         message = (char *) error_strings[message_id]; 
     }
 

@@ -33,6 +33,14 @@ GDColorChannel *colorChannels = NULL;
 
 LoadedLevelInfo level_info;
 
+const char *level_lengths[] = {
+    "Tiny",
+    "Small",
+    "Medium",
+    "Long",
+    "XL",
+};
+
 static inline unsigned int section_hash_func(unsigned int x, unsigned int y) {
     return ((unsigned int)x * 73856093u ^ (unsigned int)y * 19349663u) & (SECTION_HASH_SIZE - 1);
 }

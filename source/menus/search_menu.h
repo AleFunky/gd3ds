@@ -2,4 +2,4 @@
 
 void search_menu_loop();
 
-extern char search_query[128];
+extern char search_query[129];

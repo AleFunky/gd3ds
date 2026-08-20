@@ -12,6 +12,7 @@
 #include "menus/external_levels.h"
 #include "external_popup.h"
 
+#include "menus/songs.h"
 #include "save/saving.h"
 
 #include "fonts/chatFont.h"
@@ -254,8 +255,8 @@ static void set_song_id(char *gmd) {
         }
     } else {
         char *song_name = "Unknown";
-        if (song_id < MAIN_LEVELS_NUM) {
-            song_name = main_levels[song_id].level_name;
+        if (IN_BOUNDS(song_id, main_songs)) {
+            song_name = main_songs[song_id].title;
         }
         snprintf(tmp, sizeof(tmp), "Using song: %s", song_name);
     }
@@ -278,7 +279,7 @@ static void set_progress() {
 
 static void set_difficulty() {
     int face = difficulty_stars[0];
-    if (stars_num >= 0 || stars_num < ARRAY_LEN(difficulty_stars)) {
+    if (IN_BOUNDS(stars_num, difficulty_stars)) {
         face = difficulty_stars[stars_num];
     }
     ui_image_set_image(difficulty_face, face, 0);
