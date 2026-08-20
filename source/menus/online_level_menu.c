@@ -118,7 +118,7 @@ void populate_level_info() {
     // get song and song artist
     char *tmp_song = "Unknown";
     char *tmp_songartist = "Unknown";
-    char *tmp_songartist2 = "";
+    char tmp_songartist2[64];
 
     if (entry_srch->songId != 0) {
         char tmp_songsize[24] = "";
@@ -174,7 +174,7 @@ void populate_level_info() {
 
     ui_label_set_text(song_id, tmp_songid);
     ui_label_set_text(song_artist, tmp_songartist2);
-};
+}
 
 void online_level_menu_loop() {
     exit_flag = false;
@@ -232,7 +232,7 @@ void online_level_menu_loop() {
         char tmp[16];
         snprintf(tmp, 16, "%d", result);
         ui_label_set_text(level_name, tmp);
-    };
+    }
 
     set_fade_status(FADE_STATUS_IN);
     while (aptMainLoop()) {

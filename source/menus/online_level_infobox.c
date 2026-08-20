@@ -43,12 +43,12 @@ void populate_online_info() {
     snprintf(tmp_creator, 48, "<#ffff00>By: %s</>", creator_entries[curr_entry[curr_search_id].creatorIndex].creatorName);
     ui_label_set_text(level_creator, tmp_creator);
 
-    char tmp_upload[150] = "";
-    snprintf(tmp_upload, 150, "Uploaded: %s ago", level_entry->uploadDate);
+    char tmp_upload[156] = "";
+    snprintf(tmp_upload, 156, "Uploaded: <#ffff00>%s ago</>", level_entry->uploadDate);
     ui_label_set_text(uploaded_ago, tmp_upload);
 
-    char tmp_update[150] = "";
-    snprintf(tmp_update, 150, "Updated: %s ago", level_entry->updateDate);
+    char tmp_update[156] = "";
+    snprintf(tmp_update, 156, "Updated: <#ffff00>%s ago</>", level_entry->updateDate);
     ui_label_set_text(updated_ago, tmp_update);
 
     char tmp_reqstars[24] = "";
@@ -64,7 +64,7 @@ void populate_online_info() {
     // ui_label_set_text(normal_percent, );
     // ui_label_set_text(practice_percent, );
 
-};
+}
 
 void online_level_infobox_init() {
     ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_level_info_pop_up.txt");
