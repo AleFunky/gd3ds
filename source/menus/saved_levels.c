@@ -22,6 +22,9 @@ static bool exit_flag = false;
 
 static int new_state;
 
+static UILabel *list_title;
+static UILabel *top_title;
+
 static UILabel *error_label;
 
 static UIImage *bg_gradient;
@@ -56,13 +59,18 @@ void saved_levels_loop() {
     new_state = 0;
     exit_flag = false;
 
-    ui_load_screen(&default_screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/saved_levels.txt");
+    ui_load_screen(&default_screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_levels.txt");
     bg_gradient = (UIImage *) ui_get_element_by_tag(&default_screen, "gradient");
-    ui_load_screen(&default_screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/saved_levels_top.txt");
+    ui_load_screen(&default_screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_levels_top.txt");
     bg_gradient_top = (UIImage *) ui_get_element_by_tag(&default_screen_top, "gradient_top");
 
     ui_image_set_tint(bg_gradient, C2D_Color32(50, 110, 255, 255));
     ui_image_set_tint(bg_gradient_top, C2D_Color32(50, 110, 255, 255));
+
+    list_title = (UILabel *) ui_get_element_by_tag(&default_screen, "listtitle");
+    ui_label_set_text(list_title, "Saved Levels");
+    top_title = (UILabel *) ui_get_element_by_tag(&default_screen_top, "toptitle");
+    ui_label_set_text(top_title, "Browse your saved user levels!");
 
     list = (UIList *) ui_get_element_by_tag(&default_screen, "list");
     error_label = (UILabel *)ui_get_element_by_tag(&default_screen, "errorLabel");

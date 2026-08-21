@@ -4,6 +4,8 @@
 #include "menus/core/ui_screen.h"
 #include "menus/components/ui_label.h"
 #include "save/saving.h"
+#include "utils/server_utils.h"
+#include "online_menu.h"
 
 static bool yes_exit = false;
 
@@ -13,6 +15,18 @@ static UIScreen screen = {
 static UIScreen screen_top = {
 };
 
+static UILabel *level_name;
+static UILabel *level_creator;
+static UILabel *uploaded_ago;
+static UILabel *updated_ago;
+static UILabel *requested_stars;
+static UILabel *game_ver;
+
+static UILabel *attempts;
+static UILabel *jumps;
+static UILabel *normal_percent;
+static UILabel *practice_percent;
+
 void exit_online_level_infobox(UIElement* e) {
     yes_exit = true;
 }
@@ -21,12 +35,60 @@ static UIAction actions[] = {
     { "exit", exit_online_level_infobox },
 };
 
+void populate_online_info() {
+    SearchEntry *curr_entry = &search_entries[curr_search_id];  
+
+    char tmp_name[34] = "";
+    snprintf(tmp_name, 34, "<#ffff00>%s</>", curr_entry->name);
+    ui_label_set_text(level_name, tmp_name);
+
+    char tmp_creator[48] = "";
+    snprintf(tmp_creator, 48, "By: <#ffff00>%s</>", creator_entries[curr_entry[curr_search_id].creatorIndex].creatorName);
+    ui_label_set_text(level_creator, tmp_creator);
+
+    char tmp_upload[156] = "";
+    snprintf(tmp_upload, 156, "Uploaded: <#ffff00>%s ago</>", level_entry->uploadDate);
+    ui_label_set_text(uploaded_ago, tmp_upload);
+
+    char tmp_update[156] = "";
+    snprintf(tmp_update, 156, "Updated: <#ffff00>%s ago</>", level_entry->updateDate);
+    ui_label_set_text(updated_ago, tmp_update);
+
+    char tmp_reqstars[32] = "";
+    snprintf(tmp_reqstars, 32, "Stars Requested: <#ffff00>%d</>", curr_entry->reqStars);
+    ui_label_set_text(requested_stars, tmp_reqstars);
+
+    char tmp_gjver[32] = "";
+    snprintf(tmp_gjver, 32, "Game Version: <#ffff00>%.1f</>", derive_gj_version(curr_entry->gameVersion));
+    ui_label_set_text(game_ver, tmp_gjver);
+
+    // ui_label_set_text(attempts, );
+    // ui_label_set_text(jumps, );
+    // ui_label_set_text(normal_percent, );
+    // ui_label_set_text(practice_percent, );
+
+}
+
 void online_level_infobox_init() {
     ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_level_info_pop_up.txt");
     ui_screen_open(&screen, ANIM_ZOOM);
 
     ui_load_screen(&screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_level_info_pop_up_top.txt");
     ui_screen_open(&screen_top, ANIM_ZOOM);
+
+    level_name = (UILabel *) ui_get_element_by_tag(&screen_top, "name");
+    level_creator = (UILabel *) ui_get_element_by_tag(&screen_top, "creator");
+    uploaded_ago = (UILabel *) ui_get_element_by_tag(&screen_top, "uploaded");
+    updated_ago = (UILabel *) ui_get_element_by_tag(&screen_top, "lastupdated");
+    requested_stars = (UILabel *) ui_get_element_by_tag(&screen_top, "requestedstars");
+    game_ver = (UILabel *) ui_get_element_by_tag(&screen_top, "gdversion");
+
+    attempts = (UILabel *) ui_get_element_by_tag(&screen, "totalattempts");
+    jumps = (UILabel *) ui_get_element_by_tag(&screen, "totaljumps");
+    normal_percent = (UILabel *) ui_get_element_by_tag(&screen, "normalprogressvalue");
+    practice_percent = (UILabel *) ui_get_element_by_tag(&screen, "practiceprogressvalue");
+
+    if (level_entry) populate_online_info();
 
     yes_exit = false;
 }

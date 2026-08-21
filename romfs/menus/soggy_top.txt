@@ -1,3 +1,1 @@
-# image x=200 y=120 id=18 sheet=1
-label x=200 y=120 align=CENTER text="a" tag="label"
-label x=200 y=140 align=CENTER text="b" tag="label2"
+image x=200 y=120 id=18 sheet=1
