@@ -1,6 +1,7 @@
 #include <3ds.h>
 #include <stdlib.h>
 #include <citro2d.h>
+#include "level_loading.h"
 #include "menus/components/ui_window_button.h"
 #include "menus/core/ui_element.h"
 #include "menus/core/ui_screen.h"
@@ -17,11 +18,11 @@
 #include "network.h"
 #include "utils/string_helpers.h"
 
-SearchEntry *search_entries;
-CreatorEntry *creator_entries;
-SongEntry *song_entries;
+SearchEntry *search_entries = NULL;
+CreatorEntry *creator_entries = NULL;
+SongEntry *song_entries = NULL;
 
-LevelEntry *level_entry;
+LevelEntry *level_entry = NULL;
 
 int searchEntriesLength = 0;
 int creatorEntriesLength = 0;
@@ -36,6 +37,7 @@ static void fill_creator_entries(char **creatorStrings, int creatorStringCount) 
         creator_entries[i].accountId = atoi(creatorString[0]);
         strncpy(creator_entries[i].creatorName, creatorString[1], sizeof(creator_entries[i].creatorName) - 1);
         creator_entries[i].userId = atoi(creatorString[2]);
+        free_string_array(creatorString, stringCount);
     }
 }
 
@@ -202,32 +204,32 @@ static void fill_level_entries(char **levelsStrings, int songStringCount, int cr
 }
 
 static void fill_level_entry(char **levelStrings, int levelStringsCount) {
-        int levelKeyCount = 0;
+    int levelKeyCount = 0;
 
-        char **levelKeys = split_string(levelStrings[0], ':', &levelKeyCount, true);
-        for (int j = 0; j + 1 < levelKeyCount; j += 2) {
-            int key = atoi(levelKeys[j]);
-            char *valStr = levelKeys[j + 1];;
-            switch (key) {
-                case 1:
-                    // level id
-                    level_entry[0].levelId = atoi(valStr);
-                    break;
-                case 4:
-                    // base64 encoded probably compressed level string
-                    level_entry[0].levelString = strdup(valStr);
-                    break;
-                case 28:
-                    // time since upload
-                    strncpy(level_entry[0].uploadDate, valStr, sizeof(level_entry[0].uploadDate) - 1);
-                    break;
-                case 29:
-                    // time since last
-                    strncpy(level_entry[0].updateDate, valStr, sizeof(level_entry[0].updateDate) - 1);
-                    break;
-            }
+    char **levelKeys = split_string(levelStrings[0], ':', &levelKeyCount, true);
+    for (int j = 0; j + 1 < levelKeyCount; j += 2) {
+        int key = atoi(levelKeys[j]);
+        char *valStr = levelKeys[j + 1];;
+        switch (key) {
+            case 1:
+                // level id
+                level_entry->levelId = atoi(valStr);
+                break;
+            case 4:
+                // base64 encoded probably compressed level string
+                level_entry->levelString = strdup(valStr);
+                break;
+            case 28:
+                // time since upload
+                strncpy(level_entry->uploadDate, valStr, sizeof(level_entry->uploadDate) - 1);
+                break;
+            case 29:
+                // time since last
+                strncpy(level_entry->updateDate, valStr, sizeof(level_entry->updateDate) - 1);
+                break;
         }
-        free_string_array(levelKeys, levelKeyCount);
+    }
+    free_string_array(levelKeys, levelKeyCount);
 }
 
 int search_levels(char *query, int type, int page) {
@@ -243,13 +245,30 @@ int search_levels(char *query, int type, int page) {
     int songStringCount = 0;
 
     char **initialStrings = split_string(outdata, '#', &initialStringCount, true);
+    if (!initialStrings) return -1;
 
     char **levelsStrings = split_string(initialStrings[0], '|', &levelStringCount, true);
+    if (!levelsStrings) return -1;
+
     char **creatorStrings = split_string(initialStrings[1], '|', &creatorStringCount, true);
+    if (!creatorStrings) return -1;
+    
     char **songStrings = split_string(initialStrings[2], ':', &songStringCount, true);
+    if (!songStrings) return -1;
+    
     search_entries = malloc(levelStringCount * sizeof(SearchEntry));
+    if (!search_entries) return -1;
+
     creator_entries = malloc(creatorStringCount * sizeof(CreatorEntry));
+    if (!creator_entries) return -1;
+
     song_entries = malloc(songStringCount * sizeof(SongEntry));
+    if (!song_entries) return -1;
+
+    // Initialize
+    memset(search_entries, 0, levelStringCount * sizeof(SearchEntry));
+    memset(creator_entries, 0, creatorStringCount * sizeof(CreatorEntry));
+    memset(song_entries, 0, songStringCount * sizeof(SongEntry));
 
     // Fill creators
     fill_creator_entries(creatorStrings, creatorStringCount);
@@ -280,8 +299,13 @@ int get_level_data(int id) {
     int initialStringCount = 0;
 
     char **initialStrings = split_string(outdata, '#', &initialStringCount, true);
+    if (!initialStrings) return -1;
 
     level_entry = malloc(initialStringCount * sizeof(LevelEntry));
+    if (!level_entry) return -1;
+
+    // Initialize
+    memset(level_entry, 0, initialStringCount * sizeof(LevelEntry));
 
     fill_level_entry(initialStrings, 1);
 
@@ -291,36 +315,34 @@ int get_level_data(int id) {
     return 0;
 }
 
-float derive_gj_version(int version)
-{
-    switch (version)
-    {
-    case 1:
-        return 1.0;
-    case 2:
-        return 1.1;
-    case 3:
-        return 1.2;
-    case 4:
-        return 1.3;
-    case 5:
-        return 1.4;
-    case 6:
-        return 1.5;
-    case 7:
-        return 1.6;
-    case 10:
-        return 1.7;
-    case 18:
-        return 1.8;
-    case 19:
-        return 1.9;
-    case 20:
-        return 2.0;
-    case 21:
-        return 2.1;
-    case 22:
-        return 2.2;
+float derive_gj_version(int version) {
+    switch (version) {
+        case 1:
+            return 1.0;
+        case 2:
+            return 1.1;
+        case 3:
+            return 1.2;
+        case 4:
+            return 1.3;
+        case 5:
+            return 1.4;
+        case 6:
+            return 1.5;
+        case 7:
+            return 1.6;
+        case 10:
+            return 1.7;
+        case 18:
+            return 1.8;
+        case 19:
+            return 1.9;
+        case 20:
+            return 2.0;
+        case 21:
+            return 2.1;
+        case 22:
+            return 2.2;
     }
     return 0;
 }

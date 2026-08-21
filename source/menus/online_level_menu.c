@@ -38,25 +38,25 @@ int result = -2;
 static UIImage *bg_gradient;
 static UIImage *bg_gradient_top;
 
-static UILabel *level_name;
-static UILabel *level_creator;
-static UIImage *high_obj_icon;
-static UIImage *collab_icon;
-static UILabel *downloads;
-static UILabel *likes;
-static UILabel *length;
-static UILabel *stars;
-static UILabel *description;
-static UILabel *level_id;
-static UIImage *difficulty_face;
-static UIImage *featured_glow;
+static UILabel *level_name_label;
+static UILabel *level_creator_label;
+static UIImage *high_obj_icon_image;
+static UIImage *collab_icon_image;
+static UILabel *downloads_label;
+static UILabel *likes_label;
+static UILabel *length_label;
+static UILabel *stars_label;
+static UILabel *description_label;
+static UILabel *level_id_label;
+static UIImage *difficulty_face_image;
+static UIImage *featured_glow_image;
 
-static UILabel *normal_percent;
-static UILabel *practice_percent;
-static UILabel *song_name;
-static UILabel *song_artist;
-static UILabel *song_id;
-static UILabel *song_size;
+static UILabel *normal_percent_label;
+static UILabel *practice_percent_label;
+static UILabel *song_name_label;
+static UILabel *song_artist_label;
+static UILabel *song_id_label;
+static UILabel *song_size_label;
 
 static void action_exit(UIElement *e) {
     exit_flag = true;
@@ -105,99 +105,141 @@ void populate_level_info() {
     CreatorEntry *entry_c = &creator_entries[entry_srch->creatorIndex];
     SongEntry *entry_sng = &song_entries[entry_srch->songIndex];
 
-    char *tmp_downloads = truncate_number(entry_srch->downloads);
-    ui_label_set_text(downloads, tmp_downloads);
+    char *downloads = truncate_number(entry_srch->downloads);
+    ui_label_set_text(downloads_label, downloads);
 
-    char *tmp_likes = truncate_number(entry_srch->likes);
-    ui_label_set_text(likes, tmp_likes);
+    char *likes = truncate_number(entry_srch->likes);
+    ui_label_set_text(likes_label, likes);
 
-    char *tmp_length = "Unkn.";
+    // Length
+    char *length = "Unkn.";
     if (IN_BOUNDS(entry_srch->lengthNum, level_lengths)) {
-        tmp_length = (char *) level_lengths[entry_srch->lengthNum];
+        length = (char *) level_lengths[entry_srch->lengthNum];
     }
-    ui_label_set_text(length, tmp_length);
+    ui_label_set_text(length_label, length);
 
-    char tmp_lvlid[32] = "";
-    snprintf(tmp_lvlid, 32, "<#78aaf0>ID: %d", entry_srch->levelId);
+    // Level ID
+    char lvlid[32];
+    snprintf(lvlid, sizeof(lvlid), "<#78aaf0>ID: %d", entry_srch->levelId);
+    ui_label_set_text(level_id_label, lvlid);
 
-    char tmp_creator[26] = "";
-    snprintf(tmp_creator, 26, "By: %s", entry_c->creatorName);
-    ui_label_set_text(level_creator, tmp_creator);
+    // Creator
+    char creator[26];
+    snprintf(creator, sizeof(creator), "By: %s", entry_c->creatorName);
+    ui_label_set_text(level_creator_label, creator);
 
-    // get song and song artist
-    char *tmp_song = "Unknown";
-    char *tmp_songartist = "Unknown";
-    char tmp_songartist2[64];
+    // Song and song artist
+    char *song_name = "Unknown";
+    char *song_artist_name = "Unknown";
 
     if (entry_srch->songId != 0) {
-        char tmp_songsize[24] = "";
-        snprintf(tmp_songsize, 24, "Size: %dMB", entry_sng->songSize);
-        ui_label_set_text(song_size, tmp_songsize);
+        // Custom song
+        char tmp_songsize[24];
+        snprintf(tmp_songsize, sizeof(tmp_songsize), "Size: %dMB", entry_sng->songSize);
+        ui_label_set_text(song_size_label, tmp_songsize);
 
         if (entry_srch->songIndex < songEntriesLength) {
-                tmp_song = entry_sng->songTitle;
-                tmp_songartist = entry_sng->artistName;
-            }
-
-    } else {
-        if (IN_BOUNDS(entry_srch->mainSongId, main_songs)) {
-            tmp_song = (char *) main_songs[entry_srch->mainSongId].title;
-            tmp_songartist = (char *) main_songs[entry_srch->mainSongId].artist;
+            song_name = entry_sng->songTitle;
+            song_artist_name = entry_sng->artistName;
         }
+    } else {
+        // Main level song
         if (IN_BOUNDS(entry_srch->mainSongId, main_songs)) {
-            
+            song_name = (char *) main_songs[entry_srch->mainSongId].title;
+            song_artist_name = (char *) main_songs[entry_srch->mainSongId].artist;
         }
         
-        ui_disable_element((UIElement *) song_size);
+        ui_disable_element((UIElement *) song_size_label);
         ui_run_func_on_tag(&default_screen, "downloadbtn", ui_disable_element);
     }
 
-    char tmp_starcount[4];
-    snprintf(tmp_starcount, 4, "%d", entry_srch->stars);
-    ui_label_set_text(stars, tmp_starcount);
+    // Song artist again
+    char song_artist[132];
+    snprintf(song_artist, sizeof(song_artist), "By: %s", song_artist_name);
+    ui_label_set_text(song_artist_label, song_artist);
+    ui_label_set_text(song_name_label, song_name);
+    
+    // Star count
+    char star_count[4];
+    snprintf(star_count, sizeof(star_count), "%d", entry_srch->stars);
+    ui_label_set_text(stars_label, star_count);
+
+    // Unrated
     if (entry_srch->stars == 0) {
         ui_run_func_on_tag(&default_screen_top, "star", ui_disable_element);
-        ui_element_set_position((UIElement *) featured_glow, 165, 97.65);
-        ui_element_set_position((UIElement *) difficulty_face, 165, 93);
+        ui_element_set_position((UIElement *) featured_glow_image, 165, 97.65);
+        ui_element_set_position((UIElement *) difficulty_face_image, 165, 93);
     }
 
-    ui_label_set_text(level_name, entry_srch->name);
+    ui_label_set_text(level_name_label, entry_srch->name);
     
-    int difficulty_id = 0;
+    // Set difficulty
+    int difficulty_id = difficulty_stars[0];
 
     if (IN_BOUNDS(entry_srch->stars, difficulty_stars)) {
-            difficulty_id = difficulty_stars[entry_srch->stars];
-        }
+        difficulty_id = difficulty_stars[entry_srch->stars];
+    }
 
-    ui_image_set_image(difficulty_face, difficulty_id, 0);
+    ui_image_set_image(difficulty_face_image, difficulty_id, 0);
 
-    if (entry_srch->featureScore == 0) ui_disable_element((UIElement *)featured_glow);
-    char *tmp_desc = "";
-    tmp_desc = strdup(wrap_text(&chatFont_fontCharset, description->base.scaleX, entry_srch->description, 270));
-    
-    ui_label_set_text(description, tmp_desc);
-    ui_label_set_text(level_id, tmp_lvlid);
+    // Set featured
+    if (entry_srch->featureScore == 0) ui_disable_element((UIElement *)featured_glow_image);
 
-    snprintf(tmp_songartist2, 132, "By: %s", tmp_songartist);
+    // Description
+    if (entry_srch->description[0] != '\0') { // Check if empty
+        char *wrapped_description = wrap_text(&chatFont_fontCharset, description_label->base.scaleX, entry_srch->description, 270);
+        char *desc = strdup(wrapped_description);
+        ui_label_set_text(description_label, desc);
+        free(desc);
+    } else {
+        ui_label_set_text(description_label, "No description provided");
+    }
 
-    ui_label_set_text(song_name, tmp_song);
+    // Song id
+    char song_id[16];
+    snprintf(song_id, sizeof(song_id), "SongID: %d", (entry_srch->songId == 0) ? entry_srch->mainSongId : entry_sng->ngSongId);
+    ui_label_set_text(song_id_label, song_id );
 
-    char tmp_songid[16] = "";
-    snprintf(tmp_songid, 16, "SongID: %d", (entry_srch->songId == 0) ? entry_srch->mainSongId : entry_sng->ngSongId);
-    
-    ui_label_set_text(song_id, tmp_songid);
-    ui_label_set_text(song_artist, tmp_songartist2);
+    // Level icons
+    float half_creator_length = get_text_length(&goldFont_fontCharset, 0.7f, false, creator) / 2;
 
-    bool high_obj_count = entry_srch->objCount >= 42000;
+    // Original icon
     bool is_copy = entry_srch->originalId != 0;
-
     if (is_copy) {
-        ui_element_set_position((UIElement *)collab_icon, 200 + get_text_length(&goldFont_fontCharset, 0.7f, false, tmp_creator) / 2 + 8, collab_icon->base.y);
-    } else ui_disable_element((UIElement *)collab_icon);
-    if (high_obj_count) {
-        ui_element_set_position((UIElement *)high_obj_icon, 200 + get_text_length(&goldFont_fontCharset, 0.7f, false, tmp_creator) / 2 + 8 + ((is_copy) ? 13 : 0), high_obj_icon->base.y);
-    } else ui_disable_element((UIElement *)high_obj_icon);
+        ui_element_set_position((UIElement *)collab_icon_image, 200 + half_creator_length + 8, collab_icon_image->base.y);
+    } else {
+        ui_disable_element((UIElement *)collab_icon_image);
+    }
 
+    // High object count icon
+    bool high_obj_count = entry_srch->objCount >= 42000;
+    if (high_obj_count) {
+        ui_element_set_position((UIElement *)high_obj_icon_image, 200 + half_creator_length + 8 + (is_copy ? 13 : 0), high_obj_icon_image->base.y);
+    } else {
+        ui_disable_element((UIElement *)high_obj_icon_image);
+    }
+}
+
+static void handle_errors(int code) {
+    char error_message[64];
+    switch (code) {
+        case -2: 
+            snprintf(error_message, sizeof(error_message), "%s", "An unknown error has occured.");
+            break;
+        case -1:
+            snprintf(error_message, sizeof(error_message), "%s", "Failed to download level!<p>Please try again later.");
+            break;
+        case 6:
+        case 7:
+            snprintf(error_message, sizeof(error_message), "No Internet connection!");
+            break;
+
+        default:
+            snprintf(error_message, sizeof(error_message), "An unknown error has occurred.<p>Error code: %d", result);
+            break;
+    }
+    in_errorbox = true;
+    online_errorbox_init(error_message);
 }
 
 void online_level_menu_loop() {
@@ -213,34 +255,33 @@ void online_level_menu_loop() {
     bg_gradient = (UIImage *) ui_get_element_by_tag(&default_screen, "gradient");
     bg_gradient_top = (UIImage *) ui_get_element_by_tag(&default_screen_top, "gradient_top");
 
-    // top screen elements
+    // Top screen elements
 
-    level_name = (UILabel *) ui_get_element_by_tag(&default_screen_top, "levelname");
-    level_creator = (UILabel *) ui_get_element_by_tag(&default_screen_top, "creatorname");
+    level_name_label = (UILabel *) ui_get_element_by_tag(&default_screen_top, "levelname");
+    level_creator_label = (UILabel *) ui_get_element_by_tag(&default_screen_top, "creatorname");
 
-    collab_icon = (UIImage *) ui_get_element_by_tag(&default_screen_top, "collab");
-    high_obj_icon = (UIImage *) ui_get_element_by_tag(&default_screen_top, "highobj");
+    collab_icon_image = (UIImage *) ui_get_element_by_tag(&default_screen_top, "collab");
+    high_obj_icon_image = (UIImage *) ui_get_element_by_tag(&default_screen_top, "highobj");
 
-    downloads = (UILabel *) ui_get_element_by_tag(&default_screen_top, "downloadcount");
-    likes = (UILabel *) ui_get_element_by_tag(&default_screen_top, "likecount");
-    length = (UILabel *) ui_get_element_by_tag(&default_screen_top, "length");
-    stars = (UILabel *) ui_get_element_by_tag(&default_screen_top, "starcount");
+    downloads_label = (UILabel *) ui_get_element_by_tag(&default_screen_top, "downloadcount");
+    likes_label = (UILabel *) ui_get_element_by_tag(&default_screen_top, "likecount");
+    length_label = (UILabel *) ui_get_element_by_tag(&default_screen_top, "length");
+    stars_label = (UILabel *) ui_get_element_by_tag(&default_screen_top, "starcount");
 
-    difficulty_face = (UIImage *) ui_get_element_by_tag(&default_screen_top, "difficultyface");
-    featured_glow = (UIImage *) ui_get_element_by_tag(&default_screen_top, "glow");
+    difficulty_face_image = (UIImage *) ui_get_element_by_tag(&default_screen_top, "difficultyface");
+    featured_glow_image = (UIImage *) ui_get_element_by_tag(&default_screen_top, "glow");
 
-    description = (UILabel *) ui_get_element_by_tag(&default_screen_top, "description");
-    level_id = (UILabel *) ui_get_element_by_tag(&default_screen_top, "levelid");
+    description_label = (UILabel *) ui_get_element_by_tag(&default_screen_top, "description");
+    level_id_label = (UILabel *) ui_get_element_by_tag(&default_screen_top, "levelid");
 
-    // bottom screen elements
+    // Bottom screen elements
+    normal_percent_label = (UILabel *) ui_get_element_by_tag(&default_screen, "normalprogressvalue");
+    practice_percent_label = (UILabel *) ui_get_element_by_tag(&default_screen, "practiceprogressvalue");
 
-    normal_percent = (UILabel *) ui_get_element_by_tag(&default_screen, "normalprogressvalue");
-    practice_percent = (UILabel *) ui_get_element_by_tag(&default_screen, "practiceprogressvalue");
-
-    song_name = (UILabel *) ui_get_element_by_tag(&default_screen, "songname");
-    song_artist = (UILabel *) ui_get_element_by_tag(&default_screen, "songartist");
-    song_id = (UILabel *) ui_get_element_by_tag(&default_screen, "songid");
-    song_size = (UILabel *) ui_get_element_by_tag(&default_screen, "songsize");
+    song_name_label = (UILabel *) ui_get_element_by_tag(&default_screen, "songname");
+    song_artist_label = (UILabel *) ui_get_element_by_tag(&default_screen, "songartist");
+    song_id_label = (UILabel *) ui_get_element_by_tag(&default_screen, "songid");
+    song_size_label = (UILabel *) ui_get_element_by_tag(&default_screen, "songsize");
 
     ui_image_set_tint(bg_gradient, C2D_Color32(50, 110, 255, 255));
     ui_image_set_tint(bg_gradient_top, C2D_Color32(50, 110, 255, 255));
@@ -250,29 +291,11 @@ void online_level_menu_loop() {
     result = get_level_data(search_entries[curr_search_id].levelId);
 
     // Handle result
-    if (result != 0)
-    {
-        char error_message[64] = "";
-        switch (result)
-        {
-        case -2: 
-            snprintf(error_message, 64 - 1, "%s", "An unknown error has occured.");
-            break;
-        case -1:
-            snprintf(error_message, 64 - 1, "%s", "Failed to download level!<p>Please try again later.");
-            break;
-        case 6:
-        case 7:
-            snprintf(error_message, 64 - 1, "No Internet connection!");
-            break;
-
-        default:
-            snprintf(error_message, 64 - 1, "An unknown error has occurred.<p>Error code: %d", result);
-            break;
-        }
-        in_errorbox = true;
-        online_errorbox_init(error_message);
-    };
+    if (result != 0) {
+        handle_errors(result);
+    } else {
+        // TODO: handle level data
+    }
 
     set_fade_status(FADE_STATUS_IN);
     while (aptMainLoop()) {
@@ -378,6 +401,12 @@ void online_level_menu_loop() {
     }
     C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
     
+
+    if (level_entry) {
+        if (level_entry->levelString) free(level_entry->levelString);
+        free(level_entry);
+    }
+
     ui_unload_screen(&default_screen);
     ui_unload_screen(&default_screen_top);
 }

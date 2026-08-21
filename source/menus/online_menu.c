@@ -292,23 +292,21 @@ void populate_list() {
     }   
 }
 
-void handle_errors(int code) {
-    char temp[54];
+static void handle_errors(int code) {
+    char temp[64];
     switch (code) {
         case -2:
             ui_label_set_text(error_label, "An unknown error has<p> occured.");
             break;
-
         case -1:
             break;
-
         case 6:
         case 7:   
             ui_label_set_text(error_label, "No<p><#599cff>Internet</> connection!");
             break;
 
         default:
-            snprintf(temp, sizeof(temp) - 1, "An unknown error has<p>occurred.<p><p>Error code: %d", code);
+            snprintf(temp, sizeof(temp), "An unknown error has<p>occurred.<p><p>Error code: %d", code);
             ui_label_set_text(error_label, temp);
 
     }
@@ -408,12 +406,19 @@ void online_menu_loop() {
         }
 
         if (exit_flag) {
+            if (search_entries) {
+                if (search_entries->description) free(search_entries->description);
+                free(search_entries);
+            }
+            if (creator_entries) free(creator_entries);
+            if (song_entries) free(song_entries);
+
             game_state = STATE_SEARCH_MENU;
             break;
         }
     }
     C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
-    
+
     ui_unload_screen(&default_screen);
     ui_unload_screen(&default_screen_top);
 }
