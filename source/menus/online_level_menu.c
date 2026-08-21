@@ -186,14 +186,10 @@ void populate_level_info() {
     if (entry_srch->featureScore == 0) ui_disable_element((UIElement *)featured_glow_image);
 
     // Description
-    if (entry_srch->description[0] != '\0') { // Check if empty
-        char *wrapped_description = wrap_text(&chatFont_fontCharset, description_label->base.scaleX, entry_srch->description, 270);
-        char *desc = strdup(wrapped_description);
-        ui_label_set_text(description_label, desc);
-        free(desc);
-    } else {
-        ui_label_set_text(description_label, "No description provided");
-    }
+    char *wrapped_description = wrap_text(&chatFont_fontCharset, description_label->base.scaleX, entry_srch->description, 270);
+    char *desc = strdup(wrapped_description);
+    ui_label_set_text(description_label, desc);
+    free(desc);
 
     // Song id
     char song_id[16];

@@ -1,6 +1,7 @@
 #include <3ds.h>
 #include <stdlib.h>
 #include <citro2d.h>
+#include <string.h>
 #include "level_loading.h"
 #include "menus/components/ui_window_button.h"
 #include "menus/core/ui_element.h"
@@ -99,6 +100,11 @@ static void fill_level_entries(char **levelsStrings, int songStringCount, int cr
                     break;
                 case 3:
                     // level description
+                    if (valStr[0] == '\0') {
+                        search_entries[i].description = strdup("No description provided.");
+                        break;
+                    }
+
                     fix_base64_url(valStr);
                     search_entries[i].description = malloc(strlen(valStr) + 1);
                     int decoded_len = base64_decode(valStr, (unsigned char *)search_entries[i].description);
