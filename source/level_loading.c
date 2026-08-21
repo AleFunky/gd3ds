@@ -358,6 +358,47 @@ char *decompress_level(char *data) {
     return decompressed;
 }
 
+char **split_string_str_del(const char *str, const char *delimiter, int *outCount, bool ignoreZeroLength) {
+    char **result = NULL;
+    int count = 0;
+    const char *start = str;
+    const char *ptr = str;
+    size_t delimiterLen = strlen(delimiter);
+
+    while (*ptr) {
+        if (strncmp(ptr, delimiter, delimiterLen) == 0) {
+            int len = ptr - start;
+
+            if (len > (ignoreZeroLength ? -1 : 0)) {
+                char *token = malloc(len + 1);
+                strncpy(token, start, len);
+                token[len] = '\0';
+                result = (char **)realloc(result, sizeof(char *) * (count + 1));
+                result[count++] = token;
+            }
+
+            ptr += delimiterLen;
+            start = ptr;
+            continue;
+        }
+        ptr++;
+    }
+
+    if (ptr > start) {
+        int len = ptr - start;
+        if (len > (ignoreZeroLength ? -1 : 0)) {
+            char *token = malloc(len + 1);
+            strncpy(token, start, len);
+            token[len] = '\0';
+            result = realloc(result, sizeof(char *) * (count + 1));
+            result[count++] = token;
+        }
+    }
+
+    *outCount = count;
+    return result;
+}
+
 char **split_string(const char *str, char delimiter, int *outCount, bool ignoreZeroLength) {
     char **result = NULL;
     int count = 0;
@@ -368,7 +409,7 @@ char **split_string(const char *str, char delimiter, int *outCount, bool ignoreZ
         if (*ptr == delimiter) {
             int len = ptr - start;
             if (len > (ignoreZeroLength ? -1 : 0)) {
-                char *token = (char *)malloc(len + 1);
+                char *token = malloc(len + 1);
                 strncpy(token, start, len);
                 token[len] = '\0';
 
@@ -381,11 +422,13 @@ char **split_string(const char *str, char delimiter, int *outCount, bool ignoreZ
     }
     if (ptr > start) {
         int len = ptr - start;
-        char *token = (char *)malloc(len + 1);
-        strncpy(token, start, len);
-        token[len] = '\0';
-        result = (char **)realloc(result, sizeof(char*) * (count + 1));
-        result[count++] = token;
+        if (len > (ignoreZeroLength ? -1 : 0)) {
+            char *token = malloc(len + 1);
+            strncpy(token, start, len);
+            token[len] = '\0';
+            result = realloc(result, sizeof(char*) * (count + 1));
+            result[count++] = token;
+        }
     }
 
     *outCount = count;

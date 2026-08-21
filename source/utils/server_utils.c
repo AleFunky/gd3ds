@@ -46,13 +46,11 @@ static void fill_song_entries(char **songStrings, int songStringCount) {
     for (int i = 0; i < songStringCount; i++) {
         int songKeyCount = 0;
 
-        char **songKeys = split_string(songStrings[i], '|', &songKeyCount, true);
+        char **songKeys = split_string_str_del(songStrings[i], "~|~", &songKeyCount, true);
 
         for (int j = 0; j + 1 < songKeyCount; j += 2) {
-            strip_character(songKeys[j], '~');
             int key = atoi(songKeys[j]);
             char *valStr = songKeys[j + 1];
-            strip_character(valStr, '~');
             switch (key) {
                 case 1:
                     // song id
@@ -259,7 +257,7 @@ int search_levels(char *query, int type, int page) {
     char **creatorStrings = split_string(initialStrings[1], '|', &creatorStringCount, true);
     if (!creatorStrings) return -1;
     
-    char **songStrings = split_string(initialStrings[2], ':', &songStringCount, true);
+    char **songStrings = split_string_str_del(initialStrings[2], "~:~", &songStringCount, true);
     if (!songStrings) return -1;
     
     search_entries = malloc(levelStringCount * sizeof(SearchEntry));
