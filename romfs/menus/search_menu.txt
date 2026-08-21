@@ -8,39 +8,39 @@ image x=284 y=205 id=178 sx=-1.0
 window x=170 y=28 w=240 h=40 style=8
 textbox x=149 y=28 w=188 limit=20 title="Search for a level or id:" tag="searchbox"
 
-button x=267 y=28 id=107 scale=0.9 action="search"
+button x=267 y=28 id=107 scale=0.9 action="search" custom=[type=0]
 #button x=240 y=28 id=106 scale=0.7 <-- profile button
 
 label x=160 y=60 text="Quick Search" scale=0.6 align=CENTER
 window x=160 y=105 w=260 h=66 style=8
 
-button x=75 y=90 text="" id=105 scale=0.72 action="disclaimer"
+button x=75 y=90 text="" id=105 scale=0.72 action="search" custom=[type=6]
 {
     label x=-50 y=0 text="Featured" scale=0.5 align=LEFT
     image x=40 y=0 w=20 h=20 id=170
 }
-button x=160 y=90 text="" id=105 scale=0.72 action="disclaimer"
+button x=160 y=90 text="" id=105 scale=0.72 action="search" custom=[type=1]
 {
     label x=-50 y=0 text="Downloads" scale=0.43 align=LEFT
     image x=40 y=0 w=20 h=20 id=163
 }
-button x=245 y=90 text="" id=105 scale=0.72 action="disclaimer"
+button x=245 y=90 text="" id=105 scale=0.72 action="search" custom=[type=2]
 {
     label x=-50 y=0 text="Likes" scale=0.62 align=LEFT
     image x=40 y=0 w=20 h=20 id=166
 }
 
-button x=75 y=120 w=110 h=30 text="" id=105 scale=0.72 action="disclaimer"
+button x=75 y=120 w=110 h=30 text="" id=105 scale=0.72 action="search" custom=[type=3]
 {
     label x=-50 y=0 text="Trending" scale=0.5 align=LEFT
     image x=40 y=0 w=20 h=20 id=171
 }
-button x=160 y=120 w=110 h=30 text="" id=105 scale=0.72 action="disclaimer"
+button x=160 y=120 w=110 h=30 text="" id=105 scale=0.72 action="search" custom=[type=4]
 {
     label x=-50 y=0 text="Recent" scale=0.62 align=LEFT
     image x=40 y=0 w=20 h=20 id=169
 }
-button x=245 y=120 w=110 h=30 text="" id=105 scale=0.72 action="disclaimer"
+button x=245 y=120 w=110 h=30 text="" id=105 scale=0.72 action="search" custom=[type=7]
 {
     label x=-50 y=0 text="Magic" scale=0.62 align=LEFT
     image x=40 y=0 w=20 h=20 id=167

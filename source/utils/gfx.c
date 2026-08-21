@@ -206,10 +206,10 @@ int get_fade_status() {
 }
 
 // How far apart both eyes get at most, in pixels
-#define MAX_EYE_SHIFT 6.f
+#define MAX_EYE_SHIFT 10.f
 
 // Under this both eyes come out identical, so one of them is enough
-#define STEREO_DEADZONE (0.5f / MAX_EYE_SHIFT)
+#define STEREO_DEADZONE (0.08f / MAX_EYE_SHIFT)
 
 // Wait a moment before freeing, so slider wiggles don't thrash VRAM
 #define STEREO_IDLE_FRAMES 60
