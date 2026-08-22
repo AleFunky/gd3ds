@@ -495,9 +495,9 @@ void fill_comment_entries(char **commentStrings, int commentStringCount)
     }
 }
 
-int get_comments(int id, int page) {
+int get_comments(int id, int page, int sortType) {
     char *outdata;
-    int result = get_comments_from_id(&outdata, id, page);
+    int result = get_comments_from_id(&outdata, id, page, sortType);
 
     if (result != 0) return result;
     // validate first two chars of response to make sure what we're parsing is the comments string
