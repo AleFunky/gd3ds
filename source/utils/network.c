@@ -156,7 +156,7 @@ int get_search_results(char **out_data, int gameVer, int type, char *query, int 
     return 2;
 }
 
-int get_comments_from_id(char **out_data, int id, int page) {
+int get_comments_from_id(char **out_data, int id, int page, int mode) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -176,7 +176,7 @@ int get_comments_from_id(char **out_data, int id, int page) {
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
 
         char data[64];
-        snprintf(data, 63, "levelID=%d&page=%d&secret=Wmfd2893gb7", id, page);
+        snprintf(data, 63, "levelID=%d&page=%d&mode=%d&secret=Wmfd2893gb7", id, page, mode);
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
 
         CURLcode code = curl_easy_perform(curl);

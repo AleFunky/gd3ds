@@ -25,6 +25,7 @@
 #include "fonts/goldFont.h"
 #include "songs.h"
 #include "online_level_errorbox.h"
+#include "online_level_comments.h"
 
 static bool exit_flag = false;
 static bool in_info_box = false;
@@ -244,6 +245,7 @@ void online_level_menu_loop() {
     in_delete = false;
     in_refresh = false;
     in_info_box = false;
+    comments_need_refresh = true;
 
     ui_load_screen(&default_screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_level_menu.txt");
     ui_load_screen(&default_screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_level_menu_top.txt");

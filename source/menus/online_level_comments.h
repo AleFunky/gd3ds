@@ -5,3 +5,5 @@ void online_comments_init();
 int online_comments_loop();
 
 void online_comments_draw();
+
+extern bool comments_need_refresh;

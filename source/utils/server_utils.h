@@ -80,7 +80,7 @@ int search_levels();
 
 int get_level_data(int id);
 
-int get_comments(int id, int page);
+int get_comments(int id, int page, int sortType);
 
 float derive_gj_version(int version);
 

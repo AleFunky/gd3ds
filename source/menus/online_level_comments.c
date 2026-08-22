@@ -5,6 +5,7 @@
 #include "menus/core/ui_screen.h"
 #include "menus/components/ui_list.h"
 #include "menus/components/ui_window.h"
+#include "menus/components/ui_button.h"
 #include "menus/components/ui_image.h"
 #include "menus/components/ui_label.h"
 #include "menus/components/ui_rectangle.h"
@@ -19,21 +20,21 @@
 
 static bool yes_exit = false;
 bool comments_need_refresh = true;
+int sortType = 0;
 
 static UIList *list;
 static UILabel *error_label;
+
+static UIButton *sort_by_recency_button;
+static UIButton *sort_by_likes_button;
 
 static UIScreen screen = {
     .isBottom = true,
 };
 
-void exit_comments(UIElement* e) {
+void action_exit_comments(UIElement* e) {
     yes_exit = true;
 }
-
-static UIAction actions[] = {
-    { "exit", exit_comments }
-};
 
 static void handle_comment_errors(int code) {
     char temp[64];
@@ -62,12 +63,12 @@ void populate_comments()
     for (int i = 0; i < commentEntriesLength; i++)
     {
         char username[25];
-        char timestamp[129];
+        char timestamp[136];
         int percent = comment_entries[i].percent;
         int likes = comment_entries[i].likes;
 
         strncpy(username, comment_entries[i].name, sizeof(username) - 1);
-        strncpy(timestamp, comment_entries[i].commentAge, sizeof(timestamp) - 1);
+        snprintf(timestamp, sizeof(timestamp) - 1, "%s ago", comment_entries[i].commentAge);
 
         truncate_filename(username, 18);
 
@@ -124,9 +125,9 @@ void populate_comments()
 
             // Comment percent
             UILabel *percent_label = ui_create_label(&default_screen.ctx);
-            if (percent_label)
+            if (percent_label && percent > 0)
             {
-                char tmp_value[16];
+                char tmp_value[24];
 
                 snprintf(tmp_value, sizeof(tmp_value), "<#00000096>%d%%", percent);
                 ui_label_set_text(percent_label, tmp_value);
@@ -170,7 +171,7 @@ void populate_comments()
             UILabel *timestamp_value = ui_create_label(&default_screen.ctx);
             if (timestamp_value)
             {
-                char tmp_value[256];
+                char tmp_value[sizeof(timestamp) + 14 - 1];
                 snprintf(tmp_value, sizeof(tmp_value), "<#0000007D>%s", timestamp);
 
                 ui_label_set_text(timestamp_value, tmp_value);
@@ -187,23 +188,60 @@ void populate_comments()
     }
 }
 
+static void action_refresh_comments(UIElement* e) {
+    int buttonType = ui_prop_int(&e->custom_properties, "sorttype", 0);
+
+    if (buttonType != -1) {
+        ui_button_set_image(sort_by_recency_button, 422, 0);
+        ui_button_set_image(sort_by_likes_button, 422, 0);
+        ui_button_set_image((UIButton *)e, 423, 0);
+        sortType = buttonType;
+    }
+    comments_need_refresh = true;
+    
+    int result = -2;
+
+    if (comments_need_refresh) {
+        result = get_comments(search_entries[curr_search_id].levelId, 1, sortType);
+    }
+   
+    // Handle result
+    if (result != 0) {
+        handle_comment_errors(result);
+    } else if (list) { // No errors
+        ui_label_set_text(error_label, "");
+        populate_comments();
+        comments_need_refresh = false;
+    }
+}
+
+static UIAction actions[] = {
+    { "exit", action_exit_comments },
+    { "refresh", action_refresh_comments },
+};
+
 void online_comments_init() {
     ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_level_comments.txt");
-
     ui_screen_open(&screen, ANIM_ZOOM_SUBTLE);
 
     list = (UIList *) ui_get_element_by_tag(&screen, "list");
 
-    int result = -2;
+    error_label = (UILabel *) ui_get_element_by_tag(&screen, "errorlabel");
+    sort_by_recency_button = (UIButton *) ui_get_element_by_tag(&screen, "sortbyrecency");
+    sort_by_likes_button = (UIButton *) ui_get_element_by_tag(&screen, "sortbylikes");
+    ui_button_set_image(sort_by_recency_button, 423, 0);
 
+    int result = -2;
+    
     if (comments_need_refresh) {
-        result = get_comments(search_entries[curr_search_id].levelId, 1);
+        result = get_comments(search_entries[curr_search_id].levelId, 1, 0);
     }
    
     // Handle result
     if (result != 0 && comments_need_refresh) {
         handle_comment_errors(result);
     } else if (list) { // No errors
+        ui_label_set_text(error_label, "");
         populate_comments();
         comments_need_refresh = false;
     }
