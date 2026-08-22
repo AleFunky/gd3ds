@@ -28,6 +28,7 @@ static int new_state;
 int curr_search_id;
 
 static UILabel *error_label;
+static UILabel *page_info_label;
 
 static UIImage *bg_gradient;
 static UIImage *bg_gradient_top;
@@ -43,19 +44,25 @@ static void action_exit(UIElement *e) {
     set_fade_status(FADE_STATUS_OUT);
 }
 
-void action_open_online_level_menu(UIElement* e) {
+static void action_open_online_level_menu(UIElement* e) {
     OnlineCardData *entry = e->userdata;
     curr_search_id = entry->entryId;
     new_state = STATE_ONLINE_LEVEL;
     set_fade_status(FADE_STATUS_OUT);
 }
 
-static UIAction actions[] = {
-    {"exit", action_exit },
-    {"open_level_menu", action_open_online_level_menu },
-};
+static void update_arrows() {
+    if (search_filters.currentPage <= page_entry->totalPages - 1) ui_run_func_on_tag(&default_screen, "nextpage", ui_enable_element); else ui_run_func_on_tag(&default_screen, "nextpage", ui_disable_element);
+    if ((search_filters.currentPage) >= 1) ui_run_func_on_tag(&default_screen, "prevpage", ui_enable_element); else ui_run_func_on_tag(&default_screen, "prevpage", ui_disable_element);
 
-void populate_list() {
+        char pageInfo[32];
+    snprintf(pageInfo, 42 - 1, "%d to %d of %d", page_entry->currentOffset, page_entry->currentOffset + page_entry->amount, page_entry->totalPages * page_entry->amount - 1);
+    ui_label_set_text(page_info_label, pageInfo);
+
+}
+
+static void populate_list() {
+    ui_list_reset(list);
     for (int i = 0; i < searchEntriesLength; i++) {
         char tmp_name[32];
         char tmp_creator[32];
@@ -289,7 +296,7 @@ void populate_list() {
 
             ui_list_add(list, card);
         }
-    }   
+    }  
 }
 
 static void handle_errors(int code) {
@@ -311,6 +318,32 @@ static void handle_errors(int code) {
 
     }
 }
+
+static void action_change_page(UIElement* e) {
+    search_filters.currentPage += ui_prop_int(&e->custom_properties, "page", 0);
+    search_needs_refresh = true;
+    
+    int search_result = -2;
+
+    if (search_needs_refresh) {
+        search_result = search_levels();
+    }
+   
+    // Handle result
+    if (search_result != 0 && search_needs_refresh) {
+        handle_errors(search_result);
+    } else if (list) { // No errors
+        populate_list();
+        search_needs_refresh = false;
+        update_arrows();
+    }
+}
+
+static UIAction actions[] = {
+    {"exit", action_exit },
+    {"open_level_menu", action_open_online_level_menu },
+    {"changepage", action_change_page }
+};
 
 void online_menu_loop() {
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
@@ -335,11 +368,15 @@ void online_menu_loop() {
 
     list = (UIList *) ui_get_element_by_tag(&default_screen, "list");
     error_label = (UILabel *)ui_get_element_by_tag(&default_screen, "errorLabel");
+    page_info_label = (UILabel *)ui_get_element_by_tag(&default_screen_top, "pageinfo");
+
+    ui_run_func_on_tag(&default_screen, "nextpage", ui_disable_element);
+    ui_run_func_on_tag(&default_screen, "prevpage", ui_disable_element);
 
     int search_result = -2;
 
     if (search_needs_refresh) {
-        search_result = search_levels(search_query, 0, 0);
+        search_result = search_levels();
     }
    
     // Handle result
@@ -348,6 +385,7 @@ void online_menu_loop() {
     } else if (list) { // No errors
         populate_list();
         search_needs_refresh = false;
+        update_arrows();
     }
 
     set_fade_status(FADE_STATUS_IN);

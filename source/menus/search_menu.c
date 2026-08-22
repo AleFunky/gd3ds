@@ -23,11 +23,11 @@ static bool in_clear_search_filters = false;
 static bool exit_flag = false;
 bool search_needs_refresh = true;
 
-char search_query[129];
-
 static UIImage *bg_gradient;
 static UIImage *bg_gradient_top;
 static UITextbox *search_input;
+
+SearchFilters search_filters;
 
 static void action_exit(UIElement *e) {
     exit_flag = true;
@@ -55,7 +55,9 @@ void action_clear_filters(UIElement* e) {
 }
 
 void action_search(UIElement* e) {
-    strncpy(search_query, search_input->text, sizeof(search_query) - 1);
+    search_filters.searchType = ui_prop_int(&e->custom_properties, "type", 0);
+    strncpy(search_filters.searchQuery, search_input->text, sizeof(search_filters.searchQuery) - 1);
+    search_filters.currentPage = 0;
     search_needs_refresh = true;
     new_state = STATE_ONLINE;
     set_fade_status(FADE_STATUS_OUT);

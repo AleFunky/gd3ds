@@ -11,3 +11,5 @@ window x=200 y=160 w=240 h=100 style=1
 
 label x=200 y=160 font=1 scale=0.9 text="Browse online user levels!" align=CENTER tag="toptitle"
 
+label x=200 y=228 font=2 scale=0.7 text="" align=CENTER tag="pageinfo"
+

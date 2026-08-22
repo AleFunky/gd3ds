@@ -24,7 +24,7 @@ enum StereoEye {
 #define DEPTH_LEVEL      (-0.2f)
 // Text is the hardest thing to fuse, so the UI stays close to the screen
 #define DEPTH_UI         (0.f)
-#define DEPTH_POPUP      (0.15f)
+#define DEPTH_POPUP      (0.1f)
 void draw_hitbox_line_inward(Vec2D rect[4], 
                              const float x1, const float y1,
                              const float x2, const float y2,

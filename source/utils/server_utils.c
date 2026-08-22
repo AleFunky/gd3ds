@@ -1,5 +1,6 @@
 #include <3ds.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <citro2d.h>
 #include <string.h>
 #include "level_loading.h"
@@ -18,18 +19,24 @@
 #include "utils/server_utils.h"
 #include "network.h"
 #include "utils/string_helpers.h"
+#include "menus/search_menu.h"
 
 SearchEntry *search_entries = NULL;
 CreatorEntry *creator_entries = NULL;
 SongEntry *song_entries = NULL;
+PageEntry *page_entry = NULL;
 
 LevelEntry *level_entry = NULL;
+
+CommentEntry *comment_entries = NULL;
 
 int searchEntriesLength = 0;
 int creatorEntriesLength = 0;
 int songEntriesLength = 0;
 
 int levelEntryLength = 0;
+
+int commentEntriesLength = 0;
 
 static void fill_creator_entries(char **creatorStrings, int creatorStringCount) {
     for (int i = 0; i < creatorStringCount; i++) {
@@ -236,11 +243,23 @@ static void fill_level_entry(char **levelStrings, int levelStringsCount) {
     free_string_array(levelKeys, levelKeyCount);
 }
 
-int search_levels(char *query, int type, int page) {
+void fill_page_entry(char *initialString) {
+    int stringCount;
+    char **pageStrings = split_string(initialString, ':', &stringCount, true);
+    page_entry->totalLevels = atoi(pageStrings[0]);
+    page_entry->currentOffset = atoi(pageStrings[1]);
+    page_entry->amount = atoi(pageStrings[2]);
+    page_entry->totalPages = (((page_entry->totalLevels + (page_entry->amount - 1)) / page_entry->amount));
+    free_string_array(pageStrings, stringCount);
+};
+
+int search_levels() {
     char *outdata;
-    int result = get_search_results(&outdata, query, type, page);
+    int result = get_search_results(&outdata, 22, search_filters.searchType, search_filters.searchQuery, search_filters.currentPage, search_filters.uncompleted, search_filters.completed, "", search_filters.featured, search_filters.original, search_filters.noStar, search_filters.songFilter, search_filters.songQuery);
 
     if (result != 0) return result;
+    // validate first two chars of response to make sure what we're parsing is the search results string
+    if (!(outdata[0] >= '0' && outdata[0] <= '9' && outdata[1] == ':')) return -2;
 
     int initialStringCount = 0;
 
@@ -269,10 +288,14 @@ int search_levels(char *query, int type, int page) {
     song_entries = malloc(songStringCount * sizeof(SongEntry));
     if (!song_entries) return -1;
 
+    page_entry = malloc(sizeof(SongEntry));
+    if (!page_entry) return -1;
+
     // Initialize
     memset(search_entries, 0, levelStringCount * sizeof(SearchEntry));
     memset(creator_entries, 0, creatorStringCount * sizeof(CreatorEntry));
     memset(song_entries, 0, songStringCount * sizeof(SongEntry));
+    memset(page_entry, 0, sizeof(PageEntry));
 
     // Fill creators
     fill_creator_entries(creatorStrings, creatorStringCount);
@@ -282,6 +305,9 @@ int search_levels(char *query, int type, int page) {
     
     // Fill levels
     fill_level_entries(levelsStrings, songStringCount, creatorStringCount, levelStringCount);
+
+    // Fill pages
+    fill_page_entry(initialStrings[3]);
    
     free_string_array(levelsStrings, levelStringCount);
     free_string_array(creatorStrings, creatorStringCount);
@@ -299,6 +325,8 @@ int get_level_data(int id) {
     int result = get_level_from_id(&outdata, id);
 
     if (result != 0) return result;
+    // validate first two chars of response to make sure what we're parsing is the level string
+    if (!(outdata[0] >= '0' && outdata[0] <= '9' && outdata[1] == ':')) return -2;
 
     int initialStringCount = 0;
 
@@ -348,5 +376,149 @@ float derive_gj_version(int version) {
         case 22:
             return 2.2;
     }
+    return 0;
+}
+
+void fill_comment_entries(char **commentStrings, int commentStringCount)
+{
+    for (int i = 0; i < commentStringCount; i++)
+    {
+        int commentKeyCount = 0;
+
+        char **commentKeys = split_string(commentStrings[i], ':', &commentKeyCount, true);
+        
+        
+        for (int j = 0; j + 1 < commentKeyCount; j += 2)
+        {
+            int commentDataKeyCount = 0;
+            int authorDataKeyCount = 0;
+            char **commentData = split_string(commentKeys[0], '~', &commentDataKeyCount, true);
+            char **authorData = split_string(commentKeys[1], '~', &authorDataKeyCount, true);
+            for (int k = 0; k + 1 < commentDataKeyCount; k += 2)
+            {
+                int key = atoi(commentData[k]);
+                char *valStr = commentData[k + 1];
+                switch (key)
+                {
+                case 1:
+                    // id of level the comment comes from
+                    comment_entries[i].levelId = atoi(valStr);
+                    break;
+                case 2:
+                    // base64 encoded comment text content
+                    if (valStr[0] == '\0')
+                    {
+                        comment_entries[i].content = strdup("No");
+                        break;
+                    }
+
+                    fix_base64_url(valStr);
+                    comment_entries[i].content = malloc(strlen(valStr) + 1);
+                    int decoded_len = base64_decode(valStr, (unsigned char *)comment_entries[i].content);
+                    if (decoded_len > 0)
+                    {
+                        comment_entries[i].content[decoded_len] = '\0';
+                    }
+                    break;
+                case 3:
+                    // author's player id
+                    comment_entries[i].authorPlayerId = atoi(valStr);
+                    break;
+                case 4:
+                    // likes
+                    comment_entries[i].likes = atoi(valStr);
+                    break;
+                case 7:
+                    // spam flag status
+                    comment_entries[i].isSpam = parse_bool(valStr);
+                    break;
+                case 8:
+                    // author account id
+                    comment_entries[i].authorAccountId = atoi(valStr);
+                    break;
+                case 9:
+                    // time since comment was posted
+                    strncpy(comment_entries[i].commentAge, valStr, sizeof(comment_entries[i].commentAge) - 1);
+                    break;
+                case 10:
+                    // percent on source level
+                    comment_entries[i].percent = atoi(valStr);
+                    break;
+                case 11:
+                    // mod badge status
+                    comment_entries[i].modBadge = atoi(valStr);
+                    break;
+                case 12:
+                    // color of username (if mod)
+                    strncpy(comment_entries[i].modCommentColor, valStr, sizeof(comment_entries[i].modCommentColor) - 1);
+                    break;
+                }
+            }
+
+            for (int k = 0; k + 1 < authorDataKeyCount; k += 2)
+            {
+                int key = atoi(authorData[k]);
+                char *valStr = authorData[k + 1];
+                switch (key)
+                {
+                case 1:
+                    // author username
+                    strncpy(comment_entries[i].name, valStr, sizeof(comment_entries[i].name) - 1);
+                    break;
+                case 9:
+                    // player icon index
+                    comment_entries[i].playerIcon = atoi(valStr);
+                    break;
+                case 10:
+                    // author icon primary color
+                    comment_entries[i].col1 = atoi(valStr);
+                    break;
+                case 11:
+                    // author icon secondary color
+                    comment_entries[i].col2 = atoi(valStr);
+                    break;
+                case 14:
+                    // icon type (gamemode)
+                    comment_entries[i].iconType = atoi(valStr);
+                    break;
+                case 15:
+                    // icon glow (why is 0 false but 2 true??????)
+                    comment_entries[i].glow = (atoi(valStr) == 2);
+                    break;
+                }
+            }
+            free_string_array(commentData, commentDataKeyCount);
+            free_string_array(authorData, authorDataKeyCount);
+
+        }
+        free_string_array(commentKeys, commentKeyCount);
+    }
+}
+
+int get_comments(int id, int page, int sortType) {
+    char *outdata;
+    int result = get_comments_from_id(&outdata, id, page, sortType);
+
+    if (result != 0) return result;
+    // validate first two chars of response to make sure what we're parsing is the comments string
+    if (!(outdata[0] >= '0' && outdata[0] <= '9' && outdata[1] == '~')) return -2;
+
+    int commentStringCount = 0;
+
+    char **commentStrings = split_string(outdata, '|', &commentStringCount, true);
+    if (!commentStrings) return -1;
+
+    comment_entries = malloc(commentStringCount * sizeof(CommentEntry));
+    if (!comment_entries) return -1;
+
+    // Initialize
+    memset(comment_entries, 0, commentStringCount * sizeof(CommentEntry));
+
+    fill_comment_entries(commentStrings, commentStringCount);
+
+    // free_string_array(commentStrings, commentStringCount);
+
+    commentEntriesLength = commentStringCount;
+
     return 0;
 }

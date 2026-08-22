@@ -39,6 +39,13 @@ typedef struct SongEntry {
     char songLink[128];
 } SongEntry;
 
+typedef struct PageEntry {
+    int totalLevels;
+    int currentOffset;
+    int amount;
+    int totalPages;
+} PageEntry;
+
 typedef struct LevelEntry {
     int levelId;
     char *levelString;
@@ -46,20 +53,50 @@ typedef struct LevelEntry {
     char updateDate[128];
 } LevelEntry;
 
-int search_levels(char *query, int type, int page);
+typedef struct CommentEntry {
+    int levelId;
+    char name[24];
+    int authorAccountId;
+    int authorPlayerId;
+    char *content;
+    int likes;
+    int percent;
+    bool isSpam;
+    char commentAge[128];
+    int modBadge;
+    char modCommentColor[16];
+    int playerIcon;
+    int iconType;
+    int col1;
+    int col2;
+    bool glow;
+} CommentEntry;
+
+typedef struct CommentAuthorEntry {
+    
+} CommentAuthorEntry;
+
+int search_levels();
 
 int get_level_data(int id);
+
+int get_comments(int id, int page, int sortType);
 
 float derive_gj_version(int version);
 
 extern SearchEntry *search_entries;
 extern CreatorEntry *creator_entries;
 extern SongEntry *song_entries;
+extern PageEntry *page_entry;
 
 extern LevelEntry *level_entry;
+
+extern CommentEntry *comment_entries;
 
 extern int creatorEntriesLength;
 extern int songEntriesLength;
 extern int searchEntriesLength;
 
 extern int levelEntryLength;
+
+extern int commentEntriesLength;
