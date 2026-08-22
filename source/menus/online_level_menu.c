@@ -44,6 +44,7 @@ static UILabel *level_creator_label;
 static UIImage *high_obj_icon_image;
 static UIImage *collab_icon_image;
 static UILabel *downloads_label;
+static UIImage *likes_image;
 static UILabel *likes_label;
 static UILabel *length_label;
 static UILabel *stars_label;
@@ -111,6 +112,10 @@ void populate_level_info() {
 
     char *likes = truncate_number(entry_srch->likes);
     ui_label_set_text(likes_label, likes);
+
+    if (entry_srch->likes < 0) {
+        ui_image_set_image(likes_image, DISLIKE_ICON, 0);
+    }
 
     // Length
     char *length = "Unkn.";
@@ -228,7 +233,7 @@ static void handle_errors(int code) {
             break;
         case 6:
         case 7:
-            snprintf(error_message, sizeof(error_message), "No Internet connection!");
+            snprintf(error_message, sizeof(error_message), "No <#41e24e>Internet</> connection!");
             break;
 
         default:
@@ -268,6 +273,8 @@ void online_level_menu_loop() {
 
     difficulty_face_image = (UIImage *) ui_get_element_by_tag(&default_screen_top, "difficultyface");
     featured_glow_image = (UIImage *) ui_get_element_by_tag(&default_screen_top, "glow");
+
+    likes_image = (UIImage *) ui_get_element_by_tag(&default_screen_top, "thumbsup");
 
     description_label = (UILabel *) ui_get_element_by_tag(&default_screen_top, "description");
     level_id_label = (UILabel *) ui_get_element_by_tag(&default_screen_top, "levelid");

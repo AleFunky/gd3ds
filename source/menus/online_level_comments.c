@@ -10,6 +10,7 @@
 #include "menus/components/ui_label.h"
 #include "menus/components/ui_rectangle.h"
 #include "main.h"
+#include "menus/external_popup.h"
 #include "utils/folders.h"
 #include "utils/server_utils.h"
 #include "search_menu.h"
@@ -46,7 +47,7 @@ static void handle_comment_errors(int code) {
             break;
         case 6:
         case 7:   
-            ui_label_set_text(error_label, "No<p><#599cff>Internet</> connection!");
+            ui_label_set_text(error_label, "No<p><#41e24e>Internet</> connection!");
             break;
 
         default:
@@ -56,12 +57,9 @@ static void handle_comment_errors(int code) {
     }
 }
 
-void populate_comments()
-{
-
+void populate_comments() {
     ui_list_reset(list);
-    for (int i = 0; i < commentEntriesLength; i++)
-    {
+    for (int i = 0; i < commentEntriesLength; i++) {
         char username[25];
         char timestamp[136];
         int percent = comment_entries[i].percent;
@@ -77,14 +75,12 @@ void populate_comments()
 
         UIElement *card = (UIElement *)ui_create_rectangle(&default_screen.ctx);
 
-        if (card)
-        {
+        if (card) {
             ui_rectangle_set_color((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 255) : C2D_Color32(161, 88, 44, 255)));
             ui_element_set_size(card, 0, 70);
 
             UIWindow *bg_window = ui_create_window(&default_screen.ctx);
-            if (bg_window)
-            {
+            if (bg_window) {
                 ui_element_set_size((UIElement *)bg_window, 2 * list_width - 10, 2 * list_height - 10);
                 ui_element_set_position((UIElement *)bg_window, 0, 0);
 
@@ -96,8 +92,7 @@ void populate_comments()
 
             // Comment author
             UILabel *username_label = ui_create_label(&default_screen.ctx);
-            if (username_label)
-            {
+            if (username_label) {
                 ui_label_set_text(username_label, username);
                 ui_element_set_position((UIElement *)username_label, -list_width + 10, -list_height + 15);
                 ui_element_set_scale((UIElement *)username_label, 0.6f);
@@ -109,8 +104,7 @@ void populate_comments()
 
             // Comment content
             UILabel *content_label = ui_create_label(&default_screen.ctx);
-            if (content_label)
-            {
+            if (content_label) {
                 char *wrapped_content = wrap_text(&chatFont_fontCharset, content_label->base.scaleX, comment_entries[i].content, 270);
                 char *desc = strdup(wrapped_content);
                 ui_label_set_text(content_label, desc);
@@ -125,8 +119,7 @@ void populate_comments()
 
             // Comment percent
             UILabel *percent_label = ui_create_label(&default_screen.ctx);
-            if (percent_label && percent > 0)
-            {
+            if (percent_label && percent > 0) {
                 char tmp_value[24];
 
                 snprintf(tmp_value, sizeof(tmp_value), "<#00000096>%d%%", percent);
@@ -142,8 +135,7 @@ void populate_comments()
 
             // Comment likes
             UILabel *like_value = ui_create_label(&default_screen.ctx);
-            if (like_value)
-            {
+            if (like_value) {
                 char tmp_value[16];
 
                 snprintf(tmp_value, sizeof(tmp_value), "%d", likes);
@@ -158,19 +150,21 @@ void populate_comments()
             }
 
             UIImage *like_icon = ui_create_image(&default_screen.ctx);
-            if (like_icon)
-            {
-                ui_image_set_image(like_icon, 166, 0);
+            if (like_icon) {
+                ui_image_set_image(like_icon, 97, 0);
                 ui_element_set_position((UIElement *)like_icon, -list_width + 18, list_height - 16);
-                ui_element_set_scale((UIElement *)like_icon, 0.9f);
+                ui_element_set_scale((UIElement *)like_icon, 0.7f);
+
+                if (likes < 0) {
+                    ui_image_set_image(like_icon, DISLIKE_ICON, 0);
+                }
 
                 ui_element_add_child(card, (UIElement *)like_icon);
             }
 
             // Comment timestamp
             UILabel *timestamp_value = ui_create_label(&default_screen.ctx);
-            if (timestamp_value)
-            {
+            if (timestamp_value) {
                 char tmp_value[sizeof(timestamp) + 14 - 1];
                 snprintf(tmp_value, sizeof(tmp_value), "<#0000007D>%s", timestamp);
 

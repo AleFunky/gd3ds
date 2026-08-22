@@ -268,9 +268,13 @@ static void populate_list() {
 
             UIImage *like_icon = ui_create_image(&default_screen.ctx);
             if (like_icon) {
-                ui_image_set_image(like_icon, 166, 0);
+                ui_image_set_image(like_icon, 97, 0);
                 ui_element_set_position((UIElement *)like_icon, -list_width + 153, 19);
-                ui_element_set_scale((UIElement *)like_icon, 0.7f);
+                ui_element_set_scale((UIElement *)like_icon, 0.5f);
+
+                if (entry->likes < 0) {
+                    ui_image_set_image(like_icon, DISLIKE_ICON, 0);
+                }
 
                 ui_element_add_child(card, (UIElement *)like_icon);
             }
@@ -309,7 +313,7 @@ static void handle_errors(int code) {
             break;
         case 6:
         case 7:   
-            ui_label_set_text(error_label, "No<p><#599cff>Internet</> connection!");
+            ui_label_set_text(error_label, "No<p><#41e24e>Internet</> connection!");
             break;
 
         default:

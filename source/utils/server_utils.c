@@ -42,6 +42,8 @@ static void fill_creator_entries(char **creatorStrings, int creatorStringCount) 
     for (int i = 0; i < creatorStringCount; i++) {
         int stringCount;
         char **creatorString = split_string(creatorStrings[i], ':', &stringCount, true);
+        if (!creatorString) return;
+
         creator_entries[i].accountId = atoi(creatorString[0]);
         strncpy(creator_entries[i].creatorName, creatorString[1], sizeof(creator_entries[i].creatorName) - 1);
         creator_entries[i].userId = atoi(creatorString[2]);
@@ -54,6 +56,7 @@ static void fill_song_entries(char **songStrings, int songStringCount) {
         int songKeyCount = 0;
 
         char **songKeys = split_string_str_del(songStrings[i], "~|~", &songKeyCount, true);
+        if (!songKeys) return;
 
         for (int j = 0; j + 1 < songKeyCount; j += 2) {
             int key = atoi(songKeys[j]);
@@ -89,6 +92,7 @@ static void fill_level_entries(char **levelsStrings, int songStringCount, int cr
     for (int i = 0; i < levelStringCount; i++) {
         int levelKeyCount = 0;
         char **levelKeys = split_string(levelsStrings[i], ':', &levelKeyCount, true);
+        if (!levelKeys) return;
 
         for (int j = 0; j + 1 < levelKeyCount; j += 2) {
             int key = atoi(levelKeys[j]);
@@ -218,6 +222,7 @@ static void fill_level_entry(char **levelStrings, int levelStringsCount) {
     int levelKeyCount = 0;
 
     char **levelKeys = split_string(levelStrings[0], ':', &levelKeyCount, true);
+    if (!levelKeys) return;
     for (int j = 0; j + 1 < levelKeyCount; j += 2) {
         int key = atoi(levelKeys[j]);
         char *valStr = levelKeys[j + 1];;
@@ -246,6 +251,8 @@ static void fill_level_entry(char **levelStrings, int levelStringsCount) {
 void fill_page_entry(char *initialString) {
     int stringCount;
     char **pageStrings = split_string(initialString, ':', &stringCount, true);
+    if (!pageStrings) return;
+
     page_entry->totalLevels = atoi(pageStrings[0]);
     page_entry->currentOffset = atoi(pageStrings[1]);
     page_entry->amount = atoi(pageStrings[2]);
@@ -379,112 +386,105 @@ float derive_gj_version(int version) {
     return 0;
 }
 
-void fill_comment_entries(char **commentStrings, int commentStringCount)
-{
-    for (int i = 0; i < commentStringCount; i++)
-    {
+void fill_comment_entries(char **commentStrings, int commentStringCount) {
+    for (int i = 0; i < commentStringCount; i++) {
         int commentKeyCount = 0;
 
         char **commentKeys = split_string(commentStrings[i], ':', &commentKeyCount, true);
+        if (!commentKeys) return;
         
-        
-        for (int j = 0; j + 1 < commentKeyCount; j += 2)
-        {
+        for (int j = 0; j + 1 < commentKeyCount; j += 2) {
             int commentDataKeyCount = 0;
             int authorDataKeyCount = 0;
             char **commentData = split_string(commentKeys[0], '~', &commentDataKeyCount, true);
             char **authorData = split_string(commentKeys[1], '~', &authorDataKeyCount, true);
-            for (int k = 0; k + 1 < commentDataKeyCount; k += 2)
-            {
+            for (int k = 0; k + 1 < commentDataKeyCount; k += 2) {
                 int key = atoi(commentData[k]);
                 char *valStr = commentData[k + 1];
-                switch (key)
-                {
-                case 1:
-                    // id of level the comment comes from
-                    comment_entries[i].levelId = atoi(valStr);
-                    break;
-                case 2:
-                    // base64 encoded comment text content
-                    if (valStr[0] == '\0')
-                    {
-                        comment_entries[i].content = strdup("No");
+                switch (key) {
+                    case 1:
+                        // id of level the comment comes from
+                        comment_entries[i].levelId = atoi(valStr);
                         break;
-                    }
+                    case 2:
+                        // base64 encoded comment text content
+                        if (valStr[0] == '\0')
+                        {
+                            comment_entries[i].content = strdup("No");
+                            break;
+                        }
 
-                    fix_base64_url(valStr);
-                    comment_entries[i].content = malloc(strlen(valStr) + 1);
-                    int decoded_len = base64_decode(valStr, (unsigned char *)comment_entries[i].content);
-                    if (decoded_len > 0)
-                    {
-                        comment_entries[i].content[decoded_len] = '\0';
-                    }
-                    break;
-                case 3:
-                    // author's player id
-                    comment_entries[i].authorPlayerId = atoi(valStr);
-                    break;
-                case 4:
-                    // likes
-                    comment_entries[i].likes = atoi(valStr);
-                    break;
-                case 7:
-                    // spam flag status
-                    comment_entries[i].isSpam = parse_bool(valStr);
-                    break;
-                case 8:
-                    // author account id
-                    comment_entries[i].authorAccountId = atoi(valStr);
-                    break;
-                case 9:
-                    // time since comment was posted
-                    strncpy(comment_entries[i].commentAge, valStr, sizeof(comment_entries[i].commentAge) - 1);
-                    break;
-                case 10:
-                    // percent on source level
-                    comment_entries[i].percent = atoi(valStr);
-                    break;
-                case 11:
-                    // mod badge status
-                    comment_entries[i].modBadge = atoi(valStr);
-                    break;
-                case 12:
-                    // color of username (if mod)
-                    strncpy(comment_entries[i].modCommentColor, valStr, sizeof(comment_entries[i].modCommentColor) - 1);
-                    break;
+                        fix_base64_url(valStr);
+                        comment_entries[i].content = malloc(strlen(valStr) + 1);
+                        int decoded_len = base64_decode(valStr, (unsigned char *)comment_entries[i].content);
+                        if (decoded_len > 0)
+                        {
+                            comment_entries[i].content[decoded_len] = '\0';
+                        }
+                        break;
+                    case 3:
+                        // author's player id
+                        comment_entries[i].authorPlayerId = atoi(valStr);
+                        break;
+                    case 4:
+                        // likes
+                        comment_entries[i].likes = atoi(valStr);
+                        break;
+                    case 7:
+                        // spam flag status
+                        comment_entries[i].isSpam = parse_bool(valStr);
+                        break;
+                    case 8:
+                        // author account id
+                        comment_entries[i].authorAccountId = atoi(valStr);
+                        break;
+                    case 9:
+                        // time since comment was posted
+                        strncpy(comment_entries[i].commentAge, valStr, sizeof(comment_entries[i].commentAge) - 1);
+                        break;
+                    case 10:
+                        // percent on source level
+                        comment_entries[i].percent = atoi(valStr);
+                        break;
+                    case 11:
+                        // mod badge status
+                        comment_entries[i].modBadge = atoi(valStr);
+                        break;
+                    case 12:
+                        // color of username (if mod)
+                        strncpy(comment_entries[i].modCommentColor, valStr, sizeof(comment_entries[i].modCommentColor) - 1);
+                        break;
                 }
             }
 
-            for (int k = 0; k + 1 < authorDataKeyCount; k += 2)
-            {
+            for (int k = 0; k + 1 < authorDataKeyCount; k += 2) {
                 int key = atoi(authorData[k]);
                 char *valStr = authorData[k + 1];
-                switch (key)
-                {
-                case 1:
-                    // author username
-                    strncpy(comment_entries[i].name, valStr, sizeof(comment_entries[i].name) - 1);
-                    break;
-                case 9:
-                    // player icon index
-                    comment_entries[i].playerIcon = atoi(valStr);
-                    break;
-                case 10:
-                    // author icon primary color
-                    comment_entries[i].col1 = atoi(valStr);
-                    break;
-                case 11:
-                    // author icon secondary color
-                    comment_entries[i].col2 = atoi(valStr);
-                    break;
-                case 14:
-                    // icon type (gamemode)
-                    comment_entries[i].iconType = atoi(valStr);
-                    break;
-                case 15:
-                    // icon glow (why is 0 false but 2 true??????)
-                    comment_entries[i].glow = (atoi(valStr) == 2);
-                    break;
+                switch (key) {
+                    case 1:
+                        // author username
+                        strncpy(comment_entries[i].name, valStr, sizeof(comment_entries[i].name) - 1);
+                        break;
+                    case 9:
+                        // player icon index
+                        comment_entries[i].playerIcon = atoi(valStr);
+                        break;
+                    case 10:
+                        // author icon primary color
+                        comment_entries[i].col1 = atoi(valStr);
+                        break;
+                    case 11:
+                        // author icon secondary color
+                        comment_entries[i].col2 = atoi(valStr);
+                        break;
+                    case 14:
+                        // icon type (gamemode)
+                        comment_entries[i].iconType = atoi(valStr);
+                        break;
+                    case 15:
+                        // icon glow (why is 0 false but 2 true??????)
+                        comment_entries[i].glow = (atoi(valStr) == 2);
+                        break;
                 }
             }
             free_string_array(commentData, commentDataKeyCount);
