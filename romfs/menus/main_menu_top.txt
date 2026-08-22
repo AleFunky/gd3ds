@@ -1,2 +1,3 @@
 image x=200 y=80 id=0 sheet=1 sx=0.85 sy=0.85 tag="title"
 image x=65 y=220 id=4 sheet=1 sx=0.85 sy=0.85
+image x=345 y=220 id=400 sheet=0 sx=1 sy=1

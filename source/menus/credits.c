@@ -30,18 +30,20 @@ static UIList *list;
 typedef struct CreditsEntries {
     char *contributor;
     char *contribution;
+    float name_scale;
 } CreditsEntries;
 
 static const CreditsEntries credits[] = {
-    { "AleFunky", "Lead Developer" },
-    { "camila314", "Pathfinder (Physics)" },
-    { "advexed", "Menus and VFX" },
-    { "nittynatty", "VFX" }, 
-    { "orionconstel", "Concepts, Menus"},
-    { "Cloud54", "Menus" },
-    { "novex", "Optimization" },
-    { "DiegoWearden", "240hz input" },
-    { "zylonity", "3D Support" },
+    { "<i400s0>", "Geometry Dash", 0.7f }, // Robert
+    { "AleFunky", "Lead Developer", 0.5f },
+    { "camila314", "Pathfinder (Physics)", 0.5f },
+    { "advexed", "Menus and VFX", 0.5f },
+    { "nittynatty", "VFX", 0.5f }, 
+    { "orionconstel", "Concepts, Menus", 0.5f },
+    { "Cloud54", "Menus", 0.5f },
+    { "novex", "Optimization", 0.5f },
+    { "DiegoWearden", "240hz input", 0.5f },
+    { "zylonity", "3D Support", 0.5f },
 };
 
 void exit_credits(UIElement* e) {
@@ -65,6 +67,7 @@ void credits_init() {
         for (int i = 0; i < ARRAY_LEN(credits); i++) {
             char *contributor = credits[i].contributor;
             char *contribution = credits[i].contribution;
+            float contributor_scale = credits[i].name_scale;
 
             UIElement *card = (UIElement *) ui_create_rectangle(&screen.ctx);
 
@@ -78,7 +81,7 @@ void credits_init() {
                     name->base.w = list->base.w - 12;
                     ui_label_set_text(name, contributor);
                     ui_element_set_position((UIElement *) name, -list_width + 3, 0);
-                    ui_element_set_scale((UIElement *) name, 0.5f);
+                    ui_element_set_scale((UIElement *) name, contributor_scale);
                     
                     // name->font = 2;
 
@@ -91,7 +94,7 @@ void credits_init() {
                     char text[256];
                     snprintf(text, sizeof(text) - 1, "- %s", contribution);
                     ui_label_set_text(description, text);
-                    ui_element_set_position((UIElement *) description, -list_width + 8 + get_text_length(&bigFont_fontCharset, 0.5f, false, contributor), -1);
+                    ui_element_set_position((UIElement *) description, -list_width + 8 + get_text_length(&bigFont_fontCharset, contributor_scale, true, contributor), -1);
                     ui_element_set_scale((UIElement *) description, 0.7f);
                     
                     description->font = 1;
