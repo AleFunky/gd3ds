@@ -1000,7 +1000,7 @@ void draw_background(float x, float y) {
 
     int bg_id = level_info.background_id;
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = -1; i < 3; i++) {
         C2D_Sprite bg = { 0 };
         // Calculate position for each tile
         float draw_x = -calc_x + i * offset;

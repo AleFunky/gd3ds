@@ -137,7 +137,7 @@ void loading_screen_update(float progress) {
     C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
     C2D_SceneBegin(bot);
 
-    draw_background(-20, SCREEN_HEIGHT-30);
+    draw_background(20, SCREEN_HEIGHT-30);
     C2D_ViewScale(SCALE, SCALE);
     draw_fade();
 
