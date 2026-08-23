@@ -1,5 +1,7 @@
 #pragma once
 
+#include <3ds.h>
+
 typedef struct SearchEntry {
     char name[20+1];
     char *description;
