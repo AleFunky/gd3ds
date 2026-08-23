@@ -321,6 +321,8 @@ int search_levels() {
     free_string_array(songStrings, songStringCount);    
     free_string_array(initialStrings, initialStringCount);
 
+    free(outdata);
+
     creatorEntriesLength = creatorStringCount;
     songEntriesLength = songStringCount;
     searchEntriesLength = levelStringCount;
@@ -349,6 +351,8 @@ int get_level_data(int id) {
     fill_level_entry(initialStrings, 1);
 
     free_string_array(initialStrings, initialStringCount);
+
+    free(outdata);
 
     levelEntryLength = initialStringCount;
     return 0;
@@ -516,7 +520,9 @@ int get_comments(int id, int page, int sortType) {
 
     fill_comment_entries(commentStrings, commentStringCount);
 
-    // free_string_array(commentStrings, commentStringCount);
+    free_string_array(commentStrings, commentStringCount);
+    
+    free(outdata);
 
     commentEntriesLength = commentStringCount;
 

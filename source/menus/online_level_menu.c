@@ -386,6 +386,11 @@ void online_level_menu_loop() {
                 free(level_entry);
                 level_entry = NULL;
             }
+
+            if (comment_entries) {
+                free(comment_entries);
+                comment_entries = NULL;
+            }
             game_state = STATE_ONLINE;
             break;
         }

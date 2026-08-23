@@ -576,6 +576,7 @@ void game_loop() {
         if (returned) {
             output_log("Failed %d", returned);
 
+            state.online_level = false;
             game_state = STATE_ONLINE_LEVEL;
             return;
         }

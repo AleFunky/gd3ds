@@ -461,6 +461,10 @@ void online_menu_loop() {
                 free(song_entries);
                 song_entries = NULL;
             }
+            if(page_entry) {
+                free(page_entry);
+                page_entry = NULL;
+            }
 
             game_state = STATE_SEARCH_MENU;
             break;
