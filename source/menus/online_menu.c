@@ -451,9 +451,16 @@ void online_menu_loop() {
             if (search_entries) {
                 if (search_entries->description) free(search_entries->description);
                 free(search_entries);
+                search_entries = NULL;
             }
-            if (creator_entries) free(creator_entries);
-            if (song_entries) free(song_entries);
+            if (creator_entries) {
+                free(creator_entries);
+                creator_entries = NULL;
+            }
+            if (song_entries) {
+                free(song_entries);
+                song_entries = NULL;
+            }
 
             game_state = STATE_SEARCH_MENU;
             break;
