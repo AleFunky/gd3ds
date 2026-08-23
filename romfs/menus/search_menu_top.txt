@@ -5,7 +5,7 @@ image x=36 y=205 id=178
 image x=364 y=205 id=178 sx=-1.0
 image x=364 y=35 id=178 sx=-1.0 sy=-1.0
 
-image x=200 y=60 id=10 sheet=1
+image x=200 y=60 id=54 sheet=1
 
 window x=200 y=160 w=240 h=100 style=1
 

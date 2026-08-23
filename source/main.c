@@ -574,7 +574,7 @@ void game_loop() {
         int returned = load_online_level(level_entry);
         level_result = returned;
         if (returned) {
-            output_log("Failed %d", returned);
+            output_log("Failed %d\n", returned);
 
             state.online_level = false;
             game_state = STATE_ONLINE_LEVEL;
@@ -591,7 +591,7 @@ void game_loop() {
         int returned = load_level(path);
         level_result = returned;
         if (returned) {
-            output_log("Failed %d", returned);
+            output_log("Failed %d\n", returned);
 
             game_state = (state.custom_level ? STATE_EXTERNAL_LEVELS : STATE_LEVEL_SELECT);
             return;
