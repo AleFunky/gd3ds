@@ -331,7 +331,6 @@ char *decompress_online_level(char *data) {
     int decoded_len = base64_decode(data, decoded);
     if (decoded_len <= 0) {
         output_log("Failed to decode base64\n");
-        free(data);
         free(decoded);
         return NULL;
     }
@@ -341,7 +340,6 @@ char *decompress_online_level(char *data) {
     if (!decompressed) {
         output_log("Decompression failed (check zlib error above)\n");
         free(decoded);
-        free(data);
         return NULL;
     }
 

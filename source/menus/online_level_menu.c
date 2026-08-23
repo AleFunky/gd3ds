@@ -384,6 +384,7 @@ void online_level_menu_loop() {
             if (level_entry) {
                 if (level_entry->levelString) free(level_entry->levelString);
                 free(level_entry);
+                level_entry = NULL;
             }
             game_state = STATE_ONLINE;
             break;
