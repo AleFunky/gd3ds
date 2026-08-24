@@ -1,9 +1,11 @@
 #include <3ds.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <citro2d.h>
 #include "level/main_levels.h"
 #include "level_loading.h"
 #include "menus/components/ui_window_button.h"
+#include "menus/core/common_setters.h"
 #include "menus/core/ui_element.h"
 #include "menus/core/ui_screen.h"
 #include "menus/components/ui_list.h"
@@ -12,6 +14,8 @@
 #include "menus/components/ui_button.h"
 #include "menus/components/ui_rectangle.h"
 #include "main.h"
+#include "menus/info_card.h"
+#include "menus/main_menu.h"
 #include "mp3_player.h"
 #include "graphics.h"
 #include "utils/folders.h"
@@ -39,6 +43,11 @@ typedef struct {
     int entryId;
 } OnlineCardData;
 
+typedef struct {
+    bool wasUpdated;
+    float version;
+} VersionWarningData;
+
 static void action_exit(UIElement *e) {
     exit_flag = true;
     set_fade_status(FADE_STATUS_OUT);
@@ -51,11 +60,24 @@ static void action_open_online_level_menu(UIElement* e) {
     set_fade_status(FADE_STATUS_OUT);
 }
 
+static void action_open_version_warning(UIElement *e) {
+    VersionWarningData *data = e->userdata;
+    if (data) {
+        char buffer[256];
+        if (data->wasUpdated) {
+            snprintf(buffer, sizeof(buffer), "This level was made <#ffff00>before or in</> %.1f,<p>but the level was updated later.<p>This level <#60abef>might not be playable</>.", GD_VERSION);
+        } else {
+            snprintf(buffer, sizeof(buffer), "This level was made <#ff0000>after</> %.1f.<p>This level will most likely<p><#ff00ff>not be playable</>.", GD_VERSION);
+        }
+        action_open_info_card_text(buffer);
+    }
+}
+
 static void update_arrows() {
     if (search_filters.currentPage <= page_entry->totalPages - 1) ui_run_func_on_tag(&default_screen, "nextpage", ui_enable_element); else ui_run_func_on_tag(&default_screen, "nextpage", ui_disable_element);
     if ((search_filters.currentPage) >= 1) ui_run_func_on_tag(&default_screen, "prevpage", ui_enable_element); else ui_run_func_on_tag(&default_screen, "prevpage", ui_disable_element);
 
-        char pageInfo[32];
+    char pageInfo[32];
     snprintf(pageInfo, 42 - 1, "%d to %d of %d", page_entry->currentOffset, page_entry->currentOffset + page_entry->amount, page_entry->totalPages * page_entry->amount - 1);
     ui_label_set_text(page_info_label, pageInfo);
 
@@ -279,6 +301,29 @@ static void populate_list() {
                 ui_element_add_child(card, (UIElement *)like_icon);
             }
 
+            // Exclamation mark
+            float version = derive_gj_version(entry->gameVersion);
+            if (version > GD_VERSION) {
+                UIButton *v_warn_button = ui_create_button(&default_screen.ctx);
+                if (v_warn_button) {
+                    VersionWarningData *data = malloc(sizeof(*data));
+                    data->version = version;
+                    if (entry->levelId <= LAST_GD_VERSION_ID) {
+                        // Made in or before GD_VERSION but updated after it
+                        data->wasUpdated = true;
+                        ui_button_set_image(v_warn_button, 426, 0);
+                    } else {
+                        data->wasUpdated = false;
+                        ui_button_set_image(v_warn_button, 315, 0);
+                    }
+                    ui_element_set_position((UIElement *)v_warn_button, list_width - 8, -23);
+                    ui_element_set_scale((UIElement *)v_warn_button, 0.3f);
+                    ui_element_set_action((UIElement *)v_warn_button, action_open_version_warning);
+                    ui_element_set_userdata((UIElement *)v_warn_button, data);
+                    ui_element_add_child(card, (UIElement *)v_warn_button);
+                }
+            }
+
             UIWindowButton *button = ui_create_window_button(&default_screen.ctx);
             if (button) {
                 // Store in the user data
@@ -409,7 +454,7 @@ void online_menu_loop() {
         touch.did_something = false;
         touch.interacted = false;
 
-        ui_screen_update(&default_screen, &touch);
+        if (!in_info_card) ui_screen_update(&default_screen, &touch);
         
         // Frees a render target, so keep it out of the frame below
         update_stereo_target();
@@ -425,6 +470,13 @@ void online_menu_loop() {
             draw_fade();
 
             ui_screen_draw(&default_screen);
+            
+            if (in_info_card) {
+                int returned = info_card_loop();
+                if (returned) {
+                    in_info_card = false;
+                }
+            }
 
             change_blending(true);
             draw_touch_effect();

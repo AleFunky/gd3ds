@@ -27,6 +27,9 @@
 #define ARRAY_LEN(arr) (sizeof(arr) / sizeof(arr[0]))
 #define IN_BOUNDS(index, arr) (index >= 0 && index < ARRAY_LEN(arr))
 
+#define GD_VERSION 1.9
+#define LAST_GD_VERSION_ID 11020426 // Last 1.9 id
+
 typedef struct {
     float x, y;
 } Vec2D;
