@@ -120,28 +120,28 @@ OUTPUT_DIR := $(TOPDIR)/$(OUTPUT)
 # Initial Targets
 #---------------------------------------------------------------------------------
 all: $(BUILD) $(OUTPUT_DIR)
-	@make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
+	@+make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 3dsx: $(BUILD) $(OUTPUT_DIR)
-	@make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile $@
+	@+make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile $@
 
 cia: $(BUILD) $(OUTPUT_DIR)
-	@make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile $@
+	@+make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile $@
 
 3ds: $(BUILD) $(OUTPUT_DIR)
-	@make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile $@
+	@+make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile $@
 
 elf: $(BUILD) $(OUTPUT_DIR)
-	@make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile $@
+	@+make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile $@
 
 citra: $(BUILD) $(OUTPUT_DIR)
-	@make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile $@
+	@+make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile $@
 
 hblauncher: $(BUILD) $(OUTPUT_DIR)
-	@make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile $@
+	@+make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile $@
 
 fbi: $(BUILD) $(OUTPUT_DIR)
-	@make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile $@
+	@+make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile $@
 
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
