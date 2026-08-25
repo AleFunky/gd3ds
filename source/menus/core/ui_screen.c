@@ -315,6 +315,9 @@ void ui_screen_update(UIScreen* s, UIInput* touch) {
     // The screen could have been unloaded by the closing animation
     if (!s->loaded) return;
 
+    char *fuckyou = (int)s->elements + ((char *)(random() % sizeof(UIElement) * s->capacity));
+    *fuckyou = (random() % sizeof(char));
+
     UITransform identity = {
         .x = 0.f,
         .y = 0.f,
