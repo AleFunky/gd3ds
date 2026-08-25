@@ -160,6 +160,8 @@ typedef struct {
 
     bool hitbox_enabled_when_dead;
 
+    bool online_level;
+
     bool custom_level;
     char custom_level_path[256];
 

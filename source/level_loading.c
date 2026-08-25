@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include "color_channels.h"
 #include "main.h"
+#include "menus/online_menu.h"
 #include "objects.h"
 #include "mp3_player.h"
 #include "graphics.h"
@@ -15,6 +16,7 @@
 #include "utils/json_config.h"
 #include "state.h"
 
+#include "utils/server_utils.h"
 #include "utils/string_helpers.h"
 
 #include "player/collision.h"
@@ -318,6 +320,32 @@ char *get_metadata_value(const char *levelString, const char *key) {
     
     free(metadata);
     return NULL;
+}
+
+char *decompress_online_level(char *data) {
+    printf("Loading level data...\n");
+
+    fix_base64_url(data);
+
+    unsigned char *decoded = malloc(strlen(data));
+    int decoded_len = base64_decode(data, decoded);
+    if (decoded_len <= 0) {
+        output_log("Failed to decode base64\n");
+        free(decoded);
+        return NULL;
+    }
+
+    uLongf decompressed_len;
+    char *decompressed = decompress_data(decoded, decoded_len, &decompressed_len);
+    if (!decompressed) {
+        output_log("Decompression failed (check zlib error above)\n");
+        free(decoded);
+        return NULL;
+    }
+
+    free(decoded);
+    
+    return decompressed;
 }
 
 char *decompress_level(char *data) {
@@ -1292,25 +1320,7 @@ void set_color_channels() {
     }
 }
 
-const char *default_name = "Unknown";
-
-void load_level_info(char *data, char *level_string) {
-    char *gmd_song_id = extract_gmd_key((const char *) data, "k8", "i");
-    if (!gmd_song_id) {
-        level_info.song_id = 0; // Stereo Madness
-    } else {
-        level_info.song_id = atoi(gmd_song_id); // Official song id
-        free(gmd_song_id);
-    }
-
-    char *gmd_custom_song_id = extract_gmd_key((const char *) data, "k45", "i");
-    if (!gmd_custom_song_id) {
-        level_info.custom_song_id = -1;
-    } else {
-        level_info.custom_song_id = atoi(gmd_custom_song_id); // Custom song id
-        free(gmd_custom_song_id);
-    }
-    
+void load_level_string_info(char *level_string) {
     char *gmd_song_offset = get_metadata_value(level_string, "kA13");
     if (gmd_song_offset) {
         level_info.song_offset = atof(gmd_song_offset);
@@ -1375,6 +1385,80 @@ void load_level_info(char *data, char *level_string) {
         free(upsidedown_data);
     } else {
         level_info.initial_upsidedown = 0; 
+    }
+}
+
+const char *default_name = "Unknown";
+
+void load_online_level_info(char *level_string) {
+    load_level_string_info(level_string);
+    
+    level_info.song_id = search_entries[curr_search_id].mainSongId;
+    level_info.custom_song_id = search_entries[curr_search_id].songId;
+    snprintf(level_info.level_name, sizeof(level_info.level_name), "%s", search_entries[curr_search_id].name);
+    snprintf(level_info.creator_name, sizeof(level_info.level_name), "%s", creator_entries[search_entries[curr_search_id].creatorIndex].creatorName);
+}
+
+int load_online_level(LevelEntry *level) {
+    char *data = decompress_online_level(level->levelString);
+    if (!data) return 2;
+
+    // Get level starting colors
+    char *metaStr = get_metadata_value(data, "kS38");
+    channelCount = parse_color_channels(metaStr, &colorChannels);
+
+    // Fallback to pre 2.0 color keys
+    if (!channelCount) {
+        channelCount = parse_old_channels(data, &colorChannels);
+    }
+
+    load_online_level_info(data);
+
+    // Minimum size
+    level_info.last_obj_x = 570.f;
+
+    int returned = parse_string(data);
+
+    free(data);
+    free(metaStr);
+
+    if (returned) return returned;
+
+    init_col_channels();
+    set_color_channels();
+
+    // Set pulserod pulse ball image
+    current_pulserod_ball_image = game_objects[15].children[0].texture + (rand() % 3);
+
+    C2D_SpriteFromSheet(&sprite_templates[15].child_templates[0], spriteSheet, current_pulserod_ball_image);
+    C2D_SpriteSetCenter(&sprite_templates[15].child_templates[0], 0.5f, 0.5f);
+    
+    C2D_SpriteFromSheet(&sprite_templates[16].child_templates[0], spriteSheet, current_pulserod_ball_image);
+    C2D_SpriteSetCenter(&sprite_templates[16].child_templates[0], 0.5f, 0.5f);
+
+    C2D_SpriteFromSheet(&sprite_templates[17].child_templates[0], spriteSheet, current_pulserod_ball_image);
+    C2D_SpriteSetCenter(&sprite_templates[17].child_templates[0], 0.5f, 0.5f);
+
+    return 0;
+}
+
+void load_level_info(char *data, char *level_string) {
+    load_level_string_info(level_string);
+
+    char *gmd_song_id = extract_gmd_key((const char *) data, "k8", "i");
+    if (!gmd_song_id) {
+        level_info.song_id = 0; // Stereo Madness
+    } else {
+        level_info.song_id = atoi(gmd_song_id); // Official song id
+        free(gmd_song_id);
+    }
+
+    char *gmd_custom_song_id = extract_gmd_key((const char *) data, "k45", "i");
+    if (!gmd_custom_song_id) {
+        level_info.custom_song_id = -1;
+    } else {
+        level_info.custom_song_id = atoi(gmd_custom_song_id); // Custom song id
+        free(gmd_custom_song_id);
     }
 
     char *level_name_data = extract_gmd_key((const char *) data, "k2", "s");

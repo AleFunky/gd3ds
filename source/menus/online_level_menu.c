@@ -11,6 +11,7 @@
 #include "main.h"
 #include "mp3_player.h"
 #include "graphics.h"
+#include "state.h"
 #include "utils/folders.h"
 #include "menus/external_level_infobox.h"
 #include "menus/online_level_comments.h"
@@ -33,6 +34,8 @@ static bool in_comments = false;
 static bool in_refresh = false;
 static bool in_delete = false;
 static bool in_errorbox = false;
+static bool play_flag = false;
+static bool comes_from_levels = false;
 
 int result = -2;
 
@@ -63,6 +66,20 @@ static UILabel *song_size_label;
 static void action_exit(UIElement *e) {
     exit_flag = true;
     set_fade_status(FADE_STATUS_OUT);
+    comes_from_levels = false;
+}
+
+static void action_play(UIElement *e) {
+    play_flag = true;
+    play_sfx(&play_sound, 1);
+
+    state.custom_level = true;
+    state.online_level = true;
+
+    set_fade_status(FADE_STATUS_OUT);
+
+    comes_from_levels = true;
+    playing_menu_loop = false;
 }
 
 static void action_open_info(UIElement *e) {
@@ -100,6 +117,7 @@ static UIAction actions[] = {
     {"comments", action_open_comments },
     {"reload", action_refresh_level },
     {"deletelevel", action_delete_level },
+    {"play", action_play },
 };
 
 void populate_level_info() {
@@ -251,6 +269,7 @@ void online_level_menu_loop() {
     in_refresh = false;
     in_info_box = false;
     comments_need_refresh = true;
+    play_flag = false;
 
     ui_load_screen(&default_screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_level_menu.txt");
     ui_load_screen(&default_screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_level_menu_top.txt");
@@ -290,19 +309,25 @@ void online_level_menu_loop() {
 
     ui_image_set_tint(bg_gradient, C2D_Color32(50, 110, 255, 255));
     ui_image_set_tint(bg_gradient_top, C2D_Color32(50, 110, 255, 255));
-
+    
     populate_level_info();
 
-    result = get_level_data(search_entries[curr_search_id].levelId);
+    if (!comes_from_levels) {
+        result = get_level_data(search_entries[curr_search_id].levelId);
 
-    // Handle result
-    if (result != 0) {
-        handle_errors(result);
-    } else {
-        // TODO: handle level data
+        // Handle result
+        if (result != 0) {
+            handle_errors(result);
+        }
     }
 
     set_fade_status(FADE_STATUS_IN);
+
+    if (!playing_menu_loop) {
+        play_mp3("romfs:/songs/menuLoop.mp3", true, 0);
+        playing_menu_loop = true;
+    }
+
     while (aptMainLoop()) {
         hidScanInput();
 
@@ -356,7 +381,23 @@ void online_level_menu_loop() {
         } while (handle_fading());
 
         if (exit_flag) {
+            if (level_entry) {
+                if (level_entry->levelString) free(level_entry->levelString);
+                free(level_entry);
+                level_entry = NULL;
+            }
+
+            if (comment_entries) {
+                free(comment_entries);
+                comment_entries = NULL;
+            }
             game_state = STATE_ONLINE;
+            break;
+        }
+
+        if (play_flag) {
+            stop_mp3();
+            game_state = STATE_GAME;
             break;
         }
 
@@ -405,12 +446,6 @@ void online_level_menu_loop() {
         }
     }
     C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
-    
-
-    if (level_entry) {
-        if (level_entry->levelString) free(level_entry->levelString);
-        free(level_entry);
-    }
 
     ui_unload_screen(&default_screen);
     ui_unload_screen(&default_screen_top);

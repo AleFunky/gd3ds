@@ -1,5 +1,6 @@
 #pragma once
 #include "objects.h"
+#include "utils/server_utils.h"
 #include <3ds.h>
 
 #define MAX_GROUPS_PER_OBJECT 20
@@ -117,6 +118,7 @@ char *read_file(const char *filepath, size_t *out_size);
 char *decompress_level(char *data);
 
 int load_level(char *path);
+int load_online_level(LevelEntry *level);
 void reload_level();
 void unload_level();
 

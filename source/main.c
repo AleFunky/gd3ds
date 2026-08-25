@@ -60,6 +60,7 @@
 #include "math_helpers.h"
 
 #include "utils/precise_input.h"
+#include "utils/server_utils.h"
 
 #ifdef DEBUG_LEAKS
 #include "utils/leaks_dbg.h"
@@ -565,27 +566,40 @@ void game_loop() {
     }
     C3D_FrameEnd(0);
     
-    char *path;
 
-    if (state.custom_level) {
-        path = state.custom_level_path;
-    } else {
-        path = main_levels[curr_level_id].gmd_path;
-    }
 
     update_player_colors();
 
-    int returned = load_level(path);
-    level_result = returned;
-    if (returned) {
-        printf("\x1b[9;1HFailed %d", returned);
+    if (state.online_level) {
+        int returned = load_online_level(level_entry);
+        level_result = returned;
+        if (returned) {
+            output_log("Failed %d\n", returned);
 
-        game_state = (state.custom_level ? STATE_EXTERNAL_LEVELS : STATE_LEVEL_SELECT);
-        return;
-    }
+            state.online_level = false;
+            game_state = STATE_ONLINE_LEVEL;
+            return;
+        }
+    } else {
+        char *path;
+        if (state.custom_level) {
+            path = state.custom_level_path;
+        } else {
+            path = main_levels[curr_level_id].gmd_path;
+        }
 
-    if (!state.custom_level) {
-        snprintf(level_info.level_name, sizeof(level_info.level_name), "%s", main_levels[curr_level_id].level_name);
+        int returned = load_level(path);
+        level_result = returned;
+        if (returned) {
+            output_log("Failed %d\n", returned);
+
+            game_state = (state.custom_level ? STATE_EXTERNAL_LEVELS : STATE_LEVEL_SELECT);
+            return;
+        }
+
+        if (!state.custom_level) {
+            snprintf(level_info.level_name, sizeof(level_info.level_name), "%s", main_levels[curr_level_id].level_name);
+        }
     }
 
     play_level_song(level_info.song_offset);
@@ -1204,17 +1218,21 @@ void game_loop() {
         }
     }
 
-    LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
+    if (!state.online_level) { // TODO: IMPLEMENT SAVING
+        LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
 
-    level_data_sel->attempts += state.current_data.attempts;
-    level_data_sel->jumps += state.current_data.jumps;
-    level_data_sel->normal_progress = state.current_data.max_normal;
-    level_data_sel->practice_progress = state.current_data.max_practice;
+        level_data_sel->attempts += state.current_data.attempts;
+        level_data_sel->jumps += state.current_data.jumps;
+        level_data_sel->normal_progress = state.current_data.max_normal;
+        level_data_sel->practice_progress = state.current_data.max_practice;
+    }
 
     total_attempts += state.current_data.attempts;
     total_jumps += state.current_data.jumps;
 
-    if (state.custom_level) {
+    if (state.online_level) {
+        ; // Nothing for now
+    } else if (state.custom_level) {
         save_level_progress();
     } else {
         save_main_level_progress(curr_level_id);
@@ -1237,7 +1255,12 @@ void game_loop() {
     
     if (song_loaded) unpause_playback_mp3();
 
-    game_state = (state.custom_level ? STATE_EXTERNAL_LEVELS : STATE_LEVEL_SELECT);
+    if (state.online_level) {
+        game_state = STATE_ONLINE_LEVEL;
+        state.online_level = false;
+    } else {
+        game_state = (state.custom_level ? STATE_EXTERNAL_LEVELS : STATE_LEVEL_SELECT);
+    }
 }
 
 void game_assets_init() {

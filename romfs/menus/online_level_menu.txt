@@ -15,8 +15,8 @@ label x=160 y=154 text="Practice mode" scale=0.45 align=CENTER tag=""
 progressbar x=160 y=167 max_value=100 style=0 scale=0.65 tag="practiceprogress"
 label x=160 y=168 text="0%" scale=0.4 align=CENTER tag="level_card,practiceprogressvalue"
 
-spinner x=160 y=70 id=53 sheet=1 scale=1 speed=240
-# button x=160 y=70 id=139 sheet=0 scale=1 action="play" keyBinds="A,START"
+# spinner x=160 y=70 id=53 sheet=1 scale=1 speed=240
+button x=160 y=70 id=139 sheet=0 scale=1 action="play" keyBinds="A,START"
 
 button x=295 y=25 id=49 sheet=0 scale=1 action="deletelevel"
 button x=295 y=75 id=202 sheet=0 scale=1 action="reload"
