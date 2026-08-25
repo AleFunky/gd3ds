@@ -223,7 +223,7 @@ static void fill_level_entries(char **levelsStrings, int songStringCount, int cr
     }
 }
 
-static void fill_level_entry(char **levelStrings, int levelStringsCount) {
+static void fill_level_entry(char **levelStrings, int levelStringsCount, bool fillSearchEntry, int searchId) {
     int levelKeyCount = 0;
 
     char **levelKeys = split_string(levelStrings[0], ':', &levelKeyCount, true);
@@ -232,22 +232,135 @@ static void fill_level_entry(char **levelStrings, int levelStringsCount) {
         int key = atoi(levelKeys[j]);
         char *valStr = levelKeys[j + 1];;
         switch (key) {
-            case 1:
-                // level id
-                level_entry->levelId = atoi(valStr);
-                break;
-            case 4:
-                // base64 encoded probably compressed level string
-                level_entry->levelString = strdup(valStr);
-                break;
-            case 28:
-                // time since upload
-                strncpy(level_entry->uploadDate, valStr, sizeof(level_entry->uploadDate) - 1);
-                break;
-            case 29:
-                // time since last
-                strncpy(level_entry->updateDate, valStr, sizeof(level_entry->updateDate) - 1);
-                break;
+        case 1:
+            // level id
+            if (fillSearchEntry)
+                search_entries[searchId].levelId = atoi(valStr);
+            break;
+        case 2:
+            // level name
+            if (fillSearchEntry)
+                strncpy(search_entries[searchId].name, valStr, sizeof(search_entries[searchId].name) - 1);
+            break;
+        case 3:
+            // level description
+            if (fillSearchEntry)
+            {
+                if (valStr[0] == '\0')
+                {
+                    search_entries[searchId].description = strdup("No description provided.");
+                    break;
+                }
+
+                fix_base64_url(valStr);
+                search_entries[searchId].description = malloc(strlen(valStr) + 1);
+                int decoded_len = base64_decode(valStr, (unsigned char *)search_entries[searchId].description);
+                if (decoded_len > 0)
+                {
+                    search_entries[searchId].description[decoded_len] = '\0';
+                }
+            }
+            break;
+        case 5:
+            // level version
+            if (fillSearchEntry)
+                search_entries[searchId].levelVersion = atoi(valStr);
+            break;
+        case 6:
+            // creator player id
+            if (fillSearchEntry)
+                search_entries[searchId].creatorId = atoi(valStr);
+            break;
+        case 9:
+            // level difficulty
+            search_entries[searchId].difficulty = atoi(valStr) / 10;
+            break;
+        case 10:
+            // level downloads
+            if (fillSearchEntry)
+                search_entries[searchId].downloads = atoi(valStr);
+            break;
+        case 12:
+            // main level song, 0 if custom song is present
+            if (fillSearchEntry)
+                search_entries[searchId].mainSongId = atoi(valStr);
+            break;
+        case 13:
+            // game version the level was uploaded in
+            if (fillSearchEntry)
+                search_entries[searchId].gameVersion = atoi(valStr);
+            break;
+        case 14:
+            // level likes, formula is likes - dislikes
+            if (fillSearchEntry)
+                search_entries[searchId].likes = atoi(valStr);
+            break;
+        case 15:
+            // level length
+            if (fillSearchEntry)
+                search_entries[searchId].lengthNum = atoi(valStr);
+            break;
+        case 17:
+            // demon status
+            if (fillSearchEntry)
+                search_entries[searchId].isDemon = parse_bool(valStr);
+            break;
+        case 18:
+            // stars
+            if (fillSearchEntry)
+                search_entries[searchId].stars = atoi(valStr);
+            break;
+        case 19:
+            // feature score
+            if (fillSearchEntry)
+                search_entries[searchId].featureScore = atoi(valStr);
+            break;
+        case 25:
+            // auto status
+            if (fillSearchEntry)
+                search_entries[searchId].isAuto = parse_bool(valStr);
+            break;
+        case 30:
+            // if level is a copy, id of original level
+            if (fillSearchEntry)
+                search_entries[searchId].originalId = atoi(valStr);
+            break;
+        case 31:
+            // two player status
+            if (fillSearchEntry)
+                search_entries[searchId].isTwoPlayer = parse_bool(valStr);
+            break;
+        case 35:
+            // newgrounds song id
+            if (fillSearchEntry)
+                search_entries[searchId].songId = atoi(valStr);
+            break;
+        case 39:
+            // stars requested
+            if (fillSearchEntry)
+                search_entries[searchId].reqStars = atoi(valStr);
+            break;
+        case 42:
+            // epic, legendary, mythic
+            if (fillSearchEntry)
+                search_entries[searchId].epic = atoi(valStr);
+        case 45:
+            // object count, caps at 65535
+            if (fillSearchEntry)
+                search_entries[searchId].objCount = atoi(valStr);
+            break;
+        case 4:
+            // base64 encoded probably compressed level string
+            level_entry->levelString = strdup(valStr);
+            break;
+        case 28:
+            // time since upload
+            strncpy(level_entry->uploadDate, valStr, sizeof(level_entry->uploadDate) - 1);
+            break;
+        case 29:
+            // time since last
+            strncpy(level_entry->updateDate, valStr, sizeof(level_entry->updateDate) - 1);
+            break;
         }
     }
     free_string_array(levelKeys, levelKeyCount);
@@ -334,7 +447,7 @@ int search_levels() {
     return 0;
 }
 
-int get_level_data(int id) {
+int get_level_data(int id, bool refresh, int currentId) {
     char *outdata;
     int result = get_level_from_id(&outdata, id);
 
@@ -353,7 +466,7 @@ int get_level_data(int id) {
     // Initialize
     memset(level_entry, 0, initialStringCount * sizeof(LevelEntry));
 
-    fill_level_entry(initialStrings, 1);
+    fill_level_entry(initialStrings, 1, refresh, currentId);
 
     free_string_array(initialStrings, initialStringCount);
 
@@ -461,8 +574,14 @@ void fill_comment_entries(char **commentStrings, int commentStringCount) {
                         break;
                     case 12:
                         // color of username (if mod)
-                        strncpy(comment_entries[i].modCommentColor, valStr, sizeof(comment_entries[i].modCommentColor) - 1);
+
+                        int rgbCount = 0;
+                        char **rgbData = split_string(valStr, ',', &rgbCount, true);
+
+                        snprintf(comment_entries[i].modCommentColor, sizeof(comment_entries[i].modCommentColor) - 1, "#%04X%04X%04X", atoi(rgbData[0]), atoi(rgbData[1]), atoi(rgbData[2]));
+                        free_string_array(rgbData, rgbCount);
                         break;
+                
                 }
             }
 
