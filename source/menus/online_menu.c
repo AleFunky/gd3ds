@@ -22,6 +22,7 @@
 #include "external_popup.h"
 #include "utils/server_utils.h"
 #include "utils/string_helpers.h"
+#include "fonts/bigFont.h"
 #include "fonts/goldFont.h"
 #include "search_menu.h"
 #include "songs.h"
@@ -92,22 +93,21 @@ static void action_open_version_warning(UIElement *e) {
     if (data) {
         char buffer[256];
         if (data->wasUpdated) {
-            snprintf(buffer, sizeof(buffer), "This level was made <#ffff00>before or in</> %.1f,<p>but the level was updated later.<p>This level <#60abef>might not be playable</>.", GD_VERSION);
+            snprintf(buffer, sizeof(buffer), "This level was uploaded <#ffff00>before or in</> %.1f,<p>but was updated in a later version.It<p><#60abef>might not be playable</>.", GD_VERSION);
         } else {
-            snprintf(buffer, sizeof(buffer), "This level was made <#ff0000>after</> %.1f.<p>This level will most likely<p><#ff00ff>not be playable</>.", GD_VERSION);
+            snprintf(buffer, sizeof(buffer), "This level was uploaded <#ff0000>after</> %.1f.<p>It will most likely<#ff00ff>not be<p>playable</>.", GD_VERSION);
         }
         action_open_info_card_text(buffer);
     }
 }
 
 static void update_arrows() {
-    if (filters.currentPage <= page_entry->totalPages - 1) ui_run_func_on_tag(&default_screen, "nextpage", ui_enable_element); else ui_run_func_on_tag(&default_screen, "nextpage", ui_disable_element);
+    if (searchEntriesLength == page_entry->amount) ui_run_func_on_tag(&default_screen, "nextpage", ui_enable_element); else ui_run_func_on_tag(&default_screen, "nextpage", ui_disable_element);
     if ((filters.currentPage) >= 1) ui_run_func_on_tag(&default_screen, "prevpage", ui_enable_element); else ui_run_func_on_tag(&default_screen, "prevpage", ui_disable_element);
 
     char pageInfo[32];
-    snprintf(pageInfo, 42 - 1, "%d to %d of %d", page_entry->currentOffset, page_entry->currentOffset + page_entry->amount, page_entry->totalPages * page_entry->amount - 1);
+    snprintf(pageInfo, 42 - 1, "%d to %d of %d", page_entry->currentOffset + 1, page_entry->currentOffset + page_entry->amount, page_entry->totalPages * page_entry->amount - 1);
     ui_label_set_text(page_info_label, pageInfo);
-
 }
 
 static void populate_list() {
@@ -137,7 +137,7 @@ static void populate_list() {
             if (entry->songIndex < songEntriesLength) {
                 song_name = song_entries[entry->songIndex].songTitle;
             }
-        } else {
+        } else if (entry->songIndex != -1) {
             if (IN_BOUNDS(entry->mainSongId, main_songs)) {
                 song_name = (char *) main_songs[entry->mainSongId].title;
             }
@@ -164,7 +164,7 @@ static void populate_list() {
                 ui_label_set_text(name_label, tmp_name);
                 ui_element_set_position((UIElement *)name_label, -list_width + 48, -17);
                 ui_element_set_scale((UIElement *)name_label, 0.54f);
-                name_label->base.w = 130;
+                name_label->base.w = 120;
                 ui_element_add_child(card, (UIElement *)name_label);
             }
 
@@ -192,7 +192,7 @@ static void populate_list() {
 
             // high object count icon
             UIImage *high_object_icon = ui_create_image(&default_screen.ctx);
-            if (high_object_icon && (entry->objCount >= 44000)) {
+            if (high_object_icon && (entry->objCount >= (is_N3DS ? 44000 : 14000))) {
                 ui_image_set_image(high_object_icon, 362, 0);
                 ui_element_set_position((UIElement *)high_object_icon, -list_width + 48 + get_text_length(&goldFont_fontCharset, 0.45f, false, tmp_creator) + 10 + ((entry->originalId != 0) ? 11 : 0), -4.5f);
                 ui_element_set_scale((UIElement *)high_object_icon, 0.7f);
@@ -221,7 +221,7 @@ static void populate_list() {
                 ui_label_set_text(length_label, level_length);
                 ui_element_set_position((UIElement *)length_label, -list_width + 60, 19.3f);
                 ui_element_set_scale((UIElement *)length_label, 0.35f);
-                
+                length_label->base.w = 30;
                 ui_element_add_child(card, (UIElement *)length_label);
             }
 
@@ -358,7 +358,10 @@ static void populate_list() {
                         data->wasUpdated = false;
                         ui_button_set_image(v_warn_button, 315, 0);
                     }
-                    ui_element_set_position((UIElement *)v_warn_button, list_width - 8, -23);
+                    float tmp = get_text_length(&bigFont_fontCharset, 0.54f, false, tmp_name);
+                    // level name width is capped at 130 so we replicate that here
+                    if (tmp > 120) tmp = 120;
+                    ui_element_set_position((UIElement *)v_warn_button, -list_width + 48 + tmp + 10, -17);
                     ui_element_set_scale((UIElement *)v_warn_button, 0.3f);
                     ui_element_set_action((UIElement *)v_warn_button, action_open_version_warning);
                     ui_element_set_userdata((UIElement *)v_warn_button, data);

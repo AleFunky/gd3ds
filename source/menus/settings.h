@@ -53,6 +53,8 @@ typedef struct {
     bool practiceMusicSync;
     bool autoCheckpoints;
     bool quickCheckpoints;
+    bool skipHighObjWarning;
+    bool skipVersionWarning;
 } SettingState;
 
 extern Setting settings[26];

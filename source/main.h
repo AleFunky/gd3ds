@@ -44,6 +44,7 @@ extern bool song_loaded;
 extern bool exiting_level;
 
 extern bool alt_title_screen;
+extern bool is_N3DS;
 
 extern float global_volume;
 extern float music_volume;
