@@ -26,6 +26,7 @@
 #include "search_menu.h"
 #include "songs.h"
 #include "online_menu.h"
+#include "components/ui_particle.h"
 
 static bool exit_flag = false;
 
@@ -49,7 +50,7 @@ const int demon_faces[] = {
     EXTREME_DEMON_FACE
 };
 
-const int difficulty_faces[] = {
+const int difficulty_faces[6] = {
     NA_FACE,
     EASY_FACE,
     NORMAL_FACE,
@@ -58,7 +59,7 @@ const int difficulty_faces[] = {
     INSANE_FACE
 };
 
-const int epics[] = {
+const int epics[4] = {
     0,
     MYTHIC_GLOW,
     EPIC_GLOW,
@@ -267,16 +268,17 @@ static void populate_list() {
             UIImage *featured_glow = ui_create_image(&default_screen.ctx);
             if (featured_glow && entry->featureScore > 0) {
                 int featured_id = 0;
+                int yOffset = 0;
 
                 if(entry->epic > 0 && IN_BOUNDS(entry->epic, epics)){
                     featured_id = epics[entry->epic];
-                    featured_glow->base.y -= 8;
+                    yOffset = -2;
                 } else if(entry->featureScore > 0) {
                     featured_id = FEATURED_GLOW;
                 }
 
                 ui_image_set_image(featured_glow, featured_id, 0);
-                ui_element_set_position((UIElement *)featured_glow, -list_width + 23, -8.5f);
+                ui_element_set_position((UIElement *)featured_glow, -list_width + 23, -8.5f + yOffset);
                 ui_element_set_scale((UIElement *)featured_glow, 0.82f);
 
                 ui_element_add_child(card, (UIElement *)featured_glow);

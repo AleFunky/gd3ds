@@ -57,12 +57,13 @@ void select_normal() {
     ui_window_button_set_style(custom_button, 5);
     ui_window_button_set_style(normal_button, 10);
 
-    filters.customSongQuery[0] = '\0';
-    song_input->text[0] = '\0';
-
     ui_run_func_on_tag(&screen, "songselector", ui_enable_element);
     ui_run_func_on_tag(&screen, "normal_song_text", ui_enable_element);
     ui_run_func_on_tag(&screen, "songinput", ui_disable_element);
+
+    filters.customSongQuery[0] = '\0';
+    song_input->text[0] = '\0';
+
     switch_song(filters.mainSong);
     filters.customSong = false;
 }
@@ -70,30 +71,34 @@ void select_normal() {
 void select_custom() {
     ui_window_button_set_style(custom_button, 10);
     ui_window_button_set_style(normal_button, 5);
-    snprintf(song_input->text, sizeof(song_input->text), "%s", filters.customSongQuery);
+
     ui_run_func_on_tag(&screen, "songselector", ui_disable_element);
     ui_run_func_on_tag(&screen, "normal_song_text", ui_disable_element);
     ui_run_func_on_tag(&screen, "songinput", ui_enable_element);
+    
     filters.customSong = true;
 }
 
 void song_filter(UIElement *e) {
     filters.songFilter = ((UICheckBox *)e)->checked;
+    UITextbox *textbox = ((UITextbox *)ui_get_element_by_tag(&screen, "songinput"));
 
     if (filters.songFilter){
         if (filters.customSong) {
             select_custom();
-            ui_run_func_on_tag(&screen, "songselector", ui_disable_element);
-            ui_run_func_on_tag(&screen, "normal_song_text", ui_disable_element);
+            snprintf(textbox->text, sizeof(textbox->text), "%s", filters.customSongQuery);
+
         } else select_normal();
     } else {
         ui_run_func_on_tag(&screen, "songselector", ui_disable_element);
-        ui_run_func_on_tag(&screen, "songinput", ui_disable_element);
         ui_run_func_on_tag(&screen, "normal_song_text", ui_disable_element);
+        ui_run_func_on_tag(&screen, "songinput", ui_disable_element);
 
+        textbox->text[0] = '\0';
         filters.customSongQuery[0] = '\0';
 
         filters.mainSong = 0;
+
         switch_song(filters.mainSong);
     }
 

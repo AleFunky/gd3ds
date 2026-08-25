@@ -14,3 +14,6 @@
 void online_menu_loop();
 
 extern int curr_search_id;
+
+extern const int difficulty_faces[6];
+extern const int epics[4];

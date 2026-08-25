@@ -1,4 +1,5 @@
 #pragma once
+#include <stdbool.h>
 
 typedef struct SearchFilters {
     bool uncompleted:1;
