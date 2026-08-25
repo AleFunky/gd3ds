@@ -14,6 +14,9 @@
 #include "clear_search_filters.h"
 #include "song_filter.h"
 #include "menus/components/ui_label.h"
+#include "utils/server_utils.h"
+#include "menus/components/ui_button.h"
+
 static int new_state = 0;
 
 static bool in_disclaimer = false;
@@ -25,9 +28,88 @@ bool search_needs_refresh = true;
 
 static UIImage *bg_gradient;
 static UIImage *bg_gradient_top;
-static UITextbox *search_input;
 
-SearchFilters search_filters;
+static void update_difficulty_tint(UIElement *e){
+    int tint = (filters.difficultyFilters & (ui_prop_int(&e->custom_properties, "diffValue", 0))) > 0 ? 255 : 127;
+    C2D_PlainImageTint(&((UIButton *)e)->image.tint, C2D_Color32(tint, tint, tint, 255), 1.f);
+}
+
+static void enable_demons(){
+    ui_button_set_image(((UIButton *)ui_get_element_by_tag(&default_screen, "easy")), 259, 0);
+    ui_button_set_image(((UIButton *)ui_get_element_by_tag(&default_screen, "normal")), 261, 0);
+    ui_button_set_image(((UIButton *)ui_get_element_by_tag(&default_screen, "hard")), 257, 0);
+    ui_button_set_image(((UIButton *)ui_get_element_by_tag(&default_screen, "harder")), 263, 0);
+    ui_button_set_image(((UIButton *)ui_get_element_by_tag(&default_screen, "insane")), 265, 0);
+}
+
+static void disable_demons(){
+    ui_button_set_image(((UIButton *)ui_get_element_by_tag(&default_screen, "easy")), 252, 0);
+    ui_button_set_image(((UIButton *)ui_get_element_by_tag(&default_screen, "normal")), 253, 0);
+    ui_button_set_image(((UIButton *)ui_get_element_by_tag(&default_screen, "hard")), 254, 0);
+    ui_button_set_image(((UIButton *)ui_get_element_by_tag(&default_screen, "harder")), 255, 0);
+    ui_button_set_image(((UIButton *)ui_get_element_by_tag(&default_screen, "insane")), 256, 0);
+}
+
+void update_difficulty_tints(){
+    C2D_PlainImageTint(
+        &((UIButton *)ui_get_element_by_tag(&default_screen, "na"))->image.tint, 
+        filters.isNA ? C2D_Color32(255, 255, 255, 255) : C2D_Color32(127, 127, 127, 255), 
+        1.f);
+    C2D_PlainImageTint(
+        &((UIButton *)ui_get_element_by_tag(&default_screen, "auto"))->image.tint, 
+        filters.isAuto ? C2D_Color32(255, 255, 255, 255) : C2D_Color32(127, 127, 127, 255), 
+        1.f);
+    C2D_PlainImageTint(
+        &((UIButton *)ui_get_element_by_tag(&default_screen, "demon"))->image.tint, 
+        filters.isDemon ? C2D_Color32(255, 255, 255, 255) : C2D_Color32(127, 127, 127, 255), 
+        1.f);
+    ui_run_func_on_tag(&default_screen, "difficulty", update_difficulty_tint);
+}
+
+static void action_na(UIElement *e){
+    filters.isNA = !filters.isNA;
+    if(filters.isNA){
+        filters.isAuto = false;
+        filters.isDemon = false;
+        disable_demons();
+        filters.difficultyFilters = 0;
+    }
+    update_difficulty_tints();
+}
+
+static void action_auto(UIElement *e){
+    filters.isAuto = !filters.isAuto;
+    if(filters.isAuto){
+        filters.isNA = false;
+        filters.isDemon = false;
+        disable_demons();
+        filters.difficultyFilters = 0;
+    }
+    update_difficulty_tints();
+}
+
+static void action_demon(UIElement *e){
+    filters.isDemon = !filters.isDemon;
+    if(filters.isDemon){
+        filters.isNA = false;
+        filters.isAuto = false;
+        filters.difficultyFilters = 0;
+        enable_demons();
+    } else{
+        filters.difficultyFilters = 0;
+        disable_demons();
+    }
+    update_difficulty_tints();
+}
+
+static void action_set_difficulty(UIElement *e){
+    filters.isNA = false;
+    filters.isAuto = false;
+    int difficultyVal = ui_prop_int(&e->custom_properties, "diffValue", 0);
+    if(filters.isDemon) filters.difficultyFilters &= difficultyVal;
+    filters.difficultyFilters ^= difficultyVal;
+    update_difficulty_tints();
+}
 
 static void action_exit(UIElement *e) {
     exit_flag = true;
@@ -54,10 +136,13 @@ void action_clear_filters(UIElement* e) {
     clear_search_filters_init();
 }
 
+void action_set_query(UIElement* e){
+    snprintf(filters.searchQuery, sizeof(filters.searchQuery), "%.*s", (int)sizeof(filters.searchQuery) - 1, ((UITextbox *)e)->text);
+}
+
 void action_search(UIElement* e) {
-    search_filters.searchType = ui_prop_int(&e->custom_properties, "type", 0);
-    strncpy(search_filters.searchQuery, search_input->text, sizeof(search_filters.searchQuery) - 1);
-    search_filters.currentPage = 0;
+    filters.searchType = ui_prop_int(&e->custom_properties, "type", 0);
+    filters.currentPage = 0;
     search_needs_refresh = true;
     new_state = STATE_ONLINE;
     set_fade_status(FADE_STATUS_OUT);
@@ -69,11 +154,15 @@ static UIAction actions[] = {
     {"serverswitcher", action_open_server_switcher },
     {"openfilters", action_open_filters },
     {"clearfilters", action_clear_filters },
-    {"search", action_search }
+    {"search", action_search },
+    {"searchtext", action_set_query},
+    {"difficulty", action_set_difficulty },
+    {"na", action_na },
+    {"auto", action_auto },
+    {"demon", action_demon },
 };
 
 void search_menu_loop() {
-
     exit_flag = false;
     new_state = STATE_SEARCH_MENU;
     
@@ -81,11 +170,15 @@ void search_menu_loop() {
     bg_gradient = (UIImage *) ui_get_element_by_tag(&default_screen, "gradient");
     ui_load_screen(&default_screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/search_menu_top.txt");
     bg_gradient_top = (UIImage *) ui_get_element_by_tag(&default_screen_top, "gradient_top");
-    search_input = (UITextbox *) ui_get_element_by_tag(&default_screen, "searchbox");
+
+    UITextbox *searchBox = ((UITextbox *)ui_get_element_by_tag(&default_screen, "searchbox"));
+    snprintf(searchBox->text, sizeof(searchBox->text), "%s", filters.searchQuery);
+
+    update_difficulty_tints();
+    if(filters.isDemon) enable_demons();
 
     ui_image_set_tint(bg_gradient, C2D_Color32(50, 110, 255, 255));
     ui_image_set_tint(bg_gradient_top, C2D_Color32(50, 110, 255, 255));
-
 
     set_fade_status(FADE_STATUS_IN);
 
@@ -108,7 +201,6 @@ void search_menu_loop() {
             }
         }
         
-
         // Frees a render target, so keep it out of the frame below
         update_stereo_target();
 

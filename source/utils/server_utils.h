@@ -1,4 +1,5 @@
 #pragma once
+#include "network.h"
 
 #include <3ds.h>
 
@@ -18,6 +19,7 @@ typedef struct SearchEntry {
     int objCount;
     int levelVersion;
     int gameVersion;
+    int epic;
     int featureScore;
     int originalId;
     bool isTwoPlayer;
@@ -94,6 +96,8 @@ extern PageEntry *page_entry;
 extern LevelEntry *level_entry;
 
 extern CommentEntry *comment_entries;
+
+extern SearchFilters filters;
 
 extern int creatorEntriesLength;
 extern int songEntriesLength;

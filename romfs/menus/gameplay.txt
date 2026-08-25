@@ -26,3 +26,5 @@ label x=120 y=32 text="Music" scale=0.5 tag="paused" align=CENTER
 slider x=120 y=48 max_value=1 scale=0.9 tag="paused,music_slider"
 label x=120 y=80 text="SFX" scale=0.5 tag="paused" align=CENTER
 slider x=120 y=96 max_value=1 scale=0.9 tag="paused,sound_slider"
+
+

@@ -91,3 +91,4 @@ fabric.properties
 
 .clangd
 compile_commands.json
+.vscode/c_cpp_properties.json

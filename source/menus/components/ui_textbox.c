@@ -24,6 +24,9 @@ static void ui_textbox_update(UIElement* e, UIInput* touch, UITransform *transfo
 
         if (hidKeysDown() & KEY_TOUCH) {
             read_text(textbox->text, textbox->title, textbox->character_limit);
+            if(e->action){
+                e->action(e);
+            }
         }
     }
 }

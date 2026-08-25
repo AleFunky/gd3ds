@@ -28,6 +28,30 @@
 #include "online_level_errorbox.h"
 #include "online_level_comments.h"
 
+#define EASY_DEMON_FACE_1 259
+#define MEDIUM_DEMON_FACE_1 261
+#define HARD_DEMON_FACE_1 257
+#define INSANE_DEMON_FACE_1 263
+#define EXTREME_DEMON_FACE_1 265
+
+const int demon_faces_1[] = {
+    NA_FACE,
+    EASY_DEMON_FACE_1,
+    MEDIUM_DEMON_FACE_1,
+    HARD_DEMON_FACE_1,
+    INSANE_DEMON_FACE_1,
+    EXTREME_DEMON_FACE_1
+};
+
+const int demon_face_featured_offsets[] = {
+    0,
+    -9,
+    -8,
+    -8,
+    -8,
+    -8
+};
+
 static bool exit_flag = false;
 static bool in_info_box = false;
 static bool in_comments = false;
@@ -198,16 +222,41 @@ void populate_level_info() {
     ui_label_set_text(level_name_label, entry_srch->name);
     
     // Set difficulty
-    int difficulty_id = difficulty_stars[0];
+    int difficulty_id = NA_FACE;
 
-    if (IN_BOUNDS(entry_srch->stars, difficulty_stars)) {
-        difficulty_id = difficulty_stars[entry_srch->stars];
+    int featured_demon_offset = 0;
+
+    if(entry_srch->isAuto) {
+        difficulty_id = AUTO_FACE;
+    } else if(entry_srch->isDemon && IN_BOUNDS(entry_srch->difficulty, demon_faces_1)) {
+        difficulty_face_image->base.y -= 5;
+        featured_demon_offset = demon_face_featured_offsets[entry_srch->difficulty];
+        difficulty_id = demon_faces_1[entry_srch->difficulty];
+    } else if (!entry_srch->isDemon && IN_BOUNDS(entry_srch->difficulty, difficulty_faces)) {
+        difficulty_id = difficulty_faces[entry_srch->difficulty];
     }
 
     ui_image_set_image(difficulty_face_image, difficulty_id, 0);
 
-    // Set featured
-    if (entry_srch->featureScore == 0) ui_disable_element((UIElement *)featured_glow_image);
+    if (entry_srch->featureScore > 0) {
+        int featured_id = 0;
+        int yOffset = 0;
+
+        if(entry_srch->epic > 0 && IN_BOUNDS(entry_srch->epic, epics)){
+            featured_id = epics[entry_srch->epic];
+            yOffset = -2;
+        } else if(entry_srch->featureScore > 0) {
+            featured_id = FEATURED_GLOW;
+        }
+
+        if(entry_srch->isDemon) yOffset += featured_demon_offset;
+
+        featured_glow_image->base.y += yOffset;
+
+        ui_image_set_image(featured_glow_image, featured_id, 0);
+    } else{
+        ui_disable_element((UIElement *)featured_glow_image);
+    }
 
     // Description
     char *wrapped_description = wrap_text(&chatFont_fontCharset, description_label->base.scaleX, entry_srch->description, 270);

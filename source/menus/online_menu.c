@@ -25,6 +25,8 @@
 #include "fonts/goldFont.h"
 #include "search_menu.h"
 #include "songs.h"
+#include "online_menu.h"
+#include "components/ui_particle.h"
 
 static bool exit_flag = false;
 
@@ -38,6 +40,31 @@ static UIImage *bg_gradient;
 static UIImage *bg_gradient_top;
 
 static UIList *list;
+
+const int demon_faces[] = {
+    NA_FACE,
+    EASY_DEMON_FACE,
+    MEDIUM_DEMON_FACE,
+    HARD_DEMON_FACE,
+    INSANE_DEMON_FACE,
+    EXTREME_DEMON_FACE
+};
+
+const int difficulty_faces[6] = {
+    NA_FACE,
+    EASY_FACE,
+    NORMAL_FACE,
+    HARD_FACE,
+    HARDER_FACE,
+    INSANE_FACE
+};
+
+const int epics[4] = {
+    0,
+    MYTHIC_GLOW,
+    EPIC_GLOW,
+    LEGENDARY_GLOW,
+};
 
 typedef struct {
     int entryId;
@@ -74,8 +101,8 @@ static void action_open_version_warning(UIElement *e) {
 }
 
 static void update_arrows() {
-    if (search_filters.currentPage <= page_entry->totalPages - 1) ui_run_func_on_tag(&default_screen, "nextpage", ui_enable_element); else ui_run_func_on_tag(&default_screen, "nextpage", ui_disable_element);
-    if ((search_filters.currentPage) >= 1) ui_run_func_on_tag(&default_screen, "prevpage", ui_enable_element); else ui_run_func_on_tag(&default_screen, "prevpage", ui_disable_element);
+    if (filters.currentPage <= page_entry->totalPages - 1) ui_run_func_on_tag(&default_screen, "nextpage", ui_enable_element); else ui_run_func_on_tag(&default_screen, "nextpage", ui_disable_element);
+    if ((filters.currentPage) >= 1) ui_run_func_on_tag(&default_screen, "prevpage", ui_enable_element); else ui_run_func_on_tag(&default_screen, "prevpage", ui_disable_element);
 
     char pageInfo[32];
     snprintf(pageInfo, 42 - 1, "%d to %d of %d", page_entry->currentOffset, page_entry->currentOffset + page_entry->amount, page_entry->totalPages * page_entry->amount - 1);
@@ -132,6 +159,7 @@ static void populate_list() {
 
             // Level name
             UILabel *name_label = ui_create_label(&default_screen.ctx);
+
             if (name_label) {
                 ui_label_set_text(name_label, tmp_name);
                 ui_element_set_position((UIElement *)name_label, -list_width + 48, -17);
@@ -239,8 +267,18 @@ static void populate_list() {
 
             UIImage *featured_glow = ui_create_image(&default_screen.ctx);
             if (featured_glow && entry->featureScore > 0) {
-                ui_image_set_image(featured_glow, 72, 0);
-                ui_element_set_position((UIElement *)featured_glow, -list_width + 23, -8.5f);
+                int featured_id = 0;
+                int yOffset = 0;
+
+                if(entry->epic > 0 && IN_BOUNDS(entry->epic, epics)){
+                    featured_id = epics[entry->epic];
+                    yOffset = -2;
+                } else if(entry->featureScore > 0) {
+                    featured_id = FEATURED_GLOW;
+                }
+
+                ui_image_set_image(featured_glow, featured_id, 0);
+                ui_element_set_position((UIElement *)featured_glow, -list_width + 23, -8.5f + yOffset);
                 ui_element_set_scale((UIElement *)featured_glow, 0.82f);
 
                 ui_element_add_child(card, (UIElement *)featured_glow);
@@ -248,10 +286,14 @@ static void populate_list() {
 
             UIImage *difficulty_face = ui_create_image(&default_screen.ctx);
             if (difficulty_face) {
-                int difficulty_id = difficulty_stars[0];
+                int difficulty_id = NA_FACE;
 
-                if (IN_BOUNDS(entry->stars, difficulty_stars)) {
-                    difficulty_id = difficulty_stars[entry->stars];
+                if(entry->isAuto) {
+                    difficulty_id = AUTO_FACE;
+                } else if(entry->isDemon && IN_BOUNDS(entry->difficulty, demon_faces)) {
+                    difficulty_id = demon_faces[entry->difficulty];
+                } else if (IN_BOUNDS(entry->difficulty, difficulty_faces)) {
+                    difficulty_id = difficulty_faces[entry->difficulty];
                 }
 
                 ui_image_set_image(difficulty_face, difficulty_id, 0);
@@ -369,7 +411,7 @@ static void handle_errors(int code) {
 }
 
 static void action_change_page(UIElement* e) {
-    search_filters.currentPage += ui_prop_int(&e->custom_properties, "page", 0);
+    filters.currentPage += ui_prop_int(&e->custom_properties, "page", 0);
     search_needs_refresh = true;
     
     int search_result = -2;

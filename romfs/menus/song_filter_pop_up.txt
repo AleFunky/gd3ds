@@ -14,7 +14,7 @@ window x=160 y=120 w=260 h=140 style=0
     windowbutton x=-35 y=10 w=60 h=20 text="Normal" tag="button,normalbutton" action="selectnormal" style=5 scale=0.9
     windowbutton x=35 y=10 w=60 h=20 text="Custom" tag="button,custombutton" action="selectcustom" style=5 scale=0.9
 
-    textbox x=0 y=40 w=120 limit=6 title="Input song ID:" tag="songinput"
+    textbox x=0 y=40 w=120 limit=15 title="Input song ID:" tag="songinput" action="customsongquery"
 
     label y=40 x=0 align=CENTER text="01. Stereo Madness" tag="normal_song_text" w=180 scale=0.6
 

@@ -37,7 +37,7 @@ LoadedLevelInfo level_info;
 
 const char *level_lengths[] = {
     "Tiny",
-    "Small",
+    "Short",
     "Medium",
     "Long",
     "XL",

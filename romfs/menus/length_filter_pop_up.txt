@@ -1,45 +1,42 @@
 darken opacity=0.4 darkenTime=0.15
 
-window x=160 y=120 w=260 h=140 style=0
+window x=160 y=120 w=260 h=100 style=0
 {
 
-    button x=-127 y=-67 id=31 scale=0.8 action="exit" keyBinds="B"
+    button x=-127 y=-47 id=31 scale=0.8 action="exit" keyBinds="B"
 
-    label x=0 y=-48 font=2 text="Length Filter" scale=0.9 align=CENTER
+    label x=0 y=-28 font=2 text="Length Filter" scale=0.9 align=CENTER
 
-    checkbox x=-30 y=-15 tag="chk_length" scale=0.75 action="length"
-    label x=-15 y=-15 text="Enable" scale=0.4 tag=""
-
-    window x=0 y=25 w=230 h=40 style=2 color="#4f251262" tag="button"
+    window x=0 y=15 w=230 h=40 style=2 color="#4f251262"
 
     # TINY
-    button x=-88 y=25 w=35 h=11 invisible=1 tag="length_filter" tag="button"
+    button x=-88 y=15 w=35 h=11 invisible=1 custom=[lengthval=1] action="length"
     {
-        label x=0 y=0 align=CENTER scale=0.44 text="Tiny" tag="button"
+        label x=0 y=0 align=CENTER scale=0.44 text="Tiny" tag="lengthbtn" custom=[lengthval=1]
     }
 
     # SHORT
-    button x=-43 y=25 w=45 h=11 invisible=1 tag="length_filter" tag="button"
+    button x=-43 y=15 w=45 h=11 invisible=1 custom=[lengthval=2] action="length"
     {
-        label x=0 y=0 align=CENTER scale=0.44 text="Short" tag="button"
+        label x=0 y=0 align=CENTER scale=0.44 text="Short" tag="lengthbtn" custom=[lengthval=2]
     }
 
     # MEDIUM
-    button x=11 y=25 w=52 h=11 invisible=1 tag="length_filter" tag="button"
+    button x=11 y=15 w=52 h=11 invisible=1 custom=[lengthval=4] action="length"
     {
-        label x=0 y=0 align=CENTER scale=0.44 text="Medium" tag="button"
+        label x=0 y=0 align=CENTER scale=0.44 text="Medium" tag="lengthbtn" custom=[lengthval=4]
     }
 
     # LARGE
-    button x=59 y=25 w=36 h=11 invisible=1 tag="length_filter" tag="button"
+    button x=59 y=15 w=36 h=11 invisible=1 custom=[lengthval=8] action="length"
     {
-        label x=0 y=0 align=CENTER scale=0.44 text="Long" tag="button"
+        label x=0 y=0 align=CENTER scale=0.44 text="Long" tag="lengthbtn" custom=[lengthval=8]
     }
 
     # XL
-    button x=93 y=25 w=20 h=11 invisible=1 tag="length_filter" tag="button"
+    button x=93 y=15 w=20 h=11 invisible=1 custom=[lengthval=16] action="length"
     {
-        label x=0 y=0 align=CENTER scale=0.44 text="XL" tag="button"
+        label x=0 y=0 align=CENTER scale=0.44 text="XL" tag="lengthbtn" custom=[lengthval=16]
     }
 
 }

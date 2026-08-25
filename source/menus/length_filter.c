@@ -8,6 +8,7 @@
 #include "save/saving.h"
 #include "save/config.h"
 #include "search_filters.h"
+#include "utils/server_utils.h"
 
 static bool yes_exit = false;
 
@@ -15,48 +16,45 @@ static UIScreen screen = {
     .isBottom = true
 };
 
-const char *length_tags[] = {
-    "tiny",
-    "short",
-    "medium",
-    "long",
-    "xl",
-};
+static void update_length_tint(UIElement *e){
+    UILabel *l = (UILabel *)e;
+    int opacity = (filters.lengthFilters & (ui_prop_int(&e->custom_properties, "lengthval", 0))) > 0 ? 255 : 127;
+
+    int length_bit = ui_prop_int(&e->custom_properties, "lengthval", 0);
+    int length = __builtin_ctz(length_bit);
+
+    char *length_str = "Unkn.";
+    if (IN_BOUNDS(length, level_lengths)) {
+        length_str = (char *) level_lengths[length];
+    }
+
+    snprintf(l->text, sizeof(l->text), "<%d,%d,%d>%s</>", opacity, opacity, opacity, length_str);
+}
+
+static void update_length_tints(){
+    ui_run_func_on_tag(&screen, "lengthbtn", update_length_tint);
+}
+
+void action_set_length(UIElement* e) {
+    filters.lengthFilters ^= ui_prop_int(&e->custom_properties, "lengthval", 0);
+    update_length_tints();
+}
 
 void exit_length_filter(UIElement* e) {
     yes_exit = true;
 }
 
-void length_filter(UIElement *e) {
-    length_filter_enabled = ((UICheckBox *)e)->checked;
-
-    ui_run_func_on_tag(&screen, "button", length_filter_enabled ? ui_enable_element : ui_disable_element);
-}
-
 static UIAction actions[] = {
-    { "length", length_filter},
-    { "exit", exit_length_filter },
+    { "length", action_set_length},
+    { "exit", exit_length_filter }
 };
 
 void length_filter_init() {
 
     ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/length_filter_pop_up.txt");
     ui_screen_open(&screen, ANIM_ZOOM);
-    
-    ui_run_func_on_tag(&screen, "button", length_filter_enabled ? ui_enable_element : ui_disable_element);
 
-    if (!length_filter_enabled){
-        for (int i = 0; i < ARRAY_LEN(length_tags); i++)
-        {
-            ui_run_func_on_tag(&screen, length_tags[i], ui_disable_element);
-        }
-    }
-
-    UICheckBox *checkbox = (UICheckBox *)ui_get_element_by_tag(&screen, "chk_length");
-    if (checkbox) {
-            checkbox->checked = length_filter_enabled;
-            ui_set_checkbox_checked(checkbox, checkbox->checked);
-        }
+    update_length_tints();
 
     yes_exit = false;
 }
@@ -67,16 +65,8 @@ int length_filter_loop() {
         ui_unload_screen(&screen);
 
         return true;
-    };
-
-    
-    if (!length_filter_enabled) {
-        ui_run_func_on_tag(&screen, "button", ui_disable_element);
-        for (int i = 0; i < ARRAY_LEN(length_tags); i++)
-        {
-            ui_run_func_on_tag(&screen, length_tags[i], ui_disable_element);
-        }
     }
+
     UIInput touch;
     touchPosition touchPos;
     hidTouchRead(&touchPos);
@@ -85,7 +75,6 @@ int length_filter_loop() {
     touch.interacted = false;
     ui_screen_update(&screen, &touch);
 
-    
     return false;
 }
 

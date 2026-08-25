@@ -17,7 +17,7 @@
             "defines": [
                 "__3DS__"
             ],
-            "compilerPath": "/opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc",
+            "compilerPath": "C:/devkitpro/devkitARM/bin/arm-none-eabi-gcc",
             "cStandard": "gnu11",
             "cppStandard": "gnu++11",
             "intelliSenseMode": "linux-gcc-arm",

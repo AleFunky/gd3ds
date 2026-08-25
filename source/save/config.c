@@ -10,12 +10,13 @@
 #include "utils/gfx.h"
 #include "menus/icon_kit.h"
 #include "menus/settings.h"
-#include "menus/search_filters.h"
 #include "menus/first_boot_disclaimer.h"
 #include "menus/soggy.h"
 
 #include "save/saving.h"
 #include "utils/json_config.h"
+
+#include "utils/server_utils.h"
 
 Config cfg;
 
@@ -131,17 +132,21 @@ void cfg_init() {
     selected_glow = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "glow", DEFAULT_GLOW);
     player_glow_enabled = config_get_bool(&cfg, CONFIG_CUSTOMIZATION_PATH "playerGlowEnabled", false);
 
-    uncompletedFilter = config_get_bool(&cfg, CONFIG_FILTERS_PATH "uncompleted", false);
-    completedFilter   = config_get_bool(&cfg, CONFIG_FILTERS_PATH "completed", false);
-    originalFilter    = config_get_bool(&cfg, CONFIG_FILTERS_PATH "original", false);
-    unratedFilter     = config_get_bool(&cfg, CONFIG_FILTERS_PATH "unrated", false);
-    ratedFilter       = config_get_bool(&cfg, CONFIG_FILTERS_PATH "rated", false);
-    featuredFilter    = config_get_bool(&cfg, CONFIG_FILTERS_PATH "featured", false);
-    song_filter_enabled        = config_get_bool(&cfg, CONFIG_FILTERS_PATH "song", false);
-    length_filter_enabled        = config_get_bool(&cfg, CONFIG_FILTERS_PATH "length", false);
-    custom_song    = config_get_bool(&cfg, CONFIG_FILTERS_PATH "customSelected", false);
-    normal_song_id_selected      = config_get_int(&cfg, CONFIG_FILTERS_PATH "normalId", 0);
-    strncpy(custom_song_id, config_get_string(&cfg, CONFIG_FILTERS_PATH "songId", ""), sizeof(custom_song_id) - 1);
+    filters.isNA = config_get_bool(&cfg, CONFIG_FILTERS_PATH "na", false);
+    filters.isAuto = config_get_bool(&cfg, CONFIG_FILTERS_PATH "auto", false);
+    filters.isDemon = config_get_bool(&cfg, CONFIG_FILTERS_PATH "demon", false);
+    filters.difficultyFilters = config_get_int(&cfg, CONFIG_FILTERS_PATH "difficulties", false);
+    filters.uncompleted = config_get_bool(&cfg, CONFIG_FILTERS_PATH "uncompleted", false);
+    filters.completed   = config_get_bool(&cfg, CONFIG_FILTERS_PATH "completed", false);
+    filters.original    = config_get_bool(&cfg, CONFIG_FILTERS_PATH "original", false);
+    filters.noStar      = config_get_bool(&cfg, CONFIG_FILTERS_PATH "unrated", false);
+    filters.star        = config_get_bool(&cfg, CONFIG_FILTERS_PATH "rated", false);
+    filters.featured    = config_get_bool(&cfg, CONFIG_FILTERS_PATH "featured", false);
+    filters.songFilter  = config_get_bool(&cfg, CONFIG_FILTERS_PATH "song", false);
+    filters.lengthFilters = config_get_int(&cfg, CONFIG_FILTERS_PATH "length", false);
+    filters.customSong  = config_get_bool(&cfg, CONFIG_FILTERS_PATH "customSelected", false);
+    filters.mainSong    = config_get_int(&cfg, CONFIG_FILTERS_PATH "normalId", 0);
+    strncpy(filters.customSongQuery, config_get_string(&cfg, CONFIG_FILTERS_PATH "songId", ""), sizeof(filters.customSongQuery) - 1);
 
     config_save(&cfg);
 }
@@ -167,17 +172,21 @@ void cfg_save() {
 
     save_user_config(&cfg);
 
-    config_set_bool(&cfg, CONFIG_FILTERS_PATH "uncompleted", uncompletedFilter);
-    config_set_bool(&cfg, CONFIG_FILTERS_PATH "completed", completedFilter);
-    config_set_bool(&cfg, CONFIG_FILTERS_PATH "original", originalFilter);
-    config_set_bool(&cfg, CONFIG_FILTERS_PATH "unrated", unratedFilter);
-    config_set_bool(&cfg, CONFIG_FILTERS_PATH "rated", ratedFilter);
-    config_set_bool(&cfg, CONFIG_FILTERS_PATH "featured", featuredFilter);
-    config_set_bool(&cfg, CONFIG_FILTERS_PATH "length", length_filter_enabled);
-    config_set_bool(&cfg, CONFIG_FILTERS_PATH "song", song_filter_enabled);
-    config_set_bool(&cfg, CONFIG_FILTERS_PATH "customSelected", custom_song);
-    config_set_int(&cfg, CONFIG_FILTERS_PATH "normalId", normal_song_id_selected);
-    config_set_string(&cfg, CONFIG_FILTERS_PATH "songId", custom_song_id);
+    config_set_bool(&cfg, CONFIG_FILTERS_PATH "na", filters.isNA);
+    config_set_bool(&cfg, CONFIG_FILTERS_PATH "auto", filters.isAuto);
+    config_set_bool(&cfg, CONFIG_FILTERS_PATH "demon", filters.isDemon);
+    config_set_int(&cfg, CONFIG_FILTERS_PATH "difficulties", filters.difficultyFilters);
+    config_set_bool(&cfg, CONFIG_FILTERS_PATH "uncompleted", filters.uncompleted);
+    config_set_bool(&cfg, CONFIG_FILTERS_PATH "completed", filters.completed);
+    config_set_bool(&cfg, CONFIG_FILTERS_PATH "original", filters.original);
+    config_set_bool(&cfg, CONFIG_FILTERS_PATH "unrated", filters.noStar);
+    config_set_bool(&cfg, CONFIG_FILTERS_PATH "rated", filters.star);
+    config_set_bool(&cfg, CONFIG_FILTERS_PATH "featured", filters.featured);
+    config_set_int(&cfg, CONFIG_FILTERS_PATH "length", filters.lengthFilters);
+    config_set_bool(&cfg, CONFIG_FILTERS_PATH "song", filters.songFilter);
+    config_set_bool(&cfg, CONFIG_FILTERS_PATH "customSelected", filters.customSong);
+    config_set_int(&cfg, CONFIG_FILTERS_PATH "normalId", filters.mainSong);
+    config_set_string(&cfg, CONFIG_FILTERS_PATH "songId", filters.customSongQuery);
 
     config_save(&cfg);
 }
