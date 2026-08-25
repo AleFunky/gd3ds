@@ -6,7 +6,7 @@ image x=36 y=205 id=178
 image x=284 y=205 id=178 sx=-1.0
 
 window x=170 y=28 w=240 h=40 style=8
-textbox x=149 y=28 w=188 limit=20 title="Search for a level or id:" tag="searchbox"
+textbox x=149 y=28 w=188 limit=20 title="Search for a level or id:" tag="searchbox" action="searchtext"
 
 button x=267 y=28 id=107 scale=0.9 action="search" custom=[type=0]
 #button x=240 y=28 id=106 scale=0.7 <-- profile button
@@ -49,21 +49,21 @@ button x=245 y=120 w=110 h=30 text="" id=105 scale=0.72 action="search" custom=[
 window x=160 y=170 w=260 h=40 style=8
 
 # NA
-button x=45 y=170 id=251 scale=0.6
+button x=45 y=170 id=251 scale=0.6 action="na" tag="na"
 # EASY
-button x=78 y=170 id=252 scale=0.6
+button x=78 y=170 id=252 scale=0.6 action="difficulty" custom=[diffValue=1] tag="difficulty,easy"
 # NORMAL
-button x=111 y=170 id=253 scale=0.6
+button x=111 y=170 id=253 scale=0.6 action="difficulty" custom=[diffValue=2] tag="difficulty,normal"
 # HARD
-button x=144 y=170 id=254 scale=0.6
+button x=144 y=170 id=254 scale=0.6 action="difficulty" custom=[diffValue=4] tag="difficulty,hard"
 # HARDER
-button x=176 y=170 id=255 scale=0.6
+button x=176 y=170 id=255 scale=0.6 action="difficulty" custom=[diffValue=8] tag="difficulty,harder"
 # INSANE
-button x=209 y=170 id=256 scale=0.6
+button x=209 y=170 id=256 scale=0.6 action="difficulty" custom=[diffValue=16] tag="difficulty,insane"
 # DEMON
-button x=242 y=170 id=258 scale=0.6
+button x=242 y=170 id=258 scale=0.6 action="demon" tag="demon"
 #AUTO
-button x=275 y=170 id=267 scale=0.6
+button x=275 y=170 id=267 scale=0.6 action="auto" tag="auto"
 
 button x=120 y=215 id=144 scale=0.8 action="openfilters"
 button x=160 y=215 id=31 scale=0.8 action="clearfilters"

@@ -109,7 +109,23 @@ int get_level_from_id(char **out_data, int id) {
     return 2;
 }
 
-int get_search_results(char **out_data, int gameVer, int type, char *query, int page, bool uncompleted, bool onlyCompleted, char *completedList, bool featured, bool original, bool noStar, bool customSong, int customSongId) {
+static void unpack_bitfield_digits(int field, int bit_count, char *string, int offset) {
+    int pos = 0;
+
+    for (int i = 0; i < bit_count; i++) {
+        if (field & (1 << i)) {
+            if (pos > 0) {
+                string[pos++] = ',';
+            }
+
+            string[pos++] = i + '0' + offset;
+        }
+    }
+
+    string[pos] = '\0';
+}
+
+int get_search_results(char **out_data, int gameVer, SearchFilters f) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -131,7 +147,57 @@ int get_search_results(char **out_data, int gameVer, int type, char *query, int 
 
         char data[512];
 
-        snprintf(data, sizeof(data) - 1, "secret=Wmfd2893gb7&gameVersion=%d&type=%d&str=%s&page=%d&uncompleted=%d&onlyCompleted=%d&completedLevels=%s&featured=%d&original=%d&noStar=%d&song=%d&customSong=%d", gameVer, type, query, page, uncompleted, onlyCompleted, completedList, featured, original, noStar, customSong, customSongId);
+        int pos = snprintf(data,
+            sizeof(data) - 1, 
+            "secret=Wmfd2893gb7&gameVersion=%d&type=%d&page=%d&original=%d&noStar=%d&star=%d&featured=%d", 
+            gameVer, 
+            f.searchType, 
+            f.currentPage, 
+            f.original, 
+            f.noStar, 
+            f.star,
+            f.featured);
+
+        pos += snprintf(data + pos, sizeof(data) - pos, "&str=%s", f.searchQuery);
+
+        if(f.lengthFilters){
+            char lengths[15] = "";
+            unpack_bitfield_digits(f.lengthFilters, 5, lengths, 0);
+            pos += snprintf(data + pos, sizeof(data) - pos, "&len=%s", lengths);
+        }
+
+        if(f.difficultyFilters || f.isNA || f.isAuto || f.isDemon){
+            if(f.isNA){
+                pos += snprintf(data + pos, sizeof(data) - pos, "&diff=%d", -1);
+            } else if(f.isAuto){
+                pos += snprintf(data + pos, sizeof(data) - pos, "&diff=%d", -3);
+            } else if(f.isDemon){
+                pos += snprintf(data + pos, sizeof(data) - pos, "&diff=%d", -2);
+                if(f.difficultyFilters){
+                    char difficulties[16] = "";
+                    unpack_bitfield_digits(f.difficultyFilters, 5, difficulties, 1);
+                    pos += snprintf(data + pos, sizeof(data) - pos, "&demonFilter=%s", difficulties);
+                }
+            } else{
+                char difficulties[16] = "";
+                unpack_bitfield_digits(f.difficultyFilters, 5, difficulties, 1);
+                pos += snprintf(data + pos, sizeof(data) - pos, "&diff=%s", difficulties);
+            }
+        }
+
+        if(f.songFilter){
+            if(f.customSong){
+                pos += snprintf(data + pos, sizeof(data) - pos, "&customSong=%d", f.customSong);
+                pos += snprintf(data + pos, sizeof(data) - pos, "&song=%s", f.customSongQuery);
+            } else{
+                pos += snprintf(data + pos, sizeof(data) - pos, "&song=%d", f.mainSong + 1);
+            }
+        }
+
+        if(f.uncompleted || f.completed){
+            pos += snprintf(data + pos, sizeof(data) - pos, "&onlyCompleted=%d&uncompleted=%d&completedLevels=(6508283,4454123,27732941)", f.completed, f.uncompleted);
+        }
+
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
 
         CURLcode code = curl_easy_perform(curl);

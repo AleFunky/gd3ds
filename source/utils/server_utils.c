@@ -30,6 +30,8 @@ LevelEntry *level_entry = NULL;
 
 CommentEntry *comment_entries = NULL;
 
+SearchFilters filters = { 0 };
+
 int searchEntriesLength = 0;
 int creatorEntriesLength = 0;
 int songEntriesLength = 0;
@@ -188,6 +190,9 @@ static void fill_level_entries(char **levelsStrings, int songStringCount, int cr
                     // stars requested
                     search_entries[i].reqStars = atoi(valStr);
                     break;
+                case 42:
+                    //epic, legendary, mythic
+                    search_entries[i].epic = atoi(valStr);
                 case 45:
                     // object count, caps at 65535
                     search_entries[i].objCount = atoi(valStr);
@@ -262,7 +267,7 @@ void fill_page_entry(char *initialString) {
 
 int search_levels() {
     char *outdata;
-    int result = get_search_results(&outdata, 22, search_filters.searchType, search_filters.searchQuery, search_filters.currentPage, search_filters.uncompleted, search_filters.completed, "", search_filters.featured, search_filters.original, search_filters.noStar, search_filters.songFilter, search_filters.songQuery);
+    int result = get_search_results(&outdata, 22, filters);
 
     if (result != 0) return result;
     // validate first two chars of response to make sure what we're parsing is the search results string
