@@ -197,7 +197,7 @@ void init_player(Player *player) {
     
     player->cutscene_timer = 0;
     player->x = 0;
-    player->y = player->height / 2;
+    player->y = 15;
     player->vel_x = player_speeds[state.speed];  
     player->vel_y = 0;
     player->new_vel_y = __FLT_MAX__;
