@@ -204,6 +204,10 @@ UIButton *ui_create_button(const UIContext *ctx) {
 
     e->base.on_disable = ui_button_on_disable;
 
+    e->base.opacity = 1.f;
+
+    C2D_PlainImageTint(&e->image.tint, C2D_Color32f(1, 1, 1, 1), 1.f);
+
     ui_element_apply_default_properties(&e->base, ctx);
 
     e->hoverScale = 1.f;

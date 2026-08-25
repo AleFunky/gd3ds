@@ -45,8 +45,6 @@ void reset_search_filters() {
     filters.customSongQuery[0] = '\0';
     update_difficulty_tints();
 
-    reset_checkboxes();
-
     yes_exit = true;
     cfg_save();
 }
