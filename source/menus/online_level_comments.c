@@ -21,7 +21,8 @@
 
 static bool yes_exit = false;
 bool comments_need_refresh = true;
-int sortType = 0;
+int sortType = 1;
+int currentCommentsPage = 0;
 
 static UIList *list;
 static UILabel *error_label;
@@ -71,13 +72,13 @@ void populate_comments() {
         truncate_filename(username, 18);
 
         float list_width = list->base.w * 0.5f;
-        float list_height = 70 * 0.5f;
+        float list_height = 80 * 0.5f;
 
         UIElement *card = (UIElement *)ui_create_rectangle(&default_screen.ctx);
 
         if (card) {
             ui_rectangle_set_color((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 255) : C2D_Color32(161, 88, 44, 255)));
-            ui_element_set_size(card, 0, 70);
+            ui_element_set_size(card, 0, 80);
 
             UIWindow *bg_window = ui_create_window(&default_screen.ctx);
             if (bg_window) {
@@ -109,7 +110,7 @@ void populate_comments() {
                 char *desc = strdup(wrapped_content);
                 ui_label_set_text(content_label, desc);
                 free(desc);
-                ui_element_set_position((UIElement *)content_label, -list_width + 12, -list_height + 34);
+                ui_element_set_position((UIElement *)content_label, -list_width + 12, 0 - 2.5);
                 ui_element_set_scale((UIElement *)content_label, 0.68f);
 
                 content_label->font = 1;
@@ -182,6 +183,12 @@ void populate_comments() {
     }
 }
 
+
+static void update_comment_arrows(bool disableArrows) {
+    if (commentEntriesLength == 10 && !disableArrows) ui_run_func_on_tag(&screen, "nextpage", ui_enable_element); else ui_run_func_on_tag(&screen, "nextpage", ui_disable_element);
+    if ((currentCommentsPage) >= 1 && !disableArrows) ui_run_func_on_tag(&screen, "prevpage", ui_enable_element); else ui_run_func_on_tag(&screen, "prevpage", ui_disable_element);
+}
+
 static void action_refresh_comments(UIElement* e) {
     int buttonType = ui_prop_int(&e->custom_properties, "sorttype", 0);
 
@@ -189,29 +196,46 @@ static void action_refresh_comments(UIElement* e) {
         ui_button_set_image(sort_by_recency_button, 422, 0);
         ui_button_set_image(sort_by_likes_button, 422, 0);
         ui_button_set_image((UIButton *)e, 423, 0);
+
+        currentCommentsPage = 0;
+
         sortType = buttonType;
     }
-    comments_need_refresh = true;
     
     int result = -2;
-
-    if (comments_need_refresh) {
-        result = get_comments(search_entries[curr_search_id].levelId, 1, sortType);
-    }
-   
+    result = get_comments(search_entries[curr_search_id].levelId, currentCommentsPage, sortType);
     // Handle result
     if (result != 0) {
+        update_comment_arrows(true);
         handle_comment_errors(result);
     } else if (list) { // No errors
         ui_label_set_text(error_label, "");
+        update_comment_arrows(false);
         populate_comments();
         comments_need_refresh = false;
+    }
+}
+
+static void action_change_comments_page(UIElement* e) {
+    currentCommentsPage += ui_prop_int(&e->custom_properties, "page", 0);
+    
+    int result = -2;
+    result = get_comments(search_entries[curr_search_id].levelId, currentCommentsPage, sortType);
+   
+    // Handle result
+    if (result != 0) {
+        update_comment_arrows(true);
+        handle_comment_errors(result);
+    } else if (list) { // No errors
+        populate_comments();
+        update_comment_arrows(false);
     }
 }
 
 static UIAction actions[] = {
     { "exit", action_exit_comments },
     { "refresh", action_refresh_comments },
+    { "changepage", action_change_comments_page }
 };
 
 void online_comments_init() {
@@ -223,19 +247,23 @@ void online_comments_init() {
     error_label = (UILabel *) ui_get_element_by_tag(&screen, "errorlabel");
     sort_by_recency_button = (UIButton *) ui_get_element_by_tag(&screen, "sortbyrecency");
     sort_by_likes_button = (UIButton *) ui_get_element_by_tag(&screen, "sortbylikes");
-    ui_button_set_image(sort_by_recency_button, 423, 0);
+    ui_button_set_image(sort_by_likes_button, 423, 0);
 
     int result = -2;
     
     if (comments_need_refresh) {
-        result = get_comments(search_entries[curr_search_id].levelId, 1, 0);
+        currentCommentsPage = 0;
+        sortType = 1;
+        result = get_comments(search_entries[curr_search_id].levelId, currentCommentsPage, sortType);
     }
    
     // Handle result
     if (result != 0 && comments_need_refresh) {
         handle_comment_errors(result);
+        update_comment_arrows(true);
     } else if (list) { // No errors
         ui_label_set_text(error_label, "");
+        update_comment_arrows(false);
         populate_comments();
         comments_need_refresh = false;
     }

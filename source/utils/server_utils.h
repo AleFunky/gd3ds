@@ -82,7 +82,7 @@ typedef struct CommentAuthorEntry {
 
 int search_levels();
 
-int get_level_data(int id);
+int get_level_data(int id, bool refresh, int currentId);
 
 int get_comments(int id, int page, int sortType);
 

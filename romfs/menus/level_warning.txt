@@ -1,0 +1,11 @@
+darken opacity=0.4 darkenTime=0.15
+window x=160 y=120 w=260 h=120 style=1 tag=window
+# Labelling
+
+label x=160 y=88 font=2 text="Title" tag="title" scale=0.9 align=CENTER
+
+label x=160 y=116 font=1 text="Content" scale=0.8 align=CENTER tag="content"
+
+windowbutton x=119 y=153 style=5 text="Cancel" w=95px h=30px scale=0.8 action="cancel" font=2 textScale=0.9 keyBinds="B"
+windowbutton x=199 y=153 style=5 text="Play" w=85px h=30px scale=0.8 action="proceed" font=2 textScale=0.9 keyBinds="A"
+

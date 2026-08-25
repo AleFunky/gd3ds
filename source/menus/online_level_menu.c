@@ -26,7 +26,9 @@
 #include "fonts/goldFont.h"
 #include "songs.h"
 #include "online_level_errorbox.h"
+#include "online_level_warningbox.h"
 #include "online_level_comments.h"
+#include "settings.h"
 
 #define EASY_DEMON_FACE_1 259
 #define MEDIUM_DEMON_FACE_1 261
@@ -53,15 +55,19 @@ const int demon_face_featured_offsets[] = {
 };
 
 static bool exit_flag = false;
-static bool in_info_box = false;
 static bool in_comments = false;
-static bool in_refresh = false;
 static bool in_delete = false;
+static bool in_info_box = false;
 static bool in_errorbox = false;
+static bool in_warningbox = false;
 static bool play_flag = false;
 static bool comes_from_levels = false;
 
 int result = -2;
+
+bool pressed_play = false;
+bool passed_highobj_warning = false;
+
 
 static UIImage *bg_gradient;
 static UIImage *bg_gradient_top;
@@ -93,17 +99,12 @@ static void action_exit(UIElement *e) {
     comes_from_levels = false;
 }
 
+static int warning_result = 0;
+
 static void action_play(UIElement *e) {
-    play_flag = true;
-    play_sfx(&play_sound, 1);
-
-    state.custom_level = true;
-    state.online_level = true;
-
-    set_fade_status(FADE_STATUS_OUT);
-
-    comes_from_levels = true;
-    playing_menu_loop = false;
+    if (result == 0) {
+        pressed_play = true;
+    }
 }
 
 static void action_open_info(UIElement *e) {
@@ -120,11 +121,6 @@ static void action_open_comments(UIElement *e) {
     }
 }
 
-static void action_refresh_level(UIElement *e) {
-    in_refresh = true;
-    refresh_level_init();
-}
-
 static void action_delete_level(UIElement *e) {
     in_delete = true;
     delete_level_init();
@@ -134,15 +130,6 @@ void delete_level(){
     exit_flag = true;
     set_fade_status(FADE_STATUS_OUT);
 }
-
-static UIAction actions[] = {
-    {"exit", action_exit },
-    {"info", action_open_info },
-    {"comments", action_open_comments },
-    {"reload", action_refresh_level },
-    {"deletelevel", action_delete_level },
-    {"play", action_play },
-};
 
 void populate_level_info() {
     SearchEntry *entry_srch = &search_entries[curr_search_id];
@@ -281,7 +268,7 @@ void populate_level_info() {
     }
 
     // High object count icon
-    bool high_obj_count = entry_srch->objCount >= 42000;
+    bool high_obj_count = entry_srch->objCount >= (is_N3DS ? 44000 : 14000);
     if (high_obj_count) {
         ui_element_set_position((UIElement *)high_obj_icon_image, 200 + half_creator_length + 8 + (is_copy ? 13 : 0), high_obj_icon_image->base.y);
     } else {
@@ -311,14 +298,53 @@ static void handle_errors(int code) {
     online_errorbox_init(error_message);
 }
 
+static void action_refresh_level(UIElement *e) {
+    int refresh_result = -2;
+    refresh_result = get_level_data(search_entries[curr_search_id].levelId, true, curr_search_id);
+    // Handle result
+    if (refresh_result != 0) {
+        handle_errors(refresh_result);
+        return;
+    }
+    result = refresh_result;
+    populate_level_info();
+    
+    // in_refresh = true;
+    // refresh_level_init();
+}
+
+static void play_level() {
+    play_flag = true;
+    play_sfx(&play_sound, 1);
+
+    state.custom_level = true;
+    state.online_level = true;
+
+    set_fade_status(FADE_STATUS_OUT);
+
+    comes_from_levels = true;
+    playing_menu_loop = false;
+}
+
+static UIAction actions[] = {
+    {"exit", action_exit },
+    {"info", action_open_info },
+    {"comments", action_open_comments },
+    {"reload", action_refresh_level },
+    {"deletelevel", action_delete_level },
+    {"play", action_play },
+};
+
 void online_level_menu_loop() {
     exit_flag = false;
     in_comments = false;
     in_delete = false;
-    in_refresh = false;
+    in_warningbox = false;
     in_info_box = false;
     comments_need_refresh = true;
     play_flag = false;
+    pressed_play = false;
+    passed_highobj_warning = false;
 
     ui_load_screen(&default_screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_level_menu.txt");
     ui_load_screen(&default_screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_level_menu_top.txt");
@@ -362,7 +388,7 @@ void online_level_menu_loop() {
     populate_level_info();
 
     if (!comes_from_levels) {
-        result = get_level_data(search_entries[curr_search_id].levelId);
+        result = get_level_data(search_entries[curr_search_id].levelId, false, curr_search_id);
 
         // Handle result
         if (result != 0) {
@@ -404,7 +430,7 @@ void online_level_menu_loop() {
             if(in_info_box) online_level_infobox_draw_bot();
             if(in_comments) online_comments_draw();
             if(in_delete) delete_level_draw_bot();
-            if(in_refresh) refresh_level_draw_bot();
+            if(in_warningbox) online_level_warningbox_draw_bot();
             if(in_errorbox) online_errorbox_draw_bot();
 
             change_blending(true);
@@ -444,13 +470,37 @@ void online_level_menu_loop() {
             break;
         }
 
+        if (pressed_play) {
+            if (settingsState.skipHighObjWarning) passed_highobj_warning = true;
+
+            if (search_entries[curr_search_id].objCount >= (is_N3DS ? 44000 : 14000) && !passed_highobj_warning && !in_warningbox) {
+                warning_result = 0;
+                online_level_warningbox_init("High objects", "This level has a <#ffa54b>high object</> count<p>and might not be <#ff5a5a>fully playable</>.");
+                in_warningbox = true;
+            }
+
+
+            if (warning_result == 1) {
+                pressed_play = false;
+            }
+
+            if (warning_result == 2) {
+                passed_highobj_warning = true;
+            }
+
+            if (passed_highobj_warning) {
+                pressed_play = false;
+                play_level();
+            }
+        }
+
         if (play_flag) {
             stop_mp3();
             game_state = STATE_GAME;
             break;
         }
 
-        if (!in_info_box && !in_comments && !in_delete && !in_refresh && !in_errorbox) ui_screen_update(&default_screen, &touch);
+        if (!in_info_box && !in_comments && !in_delete && !in_warningbox && !in_errorbox) ui_screen_update(&default_screen, &touch);
 
         if (in_info_box)
         {
@@ -477,12 +527,15 @@ void online_level_menu_loop() {
                 in_delete = false;
             }
         }
-        if (in_refresh)
+        if (in_warningbox)
         {
-            int returned = refresh_level_loop();
-            if (returned)
+            int returned = online_level_warningbox_loop();
+            if (returned != 0)
             {
-                in_refresh = false;
+                in_warningbox = false;
+                warning_result = returned;
+                char temp = warning_result + '0';
+                output_log(&temp);
             }
         }
         if (in_errorbox)

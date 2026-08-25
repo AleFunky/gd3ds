@@ -207,6 +207,16 @@ Setting settings[] = {
         .onChanged = practiceMusicSync_setting
     },
     {
+        .id = "skipHighObjWarning",
+        .label = "Disable object alert",
+        .additionalInfo = "Disables the high object alert for<p>custom levels.",
+        .page = PAGE_MISC, 
+
+        .defaultValue = false,
+        .var = &settingsState.skipHighObjWarning,
+        .key = CONFIG_MISC_PATH "skipHighObjAlert",
+    },
+    {
         .id = "showProgressBar",
         .label = "Show progress bar",
         .additionalInfo = NULL,

@@ -5,7 +5,7 @@ image x=36 y=205 id=178
 image x=364 y=205 id=178 sx=-1.0
 image x=364 y=35 id=178 sx=-1.0 sy=-1.0
 
-label x=200 y=22 text="Unknown" font=0 scale=0.9 align=CENTER tag="levelname"
+label x=200 y=22 text="Unknown" font=0 scale=0.9 align=CENTER tag="levelname" w=300px
 
 label x=200 y=46 text="By Unknown" scale=0.7 font=2 align=CENTER tag="creatorname"
 image x=200 y=46.5 id=213 scale=0.8 tag="collab"

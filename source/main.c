@@ -59,6 +59,7 @@
 
 #include "math_helpers.h"
 
+#include "utils/utils.h"
 #include "utils/precise_input.h"
 #include "utils/server_utils.h"
 
@@ -128,6 +129,8 @@ float fast_speed_particles_timer = 0.f;
 float faster_speed_particles_timer = 0.f;
 
 bool alt_title_screen;
+
+bool is_N3DS;
 
 // Checks if the game is being emulated by citra/azahar
 bool is_citra() {
@@ -242,6 +245,11 @@ void apply_volume_settings() {
     for (int i = 1; i <= 7; i++) {
         set_channel_volume(i, sound_volume);
     }
+}
+
+void check_system_model() {
+    u8 model = get_model();
+    is_N3DS = model == CFG_MODEL_N2DSXL || model == CFG_MODEL_N3DS || model == CFG_MODEL_N3DSXL;
 }
 
 float sprite_drawing_time = 0;
@@ -1326,6 +1334,7 @@ int main(int argc, char* argv[]) {
     C2D_Prepare();
     osSetSpeedupEnable(1);
     soc_init();
+    check_system_model();
 
     cfg_init();
     cfguInit();
