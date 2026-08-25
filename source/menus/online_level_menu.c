@@ -67,7 +67,7 @@ int result = -2;
 
 bool pressed_play = false;
 bool passed_highobj_warning = false;
-
+bool passed_version_warning = false;
 
 static UIImage *bg_gradient;
 static UIImage *bg_gradient_top;
@@ -345,6 +345,8 @@ void online_level_menu_loop() {
     play_flag = false;
     pressed_play = false;
     passed_highobj_warning = false;
+    passed_version_warning = false;
+    warning_result = 0;
 
     ui_load_screen(&default_screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_level_menu.txt");
     ui_load_screen(&default_screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_level_menu_top.txt");
@@ -416,6 +418,39 @@ void online_level_menu_loop() {
         // Frees a render target, so keep it out of the frame below
         update_stereo_target();
 
+        if (pressed_play) {
+            if (settingsState.skipHighObjWarning || (search_entries[curr_search_id].objCount < (is_N3DS ? 44000 : 14000))) passed_highobj_warning = true;
+            if (settingsState.skipVersionWarning || (search_entries[curr_search_id].gameVersion < 22)) passed_version_warning = true;
+
+            if (warning_result == 1) {
+                pressed_play = false;
+                warning_result = 0;
+            }
+
+            if (warning_result == 2 && passed_highobj_warning) passed_version_warning = true;
+
+            if (warning_result == 2) passed_highobj_warning = true;
+
+            if (!passed_highobj_warning && !in_warningbox && pressed_play) {
+                warning_result = 0;
+                online_level_warningbox_init("High objects", "This level has a <#ffa54b>high object</> count<p>and might not be <#ff5a5a>fully playable</>.");
+                in_warningbox = true;
+            }
+
+            if (passed_highobj_warning && !passed_version_warning && !in_warningbox && pressed_play) {
+                warning_result = 0;
+                online_level_warningbox_init("Version warning", "This level was made or updated in an<p><#ffa54b>incompatible game version</>. It might<p>not be <#ff5a5a>fully playable</>.");
+                in_warningbox = true;
+            }
+
+            if (passed_highobj_warning && passed_version_warning) {
+                pressed_play = false;
+                passed_highobj_warning = false;
+                passed_version_warning = false;
+                play_level();
+            }
+        }
+
         do {
             update_touch_effect(DT);
             
@@ -468,30 +503,6 @@ void online_level_menu_loop() {
             }
             game_state = STATE_ONLINE;
             break;
-        }
-
-        if (pressed_play) {
-            if (settingsState.skipHighObjWarning) passed_highobj_warning = true;
-
-            if (search_entries[curr_search_id].objCount >= (is_N3DS ? 44000 : 14000) && !passed_highobj_warning && !in_warningbox) {
-                warning_result = 0;
-                online_level_warningbox_init("High objects", "This level has a <#ffa54b>high object</> count<p>and might not be <#ff5a5a>fully playable</>.");
-                in_warningbox = true;
-            }
-
-
-            if (warning_result == 1) {
-                pressed_play = false;
-            }
-
-            if (warning_result == 2) {
-                passed_highobj_warning = true;
-            }
-
-            if (passed_highobj_warning) {
-                pressed_play = false;
-                play_level();
-            }
         }
 
         if (play_flag) {

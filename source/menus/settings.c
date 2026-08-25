@@ -217,6 +217,16 @@ Setting settings[] = {
         .key = CONFIG_MISC_PATH "skipHighObjAlert",
     },
     {
+        .id = "skipVersionWarning",
+        .label = "Disable version alert",
+        .additionalInfo = "Disables the incompatible<p>Geometry Dash version alert for<p>custom levels.",
+        .page = PAGE_MISC, 
+
+        .defaultValue = false,
+        .var = &settingsState.skipVersionWarning,
+        .key = CONFIG_MISC_PATH "skipVersionAlert",
+    },
+    {
         .id = "showProgressBar",
         .label = "Show progress bar",
         .additionalInfo = NULL,

@@ -210,16 +210,16 @@ static void fill_level_entries(char **levelsStrings, int songStringCount, int cr
                 break;
             }
         }
-
+        
         // Find the creator
         for (creator_index = 0; creator_index < creatorStringCount; creator_index++) {
             if (search_entries[i].creatorId == creator_entries[creator_index].accountId) {
                 break;
             }
         }
-
-        search_entries[i].creatorIndex = creator_index;
+        
         search_entries[i].songIndex = song_index;
+        search_entries[i].creatorIndex = creator_index;
     }
 }
 
@@ -402,7 +402,7 @@ int search_levels() {
     if (!creatorStrings) return -1;
     
     char **songStrings = split_string_str_del(initialStrings[2], "~:~", &songStringCount, true);
-    if (!songStrings) return -1;
+    // if (!songStrings && !filters.mainSong) return -1; 
     
     search_entries = malloc(levelStringCount * sizeof(SearchEntry));
     if (!search_entries) return -1;
@@ -410,8 +410,10 @@ int search_levels() {
     creator_entries = malloc(creatorStringCount * sizeof(CreatorEntry));
     if (!creator_entries) return -1;
 
-    song_entries = malloc(songStringCount * sizeof(SongEntry));
-    if (!song_entries) return -1;
+    if (songStringCount > 0) {
+        song_entries = malloc(songStringCount * sizeof(SongEntry));
+        if (!song_entries) return -1;
+    }
 
     page_entry = malloc(sizeof(SongEntry));
     if (!page_entry) return -1;
@@ -419,14 +421,14 @@ int search_levels() {
     // Initialize
     memset(search_entries, 0, levelStringCount * sizeof(SearchEntry));
     memset(creator_entries, 0, creatorStringCount * sizeof(CreatorEntry));
-    memset(song_entries, 0, songStringCount * sizeof(SongEntry));
+    if (songStringCount > 0) memset(song_entries, 0, songStringCount * sizeof(SongEntry));
     memset(page_entry, 0, sizeof(PageEntry));
 
     // Fill creators
     fill_creator_entries(creatorStrings, creatorStringCount);
 
     // Fill songs
-    fill_song_entries(songStrings, songStringCount);
+    if (songStringCount > 0) fill_song_entries(songStrings, songStringCount);
     
     // Fill levels
     fill_level_entries(levelsStrings, songStringCount, creatorStringCount, levelStringCount);
@@ -436,7 +438,7 @@ int search_levels() {
    
     free_string_array(levelsStrings, levelStringCount);
     free_string_array(creatorStrings, creatorStringCount);
-    free_string_array(songStrings, songStringCount);    
+    if (songStringCount > 0) free_string_array(songStrings, songStringCount);    
     free_string_array(initialStrings, initialStringCount);
 
     free(outdata);

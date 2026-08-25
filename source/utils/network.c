@@ -77,11 +77,13 @@ int get_level_from_id(char **out_data, int id) {
             "Content-Type: application/x-www-form-urlencoded");
 
         curl_easy_setopt(curl, CURLOPT_URL, "http://www.boomlings.com/database/downloadGJLevel22.php");
+        // curl_easy_setopt(curl, CURLOPT_URL, "https://19gdps.com/gdapi/downloadGJLevel22.php");
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 
         char data[64];
         snprintf(data, 63, "levelID=%d&secret=Wmfd2893gb7", id);
@@ -144,6 +146,7 @@ int get_search_results(char **out_data, int gameVer, SearchFilters f) {
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 
         char data[512];
 
@@ -189,7 +192,7 @@ int get_search_results(char **out_data, int gameVer, SearchFilters f) {
             if(f.customSong){
                 pos += snprintf(data + pos, sizeof(data) - pos, "&customSong=%d", f.customSong);
                 pos += snprintf(data + pos, sizeof(data) - pos, "&song=%s", f.customSongQuery);
-            } else{
+            } else {
                 pos += snprintf(data + pos, sizeof(data) - pos, "&song=%d", f.mainSong + 1);
             }
         }
@@ -235,11 +238,13 @@ int get_comments_from_id(char **out_data, int id, int page, int mode) {
             "Content-Type: application/x-www-form-urlencoded");
 
         curl_easy_setopt(curl, CURLOPT_URL, "http://www.boomlings.com/database/getGJComments21.php");
+        // curl_easy_setopt(curl, CURLOPT_URL, "https://19gdps.com/gdapi/getGJComments21.php");
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 
         char data[64];
         snprintf(data, 63, "levelID=%d&page=%d&mode=%d&secret=Wmfd2893gb7", id, page, mode);

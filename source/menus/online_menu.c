@@ -22,6 +22,7 @@
 #include "external_popup.h"
 #include "utils/server_utils.h"
 #include "utils/string_helpers.h"
+#include "fonts/bigFont.h"
 #include "fonts/goldFont.h"
 #include "search_menu.h"
 #include "songs.h"
@@ -94,7 +95,7 @@ static void action_open_version_warning(UIElement *e) {
         if (data->wasUpdated) {
             snprintf(buffer, sizeof(buffer), "This level was uploaded <#ffff00>before or in</> %.1f,<p>but was updated in a later version.It<p><#60abef>might not be playable</>.", GD_VERSION);
         } else {
-            snprintf(buffer, sizeof(buffer), "This level was uploaded <#ff0000>after</> %.1f.<p>It will most likely<p><#ff00ff>not be playable</>.", GD_VERSION);
+            snprintf(buffer, sizeof(buffer), "This level was uploaded <#ff0000>after</> %.1f.<p>It will most likely<#ff00ff>not be<p>playable</>.", GD_VERSION);
         }
         action_open_info_card_text(buffer);
     }
@@ -136,7 +137,7 @@ static void populate_list() {
             if (entry->songIndex < songEntriesLength) {
                 song_name = song_entries[entry->songIndex].songTitle;
             }
-        } else {
+        } else if (entry->songIndex != -1) {
             if (IN_BOUNDS(entry->mainSongId, main_songs)) {
                 song_name = (char *) main_songs[entry->mainSongId].title;
             }
@@ -163,7 +164,7 @@ static void populate_list() {
                 ui_label_set_text(name_label, tmp_name);
                 ui_element_set_position((UIElement *)name_label, -list_width + 48, -17);
                 ui_element_set_scale((UIElement *)name_label, 0.54f);
-                name_label->base.w = 130;
+                name_label->base.w = 120;
                 ui_element_add_child(card, (UIElement *)name_label);
             }
 
@@ -357,7 +358,10 @@ static void populate_list() {
                         data->wasUpdated = false;
                         ui_button_set_image(v_warn_button, 315, 0);
                     }
-                    ui_element_set_position((UIElement *)v_warn_button, list_width - 8, -23);
+                    float tmp = get_text_length(&bigFont_fontCharset, 0.54f, false, tmp_name);
+                    // level name width is capped at 130 so we replicate that here
+                    if (tmp > 120) tmp = 120;
+                    ui_element_set_position((UIElement *)v_warn_button, -list_width + 48 + tmp + 10, -17);
                     ui_element_set_scale((UIElement *)v_warn_button, 0.3f);
                     ui_element_set_action((UIElement *)v_warn_button, action_open_version_warning);
                     ui_element_set_userdata((UIElement *)v_warn_button, data);
