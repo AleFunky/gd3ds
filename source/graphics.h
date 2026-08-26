@@ -37,11 +37,14 @@ typedef struct SpriteObject
     C2D_Image image;
     float x;
     float y;
+    float offset_x;
+    float offset_y;
     float half_width;
     float half_height;
     float rotation_sin;
     float rotation_cos;
     u32 color_meta;
+    u32 fade_meta;
     int obj;
     int layer;
     float opacity;
@@ -121,6 +124,8 @@ extern C2D_SpriteSheet particleSheet;
 extern SpriteTemplate sprite_templates[GAME_OBJECT_COUNT];
 
 extern const Color white;
+
+extern float object_pulse_scales[4];
 
 extern float object_creating_time;
 extern float object_sorting_time;

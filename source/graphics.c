@@ -79,9 +79,7 @@ enum ObjectFadeOpacityMode {
     OBJECT_FADE_DETAIL_IF_OPAQUE,
 };
 
-static float frame_pulse_amplitude = 1.f;
-static float frame_pulse_wide = 1.f;
-static float frame_pulse_narrow = 1.f;
+float object_pulse_scales[4] = { 1.f, 1.f, 1.f, 1.f };
 
 static float get_rotation_speed_for_id(int id);
 static int get_glow_channel_for_id(int id, bool fades);
@@ -536,18 +534,18 @@ static u8 get_object_pulse_mode(int id) {
     return OBJECT_PULSE_NONE;
 }
 
-static inline float get_cached_object_pulse(int id, int layer) {
+static inline u8 get_cached_object_pulse_index(int id, int layer) {
     switch (sprite_templates[id].pulse_mode) {
         case OBJECT_PULSE_AMPLITUDE:
-            return frame_pulse_amplitude;
+            return 1;
         case OBJECT_PULSE_WIDE:
-            return frame_pulse_wide;
+            return 2;
         case OBJECT_PULSE_NARROW:
-            return frame_pulse_narrow;
+            return 3;
         case OBJECT_PULSE_ROD_CHILD:
-            return layer == 2 ? frame_pulse_amplitude : 1.f;
+            return layer == 2 ? 1 : 0;
         default:
-            return 1.f;
+            return 0;
     }
 }
 
@@ -591,6 +589,8 @@ static inline void set_sprite_render_data(
     const C2D_Image image,
     float x,
     float y,
+    float offset_x,
+    float offset_y,
     float scale_x,
     float scale_y,
     float rotation_sin,
@@ -599,12 +599,25 @@ static inline void set_sprite_render_data(
     sprite->image = image;
     sprite->x = x;
     sprite->y = y;
+    sprite->offset_x = offset_x;
+    sprite->offset_y = offset_y;
     sprite->half_width = fabsf(scale_x * image.subtex->width) * 0.5f;
     sprite->half_height = fabsf(scale_y * image.subtex->height) * 0.5f;
     sprite->rotation_sin = rotation_sin;
     sprite->rotation_cos = rotation_cos;
     sprite->flip_x = scale_x < 0.f;
     sprite->flip_y = scale_y < 0.f;
+}
+
+static inline void prepare_sprite_transform(
+    SpriteObject *sprite,
+    int fade_value,
+    u8 fade_transition,
+    u8 pulse_index
+) {
+    sprite->fade_meta = (u32)(fade_value & 0xff)
+        | ((u32)fade_transition << 8)
+        | ((u32)pulse_index << 16);
 }
 
 static inline void prepare_sprite_color(SpriteObject *sprite, int edge_opacity, float fade_opacity) {
@@ -655,14 +668,16 @@ void spawn_object_at(
     float cos_r,
     unsigned char flip_x,
     unsigned char flip_y,
-    float scale,
     int edge_opacity,
     float fading_opacity,
-    float glow_opacity
+    float glow_opacity,
+    int fade_value,
+    u8 fade_transition
 ) {
     const GameObject* obj = &game_objects[id];
 
-    // A vertical mirror negates the angle. Its cosine is unchanged.
+    // Child rotations are relative to the mirrored parent angle in the
+    // original renderer, so retain this discrete orientation step on CPU.
     if (state.mirror_mult < 0) sin_r = -sin_r;
 
     int flip_x_mult = (flip_x ? -1 : 1);
@@ -673,8 +688,8 @@ void spawn_object_at(
     float m10 = sin_r;
     float m11 = -cos_r;
 
-    float sx = scale * flip_x_mult;
-    float sy = scale * flip_y_mult;
+    float sx = flip_x_mult;
+    float sy = flip_y_mult;
 
     if (sprite_count >= MAX_SPRITES - 1) return;
 
@@ -694,9 +709,6 @@ void spawn_object_at(
         float rot_x = local_x * m00 + local_y * m01;
         float rot_y = local_x * m10 + local_y * m11;
 
-        float p_x = x + rot_x * scale;
-        float p_y = y + rot_y * scale;
-
         int random_layer = get_obj_random_layer(obj_game, id);
         C2D_Image image;
         if (random_layer < 0) {
@@ -707,15 +719,14 @@ void spawn_object_at(
             image = C2D_SpriteSheetGetImage(*sheet, rel_index);
         }
 
-        float pulse_scale = get_cached_object_pulse(id, 0);
-
-        set_sprite_render_data(vo, image, p_x, p_y, sx * pulse_scale, sy * pulse_scale, sin_r, cos_r);
+        set_sprite_render_data(vo, image, x, y, rot_x, rot_y, sx, sy, sin_r, cos_r);
 
         vo->obj = obj_game;
         vo->layer = 0;
         vo->opacity = obj->opacity;
         vo->col_channel = get_color_channel(obj->color_type, obj_game, obj);
         prepare_sprite_color(vo, edge_opacity, fading_opacity);
+        prepare_sprite_transform(vo, fade_value, fade_transition, get_cached_object_pulse_index(id, 0));
         viewable_objects_ptr[sprite_count] = vo;
         sprite_count++;
     }
@@ -726,16 +737,15 @@ void spawn_object_at(
 
         SpriteObject *vo = &viewable_objects[sprite_count];
 
-        float pulse_scale = get_cached_object_pulse(id, 1);
-
         set_sprite_render_data(vo, sprite_templates[id].glow_template.image,
-            x, y, sx * pulse_scale, sy * pulse_scale, sin_r, cos_r);
+            x, y, 0.f, 0.f, sx, sy, sin_r, cos_r);
 
         vo->obj = obj_game;
         vo->layer = 1;
         vo->opacity = obj->opacity;
         vo->col_channel = get_glow_channel(obj_game);
         prepare_sprite_color(vo, edge_opacity, glow_opacity);
+        prepare_sprite_transform(vo, fade_value, fade_transition, get_cached_object_pulse_index(id, 1));
         viewable_objects_ptr[sprite_count] = vo;
         sprite_count++;
     }
@@ -756,25 +766,21 @@ void spawn_object_at(
             float c_rot_x = c_local_x * m00 + c_local_y * m01;
             float c_rot_y = c_local_x * m10 + c_local_y * m11;
 
-            float c_x = x + c_rot_x * scale;
-            float c_y = y + c_rot_y * scale;
-
             int c_flip_x_mult = (c->flip_x ? -1 : 1);
             int c_flip_y_mult = (c->flip_y ? -1 : 1);
 
-            float pulse_scale = get_cached_object_pulse(id, i + 2);
             const ChildSpriteTemplate *child_template = &sprite_templates[id].child_templates[i];
             if (id < 15 || id > 17) {
                 float child_sin = sin_r * child_template->rotation_cos + cos_r * child_template->rotation_sin;
                 float child_cos = cos_r * child_template->rotation_cos - sin_r * child_template->rotation_sin;
-                set_sprite_render_data(vo, child_template->sprite.image, c_x, c_y,
-                    c->scale_x * c_flip_x_mult * sx * pulse_scale,
-                    c->scale_y * c_flip_y_mult * sy * pulse_scale,
+                set_sprite_render_data(vo, child_template->sprite.image, x, y, c_rot_x, c_rot_y,
+                    c->scale_x * c_flip_x_mult * sx,
+                    c->scale_y * c_flip_y_mult * sy,
                     child_sin, child_cos);
             } else {
-                set_sprite_render_data(vo, child_template->sprite.image, c_x, c_y,
-                    fabsf(c->scale_x * c_flip_x_mult * sx * pulse_scale),
-                    fabsf(c->scale_y * c_flip_y_mult * sy * pulse_scale),
+                set_sprite_render_data(vo, child_template->sprite.image, x, y, c_rot_x, c_rot_y,
+                    fabsf(c->scale_x * c_flip_x_mult * sx),
+                    fabsf(c->scale_y * c_flip_y_mult * sy),
                     0.f, 1.f);
             }
 
@@ -783,6 +789,7 @@ void spawn_object_at(
             vo->opacity = c->opacity;
             vo->col_channel = get_color_channel(c->color_type, obj_game, obj);
             prepare_sprite_color(vo, edge_opacity, fading_opacity);
+            prepare_sprite_transform(vo, fade_value, fade_transition, get_cached_object_pulse_index(id, i + 2));
             viewable_objects_ptr[sprite_count] = vo;
             sprite_count++;
         }
@@ -1260,11 +1267,11 @@ float object_drawing_time = 0;
 void create_objects() {
     sprite_count = 0;
 
-    frame_pulse_amplitude = amplitude;
-    frame_pulse_amplitude *= music_volume > 0 && global_volume > 0;
-    frame_pulse_amplitude = MAX(0.1f, frame_pulse_amplitude);
-    frame_pulse_wide = 0.3f + frame_pulse_amplitude * 0.9f;
-    frame_pulse_narrow = 0.6f + frame_pulse_amplitude * 0.6f;
+    object_pulse_scales[0] = 1.f;
+    object_pulse_scales[1] = amplitude * (music_volume > 0 && global_volume > 0);
+    object_pulse_scales[1] = MAX(0.1f, object_pulse_scales[1]);
+    object_pulse_scales[2] = 0.3f + object_pulse_scales[1] * 0.9f;
+    object_pulse_scales[3] = 0.6f + object_pulse_scales[1] * 0.6f;
 
     // Saw speeds are limited to 180 or 360 degrees per second. Compute both
     // frame steps once, then advance each visible saw with angle addition.
@@ -1325,15 +1332,7 @@ void create_objects() {
                         handle_special_fading(obj, calc_x, calc_y);
                     }
                 }
-                int fade_x = 0;
-                int fade_y = 0;
-
-                float fade_scale = 1.f;
-
                 u8 fade_transition = objects.transition_applied[obj];
-                if (fade_transition != FADE_NONE) {
-                    get_fade_vars_from_value(obj, fade_val, &fade_x, &fade_y, &fade_scale);
-                }
 
                 // Handle saw rotation
                 float rotation_sin = objects.rotation_sin[obj];
@@ -1365,9 +1364,13 @@ void create_objects() {
                     objects.rotation_cos[obj] = rotation_cos;
                 }
                 
-                // Handle special fade types
+                // Stationary transitions pin the object root at an edge. The
+                // shader handles their remaining translation and scale.
+                float render_world_x = objects.x[obj];
                 if (fade_transition == FADE_DOWN_STATIONARY || fade_transition == FADE_UP_STATIONARY) {
-                    get_special_fading_vars(obj, fade_val, &calc_x);
+                    float stationary_x = calc_x;
+                    get_special_fading_vars(obj, fade_val, &stationary_x);
+                    render_world_x = state.camera_x + stationary_x;
                 }
 
                 int edge_opacity = get_obj_opacity_from_fade(obj, fade_val);
@@ -1380,16 +1383,17 @@ void create_objects() {
                 spawn_object_at(
                     obj,
                     objects.id[obj],
-                    get_mirror_x(calc_x + fade_x, state.mirror_factor),
-                    calc_y + fade_y,
+                    render_world_x,
+                    objects.y[obj],
                     rotation_sin,
                     rotation_cos,
                     objects.flippedH[obj] ^ (state.mirror_mult < 0),
                     objects.flippedV[obj],
-                    fade_scale,
                     edge_opacity,
                     fading_opacity,
-                    glow_opacity
+                    glow_opacity,
+                    fade_val,
+                    fade_transition
                 );
 
                 if (sprite_templates[objects.id[obj]].has_particles) {

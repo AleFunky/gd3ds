@@ -1,20 +1,51 @@
 #include "object_renderer.h"
 
+#include <math.h>
+#include <stddef.h>
 #include <stdlib.h>
 
 #include "graphics.h"
 #include "object_shbin.h"
+#include "state.h"
 #include "utils/c2d_internal.h"
 
 typedef struct {
     float local[2];
     float position[2];
+    s16 offset[2];
     float rotation[2];
     float texcoord[2];
     u32 color;
+    u32 fade;
 } ObjectVertex;
 
-_Static_assert(sizeof(ObjectVertex) == 36, "ObjectVertex layout must match object.v.pica");
+_Static_assert(sizeof(ObjectVertex) == 44, "ObjectVertex layout must match object.v.pica");
+_Static_assert(offsetof(ObjectVertex, position) == 8, "ObjectVertex position offset mismatch");
+_Static_assert(offsetof(ObjectVertex, offset) == 16, "ObjectVertex center offset mismatch");
+_Static_assert(offsetof(ObjectVertex, rotation) == 20, "ObjectVertex rotation offset mismatch");
+_Static_assert(offsetof(ObjectVertex, texcoord) == 28, "ObjectVertex texcoord offset mismatch");
+_Static_assert(offsetof(ObjectVertex, color) == 36, "ObjectVertex color offset mismatch");
+_Static_assert(offsetof(ObjectVertex, fade) == 40, "ObjectVertex fade offset mismatch");
+
+static const float fade_modes[FADE_COUNT][4] = {
+    [FADE_NONE]                = {  0.f,       0.f,       1.f,  0.f  },
+    [FADE_UP]                  = {  0.f,       1.f,       1.f,  0.f  },
+    [FADE_DOWN]                = {  0.f,      -1.f,       1.f,  0.f  },
+    [FADE_RIGHT]               = {  1.f,       0.f,       1.f,  0.f  },
+    [FADE_LEFT]                = { -1.f,       0.f,       1.f,  0.f  },
+    [FADE_SCALE_IN]            = {  0.f,       0.f,       0.f,  1.f  },
+    [FADE_SCALE_OUT]           = {  0.f,       0.f,       1.5f, -0.5f },
+    [FADE_INWARDS]             = {  0.f,       0.f,       1.f,  0.f  },
+    [FADE_OUTWARDS]            = {  0.f,       0.f,       1.f,  0.f  },
+    [FADE_CIRCLE_LEFT]         = {  0.f,       0.f,       1.f,  0.f  },
+    [FADE_CIRCLE_RIGHT]        = {  0.f,       0.f,       1.f,  0.f  },
+    [FADE_UP_SLOW_LEFT]        = { -1.f,       1.f / 3.f, 1.f,  0.f  },
+    [FADE_DOWN_SLOW_LEFT]      = { -1.f,      -1.f / 3.f, 1.f,  0.f  },
+    [FADE_UP_SLOW_RIGHT]       = {  1.f,       1.f / 3.f, 1.f,  0.f  },
+    [FADE_DOWN_SLOW_RIGHT]     = {  1.f,      -1.f / 3.f, 1.f,  0.f  },
+    [FADE_UP_STATIONARY]       = {  0.f,       1.f / 3.f, 1.f,  0.f  },
+    [FADE_DOWN_STATIONARY]     = {  0.f,      -1.f / 3.f, 1.f,  0.f  },
+};
 
 static DVLB_s *object_shader_dvlb;
 static shaderProgram_s object_shader;
@@ -26,6 +57,10 @@ static int object_mdlv_uniform;
 static int object_proj_uniform;
 static int object_colors_uniform;
 static int object_p1_uniform;
+static int object_fade_modes_uniform;
+static int object_pulse_scales_uniform;
+static int object_camera_uniform;
+static int object_mirror_uniform;
 static int built_sprite_count;
 static int current_blending = -1;
 static C3D_Tex *current_texture;
@@ -41,11 +76,14 @@ static void set_vertex(
     vertex->local[1] = local_y;
     vertex->position[0] = sprite->x;
     vertex->position[1] = sprite->y;
+    vertex->offset[0] = (s16)lrintf(sprite->offset_x * 64.f);
+    vertex->offset[1] = (s16)lrintf(sprite->offset_y * 64.f);
     vertex->rotation[0] = sprite->rotation_sin;
     vertex->rotation[1] = sprite->rotation_cos;
     vertex->texcoord[0] = uv[0];
     vertex->texcoord[1] = uv[1];
     vertex->color = sprite->color_meta;
+    vertex->fade = sprite->fade_meta;
 }
 
 bool object_renderer_init(void) {
@@ -79,8 +117,14 @@ bool object_renderer_init(void) {
     object_proj_uniform = shaderInstanceGetUniformLocation(object_shader.vertexShader, "projMtx");
     object_colors_uniform = shaderInstanceGetUniformLocation(object_shader.vertexShader, "channelColors");
     object_p1_uniform = shaderInstanceGetUniformLocation(object_shader.vertexShader, "p1Color");
+    object_fade_modes_uniform = shaderInstanceGetUniformLocation(object_shader.vertexShader, "fadeModes");
+    object_pulse_scales_uniform = shaderInstanceGetUniformLocation(object_shader.vertexShader, "pulseScales");
+    object_camera_uniform = shaderInstanceGetUniformLocation(object_shader.vertexShader, "cameraParams");
+    object_mirror_uniform = shaderInstanceGetUniformLocation(object_shader.vertexShader, "mirrorParams");
     if (object_mdlv_uniform < 0 || object_proj_uniform < 0
-        || object_colors_uniform < 0 || object_p1_uniform < 0) {
+        || object_colors_uniform < 0 || object_p1_uniform < 0
+        || object_fade_modes_uniform < 0 || object_pulse_scales_uniform < 0
+        || object_camera_uniform < 0 || object_mirror_uniform < 0) {
         object_renderer_fini();
         return false;
     }
@@ -88,12 +132,14 @@ bool object_renderer_init(void) {
     AttrInfo_Init(&object_attr_info);
     AttrInfo_AddLoader(&object_attr_info, 0, GPU_FLOAT, 2);
     AttrInfo_AddLoader(&object_attr_info, 1, GPU_FLOAT, 2);
-    AttrInfo_AddLoader(&object_attr_info, 2, GPU_FLOAT, 2);
+    AttrInfo_AddLoader(&object_attr_info, 2, GPU_SHORT, 2);
     AttrInfo_AddLoader(&object_attr_info, 3, GPU_FLOAT, 2);
-    AttrInfo_AddLoader(&object_attr_info, 4, GPU_UNSIGNED_BYTE, 4);
+    AttrInfo_AddLoader(&object_attr_info, 4, GPU_FLOAT, 2);
+    AttrInfo_AddLoader(&object_attr_info, 5, GPU_UNSIGNED_BYTE, 4);
+    AttrInfo_AddLoader(&object_attr_info, 6, GPU_UNSIGNED_BYTE, 4);
 
     BufInfo_Init(&object_buf_info);
-    BufInfo_Add(&object_buf_info, object_vertices, sizeof(ObjectVertex), 5, 0x43210);
+    BufInfo_Add(&object_buf_info, object_vertices, sizeof(ObjectVertex), 7, 0x6543210);
     return true;
 }
 
@@ -171,6 +217,19 @@ void object_renderer_begin(void) {
     Color p1 = get_white_if_black(p1_color);
     C3D_FVUnifSet(GPU_VERTEX_SHADER, object_p1_uniform,
         p1.r * color_scale, p1.g * color_scale, p1.b * color_scale, 1.f);
+
+    for (int i = 0; i < FADE_COUNT; i++) {
+        C3D_FVUnifSet(GPU_VERTEX_SHADER, object_fade_modes_uniform + i,
+            fade_modes[i][0], fade_modes[i][1], fade_modes[i][2], fade_modes[i][3]);
+    }
+    for (int i = 0; i < 4; i++) {
+        C3D_FVUnifSet(GPU_VERTEX_SHADER, object_pulse_scales_uniform + i,
+            object_pulse_scales[i], 0.f, 0.f, 0.f);
+    }
+    C3D_FVUnifSet(GPU_VERTEX_SHADER, object_camera_uniform,
+        state.camera_x, state.camera_y, SCREEN_HEIGHT, SCREEN_WIDTH / SCALE);
+    C3D_FVUnifSet(GPU_VERTEX_SHADER, object_mirror_uniform,
+        state.mirror_factor, state.mirror_mult, SCREEN_WIDTH / SCALE, 0.f);
 
     C3D_TexEnv *env = C3D_GetTexEnv(0);
     C3D_TexEnvInit(env);

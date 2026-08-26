@@ -1,9 +1,11 @@
 ; Batched Geometry Dash object vertex shader
 
 .fvec mdlvMtx[4], projMtx[4], channelColors[21], p1Color
+.fvec fadeModes[17], pulseScales[4], cameraParams, mirrorParams
 
 .constf common_const(0.0, 1.0, 0.5, 0.003921568393707275390625)
 .constf invisible_const(1.9, -1.5, 0.8, 0.0)
+.constf transform_const(255.0, -2.0, 0.015625, 0.0)
 .alias clrdiv common_const.wwww
 
 .out outPosition position
@@ -12,19 +14,55 @@
 
 .in inLocal v0
 .in inPosition v1
-.in inRotation v2
-.in inTexCoord v3
-.in inMeta v4
+.in inOffset v2
+.in inRotation v3
+.in inTexCoord v4
+.in inMeta v5
+.in inFadeMeta v6
 
 .entry object_main
 .proc object_main
-    ; Rotate the local corner with the per-object sin/cos pair, then translate it.
+    ; Resolve the fade and pulse modes from compact per-sprite indices.
+    mova a0.x, inFadeMeta.y
+    mov r6, fadeModes[a0.x]
+    mul r7.x, clrdiv, inFadeMeta.x
+    add r7.y, transform_const.x, -inFadeMeta.x
+    mul r7.y, common_const.z, r7.y
+    flr r7.y, r7.y
+    mul r7.z, r7.x, r6.w
+    add r7.z, r6.z, r7.z
+
+    mova a0.x, inFadeMeta.z
+    mov r8, pulseScales[a0.x]
+    mov r7.w, r8.x
+
+    ; Convert the shared world root to screen space and apply fade translation.
+    add r8.x, -cameraParams.x, inPosition.x
+    add r8.y, -cameraParams.y, inPosition.y
+    add r8.y, cameraParams.z, -r8.y
+    mad r8.x, r7.y, r6.x, r8.x
+    mad r8.y, r7.y, r6.y, r8.y
+
+    ; Mirror the root continuously. Discrete sprite orientation remains packed
+    ; by the CPU so relative child rotations preserve the original behavior.
+    mul r9.x, transform_const.y, r8.x
+    add r9.x, mirrorParams.z, r9.x
+    mad r8.x, r9.x, mirrorParams.x, r8.x
+
+    mul r9.xy, transform_const.z, inOffset.xy
+    mul r9.xy, r7.zz, r9.xy
+
+    ; Rotate the local corner, then apply the shared fade and pulse scales.
     mov r2.xy, inLocal.xy
     mul r0.xy, r2.xy, inRotation.yy
     mul r1.xy, r2.yx, inRotation.xx
     add r0.x, r0.x, -r1.x
     add r0.y, r0.y, r1.y
-    add r0.xy, r0.xy, inPosition.xy
+    mul r0.xy, r7.zz, r0.xy
+    mul r0.xy, r7.ww, r0.xy
+    add r0.xy, r0.xy, r9.xy
+    add r0.x, r0.x, r8.x
+    add r0.y, r0.y, r8.y
     mov r0.zw, common_const.xy
 
     ; Preserve Citro2D's current view and projection transforms.
