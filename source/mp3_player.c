@@ -444,7 +444,7 @@ int play_mp3_buf(void *buf, size_t sz, bool loop, float seek) {
 
     int32_t priority = 0x30;
     svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
-    priority += 1;
+    priority -= 10;
     priority = priority < 0x18 ? 0x18 : priority;
     priority = priority > 0x3F ? 0x3F : priority;
 

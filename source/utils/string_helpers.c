@@ -63,10 +63,17 @@ void strip_character(char* s, char character) {
     if (length < 2)
         return;
 
-    if ((s[0] == character && s[length - 1] == character))
-    {
+    if ((s[0] == character && s[length - 1] == character)) {
         memmove(s, s + 1, length - 1);
         s[length - 2] = '\0';
+    }
+}
+
+void url_convert_to_http(char *str) {
+    size_t length = strlen(str);
+
+    if (strncmp(str, "https", 5) == 0) {
+        memmove(str + 4, str + 5, length - 4);
     }
 }
 
@@ -87,7 +94,7 @@ char *url_decode(const char *str) {
             if(dStr[i] == '%') {
                 if(dStr[i+1] == 0) return dStr;
             
-                if (isxdigit(dStr[i+1]) && isxdigit(dStr[i+2])) {
+                if (isxdigit((unsigned char) dStr[i+1]) && isxdigit((unsigned char) dStr[i+2])) {
                     d = 0;
 
                     /* combine the next to numbers into one */

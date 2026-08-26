@@ -105,6 +105,7 @@ void soggy_menu_loop() {
             // START TEST
             
             draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 200, 0.5f, 0.5f, 0.f, true, "Progress %.2f Finished %d", task.progress, !task.running);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 210, 0.5f, 0.5f, 0.f, true, "Speed %.2f KB/s", task.speed / 1024.f);
 
             // END TEST
 

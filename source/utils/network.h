@@ -1,5 +1,6 @@
 #pragma once
 #include "3ds/thread.h"
+#include "curl/system.h"
 #include <stdbool.h>
 
 typedef struct SearchFilters {
@@ -39,12 +40,16 @@ typedef struct {
 
 typedef struct {
     volatile float progress;
+    volatile int speed;
 
     volatile int result;
     
     volatile bool finished;
     volatile bool running;
     volatile bool cancelled;
+
+    u64 last_time;
+    curl_off_t last_bytes;
 
     char *path;
     char *url;

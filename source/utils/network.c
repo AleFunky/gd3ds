@@ -281,9 +281,29 @@ static int progressCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow,
         return 1;
     }
 
+    u64 now = svcGetSystemTick();
+
+    u64 elapsed_ticks = now - task->last_time;
+    
+    float time = ((elapsed_ticks / CPU_TICKS_PER_MSEC));
+
+    if (time >= 1000.f) {
+        curl_off_t bytes = dlnow - task->last_bytes;
+
+        float seconds = time / 1000.f;
+
+        int speed = (int)(bytes / seconds);
+
+        task->speed = speed;
+
+        task->last_time = now;
+        task->last_bytes = dlnow;
+    }
+
     if (dltotal > 0) {
         progress = (dlnow * 100.f) / dltotal;
     }
+
     task->progress = progress;
     return 0;
 }
@@ -299,12 +319,14 @@ static int download_song(DownloadTask *task) {
     if (curl) {
         char *decoded_url = url_decode(url);
 
+        url_convert_to_http(decoded_url);
+
         curl_easy_setopt(curl, CURLOPT_URL, decoded_url);
         
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, progressCallback);
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/ng_certs.pem"); // Certificate slop
 
         char full_path[273];
         snprintf(full_path, sizeof(full_path), "%s/%s.mp3", path, song_id);
@@ -348,7 +370,7 @@ static void network_thread(void *arg) {
 Thread create_network_thread(NetworkTask *task) {
     int32_t priority = 0x30;
     svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
-    priority += 1;
+    priority -= 1;
     priority = priority < 0x18 ? 0x18 : priority;
     priority = priority > 0x3F ? 0x3F : priority;
     
