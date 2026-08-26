@@ -30,6 +30,9 @@
 #define GD_VERSION 1.9
 #define LAST_GD_VERSION_ID 11020426 // Last 1.9 id
 
+// When making a release, uncomment this please thanks
+// #define IS_RELEASE
+
 typedef struct {
     float x, y;
 } Vec2D;

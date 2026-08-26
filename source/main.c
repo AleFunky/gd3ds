@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include "3ds/console.h"
 #include "3ds/env.h"
 #include "3ds/services/cfgu.h"
 #include "objects.h"
@@ -1335,6 +1336,9 @@ int main(int argc, char* argv[]) {
     osSetSpeedupEnable(1);
     soc_init();
     check_system_model();
+#ifndef IS_RELEASE
+    consoleDebugInit(debugDevice_SVC);
+#endif
 
     cfg_init();
     cfguInit();

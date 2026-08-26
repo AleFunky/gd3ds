@@ -73,11 +73,11 @@ void soggy_menu_loop() {
         // START TEST
         
         if (task.running) {
-            output_log("Progress: %.2f\n", task.progress);
+            //output_log("Progress: %.2f\n", task.progress);
         }
 
         if (task.finished) {
-            output_log("Download finished with code %d\n", task.result);
+            //output_log("Download finished with code %d\n", task.result);
             task.finished = false;
         }
         
