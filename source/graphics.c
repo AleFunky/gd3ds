@@ -807,13 +807,19 @@ static inline uint32_t make_sort_key(SpriteObject *s)
     int col_channel = s->col_channel;
 
     bool blending = col_channel > 0 && (channels[get_col_channel_index(col_channel)].blending ^ ((zlayer & 1) == 0));
+    bool inset_speed_glow = s->layer == 1 && id >= SLOW_SPEED_PORTAL && id <= FASTER_SPEED_PORTAL;
+
+    // A speed portal is intentionally sandwiched between the back and front
+    // halves of the other portals. Keep its glow in that same layer, directly
+    // behind its arrow, instead of applying the generic full-layer glow drop.
+    if (inset_speed_glow) blending = false;
 
     // If layer is a glow layer or it has blending, decrement it
-    if (s->layer == 1 || blending) {
+    if ((s->layer == 1 && !inset_speed_glow) || blending) {
         zlayer--;
     }
 
-    int child_z = 0;
+    int child_z = inset_speed_glow ? -1 : 0;
     int tex = game_obj->texture;
 
     // If layer is a glow layer, it does something for sure
@@ -827,7 +833,7 @@ static inline uint32_t make_sort_key(SpriteObject *s)
     // Glow layers always use spritesheet 2 (only for sorting purposes)
     int sheet;
     if (s->layer == 1) {
-        sheet = 2;
+        sheet = inset_speed_glow ? 0 : 2;
     } else {
         sheet = tex < SPRITESHEET2_START ? 1 : 0;
     }
