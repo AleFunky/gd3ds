@@ -1,8 +1,9 @@
 ; Batched Geometry Dash object vertex shader
 
-.fvec mdlvMtx[4], projMtx[4]
+.fvec mdlvMtx[4], projMtx[4], channelColors[21], p1Color
 
 .constf common_const(0.0, 1.0, 0.5, 0.003921568393707275390625)
+.constf invisible_const(1.9, -1.5, 0.8, 0.0)
 .alias clrdiv common_const.wwww
 
 .out outPosition position
@@ -13,7 +14,7 @@
 .in inPosition v1
 .in inRotation v2
 .in inTexCoord v3
-.in inColor v4
+.in inMeta v4
 
 .entry object_main
 .proc object_main
@@ -38,6 +39,24 @@
     dp4 outPosition.w, projMtx[3], r1
 
     mov outTexCoord, inTexCoord
-    mul outColor, clrdiv, inColor
+
+    ; Select one of the small set of live color channels on the GPU. inMeta is
+    ; packed as channel index, layer alpha, parent alpha, invisible-glow mix.
+    mova a0.x, inMeta.x
+    mov r5, channelColors[a0.x]
+    mul r5.w, clrdiv, inMeta.y
+
+    ; Invisible glow blends the player and LBG colors only above its threshold.
+    ; The CPU sets the flag so ordinary layers do not take this path.
+    cmp common_const.x, ne, ne, inMeta.w
+    ifc cmp.x
+        mul r3.x, clrdiv, inMeta.z
+        mul r3.y, invisible_const.y, r3.x
+        add r3.y, invisible_const.x, r3.y
+        add r3.z, common_const.y, -r3.y
+        mul r4.xyz, r3.y, r5
+        mad r5.xyz, r3.z, p1Color, r4
+    .end
+    mov outColor, r5
     end
 .end

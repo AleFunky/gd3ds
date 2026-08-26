@@ -4,12 +4,22 @@
 #include "main.h"
 #include "player/collision.h"
 #include "math_helpers.h"
+#include <stdlib.h>
+#include <string.h>
 
 ObjectParticles object_particle[MAX_OBJECT_PS];
 
 ParticleSystem brick_destroy_particles;
+static s8 *object_particle_slots;
 
 void init_op_system() {
+    free(object_particle_slots);
+    object_particle_slots = NULL;
+    if (objects.count > 0) {
+        object_particle_slots = malloc(sizeof(*object_particle_slots) * objects.count);
+        if (object_particle_slots) memset(object_particle_slots, -1, sizeof(*object_particle_slots) * objects.count);
+    }
+
     for (size_t i = 0; i < MAX_OBJECT_PS; i++) {
         object_particle[i].id = -1;
         object_particle[i].occupied = false;
@@ -17,6 +27,16 @@ void init_op_system() {
 }
 
 bool is_ps_already_loaded(int id) {
+    if (object_particle_slots && id >= 0 && id < objects.count) {
+        int slot = object_particle_slots[id];
+        if (slot >= 0 && slot < MAX_OBJECT_PS
+            && object_particle[slot].occupied && object_particle[slot].id == id) {
+            return true;
+        }
+        object_particle_slots[id] = -1;
+        return false;
+    }
+
     for (size_t i = 0; i < MAX_OBJECT_PS; i++) {
         if (object_particle[i].occupied && object_particle[i].id == id) {
             return true;
@@ -59,6 +79,10 @@ static float get_object_particle_depth(int id) {
     return 0.f;
 }
 
+bool object_uses_particles(int id) {
+    return get_object_particle_depth(id) > 0.f;
+}
+
 int load_object_particles(int id, const ParticleDefinition *cfg, bool stationary) {
     for (size_t i = 0; i < MAX_OBJECT_PS; i++) {
         if (!object_particle[i].occupied) {
@@ -74,6 +98,7 @@ int load_object_particles(int id, const ParticleDefinition *cfg, bool stationary
             object_particle[i].ps.depthInwards = (cfg == &portal_effect_01 || cfg == &ring_effect);
 
             object_particle[i].ps.emitting = true;
+            if (object_particle_slots && id >= 0 && id < objects.count) object_particle_slots[id] = i;
             return i;
         }
     }
@@ -84,8 +109,11 @@ void free_object_particles() {
     for (size_t i = 0; i < MAX_OBJECT_PS; i++) {
         if (object_particle[i].occupied) {
             freeParticleData(&object_particle[i].ps.data);
+            object_particle[i].occupied = false;
         }
     }
+    free(object_particle_slots);
+    object_particle_slots = NULL;
 }
 
 static void remove_offscreen_object_particles() {
@@ -100,6 +128,9 @@ static void remove_offscreen_object_particles() {
             }
 
             if (x < -60 || x >= (SCREEN_WIDTH / SCALE) + 60 || y < -60 || y >= (SCREEN_HEIGHT / SCALE) + 60) {
+                if (object_particle_slots && object_particle[i].id >= 0 && object_particle[i].id < objects.count) {
+                    object_particle_slots[object_particle[i].id] = -1;
+                }
                 object_particle[i].occupied = false;
                 freeParticleData(&object_particle[i].ps.data);
             }

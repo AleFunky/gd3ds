@@ -64,6 +64,30 @@ SpriteTemplate sprite_templates[GAME_OBJECT_COUNT]; // global cache
 
 float touch_effect_drag_timer = 0.f;
 
+enum ObjectPulseMode {
+    OBJECT_PULSE_NONE,
+    OBJECT_PULSE_AMPLITUDE,
+    OBJECT_PULSE_WIDE,
+    OBJECT_PULSE_NARROW,
+    OBJECT_PULSE_ROD_CHILD,
+};
+
+enum ObjectFadeOpacityMode {
+    OBJECT_FADE_NORMAL,
+    OBJECT_FADE_ALWAYS_OPAQUE,
+    OBJECT_FADE_BASE_IF_OPAQUE,
+    OBJECT_FADE_DETAIL_IF_OPAQUE,
+};
+
+static float frame_pulse_amplitude = 1.f;
+static float frame_pulse_wide = 1.f;
+static float frame_pulse_narrow = 1.f;
+
+static float get_rotation_speed_for_id(int id);
+static int get_glow_channel_for_id(int id, bool fades);
+static u8 get_object_pulse_mode(int id);
+static u8 get_fade_opacity_mode_for_id(int id);
+
 static C2D_SpriteSheet *get_sprite_sheet(int index, int *rel_index) {
     // Check if index belongs to spritesheet 1 (most objects)
     if (index < SPRITESHEET2_START) {
@@ -140,6 +164,15 @@ void cache_all_sprites() {
     for (int id = 0; id < GAME_OBJECT_COUNT; id++) {
         const GameObject* obj = &game_objects[id];
 
+        sprite_templates[id].rotation_speed = get_rotation_speed_for_id(id);
+        sprite_templates[id].fades = id == 144 || id == 145 || id == 146 || id == 147
+            || id == 204 || id == 205 || id == 206 || id == 459
+            || id == 673 || id == 674 || id == 740 || id == 741 || id == 742;
+        sprite_templates[id].glow_channel = get_glow_channel_for_id(id, sprite_templates[id].fades);
+        sprite_templates[id].pulse_mode = get_object_pulse_mode(id);
+        sprite_templates[id].fade_opacity_mode = get_fade_opacity_mode_for_id(id);
+        sprite_templates[id].has_particles = object_uses_particles(id);
+
         // Skip if object has no texture
         if (obj->texture < 0) continue;
 
@@ -205,23 +238,7 @@ float mirror_angle(float angle, bool hflip, bool vflip) {
 
 // Returns true if the object is a invisible object
 bool object_fades(int obj) {
-    switch (objects.id[obj]) {
-        case 144:
-        case 145:
-        case 146:
-        case 147:
-        case 204:
-        case 205:
-        case 206:
-        case 459:
-        case 673:
-        case 674:
-        case 740:
-        case 741:
-        case 742:
-            return true;
-    }
-    return false;
+    return sprite_templates[objects.id[obj]].fades;
 }
 
 inline int get_color_channel(int col_type, int obj, const GameObject *game_obj) {
@@ -343,13 +360,13 @@ float get_fading_obj_fade(int obj, float right_edge, float *glow_out) {
     return 1.f;
 }
 
-// Get the glow color channel
-int get_glow_channel(int obj) {
-    if (object_fades(obj)) {
+// Get the glow color channel. This depends only on the object definition, so
+// cache it with the sprite template instead of switching for every instance.
+static int get_glow_channel_for_id(int id, bool fades) {
+    if (fades) {
         return CHANNEL_INVISIBLE_GLOW;
     }
 
-    int id = objects.id[obj];
     switch (id) {
         case 143:
         case 177:
@@ -402,6 +419,10 @@ int get_glow_channel(int obj) {
     return CHANNEL_OBJ_BLENDING;
 }
 
+int get_glow_channel(int obj) {
+    return sprite_templates[objects.id[obj]].glow_channel;
+}
+
 int get_coin_texture(int tex, int ticks) {
     return tex + ((level_frame / ticks) & 0b11);;
 }
@@ -427,7 +448,7 @@ int get_obj_random_layer(int obj, int id) {
 }
 
 // Deco saws rotate slower than normal saws. If not a saw, rotation speed is just 0
-float get_rotation_speed(int id) {
+static float get_rotation_speed_for_id(int id) {
     switch (id) {
         case 88: 
         case 89:
@@ -480,23 +501,16 @@ float get_rotation_speed(int id) {
     return 0.f;
 }
 
-// Map amplitude pulsing to ranges
-float get_object_pulse(float amplitude, int id, int layer) {
-     // No pulse if one of those is 0
-    amplitude *= music_volume > 0 && global_volume > 0;
-    amplitude = MAX(0.1f, amplitude); // Cap at 0.1
+static u8 get_object_pulse_mode(int id) {
     switch (id) {
         case 36:
         case 84:
         case 141:
-            return map_range(amplitude, 0.f, 1.f, 0.3f, 1.2f);
+            return OBJECT_PULSE_WIDE;
         case 15:
         case 16:
         case 17:
-            if (layer == 2) {    
-                return amplitude;
-            }
-            return 1.0f;
+            return OBJECT_PULSE_ROD_CHILD;
         case 50:
         case 51:
         case 52:
@@ -506,7 +520,7 @@ float get_object_pulse(float amplitude, int id, int layer) {
         case 148:
         case 149:
         case 405:
-            return amplitude;
+            return OBJECT_PULSE_AMPLITUDE;
         case 132:
         case 133:
         case 136:
@@ -517,9 +531,56 @@ float get_object_pulse(float amplitude, int id, int layer) {
         case 495:
         case 496:
         case 497:
-            return map_range(amplitude, 0.f, 1.f, 0.6f, 1.2f);
+            return OBJECT_PULSE_NARROW;
     }
-    return 1.0f;
+    return OBJECT_PULSE_NONE;
+}
+
+static inline float get_cached_object_pulse(int id, int layer) {
+    switch (sprite_templates[id].pulse_mode) {
+        case OBJECT_PULSE_AMPLITUDE:
+            return frame_pulse_amplitude;
+        case OBJECT_PULSE_WIDE:
+            return frame_pulse_wide;
+        case OBJECT_PULSE_NARROW:
+            return frame_pulse_narrow;
+        case OBJECT_PULSE_ROD_CHILD:
+            return layer == 2 ? frame_pulse_amplitude : 1.f;
+        default:
+            return 1.f;
+    }
+}
+
+static u8 get_fade_opacity_mode_for_id(int id) {
+    switch (id) {
+        case 90:
+        case 91:
+        case 92:
+        case 93:
+        case 94:
+        case 95:
+        case 96:
+        case 309:
+        case 311:
+        case 687:
+        case 688:
+            return OBJECT_FADE_ALWAYS_OPAQUE;
+        case 211:
+            return OBJECT_FADE_BASE_IF_OPAQUE;
+        case 207:
+        case 208:
+        case 209:
+        case 210:
+        case 212:
+        case 213:
+        case 331:
+        case 333:
+        case 693:
+        case 694:
+            return OBJECT_FADE_DETAIL_IF_OPAQUE;
+        default:
+            return OBJECT_FADE_NORMAL;
+    }
 }
 
 // Keep the compact per-object transform in the render list. The raw Citro3D
@@ -549,41 +610,40 @@ static inline void set_sprite_render_data(
 static inline void prepare_sprite_color(SpriteObject *sprite, int edge_opacity, float fade_opacity) {
     int col_channel = sprite->col_channel;
     ColorChannel col;
+    int channel_index;
+    bool mix_invisible_glow = false;
 
     if (col_channel < 0) {
+        channel_index = COL_CHANNEL_NUM;
         col.color.r = 255;
         col.color.g = 255;
         col.color.b = 255;
         col.blending = false;
     } else if (col_channel == CHANNEL_INVISIBLE_GLOW) {
-        int chan = get_col_channel_index(CHANNEL_LBG_NOLERP);
-        Color lbg = channels[chan].color;
-        Color p1 = get_white_if_black(p1_color);
+        channel_index = get_col_channel_index(CHANNEL_LBG_NOLERP);
+        col = channels[channel_index];
         float opacity = objects.opacity[sprite->obj];
 
-        if (opacity < 0.8f || state.dead) {
-            col = channels[chan];
-        } else {
-            float blend_factor = 1.9f - 1.5f * opacity;
-            float one_minus_factor = 1.0f - blend_factor;
-
-            int r = (float)p1.r * one_minus_factor + (float)lbg.r * blend_factor;
-            int g = (float)p1.g * one_minus_factor + (float)lbg.g * blend_factor;
-            int b = (float)p1.b * one_minus_factor + (float)lbg.b * blend_factor;
-
-            col.color.r = CLAMP(r, 0, 255);
-            col.color.g = CLAMP(g, 0, 255);
-            col.color.b = CLAMP(b, 0, 255);
+        if (opacity >= 0.8f && !state.dead) {
+            mix_invisible_glow = true;
             col.blending = true;
         }
     } else {
-        col = channels[get_col_channel_index(col_channel)];
+        channel_index = get_col_channel_index(col_channel);
+        col = channels[channel_index];
     }
 
     int real_opacity = edge_opacity * sprite->opacity * fade_opacity;
-    sprite->tint_color = C2D_Color32(col.color.r, col.color.g, col.color.b, real_opacity);
+    int parent_opacity = mix_invisible_glow
+        ? CLAMP((int)(objects.opacity[sprite->obj] * 255.f), 0, 255)
+        : 0;
+    sprite->color_meta = (u32)channel_index
+        | ((u32)(real_opacity & 0xff) << 8)
+        | ((u32)parent_opacity << 16)
+        | ((u32)mix_invisible_glow << 24);
     sprite->blending = col.blending;
-    sprite->visible = real_opacity > 0 && (!col.blending || (col.color.r | col.color.g | col.color.b) != 0);
+    sprite->visible = real_opacity > 0
+        && (mix_invisible_glow || !col.blending || (col.color.r | col.color.g | col.color.b) != 0);
 }
 
 void spawn_object_at(
@@ -647,7 +707,7 @@ void spawn_object_at(
             image = C2D_SpriteSheetGetImage(*sheet, rel_index);
         }
 
-        float pulse_scale = get_object_pulse(amplitude, id, 0);
+        float pulse_scale = get_cached_object_pulse(id, 0);
 
         set_sprite_render_data(vo, image, p_x, p_y, sx * pulse_scale, sy * pulse_scale, sin_r, cos_r);
 
@@ -666,7 +726,7 @@ void spawn_object_at(
 
         SpriteObject *vo = &viewable_objects[sprite_count];
 
-        float pulse_scale = get_object_pulse(amplitude, id, 1);
+        float pulse_scale = get_cached_object_pulse(id, 1);
 
         set_sprite_render_data(vo, sprite_templates[id].glow_template.image,
             x, y, sx * pulse_scale, sy * pulse_scale, sin_r, cos_r);
@@ -702,7 +762,7 @@ void spawn_object_at(
             int c_flip_x_mult = (c->flip_x ? -1 : 1);
             int c_flip_y_mult = (c->flip_y ? -1 : 1);
 
-            float pulse_scale = get_object_pulse(amplitude, id, i + 2);
+            float pulse_scale = get_cached_object_pulse(id, i + 2);
             const ChildSpriteTemplate *child_template = &sprite_templates[id].child_templates[i];
             if (id < 15 || id > 17) {
                 float child_sin = sin_r * child_template->rotation_cos + cos_r * child_template->rotation_sin;
@@ -735,7 +795,7 @@ static inline uint32_t make_sort_key(SpriteObject *s)
 
     // Player sprite is -1 so handle it there
     if (obj == -1) {
-        return ((5 + 8) << 18) | (0 << 16) | (0 << 8) | 0;
+        return (5 + 8) << 19;
     }
 
     const int id = objects.id[obj];
@@ -779,14 +839,16 @@ static inline uint32_t make_sort_key(SpriteObject *s)
         zlayer += 2;
     } 
 
-    // Pack all variables into a nice 32 bit variable
-    uint32_t zl = (uint32_t)(zlayer + 8);     // fits in 6 bits
-    uint32_t zb = (uint32_t)(blending);       // fits in 1 bit
-    uint32_t zs = (uint32_t)(sheet);          // fits in 1 bit
+    // Combine blending and sheet order into one real three-bit field. Glow
+    // uses sheet value 2, so the old one-bit packing collided with blending
+    // and could put otherwise identical layers on the wrong side of each
+    // other. Five z-layer bits retain the three-pass radix sort.
+    uint32_t zl = (uint32_t)CLAMP(zlayer + 8, 0, 31);
+    uint32_t material = (uint32_t)blending * 3 + (uint32_t)sheet;
     uint32_t zo = (uint32_t)(zorder + 128);   // fits in 8 bits
     uint32_t cz = (uint32_t)(child_z + 128);  // fits in 8 bits
 
-    return (zl << 18) | (zb << 17) | (zs << 16) | (zo << 8) | cz;
+    return (zl << 19) | (material << 16) | (zo << 8) | cz;
 }
 
 #define VIEW_OBJECTS (12 * 6)
@@ -875,39 +937,16 @@ float get_out_scale_fade(float x, int right_edge) {
 
 // Some objects dont change opacity on fade transitions.
 static int get_obj_opacity_from_fade(int obj, int opacity) {
-    bool blending;
+    if (objects.transition_applied[obj] != FADE_NONE) return opacity;
 
-    switch (objects.id[obj]) {
-        case 90:
-        case 91:
-        case 92:
-        case 93:
-        case 94:
-        case 95:
-        case 96:
-        case 309:
-        case 311:
-        case 687:
-        case 688:
-            if (objects.transition_applied[obj] == FADE_NONE) opacity = 255;
+    switch (sprite_templates[objects.id[obj]].fade_opacity_mode) {
+        case OBJECT_FADE_ALWAYS_OPAQUE:
+            return 255;
+        case OBJECT_FADE_BASE_IF_OPAQUE:
+            if (!channels[get_col_channel_index(objects.col_channel[obj])].blending) return 255;
             break;
-            
-        case 211:
-            blending = channels[get_col_channel_index(objects.col_channel[obj])].blending;
-            if (!blending && objects.transition_applied[obj] == FADE_NONE) opacity = 255;
-            break;
-        case 207:
-        case 208:
-        case 209:
-        case 210:
-        case 212:
-        case 213:
-        case 693:
-        case 694:
-        case 331:
-        case 333:
-            blending = channels[get_col_channel_index(objects.detail_col_channel[obj])].blending;
-            if (!blending && objects.transition_applied[obj] == FADE_NONE) opacity = 255;
+        case OBJECT_FADE_DETAIL_IF_OPAQUE:
+            if (!channels[get_col_channel_index(objects.detail_col_channel[obj])].blending) return 255;
             break;
     }
 
@@ -1215,6 +1254,12 @@ float object_drawing_time = 0;
 void create_objects() {
     sprite_count = 0;
 
+    frame_pulse_amplitude = amplitude;
+    frame_pulse_amplitude *= music_volume > 0 && global_volume > 0;
+    frame_pulse_amplitude = MAX(0.1f, frame_pulse_amplitude);
+    frame_pulse_wide = 0.3f + frame_pulse_amplitude * 0.9f;
+    frame_pulse_narrow = 0.6f + frame_pulse_amplitude * 0.6f;
+
     // Saw speeds are limited to 180 or 360 degrees per second. Compute both
     // frame steps once, then advance each visible saw with angle addition.
     float step_180 = C3D_AngleFromDegrees(180.f * delta);
@@ -1267,18 +1312,27 @@ void create_objects() {
                 int fade_val = obj_edge_fade(calc_x, SCREEN_WIDTH / SCALE);
                 bool fade_edge = (fade_val == 255 || fade_val == 0);
 
-                if (fade_edge) handle_special_fading(obj, calc_x, calc_y);
+                if (fade_edge) {
+                    if (current_fading_effect == FADE_NONE) {
+                        objects.transition_applied[obj] = FADE_NONE;
+                    } else {
+                        handle_special_fading(obj, calc_x, calc_y);
+                    }
+                }
                 int fade_x = 0;
                 int fade_y = 0;
 
                 float fade_scale = 1.f;
 
-                get_fade_vars_from_value(obj, fade_val, &fade_x, &fade_y, &fade_scale);
+                u8 fade_transition = objects.transition_applied[obj];
+                if (fade_transition != FADE_NONE) {
+                    get_fade_vars_from_value(obj, fade_val, &fade_x, &fade_y, &fade_scale);
+                }
 
                 // Handle saw rotation
                 float rotation_sin = objects.rotation_sin[obj];
                 float rotation_cos = objects.rotation_cos[obj];
-                float rotation_speed = get_rotation_speed(objects.id[obj]);
+                float rotation_speed = sprite_templates[objects.id[obj]].rotation_speed;
                 if (rotation_speed != 0.f) {
                     bool reverse = (objects.random[obj] & 1) != 0;
                     float step_sin = rotation_speed == 360.f ? step_360_sin : step_180_sin;
@@ -1306,7 +1360,9 @@ void create_objects() {
                 }
                 
                 // Handle special fade types
-                get_special_fading_vars(obj, fade_val, &calc_x);
+                if (fade_transition == FADE_DOWN_STATIONARY || fade_transition == FADE_UP_STATIONARY) {
+                    get_special_fading_vars(obj, fade_val, &calc_x);
+                }
 
                 int edge_opacity = get_obj_opacity_from_fade(obj, fade_val);
                 float fading_opacity = 1.f;
@@ -1330,7 +1386,9 @@ void create_objects() {
                     glow_opacity
                 );
 
-                spawn_object_particles(obj);
+                if (sprite_templates[objects.id[obj]].has_particles) {
+                    spawn_object_particles(obj);
+                }
             }
         }
     }

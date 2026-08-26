@@ -24,6 +24,8 @@ static ObjectVertex *object_vertices;
 static u16 *object_indices;
 static int object_mdlv_uniform;
 static int object_proj_uniform;
+static int object_colors_uniform;
+static int object_p1_uniform;
 static int built_sprite_count;
 static int current_blending = -1;
 static C3D_Tex *current_texture;
@@ -43,7 +45,7 @@ static void set_vertex(
     vertex->rotation[1] = sprite->rotation_cos;
     vertex->texcoord[0] = uv[0];
     vertex->texcoord[1] = uv[1];
-    vertex->color = sprite->tint_color;
+    vertex->color = sprite->color_meta;
 }
 
 bool object_renderer_init(void) {
@@ -75,7 +77,10 @@ bool object_renderer_init(void) {
     shaderProgramSetVsh(&object_shader, &object_shader_dvlb->DVLE[0]);
     object_mdlv_uniform = shaderInstanceGetUniformLocation(object_shader.vertexShader, "mdlvMtx");
     object_proj_uniform = shaderInstanceGetUniformLocation(object_shader.vertexShader, "projMtx");
-    if (object_mdlv_uniform < 0 || object_proj_uniform < 0) {
+    object_colors_uniform = shaderInstanceGetUniformLocation(object_shader.vertexShader, "channelColors");
+    object_p1_uniform = shaderInstanceGetUniformLocation(object_shader.vertexShader, "p1Color");
+    if (object_mdlv_uniform < 0 || object_proj_uniform < 0
+        || object_colors_uniform < 0 || object_p1_uniform < 0) {
         object_renderer_fini();
         return false;
     }
@@ -155,6 +160,18 @@ void object_renderer_begin(void) {
     C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, object_mdlv_uniform, &c2d->mdlvMtx);
     C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, object_proj_uniform, &c2d->projMtx);
 
+    const float color_scale = 1.f / 255.f;
+    for (int i = 0; i < COL_CHANNEL_NUM; i++) {
+        Color color = channels[i].color;
+        C3D_FVUnifSet(GPU_VERTEX_SHADER, object_colors_uniform + i,
+            color.r * color_scale, color.g * color_scale, color.b * color_scale, 1.f);
+    }
+    C3D_FVUnifSet(GPU_VERTEX_SHADER, object_colors_uniform + COL_CHANNEL_NUM, 1.f, 1.f, 1.f, 1.f);
+
+    Color p1 = get_white_if_black(p1_color);
+    C3D_FVUnifSet(GPU_VERTEX_SHADER, object_p1_uniform,
+        p1.r * color_scale, p1.g * color_scale, p1.b * color_scale, 1.f);
+
     C3D_TexEnv *env = C3D_GetTexEnv(0);
     C3D_TexEnvInit(env);
     C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, 0);
@@ -163,7 +180,10 @@ void object_renderer_begin(void) {
     C3D_TexEnvInit(C3D_GetTexEnv(2));
     C3D_TexEnvInit(C3D_GetTexEnv(3));
 
-    C3D_DepthTest(true, GPU_GEQUAL, GPU_WRITE_ALL);
+    // The sorted object list is painter-ordered and is interrupted to draw the
+    // player. Disable depth rejection so later layers always win across those
+    // raw/Citro2D transitions.
+    C3D_DepthTest(false, GPU_ALWAYS, GPU_WRITE_COLOR);
     C3D_CullFace(GPU_CULL_NONE);
     current_blending = -1;
     current_texture = NULL;

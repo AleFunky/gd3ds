@@ -14,6 +14,7 @@ extern ObjectParticles object_particle[MAX_OBJECT_PS];
 extern ParticleSystem brick_destroy_particles;
 
 void init_op_system();
+bool object_uses_particles(int id);
 bool is_ps_already_loaded(int id);
 int load_object_particles(int id, const ParticleDefinition *cfg, bool stationary);
 void draw_object_particles();

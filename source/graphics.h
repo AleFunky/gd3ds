@@ -41,7 +41,7 @@ typedef struct SpriteObject
     float half_height;
     float rotation_sin;
     float rotation_cos;
-    u32 tint_color;
+    u32 color_meta;
     int obj;
     int layer;
     float opacity;
@@ -90,6 +90,12 @@ typedef struct {
     C2D_Sprite glow_template;
     int child_count;
     ChildSpriteTemplate *child_templates;
+    float rotation_speed;
+    int glow_channel;
+    u8 pulse_mode;
+    u8 fade_opacity_mode;
+    bool fades;
+    bool has_particles;
 } SpriteTemplate;
 
 void cache_all_sprites();
