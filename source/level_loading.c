@@ -3,6 +3,7 @@
 #include "level_loading.h"
 #include <zlib.h>
 #include <ctype.h>
+#include <math.h>
 #include <string.h>
 #include <stdio.h>
 #include "color_channels.h"
@@ -884,7 +885,12 @@ void fill_object_data(int object, int key, GDValueType type, GDValue val) {
             if (type == GD_VAL_BOOL) objects.flippedV[object] = val.b;
             break;
         case 6:  // Rotation
-            if (type == GD_VAL_FLOAT) objects.rotation[object] = val.f;
+            if (type == GD_VAL_FLOAT) {
+                objects.rotation[object] = val.f;
+                float radians = C3D_AngleFromDegrees(val.f);
+                objects.rotation_sin[object] = sinf(radians);
+                objects.rotation_cos[object] = cosf(radians);
+            }
             break;
         case 7:  // Color R
             if (type == GD_VAL_INT) objects.trig_colorR[object] = val.i;
@@ -1066,6 +1072,8 @@ void free_arrays() {
     if (objects.x)                  { free(objects.x);                  objects.x = NULL; }
     if (objects.y)                  { free(objects.y);                  objects.y = NULL; }
     if (objects.rotation)           { free(objects.rotation);           objects.rotation = NULL; }
+    if (objects.rotation_sin)       { free(objects.rotation_sin);       objects.rotation_sin = NULL; }
+    if (objects.rotation_cos)       { free(objects.rotation_cos);       objects.rotation_cos = NULL; }
     if (objects.zlayer)             { free(objects.zlayer);             objects.zlayer = NULL; }
     if (objects.zorder)             { free(objects.zorder);             objects.zorder = NULL; }
     if (objects.trig_duration)      { free(objects.trig_duration);      objects.trig_duration = NULL; }
@@ -1109,6 +1117,12 @@ bool init_arrays(int count) {
 
     objects.rotation = malloc(sizeof(float) * count);
     if (!objects.rotation) return false;
+
+    objects.rotation_sin = malloc(sizeof(float) * count);
+    if (!objects.rotation_sin) return false;
+
+    objects.rotation_cos = malloc(sizeof(float) * count);
+    if (!objects.rotation_cos) return false;
 
     objects.zlayer = malloc(sizeof(int) * count);
     if (!objects.zlayer) return false;
@@ -1194,6 +1208,8 @@ bool init_arrays(int count) {
     memset(objects.x,                  0, sizeof(float) * count);
     memset(objects.y,                  0, sizeof(float) * count);
     memset(objects.rotation,           0, sizeof(float) * count);
+    memset(objects.rotation_sin,       0, sizeof(float) * count);
+    for (int i = 0; i < count; i++) objects.rotation_cos[i] = 1.f;
     memset(objects.zlayer,             0, sizeof(int) * count);
     memset(objects.zorder,             0, sizeof(int) * count);
     memset(objects.trig_duration,      0, sizeof(float) * count);

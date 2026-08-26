@@ -30,6 +30,7 @@ typedef struct {
     int *id;
     float *x, *y;
     float *rotation;
+    float *rotation_sin, *rotation_cos;
     int *zlayer, *zorder;
     float *trig_duration;
     float *opacity;

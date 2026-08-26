@@ -268,6 +268,8 @@ const float rightFadeBound = leftFadeBound + 110;
 const float rightFadeWidth = (SCREEN_WIDTH_AREA) - (leftFadeBound + 190);
 
 float get_fading_obj_fade(int obj, float right_edge, float *glow_out) {
+    *glow_out = 1.f;
+
     if (!state.dead) {
         // Offset fade checks slightly so invisible blocks
         // begin fading before reaching the actual boundary
@@ -544,21 +546,64 @@ static inline void set_sprite_render_data(
     sprite->flip_y = scale_y < 0.f;
 }
 
+static inline void prepare_sprite_color(SpriteObject *sprite, int edge_opacity, float fade_opacity) {
+    int col_channel = sprite->col_channel;
+    ColorChannel col;
+
+    if (col_channel < 0) {
+        col.color.r = 255;
+        col.color.g = 255;
+        col.color.b = 255;
+        col.blending = false;
+    } else if (col_channel == CHANNEL_INVISIBLE_GLOW) {
+        int chan = get_col_channel_index(CHANNEL_LBG_NOLERP);
+        Color lbg = channels[chan].color;
+        Color p1 = get_white_if_black(p1_color);
+        float opacity = objects.opacity[sprite->obj];
+
+        if (opacity < 0.8f || state.dead) {
+            col = channels[chan];
+        } else {
+            float blend_factor = 1.9f - 1.5f * opacity;
+            float one_minus_factor = 1.0f - blend_factor;
+
+            int r = (float)p1.r * one_minus_factor + (float)lbg.r * blend_factor;
+            int g = (float)p1.g * one_minus_factor + (float)lbg.g * blend_factor;
+            int b = (float)p1.b * one_minus_factor + (float)lbg.b * blend_factor;
+
+            col.color.r = CLAMP(r, 0, 255);
+            col.color.g = CLAMP(g, 0, 255);
+            col.color.b = CLAMP(b, 0, 255);
+            col.blending = true;
+        }
+    } else {
+        col = channels[get_col_channel_index(col_channel)];
+    }
+
+    int real_opacity = edge_opacity * sprite->opacity * fade_opacity;
+    sprite->tint_color = C2D_Color32(col.color.r, col.color.g, col.color.b, real_opacity);
+    sprite->blending = col.blending;
+    sprite->visible = real_opacity > 0 && (!col.blending || (col.color.r | col.color.g | col.color.b) != 0);
+}
+
 void spawn_object_at(
     int obj_game,
     int id,
     float x,
     float y,
-    float deg,
+    float sin_r,
+    float cos_r,
     unsigned char flip_x,
     unsigned char flip_y,
-    float scale
+    float scale,
+    int edge_opacity,
+    float fading_opacity,
+    float glow_opacity
 ) {
     const GameObject* obj = &game_objects[id];
 
-    float rad = C3D_AngleFromDegrees(adjust_angle(deg, 0, state.mirror_mult < 0));
-    float cos_r = cosf(rad);
-    float sin_r = sinf(rad);
+    // A vertical mirror negates the angle. Its cosine is unchanged.
+    if (state.mirror_mult < 0) sin_r = -sin_r;
 
     int flip_x_mult = (flip_x ? -1 : 1);
     int flip_y_mult = (flip_y ? -1 : 1);
@@ -572,6 +617,12 @@ void spawn_object_at(
     float sy = scale * flip_y_mult;
 
     if (sprite_count >= MAX_SPRITES - 1) return;
+
+    // Invisible glow channels depend on the parent opacity. Resolve it before
+    // spawning any layer so glow ordering cannot make it use the prior frame.
+    if (obj->texture >= 0) {
+        objects.opacity[obj_game] = (edge_opacity * obj->opacity * fading_opacity) / 255.f;
+    }
 
     // Spawn parent, skip if no texture
     if (obj->texture >= 0) {
@@ -604,6 +655,7 @@ void spawn_object_at(
         vo->layer = 0;
         vo->opacity = obj->opacity;
         vo->col_channel = get_color_channel(obj->color_type, obj_game, obj);
+        prepare_sprite_color(vo, edge_opacity, fading_opacity);
         viewable_objects_ptr[sprite_count] = vo;
         sprite_count++;
     }
@@ -623,6 +675,7 @@ void spawn_object_at(
         vo->layer = 1;
         vo->opacity = obj->opacity;
         vo->col_channel = get_glow_channel(obj_game);
+        prepare_sprite_color(vo, edge_opacity, glow_opacity);
         viewable_objects_ptr[sprite_count] = vo;
         sprite_count++;
     }
@@ -669,6 +722,7 @@ void spawn_object_at(
             vo->layer = i + 2;
             vo->opacity = c->opacity;
             vo->col_channel = get_color_channel(c->color_type, obj_game, obj);
+            prepare_sprite_color(vo, edge_opacity, fading_opacity);
             viewable_objects_ptr[sprite_count] = vo;
             sprite_count++;
         }
@@ -819,9 +873,8 @@ float get_out_scale_fade(float x, int right_edge) {
     return 1 + ((fade / 255.f) / 2);
 }
 
-// Some objects dont change opacity on fade transitions
-int get_obj_opacity(int obj, float x) {
-    int opacity = obj_edge_fade(x, SCREEN_WIDTH / SCALE);
+// Some objects dont change opacity on fade transitions.
+static int get_obj_opacity_from_fade(int obj, int opacity) {
     bool blending;
 
     switch (objects.id[obj]) {
@@ -859,6 +912,10 @@ int get_obj_opacity(int obj, float x) {
     }
 
     return opacity;
+}
+
+int get_obj_opacity(int obj, float x) {
+    return get_obj_opacity_from_fade(obj, obj_edge_fade(x, SCREEN_WIDTH / SCALE));
 }
 
 // Handle complex fading transitions
@@ -913,51 +970,57 @@ void handle_special_fading(int obj, float calc_x, float calc_y) {
     }   
 }
 
-void get_fade_vars(int obj, float x, int *fade_x, int *fade_y, float *fade_scale) {
+static void get_fade_vars_from_value(int obj, int fade, int *fade_x, int *fade_y, float *fade_scale) {
+    int offset = (255 - fade) / 2;
+
     switch (objects.transition_applied[obj]) {
         case FADE_NONE:
             break;
         case FADE_UP:
-            *fade_y = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
+            *fade_y = offset;
             break;
         case FADE_DOWN:
-            *fade_y = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
+            *fade_y = -offset;
             break;
         case FADE_RIGHT:
-            *fade_x = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
+            *fade_x = offset;
             break;
         case FADE_LEFT:
-            *fade_x = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
+            *fade_x = -offset;
             break;
         case FADE_SCALE_IN:
-            *fade_scale = get_in_scale_fade(x, SCREEN_WIDTH / SCALE);
+            *fade_scale = fade / 255.f;
             break;
         case FADE_SCALE_OUT:
-            *fade_scale = get_out_scale_fade(x, SCREEN_WIDTH / SCALE);
+            *fade_scale = 1.f + ((255 - fade) / 255.f) / 2.f;
             break;
         case FADE_UP_SLOW_LEFT:
-            *fade_x = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
-            *fade_y = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            *fade_x = -offset;
+            *fade_y = offset / 3;
             break;
         case FADE_UP_SLOW_RIGHT:
-            *fade_x = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
-            *fade_y = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            *fade_x = offset;
+            *fade_y = offset / 3;
             break;
         case FADE_UP_STATIONARY:
-            *fade_y = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            *fade_y = offset / 3;
             break;
         case FADE_DOWN_SLOW_LEFT:
-            *fade_x = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
-            *fade_y = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            *fade_x = -offset;
+            *fade_y = -offset / 3;
             break;
         case FADE_DOWN_SLOW_RIGHT:
-            *fade_x = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
-            *fade_y = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            *fade_x = offset;
+            *fade_y = -offset / 3;
             break;
         case FADE_DOWN_STATIONARY:
-            *fade_y = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            *fade_y = -offset / 3;
             break;
     }
+}
+
+void get_fade_vars(int obj, float x, int *fade_x, int *fade_y, float *fade_scale) {
+    get_fade_vars_from_value(obj, obj_edge_fade(x, SCREEN_WIDTH / SCALE), fade_x, fade_y, fade_scale);
 }
 
 void get_special_fading_vars(int obj, float fade_val, float *calc_x) {
@@ -1152,6 +1215,15 @@ float object_drawing_time = 0;
 void create_objects() {
     sprite_count = 0;
 
+    // Saw speeds are limited to 180 or 360 degrees per second. Compute both
+    // frame steps once, then advance each visible saw with angle addition.
+    float step_180 = C3D_AngleFromDegrees(180.f * delta);
+    float step_360 = C3D_AngleFromDegrees(360.f * delta);
+    float step_180_sin = sinf(step_180);
+    float step_180_cos = cosf(step_180);
+    float step_360_sin = sinf(step_360);
+    float step_360_cos = cosf(step_360);
+
     // Player sprite
     // Only needs one as its only for sorting purposes
     SpriteObject *vo = &viewable_objects[sprite_count];
@@ -1201,23 +1273,61 @@ void create_objects() {
 
                 float fade_scale = 1.f;
 
-                get_fade_vars(obj, calc_x, &fade_x, &fade_y, &fade_scale);
+                get_fade_vars_from_value(obj, fade_val, &fade_x, &fade_y, &fade_scale);
 
                 // Handle saw rotation
-                objects.rotation[obj] += (((objects.random[obj] & 1) ? -get_rotation_speed(objects.id[obj]) : get_rotation_speed(objects.id[obj]))) * delta;
+                float rotation_sin = objects.rotation_sin[obj];
+                float rotation_cos = objects.rotation_cos[obj];
+                float rotation_speed = get_rotation_speed(objects.id[obj]);
+                if (rotation_speed != 0.f) {
+                    bool reverse = (objects.random[obj] & 1) != 0;
+                    float step_sin = rotation_speed == 360.f ? step_360_sin : step_180_sin;
+                    float step_cos = rotation_speed == 360.f ? step_360_cos : step_180_cos;
+                    if (reverse) {
+                        rotation_speed = -rotation_speed;
+                        step_sin = -step_sin;
+                    }
+
+                    objects.rotation[obj] += rotation_speed * delta;
+                    float old_sin = rotation_sin;
+                    rotation_sin = old_sin * step_cos + rotation_cos * step_sin;
+                    rotation_cos = rotation_cos * step_cos - old_sin * step_sin;
+
+                    // Bound floating-point drift without returning to per-object
+                    // trigonometry on every frame.
+                    if ((level_frame & 0x1ff) == 0) {
+                        float radians = C3D_AngleFromDegrees(objects.rotation[obj]);
+                        rotation_sin = sinf(radians);
+                        rotation_cos = cosf(radians);
+                    }
+
+                    objects.rotation_sin[obj] = rotation_sin;
+                    objects.rotation_cos[obj] = rotation_cos;
+                }
                 
                 // Handle special fade types
                 get_special_fading_vars(obj, fade_val, &calc_x);
+
+                int edge_opacity = get_obj_opacity_from_fade(obj, fade_val);
+                float fading_opacity = 1.f;
+                float glow_opacity = 1.f;
+                if (object_fades(obj)) {
+                    fading_opacity = get_fading_obj_fade(obj, SCREEN_WIDTH / SCALE, &glow_opacity);
+                }
 
                 spawn_object_at(
                     obj,
                     objects.id[obj],
                     get_mirror_x(calc_x + fade_x, state.mirror_factor),
                     calc_y + fade_y,
-                    objects.rotation[obj],
+                    rotation_sin,
+                    rotation_cos,
                     objects.flippedH[obj] ^ (state.mirror_mult < 0),
                     objects.flippedV[obj],
-                    fade_scale
+                    fade_scale,
+                    edge_opacity,
+                    fading_opacity,
+                    glow_opacity
                 );
 
                 spawn_object_particles(obj);
@@ -1235,70 +1345,6 @@ void create_objects() {
     end = svcGetSystemTick();
     ticks = end - start;
     object_sorting_time = ticks / CPU_TICKS_PER_MSEC;
-
-    for (size_t s = 0; s < sprite_count; s++) {
-        SpriteObject *obj = viewable_objects_ptr[s];
-        if (obj->obj != -1) {
-            int col_channel = obj->col_channel;
-
-            ColorChannel col;
-
-            if (col_channel < 0) {
-                col.color.r = 255;
-                col.color.g = 255;
-                col.color.b = 255;
-                col.blending = false;
-            } else if (col_channel == CHANNEL_INVISIBLE_GLOW) { // Handle invisible blocks color lerping
-                int chan = get_col_channel_index(CHANNEL_LBG_NOLERP);
-
-                Color lbg = channels[chan].color;
-                Color p1 = get_white_if_black(p1_color);
-                float opacity = objects.opacity[obj->obj];
-
-                if (opacity < 0.8f || state.dead) {
-                    col = channels[chan];
-                } else {
-                    float blendFactor = 1.9f - 1.5f * opacity;
-                    float oneMinusFactor = 1.0f - blendFactor;
-
-                    int r = (float)p1.r * oneMinusFactor + (float)lbg.r * blendFactor;
-                    int g = (float)p1.g * oneMinusFactor + (float)lbg.g * blendFactor;
-                    int b = (float)p1.b * oneMinusFactor + (float)lbg.b * blendFactor;
-                    
-                    col.color.r = CLAMP(r, 0, 255);
-                    col.color.g = CLAMP(g, 0, 255);
-                    col.color.b = CLAMP(b, 0, 255);
-                    col.blending = true;
-                }
-            } else {
-                col = channels[get_col_channel_index(col_channel)];
-            }
-            
-            int game_object = obj->obj;
-            float x = ((objects.x[game_object] - state.camera_x));
-            
-            float opacity = obj->opacity;
-
-            // Handle invisible object opacity
-            if (object_fades(game_object)) {
-                float glow_out;
-                float fading_opacity = get_fading_obj_fade(game_object, SCREEN_WIDTH / SCALE, &glow_out);
-                
-                // Check if layer is glow
-                if (obj->layer == 1) opacity *= glow_out;
-                else opacity *= fading_opacity;
-            }
-
-            int real_opacity = get_obj_opacity(game_object, x) * opacity;
-
-            // Set opacity here
-            if (obj->layer == 0) objects.opacity[game_object] = real_opacity / 255.f;
-            
-            obj->tint_color = C2D_Color32(col.color.r, col.color.g, col.color.b, real_opacity);
-            obj->blending = col.blending;
-            obj->visible = real_opacity > 0 && (!col.blending || (col.color.r | col.color.g | col.color.b) != 0);
-        }
-    }
 }
 
 void draw_player_effects() {
