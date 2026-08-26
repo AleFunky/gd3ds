@@ -16,6 +16,7 @@
 #include "player/collision.h"
 
 #include "utils/gfx.h"
+#include "object_renderer.h"
 
 #include "particles/object_particles.h"
 #include "particles/circles.h"
@@ -159,17 +160,23 @@ void cache_all_sprites() {
         // Children
         sprite_templates[id].child_count = obj->child_count;
         if (obj->child_count > 0) {
-            sprite_templates[id].child_templates = malloc(sizeof(C2D_Sprite) * obj->child_count);
+            sprite_templates[id].child_templates = malloc(sizeof(ChildSpriteTemplate) * obj->child_count);
             for (int i = 0; i < obj->child_count; i++) {
                 const ChildSprite* c = &obj->children[i];
+
+                float child_rotation = C3D_AngleFromDegrees(c->rot);
+                sprite_templates[id].child_templates[i].rotation_sin = sinf(child_rotation);
+                sprite_templates[id].child_templates[i].rotation_cos = cosf(child_rotation);
+
                 if (c->texture < 0) continue;
 
                 int c_tex;
                 C2D_SpriteSheet *c_sheet = get_sprite_sheet(c->texture, &c_tex);
 
-                C2D_SpriteFromSheet(&sprite_templates[id].child_templates[i], *c_sheet, c_tex);
-                C3D_TexSetFilter(sprite_templates[id].child_templates[i].image.tex, GPU_LINEAR, GPU_LINEAR);
-                C2D_SpriteSetCenter(&sprite_templates[id].child_templates[i], 0.5f, 0.5f);
+                C2D_Sprite *child_template = &sprite_templates[id].child_templates[i].sprite;
+                C2D_SpriteFromSheet(child_template, *c_sheet, c_tex);
+                C3D_TexSetFilter(child_template->image.tex, GPU_LINEAR, GPU_LINEAR);
+                C2D_SpriteSetCenter(child_template, 0.5f, 0.5f);
             }
         } else {
             sprite_templates[id].child_templates = NULL;
@@ -513,6 +520,30 @@ float get_object_pulse(float amplitude, int id, int layer) {
     return 1.0f;
 }
 
+// Keep the compact per-object transform in the render list. The raw Citro3D
+// object renderer expands it in its vertex shader instead of rotating all four
+// corners on the CPU through Citro2D.
+static inline void set_sprite_render_data(
+    SpriteObject *sprite,
+    const C2D_Image image,
+    float x,
+    float y,
+    float scale_x,
+    float scale_y,
+    float rotation_sin,
+    float rotation_cos
+) {
+    sprite->image = image;
+    sprite->x = x;
+    sprite->y = y;
+    sprite->half_width = fabsf(scale_x * image.subtex->width) * 0.5f;
+    sprite->half_height = fabsf(scale_y * image.subtex->height) * 0.5f;
+    sprite->rotation_sin = rotation_sin;
+    sprite->rotation_cos = rotation_cos;
+    sprite->flip_x = scale_x < 0.f;
+    sprite->flip_y = scale_y < 0.f;
+}
+
 void spawn_object_at(
     int obj_game,
     int id,
@@ -556,26 +587,21 @@ void spawn_object_at(
         float p_y = y + rot_y * scale;
 
         int random_layer = get_obj_random_layer(obj_game, id);
+        C2D_Image image;
         if (random_layer < 0) {
-            vo->spr = sprite_templates[id].parent_template;
+            image = sprite_templates[id].parent_template.image;
         } else {
             int rel_index;
             C2D_SpriteSheet *sheet = get_sprite_sheet(random_layer, &rel_index);
-            C2D_Sprite rnd = { 0 };
-            vo->spr = rnd;
-            C2D_SpriteFromSheet(&vo->spr, *sheet, rel_index);
-            C2D_SpriteSetCenter(&vo->spr, 0.5f, 0.5f);
+            image = C2D_SpriteSheetGetImage(*sheet, rel_index);
         }
 
         float pulse_scale = get_object_pulse(amplitude, id, 0);
 
-        C2D_SpriteSetPos(&vo->spr, p_x, p_y);
-        C2D_SpriteSetScale(&vo->spr, sx * pulse_scale, sy * pulse_scale);
-        C2D_SpriteSetRotation(&vo->spr, rad);
+        set_sprite_render_data(vo, image, p_x, p_y, sx * pulse_scale, sy * pulse_scale, sin_r, cos_r);
 
         vo->obj = obj_game;
         vo->layer = 0;
-        vo->col_type = obj->color_type;
         vo->opacity = obj->opacity;
         vo->col_channel = get_color_channel(obj->color_type, obj_game, obj);
         viewable_objects_ptr[sprite_count] = vo;
@@ -588,17 +614,13 @@ void spawn_object_at(
 
         SpriteObject *vo = &viewable_objects[sprite_count];
 
-        vo->spr = sprite_templates[id].glow_template;
-
         float pulse_scale = get_object_pulse(amplitude, id, 1);
 
-        C2D_SpriteSetPos(&vo->spr, x, y);
-        C2D_SpriteSetScale(&vo->spr, sx * pulse_scale, sy * pulse_scale);
-        C2D_SpriteSetRotation(&vo->spr, rad);
+        set_sprite_render_data(vo, sprite_templates[id].glow_template.image,
+            x, y, sx * pulse_scale, sy * pulse_scale, sin_r, cos_r);
 
         vo->obj = obj_game;
         vo->layer = 1;
-        vo->col_type = COLOR_TYPE_BASE;
         vo->opacity = obj->opacity;
         vo->col_channel = get_glow_channel(obj_game);
         viewable_objects_ptr[sprite_count] = vo;
@@ -627,23 +649,24 @@ void spawn_object_at(
             int c_flip_x_mult = (c->flip_x ? -1 : 1);
             int c_flip_y_mult = (c->flip_y ? -1 : 1);
 
-            vo->spr = sprite_templates[id].child_templates[i]; 
-
             float pulse_scale = get_object_pulse(amplitude, id, i + 2);
-
-            C2D_SpriteSetPos(&vo->spr, c_x, c_y);
+            const ChildSpriteTemplate *child_template = &sprite_templates[id].child_templates[i];
             if (id < 15 || id > 17) {
-                C2D_SpriteSetScale(&vo->spr, c->scale_x * c_flip_x_mult * sx * pulse_scale,
-                                          c->scale_y * c_flip_y_mult * sy * pulse_scale);
-                C2D_SpriteSetRotation(&vo->spr, C3D_AngleFromDegrees(c->rot) + rad);
+                float child_sin = sin_r * child_template->rotation_cos + cos_r * child_template->rotation_sin;
+                float child_cos = cos_r * child_template->rotation_cos - sin_r * child_template->rotation_sin;
+                set_sprite_render_data(vo, child_template->sprite.image, c_x, c_y,
+                    c->scale_x * c_flip_x_mult * sx * pulse_scale,
+                    c->scale_y * c_flip_y_mult * sy * pulse_scale,
+                    child_sin, child_cos);
             } else {
-                C2D_SpriteSetScale(&vo->spr, fabsf(c->scale_x * c_flip_x_mult * sx * pulse_scale),
-                                          fabsf(c->scale_y * c_flip_y_mult * sy * pulse_scale));
+                set_sprite_render_data(vo, child_template->sprite.image, c_x, c_y,
+                    fabsf(c->scale_x * c_flip_x_mult * sx * pulse_scale),
+                    fabsf(c->scale_y * c_flip_y_mult * sy * pulse_scale),
+                    0.f, 1.f);
             }
 
             vo->obj = obj_game;
             vo->layer = i + 2;
-            vo->col_type = c->color_type;
             vo->opacity = c->opacity;
             vo->col_channel = get_color_channel(c->color_type, obj_game, obj);
             viewable_objects_ptr[sprite_count] = vo;
@@ -701,8 +724,6 @@ static inline uint32_t make_sort_key(SpriteObject *s)
     if (id >= 15 && id <= 17 && s->layer == 2) {
         zlayer += 2;
     } 
-
-    s->zlayer = zlayer;
 
     // Pack all variables into a nice 32 bit variable
     uint32_t zl = (uint32_t)(zlayer + 8);     // fits in 6 bits
@@ -1135,13 +1156,12 @@ void create_objects() {
     // Only needs one as its only for sorting purposes
     SpriteObject *vo = &viewable_objects[sprite_count];
 
-    C2D_Sprite spr = { 0 };
-    vo->spr = spr;
     vo->obj = -1;
     vo->layer = 0;
-    vo->col_type = 0;
     vo->opacity = 1.f;
     vo->col_channel = 0;
+    vo->blending = false;
+    vo->visible = true;
     viewable_objects_ptr[sprite_count] = vo;
     sprite_count++;
 
@@ -1274,7 +1294,9 @@ void create_objects() {
             // Set opacity here
             if (obj->layer == 0) objects.opacity[game_object] = real_opacity / 255.f;
             
-            C2D_PlainImageTint(&obj->tint, C2D_Color32(col.color.r, col.color.g, col.color.b, real_opacity), 1.f);
+            obj->tint_color = C2D_Color32(col.color.r, col.color.g, col.color.b, real_opacity);
+            obj->blending = col.blending;
+            obj->visible = real_opacity > 0 && (!col.blending || (col.color.r | col.color.g | col.color.b) != 0);
         }
     }
 }
@@ -1338,36 +1360,64 @@ void draw_player_graphics() {
     draw_post_player_effects();
 }
 
+static void draw_object_range(size_t begin, size_t end) {
+    bool renderer_active = false;
+    C3D_Tex *batch_texture = NULL;
+    bool batch_blending = false;
+    int batch_first_slot = 0;
+    int batch_sprite_count = 0;
+
+    for (size_t s = begin; s < end; s++) {
+        SpriteObject *obj = viewable_objects_ptr[s];
+        if (obj->obj == -1 || !obj->visible) continue;
+
+        bool continues_batch = batch_sprite_count > 0
+            && obj->image.tex == batch_texture
+            && obj->blending == batch_blending
+            && obj->render_slot == batch_first_slot + batch_sprite_count;
+
+        if (!continues_batch && batch_sprite_count > 0) {
+            object_renderer_draw_batch(batch_first_slot, batch_sprite_count, batch_texture, batch_blending);
+            batch_sprite_count = 0;
+        }
+
+        if (batch_sprite_count == 0) {
+            if (!renderer_active) {
+                object_renderer_begin();
+                renderer_active = true;
+            }
+            batch_texture = obj->image.tex;
+            batch_blending = obj->blending;
+            batch_first_slot = obj->render_slot;
+        }
+        batch_sprite_count++;
+    }
+
+    if (batch_sprite_count > 0) {
+        object_renderer_draw_batch(batch_first_slot, batch_sprite_count, batch_texture, batch_blending);
+    }
+    if (renderer_active) {
+        object_renderer_end();
+        blending_state = false;
+    }
+}
+
 void draw_objects() {
     u64 start = svcGetSystemTick();
 
-    // Draw
-    for (size_t s = 0; s < sprite_count; s++) {
-        SpriteObject *obj = viewable_objects_ptr[s];
+    // The left eye is always first. Build the GPU buffer once after FrameBegin
+    // has synchronized with the previous frame, then reuse it for the right eye.
+    if (!is_extra_eye()) {
+        object_renderer_build(viewable_objects_ptr, sprite_count);
+    }
 
-        if (obj->obj != -1) {
-            int col_channel = obj->col_channel;
-            
-            ColorChannel col;
+    size_t player_pos = 0;
+    while (player_pos < sprite_count && viewable_objects_ptr[player_pos]->obj != -1) player_pos++;
 
-            if (col_channel < 0) {
-                col.color.r = 255;
-                col.color.g = 255;
-                col.color.b = 255;
-                col.blending = false;
-            } else {
-                col = channels[get_col_channel_index(col_channel)];
-            }
-
-            change_blending(col.blending);
-
-            // Cull invisible objects
-            if ((col.color.r | col.color.g | col.color.b) == 0 && col.blending) continue;
-            
-            C2D_DrawSpriteTinted(&obj->spr, &obj->tint);
-        } else {   
-            draw_player_graphics();
-        }
+    draw_object_range(0, player_pos);
+    if (player_pos < sprite_count) {
+        draw_player_graphics();
+        draw_object_range(player_pos + 1, sprite_count);
     }
 
     change_blending(true);

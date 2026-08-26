@@ -32,16 +32,25 @@ typedef struct
     float dx, dy; // velocity
 } Sprite;
 
-typedef struct
+typedef struct SpriteObject
 {
-    C2D_Sprite spr;
-    C2D_ImageTint tint;
+    C2D_Image image;
+    float x;
+    float y;
+    float half_width;
+    float half_height;
+    float rotation_sin;
+    float rotation_cos;
+    u32 tint_color;
     int obj;
     int layer;
-    int col_type;
     float opacity;
     int col_channel;
-    int zlayer;
+    int render_slot;
+    bool flip_x;
+    bool flip_y;
+    bool blending;
+    bool visible;
 } SpriteObject;
 
 typedef struct {
@@ -71,10 +80,16 @@ enum FadingEffects {
 };
 
 typedef struct {
+    C2D_Sprite sprite;
+    float rotation_sin;
+    float rotation_cos;
+} ChildSpriteTemplate;
+
+typedef struct {
     C2D_Sprite parent_template;
     C2D_Sprite glow_template;
     int child_count;
-    C2D_Sprite *child_templates;
+    ChildSpriteTemplate *child_templates;
 } SpriteTemplate;
 
 void cache_all_sprites();

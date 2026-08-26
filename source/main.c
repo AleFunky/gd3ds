@@ -13,6 +13,7 @@
 #include "level_loading.h"
 #include "main.h"
 #include "graphics.h"
+#include "object_renderer.h"
 #include "color_channels.h"
 #include "mp3_player.h"
 #include "level/main_levels.h"
@@ -1333,6 +1334,7 @@ int main(int argc, char* argv[]) {
     C3D_Init(C3D_DEFAULT_CMDBUF_SIZE * 4);
     C2D_Init(MAX_SPRITES);
     C2D_Prepare();
+    if (!object_renderer_init()) svcBreak(USERBREAK_PANIC);
     osSetSpeedupEnable(1);
     soc_init();
     check_system_model();
@@ -1507,6 +1509,7 @@ int main(int argc, char* argv[]) {
     cfg_fini();
 
     // Deinit libs
+    object_renderer_fini();
     C2D_Fini();
     C3D_Fini();
     gfxExit();

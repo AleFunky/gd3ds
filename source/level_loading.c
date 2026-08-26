@@ -1430,14 +1430,14 @@ int load_online_level(LevelEntry *level) {
     // Set pulserod pulse ball image
     current_pulserod_ball_image = game_objects[15].children[0].texture + (rand() % 3);
 
-    C2D_SpriteFromSheet(&sprite_templates[15].child_templates[0], spriteSheet, current_pulserod_ball_image);
-    C2D_SpriteSetCenter(&sprite_templates[15].child_templates[0], 0.5f, 0.5f);
+    C2D_SpriteFromSheet(&sprite_templates[15].child_templates[0].sprite, spriteSheet, current_pulserod_ball_image);
+    C2D_SpriteSetCenter(&sprite_templates[15].child_templates[0].sprite, 0.5f, 0.5f);
     
-    C2D_SpriteFromSheet(&sprite_templates[16].child_templates[0], spriteSheet, current_pulserod_ball_image);
-    C2D_SpriteSetCenter(&sprite_templates[16].child_templates[0], 0.5f, 0.5f);
+    C2D_SpriteFromSheet(&sprite_templates[16].child_templates[0].sprite, spriteSheet, current_pulserod_ball_image);
+    C2D_SpriteSetCenter(&sprite_templates[16].child_templates[0].sprite, 0.5f, 0.5f);
 
-    C2D_SpriteFromSheet(&sprite_templates[17].child_templates[0], spriteSheet, current_pulserod_ball_image);
-    C2D_SpriteSetCenter(&sprite_templates[17].child_templates[0], 0.5f, 0.5f);
+    C2D_SpriteFromSheet(&sprite_templates[17].child_templates[0].sprite, spriteSheet, current_pulserod_ball_image);
+    C2D_SpriteSetCenter(&sprite_templates[17].child_templates[0].sprite, 0.5f, 0.5f);
 
     return 0;
 }
@@ -1515,14 +1515,14 @@ int load_level(char *path) {
     // Set pulserod pulse ball image
     current_pulserod_ball_image = game_objects[15].children[0].texture + (rand() % 3);
 
-    C2D_SpriteFromSheet(&sprite_templates[15].child_templates[0], spriteSheet, current_pulserod_ball_image);
-    C2D_SpriteSetCenter(&sprite_templates[15].child_templates[0], 0.5f, 0.5f);
+    C2D_SpriteFromSheet(&sprite_templates[15].child_templates[0].sprite, spriteSheet, current_pulserod_ball_image);
+    C2D_SpriteSetCenter(&sprite_templates[15].child_templates[0].sprite, 0.5f, 0.5f);
     
-    C2D_SpriteFromSheet(&sprite_templates[16].child_templates[0], spriteSheet, current_pulserod_ball_image);
-    C2D_SpriteSetCenter(&sprite_templates[16].child_templates[0], 0.5f, 0.5f);
+    C2D_SpriteFromSheet(&sprite_templates[16].child_templates[0].sprite, spriteSheet, current_pulserod_ball_image);
+    C2D_SpriteSetCenter(&sprite_templates[16].child_templates[0].sprite, 0.5f, 0.5f);
 
-    C2D_SpriteFromSheet(&sprite_templates[17].child_templates[0], spriteSheet, current_pulserod_ball_image);
-    C2D_SpriteSetCenter(&sprite_templates[17].child_templates[0], 0.5f, 0.5f);
+    C2D_SpriteFromSheet(&sprite_templates[17].child_templates[0].sprite, spriteSheet, current_pulserod_ball_image);
+    C2D_SpriteSetCenter(&sprite_templates[17].child_templates[0].sprite, 0.5f, 0.5f);
 
     return 0;
 }
