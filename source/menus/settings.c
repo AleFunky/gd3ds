@@ -227,6 +227,16 @@ Setting settings[] = {
         .key = CONFIG_MISC_PATH "skipVersionAlert",
     },
     {
+        .id = "skipSongWarning",
+        .label = "Disable version alert",
+        .additionalInfo = "Disables the missing song alert for<p>custom levels.",
+        .page = PAGE_MISC, 
+
+        .defaultValue = false,
+        .var = &settingsState.skipSongWarning,
+        .key = CONFIG_MISC_PATH "skipSongAlert",
+    },
+    {
         .id = "showProgressBar",
         .label = "Show progress bar",
         .additionalInfo = NULL,

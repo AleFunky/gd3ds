@@ -8,6 +8,7 @@
 #include "menus/components/ui_label.h"
 #include "menus/components/ui_button.h"
 #include "menus/components/ui_rectangle.h"
+#include "menus/components/ui_progress_bar.h"
 #include "main.h"
 #include "mp3_player.h"
 #include "graphics.h"
@@ -29,6 +30,7 @@
 #include "online_level_warningbox.h"
 #include "online_level_comments.h"
 #include "settings.h"
+#include "utils/json_config.h"
 
 #define EASY_DEMON_FACE_1 259
 #define MEDIUM_DEMON_FACE_1 261
@@ -54,6 +56,18 @@ const int demon_face_featured_offsets[] = {
     -8
 };
 
+static NetworkTask level_task = {
+    .func = get_level
+};
+
+static NetworkTask song_data_task = {
+    .func = get_song_data
+};
+
+static DownloadTask song_task = {
+    .path = USER_SONGS_DIR
+};
+
 static bool exit_flag = false;
 static bool in_comments = false;
 static bool in_delete = false;
@@ -68,6 +82,10 @@ int result = -2;
 bool pressed_play = false;
 bool passed_highobj_warning = false;
 bool passed_version_warning = false;
+bool passed_song_warning = false;
+bool refresh = false;
+
+char download_speed[24]= "Speed: 0KB/s";
 
 static UIImage *bg_gradient;
 static UIImage *bg_gradient_top;
@@ -86,12 +104,41 @@ static UILabel *level_id_label;
 static UIImage *difficulty_face_image;
 static UIImage *featured_glow_image;
 
+static UISpinner *spinner;
+static UIButton *play_button;
 static UILabel *normal_percent_label;
 static UILabel *practice_percent_label;
 static UILabel *song_name_label;
 static UILabel *song_artist_label;
+static UILabel *song_status_label;
+static UIProgressBar *song_progress_bar;
 static UILabel *song_id_label;
+static UILabel *speed_label;
 static UILabel *song_size_label;
+static UIButton *song_download_button;
+
+static void update_download_button(){
+    bool song_exists = check_song(search_entries[curr_search_id].songId);
+    if (song_exists) {
+        ui_disable_element((UIElement *)song_download_button);
+    }
+}
+
+static void action_download(){
+    if (!song_task.running && !song_data_task.running) {
+        ui_button_set_image(song_download_button, 22, 0);
+        ui_disable_element((UIElement *) song_status_label);
+        ui_disable_element((UIElement *) song_id_label);
+        ui_enable_element((UIElement *) song_progress_bar);
+        ui_enable_element((UIElement *) speed_label);
+        snprintf(download_speed, sizeof(download_speed), "Speed: 0KB/s");
+        ui_label_set_text(speed_label, download_speed);
+        create_network_thread(&song_data_task);
+    } else {
+        song_data_task.cancelled = true;
+        song_task.cancelled = true;
+    }
+}
 
 static void action_exit(UIElement *e) {
     exit_flag = true;
@@ -102,20 +149,20 @@ static void action_exit(UIElement *e) {
 static int warning_result = 0;
 
 static void action_play(UIElement *e) {
-    if (result == 0) {
+    if (result == 0 || comes_from_levels) {
         pressed_play = true;
     }
 }
 
 static void action_open_info(UIElement *e) {
-    if (result == 0){
+    if (result == 0 || comes_from_levels){
         in_info_box = true;
         online_level_infobox_init();
     }
 }
 
 static void action_open_comments(UIElement *e) {
-    if (result == 0){
+    if (result == 0 || comes_from_levels){
         in_comments = true;
         online_comments_init();
     }
@@ -159,13 +206,13 @@ void populate_level_info() {
     ui_label_set_text(level_id_label, lvlid);
 
     // Creator
-    char creator[26];
-    snprintf(creator, sizeof(creator), "By: %s", entry_c->creatorName);
+    char creator[36] = "By -";
+    snprintf(creator, sizeof(creator), "<#%s>By %s</>", (entry_c->userId == 0) ? "5AFFFF" : "FFFFFF", entry_c->creatorName );
     ui_label_set_text(level_creator_label, creator);
 
     // Song and song artist
     char *song_name = "Unknown";
-    char *song_artist_name = "Unknown";
+    char *song_artist_name = "By Unknown";
 
     if (entry_srch->songId != 0) {
         // Custom song
@@ -177,6 +224,7 @@ void populate_level_info() {
             song_name = entry_sng->songTitle;
             song_artist_name = entry_sng->artistName;
         }
+        update_download_button();
     } else {
         // Main level song
         if (IN_BOUNDS(entry_srch->mainSongId, main_songs)) {
@@ -185,7 +233,7 @@ void populate_level_info() {
         }
         
         ui_disable_element((UIElement *) song_size_label);
-        ui_run_func_on_tag(&default_screen, "downloadbtn", ui_disable_element);
+        ui_disable_element((UIElement *)song_download_button);
     }
 
     // Song artist again
@@ -216,7 +264,7 @@ void populate_level_info() {
     if(entry_srch->isAuto) {
         difficulty_id = AUTO_FACE;
     } else if(entry_srch->isDemon && IN_BOUNDS(entry_srch->difficulty, demon_faces_1)) {
-        difficulty_face_image->base.y -= 5;
+        difficulty_face_image->base.y = 87 - 5;
         featured_demon_offset = demon_face_featured_offsets[entry_srch->difficulty];
         difficulty_id = demon_faces_1[entry_srch->difficulty];
     } else if (!entry_srch->isDemon && IN_BOUNDS(entry_srch->difficulty, difficulty_faces)) {
@@ -238,7 +286,7 @@ void populate_level_info() {
 
         if(entry_srch->isDemon) yOffset += featured_demon_offset;
 
-        featured_glow_image->base.y += yOffset;
+        featured_glow_image->base.y = 81.65 + yOffset;
 
         ui_image_set_image(featured_glow_image, featured_id, 0);
     } else{
@@ -257,12 +305,12 @@ void populate_level_info() {
     ui_label_set_text(song_id_label, song_id );
 
     // Level icons
-    float half_creator_length = get_text_length(&goldFont_fontCharset, 0.7f, false, creator) / 2;
+    float half_creator_length = get_text_length(&goldFont_fontCharset, 0.7f, false, entry_c->creatorName) / 2;
 
     // Original icon
     bool is_copy = entry_srch->originalId != 0;
     if (is_copy) {
-        ui_element_set_position((UIElement *)collab_icon_image, 200 + half_creator_length + 8, collab_icon_image->base.y);
+        ui_element_set_position((UIElement *)collab_icon_image, 200 + half_creator_length + 24, collab_icon_image->base.y);
     } else {
         ui_disable_element((UIElement *)collab_icon_image);
     }
@@ -270,13 +318,14 @@ void populate_level_info() {
     // High object count icon
     bool high_obj_count = entry_srch->objCount >= (is_N3DS ? 44000 : 14000);
     if (high_obj_count) {
-        ui_element_set_position((UIElement *)high_obj_icon_image, 200 + half_creator_length + 8 + (is_copy ? 13 : 0), high_obj_icon_image->base.y);
+        ui_element_set_position((UIElement *)high_obj_icon_image, 200 + half_creator_length + 24 + (is_copy ? 13 : 0), high_obj_icon_image->base.y);
     } else {
         ui_disable_element((UIElement *)high_obj_icon_image);
     }
 }
 
 static void handle_errors(int code) {
+    ui_disable_element((UIElement *) spinner);
     char error_message[64];
     switch (code) {
         case -2: 
@@ -298,19 +347,73 @@ static void handle_errors(int code) {
     online_errorbox_init(error_message);
 }
 
-static void action_refresh_level(UIElement *e) {
-    int refresh_result = -2;
-    refresh_result = get_level_data(search_entries[curr_search_id].levelId, true, curr_search_id);
-    // Handle result
-    if (refresh_result != 0) {
-        handle_errors(refresh_result);
-        return;
+static void handle_song_codes(int code) {
+    // i have no idea how the actual codes work and why they give seemingly wrong results this is my best guess
+    ui_disable_element((UIElement *) song_progress_bar);
+    ui_disable_element((UIElement *) speed_label);
+    ui_enable_element((UIElement *) song_id_label);
+    ui_enable_element((UIElement *) song_status_label);
+    ui_button_set_image(song_download_button, 57, 0);
+    char message[64];
+    switch (code) {
+        case -3:
+        case -2: 
+            snprintf(message, sizeof(message), "<#f93219>Unknown error.</>");
+            break;
+        case 0:
+            snprintf(message, sizeof(message), "<#00FF00>Download complete.</>");
+            ui_disable_element((UIElement *) song_download_button);
+        case 1:
+            snprintf(message, sizeof(message), "<#f93219>Download cancelled.</>");
+            break;
+        case 6:
+        case 7:
+            snprintf(message, sizeof(message), "<#f93219>No Internet connection!</>");
+            break;
+        default:
+            snprintf(message, sizeof(message), "<#f93219>Unknown error. Code: %d</>", result);
+            break;
     }
-    result = refresh_result;
-    populate_level_info();
-    
-    // in_refresh = true;
-    // refresh_level_init();
+    ui_label_set_text(song_status_label, message);
+}
+
+static void handle_song_data_errors(int code) {
+    ui_disable_element((UIElement *) song_progress_bar);
+    ui_disable_element((UIElement *) speed_label);
+    ui_enable_element((UIElement *) song_status_label);
+    ui_enable_element((UIElement *) song_id_label);
+    ui_button_set_image(song_download_button, 57, 0);
+    char message[64] = "";
+    switch (code) {
+        case -3: 
+            snprintf(message, sizeof(message), "<#f93219>Unknown data failure.</>");
+            break;
+        case -2:
+            snprintf(message, sizeof(message), "<#f93219>Song not allowed for use.</>");
+            break;
+        case -1: 
+            snprintf(message, sizeof(message), "<#f93219>Failed to fetch info.</>");
+            break;
+        case 1:
+            snprintf(message, sizeof(message), "<#f93219>Download cancelled.</>");
+            break;
+        case 6:
+        case 7:
+            snprintf(message, sizeof(message), "<#f93219>No Internet connection!</>");
+            break;
+        default:
+            snprintf(message, sizeof(message), "<#f93219>Unknown error. Code: %d</>", result);
+            break;
+    }
+    ui_label_set_text(song_status_label, message);
+}
+
+static void action_refresh_level(UIElement *e) {
+    result = -2;
+    refresh = true;
+    ui_enable_element((UIElement *)spinner);
+    ui_disable_element((UIElement *)play_button);
+    create_network_thread(&level_task);
 }
 
 static void play_level() {
@@ -333,6 +436,7 @@ static UIAction actions[] = {
     {"reload", action_refresh_level },
     {"deletelevel", action_delete_level },
     {"play", action_play },
+    {"download", action_download },
 };
 
 void online_level_menu_loop() {
@@ -346,7 +450,10 @@ void online_level_menu_loop() {
     pressed_play = false;
     passed_highobj_warning = false;
     passed_version_warning = false;
+    passed_song_warning = false;
     warning_result = 0;
+    result = -2;
+    refresh = false;
 
     ui_load_screen(&default_screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_level_menu.txt");
     ui_load_screen(&default_screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_level_menu_top.txt");
@@ -382,20 +489,36 @@ void online_level_menu_loop() {
     song_name_label = (UILabel *) ui_get_element_by_tag(&default_screen, "songname");
     song_artist_label = (UILabel *) ui_get_element_by_tag(&default_screen, "songartist");
     song_id_label = (UILabel *) ui_get_element_by_tag(&default_screen, "songid");
+    speed_label = (UILabel *) ui_get_element_by_tag(&default_screen, "speed");
     song_size_label = (UILabel *) ui_get_element_by_tag(&default_screen, "songsize");
+    song_download_button = (UIButton *) ui_get_element_by_tag(&default_screen, "downloadbtn");
+    song_status_label = (UILabel *) ui_get_element_by_tag(&default_screen, "songstatus");
+    song_progress_bar = (UIProgressBar *) ui_get_element_by_tag(&default_screen, "progressbar");
+
+    spinner = (UISpinner *) ui_get_element_by_tag(&default_screen, "spinner");
+    play_button = (UIButton *) ui_get_element_by_tag(&default_screen, "playbutton");
 
     ui_image_set_tint(bg_gradient, C2D_Color32(50, 110, 255, 255));
     ui_image_set_tint(bg_gradient_top, C2D_Color32(50, 110, 255, 255));
+
+    ui_progress_bar_set_tint(song_progress_bar, C2D_Color32(50, 190, 240, 255));
+    ui_disable_element((UIElement *) song_progress_bar);
+    ui_disable_element((UIElement *) song_status_label);
+    ui_disable_element((UIElement *) speed_label);
+
+    if (!comes_from_levels) {
+        ui_disable_element((UIElement *)play_button);
+    } else {
+        ui_disable_element((UIElement *)spinner);
+        ui_enable_element((UIElement *)play_button);
+    }
+
+    
     
     populate_level_info();
 
     if (!comes_from_levels) {
-        result = get_level_data(search_entries[curr_search_id].levelId, false, curr_search_id);
-
-        // Handle result
-        if (result != 0) {
-            handle_errors(result);
-        }
+        create_network_thread(&level_task);
     }
 
     set_fade_status(FADE_STATUS_IN);
@@ -418,14 +541,69 @@ void online_level_menu_loop() {
         // Frees a render target, so keep it out of the frame below
         update_stereo_target();
 
+        if (song_data_task.finished) {
+            int song_data_result = -3;
+            song_data_result = song_data_task.result;
+            // Handle result
+            if (song_data_result == 0) {
+                char songId[10];
+                snprintf(songId, sizeof(songId), "%d", search_entries[curr_search_id].songId);
+                song_data_task.finished = false;
+                song_task.url = song_entries[search_entries[curr_search_id].songIndex].songLink;
+                song_task.song_id = songId;
+
+                create_download_song_thread(&song_task);
+            } else { handle_song_data_errors(song_data_result); }
+            
+        }
+
+        if (song_task.running) {
+            song_progress_bar->value = song_task.progress;
+            snprintf(download_speed, sizeof(download_speed), "Speed: %dKB/s", song_task.speed);
+            ui_label_set_text(speed_label, download_speed);
+        }
+
+        // Run when finished
+        if (song_task.finished) {
+            int song_result = -3;
+            song_result = song_task.result;
+            // Handle result
+
+            handle_song_codes(song_result);
+            song_task.finished = false;
+        }
+
+        // Run when finished
+        if (level_task.finished) {
+            result = level_task.result;
+            // Handle result
+            if (result != 0 && !comes_from_levels) {
+                handle_errors(result);
+            } else { // No errors
+                ui_disable_element((UIElement *) spinner);
+                ui_enable_element((UIElement *) play_button);
+                if (refresh == true) {
+                    populate_level_info();
+                    refresh = false;
+                }
+            }
+            level_task.finished = false;
+        }
+
         if (pressed_play) {
             if (settingsState.skipHighObjWarning || (search_entries[curr_search_id].objCount < (is_N3DS ? 44000 : 14000))) passed_highobj_warning = true;
             if (settingsState.skipVersionWarning || (search_entries[curr_search_id].gameVersion < 22)) passed_version_warning = true;
+            if (settingsState.skipSongWarning || (check_song(search_entries[curr_search_id].songId))) passed_song_warning = true;
 
             if (warning_result == 1) {
                 pressed_play = false;
+                passed_highobj_warning = false;
+                passed_version_warning = false;
+                passed_song_warning = false;
                 warning_result = 0;
             }
+
+            if (warning_result == 2 && passed_highobj_warning && passed_version_warning) passed_song_warning = true;
 
             if (warning_result == 2 && passed_highobj_warning) passed_version_warning = true;
 
@@ -443,10 +621,17 @@ void online_level_menu_loop() {
                 in_warningbox = true;
             }
 
-            if (passed_highobj_warning && passed_version_warning) {
+            if (passed_highobj_warning && passed_version_warning && !passed_song_warning && !in_warningbox && pressed_play) {
+                warning_result = 0;
+                online_level_warningbox_init("Missing song", "This level uses a <#4c8cc7>custom song</> that<p>has not been <#36c244>downloaded</> yet. Play<p>without music?");
+                in_warningbox = true;
+            }
+
+            if (passed_highobj_warning && passed_version_warning && passed_song_warning) {
                 pressed_play = false;
                 passed_highobj_warning = false;
                 passed_version_warning = false;
+                passed_song_warning = false;
                 play_level();
             }
         }
@@ -521,7 +706,6 @@ void online_level_menu_loop() {
                 in_info_box = false;
             }
         }
-
         if (in_comments)
         {
             int returned = online_comments_loop();

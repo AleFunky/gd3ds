@@ -67,5 +67,6 @@ int get_search_results(char **out_data, int gameVer, SearchFilters f);
 
 int get_comments_from_id(char **out_data, int id, int page, int mode);
 
+int get_song_info_from_id(char **out_data, int songId);
 
 void soc_exit();

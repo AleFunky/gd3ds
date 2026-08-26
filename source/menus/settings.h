@@ -55,9 +55,10 @@ typedef struct {
     bool quickCheckpoints;
     bool skipHighObjWarning;
     bool skipVersionWarning;
+    bool skipSongWarning;
 } SettingState;
 
-extern Setting settings[28];
+extern Setting settings[29];
 extern SettingState settingsState;
 
 void settings_init();

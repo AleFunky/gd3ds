@@ -15,8 +15,8 @@ label x=160 y=154 text="Practice mode" scale=0.45 align=CENTER tag=""
 progressbar x=160 y=167 max_value=100 style=0 scale=0.65 tag="practiceprogress"
 label x=160 y=168 text="0%" scale=0.4 align=CENTER tag="level_card,practiceprogressvalue"
 
-# spinner x=160 y=70 id=53 sheet=1 scale=1 speed=240
-button x=160 y=70 id=139 sheet=0 scale=1 action="play" keyBinds="A,START"
+button x=160 y=70 id=139 sheet=0 scale=1 action="play" keyBinds="A,START" tag="playbutton"
+spinner x=160 y=70 id=53 sheet=1 scale=1 speed=240 tag="spinner"
 
 button x=295 y=25 id=49 sheet=0 scale=1 action="deletelevel"
 button x=295 y=75 id=202 sheet=0 scale=1 action="reload"
@@ -30,6 +30,9 @@ window x=160 y=210 w=216 h=60 style=0
 
 label x=61 y=195 text="Song Name Here" font=0 scale=0.55 align=LEFT tag="songname" w=160
 label x=61 y=207 text="By: Song Artist" font=2 scale=0.55 align=LEFT tag="songartist" w=160
+progressbar x=142 y=218 max_value=100 style=2 scale=0.75 tag="progressbar"
+label x=61 y=218 text="slop" font=0 scale=0.41 align=LEFT tag="songstatus" w=160
 label x=61 y=229 text="ID: 123456" font=0 scale=0.35 align=LEFT tag="songid"
+label x=61 y=229 text="Speed: 0KB/s" font=0 scale=0.35 align=LEFT tag="speed" w=100
 label x=230 y=229 text="Size: 0.00MB" font=0 scale=0.35 align=RIGHT tag="songsize"
 button x=245 y=215 id=57 sheet=0 scale=0.9 action="download" tag="downloadbtn"

@@ -6,6 +6,7 @@ button x=24 y=25 id=31 action="exit" keyBinds="B"
 
 list w=216 h=150 x=160 y=130 tag="list" bgColor="#bf723e"
 label x=160 y=130 scale=0.5 tag="errorlabel" font=0 text="" align=CENTER
+spinner x=160 y=130 id=53 sheet=1 scale=1 speed=240 tag="spinner"
 
 image x=160 y=60 id=39
 image x=160 y=200 id=39 sy=-1.0

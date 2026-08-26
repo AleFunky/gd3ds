@@ -84,7 +84,7 @@ int get_level_from_id(char **out_data, int id) {
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
 
         char data[64];
         snprintf(data, 63, "levelID=%d&secret=Wmfd2893gb7", id);
@@ -147,7 +147,7 @@ int get_search_results(char **out_data, int gameVer, SearchFilters f) {
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
 
         char data[512];
 
@@ -245,10 +245,57 @@ int get_comments_from_id(char **out_data, int id, int page, int mode) {
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
 
         char data[64];
         snprintf(data, 63, "levelID=%d&page=%d&mode=%d&secret=Wmfd2893gb7", id, page, mode);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
+
+        CURLcode code = curl_easy_perform(curl);
+        
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+
+        if (code) {
+            return code;
+        }
+
+        printf("(code %d) Response (%d): %s\n", code, chunk.size, chunk.memory);
+
+        if (chunk.memory[0] == '-') {
+            return atoi(chunk.memory);
+        }
+        
+        *out_data = chunk.memory;
+
+        return 0;
+    }
+    return 2;
+}
+
+int get_song_info_from_id(char **out_data, int songId) {
+    // Init
+    CURL *curl = curl_easy_init();
+    struct curl_slist *headers = NULL;
+
+    if (curl) {
+        struct MemoryStruct chunk;
+        chunk.memory = malloc(1);
+        chunk.size = 0;
+        headers = curl_slist_append(headers,
+            "Content-Type: application/x-www-form-urlencoded");
+
+        curl_easy_setopt(curl, CURLOPT_URL, "http://www.boomlings.com/database/getGJSongInfo.php");
+        // curl_easy_setopt(curl, CURLOPT_URL, "https://19gdps.com/gdapi/getGJSongInfo.php");
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, "");
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+        curl_easy_setopt(curl, CURLOPT_PROXY, "");
+        curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
+
+        char data[64];
+        snprintf(data, sizeof(data), "songID=%d&secret=Wmfd2893gb7", songId);
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
 
         CURLcode code = curl_easy_perform(curl);
@@ -353,7 +400,6 @@ static int download_song(DownloadTask *task) {
     }
     return -2;
 }
-
 
 static void network_thread(void *arg) {
     NetworkTask *task = arg;
