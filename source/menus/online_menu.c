@@ -20,6 +20,7 @@
 #include "graphics.h"
 #include "utils/folders.h"
 #include "external_popup.h"
+#include "utils/network.h"
 #include "utils/server_utils.h"
 #include "utils/string_helpers.h"
 #include "fonts/bigFont.h"
@@ -40,7 +41,14 @@ static UILabel *page_info_label;
 static UIImage *bg_gradient;
 static UIImage *bg_gradient_top;
 
+static UISpinner *spinner;
+
 static UIList *list;
+
+
+static NetworkTask task = {
+    .func = search_levels
+};
 
 const int demon_faces[] = {
     NA_FACE,
@@ -111,6 +119,7 @@ static void update_arrows() {
 }
 
 static void populate_list() {
+    ui_disable_element((UIElement *) spinner);
     ui_list_reset(list);
     for (int i = 0; i < searchEntriesLength; i++) {
         char tmp_name[32];
@@ -390,6 +399,8 @@ static void populate_list() {
 
             ui_list_add(list, card);
         }
+        
+        update_arrows();
     }  
 }
 
@@ -416,21 +427,10 @@ static void handle_errors(int code) {
 static void action_change_page(UIElement* e) {
     filters.currentPage += ui_prop_int(&e->custom_properties, "page", 0);
     search_needs_refresh = true;
-    
-    int search_result = -2;
 
-    if (search_needs_refresh) {
-        search_result = search_levels();
-    }
-   
-    // Handle result
-    if (search_result != 0 && search_needs_refresh) {
-        handle_errors(search_result);
-    } else if (list) { // No errors
-        populate_list();
-        search_needs_refresh = false;
-        update_arrows();
-    }
+    create_network_thread(&task);
+    ui_enable_element((UIElement *) spinner);
+    if (list) ui_list_reset(list);
 }
 
 static UIAction actions[] = {
@@ -454,6 +454,8 @@ void online_menu_loop() {
     ui_load_screen(&default_screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_levels.txt");
     ui_load_screen(&default_screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/online_levels_top.txt");
 
+    spinner = (UISpinner *) ui_get_element_by_tag(&default_screen, "spinner");
+
     bg_gradient = (UIImage *) ui_get_element_by_tag(&default_screen, "gradient");
     bg_gradient_top = (UIImage *) ui_get_element_by_tag(&default_screen_top, "gradient_top");
 
@@ -468,18 +470,13 @@ void online_menu_loop() {
     ui_run_func_on_tag(&default_screen, "prevpage", ui_disable_element);
 
     int search_result = -2;
-
+    
     if (search_needs_refresh) {
-        search_result = search_levels();
-    }
-   
-    // Handle result
-    if (search_result != 0 && search_needs_refresh) {
-        handle_errors(search_result);
-    } else if (list) { // No errors
-        populate_list();
-        search_needs_refresh = false;
-        update_arrows();
+        create_network_thread(&task);
+    } else {
+        if (list) { // No errors
+            populate_list();
+        }
     }
 
     set_fade_status(FADE_STATUS_IN);
@@ -498,6 +495,19 @@ void online_menu_loop() {
         touch.touchPosition = touchPos;
         touch.did_something = false;
         touch.interacted = false;
+        
+        // Run when finished
+        if (task.finished) {
+            search_result = task.result;
+            // Handle result
+            if (search_result != 0 && search_needs_refresh) {
+                handle_errors(search_result);
+            } else if (list) { // No errors
+                populate_list();
+                search_needs_refresh = false;
+            }
+            task.finished = false;
+        }
 
         if (!in_info_card) ui_screen_update(&default_screen, &touch);
         

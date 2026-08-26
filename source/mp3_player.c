@@ -10,7 +10,7 @@
 #include "menus/settings.h"
 #include "state.h"
 
-#define THREAD_AFFINITY -1           // Execute thread on any core
+#define THREAD_AFFINITY (is_N3DS ? 2 : 0)
 #define THREAD_STACK_SZ 32 * 1024    // 32kB stack for audio thread
 
 #define MUSIC_CHANNEL 0
@@ -444,7 +444,7 @@ int play_mp3_buf(void *buf, size_t sz, bool loop, float seek) {
 
     int32_t priority = 0x30;
     svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
-    priority -= 1;
+    priority += 1;
     priority = priority < 0x18 ? 0x18 : priority;
     priority = priority > 0x3F ? 0x3F : priority;
 

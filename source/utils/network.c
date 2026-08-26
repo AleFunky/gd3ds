@@ -1,14 +1,15 @@
 #include <3ds.h>
 #include "network.h"
+#include "main.h"
 #include <curl/curl.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
-#include <errno.h>
 #include <stdarg.h>
 #include <unistd.h>
+#include "string_helpers.h"
 
 #include <fcntl.h>
 
@@ -270,6 +271,125 @@ int get_comments_from_id(char **out_data, int id, int page, int mode) {
         return 0;
     }
     return 2;
+}
+
+static int progressCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
+    DownloadTask *task = clientp;
+    float progress = 0;
+
+    if (task->cancelled) {
+        return 1;
+    }
+
+    if (dltotal > 0) {
+        progress = (dlnow * 100.f) / dltotal;
+    }
+    task->progress = progress;
+    return 0;
+}
+
+static int download_song(DownloadTask *task) {
+    char *path = task->path;
+    char *url = task->url;
+    char *song_id = task->song_id;
+    
+    // Init
+    CURL *curl = curl_easy_init();
+
+    if (curl) {
+        char *decoded_url = url_decode(url);
+
+        curl_easy_setopt(curl, CURLOPT_URL, decoded_url);
+        
+        curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
+        curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, progressCallback);
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+
+        char full_path[273];
+        snprintf(full_path, sizeof(full_path), "%s/%s.mp3", path, song_id);
+        FILE* f = fopen(full_path, "wb");
+        if (!f) {
+            free(decoded_url);
+            return -3;
+        }
+        
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, f);
+
+        CURLcode code = curl_easy_perform(curl);
+
+        free(decoded_url);
+        fclose(f);
+        
+        curl_easy_cleanup(curl);
+
+        if (code) {
+            return code;
+        }
+
+        return 0;
+    }
+    return -2;
+}
+
+
+static void network_thread(void *arg) {
+    NetworkTask *task = arg;
+
+    task->finished = false;
+    task->running = true;
+
+    task->result = task->func();
+
+    task->running = false;
+    task->finished = true;
+}
+
+Thread create_network_thread(NetworkTask *task) {
+    int32_t priority = 0x30;
+    svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
+    priority += 1;
+    priority = priority < 0x18 ? 0x18 : priority;
+    priority = priority > 0x3F ? 0x3F : priority;
+    
+    return threadCreate(
+        network_thread,
+        task,
+        32 * 1024,
+        priority,
+        (is_N3DS ? 2 : 0),
+        true
+    );
+}
+
+static void download_thread(void *arg) {
+    DownloadTask *task = arg;
+
+    task->progress = 0;
+    task->finished = false;
+    task->running = true;
+
+    task->result = download_song(task);
+
+    task->running = false;
+    task->finished = true;
+}
+
+Thread create_download_song_thread(DownloadTask *task) {
+    int32_t priority = 0x30;
+    svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
+    priority += 1;
+    priority = priority < 0x18 ? 0x18 : priority;
+    priority = priority > 0x3F ? 0x3F : priority;
+    
+    return threadCreate(
+        download_thread,
+        task,
+        32 * 1024,
+        priority,
+        (is_N3DS ? 2 : 0),
+        true
+    );
 }
 
 void soc_exit() {

@@ -1,5 +1,8 @@
 #include <3ds.h>
 #include <citro2d.h>
+#include "3ds/thread.h"
+#include "3ds/types.h"
+#include "fonts/bigFont.h"
 #include "menus/core/ui_element.h"
 #include "menus/core/ui_screen.h"
 #include "menus/components/ui_list.h"
@@ -8,6 +11,9 @@
 #include "graphics.h"
 
 #include "save/config.h"
+#include "text.h"
+#include "utils/json_config.h"
+#include "utils/network.h"
 
 static bool exit_flag = false;
 
@@ -40,6 +46,18 @@ void soggy_menu_loop() {
     stop_mp3();
     play_mp3("romfs:/songs/SogLoop.mp3", true, 0);
 
+    // START TEST
+
+    DownloadTask task = {
+        .path = USER_SONGS_DIR,
+        .url = "https%3A%2F%2Faudio.ngfiles.com%2F803000%2F803223_Xtrullor---Arcana.mp3%3Ff1524940372",
+        .song_id = "803223"
+    };
+
+    Thread thread = create_download_song_thread(&task);
+
+    // END TEST
+
     while (aptMainLoop()) {
         hidScanInput();
 
@@ -51,7 +69,20 @@ void soggy_menu_loop() {
         touch.interacted = false;
 
         ui_screen_update(&default_screen, &touch);
+
+        // START TEST
         
+        if (task.running) {
+            output_log("Progress: %.2f\n", task.progress);
+        }
+
+        if (task.finished) {
+            output_log("Download finished with code %d\n", task.result);
+            task.finished = false;
+        }
+        
+        // END TEST
+
         // Frees a render target, so keep it out of the frame below
         update_stereo_target();
 
@@ -71,6 +102,12 @@ void soggy_menu_loop() {
             draw_touch_effect();
             change_blending(false);
 
+            // START TEST
+            
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 200, 0.5f, 0.5f, 0.f, true, "Progress %.2f Finished %d", task.progress, !task.running);
+
+            // END TEST
+
             // Top screen, drawn once per eye when 3D is on
             for (int eye = 0; begin_top_eye(eye); eye++) {
                 draw_fade();
@@ -85,6 +122,17 @@ void soggy_menu_loop() {
 
         if (exit_flag) {
             stop_mp3();
+
+            // START TEST
+
+            // Cancel task
+            if (task.running) {
+                task.cancelled = true;
+                threadJoin(thread, U64_MAX);
+            }
+
+            // END TEST
+
             game_state = STATE_CREATOR_MENU;
             break;
         }

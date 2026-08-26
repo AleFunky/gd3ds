@@ -57,7 +57,7 @@ typedef struct {
     bool skipVersionWarning;
 } SettingState;
 
-extern Setting settings[26];
+extern Setting settings[28];
 extern SettingState settingsState;
 
 void settings_init();
