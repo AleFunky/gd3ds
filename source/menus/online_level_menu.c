@@ -155,7 +155,8 @@ static int warning_result = 0;
 static void action_play(UIElement *e) {
     if (result == 0 || comes_from_levels) {
         pressed_play = true;
-        song_exists = check_song(search_entries[curr_search_id].songId);
+        int song_id = search_entries[curr_search_id].songId;
+        song_exists = song_id == 0 || check_song(song_id);
     }
 }
 
@@ -306,7 +307,7 @@ void populate_level_info() {
 
     // Song id
     char song_id[16];
-    snprintf(song_id, sizeof(song_id), "SongID: %d", (entry_srch->songId == 0) ? entry_srch->mainSongId : entry_sng->ngSongId);
+    snprintf(song_id, sizeof(song_id), "SongID: %d", (entry_srch->songId == 0) ? entry_srch->mainSongId + 1 : entry_sng->ngSongId);
     ui_label_set_text(song_id_label, song_id );
 
     // Level icons
