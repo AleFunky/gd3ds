@@ -477,6 +477,7 @@ void online_menu_loop() {
     } else {
         if (list) { // No errors
             populate_list();
+            update_arrows();
         }
     }
 
@@ -504,8 +505,8 @@ void online_menu_loop() {
             if (search_result != 0 && search_needs_refresh) {
                 handle_errors(search_result);
             } else if (list) { // No errors
-                update_arrows();
                 populate_list();
+                update_arrows();
                 search_needs_refresh = false;
             }
             search_task.finished = false;

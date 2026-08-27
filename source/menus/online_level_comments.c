@@ -274,7 +274,6 @@ void online_comments_init() {
 
     ui_button_set_image(sort_by_likes_button, 423, 0);
     ui_disable_element((UIElement *) spinner);
-    update_comment_arrows(false);
     
     if (comments_need_refresh) {
         ui_enable_element((UIElement *)spinner);
@@ -285,6 +284,7 @@ void online_comments_init() {
         if (list) { // No need to fetch new comments
             ui_label_set_text(error_label, "");
             populate_comments();
+            update_comment_arrows(false);
         }
     }
 
@@ -302,6 +302,7 @@ int online_comments_loop() {
         } else { // No errors
             ui_label_set_text(error_label, "");
             populate_comments();
+            update_comment_arrows(false);
             comments_need_refresh = false;
         }
         comments_task.finished = false;
