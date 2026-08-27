@@ -100,7 +100,7 @@ void action_open_info_card(int id) {
     switch (id) {
         case 1:
             // wide mode info
-            set_info_content("Doubles the top screen's horizontal<p>resolution.");
+            set_info_content("Doubles the top screen's horizontal\nresolution.");
             break;
         case 2:
             // global tap effect info
@@ -112,11 +112,11 @@ void action_open_info_card(int id) {
             break;
         case 4:
             // hitboxes info
-            set_info_content("Shows object hitboxes while in a level.<p>WARNING: AFFECTS PERFORMANCE!");
+            set_info_content("Shows object hitboxes while in a level.\nWARNING: AFFECTS PERFORMANCE!");
             break;
         case 5:
             // debug info
-            set_info_content("Enables debug key shortcuts.<p>(B + L, B + R, X)");
+            set_info_content("Enables debug key shortcuts.\n(B + L, B + R, X)");
             break;
         case 6:
             // accurate percentage info
@@ -124,15 +124,15 @@ void action_open_info_card(int id) {
             break;
         case 7:
             // ULTRA accurate percentage info
-            set_info_content("But mom, I want more decimals!!!!<p>(use at your own risk)");
+            set_info_content("But mom, I want more decimals!!!!\n(use at your own risk)");
             break;
         case 8:
             // Switch trail color
-            set_info_content("Makes the player trail use P1<p>instead of P2.");
+            set_info_content("Makes the player trail use P1\ninstead of P2.");
             break;
         case 9:
             // Switch wave trail color
-            set_info_content("Makes the wave trail use P1<p>instead of P2.");
+            set_info_content("Makes the wave trail use P1\ninstead of P2.");
             break;
         case 10:
             // quick retry info
@@ -148,11 +148,11 @@ void action_open_info_card(int id) {
             break;
         case 13:
             // do not info
-            set_info_content("Doesn't do anything...<p>Well, nothing useful.");
+            set_info_content("Doesn't do anything...\nWell, nothing useful.");
             break;
         case 14:
             // stereoscopic 3D info
-            set_info_content("Adds depth to the top screen.<p>Use the 3D slider, costs some FPS.");
+            set_info_content("Adds depth to the top screen.\nUse the 3D slider, costs some FPS.");
             break;
     }
     in_info_card = true;

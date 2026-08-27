@@ -101,9 +101,9 @@ static void action_open_version_warning(UIElement *e) {
     if (data) {
         char buffer[256];
         if (data->wasUpdated) {
-            snprintf(buffer, sizeof(buffer), "This level was uploaded <#ffff00>before or in</> %.1f,<p>but was updated in a later version. It<p>might not be <#60abef>playable</>.", GD_VERSION);
+            snprintf(buffer, sizeof(buffer), "This level was uploaded <#ffff00>before or in</> %.1f,\nbut was updated in a later version. It\nmight not be <#60abef>playable</>.", GD_VERSION);
         } else {
-            snprintf(buffer, sizeof(buffer), "This level was uploaded <#ff0000>after</> %.1f.<p>It will most likely <#ff00ff>not be playable</>.", GD_VERSION);
+            snprintf(buffer, sizeof(buffer), "This level was uploaded <#ff0000>after</> %.1f.\nIt will most likely <#ff00ff>not be playable</>.", GD_VERSION);
         }
         action_open_info_card_text(buffer);
     }
@@ -409,17 +409,17 @@ static void handle_errors(int code) {
     char temp[64];
     switch (code) {
         case -2:
-            ui_label_set_text(error_label, "An unknown error has<p> occured.");
+            ui_label_set_text(error_label, "An unknown error has\n occured.");
             break;
         case -1:
             break;
         case 6:
         case 7:   
-            ui_label_set_text(error_label, "No<p><#41e24e>Internet</> connection!");
+            ui_label_set_text(error_label, "No\n<#41e24e>Internet</> connection!");
             break;
 
         default:
-            snprintf(temp, sizeof(temp), "An unknown error has<p>occurred.<p><p>Error code: %d", code);
+            snprintf(temp, sizeof(temp), "An unknown error has\noccurred.\n\nError code: %d", code);
             ui_label_set_text(error_label, temp);
 
     }

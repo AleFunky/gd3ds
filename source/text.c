@@ -24,7 +24,7 @@ typedef struct {
 // you can also do this "<green>i am green <#ff0000>and i am red</>"
 // now you can also put it in decimal like "<255,0,0>red</>" and also include opacity "<255,255,255,127>half</>""
 // </> ALWAYS resets to white and doesn't care if there is a tag before, its just so it looks like html
-// <p> makes a new line
+// \n makes a new line
 // you can display an image like if it was an emoji via "<i(id)s(s)>", where id is the iamge index and s the spritesheet id, for example, "<i19s1>" display image #19 in sheet #1, which is soggy
 
 // Even thought the macro is called "ABGR8", the paremeters are still in this order: red, green, blue, alpha
@@ -142,15 +142,8 @@ static int count_lines(const char *text, bool parse_tags) {
     int lines = 1;
 
     for (int i = 0; text[i]; i++) {
-        if (text[i] == '<') {
-            char tag[64];
-            
-            // If found p tag, we found a line separator
-            if (read_tag(text, &i, tag, sizeof(tag))) {
-                if (strcmp(tag, "p") == 0) {
-                    lines++;
-                }
-            }
+        if (text[i] == '\n') {
+            lines++;
         }
     }
 
@@ -183,7 +176,7 @@ const Glyph *get_glyph(const Charset *font, char character) {
 char *wrap_text(const Charset *font, float zoom_x, const char *text, float max_width) {
     wrap_buffer[0] = '\0';
 
-    float line_width = 0.0f;
+    float line_width = 0.f;
     const char *p = text;
     while (*p) {
         // Copy tags 
@@ -207,28 +200,71 @@ char *wrap_text(const Charset *font, float zoom_x, const char *text, float max_w
         int len = 0;
 
         while (*p && *p != ' ' && *p != '<') {
-            word[len++] = *p++;
+            if (len < sizeof(word) - 1) {
+                word[len++] = *p;
+            }
+            p++;
         }
 
         word[len] = '\0';
 
-        float word_width =
-            get_text_length(font, zoom_x, true, word);
+        float word_width = get_text_length(font, zoom_x, true, word);
 
-        float space_width =
-            get_text_length(font, zoom_x, true, " ");
+        float space_width = get_text_length(font, zoom_x, true, " ");
 
-        // Wrap if needed
-        if (line_width > 0 && line_width + space_width + word_width > max_width) {
-            strcat(wrap_buffer, "<p>");
-            line_width = 0.0f;
-        } else if (line_width > 0) {
-            strcat(wrap_buffer, " ");
-            line_width += space_width;
+        if (word_width <= max_width) {
+            // Wrap if needed
+            if (line_width > 0 && line_width + space_width + word_width > max_width) {
+                strcat(wrap_buffer, "\n");
+                line_width = 0.0f;
+            } else if (line_width > 0) {
+                strcat(wrap_buffer, " ");
+                line_width += space_width;
+            }
+
+            strcat(wrap_buffer, word);
+            line_width += word_width;
+        } else {
+            if (line_width > 0) {
+                strcat(wrap_buffer, "\n");
+                line_width = 0.f;
+            }
+
+            int start = 0;
+
+            while (start < len) {
+                int end = start;
+                float chunk_width = 0.f;
+
+                // Find the largest chunk that fits
+                while (end < len) {
+                    char c[2] = { 
+                        word[end], '\0' 
+                    };
+
+                    float char_width = get_text_length(font, zoom_x, true, c);
+
+                    // If already outside the max width, break
+                    if (end > start && chunk_width + char_width > max_width) {
+                        break;
+                    }
+
+                    chunk_width += char_width;
+                    end++;
+                }
+
+                // Append this chunk
+                strncat(wrap_buffer, word + start, end - start);
+
+                start = end;
+
+                if (start < len) {
+                    strcat(wrap_buffer, "\n");
+                }
+
+                line_width = chunk_width;
+            }
         }
-
-        strcat(wrap_buffer, word);
-        line_width += word_width;
 
         // Skip original spaces
         while (*p == ' ') {
@@ -277,14 +313,12 @@ static void get_line_metrics(const Charset *font, float zoom_x, bool parse_tags,
         if (text[i] == '<' && parse_tags) {
             char tag[64];
             if (read_tag(text, &i, tag, sizeof(tag))) {
-                if (strcmp(tag, "p") == 0) {
-                    break;
-                }
-
                 length += get_image_tag_length(font, zoom_x, tag);
                 
                 continue;
             }
+        } else if (text[i] == '\n') {
+            break;
         }
 
         const Glyph *character = get_glyph(font, text[i]);
@@ -317,14 +351,12 @@ float get_line_length(const Charset *font, const float zoom_x, bool parse_tags, 
             char tag[64];
 
             if (read_tag(text, &i, tag, sizeof(tag))) {
-                if (strcmp(tag, "p") == 0) {
-                    break;
-                }
-
                 text_length += get_image_tag_length(font, zoom_x, tag);
 
                 continue;
             }
+        } else if (text[i] == '\n') {
+            break;
         }
 
         if (character) {
@@ -343,18 +375,9 @@ float get_longest_line_length(const Charset *font, const float zoom_x, const cha
     while (true) {
         if (text[i] == '<' || text[i] == '\0') {
             bool newline = false;
-
-            // Read tags
-            if (text[i] == '<') {
-                char tag[64];
-
-                int temp = i;
-                if (read_tag(text, &temp, tag, sizeof(tag))) {
-                    if (strcmp(tag, "p") == 0) {
-                        newline = true;
-                        i = temp;
-                    }
-                }
+            
+            if (text[i] == '\n') {
+                newline = true;
             }
 
             // Measure line
@@ -392,13 +415,11 @@ float get_text_length(const Charset *font, const float zoom_x, bool parse_tags, 
             char tag[64];
 
             if (read_tag(text, &i, tag, sizeof(tag))) {
-                if (strcmp(tag, "p") == 0) {
-                    continue;
-                }
-
                 text_length += get_image_tag_length(font, zoom_x, tag);
                 continue;
             }
+        } else if (text[i] == '\n') {
+            continue;
         }
 
         if (character != NULL) {
@@ -461,20 +482,18 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
                 if (parse_image_tag(tag, &image_index, &image_sheet)) {
                     is_image = true;
                 } else {
-                    if (strcmp(tag, "p") == 0) {
-                        offset_x = 0;
-                        
-                        offset_y += line_height;
-
-                        get_line_metrics(font, fabsf(scaleX), true, tmp, i + 1, &line_length, &first_char, &last_char);
-
-                        continue;
-                    }
-
                     parse_color_tag(tag, &current_color);
                     continue;
                 }
             }
+        } else if (tmp[i] == '\n') {
+            offset_x = 0;
+            
+            offset_y += line_height;
+
+            get_line_metrics(font, fabsf(scaleX), true, tmp, i + 1, &line_length, &first_char, &last_char);
+
+            continue;
         }
 
         C2D_PlainImageTint(&tint, current_color, 1.f);

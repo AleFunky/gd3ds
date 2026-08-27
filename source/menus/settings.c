@@ -67,7 +67,7 @@ Setting settings[] = {
     {
         .id = "wideEnabled",
         .label = "800 px res",
-        .additionalInfo = "Doubles the top screen's horizontal<p>resolution.",
+        .additionalInfo = "Doubles the top screen's horizontal\nresolution.",
         .page = PAGE_GRAPHICS, 
 
         .defaultValue = false,
@@ -82,7 +82,7 @@ Setting settings[] = {
     {
         .id = "stereoEnabled",
         .label = "Stereoscopic 3D",
-        .additionalInfo = "Adds depth to the top screen.<p>Use the 3D slider, costs some FPS.",
+        .additionalInfo = "Adds depth to the top screen.\nUse the 3D slider, costs some FPS.",
         .page = PAGE_GRAPHICS, 
 
         .defaultValue = false,
@@ -137,7 +137,7 @@ Setting settings[] = {
     {
         .id = "enableDebugBindings",
         .label = "Enable debug keys",
-        .additionalInfo = "Enables debug key shortcuts.<p>(B + L, B + R, X)",
+        .additionalInfo = "Enables debug key shortcuts.\n(B + L, B + R, X)",
         .page = PAGE_INPUT,
 
         .defaultValue = false,
@@ -147,7 +147,7 @@ Setting settings[] = {
     {
         .id = "preciseInput",
         .label = "240Hz input (CBF)",
-        .additionalInfo = "Registers jumps on the exact 240Hz<p>physics tick they were pressed on.<p>Precision is reduced below 30fps.",
+        .additionalInfo = "Registers jumps on the exact 240Hz\nphysics tick they were pressed on.\nPrecision is reduced below 30fps.",
         .page = PAGE_INPUT,
 
         .defaultValue = false,
@@ -157,7 +157,7 @@ Setting settings[] = {
     {
         .id = "hitboxesEnabled",
         .label = "Show hitboxes",
-        .additionalInfo = "Shows object hitboxes while in a level.<p>WARNING: AFFECTS PERFOMANCE!",
+        .additionalInfo = "Shows object hitboxes while in a level.\nWARNING: AFFECTS PERFOMANCE!",
         .page = PAGE_MISC, 
 
         .defaultValue = false,
@@ -176,7 +176,7 @@ Setting settings[] = {
     },
     {
         .id = "hitboxesOnDeath",
-        .label = "Show hitboxes<p>on death",
+        .label = "Show hitboxes\non death",
         .additionalInfo = NULL,
         .page = PAGE_MISC, 
 
@@ -187,7 +187,7 @@ Setting settings[] = {
     {
         .id = "doNot",
         .label = "Do not",
-        .additionalInfo = "Doesn't do anything...<p>Well, nothing useful.",
+        .additionalInfo = "Doesn't do anything...\nWell, nothing useful.",
         .page = PAGE_MISC, 
 
         .defaultValue = false,
@@ -209,7 +209,7 @@ Setting settings[] = {
     {
         .id = "skipHighObjWarning",
         .label = "Disable object alert",
-        .additionalInfo = "Disables the high object alert for<p>custom levels.",
+        .additionalInfo = "Disables the high object alert for\ncustom levels.",
         .page = PAGE_MISC, 
 
         .defaultValue = false,
@@ -219,7 +219,7 @@ Setting settings[] = {
     {
         .id = "skipVersionWarning",
         .label = "Disable version alert",
-        .additionalInfo = "Disables the incompatible<p>Geometry Dash version alert for<p>custom levels.",
+        .additionalInfo = "Disables the incompatible\nGeometry Dash version alert for\ncustom levels.",
         .page = PAGE_MISC, 
 
         .defaultValue = false,
@@ -229,7 +229,7 @@ Setting settings[] = {
     {
         .id = "skipSongWarning",
         .label = "Disable version alert",
-        .additionalInfo = "Disables the missing song alert for<p>custom levels.",
+        .additionalInfo = "Disables the missing song alert for\ncustom levels.",
         .page = PAGE_MISC, 
 
         .defaultValue = false,
@@ -269,7 +269,7 @@ Setting settings[] = {
     {
         .id = "ultraDecimalPercent",
         .label = "Ultra percentage",
-        .additionalInfo = "But mom, I want more decimals!!!!<p>(Why would you want to use this?)",
+        .additionalInfo = "But mom, I want more decimals!!!!\n(Why would you want to use this?)",
         .page = PAGE_GAMEPLAY, 
 
         .defaultValue = false,
@@ -309,7 +309,7 @@ Setting settings[] = {
     {
         .id = "defaultMiniIcon",
         .label = "Default mini icon",
-        .additionalInfo = "Uses default player icon in<p>mini mode.",
+        .additionalInfo = "Uses default player icon in\nmini mode.",
         .page = PAGE_COSMETIC, 
 
         .defaultValue = false,
@@ -319,7 +319,7 @@ Setting settings[] = {
     {
         .id = "switchTrailColor",
         .label = "Switch trail color",
-        .additionalInfo = "Makes the player trail use P1<p>instead of P2.",
+        .additionalInfo = "Makes the player trail use P1\ninstead of P2.",
         .page = PAGE_COSMETIC, 
 
         .defaultValue = false,
@@ -328,8 +328,8 @@ Setting settings[] = {
     },
     {
         .id = "switchWaveTrailColor",
-        .label = "Switch wave<p>trail color",
-        .additionalInfo = "Makes the wave trail use P1<p>instead of P2.",
+        .label = "Switch wave\ntrail color",
+        .additionalInfo = "Makes the wave trail use P1\ninstead of P2.",
         .page = PAGE_COSMETIC, 
 
         .defaultValue = false,

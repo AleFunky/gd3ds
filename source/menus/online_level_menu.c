@@ -333,7 +333,7 @@ static void handle_errors(int code) {
             snprintf(error_message, sizeof(error_message), "%s", "An unknown error has occured.");
             break;
         case -1:
-            snprintf(error_message, sizeof(error_message), "%s", "Failed to download level!<p>Please try again later.");
+            snprintf(error_message, sizeof(error_message), "%s", "Failed to download level!\nPlease try again later.");
             break;
         case 6:
         case 7:
@@ -341,7 +341,7 @@ static void handle_errors(int code) {
             break;
 
         default:
-            snprintf(error_message, sizeof(error_message), "An unknown error has occurred.<p>Error code: %d", result);
+            snprintf(error_message, sizeof(error_message), "An unknown error has occurred.\nError code: %d", result);
             break;
     }
     in_errorbox = true;
@@ -560,8 +560,14 @@ void online_level_menu_loop() {
 
         if (song_task.running) {
             song_progress_bar->value = song_task.progress;
-            snprintf(download_speed, sizeof(download_speed), "Speed: %dKB/s", song_task.speed / 1024);
-            ui_label_set_text(speed_label, download_speed);
+
+            
+            char *speed = truncate_speed(song_task.speed);
+            if (speed) {
+                snprintf(download_speed, sizeof(download_speed), "Speed: %s", speed);
+                ui_label_set_text(speed_label, download_speed);
+                free(speed);
+            }
         }
 
         // Run when finished
@@ -609,19 +615,19 @@ void online_level_menu_loop() {
 
             if (!passed_highobj_warning && !in_warningbox && pressed_play) {
                 warning_result = 0;
-                online_level_warningbox_init("High objects", "This level has a <#ffa54b>high object</> count<p>and might not be <#ff5a5a>fully playable</>.");
+                online_level_warningbox_init("High objects", "This level has a <#ffa54b>high object</> count\nand might not be <#ff5a5a>fully playable</>.");
                 in_warningbox = true;
             }
 
             if (passed_highobj_warning && !passed_version_warning && !in_warningbox && pressed_play) {
                 warning_result = 0;
-                online_level_warningbox_init("Version warning", "This level was made or updated in an<p><#ffa54b>incompatible game version</>. It might<p>not be <#ff5a5a>fully playable</>.");
+                online_level_warningbox_init("Version warning", "This level was made or updated in an\n<#ffa54b>incompatible game version</>. It might\nnot be <#ff5a5a>fully playable</>.");
                 in_warningbox = true;
             }
 
             if (passed_highobj_warning && passed_version_warning && !passed_song_warning && !in_warningbox && pressed_play) {
                 warning_result = 0;
-                online_level_warningbox_init("Missing song", "This level uses a <#4c8cc7>custom song</> that<p>has not been <#36c244>downloaded</> yet. Play<p>without music?");
+                online_level_warningbox_init("Missing song", "This level uses a <#4c8cc7>custom song</> that\nhas not been <#36c244>downloaded</> yet. Play\nwithout music?");
                 in_warningbox = true;
             }
 

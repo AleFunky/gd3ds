@@ -63,7 +63,7 @@ static UILabel *completion_text;
 static UIImage *coins_full[3];
 static UIParticle *particles[4];
 
-char *practice_completion_text = "Well done... Now try to complete it<p>without any checkpoints!";
+char *practice_completion_text = "Well done... Now try to complete it\nwithout any checkpoints!";
 
 char *do_not_completion_texts[] = {
     "Not 1 attempt",
@@ -78,7 +78,7 @@ char *do_not_completion_texts[] = {
     "Would be better if it was a harder level",
     "Would be better if it was an easier level",
     "Auto Safe Mode cheat detected: Using a 3DS",
-    "Auto Safe Mode cheat detected:<p>Noclipped through the end wall",
+    "Auto Safe Mode cheat detected:\nNoclipped through the end wall",
     "I lied, you got 99%",
     "I have no words.... oh wait",
     "we really doing anything now"

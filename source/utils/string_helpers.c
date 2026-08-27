@@ -57,6 +57,24 @@ char *truncate_number(int number) {
     return buffer;
 }
 
+char *truncate_speed(size_t bytes) {
+    char *buffer = malloc(20);
+
+    if (!buffer) return NULL;
+
+    if (bytes >= 1024 * 1024) { // Megabytes
+        float value = bytes / (float) (1024 * 1024);
+        snprintf(buffer, 20, "%.3g MB/s", value);
+    } else if (bytes >= 1024) { // Kilobytes
+        float value = bytes / 1024.f;
+        snprintf(buffer, 20, "%.3g KB/s", value);
+    } else {
+        snprintf(buffer, 20, "%d B/s", bytes);
+    }
+
+    return buffer;
+}
+
 void strip_character(char* s, char character) {
     size_t length = strlen(s);
 

@@ -226,7 +226,7 @@ static void show_error_message() {
         message = (char *) error_strings[message_id]; 
     }
 
-    snprintf(tmp, sizeof(tmp), "<red>ERROR</>:<p>%s", message);
+    snprintf(tmp, sizeof(tmp), "<red>ERROR</>:\n%s", message);
 
     info_card_init();
     set_info_content(tmp);

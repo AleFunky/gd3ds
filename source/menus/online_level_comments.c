@@ -49,17 +49,17 @@ static void handle_comment_errors(int code) {
     char temp[64];
     switch (code) {
         case -2:
-            ui_label_set_text(error_label, "An unknown error has<p> occured.");
+            ui_label_set_text(error_label, "An unknown error has\n occured.");
             break;
         case -1:
             break;
         case 6:
         case 7:   
-            ui_label_set_text(error_label, "No<p><#41e24e>Internet</> connection!");
+            ui_label_set_text(error_label, "No\n<#41e24e>Internet</> connection!");
             break;
 
         default:
-            snprintf(temp, sizeof(temp), "An unknown error has<p>occurred.<p><p>Error code: %d", code);
+            snprintf(temp, sizeof(temp), "An unknown error has\noccurred.\n\nError code: %d", code);
             ui_label_set_text(error_label, temp);
 
     }

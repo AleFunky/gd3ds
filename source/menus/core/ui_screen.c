@@ -442,6 +442,15 @@ static void strip_enclosures(char* s) {
     }
 }
 
+static void convert_new_line(char *str) {
+    for (char *p = str; *p; p++) {
+        if (*p == '\\' && p[1] == 'n') {
+            *p = '\n';
+            memmove(p + 1, p + 2, strlen(p + 2) + 1);
+        }
+    }
+}
+
 // Searches for the next token
 char* next_token(char** cursor) {
     if (!*cursor) return NULL;
@@ -758,6 +767,8 @@ void collect_properties(UIPropertyList *props, char *token, char **cursor, bool 
         char* value = equal + 1;
 
         strip_enclosures(value);
+
+        convert_new_line(value);
 
         ui_proplist_add(props, key, value);
     }
