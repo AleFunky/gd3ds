@@ -84,6 +84,8 @@ bool passed_highobj_warning = false;
 bool passed_version_warning = false;
 bool passed_song_warning = false;
 bool refresh = false;
+bool song_exists = false;
+
 
 char download_speed[24]= "Speed: 0KB/s";
 
@@ -152,6 +154,7 @@ static int warning_result = 0;
 static void action_play(UIElement *e) {
     if (result == 0 || comes_from_levels) {
         pressed_play = true;
+        song_exists = check_song(search_entries[curr_search_id].songId);
     }
 }
 
@@ -597,7 +600,7 @@ void online_level_menu_loop() {
         if (pressed_play) {
             if (settingsState.skipHighObjWarning || (search_entries[curr_search_id].objCount < (is_N3DS ? 44000 : 14000))) passed_highobj_warning = true;
             if (settingsState.skipVersionWarning || (search_entries[curr_search_id].gameVersion < 22)) passed_version_warning = true;
-            if (settingsState.skipSongWarning || (check_song(search_entries[curr_search_id].songId))) passed_song_warning = true;
+            if (settingsState.skipSongWarning || song_exists) passed_song_warning = true;
 
             if (warning_result == 1) {
                 pressed_play = false;
@@ -733,8 +736,6 @@ void online_level_menu_loop() {
             {
                 in_warningbox = false;
                 warning_result = returned;
-                char temp = warning_result + '0';
-                output_log(&temp);
             }
         }
         if (in_errorbox)
