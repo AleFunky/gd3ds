@@ -82,9 +82,13 @@ typedef struct CommentAuthorEntry {
 
 int search_levels();
 
-int get_level_data(int id, bool refresh, int currentId);
+int get_level_data_internal(int id, bool refresh, int currentId);
 
-int get_comments(int id, int page, int sortType);
+int get_comments_internal(int id, int page, int sortType);
+
+int get_level();
+int get_comments();
+int get_song_data();
 
 float derive_gj_version(int version);
 

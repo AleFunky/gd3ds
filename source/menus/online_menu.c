@@ -46,7 +46,7 @@ static UISpinner *spinner;
 static UIList *list;
 
 
-static NetworkTask task = {
+static NetworkTask search_task = {
     .func = search_levels
 };
 
@@ -101,9 +101,9 @@ static void action_open_version_warning(UIElement *e) {
     if (data) {
         char buffer[256];
         if (data->wasUpdated) {
-            snprintf(buffer, sizeof(buffer), "This level was uploaded <#ffff00>before or in</> %.1f,<p>but was updated in a later version.It<p><#60abef>might not be playable</>.", GD_VERSION);
+            snprintf(buffer, sizeof(buffer), "This level was uploaded <#ffff00>before or in</> %.1f,<p>but was updated in a later version. It<p>might not be <#60abef>playable</>.", GD_VERSION);
         } else {
-            snprintf(buffer, sizeof(buffer), "This level was uploaded <#ff0000>after</> %.1f.<p>It will most likely<#ff00ff>not be<p>playable</>.", GD_VERSION);
+            snprintf(buffer, sizeof(buffer), "This level was uploaded <#ff0000>after</> %.1f.<p>It will most likely <#ff00ff>not be playable</>.", GD_VERSION);
         }
         action_open_info_card_text(buffer);
     }
@@ -123,7 +123,7 @@ static void populate_list() {
     ui_list_reset(list);
     for (int i = 0; i < searchEntriesLength; i++) {
         char tmp_name[32];
-        char tmp_creator[32];
+        char tmp_creator[36];
         char tmp_song[256];
 
         SearchEntry *entry = &search_entries[i];
@@ -131,13 +131,13 @@ static void populate_list() {
         strncpy(tmp_name, entry->name, sizeof(tmp_name) - 1);
         
         // Get creator name
-        char *creator_name = "Unknown";
+        char *creator_name = "By -";
 
         if (entry->creatorIndex < creatorEntriesLength) {
             creator_name = creator_entries[entry->creatorIndex].creatorName;
         }
 
-        strncpy(tmp_creator, creator_name, sizeof(tmp_creator) - 1);
+        snprintf(tmp_creator, sizeof(tmp_creator), "<#%s>By %s</>", (creator_entries[entry->creatorIndex].userId == 0) ? "5AFFFF" : "FFFFFF", creator_name);
 
         // Get song name
         char *song_name = "Unknown";
@@ -193,7 +193,7 @@ static void populate_list() {
             UIImage *collaboration_icon = ui_create_image(&default_screen.ctx);
             if (collaboration_icon && entry->originalId != 0) {
                 ui_image_set_image(collaboration_icon, 213, 0);
-                ui_element_set_position((UIElement *)collaboration_icon, -list_width + 48 + get_text_length(&goldFont_fontCharset, 0.45f, false, tmp_creator) + 10, -4.5f);
+                ui_element_set_position((UIElement *)collaboration_icon, -list_width + 48 + get_text_length(&goldFont_fontCharset, 0.45f, false, creator_name) + 27, -4.5f);
                 ui_element_set_scale((UIElement *)collaboration_icon, 0.7f);
 
                 ui_element_add_child(card, (UIElement *)collaboration_icon);
@@ -203,7 +203,7 @@ static void populate_list() {
             UIImage *high_object_icon = ui_create_image(&default_screen.ctx);
             if (high_object_icon && (entry->objCount >= (is_N3DS ? 44000 : 14000))) {
                 ui_image_set_image(high_object_icon, 362, 0);
-                ui_element_set_position((UIElement *)high_object_icon, -list_width + 48 + get_text_length(&goldFont_fontCharset, 0.45f, false, tmp_creator) + 10 + ((entry->originalId != 0) ? 11 : 0), -4.5f);
+                ui_element_set_position((UIElement *)high_object_icon, -list_width + 48 + get_text_length(&goldFont_fontCharset, 0.45f, false, creator_name) + 27 + ((entry->originalId != 0) ? 11 : 0), -4.5f);
                 ui_element_set_scale((UIElement *)high_object_icon, 0.7f);
 
                 ui_element_add_child(card, (UIElement *)high_object_icon);
@@ -405,6 +405,7 @@ static void populate_list() {
 }
 
 static void handle_errors(int code) {
+    ui_disable_element((UIElement *) spinner);
     char temp[64];
     switch (code) {
         case -2:
@@ -428,7 +429,7 @@ static void action_change_page(UIElement* e) {
     filters.currentPage += ui_prop_int(&e->custom_properties, "page", 0);
     search_needs_refresh = true;
 
-    create_network_thread(&task);
+    create_network_thread(&search_task);
     ui_enable_element((UIElement *) spinner);
     if (list) ui_list_reset(list);
 }
@@ -472,7 +473,7 @@ void online_menu_loop() {
     int search_result = -2;
     
     if (search_needs_refresh) {
-        create_network_thread(&task);
+        create_network_thread(&search_task);
     } else {
         if (list) { // No errors
             populate_list();
@@ -497,8 +498,8 @@ void online_menu_loop() {
         touch.interacted = false;
         
         // Run when finished
-        if (task.finished) {
-            search_result = task.result;
+        if (search_task.finished) {
+            search_result = search_task.result;
             // Handle result
             if (search_result != 0 && search_needs_refresh) {
                 handle_errors(search_result);
@@ -506,7 +507,7 @@ void online_menu_loop() {
                 populate_list();
                 search_needs_refresh = false;
             }
-            task.finished = false;
+            search_task.finished = false;
         }
 
         if (!in_info_card) ui_screen_update(&default_screen, &touch);

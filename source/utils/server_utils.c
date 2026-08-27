@@ -20,6 +20,9 @@
 #include "network.h"
 #include "utils/string_helpers.h"
 #include "menus/search_menu.h"
+#include "menus/online_menu.h"
+#include "menus/online_level_menu.h"
+#include "menus/online_level_comments.h"
 
 SearchEntry *search_entries = NULL;
 CreatorEntry *creator_entries = NULL;
@@ -88,6 +91,26 @@ static void fill_song_entries(char **songStrings, int songStringCount) {
         }
         free_string_array(songKeys, songKeyCount);
     }
+}
+
+static void fill_song_entry(char *songString, int targetEntry) {
+        int songKeyCount = 0;
+
+        char **songKeys = split_string_str_del(songString, "~|~", &songKeyCount, true);
+        if (!songKeys) return;
+
+        for (int i = 0; i + 1 < songKeyCount; i += 2) {
+            int key = atoi(songKeys[i]);
+            char *valStr = songKeys[i + 1];
+            switch (key) {
+                case 10:
+                    // song link
+                    strncpy(song_entries[targetEntry].songLink, valStr, sizeof(song_entries[targetEntry].songLink) - 1);
+                    break;
+            }
+        }
+        free_string_array(songKeys, songKeyCount);
+    
 }
 
 static void fill_level_entries(char **levelsStrings, int songStringCount, int creatorStringCount, int levelStringCount) {
@@ -449,7 +472,7 @@ int search_levels() {
     return 0;
 }
 
-int get_level_data(int id, bool refresh, int currentId) {
+int get_level_data_internal(int id, bool refresh, int currentId) {
     char *outdata;
     int result = get_level_from_id(&outdata, id);
 
@@ -625,7 +648,7 @@ void fill_comment_entries(char **commentStrings, int commentStringCount) {
     }
 }
 
-int get_comments(int id, int page, int sortType) {
+int get_comments_internal(int id, int page, int sortType) {
     char *outdata;
     int result = get_comments_from_id(&outdata, id, page, sortType);
 
@@ -653,4 +676,37 @@ int get_comments(int id, int page, int sortType) {
     commentEntriesLength = commentStringCount;
 
     return 0;
+}
+
+int get_song_data_internal(int songId, int targetSongEntry) {
+    char *outdata;
+    int result = get_song_info_from_id(&outdata, songId);
+
+    if (result != 0) return result;
+    // validate first two chars of response to make sure what we're parsing is the level string
+    if (!(outdata[0] >= '0' && outdata[0] <= '9' && outdata[1] == '~')) return -2;
+
+    int initialStringCount = 0;
+
+    fill_song_entry(outdata, targetSongEntry);
+
+    free(outdata);
+
+    levelEntryLength = initialStringCount;
+    return 0;
+}
+
+int get_level() {
+    int result = get_level_data_internal(search_entries[curr_search_id].levelId, refresh, curr_search_id);
+    return result;
+}
+
+int get_comments() {
+    int result = get_comments_internal(search_entries[curr_search_id].levelId, current_comments_page, comments_sort_type);
+    return result;
+}
+
+int get_song_data() {
+    int result = get_song_data_internal(search_entries[curr_search_id].songId, search_entries[curr_search_id].songIndex);
+    return result;
 }
