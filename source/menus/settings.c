@@ -228,7 +228,7 @@ Setting settings[] = {
     },
     {
         .id = "skipSongWarning",
-        .label = "Disable version alert",
+        .label = "Disable song alert",
         .additionalInfo = "Disables the missing song alert for\ncustom levels.",
         .page = PAGE_MISC, 
 

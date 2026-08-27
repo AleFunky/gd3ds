@@ -401,9 +401,9 @@ void fill_page_entry(char *initialString) {
     free_string_array(pageStrings, stringCount);
 };
 
-int search_levels() {
+int search_levels_internal(bool useGdps) {
     char *outdata;
-    int result = get_search_results(&outdata, 22, filters);
+    int result = get_search_results(&outdata, 22, filters, useGdps);
 
     if (result != 0) return result;
     // validate first two chars of response to make sure what we're parsing is the search results string
@@ -472,9 +472,9 @@ int search_levels() {
     return 0;
 }
 
-int get_level_data_internal(int id, bool refresh, int currentId) {
+int get_level_data_internal(int id, bool refresh, int currentId, bool useGdps) {
     char *outdata;
-    int result = get_level_from_id(&outdata, id);
+    int result = get_level_from_id(&outdata, id, useGdps);
 
     if (result != 0) return result;
     // validate first two chars of response to make sure what we're parsing is the level string
@@ -580,11 +580,7 @@ void fill_comment_entries(char **commentStrings, int commentStringCount) {
                     case 7:
                         // spam flag status
                         comment_entries[i].isSpam = parse_bool(valStr);
-                        break;
-                    case 8:
-                        // author account id
-                        comment_entries[i].authorAccountId = atoi(valStr);
-                        break;
+                        break; 
                     case 9:
                         // time since comment was posted
                         strncpy(comment_entries[i].commentAge, valStr, sizeof(comment_entries[i].commentAge) - 1);
@@ -602,8 +598,11 @@ void fill_comment_entries(char **commentStrings, int commentStringCount) {
 
                         int rgbCount = 0;
                         char **rgbData = split_string(valStr, ',', &rgbCount, true);
+                        if (!rgbData) break;
 
-                        snprintf(comment_entries[i].modCommentColor, sizeof(comment_entries[i].modCommentColor) - 1, "#%04X%04X%04X", atoi(rgbData[0]), atoi(rgbData[1]), atoi(rgbData[2]));
+                        snprintf(comment_entries[i].modCommentColor, sizeof(comment_entries[i].modCommentColor) - 1, "#%02X%02X%02X", atoi(rgbData[0]), atoi(rgbData[1]), atoi(rgbData[2]));
+                        
+                        output_log(comment_entries->modCommentColor);
                         free_string_array(rgbData, rgbCount);
                         break;
                 
@@ -638,6 +637,10 @@ void fill_comment_entries(char **commentStrings, int commentStringCount) {
                         // icon glow (why is 0 false but 2 true??????)
                         comment_entries[i].glow = (atoi(valStr) == 2);
                         break;
+                    case 16:
+                    // author account id
+                        comment_entries[i].authorAccountId = atoi(valStr);
+                        break;
                 }
             }
             free_string_array(commentData, commentDataKeyCount);
@@ -648,39 +651,169 @@ void fill_comment_entries(char **commentStrings, int commentStringCount) {
     }
 }
 
-int get_comments_internal(int id, int page, int sortType) {
+void fill_gdps_comment_entries(char **commentStrings, int commentStringCount) {
+    for (int i = 0; i < commentStringCount; i++) {
+            int commentKeyCount = 0;
+            char **comments = split_string(commentStrings[i], '~', &commentKeyCount, true);
+
+            for (int k = 0; k + 1 < commentKeyCount; k += 2) {
+                int key = atoi(comments[k]);
+                char *valStr = comments[k + 1];
+                switch (key) {
+                    case 1:
+                        // id of level the comment comes from
+                        comment_entries[i].levelId = atoi(valStr);
+                        break;
+                    case 2:
+                        // comment text content (not base64 encoded this time!!!)
+                        if (valStr[0] == '\0') {
+                            comment_entries[i].content = strdup("");
+                            break;
+                        }
+                        comment_entries[i].content = malloc(strlen(valStr) + 1);
+                        snprintf(comment_entries[i].content, strlen(valStr) + 1, valStr);
+                        break;
+                    case 3:
+                        // author's player id
+                        comment_entries[i].authorPlayerId = atoi(valStr);
+                        break;
+                    case 4:
+                        // likes
+                        comment_entries[i].likes = atoi(valStr);
+                        break;
+                    case 7:
+                        // spam flag status
+                        comment_entries[i].isSpam = parse_bool(valStr);
+                        break; 
+                    case 9:
+                        // time since comment was posted
+                        strncpy(comment_entries[i].commentAge, valStr, sizeof(comment_entries[i].commentAge) - 1);
+                        break;
+                    case 10:
+                        // percent on source level
+                        comment_entries[i].percent = atoi(valStr);
+                        break;
+                    case 11:
+                        // mod badge status
+                        comment_entries[i].modBadge = atoi(valStr);
+                        break;
+                    case 12:
+                        // color of username (if mod)
+
+                        int rgbCount = 0;
+                        char **rgbData = split_string(valStr, ',', &rgbCount, true);
+                        if (!rgbData) break;
+
+                        snprintf(comment_entries[i].modCommentColor, sizeof(comment_entries[i].modCommentColor) - 1, "#%02X%02X%02X", atoi(rgbData[0]), atoi(rgbData[1]), atoi(rgbData[2]));
+                        
+                        output_log(comment_entries->modCommentColor);
+                        free_string_array(rgbData, rgbCount);
+                        break;
+                
+                }
+            }
+        free_string_array(comments, commentKeyCount);
+    }
+}
+
+void fill_gdps_comment_author_entries(char **authorStrings, int authorStringCount, int commentStringCount) {
+    for (int i = 0; i < authorStringCount; i++) {
+        int stringCount;
+        char **authorString = split_string(authorStrings[i], ':', &stringCount, true);
+        if (!authorString) return;
+
+        char name[21];
+        int playerId = atoi(authorString[0]);
+        strncpy(name, authorString[1], sizeof(name) - 1);
+        int userId = atoi(authorString[2]);
+
+        int commentIndex;
+        
+        // Find the song
+        for (commentIndex = 0; commentIndex < commentStringCount; commentIndex++) {
+            if (playerId == comment_entries[commentIndex].authorPlayerId) {
+                snprintf(comment_entries[commentIndex].name, sizeof(comment_entries[commentIndex].name), name);
+                comment_entries[commentIndex].authorAccountId = userId;
+                break;
+            }
+        }
+
+        free_string_array(authorString, stringCount);
+    }
+}
+
+int get_comments_internal(int id, int page, int sortType, bool useGdps) {
     char *outdata;
-    int result = get_comments_from_id(&outdata, id, page, sortType);
+    int result = get_comments_from_id(&outdata, id, page, sortType, useGdps);
 
     if (result != 0) return result;
     // validate first two chars of response to make sure what we're parsing is the comments string
     if (!(outdata[0] >= '0' && outdata[0] <= '9' && outdata[1] == '~')) return -2;
 
-    int commentStringCount = 0;
+    // i dont know why but the 1.9 gdps handles its comments completely differently, very annoying
+    if (!useGdps) {
+        int commentStringCount = 0;
 
-    char **commentStrings = split_string(outdata, '|', &commentStringCount, true);
-    if (!commentStrings) return -1;
+        char **commentStrings = split_string(outdata, '|', &commentStringCount, true);
+        if (!commentStrings)
+            return -1;
 
-    comment_entries = malloc(commentStringCount * sizeof(CommentEntry));
-    if (!comment_entries) return -1;
+        comment_entries = malloc(commentStringCount * sizeof(CommentEntry));
+        if (!comment_entries)
+            return -1;
 
-    // Initialize
-    memset(comment_entries, 0, commentStringCount * sizeof(CommentEntry));
+        // Initialize
+        memset(comment_entries, 0, commentStringCount * sizeof(CommentEntry));
 
-    fill_comment_entries(commentStrings, commentStringCount);
+        fill_comment_entries(commentStrings, commentStringCount);
 
-    free_string_array(commentStrings, commentStringCount);
-    
-    free(outdata);
+        free_string_array(commentStrings, commentStringCount);
 
-    commentEntriesLength = commentStringCount;
+        free(outdata);
+
+        commentEntriesLength = commentStringCount;
+    } else {
+        // gdps exclusive slop
+        int initialStringCount = 0;
+
+        char **initialStrings = split_string(outdata, '#', &initialStringCount, true);
+        if (!initialStrings) return -1;
+
+        int commentStringCount = 0;
+        int commentAuthorStringCount = 0;
+
+        char **commentStrings = split_string(initialStrings[0], '|', &commentStringCount, true);
+        if (!commentStrings) return -1;
+
+        char **commentAuthorStrings = split_string(initialStrings[1], '|', &commentAuthorStringCount, true);
+        if (!commentAuthorStrings) return -1;
+
+        comment_entries = malloc(commentStringCount * sizeof(CommentEntry));
+        if (!comment_entries) return -1;
+        
+        commentEntriesLength = commentStringCount;
+
+        // Initialize
+        memset(comment_entries, 0, commentStringCount * sizeof(CommentEntry));
+
+        // Fill comment entries
+        fill_gdps_comment_entries(commentStrings, commentStringCount);
+
+        // Fill missing creator entries
+        fill_gdps_comment_author_entries(commentAuthorStrings, commentAuthorStringCount, commentStringCount);
+
+        free_string_array(commentStrings, commentStringCount);
+        free_string_array(commentAuthorStrings, commentAuthorStringCount);
+        free_string_array(initialStrings, initialStringCount);
+
+    }
 
     return 0;
 }
 
-int get_song_data_internal(int songId, int targetSongEntry) {
+int get_song_data_internal(int songId, int targetSongEntry, bool useGdps) {
     char *outdata;
-    int result = get_song_info_from_id(&outdata, songId);
+    int result = get_song_info_from_id(&outdata, songId, useGdps);
 
     if (result != 0) return result;
     // validate first two chars of response to make sure what we're parsing is the level string
@@ -696,17 +829,22 @@ int get_song_data_internal(int songId, int targetSongEntry) {
     return 0;
 }
 
+int search_levels() {
+    int result = search_levels_internal(gdps);
+    return result;
+}
+
 int get_level() {
-    int result = get_level_data_internal(search_entries[curr_search_id].levelId, refresh, curr_search_id);
+    int result = get_level_data_internal(search_entries[curr_search_id].levelId, refresh, curr_search_id, gdps);
     return result;
 }
 
 int get_comments() {
-    int result = get_comments_internal(search_entries[curr_search_id].levelId, current_comments_page, comments_sort_type);
+    int result = get_comments_internal(search_entries[curr_search_id].levelId, current_comments_page, comments_sort_type, gdps);
     return result;
 }
 
 int get_song_data() {
-    int result = get_song_data_internal(search_entries[curr_search_id].songId, search_entries[curr_search_id].songIndex);
+    int result = get_song_data_internal(search_entries[curr_search_id].songId, search_entries[curr_search_id].songIndex, gdps);
     return result;
 }

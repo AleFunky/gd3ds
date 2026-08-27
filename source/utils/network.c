@@ -65,7 +65,7 @@ int soc_init() {
     return ret;
 }
 
-int get_level_from_id(char **out_data, int id) {
+int get_level_from_id(char **out_data, int id, bool useGdps) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -77,8 +77,7 @@ int get_level_from_id(char **out_data, int id) {
         headers = curl_slist_append(headers,
             "Content-Type: application/x-www-form-urlencoded");
 
-        curl_easy_setopt(curl, CURLOPT_URL, "http://www.boomlings.com/database/downloadGJLevel22.php");
-        // curl_easy_setopt(curl, CURLOPT_URL, "https://19gdps.com/gdapi/downloadGJLevel22.php");
+        curl_easy_setopt(curl, CURLOPT_URL, useGdps ? GDPS_LEVEL_API : ROBTOP_LEVEL_API);
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
@@ -128,7 +127,7 @@ static void unpack_bitfield_digits(int field, int bit_count, char *string, int o
     string[pos] = '\0';
 }
 
-int get_search_results(char **out_data, int gameVer, SearchFilters f) {
+int get_search_results(char **out_data, int gameVer, SearchFilters f, bool useGdps) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -140,8 +139,7 @@ int get_search_results(char **out_data, int gameVer, SearchFilters f) {
         headers = curl_slist_append(headers,
             "Content-Type: application/x-www-form-urlencoded");
 
-        curl_easy_setopt(curl, CURLOPT_URL, "http://www.boomlings.com/database/getGJLevels21.php");
-        // curl_easy_setopt(curl, CURLOPT_URL, "https://19gdps.com/gdapi/getGJLevels21.php");
+        curl_easy_setopt(curl, CURLOPT_URL, useGdps ? GDPS_SEARCH_API : ROBTOP_SEARCH_API);
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
@@ -226,7 +224,7 @@ int get_search_results(char **out_data, int gameVer, SearchFilters f) {
     return 2;
 }
 
-int get_comments_from_id(char **out_data, int id, int page, int mode) {
+int get_comments_from_id(char **out_data, int id, int page, int mode, bool useGdps) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -238,8 +236,7 @@ int get_comments_from_id(char **out_data, int id, int page, int mode) {
         headers = curl_slist_append(headers,
             "Content-Type: application/x-www-form-urlencoded");
 
-        curl_easy_setopt(curl, CURLOPT_URL, "http://www.boomlings.com/database/getGJComments21.php");
-        // curl_easy_setopt(curl, CURLOPT_URL, "https://19gdps.com/gdapi/getGJComments21.php");
+        curl_easy_setopt(curl, CURLOPT_URL, useGdps ? GDPS_COMMENTS_API : ROBTOP_COMMENTS_API);
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
@@ -273,7 +270,7 @@ int get_comments_from_id(char **out_data, int id, int page, int mode) {
     return 2;
 }
 
-int get_song_info_from_id(char **out_data, int songId) {
+int get_song_info_from_id(char **out_data, int songId, bool useGdps) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -285,8 +282,7 @@ int get_song_info_from_id(char **out_data, int songId) {
         headers = curl_slist_append(headers,
             "Content-Type: application/x-www-form-urlencoded");
 
-        curl_easy_setopt(curl, CURLOPT_URL, "http://www.boomlings.com/database/getGJSongInfo.php");
-        // curl_easy_setopt(curl, CURLOPT_URL, "https://19gdps.com/gdapi/getGJSongInfo.php");
+        curl_easy_setopt(curl, CURLOPT_URL, useGdps ? GDPS_SONGS_API : ROBTOP_SONGS_API);
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
@@ -365,15 +361,15 @@ static int download_song(DownloadTask *task) {
 
     if (curl) {
         char *decoded_url = url_decode(url);
-
-        url_convert_to_http(decoded_url);
+        output_log(decoded_url, '\n');
+        // url_convert_to_http(decoded_url);
 
         curl_easy_setopt(curl, CURLOPT_URL, decoded_url);
         
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, progressCallback);
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
-        curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/ng_certs.pem"); // Certificate slop
+        curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem"); // Certificate slop
 
         char full_path[273];
         snprintf(full_path, sizeof(full_path), "%s/%s.mp3", path, song_id);

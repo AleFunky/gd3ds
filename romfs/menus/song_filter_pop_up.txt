@@ -16,7 +16,7 @@ window x=160 y=120 w=260 h=140 style=0
 
     textbox x=0 y=40 w=120 limit=15 title="Input song ID:" tag="songinput" action="customsongquery"
 
-    label y=40 x=0 align=CENTER text="01. Stereo Madness" tag="normal_song_text" w=180 scale=0.6
+    label y=48 x=0 align=CENTER text="01. Stereo Madness" tag="normal_song_text" w=180 scale=0.6
 
     button id=300 x=-110 y=40 action="left" tag="songselector"
     button id=304 x=110 y=40 action="right" tag="songselector"

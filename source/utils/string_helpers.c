@@ -113,14 +113,17 @@ char *url_decode(const char *str) {
                 if(dStr[i+1] == 0) return dStr;
             
                 if (isxdigit((unsigned char) dStr[i+1]) && isxdigit((unsigned char) dStr[i+2])) {
-                    d = 0;
-
                     /* combine the next to numbers into one */
                     eStr[0] = dStr[i+1];
                     eStr[1] = dStr[i+2];
 
                     /* convert it to decimal */
                     long int x = strtol(eStr, NULL, 16);
+
+                    /* ignore spaces */
+                    if (x == 0x20) continue;
+                    
+                    d = 0;
 
                     /* remove the hex */
                     memmove(&dStr[i+1], &dStr[i+3], strlen(&dStr[i+3])+1);

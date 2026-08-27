@@ -14,6 +14,7 @@
 #include "graphics.h"
 #include "state.h"
 #include "utils/folders.h"
+#include "menus/search_menu.h"
 #include "menus/external_level_infobox.h"
 #include "menus/online_level_comments.h"
 #include "menus/online_level_infobox.h"
@@ -88,7 +89,7 @@ bool song_exists = false;
 
 int warning_step = 0;
 
-char download_speed[24]= "Speed: 0KB/s";
+char download_speed[24]= "Speed: 0B/s";
 
 static UIImage *bg_gradient;
 static UIImage *bg_gradient_top;
@@ -135,7 +136,7 @@ static void action_download(){
         ui_disable_element((UIElement *) song_id_label);
         ui_enable_element((UIElement *) song_progress_bar);
         ui_enable_element((UIElement *) speed_label);
-        snprintf(download_speed, sizeof(download_speed), "Speed: 0KB/s");
+        snprintf(download_speed, sizeof(download_speed), "Speed: 0B/s");
         ui_label_set_text(speed_label, download_speed);
         create_network_thread(&song_data_task);
     } else {
@@ -269,7 +270,9 @@ void populate_level_info() {
 
     if(entry_srch->isAuto) {
         difficulty_id = AUTO_FACE;
-    } else if(entry_srch->isDemon && IN_BOUNDS(entry_srch->difficulty, demon_faces_1)) {
+    } else if(entry_srch->isDemon && gdps) {
+        difficulty_id = 258;
+    } else if (entry_srch->isDemon && IN_BOUNDS(entry_srch->difficulty, demon_faces_1)) {
         difficulty_face_image->base.y = 87 - 5;
         featured_demon_offset = demon_face_featured_offsets[entry_srch->difficulty];
         difficulty_id = demon_faces_1[entry_srch->difficulty];
@@ -284,14 +287,15 @@ void populate_level_info() {
         int yOffset = 0;
 
         if(entry_srch->epic > 0 && IN_BOUNDS(entry_srch->epic, epics)){
-            featured_id = epics[entry_srch->epic];
-            yOffset = -2;
+            featured_id = (gdps ? SUPER_GLOW : epics[entry_srch->epic]);
+            yOffset = gdps ? -1 : -2;
         } else if(entry_srch->featureScore > 0) {
             featured_id = FEATURED_GLOW;
         }
 
         if(entry_srch->isDemon) yOffset += featured_demon_offset;
 
+        featured_glow_image->base.x = 165 + (gdps ? 0.3 : 0);
         featured_glow_image->base.y = 81.65 + yOffset;
 
         ui_image_set_image(featured_glow_image, featured_id, 0);

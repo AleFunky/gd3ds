@@ -280,14 +280,14 @@ static void populate_list() {
                 int yOffset = 0;
 
                 if(entry->epic > 0 && IN_BOUNDS(entry->epic, epics)){
-                    featured_id = epics[entry->epic];
-                    yOffset = -2;
+                    featured_id = (gdps ? SUPER_GLOW : epics[entry->epic]);
+                    yOffset = (gdps ? -1 : -2);
                 } else if(entry->featureScore > 0) {
                     featured_id = FEATURED_GLOW;
                 }
 
                 ui_image_set_image(featured_glow, featured_id, 0);
-                ui_element_set_position((UIElement *)featured_glow, -list_width + 23, -8.5f + yOffset);
+                ui_element_set_position((UIElement *)featured_glow, -list_width + 23 + (gdps ? 0.3 : 0), -8.5f + yOffset);
                 ui_element_set_scale((UIElement *)featured_glow, 0.82f);
 
                 ui_element_add_child(card, (UIElement *)featured_glow);
@@ -299,6 +299,8 @@ static void populate_list() {
 
                 if(entry->isAuto) {
                     difficulty_id = AUTO_FACE;
+                } else if (entry->isDemon && gdps) {
+                    difficulty_id = 258;
                 } else if(entry->isDemon && IN_BOUNDS(entry->difficulty, demon_faces)) {
                     difficulty_id = demon_faces[entry->difficulty];
                 } else if (IN_BOUNDS(entry->difficulty, difficulty_faces)) {
@@ -399,8 +401,6 @@ static void populate_list() {
 
             ui_list_add(list, card);
         }
-        
-        update_arrows();
     }  
 }
 
@@ -428,7 +428,7 @@ static void handle_errors(int code) {
 static void action_change_page(UIElement* e) {
     filters.currentPage += ui_prop_int(&e->custom_properties, "page", 0);
     search_needs_refresh = true;
-
+    update_arrows();
     create_network_thread(&search_task);
     ui_enable_element((UIElement *) spinner);
     if (list) ui_list_reset(list);
@@ -504,6 +504,7 @@ void online_menu_loop() {
             if (search_result != 0 && search_needs_refresh) {
                 handle_errors(search_result);
             } else if (list) { // No errors
+                update_arrows();
                 populate_list();
                 search_needs_refresh = false;
             }

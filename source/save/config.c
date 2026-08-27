@@ -12,6 +12,7 @@
 #include "menus/settings.h"
 #include "menus/first_boot_disclaimer.h"
 #include "menus/soggy.h"
+#include "menus/search_menu.h"
 
 #include "save/saving.h"
 #include "utils/json_config.h"
@@ -70,6 +71,7 @@ void save_user_config(Config *cfg) {
 void init_values() {
     config_init_bool(&cfg, CONFIG_FLAGS "initialDisclaimerAccepted", false);
     config_init_bool(&cfg, CONFIG_FLAGS "sogged", false);
+    config_init_bool(&cfg, CONFIG_FLAGS "gdps", false);
     
     config_init_int(&cfg, CONFIG_VALUES "playersDestroyed", 0);
     config_init_float(&cfg, CONFIG_VALUES "music_volume", 1);
@@ -114,6 +116,7 @@ void cfg_init() {
 
     initialDisclaimerAccepted = config_get_bool(&cfg, CONFIG_FLAGS "initialDisclaimerAccepted", false);
     gotSogged = config_get_bool(&cfg, CONFIG_FLAGS "sogged", false);
+    gdps = config_get_bool(&cfg, CONFIG_FLAGS "gdps", false);
 
     players_destroyed = config_get_int(&cfg, CONFIG_VALUES "playersDestroyed", 0);
     music_volume = config_get_float(&cfg, CONFIG_VALUES "music_volume", 1);
@@ -154,6 +157,7 @@ void cfg_init() {
 void cfg_save() {
     config_set_bool(&cfg, CONFIG_FLAGS "initialDisclaimerAccepted", initialDisclaimerAccepted);
     config_set_bool(&cfg, CONFIG_FLAGS "sogged", gotSogged);
+    config_set_bool(&cfg, CONFIG_FLAGS "gdps", gdps);
 
     config_set_int(&cfg, CONFIG_VALUES "playersDestroyed", players_destroyed);
     config_set_float(&cfg, CONFIG_VALUES "music_volume", music_volume);
