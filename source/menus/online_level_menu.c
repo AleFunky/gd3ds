@@ -126,6 +126,7 @@ static void update_download_button(){
 
 static void action_download(){
     if (!song_task.running && !song_data_task.running) {
+        song_progress_bar->value = 0;
         ui_button_set_image(song_download_button, 22, 0);
         ui_disable_element((UIElement *) song_status_label);
         ui_disable_element((UIElement *) song_id_label);
@@ -348,7 +349,6 @@ static void handle_errors(int code) {
 }
 
 static void handle_song_codes(int code) {
-    // i have no idea how the actual codes work and why they give seemingly wrong results this is my best guess
     ui_disable_element((UIElement *) song_progress_bar);
     ui_disable_element((UIElement *) speed_label);
     ui_enable_element((UIElement *) song_id_label);
@@ -363,15 +363,16 @@ static void handle_song_codes(int code) {
         case 0:
             snprintf(message, sizeof(message), "<#00FF00>Download complete.</>");
             ui_disable_element((UIElement *) song_download_button);
-        case 1:
-            snprintf(message, sizeof(message), "<#f93219>Download cancelled.</>");
             break;
         case 6:
         case 7:
             snprintf(message, sizeof(message), "<#f93219>No Internet connection!</>");
             break;
+        case 42:
+            snprintf(message, sizeof(message), "<#f93219>Download cancelled.</>");
+            break;
         default:
-            snprintf(message, sizeof(message), "<#f93219>Unknown error. Code: %d</>", result);
+            snprintf(message, sizeof(message), "<#f93219>Unknown error. Code: %d</>", code);
             break;
     }
     ui_label_set_text(song_status_label, message);
@@ -394,12 +395,12 @@ static void handle_song_data_errors(int code) {
         case -1: 
             snprintf(message, sizeof(message), "<#f93219>Failed to fetch info.</>");
             break;
-        case 1:
-            snprintf(message, sizeof(message), "<#f93219>Download cancelled.</>");
-            break;
         case 6:
         case 7:
             snprintf(message, sizeof(message), "<#f93219>No Internet connection!</>");
+            break;
+        case 42:
+            snprintf(message, sizeof(message), "<#f93219>Download cancelled.</>");
             break;
         default:
             snprintf(message, sizeof(message), "<#f93219>Unknown error. Code: %d</>", result);
@@ -559,17 +560,14 @@ void online_level_menu_loop() {
 
         if (song_task.running) {
             song_progress_bar->value = song_task.progress;
-            snprintf(download_speed, sizeof(download_speed), "Speed: %dKB/s", song_task.speed);
+            snprintf(download_speed, sizeof(download_speed), "Speed: %dKB/s", song_task.speed / 1024);
             ui_label_set_text(speed_label, download_speed);
         }
 
         // Run when finished
         if (song_task.finished) {
-            int song_result = -3;
-            song_result = song_task.result;
             // Handle result
-
-            handle_song_codes(song_result);
+            handle_song_codes(song_task.result);
             song_task.finished = false;
         }
 

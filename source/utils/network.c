@@ -386,15 +386,18 @@ static int download_song(DownloadTask *task) {
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, f);
 
         CURLcode code = curl_easy_perform(curl);
+        
+        if (code) {
+            remove(full_path);
+            free(decoded_url);
+            curl_easy_cleanup(curl);
+            return code;
+        }
 
         free(decoded_url);
         fclose(f);
         
         curl_easy_cleanup(curl);
-
-        if (code) {
-            return code;
-        }
 
         return 0;
     }
@@ -434,6 +437,11 @@ static void download_thread(void *arg) {
     DownloadTask *task = arg;
 
     task->progress = 0;
+    task->speed = 0;
+    task->last_bytes = 0;
+    task->last_time = 0;
+    task->cancelled = false;
+
     task->finished = false;
     task->running = true;
 
