@@ -86,6 +86,7 @@ bool passed_song_warning = false;
 bool refresh = false;
 bool song_exists = false;
 
+int warning_step = 0;
 
 char download_speed[24]= "Speed: 0KB/s";
 
@@ -443,6 +444,67 @@ static UIAction actions[] = {
     {"download", action_download },
 };
 
+typedef enum WarningPopupStep {
+    WARNING_HIGH_OBJECT,
+    WARNING_VERSION,
+    WARNING_MISSING_SONG,
+    WARNING_DONE
+} WarningPopupStep;
+
+static void advance_warning_step() {
+    int obj_count = (is_N3DS ? 44000 : 14000);
+            
+    bool low_object_count = search_entries[curr_search_id].objCount < obj_count;
+    bool compatible_level = derive_gj_version(search_entries[curr_search_id].gameVersion) <= GD_VERSION;
+
+    if (warning_step == WARNING_HIGH_OBJECT && (settingsState.skipHighObjWarning || low_object_count))
+        warning_step = WARNING_VERSION;
+
+    if (warning_step == WARNING_VERSION && (settingsState.skipVersionWarning || compatible_level))
+        warning_step = WARNING_MISSING_SONG;
+
+    if (warning_step == WARNING_MISSING_SONG && (settingsState.skipSongWarning || song_exists))
+        warning_step = WARNING_DONE;
+}
+
+static void handle_warnings() {
+    if (warning_result == 1) {
+        pressed_play = false;
+        warning_step = WARNING_HIGH_OBJECT;
+        warning_result = 0;
+        return;
+    } else if (warning_result == 2) {
+        warning_step++;
+        warning_result = 0;
+    }
+
+    advance_warning_step();
+    
+    if (!in_warningbox) {
+        switch (warning_step) {
+            case WARNING_HIGH_OBJECT:
+                warning_result = 0;
+                online_level_warningbox_init("High objects", "This level has a <#ffa54b>high object</> count\nand might not be <#ff5a5a>fully playable</>.");
+                in_warningbox = true;
+                break;
+            case WARNING_VERSION:
+                warning_result = 0;
+                online_level_warningbox_init("Version warning", "This level was made or updated in an\n<#ffa54b>incompatible game version</>. It might\nnot be <#ff5a5a>fully playable</>.");
+                in_warningbox = true;
+                break;
+            case WARNING_MISSING_SONG:
+                warning_result = 0;
+                online_level_warningbox_init("Missing song", "This level uses a <#4c8cc7>custom song</> that\nhas not been <#36c244>downloaded</> yet. Play\nwithout music?");
+                in_warningbox = true;
+                break;
+            case WARNING_DONE:
+                pressed_play = false;
+                warning_step = 0;
+                play_level();
+        }
+    }
+}
+
 void online_level_menu_loop() {
     exit_flag = false;
     in_comments = false;
@@ -456,6 +518,7 @@ void online_level_menu_loop() {
     passed_version_warning = false;
     passed_song_warning = false;
     warning_result = 0;
+    warning_step = 0;
     result = -2;
     refresh = false;
 
@@ -598,49 +661,7 @@ void online_level_menu_loop() {
         }
 
         if (pressed_play) {
-            if (settingsState.skipHighObjWarning || (search_entries[curr_search_id].objCount < (is_N3DS ? 44000 : 14000))) passed_highobj_warning = true;
-            if (settingsState.skipVersionWarning || (search_entries[curr_search_id].gameVersion < 22)) passed_version_warning = true;
-            if (settingsState.skipSongWarning || song_exists) passed_song_warning = true;
-
-            if (warning_result == 1) {
-                pressed_play = false;
-                passed_highobj_warning = false;
-                passed_version_warning = false;
-                passed_song_warning = false;
-                warning_result = 0;
-            }
-
-            if (warning_result == 2 && passed_highobj_warning && passed_version_warning) passed_song_warning = true;
-
-            if (warning_result == 2 && passed_highobj_warning) passed_version_warning = true;
-
-            if (warning_result == 2) passed_highobj_warning = true;
-
-            if (!passed_highobj_warning && !in_warningbox && pressed_play) {
-                warning_result = 0;
-                online_level_warningbox_init("High objects", "This level has a <#ffa54b>high object</> count\nand might not be <#ff5a5a>fully playable</>.");
-                in_warningbox = true;
-            }
-
-            if (passed_highobj_warning && !passed_version_warning && !in_warningbox && pressed_play) {
-                warning_result = 0;
-                online_level_warningbox_init("Version warning", "This level was made or updated in an\n<#ffa54b>incompatible game version</>. It might\nnot be <#ff5a5a>fully playable</>.");
-                in_warningbox = true;
-            }
-
-            if (passed_highobj_warning && passed_version_warning && !passed_song_warning && !in_warningbox && pressed_play) {
-                warning_result = 0;
-                online_level_warningbox_init("Missing song", "This level uses a <#4c8cc7>custom song</> that\nhas not been <#36c244>downloaded</> yet. Play\nwithout music?");
-                in_warningbox = true;
-            }
-
-            if (passed_highobj_warning && passed_version_warning && passed_song_warning) {
-                pressed_play = false;
-                passed_highobj_warning = false;
-                passed_version_warning = false;
-                passed_song_warning = false;
-                play_level();
-            }
+            handle_warnings();
         }
 
         do {
