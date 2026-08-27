@@ -176,8 +176,12 @@ typedef struct {
 
     int gamemode;
     int index;
+    u32 p1_color;
+    u32 p2_color;
+    u32 glow_color;
 
     bool isSelected;
+    bool glow;
 } UIIcon;
 
 typedef struct {

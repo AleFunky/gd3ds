@@ -1,3 +1,4 @@
+#include "math_helpers.h"
 #include "menus/components/ui_button.h"
 #include "menus/core/common_setters.h"
 #include "menus/core/ui_element.h"
@@ -33,15 +34,15 @@ static void ui_icon_draw(UIElement* e, UITransform *transform) {
         spawn_icon_at(
             icon->gamemode,
             icon->index,
-            false,
+            icon->glow,
             transform->x, transform->y,
             0,
             0,
             0,
             transform->scaleX,
-            C2D_Color32(175, 175, 175, 255),
-            C2D_Color32(255, 255, 255, 255),
-            0
+            icon->p1_color,
+            icon->p2_color,
+            icon->glow_color
         );
     }
 
@@ -60,12 +61,35 @@ static void ui_icon_destroy(UIElement *e) {
     }
 }
 
-void ui_icon_set_gamemode_index(UIIcon*e, int gamemode, int index) {
+void ui_icon_set_selected(UIIcon *e, bool selected) {
     if (!e) return;
 
-    e->isSelected = *current_icons[gamemode] == index,
+    e->isSelected = selected;
+}
+
+void ui_icon_set_gamemode_index(UIIcon *e, int gamemode, int index) {
+    if (!e) return;
+
     e->gamemode = gamemode;
     e->index = index;
+}
+
+void ui_icon_set_p1(UIIcon *e, u32 color) {
+    if (!e) return;
+
+    e->p1_color = color;
+}
+
+void ui_icon_set_p2(UIIcon *e, u32 color) {
+    if (!e) return;
+
+    e->p2_color = color;
+}
+
+void ui_icon_set_glow(UIIcon *e, u32 color) {
+    if (!e) return;
+
+    e->glow_color = color;
 }
 
 UIIcon *ui_create_icon(const UIContext *ctx) {
@@ -112,6 +136,12 @@ UIElement *ui_create_icon_from_props(const UIContext *ctx, const UIPropertyList 
     ui_icon_set_gamemode_index(icon, 
         ui_prop_int(props, "gamemode", 0), 
         ui_prop_int(props, "id", 0));
+
+    icon->glow = ui_prop_bool(props, "glow", false);
+
+    ui_icon_set_p1(icon, ui_prop_color(props, "p1_color", ABGR8(175, 175, 175, 255)));
+    ui_icon_set_p2(icon, ui_prop_color(props, "p2_color", ABGR8(255, 255, 255, 255)));
+    ui_icon_set_glow(icon, ui_prop_color(props, "glow_color", ABGR8(255, 255, 255, 255)));
 
     return &button->base;
 }

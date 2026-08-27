@@ -109,6 +109,7 @@ static void set_icon_index(UIElement *e) {
     int new_index = (*current_pages[gamemode_page] * ICONS_PER_PAGE) + icon_counter;
     if (new_index < gamemode_icon_count[gamemode_page]) {
         e->enabled = true;
+        ui_icon_set_selected((UIIcon *) e, *current_icons[gamemode_page] == new_index);
         ui_icon_set_gamemode_index((UIIcon *) e, gamemode_page, new_index);
         icon_counter++;
     } else {
@@ -120,6 +121,7 @@ static void set_trail_index(UIElement *e) {
     int new_index = icon_counter;
     if (new_index < gamemode_icon_count[gamemode_page]) {
         e->enabled = true;
+        ui_icon_set_selected((UIIcon *) e, *current_icons[gamemode_page] == new_index);
         ui_icon_set_gamemode_index((UIIcon *) e, gamemode_page, new_index);
         icon_counter++;
     } else {
