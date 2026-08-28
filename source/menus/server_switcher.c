@@ -5,7 +5,7 @@
 #include "menus/components/ui_label.h"
 #include "menus/components/ui_checkbox.h"
 #include "menus/components/ui_window_button.h"
-#include "search_filters.h"
+#include "search_menu.h"
 #include "utils/server_utils.h"
 
 static bool yes_exit = false;
@@ -13,6 +13,8 @@ static bool yes_exit = false;
 static UIScreen screen = {
     .isBottom = true
 };
+static UICheckBox *robtop_checkbox;
+static UICheckBox *gdps_checkbox;
 
 static void update_length_tint(UIElement *e){
     UILabel *l = (UILabel *)e;
@@ -33,31 +35,39 @@ static void update_length_tints(){
     ui_run_func_on_tag(&screen, "lengthbtn", update_length_tint);
 }
 
-void action_set_length(UIElement* e) {
-    filters.lengthFilters ^= ui_prop_int(&e->custom_properties, "lengthval", 0);
-    update_length_tints();
+static void action_switch_server(UIElement* e) {
+    int target = ui_prop_int(&e->custom_properties, "server", 0);
+    gdps = (target == 1);
+    ui_set_checkbox_checked(robtop_checkbox, !gdps);
+    ui_set_checkbox_checked(gdps_checkbox, gdps);
 }
 
-void exit_length_filter(UIElement* e) {
+void exit_server_switcher(UIElement* e) {
     yes_exit = true;
 }
 
 static UIAction actions[] = {
-    { "length", action_set_length},
-    { "exit", exit_length_filter }
+
+    { "change_server", action_switch_server},
+    { "exit", exit_server_switcher }
 };
 
-void length_filter_init() {
-
-    ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/length_filter_pop_up.txt");
+void server_switcher_init() {
+    ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/server_switcher_pop_up.txt");
     ui_screen_open(&screen, ANIM_ZOOM);
 
-    update_length_tints();
+    gdps_checkbox = (UICheckBox *) ui_get_element_by_tag(&screen, "chk_gdps");
+    robtop_checkbox = (UICheckBox *) ui_get_element_by_tag(&screen, "chk_robtop");
 
+    ui_set_checkbox_checked(robtop_checkbox, !gdps);
+    ui_set_checkbox_checked(gdps_checkbox, gdps);
+
+    // update_length_tints();
+    
     yes_exit = false;
 }
 
-int length_filter_loop() {
+int server_switcher_loop() {
     if (yes_exit) {
         ui_unload_screen(&screen);
 
@@ -75,6 +85,6 @@ int length_filter_loop() {
     return false;
 }
 
-void length_filter_draw() {
+void server_switcher_draw() {
     ui_screen_draw(&screen);
 }

@@ -7,8 +7,6 @@
 #include "menus/components/ui_checkbox.h"
 #include "menus/components/ui_window_button.h"
 #include "menus/songs.h"
-#include "save/saving.h"
-#include "save/config.h"
 #include "search_filters.h"
 #include "utils/server_utils.h"
 
@@ -143,7 +141,6 @@ void song_filter_init() {
 
 int song_filter_loop() {
     if (yes_exit) {
-        cfg_save();
         ui_unload_screen(&screen);
 
         return true;

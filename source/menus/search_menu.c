@@ -9,13 +9,16 @@
 
 #include "generic_disclaimer.h"
 #include "search_menu.h"
-// #include "server_switcher.h"
+#include "server_switcher.h"
 #include "search_filters.h"
 #include "clear_search_filters.h"
 #include "song_filter.h"
 #include "menus/components/ui_label.h"
 #include "utils/server_utils.h"
 #include "menus/components/ui_button.h"
+
+#include "save/saving.h"
+#include "save/config.h"
 
 static int new_state = 0;
 
@@ -25,6 +28,7 @@ static bool in_filters = false;
 static bool in_clear_search_filters = false;
 static bool exit_flag = false;
 bool search_needs_refresh = true;
+bool gdps = false;
 
 static UIImage *bg_gradient;
 static UIImage *bg_gradient_top;
@@ -122,8 +126,8 @@ void action_open_disclaimer(UIElement* e) {
 }
 
 void action_open_server_switcher(UIElement* e) {
-    // in_server_switcher = true;
-    // server_switcher_init();
+    in_server_switcher = true;
+    server_switcher_init();
 }
 
 void action_open_filters(UIElement* e) {
@@ -193,13 +197,6 @@ void search_menu_loop() {
         touch.interacted = false;
 
         if (!in_disclaimer && !in_server_switcher && !in_clear_search_filters && !in_filters) ui_screen_update(&default_screen, &touch);
-
-        if (in_filters) {
-            int returned = search_filters_loop();
-            if (returned) {
-                in_filters = false;
-            }
-        }
         
         // Frees a render target, so keep it out of the frame below
         update_stereo_target();
@@ -223,6 +220,20 @@ void search_menu_loop() {
                 }
             }
 
+            if (in_filters) {
+                int returned = search_filters_loop();
+                if (returned) {
+                    in_filters = false;
+                }
+            }
+
+            if (in_server_switcher) {
+                int returned = server_switcher_loop();
+                if (returned) {
+                    in_server_switcher = false;
+                }
+            }
+
             if (in_clear_search_filters) {
                 int returned = clear_search_filters_loop();
                 if (returned) {
@@ -231,6 +242,8 @@ void search_menu_loop() {
             }
             
             if (in_filters) search_filters_draw();
+
+            if (in_server_switcher) server_switcher_draw();
 
             change_blending(true);
             draw_touch_effect();
@@ -249,11 +262,11 @@ void search_menu_loop() {
         } while (handle_fading());
 
         if (exit_flag) {
-            game_state = STATE_CREATOR_MENU;
-            break;
+            new_state = STATE_CREATOR_MENU;
         }
 
         if (new_state != STATE_SEARCH_MENU) {
+            cfg_save();
             game_state = new_state;
             break;
         }

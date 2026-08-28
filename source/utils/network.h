@@ -3,6 +3,16 @@
 #include "curl/system.h"
 #include <stdbool.h>
 
+#define ROBTOP_SEARCH_API "http://www.boomlings.com/database/getGJLevels21.php"
+#define ROBTOP_LEVEL_API "http://www.boomlings.com/database/downloadGJLevel22.php"
+#define ROBTOP_COMMENTS_API "http://www.boomlings.com/database/getGJComments21.php"
+#define ROBTOP_SONGS_API "http://www.boomlings.com/database/getGJSongInfo.php"
+
+#define GDPS_SEARCH_API "https://19gdps.com/gdapi/getGJLevels21.php"
+#define GDPS_LEVEL_API "https://19gdps.com/gdapi/downloadGJLevel22.php"
+#define GDPS_COMMENTS_API "https://19gdps.com/gdapi/getGJComments21.php"
+#define GDPS_SONGS_API "https://19gdps.com/gdapi/getGJSongInfo.php"
+
 typedef struct SearchFilters {
     bool uncompleted:1;
     bool completed:1;
@@ -61,12 +71,12 @@ Thread create_network_thread(NetworkTask *task);
 
 int soc_init();
 
-int get_level_from_id(char **out_data, int id);
+int get_level_from_id(char **out_data, int id, bool useGdps);
 
-int get_search_results(char **out_data, int gameVer, SearchFilters f);
+int get_search_results(char **out_data, int gameVer, SearchFilters f, bool useGdps);
 
-int get_comments_from_id(char **out_data, int id, int page, int mode);
+int get_comments_from_id(char **out_data, int id, int page, int mode, bool useGdps);
 
-int get_song_info_from_id(char **out_data, int songId);
+int get_song_info_from_id(char **out_data, int songId, bool useGdps);
 
 void soc_exit();

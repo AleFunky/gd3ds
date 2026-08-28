@@ -9,6 +9,7 @@
 #include "menus/components/ui_image.h"
 #include "menus/components/ui_label.h"
 #include "menus/components/ui_rectangle.h"
+#include "menus/components/ui_icon.h"
 #include "main.h"
 #include "menus/external_popup.h"
 #include "utils/folders.h"
@@ -16,6 +17,7 @@
 #include "search_menu.h"
 #include "online_menu.h"
 #include "fonts/chatFont.h"
+#include "fonts/goldFont.h"
 
 #include "state.h"
 
@@ -44,6 +46,11 @@ void action_exit_comments(UIElement* e) {
     yes_exit = true;
 }
 
+static void update_comment_arrows(bool disableArrows) {
+    if (commentEntriesLength == 10 && !disableArrows) ui_run_func_on_tag(&screen, "nextpage", ui_enable_element); else ui_run_func_on_tag(&screen, "nextpage", ui_disable_element);
+    if ((current_comments_page) >= 1 && !disableArrows) ui_run_func_on_tag(&screen, "prevpage", ui_enable_element); else ui_run_func_on_tag(&screen, "prevpage", ui_disable_element);
+}
+
 static void handle_comment_errors(int code) {
     ui_disable_element((UIElement *)spinner);
     char temp[64];
@@ -56,12 +63,13 @@ static void handle_comment_errors(int code) {
         case 6:
         case 7:   
             ui_label_set_text(error_label, "No\n<#41e24e>Internet</> connection!");
+            update_comment_arrows(true);
             break;
 
         default:
             snprintf(temp, sizeof(temp), "An unknown error has\noccurred.\n\nError code: %d", code);
             ui_label_set_text(error_label, temp);
-
+            break;
     }
 }
 
@@ -69,24 +77,23 @@ void populate_comments() {
     ui_list_reset(list);
     ui_disable_element((UIElement *) spinner);
     for (int i = 0; i < commentEntriesLength; i++) {
-        char username[25];
+        char username[36] = "-";
+        snprintf(username, sizeof(username), "<#%s>%s</>", (comment_entries[i].authorAccountId == 0) ? "5AFFFF" : "FFFFFF", comment_entries[i].name);
+
         char timestamp[136];
         int percent = comment_entries[i].percent;
         int likes = comment_entries[i].likes;
 
-        strncpy(username, comment_entries[i].name, sizeof(username) - 1);
         snprintf(timestamp, sizeof(timestamp) - 1, "%s ago", comment_entries[i].commentAge);
 
-        truncate_filename(username, 18);
-
         float list_width = list->base.w * 0.5f;
-        float list_height = 80 * 0.5f;
+        float list_height = 86 * 0.5f;
 
         UIElement *card = (UIElement *)ui_create_rectangle(&default_screen.ctx);
 
         if (card) {
             ui_rectangle_set_color((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 255) : C2D_Color32(161, 88, 44, 255)));
-            ui_element_set_size(card, 0, 80);
+            ui_element_set_size(card, 0, 86);
 
             UIWindow *bg_window = ui_create_window(&default_screen.ctx);
             if (bg_window) {
@@ -99,11 +106,22 @@ void populate_comments() {
                 ui_element_add_child(card, (UIElement *)bg_window);
             }
 
+            // Commenter's icon
+            UIIcon *user_icon = ui_create_icon(&default_screen.ctx);
+            if (user_icon && !gdps) {
+                ui_icon_set_gamemode_index(user_icon, comment_entries[i].iconType, comment_entries[i].playerIcon);
+                
+                ui_element_set_position((UIElement *)user_icon, -list_width + 20, -list_height + 15);
+                ui_element_set_scale((UIElement *)user_icon, 0.5f);
+
+                ui_element_add_child(card, (UIElement *)user_icon);
+            }
+
             // Comment author
             UILabel *username_label = ui_create_label(&default_screen.ctx);
             if (username_label) {
                 ui_label_set_text(username_label, username);
-                ui_element_set_position((UIElement *)username_label, -list_width + 10, -list_height + 15);
+                ui_element_set_position((UIElement *)username_label, -list_width + (gdps ? 10 : 30), -list_height + 15);
                 ui_element_set_scale((UIElement *)username_label, 0.6f);
 
                 username_label->font = 2;
@@ -111,14 +129,31 @@ void populate_comments() {
                 ui_element_add_child(card, (UIElement *)username_label);
             }
 
+            // Mod badge
+
+            UIImage *badge = ui_create_image(&default_screen.ctx);
+            if (badge && comment_entries[i].modBadge > 0) {
+                int badgeOffset = 0;
+                badgeOffset += comment_entries[i].modBadge;
+                if (comment_entries[i].modBadge > 2) badgeOffset = 2;
+                ui_image_set_image(badge, 371 + badgeOffset, 0);
+                ui_element_set_position((UIElement *)badge, -list_width + (gdps ? 15 : 30) + get_text_length(&goldFont_fontCharset, 0.7, false, comment_entries[i].name) + 3, -list_height + 15);
+                ui_element_set_scale((UIElement *)badge, 0.7f);
+
+                ui_element_add_child(card, (UIElement *)badge);
+            }
+
             // Comment content
             UILabel *content_label = ui_create_label(&default_screen.ctx);
             if (content_label) {
                 char *wrapped_content = wrap_text(&chatFont_fontCharset, content_label->base.scaleX, comment_entries[i].content, 270);
                 char *desc = strdup(wrapped_content);
-                ui_label_set_text(content_label, desc);
+                char tinted_desc[strlen(desc) + 13];
+                snprintf(tinted_desc, sizeof(tinted_desc), "<%s>%s</>", ((comment_entries[i].modBadge == 0) ? "#FFFFFF" : comment_entries[i].modCommentColor), desc);
+                output_log(tinted_desc);
+                ui_label_set_text(content_label, tinted_desc);
                 free(desc);
-                ui_element_set_position((UIElement *)content_label, -list_width + 12, 0 - 2.5);
+                ui_element_set_position((UIElement *)content_label, -list_width + 12, 0 - 1.5);
                 ui_element_set_scale((UIElement *)content_label, 0.68f);
 
                 content_label->font = 1;
@@ -143,20 +178,6 @@ void populate_comments() {
             }
 
             // Comment likes
-            UILabel *like_value = ui_create_label(&default_screen.ctx);
-            if (like_value) {
-                char tmp_value[16];
-
-                snprintf(tmp_value, sizeof(tmp_value), "%d", likes);
-
-                ui_label_set_text(like_value, tmp_value);
-                ui_element_set_position((UIElement *)like_value, -list_width + 28, list_height - 16);
-                ui_element_set_scale((UIElement *)like_value, 0.35f);
-
-                // like_value->alignment = 1.f;
-
-                ui_element_add_child(card, (UIElement *)like_value);
-            }
 
             UIImage *like_icon = ui_create_image(&default_screen.ctx);
             if (like_icon) {
@@ -169,6 +190,21 @@ void populate_comments() {
                 }
 
                 ui_element_add_child(card, (UIElement *)like_icon);
+            }
+
+            UILabel *like_value = ui_create_label(&default_screen.ctx);
+            if (like_value) {
+                char tmp_value[16];
+
+                snprintf(tmp_value, sizeof(tmp_value), "%d",  likes);
+
+                ui_label_set_text(like_value, tmp_value);
+                ui_element_set_position((UIElement *)like_value, -list_width + 28, list_height - 16);
+                ui_element_set_scale((UIElement *)like_value, 0.35f);
+
+                // like_value->alignment = 1.f;
+
+                ui_element_add_child(card, (UIElement *)like_value);
             }
 
             // Comment timestamp
@@ -191,12 +227,6 @@ void populate_comments() {
     }
 }
 
-
-static void update_comment_arrows(bool disableArrows) {
-    if (commentEntriesLength == 10 && !disableArrows) ui_run_func_on_tag(&screen, "nextpage", ui_enable_element); else ui_run_func_on_tag(&screen, "nextpage", ui_disable_element);
-    if ((current_comments_page) >= 1 && !disableArrows) ui_run_func_on_tag(&screen, "prevpage", ui_enable_element); else ui_run_func_on_tag(&screen, "prevpage", ui_disable_element);
-}
-
 static void action_refresh_comments(UIElement* e) {
     int buttonType = ui_prop_int(&e->custom_properties, "sorttype", 0);
 
@@ -209,6 +239,7 @@ static void action_refresh_comments(UIElement* e) {
 
         comments_sort_type = buttonType;
     }
+    update_comment_arrows(false);
     ui_list_reset(list);
     ui_enable_element((UIElement *)spinner);
     
@@ -243,7 +274,7 @@ void online_comments_init() {
 
     ui_button_set_image(sort_by_likes_button, 423, 0);
     ui_disable_element((UIElement *) spinner);
-
+    
     if (comments_need_refresh) {
         ui_enable_element((UIElement *)spinner);
         current_comments_page = 0;
@@ -252,8 +283,8 @@ void online_comments_init() {
     } else {
         if (list) { // No need to fetch new comments
             ui_label_set_text(error_label, "");
-            update_comment_arrows(false);
             populate_comments();
+            update_comment_arrows(false);
         }
     }
 
@@ -270,8 +301,8 @@ int online_comments_loop() {
             handle_comment_errors(result);
         } else { // No errors
             ui_label_set_text(error_label, "");
-            update_comment_arrows(false);
             populate_comments();
+            update_comment_arrows(false);
             comments_need_refresh = false;
         }
         comments_task.finished = false;

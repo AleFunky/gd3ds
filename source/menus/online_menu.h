@@ -8,6 +8,7 @@
 
 #define FEATURED_GLOW 72
 #define EPIC_GLOW 68
+#define SUPER_GLOW 427
 #define LEGENDARY_GLOW 69
 #define MYTHIC_GLOW 70
 
