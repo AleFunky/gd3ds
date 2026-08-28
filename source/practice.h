@@ -11,6 +11,8 @@ extern bool pseudo_checkpoint_exists;
 void start_practice_mode();
 void exit_practice_mode();
 
+int get_checkpoint_count();
+
 void new_checkpoint();
 void restore_checkpoint();
 void delete_last_checkpoint();

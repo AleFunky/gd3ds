@@ -1411,6 +1411,7 @@ int load_online_level(LevelEntry *level) {
         if (!data) return 2;
     } else {
         data = strdup(level->levelString);
+        if (!data) return 2;
     }
 
     // Get level starting colors
