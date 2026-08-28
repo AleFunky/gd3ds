@@ -1400,8 +1400,18 @@ void load_online_level_info(char *level_string) {
 }
 
 int load_online_level(LevelEntry *level) {
-    char *data = decompress_online_level(level->levelString);
-    if (!data) return 2;
+    bool compressed = true;
+
+    // Base64 doesn't allow commas, so if theres one, its not compressed
+    if (strchr(level->levelString, ',')) compressed = false;
+    
+    char *data;
+    if (compressed) {
+        data = decompress_online_level(level->levelString);
+        if (!data) return 2;
+    } else {
+        data = strdup(level->levelString);
+    }
 
     // Get level starting colors
     char *metaStr = get_metadata_value(data, "kS38");
