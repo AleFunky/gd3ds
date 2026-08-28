@@ -57,7 +57,7 @@ int selected_glow = 0;
 
 bool player_glow_enabled = false;
 
-static const int gamemode_icon_count[GAMEMODE_COUNT + 1] = {
+const int gamemode_icon_count[GAMEMODE_COUNT + 1] = {
     ICON_COUNT_PLAYER,
     ICON_COUNT_SHIP,
     ICON_COUNT_PLAYER_BALL,

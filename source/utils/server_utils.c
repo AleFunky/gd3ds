@@ -401,138 +401,6 @@ void fill_page_entry(char *initialString) {
     free_string_array(pageStrings, stringCount);
 };
 
-int search_levels_internal(bool useGdps) {
-    char *outdata;
-    int result = get_search_results(&outdata, 22, filters, useGdps);
-
-    if (result != 0) return result;
-    // validate first two chars of response to make sure what we're parsing is the search results string
-    if (!(outdata[0] >= '0' && outdata[0] <= '9' && outdata[1] == ':')) return -2;
-
-    int initialStringCount = 0;
-
-    int levelStringCount = 0;
-    int creatorStringCount = 0;
-    int songStringCount = 0;
-
-    char **initialStrings = split_string(outdata, '#', &initialStringCount, true);
-    if (!initialStrings) return -1;
-
-    char **levelsStrings = split_string(initialStrings[0], '|', &levelStringCount, true);
-    if (!levelsStrings) return -1;
-
-    char **creatorStrings = split_string(initialStrings[1], '|', &creatorStringCount, true);
-    if (!creatorStrings) return -1;
-    
-    char **songStrings = split_string_str_del(initialStrings[2], "~:~", &songStringCount, true);
-    // if (!songStrings && !filters.mainSong) return -1; 
-    
-    search_entries = malloc(levelStringCount * sizeof(SearchEntry));
-    if (!search_entries) return -1;
-
-    creator_entries = malloc(creatorStringCount * sizeof(CreatorEntry));
-    if (!creator_entries) return -1;
-
-    if (songStringCount > 0) {
-        song_entries = malloc(songStringCount * sizeof(SongEntry));
-        if (!song_entries) return -1;
-    }
-
-    page_entry = malloc(sizeof(SongEntry));
-    if (!page_entry) return -1;
-
-    // Initialize
-    memset(search_entries, 0, levelStringCount * sizeof(SearchEntry));
-    memset(creator_entries, 0, creatorStringCount * sizeof(CreatorEntry));
-    if (songStringCount > 0) memset(song_entries, 0, songStringCount * sizeof(SongEntry));
-    memset(page_entry, 0, sizeof(PageEntry));
-
-    // Fill creators
-    fill_creator_entries(creatorStrings, creatorStringCount);
-
-    // Fill songs
-    if (songStringCount > 0) fill_song_entries(songStrings, songStringCount);
-    
-    // Fill levels
-    fill_level_entries(levelsStrings, songStringCount, creatorStringCount, levelStringCount);
-
-    // Fill pages
-    fill_page_entry(initialStrings[3]);
-   
-    free_string_array(levelsStrings, levelStringCount);
-    free_string_array(creatorStrings, creatorStringCount);
-    if (songStringCount > 0) free_string_array(songStrings, songStringCount);    
-    free_string_array(initialStrings, initialStringCount);
-
-    free(outdata);
-
-    creatorEntriesLength = creatorStringCount;
-    songEntriesLength = songStringCount;
-    searchEntriesLength = levelStringCount;
-    return 0;
-}
-
-int get_level_data_internal(int id, bool refresh, int currentId, bool useGdps) {
-    char *outdata;
-    int result = get_level_from_id(&outdata, id, useGdps);
-
-    if (result != 0) return result;
-    // validate first two chars of response to make sure what we're parsing is the level string
-    if (!(outdata[0] >= '0' && outdata[0] <= '9' && outdata[1] == ':')) return -2;
-
-    int initialStringCount = 0;
-
-    char **initialStrings = split_string(outdata, '#', &initialStringCount, true);
-    if (!initialStrings) return -1;
-
-    level_entry = malloc(initialStringCount * sizeof(LevelEntry));
-    if (!level_entry) return -1;
-
-    // Initialize
-    memset(level_entry, 0, initialStringCount * sizeof(LevelEntry));
-
-    fill_level_entry(initialStrings, 1, refresh, currentId);
-
-    free_string_array(initialStrings, initialStringCount);
-
-    free(outdata);
-
-    levelEntryLength = initialStringCount;
-    return 0;
-}
-
-float derive_gj_version(int version) {
-    switch (version) {
-        case 1:
-            return 1.0;
-        case 2:
-            return 1.1;
-        case 3:
-            return 1.2;
-        case 4:
-            return 1.3;
-        case 5:
-            return 1.4;
-        case 6:
-            return 1.5;
-        case 7:
-            return 1.6;
-        case 10:
-            return 1.7;
-        case 18:
-            return 1.8;
-        case 19:
-            return 1.9;
-        case 20:
-            return 2.0;
-        case 21:
-            return 2.1;
-        case 22:
-            return 2.2;
-    }
-    return 0;
-}
-
 void fill_comment_entries(char **commentStrings, int commentStringCount) {
     for (int i = 0; i < commentStringCount; i++) {
         int commentKeyCount = 0;
@@ -545,6 +413,8 @@ void fill_comment_entries(char **commentStrings, int commentStringCount) {
             int authorDataKeyCount = 0;
             char **commentData = split_string(commentKeys[0], '~', &commentDataKeyCount, true);
             char **authorData = split_string(commentKeys[1], '~', &authorDataKeyCount, true);
+
+            // comment data entries
             for (int k = 0; k + 1 < commentDataKeyCount; k += 2) {
                 int key = atoi(commentData[k]);
                 char *valStr = commentData[k + 1];
@@ -608,7 +478,7 @@ void fill_comment_entries(char **commentStrings, int commentStringCount) {
                 
                 }
             }
-
+            // comment author entries
             for (int k = 0; k + 1 < authorDataKeyCount; k += 2) {
                 int key = atoi(authorData[k]);
                 char *valStr = authorData[k + 1];
@@ -742,6 +612,138 @@ void fill_gdps_comment_author_entries(char **authorStrings, int authorStringCoun
     }
 }
 
+int search_levels_internal(bool useGdps) {
+    char *outdata;
+    int result = get_search_results(&outdata, 22, filters, useGdps);
+
+    if (result != 0) return result;
+    // validate first two chars of response to make sure what we're parsing is the search results string
+    if (!(outdata[0] >= '0' && outdata[0] <= '9' && outdata[1] == ':')) return -2;
+
+    int initialStringCount = 0;
+
+    int levelStringCount = 0;
+    int creatorStringCount = 0;
+    int songStringCount = 0;
+
+    char **initialStrings = split_string(outdata, '#', &initialStringCount, true);
+    if (!initialStrings) return -1;
+
+    char **levelsStrings = split_string(initialStrings[0], '|', &levelStringCount, true);
+    if (!levelsStrings) return -1;
+
+    char **creatorStrings = split_string(initialStrings[1], '|', &creatorStringCount, true);
+    if (!creatorStrings) return -1;
+    
+    char **songStrings = split_string_str_del(initialStrings[2], "~:~", &songStringCount, true);
+    // if (!songStrings && !filters.mainSong) return -1; 
+    
+    search_entries = malloc(levelStringCount * sizeof(SearchEntry));
+    if (!search_entries) return -1;
+
+    creator_entries = malloc(creatorStringCount * sizeof(CreatorEntry));
+    if (!creator_entries) return -1;
+
+    if (songStringCount > 0) {
+        song_entries = malloc(songStringCount * sizeof(SongEntry));
+        if (!song_entries) return -1;
+    }
+
+    page_entry = malloc(sizeof(SongEntry));
+    if (!page_entry) return -1;
+
+    // Initialize
+    memset(search_entries, 0, levelStringCount * sizeof(SearchEntry));
+    memset(creator_entries, 0, creatorStringCount * sizeof(CreatorEntry));
+    if (songStringCount > 0) memset(song_entries, 0, songStringCount * sizeof(SongEntry));
+    memset(page_entry, 0, sizeof(PageEntry));
+
+    // Fill creators
+    fill_creator_entries(creatorStrings, creatorStringCount);
+
+    // Fill songs
+    if (songStringCount > 0) fill_song_entries(songStrings, songStringCount);
+    
+    // Fill levels
+    fill_level_entries(levelsStrings, songStringCount, creatorStringCount, levelStringCount);
+
+    // Fill pages
+    fill_page_entry(initialStrings[3]);
+   
+    free_string_array(levelsStrings, levelStringCount);
+    free_string_array(creatorStrings, creatorStringCount);
+    if (songStringCount > 0) free_string_array(songStrings, songStringCount);    
+    free_string_array(initialStrings, initialStringCount);
+
+    free(outdata);
+
+    creatorEntriesLength = creatorStringCount;
+    songEntriesLength = songStringCount;
+    searchEntriesLength = levelStringCount;
+    return 0;
+}
+
+int get_level_data_internal(int id, bool refresh, int currentId, bool useGdps) {
+    char *outdata;
+    int result = get_level_from_id(&outdata, id, useGdps);
+
+    if (result != 0) return result;
+    // validate first two chars of response to make sure what we're parsing is the level string
+    if (!(outdata[0] >= '0' && outdata[0] <= '9' && outdata[1] == ':')) return -2;
+
+    int initialStringCount = 0;
+
+    char **initialStrings = split_string(outdata, '#', &initialStringCount, true);
+    if (!initialStrings) return -1;
+
+    level_entry = malloc(initialStringCount * sizeof(LevelEntry));
+    if (!level_entry) return -1;
+
+    // Initialize
+    memset(level_entry, 0, initialStringCount * sizeof(LevelEntry));
+
+    fill_level_entry(initialStrings, 1, refresh, currentId);
+
+    free_string_array(initialStrings, initialStringCount);
+
+    free(outdata);
+
+    levelEntryLength = initialStringCount;
+    return 0;
+}
+
+float derive_gj_version(int version) {
+    switch (version) {
+        case 1:
+            return 1.0;
+        case 2:
+            return 1.1;
+        case 3:
+            return 1.2;
+        case 4:
+            return 1.3;
+        case 5:
+            return 1.4;
+        case 6:
+            return 1.5;
+        case 7:
+            return 1.6;
+        case 10:
+            return 1.7;
+        case 18:
+            return 1.8;
+        case 19:
+            return 1.9;
+        case 20:
+            return 2.0;
+        case 21:
+            return 2.1;
+        case 22:
+            return 2.2;
+    }
+    return 0;
+}
+
 int get_comments_internal(int id, int page, int sortType, bool useGdps) {
     char *outdata;
     int result = get_comments_from_id(&outdata, id, page, sortType, useGdps);
@@ -828,6 +830,8 @@ int get_song_data_internal(int songId, int targetSongEntry, bool useGdps) {
     levelEntryLength = initialStringCount;
     return 0;
 }
+
+//intermediate functions
 
 int search_levels() {
     int result = search_levels_internal(gdps);
