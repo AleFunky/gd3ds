@@ -250,7 +250,7 @@ void apply_volume_settings() {
 
 void check_system_model() {
     u8 model = get_model();
-    is_N3DS = model == CFG_MODEL_N2DSXL || model == CFG_MODEL_N3DS || model == CFG_MODEL_N3DSXL;
+    is_N3DS = model == CFG_MODEL_N2DSXL || model == CFG_MODEL_N3DS || model == CFG_MODEL_N3DSXL || is_citra();
 }
 
 float sprite_drawing_time = 0;
