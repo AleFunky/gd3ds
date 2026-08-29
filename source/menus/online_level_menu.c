@@ -367,6 +367,9 @@ static void handle_song_codes(int code) {
     ui_button_set_image(song_download_button, 57, 0);
     char message[64];
     switch (code) {
+        case -4:
+            snprintf(message, sizeof(message), "<#f93219>Download failed.</>");
+            break;
         case -3:
         case -2: 
             snprintf(message, sizeof(message), "<#f93219>Unknown error.</>");

@@ -1,5 +1,6 @@
 #include <3ds.h>
 #include "network.h"
+#include "curl/system.h"
 #include "main.h"
 #include <curl/curl.h>
 #include <string.h>
@@ -304,7 +305,7 @@ int get_song_info_from_id(char **out_data, int songId, bool useGdps) {
             return code;
         }
 
-        printf("(code %d) Response (%d): %s\n", code, chunk.size, chunk.memory);
+        output_log("(code %d) Response (%d): <%s>\n", code, chunk.size, chunk.memory);
 
         if (chunk.memory[0] == '-') {
             return atoi(chunk.memory);
@@ -383,7 +384,17 @@ static int download_song(DownloadTask *task) {
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, f);
 
         CURLcode code = curl_easy_perform(curl);
+
+        long http_code = 0;
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
         
+        if (http_code != 200) {
+            remove(full_path);
+            free(decoded_url);
+            curl_easy_cleanup(curl);
+            return -4;
+        }
+
         if (code) {
             remove(full_path);
             free(decoded_url);
