@@ -4,6 +4,8 @@
 
 #define ICONS_PER_PAGE 21
 
+extern const int gamemode_icon_count[GAMEMODE_COUNT + 1];
+
 void icon_kit_loop();
 
 extern int selected_cube;

@@ -10,8 +10,10 @@
 #include "menus/components/ui_label.h"
 #include "menus/components/ui_rectangle.h"
 #include "menus/components/ui_icon.h"
+#include "icons.h"
 #include "main.h"
 #include "menus/external_popup.h"
+#include "menus/icon_kit.h"
 #include "utils/folders.h"
 #include "utils/server_utils.h"
 #include "search_menu.h"
@@ -106,10 +108,23 @@ void populate_comments() {
                 ui_element_add_child(card, (UIElement *)bg_window);
             }
 
-            // Commenter's icon
+            // Commenter's icon (robtop server exclusive)
             UIIcon *user_icon = ui_create_icon(&default_screen.ctx);
             if (user_icon && !gdps) {
-                ui_icon_set_gamemode_index(user_icon, comment_entries[i].iconType, comment_entries[i].playerIcon);
+                output_log("icon type: %d\nicon id: %d\nicon p1: %d\n icon p2: %d\n\n", comment_entries[i].iconType, comment_entries[i].playerIcon, comment_entries[i].col1, comment_entries[i].col2);
+                int iconType = comment_entries[i].iconType;
+                int iconIndex = comment_entries[i].playerIcon;
+
+                // check if provided player icon is in bounds
+                if (iconType >= GAMEMODE_COUNT) {
+                    iconType = 0;
+                    iconIndex = 1;
+                } else if (iconIndex >= gamemode_icon_count[iconType]) iconIndex = 1;
+
+                ui_icon_set_gamemode_index(user_icon, iconType, iconIndex);
+                ui_icon_set_glow(user_icon, C2D_Color32(175, 175, 175, 255));
+                ui_icon_set_p1(user_icon, C2D_Color32(175, 175, 175, 255));
+                ui_icon_set_p2(user_icon, C2D_Color32(175, 175, 175, 255));
                 
                 ui_element_set_position((UIElement *)user_icon, -list_width + 20, -list_height + 15);
                 ui_element_set_scale((UIElement *)user_icon, 0.5f);
@@ -150,7 +165,6 @@ void populate_comments() {
                 char *desc = strdup(wrapped_content);
                 char tinted_desc[strlen(desc) + 13];
                 snprintf(tinted_desc, sizeof(tinted_desc), "<%s>%s</>", ((comment_entries[i].modBadge == 0) ? "#FFFFFF" : comment_entries[i].modCommentColor), desc);
-                output_log(tinted_desc);
                 ui_label_set_text(content_label, tinted_desc);
                 free(desc);
                 ui_element_set_position((UIElement *)content_label, -list_width + 12, 0 - 1.5);
@@ -207,9 +221,9 @@ void populate_comments() {
                 ui_element_add_child(card, (UIElement *)like_value);
             }
 
-            // Comment timestamp
+            // Comment timestamp (robtop server exclusive)
             UILabel *timestamp_value = ui_create_label(&default_screen.ctx);
-            if (timestamp_value) {
+            if (timestamp_value && !gdps) {
                 char tmp_value[sizeof(timestamp) + 14 - 1];
                 snprintf(tmp_value, sizeof(tmp_value), "<#0000007D>%s", timestamp);
 
