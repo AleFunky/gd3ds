@@ -600,10 +600,7 @@ void online_level_menu_loop() {
 
     set_fade_status(FADE_STATUS_IN);
 
-    if (!playing_menu_loop) {
-        play_mp3(menu_loop_path, true, 0);
-        playing_menu_loop = true;
-    }
+    play_menu_song();
 
     while (aptMainLoop()) {
         hidScanInput();

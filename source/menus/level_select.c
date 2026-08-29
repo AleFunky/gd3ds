@@ -460,10 +460,7 @@ void level_select_loop() {
     bg_gradient = (UIImage *) ui_get_element_by_tag(&default_screen, "gradient");
     bg_gradient_top = (UIImage *) ui_get_element_by_tag(&default_screen_top, "gradient");
 
-    if (!playing_menu_loop) {
-        play_mp3(menu_loop_path, true, 0);
-        playing_menu_loop = true;
-    }
+    play_menu_song();
 
     while (aptMainLoop()) {
         hidScanInput();

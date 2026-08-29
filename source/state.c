@@ -504,6 +504,17 @@ void play_practice_song() {
     play_mp3("romfs:/songs/StayInsideMe.mp3", true, 0);
 }
 
+void play_menu_song() {
+    if (!playing_menu_loop) {
+        size_t out_size;
+        void *buf = read_file(menu_loop_path, &out_size);
+        if (buf) {
+            play_mp3_buf(buf, out_size, true, 0);
+            playing_menu_loop = true;
+        }
+    }
+}
+
 // Respawn effect
 
 void start_respawn_effect() {
