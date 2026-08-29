@@ -205,6 +205,20 @@ void search_menu_loop() {
         
         // Frees a render target, so keep it out of the frame below
         update_stereo_target();
+        
+        if (in_filters) { // Bro stop putting this in the rendering do while
+            int returned = search_filters_loop();
+            if (returned) {
+                in_filters = false;
+            }
+        }
+
+        if (in_server_switcher) {
+            int returned = server_switcher_loop();
+            if (returned) {
+                in_server_switcher = false;
+            }
+        }
 
         do {
             update_touch_effect(DT);
@@ -222,20 +236,6 @@ void search_menu_loop() {
                 int returned = disclaimer_loop();
                 if (returned) {
                     in_disclaimer = false;
-                }
-            }
-
-            if (in_filters) {
-                int returned = search_filters_loop();
-                if (returned) {
-                    in_filters = false;
-                }
-            }
-
-            if (in_server_switcher) {
-                int returned = server_switcher_loop();
-                if (returned) {
-                    in_server_switcher = false;
                 }
             }
 
