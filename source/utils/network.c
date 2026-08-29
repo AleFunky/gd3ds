@@ -416,7 +416,7 @@ static void network_thread(void *arg) {
 Thread create_network_thread(NetworkTask *task) {
     int32_t priority = 0x30;
     svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
-    priority -= 1;
+    priority += 1;
     priority = priority < 0x18 ? 0x18 : priority;
     priority = priority > 0x3F ? 0x3F : priority;
     

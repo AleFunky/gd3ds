@@ -354,9 +354,7 @@ int play_mp3(char *path, bool loop, float seek) {
 
     int32_t priority = 0x30;
     svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
-    // ... then subtract 1, as lower number => higher actual priority ...
-    priority -= 1;
-    // ... finally, clamp it between 0x18 and 0x3F to guarantee that it's valid.
+    priority -= 10;
     priority = priority < 0x18 ? 0x18 : priority;
     priority = priority > 0x3F ? 0x3F : priority;
 
