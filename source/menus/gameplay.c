@@ -173,7 +173,12 @@ static void restart_level() {
     init_variables();
     reload_level();
     if (state.practice_mode) {
-        if (checkpoint_count > 0) {
+        if (settingsState.autoCheckpoints && player_gamemode_is_flying(&state.death_player) && pseudo_checkpoint_exists) {
+            delete_last_checkpoint();
+            pseudo_checkpoint_exists = false;
+        }
+        
+        if (get_checkpoint_count() > 0) {
             restore_checkpoint();
         } else {
             seek_mp3(level_info.song_offset);

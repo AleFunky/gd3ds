@@ -124,12 +124,6 @@ void new_checkpoint() {
 }
 
 void restore_checkpoint() {
-    // If auto checkpoints and flying gamemode, remove the pseudo checkpoint
-    if (settingsState.autoCheckpoints && player_gamemode_is_flying(&state.death_player) && pseudo_checkpoint_exists) {
-        delete_last_checkpoint();
-        pseudo_checkpoint_exists = false;
-    }
-
     CheckpointData *check = &checkpoints[checkpoint_pointer];
 
     state.camera_x = check->camera_x;
@@ -277,6 +271,14 @@ static void draw_checkpoint(float x, float y) {
     C2D_SpriteSetPos(&spr, get_mirror_x(x, state.mirror_factor), y);
 
     C2D_DrawSprite(&spr);
+}
+
+int get_checkpoint_count() {
+    int count = checkpoint_count;
+    if (settingsState.autoCheckpoints && player_gamemode_is_flying(&state.player) && pseudo_checkpoint_exists) {
+        count--;
+    }
+    return MAX(0, count);
 }
 
 void draw_checkpoints() {
