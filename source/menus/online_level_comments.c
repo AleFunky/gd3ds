@@ -111,7 +111,7 @@ void populate_comments() {
             // Commenter's icon (robtop server exclusive)
             UIIcon *user_icon = ui_create_icon(&default_screen.ctx);
             if (user_icon && !gdps) {
-                output_log("icon type: %d\nicon id: %d\nicon p1: %d\n icon p2: %d\n\n", comment_entries[i].iconType, comment_entries[i].playerIcon, comment_entries[i].col1, comment_entries[i].col2);
+                //output_log("icon type: %d\nicon id: %d\nicon p1: %d\n icon p2: %d\n\n", comment_entries[i].iconType, comment_entries[i].playerIcon, comment_entries[i].col1, comment_entries[i].col2);
                 int iconType = comment_entries[i].iconType;
                 int iconIndex = comment_entries[i].playerIcon;
 

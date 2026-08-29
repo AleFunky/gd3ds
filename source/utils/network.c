@@ -305,7 +305,7 @@ int get_song_info_from_id(char **out_data, int songId, bool useGdps) {
             return code;
         }
 
-        output_log("(code %d) Response (%d): <%s>\n", code, chunk.size, chunk.memory);
+        printf("(code %d) Response (%d): <%s>\n", code, chunk.size, chunk.memory);
 
         if (chunk.memory[0] == '-') {
             return atoi(chunk.memory);
@@ -363,7 +363,6 @@ static int download_song(DownloadTask *task) {
 
     if (curl) {
         char *decoded_url = url_decode(url);
-        output_log(decoded_url, '\n');
         // url_convert_to_http(decoded_url);
 
         curl_easy_setopt(curl, CURLOPT_URL, decoded_url);

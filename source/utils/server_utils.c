@@ -465,14 +465,12 @@ void fill_comment_entries(char **commentStrings, int commentStringCount) {
                         break;
                     case 12:
                         // color of username (if mod)
-
                         int rgbCount = 0;
                         char **rgbData = split_string(valStr, ',', &rgbCount, true);
                         if (!rgbData) break;
 
                         snprintf(comment_entries[i].modCommentColor, sizeof(comment_entries[i].modCommentColor) - 1, "#%02X%02X%02X", atoi(rgbData[0]), atoi(rgbData[1]), atoi(rgbData[2]));
-                        
-                        output_log(comment_entries->modCommentColor);
+                
                         free_string_array(rgbData, rgbCount);
                         break;
                 
@@ -575,8 +573,7 @@ void fill_gdps_comment_entries(char **commentStrings, int commentStringCount) {
                         if (!rgbData) break;
 
                         snprintf(comment_entries[i].modCommentColor, sizeof(comment_entries[i].modCommentColor) - 1, "#%02X%02X%02X", atoi(rgbData[0]), atoi(rgbData[1]), atoi(rgbData[2]));
-                        
-                        output_log(comment_entries->modCommentColor);
+        
                         free_string_array(rgbData, rgbCount);
                         break;
                 
