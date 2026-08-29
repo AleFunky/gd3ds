@@ -183,6 +183,8 @@ C2D_SpriteSheet *get_sheet(int sheet) {
             return &bg2Sheet;
         case 9:
             return &bar_sheet;
+        case 10:
+            return &bg_gradient_sheet;
     }
     return NULL;
 }

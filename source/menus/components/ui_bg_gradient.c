@@ -6,18 +6,22 @@
 #include "menus/core/ui_props.h"
 #include "ui_bg_gradient.h"
 #include "math_helpers.h"
+#include "menus/search_menu.h"
 
 static void ui_bg_gradient_update(UIElement* e, UIInput* touch, UITransform *transform) {
     bool inside = ui_element_basic_bound_check(e, touch, transform);
-    
+
     // Mask background elements
     if (inside) touch->did_something = true;
 }
 
 static void ui_bg_gradient_draw(UIElement* e, UITransform *transform) {
     UIImage *image = (UIImage *) e;
-    C2D_SpriteSetPos(&image->image.sprite, transform->x, transform->y);
-    C2D_SpriteSetScale(&image->image.sprite, transform->scaleX, transform->scaleY);
+
+    C2D_SpriteFromSheet(&image->image.sprite, bg_gradient_sheet, gdps ? 1 : 0);
+
+    C2D_SpriteSetPos(&image->image.sprite, gdps ? 0.f : transform->x, gdps ? 0.f : transform->y);
+    C2D_SpriteSetScale(&image->image.sprite, gdps ? 1.f : transform->scaleX, gdps ? 1.f : transform->scaleY);
     C2D_DrawSpriteTinted(&image->image.sprite, &image->image.tint);
 }
 

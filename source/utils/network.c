@@ -151,14 +151,15 @@ int get_search_results(char **out_data, int gameVer, SearchFilters f, bool useGd
 
         int pos = snprintf(data,
             sizeof(data) - 1, 
-            "secret=Wmfd2893gb7&gameVersion=%d&type=%d&page=%d&original=%d&noStar=%d&star=%d&featured=%d", 
+            "secret=Wmfd2893gb7&gameVersion=%d&type=%d&page=%d&original=%d&noStar=%d&star=%d&featured=%d&epic=%d", 
             gameVer, 
             f.searchType, 
             f.currentPage, 
             f.original, 
             f.noStar, 
             f.star,
-            f.featured);
+            f.featured,
+            f.super);
 
         pos += snprintf(data + pos, sizeof(data) - pos, "&str=%s", f.searchQuery);
 

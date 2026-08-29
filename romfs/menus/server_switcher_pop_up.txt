@@ -1,20 +1,26 @@
 darken opacity=0.4 darkenTime=0.15
 
-window x=160 y=120 w=260 h=180 style=0
+window x=160 y=120 w=260 h=180 style=13
 {
+    # corner thingys
+    image x=-105 y=65 id=230
+    image x=105 y=65 id=230 sx=-1.0
+    image x=-105 y=-65 id=230 sy=-1.0
+    image x=105 y=-65 id=230 sx=-1.0 sy=-1.0
+
     button x=-127 y=-87 id=31 scale=0.8 action="exit" keyBinds="B"
 
-    label x=0 y=-68 font=2 text="Server Switcher" scale=0.9 align=CENTER
+    # SERVERS
+    image x=0 y=-55 id=56 sheet=1
 
-
-    image x=-60 y=-10 id=55 scale=0.5 sheet=1
-    image x=60 y=-10 id=44 scale=0.5 sheet=1
-
-
-
-    label x=-60 y=36 text="Official" scale=0.4 tag="" align=CENTER
-    checkbox x=-60 y=60 tag="chk_robtop" scale=0.75 action="change_server" custom=[server=0]
-
-    label x=60 y=36 text="1.9 GDPS" scale=0.4 tag="" align=CENTER
-    checkbox x=60 y=60 tag="chk_gdps" scale=0.75 action="change_server" custom=[server=1]
+    windowbutton x=-60 y=20 w=100 h=100 style=11 action="change_server" custom=[server=0] tag="server"
+    {
+        image x=0 y=-5 id=55 scale=0.5 sheet=1 tag="serverimage"
+        label x=0 y=40 text="Official" scale=0.4 align=CENTER tag="servertext" custom=[basetext="Official"]
+    }
+    windowbutton x=60 y=20 w=100 h=100 style=12 action="change_server" custom=[server=1] tag="server"
+    {
+        image x=0 y=-5 id=44 scale=0.5 sheet=1 tag="serverimage"
+        label x=0 y=40 text="1.9 GDPS" scale=0.4 align=CENTER tag="servertext" custom=[basetext="1.9 GDPS"]
+    }
 }

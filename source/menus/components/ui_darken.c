@@ -98,19 +98,18 @@ UIElement *ui_create_darken_from_props(const UIContext *ctx, const UIPropertyLis
     float darkenTime = ui_prop_float(props, "darkenTime", 0.1f);
     float opacity = ui_prop_float(props, "opacity", 0.4f);
     
-    if (darkenTime <= 0.f) {
-        ui_darken_reset_opacity(darken );
-        
+    if (darkenTime <= 0.f) {    
         darken->base.opacity = opacity;
         darken->darkenOver = true;
     } else {
         darken->darkenTime = darkenTime;
         darken->darkenTimeElapsed = 0.f;
         darken->darkenOver = false;
+        darken->base.opacity = 0.f;
         darken->targetOpacity = opacity;
     }
 
-    C2D_PlainImageTint(&darken->image.tint, C2D_Color32f(0, 0, 0, opacity), 1.0f);
+    C2D_PlainImageTint(&darken->image.tint, C2D_Color32f(0.f, 0.f, 0.f, darken->base.opacity), 1.0f);
 
     return &darken->base;
 }

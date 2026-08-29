@@ -479,7 +479,7 @@ void clear_bg_flash() {
 }
 
 void play_level_song(float seek) {
-    if (level_info.custom_song_id > 0) {
+    if (level_info.custom_song_id > 0 && state.custom_level) {
         size_t sz = 0;
         void *buf = load_user_song(level_info.custom_song_id, &sz);
         if (buf) {
