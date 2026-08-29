@@ -221,20 +221,12 @@ void populate_comments() {
                 ui_element_add_child(card, (UIElement *)like_value);
             }
 
-<<<<<<< Updated upstream
-            // Comment timestamp (robtop server exclusive)
-            UILabel *timestamp_value = ui_create_label(&default_screen.ctx);
-            if (timestamp_value && !gdps) {
-                char tmp_value[sizeof(timestamp) + 14 - 1];
-                snprintf(tmp_value, sizeof(tmp_value), "<#0000007D>%s", timestamp);
-=======
             // Comment timestamp
             if(!gdps){
                 UILabel *timestamp_value = ui_create_label(&default_screen.ctx);
                 if (timestamp_value) {
                     char tmp_value[sizeof(timestamp) + 14 - 1];
                     snprintf(tmp_value, sizeof(tmp_value), "<#0000007D>%s", timestamp);
->>>>>>> Stashed changes
 
                     ui_label_set_text(timestamp_value, tmp_value);
                     ui_element_set_position((UIElement *)timestamp_value, list_width - 8, list_height - 15);
