@@ -6,6 +6,7 @@
 #include "save/saving.h"
 #include "utils/server_utils.h"
 #include "online_menu.h"
+#include "search_menu.h"
 
 static bool yes_exit = false;
 
@@ -46,7 +47,11 @@ void populate_online_info() {
     snprintf(buffer, sizeof(buffer), "By: <#ffff00>%s</>", creator_entries[curr_entry->creatorIndex].creatorName);
     ui_label_set_text(level_creator, buffer);
     
-    snprintf(buffer, sizeof(buffer), "Uploaded: <#ffff00>%s ago</>", level_entry->uploadDate);
+    snprintf(
+        buffer, sizeof(buffer), 
+        gdps ? "Uploaded: <#ffff00>%s</>" : "Uploaded: <#ffff00>%s ago</>", 
+        level_entry->uploadDate
+    );
     ui_label_set_text(uploaded_ago, buffer);
     
     snprintf(buffer, sizeof(buffer), "Updated: <#ffff00>%s ago</>", level_entry->updateDate);

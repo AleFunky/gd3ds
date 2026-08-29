@@ -286,6 +286,8 @@ static void populate_list() {
                     featured_id = FEATURED_GLOW;
                 }
 
+                if(!entry->stars) yOffset += 4;
+
                 ui_image_set_image(featured_glow, featured_id, 0);
                 ui_element_set_position((UIElement *)featured_glow, -list_width + 23 + (gdps ? 0.3 : 0), -8.5f + yOffset);
                 ui_element_set_scale((UIElement *)featured_glow, 0.82f);
@@ -308,7 +310,7 @@ static void populate_list() {
                 }
 
                 ui_image_set_image(difficulty_face, difficulty_id, 0);
-                ui_element_set_position((UIElement *)difficulty_face, -list_width + 23,  (entry->stars > 0) ? -4 : 0);
+                ui_element_set_position((UIElement *)difficulty_face, -list_width + 23, (entry->stars > 0) ? -4 : 0);
                 ui_element_set_scale((UIElement *)difficulty_face, 0.82f);
 
                 ui_element_add_child(card, (UIElement *)difficulty_face);
@@ -484,7 +486,7 @@ void online_menu_loop() {
     set_fade_status(FADE_STATUS_IN);
 
     if (!playing_menu_loop) {
-        play_mp3("romfs:/songs/menuLoop.mp3", true, 0);
+        play_mp3(menu_loop_path, true, 0);
         playing_menu_loop = true;
     }
 

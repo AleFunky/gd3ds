@@ -20,6 +20,7 @@ typedef struct SearchFilters {
     bool noStar:1;
     bool star:1;
     bool featured:1;
+    bool super:1;
     bool isNA:1;
     bool isAuto:1;
     bool isDemon:1;

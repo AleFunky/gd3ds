@@ -109,6 +109,7 @@ extern C3D_RenderTarget* bot;
 
 extern int game_state;
 extern bool playing_menu_loop;
+extern char menu_loop_path[32];
 
 extern SFX play_sound;
 extern SFX quit_sound;

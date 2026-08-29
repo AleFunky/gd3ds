@@ -44,6 +44,7 @@ static const CreditsEntries credits[] = {
     { "novex", "Optimization", 0.5f },
     { "DiegoWearden", "240hz input", 0.5f },
     { "zylonity", "3D Support", 0.5f },
+    { "Crafty Jumper", "UI Assets", 0.5f}
 };
 
 void exit_credits(UIElement* e) {

@@ -28,7 +28,6 @@ char *splash_texts[] = {
     "2.0 when",
     "Look ma! no move triggers!",
     "99% accuracy!",
-    "Six Seven!",
     "AAAAAAAAAAAAAAAAAAA",
     "Progress Alert",
     "Jesse, the gpu and cpu ARE parallel",
@@ -54,7 +53,7 @@ char *splash_texts[] = {
     "I love GD cologne",
     "You cant beat TOE 2? Git gud",
     "When the verification video is lost media",
-    "Music by... too many to list here",
+    "Music by me. I made it all.",
     "Update 1.9 is revolution!",
     "1.9 compatible!",
     "/\\/\\/\\",
@@ -64,7 +63,22 @@ char *splash_texts[] = {
     "Does this look possible to you?",
     "Bwomp",
     "Trans rights are human rights",
-    "No consistent naming conventions!"
+    "No consistent naming conventions!",
+    "void envelop_objects();",
+    "FIVE FIVE. FIVE FIVE.",
+    "advexed never clear",
+    "By: Dimrain47",
+    "Probably runs at like... 5FPS",
+    "Wouldn't it be funny if this was in the Oxygene1 font -Crafty Jumper"
+    "Its mostly optimisation",
+    "500 memory leaks",
+    "CONCRETE",
+    "Hope you don't mind 45 seconds of input lag",
+    "Put ya 3DS away Waltuh",
+    "free(people_array[get_SSN(\"KandoWontu\")])",
+    "Have you encountered the nightmare men?",
+    "who is cloud5474",
+    "Can you do um maybe like um... stuff"
 };
 
 static UIAction actions[] = {
