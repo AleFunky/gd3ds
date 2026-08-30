@@ -74,6 +74,7 @@ typedef struct CommentEntry {
     int col1;
     int col2;
     bool glow;
+    int glowCol;
 } CommentEntry;
 
 typedef struct CommentAuthorEntry {

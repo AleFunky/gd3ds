@@ -29,5 +29,5 @@ button x=37 y=95 id=422 sheet=0 scale=0.55 action="refresh" custom=[sorttype=1] 
 
 button x=296 y=215 id=202 sheet=0 scale=0.8 action="refresh" custom=[sorttype=-1]
 
-button x=38 y=140 id=6 scale=0.7 action="changepage" keyBinds="L,DPAD_LEFT" custom=[page=-1] tag="prevpage"
-button x=282 y=140 sx=-0.7 sy=0.7 id=6 action="changepage" keyBinds="R,DPAD_RIGHT" custom=[page=1] tag="nextpage"
+button x=38 y=140 id=6 scale=0.7 action="changepage" keyBinds="L,ZL,LEFT" custom=[page=-1] tag="prevpage"
+button x=282 y=140 sx=-0.7 sy=0.7 id=6 action="changepage" keyBinds="R,ZR,RIGHT" custom=[page=1] tag="nextpage"

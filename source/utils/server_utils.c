@@ -269,12 +269,17 @@ static void fill_level_entry(char **levelStrings, int levelStringsCount, bool fi
             // level description
             if (fillSearchEntry)
             {
+
+                
                 if (valStr[0] == '\0')
                 {
                     search_entries[searchId].description = strdup("No description provided.");
                     break;
                 }
-
+                if (gdps) {
+                    search_entries[searchId].description = strdup(valStr);
+                    break;
+                };
                 fix_base64_url(valStr);
                 search_entries[searchId].description = malloc(strlen(valStr) + 1);
                 int decoded_len = base64_decode(valStr, (unsigned char *)search_entries[searchId].description);
@@ -508,6 +513,10 @@ void fill_comment_entries(char **commentStrings, int commentStringCount) {
                     case 16:
                     // author account id
                         comment_entries[i].authorAccountId = atoi(valStr);
+                        break;
+                    case 51:
+                        // glow color 
+                        comment_entries[i].glowCol = atoi(valStr);
                         break;
                 }
             }

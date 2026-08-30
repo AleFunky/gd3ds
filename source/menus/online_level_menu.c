@@ -89,7 +89,7 @@ bool song_exists = false;
 
 int warning_step = 0;
 
-char download_speed[24]= "Speed: 0B/s";
+char download_speed[24] = "Speed: 0 B/s";
 
 static UIImage *bg_gradient;
 static UIImage *bg_gradient_top;
@@ -136,7 +136,7 @@ static void action_download(){
         ui_disable_element((UIElement *) song_id_label);
         ui_enable_element((UIElement *) song_progress_bar);
         ui_enable_element((UIElement *) speed_label);
-        snprintf(download_speed, sizeof(download_speed), "Speed: 0B/s");
+        snprintf(download_speed, sizeof(download_speed), "Speed: 0 B/s");
         ui_label_set_text(speed_label, download_speed);
         create_network_thread(&song_data_task);
     } else {
@@ -169,10 +169,8 @@ static void action_open_info(UIElement *e) {
 }
 
 static void action_open_comments(UIElement *e) {
-    if (result == 0 || comes_from_levels){
-        in_comments = true;
-        online_comments_init();
-    }
+    in_comments = true;
+    online_comments_init();
 }
 
 static void action_delete_level(UIElement *e) {
