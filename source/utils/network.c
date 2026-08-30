@@ -31,8 +31,17 @@ struct MemoryStruct {
     size_t size;
 };
 
-size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
-{
+static int cancelCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
+    NetworkTask *task = clientp;
+
+    if (task->cancelled) {
+        return 1;
+    }
+
+    return 0;
+}
+
+size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp) {
     size_t realsize = size * nmemb;
     struct MemoryStruct *mem = (struct MemoryStruct *)userp;
 
@@ -66,7 +75,7 @@ int soc_init() {
     return ret;
 }
 
-int get_level_from_id(char **out_data, int id, bool useGdps) {
+int get_level_from_id(NetworkTask *task, char **out_data, int id, bool useGdps) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -83,6 +92,8 @@ int get_level_from_id(char **out_data, int id, bool useGdps) {
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+        curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
+        curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
         curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
 
@@ -128,7 +139,7 @@ static void unpack_bitfield_digits(int field, int bit_count, char *string, int o
     string[pos] = '\0';
 }
 
-int get_search_results(char **out_data, int gameVer, SearchFilters f, bool useGdps) {
+int get_search_results(NetworkTask *task, char **out_data, int gameVer, SearchFilters f, bool useGdps) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -145,6 +156,8 @@ int get_search_results(char **out_data, int gameVer, SearchFilters f, bool useGd
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+        curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
+        curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
         curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
 
@@ -226,7 +239,7 @@ int get_search_results(char **out_data, int gameVer, SearchFilters f, bool useGd
     return 2;
 }
 
-int get_comments_from_id(char **out_data, int id, int page, int mode, bool useGdps) {
+int get_comments_from_id(NetworkTask *task, char **out_data, int id, int page, int mode, bool useGdps) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -243,6 +256,8 @@ int get_comments_from_id(char **out_data, int id, int page, int mode, bool useGd
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+        curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
+        curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
         curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
 
@@ -272,7 +287,7 @@ int get_comments_from_id(char **out_data, int id, int page, int mode, bool useGd
     return 2;
 }
 
-int get_song_info_from_id(char **out_data, int songId, bool useGdps) {
+int get_song_info_from_id(NetworkTask *task, char **out_data, int songId, bool useGdps) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -289,6 +304,8 @@ int get_song_info_from_id(char **out_data, int songId, bool useGdps) {
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+        curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
+        curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
         curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
 
@@ -372,9 +389,9 @@ static int download_song(DownloadTask *task) {
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
         curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem"); // Certificate slop
 
-        char full_path[273];
-        snprintf(full_path, sizeof(full_path), "%s/%s.mp3", path, song_id);
-        FILE* f = fopen(full_path, "wb");
+        char tmp_file[273];
+        snprintf(tmp_file, sizeof(tmp_file), "%s/%s.tmp", path, song_id);
+        FILE* f = fopen(tmp_file, "wb");
         if (!f) {
             free(decoded_url);
             return -3;
@@ -388,14 +405,14 @@ static int download_song(DownloadTask *task) {
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
         
         if (http_code != 200) {
-            remove(full_path);
+            remove(tmp_file);
             free(decoded_url);
             curl_easy_cleanup(curl);
             return -4;
         }
 
         if (code) {
-            remove(full_path);
+            remove(tmp_file);
             free(decoded_url);
             curl_easy_cleanup(curl);
             return code;
@@ -403,8 +420,11 @@ static int download_song(DownloadTask *task) {
 
         free(decoded_url);
         fclose(f);
-        
         curl_easy_cleanup(curl);
+        
+        char actual_file[273];
+        snprintf(actual_file, sizeof(actual_file), "%s/%s.mp3", path, song_id);
+        rename(tmp_file, actual_file);
 
         return 0;
     }
@@ -416,8 +436,9 @@ static void network_thread(void *arg) {
 
     task->finished = false;
     task->running = true;
+    task->cancelled = false;
 
-    task->result = task->func();
+    task->result = task->func(task);
 
     task->running = false;
     task->finished = true;

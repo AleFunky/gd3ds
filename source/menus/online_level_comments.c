@@ -41,11 +41,18 @@ static UIScreen screen = {
     .isBottom = true,
 };
 
+static Thread thread;
+
 static NetworkTask comments_task = {
     .func = get_comments
 };
 
 void action_exit_comments(UIElement* e) {
+    if (comments_task.running) {
+        comments_task.cancelled = true;
+        threadJoin(thread, U64_MAX);
+    }
+
     yes_exit = true;
 }
 
@@ -265,7 +272,7 @@ static void action_refresh_comments(UIElement* e) {
     ui_disable_element((UIElement *) error_label);
     ui_enable_element((UIElement *)spinner);
     
-    create_network_thread(&comments_task);
+    thread = create_network_thread(&comments_task);
 }
 
 static void action_change_comments_page(UIElement* e) {
@@ -274,7 +281,7 @@ static void action_change_comments_page(UIElement* e) {
     ui_list_reset(list);
     update_comment_arrows(false);
     ui_enable_element((UIElement *)spinner);
-    create_network_thread(&comments_task);
+    thread = create_network_thread(&comments_task);
 }
 
 static UIAction actions[] = {

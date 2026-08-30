@@ -81,10 +81,10 @@ typedef struct CommentAuthorEntry {
     
 } CommentAuthorEntry;
 
-int search_levels();
-int get_level();
-int get_comments();
-int get_song_data();
+int search_levels(NetworkTask *task);
+int get_level(NetworkTask *task);
+int get_comments(NetworkTask *task);
+int get_song_data(NetworkTask *task);
 
 float derive_gj_version(int version);
 

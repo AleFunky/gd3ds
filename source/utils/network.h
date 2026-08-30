@@ -37,9 +37,11 @@ typedef struct SearchFilters {
     char searchQuery[20];
 } SearchFilters;
 
-typedef int (*NetworkFunc)(void);
+typedef struct NetworkTask NetworkTask;
 
-typedef struct {
+typedef int (*NetworkFunc)(NetworkTask *);
+
+typedef struct NetworkTask {
     NetworkFunc func;
 
     volatile int result;
@@ -72,12 +74,12 @@ Thread create_network_thread(NetworkTask *task);
 
 int soc_init();
 
-int get_level_from_id(char **out_data, int id, bool useGdps);
+int get_level_from_id(NetworkTask *task, char **out_data, int id, bool useGdps);
 
-int get_search_results(char **out_data, int gameVer, SearchFilters f, bool useGdps);
+int get_search_results(NetworkTask *task, char **out_data, int gameVer, SearchFilters f, bool useGdps);
 
-int get_comments_from_id(char **out_data, int id, int page, int mode, bool useGdps);
+int get_comments_from_id(NetworkTask *task, char **out_data, int id, int page, int mode, bool useGdps);
 
-int get_song_info_from_id(char **out_data, int songId, bool useGdps);
+int get_song_info_from_id(NetworkTask *task, char **out_data, int songId, bool useGdps);
 
 void soc_exit();

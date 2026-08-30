@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <citro2d.h>
+#include "3ds/thread.h"
 #include "level/main_levels.h"
 #include "level_loading.h"
 #include "menus/components/ui_window_button.h"
@@ -46,6 +47,7 @@ static UISpinner *spinner;
 
 static UIList *list;
 
+static Thread thread;
 
 static NetworkTask search_task = {
     .func = search_levels
@@ -434,7 +436,7 @@ static void action_change_page(UIElement* e) {
     filters.currentPage += ui_prop_int(&e->custom_properties, "page", 0);
     search_needs_refresh = true;
     update_arrows();
-    create_network_thread(&search_task);
+    thread = create_network_thread(&search_task);
     ui_enable_element((UIElement *) spinner);
     if (list) ui_list_reset(list);
 }
@@ -478,7 +480,7 @@ void online_menu_loop() {
     int search_result = -2;
     
     if (search_needs_refresh) {
-        create_network_thread(&search_task);
+        thread = create_network_thread(&search_task);
     } else {
         if (list) { // No errors
             populate_list();
@@ -560,6 +562,12 @@ void online_menu_loop() {
         }
 
         if (exit_flag) {
+
+            if (search_task.running) {
+                search_task.cancelled = true;
+                threadJoin(thread, U64_MAX);
+            }
+
             if (search_entries) {
                 if (search_entries->description) free(search_entries->description);
                 free(search_entries);

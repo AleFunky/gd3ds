@@ -1,5 +1,7 @@
 #include <3ds.h>
 #include <citro2d.h>
+#include "3ds/thread.h"
+#include "3ds/types.h"
 #include "menus/components/ui_window_button.h"
 #include "menus/core/ui_element.h"
 #include "menus/core/ui_screen.h"
@@ -61,13 +63,19 @@ static NetworkTask level_task = {
     .func = get_level
 };
 
+static Thread level_thread;
+
 static NetworkTask song_data_task = {
     .func = get_song_data
 };
 
+static Thread song_data_thread;
+
 static DownloadTask song_task = {
     .path = USER_SONGS_DIR
 };
+
+static Thread song_thread;
 
 static bool exit_flag = false;
 static bool in_comments = false;
@@ -138,10 +146,17 @@ static void action_download(){
         ui_enable_element((UIElement *) speed_label);
         snprintf(download_speed, sizeof(download_speed), "Speed: 0 B/s");
         ui_label_set_text(speed_label, download_speed);
-        create_network_thread(&song_data_task);
+        song_data_thread = create_network_thread(&song_data_task);
     } else {
-        song_data_task.cancelled = true;
-        song_task.cancelled = true;
+        if (song_data_task.running) {
+            song_data_task.cancelled = true;
+            threadJoin(song_data_thread, U64_MAX);
+        }
+
+        if (song_task.running) {
+            song_task.cancelled = true;
+            threadJoin(song_thread, U64_MAX);
+        }
     }
 }
 
@@ -426,7 +441,7 @@ static void action_refresh_level(UIElement *e) {
     refresh = true;
     ui_enable_element((UIElement *)spinner);
     ui_disable_element((UIElement *)play_button);
-    create_network_thread(&level_task);
+    level_thread = create_network_thread(&level_task);
 }
 
 static void play_level() {
@@ -593,7 +608,7 @@ void online_level_menu_loop() {
     populate_level_info();
 
     if (!comes_from_levels) {
-        create_network_thread(&level_task);
+        level_thread = create_network_thread(&level_task);
     }
 
     set_fade_status(FADE_STATUS_IN);
@@ -624,7 +639,7 @@ void online_level_menu_loop() {
                 song_task.url = song_entries[search_entries[curr_search_id].songIndex].songLink;
                 song_task.song_id = songId;
 
-                create_download_song_thread(&song_task);
+                song_thread = create_download_song_thread(&song_task);
             } else { handle_song_data_errors(song_data_result); }
             
         }
@@ -773,6 +788,12 @@ void online_level_menu_loop() {
             }
         }
     }
+
+    if (level_task.running) {
+        level_task.cancelled = true;
+        threadJoin(level_thread, U64_MAX);
+    }
+
     C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
 
     ui_unload_screen(&default_screen);
