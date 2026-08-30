@@ -1,4 +1,5 @@
 #include "collision.h"
+#include "icons.h"
 #include "player.h"
 #include <math.h>
 #include "practice.h"
@@ -200,8 +201,23 @@ void trySnap(int block, Player *player) {
     }
 }
 
+#define Y true
+#define N false
+
+// Table that says if gravity changes should affect the other gamemode
+static const bool gamemode_linked_gravity[GAMEMODE_COUNT][GAMEMODE_COUNT] = {
+    /* CUBE */ { Y, N, N, N, Y},
+    /* SHIP */ { N, Y, N, N, N},
+    /* BALL */ { N, N, Y, N, N},
+    /* UFO  */ { N, N, N, Y, N},
+    /* WAVE */ { Y, N, N, N, Y},
+};
+
+#undef Y
+#undef N
+
 void flip_other_player(int current_player) {
-    if (state.dual && state.player.gamemode == state.player2.gamemode && state.player.upside_down == state.player2.upside_down) {
+    if (state.dual && gamemode_linked_gravity[state.player.gamemode][state.player2.gamemode] && state.player.upside_down == state.player2.upside_down) {
         if (current_player == 0) {
             state.player2.upside_down = !state.player.upside_down;
             state.player2.vel_y /= -2;
