@@ -412,6 +412,8 @@ static void handle_errors(int code) {
     char temp[64];
     switch (code) {
         case -2:
+            //me when gdps returns -2 when no levels are found
+            if (gdps) break;
             ui_label_set_text(error_label, "An unknown error has\n occured.");
             break;
         case -1:

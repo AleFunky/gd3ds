@@ -1,6 +1,12 @@
 #include <3ds.h>
 #include <citro2d.h>
 #include <stdlib.h>
+#include "main.h"
+#include "icons.h"
+#include "fonts/chatFont.h"
+#include "fonts/goldFont.h"
+#include "utils/folders.h"
+#include "utils/server_utils.h"
 #include "menus/core/ui_element.h"
 #include "menus/core/ui_screen.h"
 #include "menus/components/ui_list.h"
@@ -10,16 +16,11 @@
 #include "menus/components/ui_label.h"
 #include "menus/components/ui_rectangle.h"
 #include "menus/components/ui_icon.h"
-#include "icons.h"
-#include "main.h"
 #include "menus/external_popup.h"
 #include "menus/icon_kit.h"
-#include "utils/folders.h"
-#include "utils/server_utils.h"
-#include "search_menu.h"
-#include "online_menu.h"
-#include "fonts/chatFont.h"
-#include "fonts/goldFont.h"
+#include "menus/search_menu.h"
+#include "menus/online_menu.h"
+#include "menus/palette_kit.h"
 
 #include "state.h"
 
@@ -55,9 +56,12 @@ static void update_comment_arrows(bool disableArrows) {
 
 static void handle_comment_errors(int code) {
     ui_disable_element((UIElement *)spinner);
+    ui_enable_element((UIElement *)error_label);
     char temp[64];
     switch (code) {
         case -2:
+            //gdps returns -2 when no comments are found idky 
+            if (gdps) break;
             ui_label_set_text(error_label, "An unknown error has\n occured.");
             break;
         case -1:
@@ -121,10 +125,12 @@ void populate_comments() {
                     iconIndex = 1;
                 } else if (iconIndex >= gamemode_icon_count[iconType]) iconIndex = 1;
 
+                
+                user_icon->glow = comment_entries[i].glow;
                 ui_icon_set_gamemode_index(user_icon, iconType, iconIndex);
-                ui_icon_set_glow(user_icon, C2D_Color32(175, 175, 175, 255));
-                ui_icon_set_p1(user_icon, C2D_Color32(175, 175, 175, 255));
-                ui_icon_set_p2(user_icon, C2D_Color32(175, 175, 175, 255));
+                ui_icon_set_glow(user_icon, colors[gd_to_gd3ds_color_table[comment_entries[i].glowCol]]);
+                ui_icon_set_p1(user_icon, colors[gd_to_gd3ds_color_table[comment_entries[i].col1]]);
+                ui_icon_set_p2(user_icon, colors[gd_to_gd3ds_color_table[comment_entries[i].col2]]);
                 
                 ui_element_set_position((UIElement *)user_icon, -list_width + 20, -list_height + 15);
                 ui_element_set_scale((UIElement *)user_icon, 0.5f);
@@ -255,8 +261,8 @@ static void action_refresh_comments(UIElement* e) {
 
         comments_sort_type = buttonType;
     }
-    update_comment_arrows(false);
     ui_list_reset(list);
+    ui_disable_element((UIElement *) error_label);
     ui_enable_element((UIElement *)spinner);
     
     create_network_thread(&comments_task);
@@ -266,6 +272,7 @@ static void action_change_comments_page(UIElement* e) {
     current_comments_page += ui_prop_int(&e->custom_properties, "page", 0);
     
     ui_list_reset(list);
+    update_comment_arrows(false);
     ui_enable_element((UIElement *)spinner);
     create_network_thread(&comments_task);
 }
@@ -290,7 +297,8 @@ void online_comments_init() {
 
     ui_button_set_image(sort_by_likes_button, 423, 0);
     ui_disable_element((UIElement *) spinner);
-    
+    ui_disable_element((UIElement *) error_label);
+    update_comment_arrows(true);
     if (comments_need_refresh) {
         ui_enable_element((UIElement *)spinner);
         current_comments_page = 0;
@@ -317,8 +325,8 @@ int online_comments_loop() {
             handle_comment_errors(result);
         } else { // No errors
             ui_label_set_text(error_label, "");
-            populate_comments();
             update_comment_arrows(false);
+            populate_comments();
             comments_need_refresh = false;
         }
         comments_task.finished = false;
