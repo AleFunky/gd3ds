@@ -96,6 +96,7 @@ void init_values() {
     config_init_bool(&cfg, CONFIG_FILTERS_PATH "unrated",  false);
     config_init_bool(&cfg, CONFIG_FILTERS_PATH "rated",  false);
     config_init_bool(&cfg, CONFIG_FILTERS_PATH "featured", false);
+    config_init_bool(&cfg, CONFIG_FILTERS_PATH "super", false);
     config_init_bool(&cfg, CONFIG_FILTERS_PATH "length", false);
     config_init_bool(&cfg, CONFIG_FILTERS_PATH "song", false);
     config_init_bool(&cfg, CONFIG_FILTERS_PATH "customSelected", false);
@@ -117,6 +118,7 @@ void cfg_init() {
     initialDisclaimerAccepted = config_get_bool(&cfg, CONFIG_FLAGS "initialDisclaimerAccepted", false);
     gotSogged = config_get_bool(&cfg, CONFIG_FLAGS "sogged", false);
     gdps = config_get_bool(&cfg, CONFIG_FLAGS "gdps", false);
+    strcpy(menu_loop_path, gdps ? "romfs:/songs/menuLoopGDPS.mp3" : "romfs:/songs/menuLoop.mp3");
 
     players_destroyed = config_get_int(&cfg, CONFIG_VALUES "playersDestroyed", 0);
     music_volume = config_get_float(&cfg, CONFIG_VALUES "music_volume", 1);
@@ -145,6 +147,7 @@ void cfg_init() {
     filters.noStar      = config_get_bool(&cfg, CONFIG_FILTERS_PATH "unrated", false);
     filters.star        = config_get_bool(&cfg, CONFIG_FILTERS_PATH "rated", false);
     filters.featured    = config_get_bool(&cfg, CONFIG_FILTERS_PATH "featured", false);
+    filters.super       = config_get_bool(&cfg, CONFIG_FILTERS_PATH "super", false);
     filters.songFilter  = config_get_bool(&cfg, CONFIG_FILTERS_PATH "song", false);
     filters.lengthFilters = config_get_int(&cfg, CONFIG_FILTERS_PATH "length", false);
     filters.customSong  = config_get_bool(&cfg, CONFIG_FILTERS_PATH "customSelected", false);
@@ -186,6 +189,7 @@ void cfg_save() {
     config_set_bool(&cfg, CONFIG_FILTERS_PATH "unrated", filters.noStar);
     config_set_bool(&cfg, CONFIG_FILTERS_PATH "rated", filters.star);
     config_set_bool(&cfg, CONFIG_FILTERS_PATH "featured", filters.featured);
+    config_set_bool(&cfg, CONFIG_FILTERS_PATH "super", filters.super);
     config_set_int(&cfg, CONFIG_FILTERS_PATH "length", filters.lengthFilters);
     config_set_bool(&cfg, CONFIG_FILTERS_PATH "song", filters.songFilter);
     config_set_bool(&cfg, CONFIG_FILTERS_PATH "customSelected", filters.customSong);

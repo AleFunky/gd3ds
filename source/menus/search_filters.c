@@ -20,6 +20,16 @@ static UIScreen screen = {
     .isBottom = true
 };
 
+static void toggle_gdps(){
+    if(gdps){
+        ui_run_func_on_tag(&screen, "gdps", ui_enable_element);
+        ui_run_func_on_tag(&screen, "no_gdps", ui_disable_element);
+    } else{
+        ui_run_func_on_tag(&screen, "gdps", ui_disable_element);
+        ui_run_func_on_tag(&screen, "no_gdps", ui_enable_element);
+    }
+}
+
 static void reset_checkboxes(){
     //set checkboxes to their saved values
     ui_set_checkbox_checked(((UICheckBox *)ui_get_element_by_tag(&screen, "chk_uncompleted")), filters.uncompleted);
@@ -28,6 +38,12 @@ static void reset_checkboxes(){
     ui_set_checkbox_checked(((UICheckBox *)ui_get_element_by_tag(&screen, "chk_unrated")), filters.noStar);
     ui_set_checkbox_checked(((UICheckBox *)ui_get_element_by_tag(&screen, "chk_rated")), filters.star);
     ui_set_checkbox_checked(((UICheckBox *)ui_get_element_by_tag(&screen, "chk_featured")), filters.featured);
+
+    ui_set_checkbox_checked(((UICheckBox *)ui_get_element_by_tag(&screen, "chk_original_gdps")), filters.original);
+    ui_set_checkbox_checked(((UICheckBox *)ui_get_element_by_tag(&screen, "chk_unrated_gdps")), filters.noStar);
+    ui_set_checkbox_checked(((UICheckBox *)ui_get_element_by_tag(&screen, "chk_rated_gdps")), filters.star);
+    ui_set_checkbox_checked(((UICheckBox *)ui_get_element_by_tag(&screen, "chk_featured_gdps")), filters.featured);
+    ui_set_checkbox_checked(((UICheckBox *)ui_get_element_by_tag(&screen, "chk_super")), filters.super);
 }
 
 void reset_search_filters() {
@@ -77,6 +93,10 @@ void featured_filter(UIElement* e) {
     filters.featured = ((UICheckBox *)e)->checked;
 }
 
+void super_filter(UIElement* e) {
+    filters.super = ((UICheckBox *)e)->checked;
+}
+
 void open_song(UIElement* e) {
     in_song_pop_up = true;
     song_filter_init();
@@ -95,6 +115,7 @@ static UIAction actions[] = {
     { "unrated", unrated_filter },
     { "rated", rated_filter },
     { "featured", featured_filter },
+    { "super", super_filter },
     { "song", open_song },
     { "length", open_length },
 };
@@ -105,6 +126,8 @@ void search_filters_init() {
 
     ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/search_filters_pop_up.txt");
     ui_screen_open(&screen, ANIM_ZOOM);
+
+    toggle_gdps();
 
     reset_checkboxes();
 

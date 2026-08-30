@@ -1,5 +1,6 @@
 #include <3ds.h>
 #include "network.h"
+#include "curl/system.h"
 #include "main.h"
 #include <curl/curl.h>
 #include <string.h>
@@ -151,14 +152,15 @@ int get_search_results(char **out_data, int gameVer, SearchFilters f, bool useGd
 
         int pos = snprintf(data,
             sizeof(data) - 1, 
-            "secret=Wmfd2893gb7&gameVersion=%d&type=%d&page=%d&original=%d&noStar=%d&star=%d&featured=%d", 
+            "secret=Wmfd2893gb7&gameVersion=%d&type=%d&page=%d&original=%d&noStar=%d&star=%d&featured=%d&epic=%d", 
             gameVer, 
             f.searchType, 
             f.currentPage, 
             f.original, 
             f.noStar, 
             f.star,
-            f.featured);
+            f.featured,
+            f.super);
 
         pos += snprintf(data + pos, sizeof(data) - pos, "&str=%s", f.searchQuery);
 
@@ -303,7 +305,7 @@ int get_song_info_from_id(char **out_data, int songId, bool useGdps) {
             return code;
         }
 
-        printf("(code %d) Response (%d): %s\n", code, chunk.size, chunk.memory);
+        printf("(code %d) Response (%d): <%s>\n", code, chunk.size, chunk.memory);
 
         if (chunk.memory[0] == '-') {
             return atoi(chunk.memory);
@@ -361,7 +363,6 @@ static int download_song(DownloadTask *task) {
 
     if (curl) {
         char *decoded_url = url_decode(url);
-        output_log(decoded_url, '\n');
         // url_convert_to_http(decoded_url);
 
         curl_easy_setopt(curl, CURLOPT_URL, decoded_url);
@@ -382,7 +383,17 @@ static int download_song(DownloadTask *task) {
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, f);
 
         CURLcode code = curl_easy_perform(curl);
+
+        long http_code = 0;
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
         
+        if (http_code != 200) {
+            remove(full_path);
+            free(decoded_url);
+            curl_easy_cleanup(curl);
+            return -4;
+        }
+
         if (code) {
             remove(full_path);
             free(decoded_url);
@@ -415,7 +426,7 @@ static void network_thread(void *arg) {
 Thread create_network_thread(NetworkTask *task) {
     int32_t priority = 0x30;
     svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
-    priority -= 1;
+    priority += 1;
     priority = priority < 0x18 ? 0x18 : priority;
     priority = priority > 0x3F ? 0x3F : priority;
     

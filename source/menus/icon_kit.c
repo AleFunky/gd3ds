@@ -23,6 +23,7 @@
 #include "palette_kit.h"
 
 #include "save/config.h"
+#include "state.h"
 
 static UIImage *bg_gradient = NULL;
 static UIImage *bg_gradient_top = NULL;
@@ -267,10 +268,7 @@ void icon_kit_loop() {
     update_player_colors();
     set_fade_status(FADE_STATUS_IN);
 
-    if (!playing_menu_loop) {
-        play_mp3("romfs:/songs/menuLoop.mp3", true, 0);
-        playing_menu_loop = true;
-    }
+    play_menu_song();
 
     gamemode_btns[0] = (UIButton *) ui_get_element_by_tag(&default_screen, "cube");
     gamemode_btns[1] = (UIButton *) ui_get_element_by_tag(&default_screen, "ship");

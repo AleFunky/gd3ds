@@ -111,7 +111,7 @@ void populate_comments() {
             // Commenter's icon (robtop server exclusive)
             UIIcon *user_icon = ui_create_icon(&default_screen.ctx);
             if (user_icon && !gdps) {
-                output_log("icon type: %d\nicon id: %d\nicon p1: %d\n icon p2: %d\n\n", comment_entries[i].iconType, comment_entries[i].playerIcon, comment_entries[i].col1, comment_entries[i].col2);
+                //output_log("icon type: %d\nicon id: %d\nicon p1: %d\n icon p2: %d\n\n", comment_entries[i].iconType, comment_entries[i].playerIcon, comment_entries[i].col1, comment_entries[i].col2);
                 int iconType = comment_entries[i].iconType;
                 int iconIndex = comment_entries[i].playerIcon;
 
@@ -221,20 +221,22 @@ void populate_comments() {
                 ui_element_add_child(card, (UIElement *)like_value);
             }
 
-            // Comment timestamp (robtop server exclusive)
-            UILabel *timestamp_value = ui_create_label(&default_screen.ctx);
-            if (timestamp_value && !gdps) {
-                char tmp_value[sizeof(timestamp) + 14 - 1];
-                snprintf(tmp_value, sizeof(tmp_value), "<#0000007D>%s", timestamp);
+            // Comment timestamp
+            if(!gdps){
+                UILabel *timestamp_value = ui_create_label(&default_screen.ctx);
+                if (timestamp_value) {
+                    char tmp_value[sizeof(timestamp) + 14 - 1];
+                    snprintf(tmp_value, sizeof(tmp_value), "<#0000007D>%s", timestamp);
 
-                ui_label_set_text(timestamp_value, tmp_value);
-                ui_element_set_position((UIElement *)timestamp_value, list_width - 8, list_height - 15);
-                ui_element_set_scale((UIElement *)timestamp_value, 0.65f);
+                    ui_label_set_text(timestamp_value, tmp_value);
+                    ui_element_set_position((UIElement *)timestamp_value, list_width - 8, list_height - 15);
+                    ui_element_set_scale((UIElement *)timestamp_value, 0.65f);
 
-                timestamp_value->font = 1;
-                timestamp_value->alignment = 1.f;
+                    timestamp_value->font = 1;
+                    timestamp_value->alignment = 1.f;
 
-                ui_element_add_child(card, (UIElement *)timestamp_value);
+                    ui_element_add_child(card, (UIElement *)timestamp_value);
+                }
             }
             ui_list_add(list, card);
         }

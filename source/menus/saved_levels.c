@@ -12,6 +12,7 @@
 #include "main.h"
 #include "mp3_player.h"
 #include "graphics.h"
+#include "state.h"
 #include "utils/folders.h"
 #include "external_popup.h"
 #include "utils/server_utils.h"
@@ -77,10 +78,7 @@ void saved_levels_loop() {
 
     set_fade_status(FADE_STATUS_IN);
 
-    if (!playing_menu_loop) {
-        play_mp3("romfs:/songs/menuLoop.mp3", true, 0);
-        playing_menu_loop = true;
-    }
+    play_menu_song();
 
     while (aptMainLoop()) {
         hidScanInput();

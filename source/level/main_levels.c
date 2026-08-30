@@ -127,4 +127,39 @@ MainLevelDefinition main_levels[] = {
         .difficulty = MAIN_DIFF_DEMON,
         .stars = 14
     },
+    {
+        .level_name = "Thumper",
+        .gmd_path = "romfs:/main_levels/Thumper.gmd",
+        .song_path = "romfs:/songs/Thumper.mp3",
+        .difficulty = MAIN_DIFF_HARDER,
+        .stars = 10
+    },
+    {
+        .level_name = "Clutterfunk 2",
+        .gmd_path = "romfs:/main_levels/Clutterfunk2.gmd",
+        .song_path = "romfs:/songs/Clutterfunk2.mp3",
+        .difficulty = MAIN_DIFF_DEMON,
+        .stars = 16
+    },
+    {
+        .level_name = "Aura",
+        .gmd_path = "romfs:/main_levels/Aura.gmd",
+        .song_path = "romfs:/songs/Aura.mp3",
+        .difficulty = MAIN_DIFF_INSANE,
+        .stars = 11
+    },
+    {
+        .level_name = "Jack Russel",
+        .gmd_path = "romfs:/main_levels/JackRussel.gmd",
+        .song_path = "romfs:/songs/JackRussel.mp3",
+        .difficulty = MAIN_DIFF_INSANE,
+        .stars = 12
+    },
+    {
+        .level_name = "Streetwise",
+        .gmd_path = "romfs:/main_levels/Streetwise.gmd",
+        .song_path = "romfs:/songs/Streetwise.mp3",
+        .difficulty = MAIN_DIFF_INSANE,
+        .stars = 12
+    },
 };

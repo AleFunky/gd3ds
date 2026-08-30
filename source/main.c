@@ -74,6 +74,7 @@
 int game_state = STATE_MAIN_MENU;
 
 bool playing_menu_loop = false;
+char menu_loop_path[32];
 
 int level_result = 0;
 

@@ -38,7 +38,9 @@ static void update_difficulty_tint(UIElement *e){
     C2D_PlainImageTint(&((UIButton *)e)->image.tint, C2D_Color32(tint, tint, tint, 255), 1.f);
 }
 
-static void enable_demons(){
+void enable_demons(){
+    if(gdps) return;
+
     ui_button_set_image(((UIButton *)ui_get_element_by_tag(&default_screen, "easy")), 259, 0);
     ui_button_set_image(((UIButton *)ui_get_element_by_tag(&default_screen, "normal")), 261, 0);
     ui_button_set_image(((UIButton *)ui_get_element_by_tag(&default_screen, "hard")), 257, 0);
@@ -46,7 +48,7 @@ static void enable_demons(){
     ui_button_set_image(((UIButton *)ui_get_element_by_tag(&default_screen, "insane")), 265, 0);
 }
 
-static void disable_demons(){
+void disable_demons(){
     ui_button_set_image(((UIButton *)ui_get_element_by_tag(&default_screen, "easy")), 252, 0);
     ui_button_set_image(((UIButton *)ui_get_element_by_tag(&default_screen, "normal")), 253, 0);
     ui_button_set_image(((UIButton *)ui_get_element_by_tag(&default_screen, "hard")), 254, 0);
@@ -110,7 +112,10 @@ static void action_set_difficulty(UIElement *e){
     filters.isNA = false;
     filters.isAuto = false;
     int difficultyVal = ui_prop_int(&e->custom_properties, "diffValue", 0);
-    if(filters.isDemon) filters.difficultyFilters &= difficultyVal;
+
+    if(filters.isDemon && !gdps) filters.difficultyFilters &= difficultyVal;
+    else filters.isDemon = false;
+
     filters.difficultyFilters ^= difficultyVal;
     update_difficulty_tints();
 }
@@ -200,6 +205,20 @@ void search_menu_loop() {
         
         // Frees a render target, so keep it out of the frame below
         update_stereo_target();
+        
+        if (in_filters) { // Bro stop putting this in the rendering do while
+            int returned = search_filters_loop();
+            if (returned) {
+                in_filters = false;
+            }
+        }
+
+        if (in_server_switcher) {
+            int returned = server_switcher_loop();
+            if (returned) {
+                in_server_switcher = false;
+            }
+        }
 
         do {
             update_touch_effect(DT);
@@ -217,20 +236,6 @@ void search_menu_loop() {
                 int returned = disclaimer_loop();
                 if (returned) {
                     in_disclaimer = false;
-                }
-            }
-
-            if (in_filters) {
-                int returned = search_filters_loop();
-                if (returned) {
-                    in_filters = false;
-                }
-            }
-
-            if (in_server_switcher) {
-                int returned = server_switcher_loop();
-                if (returned) {
-                    in_server_switcher = false;
                 }
             }
 

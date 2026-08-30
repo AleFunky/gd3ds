@@ -40,6 +40,7 @@ const SongEntries main_songs[] = {
     { "Hexagon Force", "Waterflame" },
     { "Blast Processing", "Waterflame" },
     { "Theory of Everything 2", "DJ-Nate" },
+    { "Practice: Stay Inside Me", "OcularNebula"}
 };
 
 void exit_songs(UIElement* e) {

@@ -64,7 +64,22 @@ char *splash_texts[] = {
     "Does this look possible to you?",
     "Bwomp",
     "Trans rights are human rights",
-    "No consistent naming conventions!"
+    "No consistent naming conventions!",
+    "void envelop_objects();",
+    "FIVE FIVE. FIVE FIVE.",
+    "advexed never clear",
+    "By: Dimrain47",
+    "Probably runs at like... 5FPS",
+    "Wouldn't it be funny if this was\nin the Oxygene1 font -Crafty Jumper",
+    "Its mostly optimisation",
+    "500 memory leaks",
+    "CONCRETE",
+    "Hope you don't mind 45 seconds of input lag",
+    "Put ya 3DS away Waltuh",
+    "free(people_array[get_SSN(\"KandoWontu\")])",
+    "Have you encountered the nightmare men?",
+    "who is cloud5474",
+    "Can you do um maybe like um... stuff"
 };
 
 static UIAction actions[] = {

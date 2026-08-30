@@ -11,26 +11,45 @@ window x=160 y=120 w=260 h=180 style=0
     checkbox x=-100 y=-36 tag="chk_uncompleted" scale=0.75 action="uncompleted"
     label x=-85 y=-36 text="Uncompleted" scale=0.4 tag=""
 
-    checkbox x=-100 y=-6 tag="chk_completed" scale=0.75 action="completed"
-    label x=-85 y=-6 text="Completed" scale=0.4 tag=""
+    checkbox x=-100 y=-6 tag="chk_completed,no_gdps" scale=0.75 action="completed"
+    label x=-85 y=-6 text="Completed" scale=0.4 tag="no_gdps"
 
-    checkbox x=-100 y=24 tag="chk_original" scale=0.75 action="original"
-    label x=-85 y=24 text="Original" scale=0.4 tag=""
+    checkbox x=-100 y=24 tag="chk_original,no_gdps" scale=0.75 action="original"
+    label x=-85 y=24 text="Original" scale=0.4 tag="no_gdps"
 
     button id=425 x=-100 y=54 action="length" scale=0.75
     label x=-85 y=54 text="Length" scale=0.4
 
+    #GDPS
+    
+    checkbox x=-100 y=-6 tag="chk_original_gdps,gdps" scale=0.75 action="original"
+    label x=-85 y=-6 text="Original" scale=0.4 tag="gdps"
+
+    checkbox x=-100 y=24 tag="chk_unrated_gdps,gdps" scale=0.75 action="unrated"
+    label x=-85 y=24 text="No Star" scale=0.4 tag="gdps"
+
     # column 2
 
-    checkbox x=30 y=-36 tag="chk_unrated" scale=0.75 action="unrated"
-    label x=45 y=-36 text="No Star" scale=0.4 tag=""
+    checkbox x=30 y=-36 tag="chk_unrated,no_gdps" scale=0.75 action="unrated"
+    label x=45 y=-36 text="No Star" scale=0.4 tag="no_gdps"
 
-    checkbox x=30 y=-6 tag="chk_rated" scale=0.75 action="rated"
-    label x=45 y=-6 text="Star" scale=0.4 tag=""
+    checkbox x=30 y=-6 tag="chk_rated,no_gdps" scale=0.75 action="rated"
+    label x=45 y=-6 text="Star" scale=0.4 tag="no_gdps"
 
-    checkbox x=30 y=24 tag="chk_featured" scale=0.75 action="featured"
-    label x=45 y=24 text="Featured" scale=0.4 tag=""
+    checkbox x=30 y=24 tag="chk_featured,no_gdps" scale=0.75 action="featured"
+    label x=45 y=24 text="Featured" scale=0.4 tag="no_gdps"
 
     button id=425 x=30 y=54 action="song" scale=0.75
     label x=45 y=54 text="Song" scale=0.4
+
+    #GDPS
+
+    checkbox x=30 y=-36 tag="chk_rated_gdps,gdps" scale=0.75 action="rated"
+    label x=45 y=-36 text="Star" scale=0.4 tag="gdps"
+
+    checkbox x=30 y=-6 tag="chk_featured_gdps,gdps" scale=0.75 action="featured"
+    label x=45 y=-6 text="Featured" scale=0.4 tag="gdps"
+
+    checkbox x=30 y=24 tag="chk_super,gdps" scale=0.75 action="super"
+    label x=45 y=24 text="Super" scale=0.4 tag="gdps"
 }

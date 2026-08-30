@@ -479,7 +479,7 @@ void clear_bg_flash() {
 }
 
 void play_level_song(float seek) {
-    if (level_info.custom_song_id > 0) {
+    if (level_info.custom_song_id > 0 && state.custom_level) {
         size_t sz = 0;
         void *buf = load_user_song(level_info.custom_song_id, &sz);
         if (buf) {
@@ -502,6 +502,17 @@ void play_level_song(float seek) {
 
 void play_practice_song() {
     play_mp3("romfs:/songs/StayInsideMe.mp3", true, 0);
+}
+
+void play_menu_song() {
+    if (!playing_menu_loop) {
+        size_t out_size;
+        void *buf = read_file(menu_loop_path, &out_size);
+        if (buf) {
+            play_mp3_buf(buf, out_size, true, 0);
+            playing_menu_loop = true;
+        }
+    }
 }
 
 // Respawn effect

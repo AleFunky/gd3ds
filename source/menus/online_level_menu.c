@@ -288,10 +288,12 @@ void populate_level_info() {
 
         if(entry_srch->epic > 0 && IN_BOUNDS(entry_srch->epic, epics)){
             featured_id = (gdps ? SUPER_GLOW : epics[entry_srch->epic]);
-            yOffset = gdps ? -1 : -2;
+            yOffset = -2;
         } else if(entry_srch->featureScore > 0) {
             featured_id = FEATURED_GLOW;
         }
+
+        if(!entry_srch->stars) yOffset += 4;
 
         if(entry_srch->isDemon) yOffset += featured_demon_offset;
 
@@ -365,6 +367,9 @@ static void handle_song_codes(int code) {
     ui_button_set_image(song_download_button, 57, 0);
     char message[64];
     switch (code) {
+        case -4:
+            snprintf(message, sizeof(message), "<#f93219>Download failed.</>");
+            break;
         case -3:
         case -2: 
             snprintf(message, sizeof(message), "<#f93219>Unknown error.</>");
@@ -595,10 +600,7 @@ void online_level_menu_loop() {
 
     set_fade_status(FADE_STATUS_IN);
 
-    if (!playing_menu_loop) {
-        play_mp3("romfs:/songs/menuLoop.mp3", true, 0);
-        playing_menu_loop = true;
-    }
+    play_menu_song();
 
     while (aptMainLoop()) {
         hidScanInput();
