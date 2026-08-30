@@ -10,7 +10,7 @@ button x=24 y=28 id=6 action="exit" keyBinds="B"
 
 label x=160 y=26 text="Online Levels" scale=0.67 align=CENTER tag="listtitle"
 
-button x=20 y=120 id=8 action="changepage" keyBinds="L,DPAD_LEFT" custom=[page=-1] tag="prevpage"
-button x=300 y=120 sx=-1.0 id=8 action="changepage" keyBinds="R,DPAD_RIGHT" custom=[page=1] tag="nextpage"
+button x=20 y=120 id=8 action="changepage" keyBinds="L,ZL,LEFT" custom=[page=-1] tag="prevpage"
+button x=300 y=120 sx=-1.0 id=8 action="changepage" keyBinds="R,ZR,RIGHT" custom=[page=1] tag="nextpage"
 
 spinner x=160 y=121 tag="spinner"
