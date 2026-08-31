@@ -81,7 +81,7 @@ static void fill_song_entries(char **songStrings, int songStringCount) {
                     break;
                 case 5:
                     // song size
-                    song_entries[i].songSize = atoi(valStr);
+                    song_entries[i].songSize = atof(valStr);
                     break;
                 case 10:
                     // song link

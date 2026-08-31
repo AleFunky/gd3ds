@@ -39,7 +39,7 @@ typedef struct SongEntry {
     int ngSongId;
     char songTitle[128];
     char artistName[128];
-    int songSize;
+    float songSize;
     char songLink[512];
 } SongEntry;
 

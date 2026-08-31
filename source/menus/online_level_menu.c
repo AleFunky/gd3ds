@@ -237,7 +237,7 @@ void populate_level_info() {
     if (entry_srch->songId != 0) {
         // Custom song
         char tmp_songsize[24];
-        snprintf(tmp_songsize, sizeof(tmp_songsize), "Size: %dMB", entry_sng->songSize);
+        snprintf(tmp_songsize, sizeof(tmp_songsize), "Size: %.1fMB", entry_sng->songSize);
         ui_label_set_text(song_size_label, tmp_songsize);
 
         if (entry_srch->songIndex < songEntriesLength) {
