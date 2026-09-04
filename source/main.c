@@ -907,6 +907,8 @@ void game_loop() {
 
                         if (get_checkpoint_count() > 0) {
                             restore_checkpoint();
+                        } else if (settingsState.practiceMusicSync) {
+                            seek_mp3(level_info.song_offset);
                         }
                     }
 
