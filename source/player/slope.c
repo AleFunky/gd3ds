@@ -246,7 +246,7 @@ void slope_calc(int obj, Player *player) {
     int orientation = grav_slope_orient(obj, player);
     if (orientation == ORIENT_NORMAL_UP) { // Normal - up
         // Make the player start with higher velocity 
-        if ((player->gamemode == GAMEMODE_BIRD || player->gamemode == GAMEMODE_SHIP) && player->vel_y < SHIP_UFO_EXITING_VEL && state.input.holdJump) {
+        if ((player->gamemode == GAMEMODE_UFO || player->gamemode == GAMEMODE_SHIP) && player->vel_y < SHIP_UFO_EXITING_VEL && state.input.holdJump) {
             player->vel_y = SHIP_UFO_EXITING_VEL; // 2 in gd
         }
         
@@ -268,7 +268,7 @@ void slope_calc(int obj, Player *player) {
             float time = clampf(10 * (player->timeElapsed - player->slope_data.elapsed), 0.4f, 1.0f);
             
             //float orig = vel;
-            if (player->gamemode == GAMEMODE_PLAYER_BALL) {
+            if (player->gamemode == GAMEMODE_BALL) {
                 vel *= 0.75f;
             }
             
@@ -276,7 +276,7 @@ void slope_calc(int obj, Player *player) {
                 vel *= 0.75f;
             }
 
-            if (player->gamemode == GAMEMODE_BIRD) {
+            if (player->gamemode == GAMEMODE_UFO) {
                 vel *= 0.7499f;
             }
 
@@ -313,7 +313,7 @@ void slope_calc(int obj, Player *player) {
         }        
     } else if (orientation == ORIENT_UD_UP) { // Upside down - up
         // Make the player start with higher velocity 
-        if ((player->gamemode == GAMEMODE_BIRD || player->gamemode == GAMEMODE_SHIP) && player->vel_y > -SHIP_UFO_EXITING_VEL && !state.input.holdJump) {
+        if ((player->gamemode == GAMEMODE_UFO || player->gamemode == GAMEMODE_SHIP) && player->vel_y > -SHIP_UFO_EXITING_VEL && !state.input.holdJump) {
             player->vel_y = -SHIP_UFO_EXITING_VEL; // 2 in gd
         }
 
@@ -326,7 +326,10 @@ void slope_calc(int obj, Player *player) {
         bool gravSnap = (player->ceiling_inv_time > 0) || (player->gravObj_id >= 0 && GET_HITBOX_COUNTER(player->gravObj_id) == 1);
         
         if (player->gamemode == GAMEMODE_PLAYER && !gravSnap) {
-            kill_player(DEATH_SLOPE);
+            if (grav(player, player->y - SLOPE_HEAD_TOLERANCE) > grav(player, expected_slope_y(obj, player))) {
+                kill_player(DEATH_SLOPE);
+            }
+            return;
         }
 
         // On slope
@@ -342,7 +345,7 @@ void slope_calc(int obj, Player *player) {
             float time = clampf(10 * (player->timeElapsed - player->slope_data.elapsed), 0.4f, 1.0f);
             
             //float orig = vel;
-            if (player->gamemode == GAMEMODE_PLAYER_BALL) {
+            if (player->gamemode == GAMEMODE_BALL) {
                 vel *= 0.75f;
             }
             
@@ -350,7 +353,7 @@ void slope_calc(int obj, Player *player) {
                 vel *= 0.75f;
             }
 
-            if (player->gamemode == GAMEMODE_BIRD) {
+            if (player->gamemode == GAMEMODE_UFO) {
                 vel *= 0.7499f;
             }
 
@@ -375,7 +378,10 @@ void slope_calc(int obj, Player *player) {
         bool gravSnap = (player->ceiling_inv_time > 0) || (player->gravObj_id >= 0 && GET_HITBOX_COUNTER(player->gravObj_id) == 1);
         
         if (player->gamemode == GAMEMODE_PLAYER && !gravSnap) {
-            kill_player(DEATH_SLOPE);
+            if (grav(player, player->y - SLOPE_HEAD_TOLERANCE) > grav(player, expected_slope_y(obj, player))) {
+                kill_player(DEATH_SLOPE);
+            }
+            return;
         }
 
         // On slope
@@ -486,7 +492,7 @@ void slope_collide(int obj, Player *player) {
 	else if (objects.orientation[obj] >= 2 && expected_slope_y(obj, player) - (hasSlope ? 3 : 0) >= player->y)
 		return;
     
-    int clip = (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_BIRD) ? 7 : 10;
+    int clip = (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_UFO) ? 7 : 10;
     int orient = grav_slope_orient(obj, player);  
     int mult = orient >= ORIENT_UD_DOWN ? -1 : 1;
 
@@ -511,7 +517,7 @@ void slope_collide(int obj, Player *player) {
         orient < ORIENT_UD_DOWN && 
         gravTop(player) - obj_gravBottom(player, obj) <= clip + 5 * !player->mini // Remove extra if mini
     ) {
-        if (player->gamemode != GAMEMODE_DART && ((player->gamemode != GAMEMODE_PLAYER && (player->vel_y >= 0)) || gravSnap)) {
+        if (player->gamemode != GAMEMODE_WAVE && ((player->gamemode != GAMEMODE_PLAYER && (player->vel_y >= 0)) || gravSnap)) {
             player->vel_y = 0;
             if (!gravSnap) player->on_ceiling = true;
             player->time_since_ground = 0;
@@ -534,7 +540,7 @@ void slope_collide(int obj, Player *player) {
         orient >= ORIENT_UD_DOWN && 
         obj_gravTop(player, obj) - gravBottom(player) <= clip + 5 * !player->mini // Remove extra if mini
     ) {
-        if (player->gamemode != GAMEMODE_DART && player->vel_y <= 0) {
+        if (player->gamemode != GAMEMODE_WAVE && player->vel_y <= 0) {
             player->vel_y = 0;
             if (!gravSnap) player->on_ground = true;
             player->time_since_ground = 0;
@@ -569,7 +575,7 @@ void slope_collide(int obj, Player *player) {
         }
         
         // Touching slope before center is in slope
-        if (player->gamemode != GAMEMODE_DART && player->vel_y * mult <= 0) {
+        if (player->gamemode != GAMEMODE_WAVE && player->vel_y * mult <= 0) {
             if (orient == ORIENT_NORMAL_DOWN) {
                 player->y = grav(player, obj_gravTop(player, obj)) + grav(player, player->height / 2);
             } else {
@@ -639,7 +645,7 @@ void slope_collide(int obj, Player *player) {
 
         if ((projectedHit && clip) || snapDown) {
             // If wave, just die, nothing else, wave hates slopes
-            if (player->gamemode == GAMEMODE_DART) {
+            if (player->gamemode == GAMEMODE_WAVE) {
                 kill_player(DEATH_SLOPE);
                 return;
             }

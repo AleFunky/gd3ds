@@ -252,11 +252,11 @@ static void handle_input() {
             // Press A 1/16 of time
             if (!(rand() & 0b1111)) pressing = true;
             break;
-        case GAMEMODE_BIRD:
+        case GAMEMODE_UFO:
             // Press A 1/16 of time
             if (!(rand() & 0b1111)) pressing = true;
             break;
-        case GAMEMODE_DART:
+        case GAMEMODE_WAVE:
             // Switch holding A 1/16 of time
             if (!(rand() & 0b1111)) title_screen_player_hold ^= 1;
 
@@ -282,7 +282,7 @@ static void handle_players() {
     state.old_player = title_screen_player;
     handle_title_screen_player(&title_screen_player);
 
-    bool wtrail_opacity_is_zero = (title_screen_player.gamemode == GAMEMODE_DART ? wave_trail_p1.opacity <= 0.f : true);
+    bool wtrail_opacity_is_zero = (title_screen_player.gamemode == GAMEMODE_WAVE ? wave_trail_p1.opacity <= 0.f : true);
     
     // Wave trail needs to be invisible in order to despawn this player
     if (wtrail_opacity_is_zero && title_screen_player.x >= SCREEN_WIDTH_AREA + OFFSCREEN_BUFFER) {
@@ -398,7 +398,7 @@ void main_menu_loop() {
         glitter_particles_bottom.emitting = false;
 
         // Fade wave trail
-        if (title_screen_player.gamemode == GAMEMODE_DART && (state.dead || title_screen_player.x >= SCREEN_WIDTH_AREA)) {
+        if (title_screen_player.gamemode == GAMEMODE_WAVE && (state.dead || title_screen_player.x >= SCREEN_WIDTH_AREA)) {
             if (wave_trail->opacity > 0) wave_trail->opacity -= 0.08f;
             
             if (wave_trail->opacity <= 0) {

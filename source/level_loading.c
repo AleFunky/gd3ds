@@ -327,7 +327,11 @@ char *decompress_online_level(char *data) {
 
     fix_base64_url(data);
 
+    // Bro theres some levels that randomly have , at the end of the base64 string wtf
+    remove_char(data, ',');
+
     unsigned char *decoded = malloc(strlen(data));
+    
     int decoded_len = base64_decode(data, decoded);
     if (decoded_len <= 0) {
         output_log("Failed to decode base64\n");
@@ -1402,8 +1406,8 @@ void load_online_level_info(char *level_string) {
 int load_online_level(LevelEntry *level) {
     bool compressed = true;
 
-    // Base64 doesn't allow commas, so if theres one, its not compressed
-    if (strchr(level->levelString, ',')) compressed = false;
+    // Base64 doesn't allow semicolons, so if theres one, its not compressed
+    if (strchr(level->levelString, ';')) compressed = false;
     
     char *data;
     if (compressed) {

@@ -209,8 +209,8 @@ extern const float player_speeds[SPEED_COUNT];
 inline float getTop(Player *player)  { return player->y + player->height / 2; }
 inline float getBottom(Player *player)  { return player->y - player->height / 2; }
 
-inline float getGroundTop(Player *player)  { return player->y + (player->height / 2) + ((player->gamemode == GAMEMODE_DART) ? (player->mini ? 3 : 5) : 0); }
-inline float getGroundBottom(Player *player)  { return player->y - (player->height / 2) - ((player->gamemode == GAMEMODE_DART) ? (player->mini ? 3 : 5) : 0); }
+inline float getGroundTop(Player *player)  { return player->y + (player->height / 2) + ((player->gamemode == GAMEMODE_WAVE) ? (player->mini ? 3 : 5) : 0); }
+inline float getGroundBottom(Player *player)  { return player->y - (player->height / 2) - ((player->gamemode == GAMEMODE_WAVE) ? (player->mini ? 3 : 5) : 0); }
 
 inline float getRight(Player *player)  { return player->x + player->width / 2; }
 inline float getLeft(Player *player)  { return player->x - player->width / 2; }

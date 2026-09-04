@@ -10,3 +10,4 @@ char *truncate_speed(size_t bytes);
 void strip_character(char* s, char character);
 char *url_decode(const char *str);
 void url_convert_to_http(char *str);
+void remove_char(char *str, char character);
