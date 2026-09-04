@@ -546,7 +546,7 @@ u32 jump_key_mask(void) {
 }
 
 static bool touch_jump_filter(u16 px, u16 py) {
-    bool on_pause_button = px > 320 - 30 && py < 30;
+    bool on_pause_button = px > 300-32/2 && py < 20+32/2;
     bool on_practice_ui = state.practice_mode && (px > 92 && px < 222 && py > 175 && py < 222);
     return !(on_pause_button || on_practice_ui);
 }
