@@ -136,3 +136,13 @@ char *url_decode(const char *str) {
 
     return dStr;
 }
+
+// Taken from: https://stackoverflow.com/a/8733511
+void remove_char(char *str, char character) {
+    char *src, *dst;
+    for (src = dst = str; *src != '\0'; src++) {
+        *dst = *src;
+        if (*dst != character) dst++;
+    }
+    *dst = '\0';
+}
