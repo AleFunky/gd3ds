@@ -181,7 +181,8 @@ typedef struct {
     DeathReason death_reason;
 } GameState;
 
-#define CEILING_INVUL_TIME 0.15f
+#define CEILING_INVUL_TIME 0.1f
+#define GAMEMODE_INVUL_TIME 0.1f
 
 extern GameState state;
 

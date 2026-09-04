@@ -458,6 +458,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             } 
             break;
         case BLUE_ORB:
+            if (GET_ACTIVATED(obj)) player->gravObj_id = obj;
             if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
             if (!GET_ACTIVATED(obj) && (state.input.holdJump) && player->buffering_state == BUFFER_READY) {    
                 MotionTrail_ResumeStroke(trail);
@@ -722,7 +723,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
 
                     if (player->gamemode == GAMEMODE_WAVE) player->vel_y *= 0.9f;
                     
-                    player->ceiling_inv_time = CEILING_INVUL_TIME;
+                    player->ceiling_inv_time = GAMEMODE_INVUL_TIME;
                     player->snap_rotation = true;
                     set_gamemode(player, GAMEMODE_PLAYER);
                     set_checkpoint_timer(0);
@@ -1163,9 +1164,8 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
 
             // This is equal to using the old player y position (a frame of snap leeway)
             clip += fabsf(player->vel_y) * STEPS_DT;
-
             
-            if (player->gravObj_id >= 0 && GET_HITBOX_COUNTER(player->gravObj_id) == 1) {
+            if (player->ceiling_inv_time > 0) {
                 // Only do the funny grav snap if player is touching a gravity object and internal hitbox is touching block
                 bool internalCollidingBlock = intersect(
                     player->x, player->y, internal.width, internal.height, 0, 
@@ -1174,7 +1174,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
 
                 float diff = obj_gravBottom(player, obj) - gravInternalBottom(player);
 
-                gravSnap = (!state.old_player.on_ground || player->ceiling_inv_time > 0) && internalCollidingBlock && (diff >= 0 && diff <= clip);
+                gravSnap = internalCollidingBlock && (diff >= 0 && diff <= clip);
             }
 
             bool safeZone = player->mini && ((obj_gravTop(player, obj) - gravBottom(player) <= clip) || (gravTop(player) - obj_gravBottom(player, obj) <= clip));
@@ -1266,7 +1266,6 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                         else player->vel_y = 0;
                         player->inverse_rotation = false;
                         player->time_since_ground = 0;
-                        player->ceiling_inv_time = 0;
                         player->y = grav(player, obj_gravBottom(player, obj)) - grav(player, player->height / 2);
                         if (player->vel_y >= 0) player->vel_y = 0;
                     }

@@ -562,7 +562,7 @@ void clamp_player_ground(Player *player) {
 
     // Check for ground collision
     if (getGroundBottom(player) < state.ground_y) {
-        if (player->ceiling_inv_time <= 0 && player->gravObj_id < 0 && player->gamemode == GAMEMODE_PLAYER && player->upside_down) {
+        if (player->ceiling_inv_time <= 0 && player->gamemode == GAMEMODE_PLAYER && player->upside_down) {
             kill_player(DEATH_CEILING);
         }
 
@@ -577,7 +577,7 @@ void clamp_player_ground(Player *player) {
 
     // Check for ceiling collision
     if (getGroundTop(player) > state.ceiling_y) {
-        if (player->ceiling_inv_time <= 0  && player->gravObj_id < 0 && player->gamemode == GAMEMODE_PLAYER && !player->upside_down) {
+        if (player->ceiling_inv_time <= 0 && player->gamemode == GAMEMODE_PLAYER && !player->upside_down) {
             kill_player(DEATH_CEILING);
         }
 

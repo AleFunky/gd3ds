@@ -326,7 +326,10 @@ void slope_calc(int obj, Player *player) {
         bool gravSnap = (player->ceiling_inv_time > 0) || (player->gravObj_id >= 0 && GET_HITBOX_COUNTER(player->gravObj_id) == 1);
         
         if (player->gamemode == GAMEMODE_PLAYER && !gravSnap) {
-            kill_player(DEATH_SLOPE);
+            if (grav(player, player->y - SLOPE_HEAD_TOLERANCE) > grav(player, expected_slope_y(obj, player))) {
+                kill_player(DEATH_SLOPE);
+            }
+            return;
         }
 
         // On slope
@@ -375,7 +378,10 @@ void slope_calc(int obj, Player *player) {
         bool gravSnap = (player->ceiling_inv_time > 0) || (player->gravObj_id >= 0 && GET_HITBOX_COUNTER(player->gravObj_id) == 1);
         
         if (player->gamemode == GAMEMODE_PLAYER && !gravSnap) {
-            kill_player(DEATH_SLOPE);
+            if (grav(player, player->y - SLOPE_HEAD_TOLERANCE) > grav(player, expected_slope_y(obj, player))) {
+                kill_player(DEATH_SLOPE);
+            }
+            return;
         }
 
         // On slope
