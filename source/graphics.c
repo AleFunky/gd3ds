@@ -1459,8 +1459,8 @@ void draw_bottom_particles() {
 void update_bottom_particles(float delta) {
     glitter_particles_bottom.emitting = false;
 
-    bool flying_gamemode = (state.player.gamemode == GAMEMODE_SHIP || state.player.gamemode == GAMEMODE_BIRD || state.player.gamemode == GAMEMODE_DART);
-    if (state.dual) flying_gamemode = flying_gamemode || (state.player2.gamemode == GAMEMODE_SHIP || state.player2.gamemode == GAMEMODE_BIRD || state.player2.gamemode == GAMEMODE_DART);
+    bool flying_gamemode = (state.player.gamemode == GAMEMODE_SHIP || state.player.gamemode == GAMEMODE_UFO || state.player.gamemode == GAMEMODE_WAVE);
+    if (state.dual) flying_gamemode = flying_gamemode || (state.player2.gamemode == GAMEMODE_SHIP || state.player2.gamemode == GAMEMODE_UFO || state.player2.gamemode == GAMEMODE_WAVE);
 
     // If in game and not paused and not fading, update the particles spawning
     if (((game_state == STATE_GAME && !game_paused)) && !get_fade_status()) {
@@ -1547,7 +1547,7 @@ void spawn_icon_at(
         if (i==0) real_index = 1;
         else if (i==1) real_index = 0;
 
-        if (gamemode == GAMEMODE_BIRD) {
+        if (gamemode == GAMEMODE_UFO) {
             if (i==2) real_index = 0;
             else if (i < 2) real_index++;
         }

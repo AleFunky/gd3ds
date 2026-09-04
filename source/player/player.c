@@ -93,7 +93,7 @@ const float cube_rotation_speed[2] = {
 };
 
 bool player_gamemode_is_flying(Player *player) {
-    return player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_BIRD || player->gamemode == GAMEMODE_DART;
+    return player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_UFO || player->gamemode == GAMEMODE_WAVE;
 }
 
 void player_non_flying_landing(Player *player) {
@@ -247,7 +247,7 @@ void rotate_fly(Player *player, float mult) {
         player->rotation = RadToDeg(angle_rad);
     } else if (STEPS_DT * 72 <= diff_x * diff_x + diff_y * diff_y) {
         // This is how gd does rotation
-        if (player->gamemode == GAMEMODE_BIRD) {
+        if (player->gamemode == GAMEMODE_UFO) {
             if (player->slope_data.slope_id >= 0) {
                 angle_rad = slope_snap_angle(player->slope_data.slope_id, player);
             } else if (player->on_ground) {
@@ -479,7 +479,7 @@ void ufo_gamemode(Player *player) {
     drag_particles_2[state.current_player].gravityFlipped = !player->upside_down;
     drag_particles_2[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
 
-    bool buffering_check = ((state.old_player.gamemode == GAMEMODE_PLAYER || state.old_player.gamemode == GAMEMODE_SHIP || state.old_player.gamemode == GAMEMODE_DART || player->buffer_ufo) && (state.input.holdJump));
+    bool buffering_check = ((state.old_player.gamemode == GAMEMODE_PLAYER || state.old_player.gamemode == GAMEMODE_SHIP || state.old_player.gamemode == GAMEMODE_WAVE || player->buffer_ufo) && (state.input.holdJump));
     // If buffering, jump
     if (player->buffering_state == BUFFER_READY && (state.input.pressedJump || buffering_check)) {
         player->vel_y = fmaxf(player->vel_y, player->mini ? 358.992 : 371.034);
@@ -570,8 +570,8 @@ void clamp_player_ground(Player *player) {
             clear_slope_data(player);
         }
         
-        if (player->gamemode != GAMEMODE_DART && grav(player, player->vel_y) <= 0) set_p_velocity(player, 0, player->gamemode == GAMEMODE_PLAYER_BALL);
-        player->y = state.ground_y + (player->height / 2) + ((player->gamemode == GAMEMODE_DART) ? (player->mini ? 3 : 5) : 0);;
+        if (player->gamemode != GAMEMODE_WAVE && grav(player, player->vel_y) <= 0) set_p_velocity(player, 0, player->gamemode == GAMEMODE_BALL);
+        player->y = state.ground_y + (player->height / 2) + ((player->gamemode == GAMEMODE_WAVE) ? (player->mini ? 3 : 5) : 0);;
         player->snap_data.player_frame = 0;
     }
 
@@ -585,8 +585,8 @@ void clamp_player_ground(Player *player) {
             clear_slope_data(player);
         }
         
-        if (player->gamemode != GAMEMODE_DART && grav(player, player->vel_y) >= 0) set_p_velocity(player, 0, player->gamemode == GAMEMODE_PLAYER_BALL);
-        player->y = state.ceiling_y - (player->height / 2) - ((player->gamemode == GAMEMODE_DART) ? (player->mini ? 3 : 5) : 0);
+        if (player->gamemode != GAMEMODE_WAVE && grav(player, player->vel_y) >= 0) set_p_velocity(player, 0, player->gamemode == GAMEMODE_BALL);
+        player->y = state.ceiling_y - (player->height / 2) - ((player->gamemode == GAMEMODE_WAVE) ? (player->mini ? 3 : 5) : 0);
     } 
 }
 void run_player(Player *player) {
@@ -623,7 +623,7 @@ void run_player(Player *player) {
     }
     
     // Handle land particles
-    if (player->gamemode != GAMEMODE_DART && !state.old_player.on_ground && player->on_ground) {
+    if (player->gamemode != GAMEMODE_WAVE && !state.old_player.on_ground && player->on_ground) {
         land_particles[state.current_player].emitterX = player->x;
         land_particles[state.current_player].emitterY = fabsf(gravBottom(player)) + (player->upside_down ? -4 : 4);
         land_particles[state.current_player].gravityFlipped = player->upside_down;
@@ -651,17 +651,17 @@ void run_player(Player *player) {
             if (!state.mirroring) MotionTrail_ResumeStroke(trail);
             ship_gamemode(player);
             break;
-        case GAMEMODE_PLAYER_BALL:
+        case GAMEMODE_BALL:
             ball_gamemode(player);
             break;
-        case GAMEMODE_BIRD:
+        case GAMEMODE_UFO:
             glitter_particles.emitterX = state.camera_x_middle;
             glitter_particles.emitterY = state.camera_y_middle;
             glitter_particles.emitting = true;
             if (!state.mirroring) MotionTrail_ResumeStroke(trail);
             ufo_gamemode(player);
             break;
-        case GAMEMODE_DART:
+        case GAMEMODE_WAVE:
             glitter_particles.emitterX = state.camera_x_middle;
             glitter_particles.emitterY = state.camera_y_middle;
             glitter_particles.emitting = true;
@@ -679,7 +679,7 @@ void run_player(Player *player) {
     player->time_since_ground += STEPS_DT;
 
     // Fade wave trail if not in wave anymore or end animation started or mirror portal animation is happening
-    if (player->gamemode != GAMEMODE_DART || state.mirroring || player->cutscene_timer > 0) {
+    if (player->gamemode != GAMEMODE_WAVE || state.mirroring || player->cutscene_timer > 0) {
         if (wave_trail->opacity > 0) wave_trail->opacity -= 0.02f;
         
         if (wave_trail->opacity <= 0) {
@@ -735,7 +735,7 @@ void run_player(Player *player) {
     }
 
     // Handle wave trail point adding
-    if (player->gamemode == GAMEMODE_DART && !state.mirroring) {    
+    if (player->gamemode == GAMEMODE_WAVE && !state.mirroring) {    
         wave_trail->positionR = (Vec2D){player->x, player->y};  
         wave_trail->startingPositionInitialized = true;
         if (player->vel_y != state.old_player.vel_y || player->on_ground != state.old_player.on_ground || player->on_ceiling != state.old_player.on_ceiling) {
@@ -755,8 +755,8 @@ void run_player(Player *player) {
         }
     }
     if (player->gamemode == GAMEMODE_SHIP) rotate_fly(player, 0.15f);
-    if (player->gamemode == GAMEMODE_DART) rotate_fly(player, player->mini ? 0.4f : 0.25f);
-    if (player->gamemode == GAMEMODE_BIRD) rotate_fly(player, 0.07f);
+    if (player->gamemode == GAMEMODE_WAVE) rotate_fly(player, player->mini ? 0.4f : 0.25f);
+    if (player->gamemode == GAMEMODE_UFO) rotate_fly(player, 0.07f);
 
     player->snap_rotation = false;
 
@@ -828,7 +828,7 @@ void handle_player(Player *player) {
         p1_trail = true;
         if (player->cutscene_timer == 0) {
             // Add a trail point for wave
-            if (player->gamemode == GAMEMODE_DART) MotionTrail_AddWavePoint(wave_trail);
+            if (player->gamemode == GAMEMODE_WAVE) MotionTrail_AddWavePoint(wave_trail);
 
             player->cutscene_initial_player_x = player->x;
             player->cutscene_initial_player_y = player->y;
@@ -906,14 +906,14 @@ void spawn_p1_trail(Player *player, int player_id) {
 
     switch (player->gamemode) {
         case GAMEMODE_PLAYER:
-        case GAMEMODE_PLAYER_BALL:
-        case GAMEMODE_DART:
+        case GAMEMODE_BALL:
+        case GAMEMODE_WAVE:
             trail_data->gamemode = player->gamemode;
             trail_data->scale = scale;
             trail_data->upside_down = false;
             break;
         case GAMEMODE_SHIP:
-        case GAMEMODE_BIRD:
+        case GAMEMODE_UFO:
             trail_data->gamemode = GAMEMODE_PLAYER;
             trail_data->scale = scale * 0.5f;
             trail_data->upside_down = player->upside_down;
@@ -1067,28 +1067,28 @@ void draw_player(Player *player) {
                 0
             );
             break;
-        case GAMEMODE_PLAYER_BALL:
-            spawn_icon_at(GAMEMODE_PLAYER_BALL, (settingsState.defaultMiniIcon && player->mini) ? 0 : selected_ball, glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, false, scale, 
+        case GAMEMODE_BALL:
+            spawn_icon_at(GAMEMODE_BALL, (settingsState.defaultMiniIcon && player->mini) ? 0 : selected_ball, glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, false, scale, 
                 primary_color,
                 secondary_color,
                 C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
             );
             break;
-        case GAMEMODE_BIRD:
-            if (glow_enabled) spawn_glow_layer_at(GAMEMODE_BIRD, selected_ufo, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale, C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255));
+        case GAMEMODE_UFO:
+            if (glow_enabled) spawn_glow_layer_at(GAMEMODE_UFO, selected_ufo, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale, C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255));
             spawn_icon_at(GAMEMODE_PLAYER, (settingsState.defaultMiniIcon && player->mini) ? 0 : selected_cube, glow_enabled, p_x, p_y, p_rot, flip_x, player->upside_down, scale * 0.5f, 
                 primary_color,
                 secondary_color,
                 C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
             );
-            spawn_icon_at(GAMEMODE_BIRD, selected_ufo, glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale, 
+            spawn_icon_at(GAMEMODE_UFO, selected_ufo, glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale, 
                 primary_color,
                 secondary_color,
                 0
             );
             break;    
-        case GAMEMODE_DART:
-            spawn_icon_at(GAMEMODE_DART, selected_wave, glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, false, scale, 
+        case GAMEMODE_WAVE:
+            spawn_icon_at(GAMEMODE_WAVE, selected_wave, glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, false, scale, 
                 primary_color,
                 secondary_color,
                 C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)

@@ -873,7 +873,7 @@ void game_loop() {
 
                 fade_to_amplitude(0);
 
-                if (state.player.gamemode == GAMEMODE_DART) {
+                if (state.player.gamemode == GAMEMODE_WAVE) {
                     if (wave_trail_p1.opacity > 0) wave_trail_p1.opacity -= 0.02f * 4;
             
                     if (wave_trail_p1.opacity <= 0) {
@@ -882,7 +882,7 @@ void game_loop() {
                     }
                 }
 
-                if (state.player2.gamemode == GAMEMODE_DART) {
+                if (state.player2.gamemode == GAMEMODE_WAVE) {
                     if (wave_trail_p2.opacity > 0) wave_trail_p2.opacity -= 0.02f * 4;
 
                     if (wave_trail_p2.opacity <= 0) {
@@ -1023,11 +1023,11 @@ void game_loop() {
                     state.mirror_speed_factor = 1 - 2*state.mirror_factor;
 
                     // When mirror transition ends, put a wave trail point
-                    if (state.player.gamemode == GAMEMODE_DART) {
+                    if (state.player.gamemode == GAMEMODE_WAVE) {
                         wave_trail_p1.positionR = (Vec2D){ state.player.x, state.player.y };
                         MotionTrail_AddWavePoint(&wave_trail_p1);
                     }
-                    if (state.dual && state.player2.gamemode == GAMEMODE_DART) {
+                    if (state.dual && state.player2.gamemode == GAMEMODE_WAVE) {
                         wave_trail_p2.positionR = (Vec2D){ state.player2.x, state.player2.y };
                         MotionTrail_AddWavePoint(&wave_trail_p2);
                     }
