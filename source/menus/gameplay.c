@@ -180,7 +180,7 @@ static void restart_level() {
         
         if (get_checkpoint_count() > 0) {
             restore_checkpoint();
-        } else {
+        } else if (settingsState.practiceMusicSync) {
             seek_mp3(level_info.song_offset);
         }
     } else if (song_loaded) seek_mp3(level_info.song_offset);
