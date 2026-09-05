@@ -409,7 +409,7 @@ void ball_gamemode(Player *player) {
 
     drag_particles[state.current_player].cfg.sourcePositionVariancey = (player->mini ? 4.f : 2.f);
 
-    bool should_coyote = (state.dual || player->upside_down) && player->coyote_frames < 10;
+    bool should_coyote = (state.dual || player->upside_down) && player->coyote_frames < 15;
     // If on ground (block or slope) and its buffering, do a jump
     if ((player->slope_data.slope_id >= 0 || player->on_ground || player->on_ceiling || should_coyote) && player->buffering_state == BUFFER_READY) {        
         player->upside_down ^= 1;
