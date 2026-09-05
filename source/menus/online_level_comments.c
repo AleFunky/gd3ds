@@ -79,6 +79,12 @@ static void handle_comment_errors(int code) {
             update_comment_arrows(true);
             break;
 
+        case 28:
+            ui_label_set_text(error_label, "Connection timed out!");
+            update_comment_arrows(true);
+            break;
+        case 42:
+            break;
         default:
             snprintf(temp, sizeof(temp), "An unknown error has\noccurred.\n\nError code: %d", code);
             ui_label_set_text(error_label, temp);

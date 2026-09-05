@@ -424,7 +424,11 @@ static void handle_errors(int code) {
         case 7:   
             ui_label_set_text(error_label, "No\n<#41e24e>Internet</> connection!");
             break;
-
+        case 28:
+            ui_label_set_text(error_label, "Connection timed out!");
+            break;
+        case 42:
+            break;
         default:
             snprintf(temp, sizeof(temp), "An unknown error has\noccurred.\n\nError code: %d", code);
             ui_label_set_text(error_label, temp);

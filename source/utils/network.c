@@ -92,7 +92,10 @@ int get_level_from_id(NetworkTask *task, char **out_data, int id, bool useGdps) 
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 3);
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
         curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
@@ -156,8 +159,11 @@ int get_search_results(NetworkTask *task, char **out_data, int gameVer, SearchFi
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 3);
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
         curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
 
@@ -256,8 +262,11 @@ int get_comments_from_id(NetworkTask *task, char **out_data, int id, int page, i
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 3);
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
         curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
 
@@ -304,8 +313,11 @@ int get_song_info_from_id(NetworkTask *task, char **out_data, int songId, bool u
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 3);
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
         curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
 
@@ -388,6 +400,8 @@ static int download_song(DownloadTask *task) {
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, progressCallback);
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
         curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem"); // Certificate slop
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 3);
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
 
         char tmp_file[273];
         snprintf(tmp_file, sizeof(tmp_file), "%s/%s.tmp", path, song_id);
@@ -434,10 +448,6 @@ static int download_song(DownloadTask *task) {
 static void network_thread(void *arg) {
     NetworkTask *task = arg;
 
-    task->finished = false;
-    task->running = true;
-    task->cancelled = false;
-
     task->result = task->func(task);
 
     task->running = false;
@@ -450,6 +460,10 @@ Thread create_network_thread(NetworkTask *task) {
     priority += 1;
     priority = priority < 0x18 ? 0x18 : priority;
     priority = priority > 0x3F ? 0x3F : priority;
+
+    task->finished = false;
+    task->running = true;
+    task->cancelled = false;
     
     return threadCreate(
         network_thread,
@@ -464,15 +478,6 @@ Thread create_network_thread(NetworkTask *task) {
 static void download_thread(void *arg) {
     DownloadTask *task = arg;
 
-    task->progress = 0;
-    task->speed = 0;
-    task->last_bytes = 0;
-    task->last_time = 0;
-    task->cancelled = false;
-
-    task->finished = false;
-    task->running = true;
-
     task->result = download_song(task);
 
     task->running = false;
@@ -485,6 +490,15 @@ Thread create_download_song_thread(DownloadTask *task) {
     priority += 1;
     priority = priority < 0x18 ? 0x18 : priority;
     priority = priority > 0x3F ? 0x3F : priority;
+    
+    task->progress = 0;
+    task->speed = 0;
+    task->last_bytes = 0;
+    task->last_time = 0;
+    task->cancelled = false;
+
+    task->finished = false;
+    task->running = true;
     
     return threadCreate(
         download_thread,
