@@ -113,12 +113,30 @@ static void action_open_version_warning(UIElement *e) {
 }
 
 static void update_arrows() {
-    if (searchEntriesLength == page_entry->amount) ui_run_func_on_tag(&default_screen, "nextpage", ui_enable_element); else ui_run_func_on_tag(&default_screen, "nextpage", ui_disable_element);
-    if ((filters.currentPage) >= 1) ui_run_func_on_tag(&default_screen, "prevpage", ui_enable_element); else ui_run_func_on_tag(&default_screen, "prevpage", ui_disable_element);
+    if (searchEntriesLength == page_entry->amount) ui_run_func_on_tag(&default_screen, "nextpage", ui_enable_element); 
+    else ui_run_func_on_tag(&default_screen, "nextpage", ui_disable_element);
+    if ((filters.currentPage) >= 1) ui_run_func_on_tag(&default_screen, "prevpage", ui_enable_element); 
+    else ui_run_func_on_tag(&default_screen, "prevpage", ui_disable_element);
 
     char pageInfo[32];
     snprintf(pageInfo, 42 - 1, "%d to %d of %d", page_entry->currentOffset + 1, page_entry->currentOffset + page_entry->amount, page_entry->totalPages * page_entry->amount - 1);
     ui_label_set_text(page_info_label, pageInfo);
+}
+
+void free_online_data() {
+    if (search_entries) {
+        if (search_entries->description) free(search_entries->description);
+        free(search_entries);
+        search_entries = NULL;
+    }
+    if (creator_entries) {
+        free(creator_entries);
+        creator_entries = NULL;
+    }
+    if (song_entries) {
+        free(song_entries);
+        song_entries = NULL;
+    }
 }
 
 static void populate_list() {
@@ -439,7 +457,9 @@ static void handle_errors(int code) {
 static void action_change_page(UIElement* e) {
     filters.currentPage += ui_prop_int(&e->custom_properties, "page", 0);
     search_needs_refresh = true;
-    update_arrows();
+    ui_run_func_on_tag(&default_screen, "prevpage", ui_disable_element);
+    ui_run_func_on_tag(&default_screen, "nextpage", ui_disable_element);
+    free_online_data(); // Free previous data
     thread = create_network_thread(&search_task);
     ui_enable_element((UIElement *) spinner);
     if (list) ui_list_reset(list);
@@ -572,19 +592,8 @@ void online_menu_loop() {
                 threadJoin(thread, U64_MAX);
             }
 
-            if (search_entries) {
-                if (search_entries->description) free(search_entries->description);
-                free(search_entries);
-                search_entries = NULL;
-            }
-            if (creator_entries) {
-                free(creator_entries);
-                creator_entries = NULL;
-            }
-            if (song_entries) {
-                free(song_entries);
-                song_entries = NULL;
-            }
+            free_online_data();
+
             if(page_entry) {
                 free(page_entry);
                 page_entry = NULL;

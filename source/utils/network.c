@@ -408,6 +408,7 @@ static int download_song(DownloadTask *task) {
         FILE* f = fopen(tmp_file, "wb");
         if (!f) {
             free(decoded_url);
+            curl_easy_cleanup(curl);
             return -3;
         }
         
@@ -421,6 +422,7 @@ static int download_song(DownloadTask *task) {
         if (http_code != 200) {
             remove(tmp_file);
             free(decoded_url);
+            fclose(f);
             curl_easy_cleanup(curl);
             return -4;
         }
@@ -428,6 +430,7 @@ static int download_song(DownloadTask *task) {
         if (code) {
             remove(tmp_file);
             free(decoded_url);
+            fclose(f);
             curl_easy_cleanup(curl);
             return code;
         }
@@ -513,4 +516,5 @@ Thread create_download_song_thread(DownloadTask *task) {
 void soc_exit() {
     close(sock);
     socExit();
+    free(SOC_buffer);
 }

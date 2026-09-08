@@ -57,8 +57,10 @@ void action_exit_comments(UIElement* e) {
 }
 
 static void update_comment_arrows(bool disableArrows) {
-    if (commentEntriesLength == 10 && !disableArrows) ui_run_func_on_tag(&screen, "nextpage", ui_enable_element); else ui_run_func_on_tag(&screen, "nextpage", ui_disable_element);
-    if ((current_comments_page) >= 1 && !disableArrows) ui_run_func_on_tag(&screen, "prevpage", ui_enable_element); else ui_run_func_on_tag(&screen, "prevpage", ui_disable_element);
+    if (commentEntriesLength == 10 && !disableArrows) ui_run_func_on_tag(&screen, "nextpage", ui_enable_element); 
+    else ui_run_func_on_tag(&screen, "nextpage", ui_disable_element);
+    if ((current_comments_page) >= 1 && !disableArrows) ui_run_func_on_tag(&screen, "prevpage", ui_enable_element); 
+    else ui_run_func_on_tag(&screen, "prevpage", ui_disable_element);
 }
 
 static void handle_comment_errors(int code) {
@@ -287,6 +289,7 @@ static void action_refresh_comments(UIElement* e) {
     ui_list_reset(list);
     ui_disable_element((UIElement *) error_label);
     ui_enable_element((UIElement *)spinner);
+    update_comment_arrows(true);
     
     thread = create_network_thread(&comments_task);
 }
@@ -295,7 +298,7 @@ static void action_change_comments_page(UIElement* e) {
     current_comments_page += ui_prop_int(&e->custom_properties, "page", 0);
     
     ui_list_reset(list);
-    update_comment_arrows(false);
+    update_comment_arrows(true);
     ui_enable_element((UIElement *)spinner);
     thread = create_network_thread(&comments_task);
 }

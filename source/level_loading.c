@@ -330,7 +330,13 @@ char *decompress_online_level(char *data) {
     // Bro theres some levels that randomly have , at the end of the base64 string wtf
     remove_char(data, ',');
 
+    //output_log("BRO len %d lol %s\n", strlen(data), data);
+
     unsigned char *decoded = malloc(strlen(data));
+
+    if (!decoded) {
+        return NULL;
+    }
     
     int decoded_len = base64_decode(data, decoded);
     if (decoded_len <= 0) {
@@ -358,7 +364,8 @@ char *decompress_level(char *data) {
     char *b64 = extract_gmd_key((const char *) data, "k4", "s");
     if (!b64) {
         // Empty level
-        return data;
+        char *temp = strdup(data);
+        return temp;
     }
 
     const char *semicolon = strchr(b64, ';');
@@ -513,10 +520,15 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray) {
         parse_color_channel(channels, i, v19_bg);
         channels[i].channelID = CHANNEL_BG;
         i++;
+        free(v19_bg);
 
-        parse_color_channel(channels, i, get_metadata_value(level_string, "kS30"));
-        channels[i].channelID = CHANNEL_GROUND;
-        i++;
+        char *ground = get_metadata_value(level_string, "kS30");
+        if (ground) {
+            parse_color_channel(channels, i, ground);
+            channels[i].channelID = CHANNEL_GROUND;
+            i++;
+            free(ground);
+        }
 
         char *line = get_metadata_value(level_string, "kS31");
         if (line) {
@@ -524,6 +536,7 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray) {
             parse_color_channel(channels, i, line);
             channels[i].channelID = CHANNEL_LINE;
             i++;
+            free(line);
         }
         
         char *obj = get_metadata_value(level_string, "kS32");
@@ -532,6 +545,7 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray) {
             parse_color_channel(channels, i, obj);
             channels[i].channelID = CHANNEL_OBJ;
             i++;
+            free(obj);
         }
 
         char *col1 = get_metadata_value(level_string, "kS33");
@@ -540,6 +554,7 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray) {
             parse_color_channel(channels, i, col1);
             channels[i].channelID = 1;
             i++;
+            free(col1);
         }
 
         char *col2 = get_metadata_value(level_string, "kS34");
@@ -548,6 +563,7 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray) {
             parse_color_channel(channels, i, col2);
             channels[i].channelID = 2;
             i++;
+            free(col2);
         }
 
         char *col3 = get_metadata_value(level_string, "kS35");
@@ -556,6 +572,7 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray) {
             parse_color_channel(channels, i, col3);
             channels[i].channelID = 3;
             i++;
+            free(col3);
         }
 
         char *col4 = get_metadata_value(level_string, "kS36");
@@ -564,6 +581,7 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray) {
             parse_color_channel(channels, i, col4);
             channels[i].channelID = 4;
             i++;
+            free(col4);
         }
 
         char *dl3 = get_metadata_value(level_string, "kS37");
@@ -572,6 +590,7 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray) {
             parse_color_channel(channels, i, dl3);
             channels[i].channelID = CHANNEL_3DL;
             i++;
+            free(dl3);
         }
         
         *outArray = channels;
@@ -591,7 +610,8 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray) {
 
     char *bg_player_color = get_metadata_value(level_string, "kS16");
     if (bg_player_color) {
-       bg_channel.playerColor = atoi(bg_player_color);
+        bg_channel.playerColor = atoi(bg_player_color);
+        free(bg_player_color);
     }
 
     channels[i] = bg_channel;
@@ -611,6 +631,7 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray) {
     char *g_player_color = get_metadata_value(level_string, "kS17");
     if (g_player_color) {
         g_channel.playerColor = atoi(g_player_color);
+        free(g_player_color);
     }
     
     channels[i] = g_channel;
@@ -630,6 +651,7 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray) {
         char *line_player_color = get_metadata_value(level_string, "kS18");
         if (line_player_color) {
             line_channel.playerColor = atoi(line_player_color);
+            free(line_player_color);
         }
 
         channels = realloc(channels, sizeof(GDColorChannel) * (i + 1));
@@ -651,6 +673,7 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray) {
         char *obj_player_color = get_metadata_value(level_string, "kS19");
         if (obj_player_color) {
             obj_channel.playerColor = atoi(obj_player_color);
+            free(obj_player_color);
         }
         
         channels = realloc(channels, sizeof(GDColorChannel) * (i + 1));
@@ -672,11 +695,13 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray) {
         char *obj_2_player_color = get_metadata_value(level_string, "kS20");
         if (obj_2_player_color) {
             obj_2_channel.playerColor = atoi(obj_2_player_color);
+            free(obj_2_player_color);
         }
 
         char *obj_2_blending = get_metadata_value(level_string, "kA5");
         if (obj_2_blending) {
             obj_2_channel.blending = atoi(obj_2_blending) != 0;
+            free(obj_2_blending);
         }
 
         channels = realloc(channels, sizeof(GDColorChannel) * (i + 1));
@@ -1252,6 +1277,7 @@ int parse_string(const char *levelString) {
     printf("%d\n", objectCount);
     
     if (!init_arrays(objectCount)) {
+        free_arrays();
         output_log("Failed to allocate object array\n");
         return 4;
     }
@@ -1508,7 +1534,10 @@ int load_level(char *path) {
     if (!level) return 1;
 
     char *data = decompress_level(level);
-    if (!data) return 2;
+    if (!data) {
+        free(level);
+        return 2;
+    }
 
     // Get level starting colors
     char *metaStr = get_metadata_value(data, "kS38");
@@ -1528,11 +1557,10 @@ int load_level(char *path) {
 
     free(data);
     free(metaStr);
+    free(level);
 
     if (returned) return returned;
     
-    free(level);
-
     init_col_channels();
     set_color_channels();
 

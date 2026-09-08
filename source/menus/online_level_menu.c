@@ -741,6 +741,12 @@ void online_level_menu_loop() {
             }
 
             if (comment_entries) {
+                for (int i = 0; i < commentEntriesLength; i++) {
+                    if (comment_entries[i].content) {
+                        free(comment_entries[i].content);
+                        comment_entries[i].content = NULL;
+                    }
+                }
                 free(comment_entries);
                 comment_entries = NULL;
             }
