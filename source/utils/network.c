@@ -94,8 +94,7 @@ int get_level_from_id(NetworkTask *task, char **out_data, int id, bool useGdps) 
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
-        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 3);
-        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
         curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
@@ -162,8 +161,7 @@ int get_search_results(NetworkTask *task, char **out_data, int gameVer, SearchFi
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
-        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 3);
-        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
         curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
 
@@ -265,8 +263,7 @@ int get_comments_from_id(NetworkTask *task, char **out_data, int id, int page, i
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
-        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 3);
-        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
         curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
 
@@ -316,8 +313,7 @@ int get_song_info_from_id(NetworkTask *task, char **out_data, int songId, bool u
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
-        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 3);
-        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
         curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
 
@@ -400,8 +396,7 @@ static int download_song(DownloadTask *task) {
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, progressCallback);
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
         curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem"); // Certificate slop
-        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 3);
-        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5);
 
         char tmp_file[273];
         snprintf(tmp_file, sizeof(tmp_file), "%s/%s.tmp", path, song_id);
