@@ -225,7 +225,7 @@ static const bool gamemode_linked_gravity[GAMEMODE_COUNT][GAMEMODE_COUNT] = {
 #undef N
 
 void flip_other_player(int current_player) {
-    if (state.dual && gamemode_linked_gravity[state.player.gamemode][state.player2.gamemode] && state.player.upside_down == state.player2.upside_down) {
+    if (!level_info.two_player_mode && state.dual && gamemode_linked_gravity[state.player.gamemode][state.player2.gamemode] && state.player.upside_down == state.player2.upside_down) {
         if (current_player == 0) {
             state.player2.upside_down = !state.player.upside_down;
             state.player2.vel_y /= -2;
@@ -403,7 +403,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case YELLOW_ORB:
             if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if (!GET_ACTIVATED(obj) && (state.input.holdJump) && player->buffering_state == BUFFER_READY) {
+            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
                 MotionTrail_ResumeStroke(trail);
                 player->vel_y = jump_heights_table[state.speed][JUMP_YELLOW_ORB][player->gamemode][player->mini];
                 
@@ -431,7 +431,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case PINK_ORB:
             if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if (!GET_ACTIVATED(obj) && (state.input.holdJump) && player->buffering_state == BUFFER_READY) {
+            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
                 MotionTrail_ResumeStroke(trail);
                 player->vel_y = jump_heights_table[state.speed][JUMP_PINK_ORB][player->gamemode][player->mini];
                 
@@ -460,7 +460,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         case BLUE_ORB:
             if (GET_ACTIVATED(obj)) player->gravObj_id = obj;
             if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if (!GET_ACTIVATED(obj) && (state.input.holdJump) && player->buffering_state == BUFFER_READY) {    
+            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {    
                 MotionTrail_ResumeStroke(trail);
                 if (player->gamemode == GAMEMODE_WAVE) MotionTrail_AddWavePoint(wave_trail);
                 player->gravObj_id = obj;
@@ -805,7 +805,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     set_checkpoint_timer(0);
                     pseudo_checkpoint_exists = false;
 
-                    if (state.input.holdJump && state.old_player.gamemode == GAMEMODE_SHIP) {
+                    if (curr_input.holdJump && state.old_player.gamemode == GAMEMODE_SHIP) {
                         player->buffering_state = BUFFER_READY;
                     }
 

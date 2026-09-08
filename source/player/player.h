@@ -204,6 +204,11 @@ extern ParticleSystem fast_speed_particles;
 extern ParticleSystem faster_speed_particles;
 extern ParticleSystem coin_pickup_particles;
 
+typedef struct KeyInput KeyInput;
+
+extern KeyInput curr_input;
+extern KeyInput curr_old_input;
+
 extern const float player_speeds[SPEED_COUNT];
 
 inline float getTop(Player *player)  { return player->y + player->height / 2; }

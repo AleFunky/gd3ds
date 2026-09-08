@@ -99,6 +99,8 @@ typedef struct {
     bool initial_dual;
     bool initial_upsidedown;
 
+    bool two_player_mode;
+
     char level_name[256];
     char creator_name[256];
 } LoadedLevelInfo;

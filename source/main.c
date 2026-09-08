@@ -541,14 +541,64 @@ void init_particles(Color p1_color, Color p2_color) {
     level_complete_effect_p2.cfg.finishColorBlue  = p2_not_white.b / 255.f;
 }
 
-u32 jump_key_mask(void) {
-    return (settingsState.yJump ? KEY_Y : KEY_A) | KEY_UP;
-}
-
 static bool touch_jump_filter(u16 px, u16 py) {
     bool on_pause_button = px > 300-32/2 && py < 20+32/2;
     bool on_practice_ui = state.practice_mode && (px > 92 && px < 222 && py > 175 && py < 222);
     return !(on_pause_button || on_practice_ui);
+}
+
+u32 jump_key_mask_p1(void) {
+    return (settingsState.yJump ? KEY_Y : KEY_A);
+}
+
+u32 jump_key_mask_p2(void) {
+    return KEY_UP;
+}
+
+u32 jump_key_mask(void) {
+    return jump_key_mask_p1() | jump_key_mask_p2();
+}
+
+static void handle_gameplay_input(touchPosition touchPos, u32 kDown, u32 kHeld) {
+    bool in_bounds = touch_jump_filter(touchPos.px, touchPos.py);
+    bool left_side = touchPos.px < SCREEN_BOT_WIDTH / 2;
+
+    bool touch_pressed = in_bounds && (kDown & KEY_TOUCH);
+    bool touch_held = in_bounds && (kHeld & KEY_TOUCH);
+
+    // CBF not enabled
+    if (!pi_enabled) {
+        if (level_info.two_player_mode) {
+            bool buttonPressed = (kDown & jump_key_mask_p1()) != 0;
+            bool buttonHeld = (kHeld & jump_key_mask_p1()) != 0;
+
+            bool buttonPressedP2 = (kDown & jump_key_mask_p2()) != 0;
+            bool buttonHeldP2 = (kHeld & jump_key_mask_p2()) != 0;
+
+            state.old_input = state.input;
+            
+            state.input.pressedJump = (buttonPressed || (touch_pressed && left_side)) == true;
+            state.input.holdJump = (state.input.pressedJump || buttonHeld || (touch_held && left_side)) == true;
+
+            state.old_input_p2 = state.input_p2;
+
+            state.input_p2.pressedJump = (buttonPressedP2 || (touch_pressed && !left_side)) == true;
+            state.input_p2.holdJump = (state.input_p2.pressedJump || buttonHeldP2 || (touch_held && !left_side)) == true;
+        } else {
+            bool buttonPressed = (kDown & jump_key_mask()) != 0;
+            bool buttonHeld = (kHeld & jump_key_mask()) != 0;
+            
+            state.old_input = state.input;
+            
+            state.input.pressedJump = (buttonPressed || touch_pressed) == true;
+            state.input.holdJump = (state.input.pressedJump || buttonHeld || touch_held) == true;
+            
+            state.old_input_p2 = state.input;
+
+            state.input_p2.pressedJump = state.input.pressedJump;
+            state.input_p2.holdJump = state.input.holdJump;
+        }
+    }
 }
 
 void sync_precise_input(bool suppress_held) {
@@ -699,8 +749,6 @@ void game_loop() {
         }
         
         int steps = 0;
-
-        bool in_bounds = touch_jump_filter(touchPos.px, touchPos.py);
         
         kHeldPaused &= ~kUp;
         if(!game_paused){
@@ -709,17 +757,7 @@ void game_loop() {
         
         global_volume = get_volume_slider();
 
-        bool buttonPressed = (kDown & jump_key_mask()) != 0;
-        bool buttonHeld = (kHeld & jump_key_mask()) != 0;
-
-        bool touch_pressed = in_bounds && (kDown & KEY_TOUCH);
-        bool touch_held = in_bounds && (kHeld & KEY_TOUCH);
-
-        if (!pi_enabled) {
-            state.old_input = state.input;
-            state.input.pressedJump = (buttonPressed || touch_pressed) == true;
-            state.input.holdJump = (state.input.pressedJump || buttonHeld || touch_held) == true;
-        }
+        handle_gameplay_input(touchPos, kDown, kHeld);
         
         for (int i = 0; i < 2; i++) {
             drag_particles[i].emitting = false;
@@ -777,9 +815,33 @@ void game_loop() {
 
                     if (pi_enabled) {
                         pi_apply_substep((u32)steps);
-                        state.old_input = state.input;
-                        state.input.pressedJump = pi_pressed() == true;
-                        state.input.holdJump = (pi_hold() || state.input.pressedJump) == true;
+                        
+                        if (level_info.two_player_mode) {
+                            state.old_input = state.input;
+                            state.old_input_p2 = state.old_input;
+
+                            state.input.pressedJump = pi_pressed();
+                            state.input.holdJump = pi_hold() || state.input.pressedJump;
+                            state.input_p2 = state.input;
+                            
+                            /* I TRIED
+                            state.input.pressedJump = (pi_pressed() & jump_key_mask_p1()) != 0;
+                            state.input.holdJump = ((pi_hold() & jump_key_mask_p1()) != 0) || state.input.pressedJump;
+                            
+                            state.old_input_p2 = state.input_p2;
+                            state.input_p2.pressedJump = (pi_pressed() & jump_key_mask_p2()) != 0;
+                            state.input_p2.holdJump = ((pi_hold() & jump_key_mask_p2()) != 0) || state.input_p2.pressedJump;
+                            */
+                        } else {
+                            state.old_input = state.input;
+                            state.old_input_p2 = state.old_input;
+
+                            state.input.pressedJump = pi_pressed();
+                            state.input.holdJump = pi_hold() || state.input.pressedJump;
+
+                            state.input_p2 = state.input;
+                        }
+                        
                         if (pi_pressed()){
                             pi_substep_presses[steps < PI_SUBSTEP_BUCKETS ? steps : PI_SUBSTEP_BUCKETS - 1]++;
                         }
@@ -787,6 +849,9 @@ void game_loop() {
 
                     state.current_player = 0;
                     state.old_player = state.player;
+                    
+                    curr_input = state.input;
+                    curr_old_input = state.old_input;
 
                     trail = &trail_p1;
                     wave_trail = &wave_trail_p1;
@@ -810,6 +875,9 @@ void game_loop() {
                         state.current_player = 1;
                         trail = &trail_p2;
                         wave_trail = &wave_trail_p2;
+
+                        curr_input = state.input_p2;
+                        curr_old_input = state.old_input_p2;
                         handle_player(&state.player2);
 
                         if (state.dead) break;

@@ -23,6 +23,9 @@ inline float gravFloor(Player *player) { return player->upside_down ? -state.cei
 
 void anim_player_to_wall(Player *player);
 
+KeyInput curr_input;
+KeyInput curr_old_input;
+
 MotionTrail *trail;
 MotionTrail trail_p1;
 MotionTrail trail_p2;
@@ -171,7 +174,7 @@ void cube_gamemode(Player *player) {
 
     drag_particles[state.current_player].cfg.sourcePositionVariancey = (player->mini ? 4.f : 2.f);
 
-    if (state.input.holdJump) {
+    if (curr_input.holdJump) {
         jump = true;
     } else if (player->on_ground) {
         player->consecutive_jumps = 0;
@@ -182,7 +185,7 @@ void cube_gamemode(Player *player) {
         update_rotation_direction(player);
     }
 
-    bool should_coyote = (state.dual || player->upside_down) && state.input.holdJump && player->coyote_frames < 10;
+    bool should_coyote = (state.dual || player->upside_down) && curr_input.holdJump && player->coyote_frames < 10;
 
     SlopeData slope_data = player->slope_data;
 
@@ -217,7 +220,7 @@ void cube_gamemode(Player *player) {
         
         state.current_data.jumps++;
     
-        if (!(state.input.pressedJump)) {
+        if (!(curr_input.pressedJump)) {
             // This prevents drag particles on succesive jumps
             player->time_since_ground = DRAG_PARTICLES_FLOOR_DURATION;
         }
@@ -313,7 +316,7 @@ void ship_gamemode(Player *player) {
 
     ship_fire_particles[state.current_player].emitterX = x;
     ship_fire_particles[state.current_player].emitterY = y;
-    ship_fire_particles[state.current_player].emitting = state.input.holdJump;
+    ship_fire_particles[state.current_player].emitting = curr_input.holdJump;
 
     ship_fire_particles[state.current_player].gravityFlipped = player->upside_down;
     ship_fire_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
@@ -340,7 +343,7 @@ void ship_gamemode(Player *player) {
 
     if (state.dual) {
         // Make both dual players symmetric by using inverted ship gravity
-        if (state.input.holdJump) {
+        if (curr_input.holdJump) {
             player->buffering_state = BUFFER_END;
             if (player->vel_y <= -velocity_thresholds[state.speed])
                 player->gravity = player->mini ? 1643.5872f : 1397.0491f;
@@ -353,7 +356,7 @@ void ship_gamemode(Player *player) {
                 player->gravity = player->mini ? -1051.8984f : -894.11464f;
         }
     } else {
-        if (state.input.holdJump) {
+        if (curr_input.holdJump) {
             player->buffering_state = BUFFER_END;
             if (player->vel_y <= grav(player, velocity_thresholds[state.speed]))
                 player->gravity = player->mini ? 1643.5872f : 1397.0491f;
@@ -480,9 +483,9 @@ void ufo_gamemode(Player *player) {
     drag_particles_2[state.current_player].gravityFlipped = !player->upside_down;
     drag_particles_2[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
 
-    bool buffering_check = ((state.old_player.gamemode == GAMEMODE_PLAYER || state.old_player.gamemode == GAMEMODE_SHIP || state.old_player.gamemode == GAMEMODE_WAVE || player->buffer_ufo) && (state.input.holdJump));
+    bool buffering_check = ((state.old_player.gamemode == GAMEMODE_PLAYER || state.old_player.gamemode == GAMEMODE_SHIP || state.old_player.gamemode == GAMEMODE_WAVE || player->buffer_ufo) && (curr_input.holdJump));
     // If buffering, jump
-    if (player->buffering_state == BUFFER_READY && (state.input.pressedJump || buffering_check)) {
+    if (player->buffering_state == BUFFER_READY && (curr_input.pressedJump || buffering_check)) {
         player->vel_y = fmaxf(player->vel_y, player->mini ? 358.992 : 371.034);
         player->buffering_state = BUFFER_END;
         player->velocity_override = true;
@@ -552,7 +555,7 @@ void wave_gamemode(Player *player) {
 
     if (player->buffering_state == BUFFER_READY) player->buffering_state = BUFFER_END;
 
-    bool input = (state.input.holdJump);
+    bool input = (curr_input.holdJump);
     player->gravity = 0;
 
     player->vel_y = (input * 2 - 1) * player_speeds[state.speed] * (player->mini ? 2 : 1);
@@ -694,7 +697,7 @@ void run_player(Player *player) {
 		float newVel = player->vel_y + player->gravity * STEPS_DT;
 
 		// Player will fall off blocks a frame faster than expected
-		if (!(player->on_ground || player->on_ceiling) && (state.old_player.on_ground || state.old_player.on_ceiling) && ((!state.input.holdJump && (state.old_input.pressedJump || state.input.pressedJump)) || player->buffering_state == BUFFER_READY) && gravBottom(&state.old_player) > gravFloor(&state.old_player) && player->mini == state.old_player.mini) {
+		if (!(player->on_ground || player->on_ceiling) && (state.old_player.on_ground || state.old_player.on_ceiling) && ((!curr_input.holdJump && (state.old_input.pressedJump || curr_input.pressedJump)) || player->buffering_state == BUFFER_READY) && gravBottom(&state.old_player) > gravFloor(&state.old_player) && player->mini == state.old_player.mini) {
 			player->y += grav(&state.old_player, state.old_player.gravity) * STEPS_DT * STEPS_DT;
 
 			if (player->vel_y == 0)
@@ -772,7 +775,7 @@ void handle_player(Player *player) {
     if (get_fade_status()) return;
 
     u64 start_player = svcGetSystemTick();
-    if (state.input.holdJump) {
+    if (curr_input.holdJump) {
         if (player->buffering_state == BUFFER_NONE) {
             player->buffering_state = BUFFER_READY;
         }

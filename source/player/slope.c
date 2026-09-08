@@ -246,7 +246,7 @@ void slope_calc(int obj, Player *player) {
     int orientation = grav_slope_orient(obj, player);
     if (orientation == ORIENT_NORMAL_UP) { // Normal - up
         // Make the player start with higher velocity 
-        if ((player->gamemode == GAMEMODE_UFO || player->gamemode == GAMEMODE_SHIP) && player->vel_y < SHIP_UFO_EXITING_VEL && state.input.holdJump) {
+        if ((player->gamemode == GAMEMODE_UFO || player->gamemode == GAMEMODE_SHIP) && player->vel_y < SHIP_UFO_EXITING_VEL && curr_input.holdJump) {
             player->vel_y = SHIP_UFO_EXITING_VEL; // 2 in gd
         }
         
@@ -313,7 +313,7 @@ void slope_calc(int obj, Player *player) {
         }        
     } else if (orientation == ORIENT_UD_UP) { // Upside down - up
         // Make the player start with higher velocity 
-        if ((player->gamemode == GAMEMODE_UFO || player->gamemode == GAMEMODE_SHIP) && player->vel_y > -SHIP_UFO_EXITING_VEL && !state.input.holdJump) {
+        if ((player->gamemode == GAMEMODE_UFO || player->gamemode == GAMEMODE_SHIP) && player->vel_y > -SHIP_UFO_EXITING_VEL && !curr_input.holdJump) {
             player->vel_y = -SHIP_UFO_EXITING_VEL; // 2 in gd
         }
 

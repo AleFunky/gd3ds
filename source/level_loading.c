@@ -1382,6 +1382,14 @@ void load_level_string_info(char *level_string) {
     } else {
         level_info.initial_dual = 0; 
     }
+    
+    char *two_player_mode_data = get_metadata_value(level_string, "kA10");
+    if (two_player_mode_data) {
+        level_info.two_player_mode = atoi(two_player_mode_data) != 0;
+        free(two_player_mode_data);
+    } else {
+        level_info.two_player_mode = 0; 
+    }
 
     char *upsidedown_data = get_metadata_value(level_string, "kA11");
     if (upsidedown_data) {
@@ -1390,6 +1398,7 @@ void load_level_string_info(char *level_string) {
     } else {
         level_info.initial_upsidedown = 0; 
     }
+    
 }
 
 const char *default_name = "Unknown";

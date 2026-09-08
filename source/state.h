@@ -18,7 +18,7 @@ typedef struct {
     InternalHitbox internal_hitbox;
 } PlayerHitboxTrail;
 
-typedef struct {
+typedef struct KeyInput {
     u8 pressedJump:1;
     u8 holdJump:1;
 } KeyInput;
@@ -176,7 +176,9 @@ typedef struct {
     P1Trail p1_trail_data[2][P1_TRAIL_LENGTH];
 
     KeyInput input;
+    KeyInput input_p2;
     KeyInput old_input;
+    KeyInput old_input_p2;
 
     DeathReason death_reason;
 } GameState;
