@@ -205,11 +205,11 @@ void cube_gamemode(Player *player) {
                 set_p_velocity(player, 0.25f * time * vel + cube_jump_heights[state.speed], false);
                 player->slope_slide_coyote_time = 0;
             } else {
-                set_p_velocity(player, cube_jump_heights[state.speed], state.old_input.holdJump);
+                set_p_velocity(player, cube_jump_heights[state.speed], curr_old_input.holdJump);
             }
         } else {
             // Normal jump
-            set_p_velocity(player, cube_jump_heights[state.speed], state.old_input.holdJump);
+            set_p_velocity(player, cube_jump_heights[state.speed], curr_old_input.holdJump);
         }
         player->inverse_rotation = false;
         player->buffering_state = BUFFER_END;
@@ -637,7 +637,7 @@ void run_player(Player *player) {
 
     // Coyote time (only applies to upside down gravity)
     if (gravBottom(&state.old_player) > gravFloor(&state.old_player) && player->upside_down == state.old_player.upside_down && !player->on_ground && player->vel_y <= 0) {
-		if (state.old_player.on_ground && !state.old_input.holdJump)
+		if (state.old_player.on_ground && !curr_old_input.holdJump)
 			player->coyote_frames = 0;
 		player->coyote_frames++;
 	} else {
@@ -697,7 +697,7 @@ void run_player(Player *player) {
 		float newVel = player->vel_y + player->gravity * STEPS_DT;
 
 		// Player will fall off blocks a frame faster than expected
-		if (!(player->on_ground || player->on_ceiling) && (state.old_player.on_ground || state.old_player.on_ceiling) && ((!curr_input.holdJump && (state.old_input.pressedJump || curr_input.pressedJump)) || player->buffering_state == BUFFER_READY) && gravBottom(&state.old_player) > gravFloor(&state.old_player) && player->mini == state.old_player.mini) {
+		if (!(player->on_ground || player->on_ceiling) && (state.old_player.on_ground || state.old_player.on_ceiling) && ((!curr_input.holdJump && (curr_old_input.pressedJump || curr_input.pressedJump)) || player->buffering_state == BUFFER_READY) && gravBottom(&state.old_player) > gravFloor(&state.old_player) && player->mini == state.old_player.mini) {
 			player->y += grav(&state.old_player, state.old_player.gravity) * STEPS_DT * STEPS_DT;
 
 			if (player->vel_y == 0)

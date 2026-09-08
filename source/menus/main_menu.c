@@ -16,6 +16,7 @@
 
 #include "main_menu.h"
 #include "level_select.h"
+#include "player/player.h"
 #include "settings_hub.h"
 #include "settings.h"
 #include "statistics.h"
@@ -366,6 +367,9 @@ void main_menu_loop() {
         state.old_input = state.input;
         state.input.pressedJump = (started) == true;
         state.input.holdJump = (state.input.pressedJump || holding) == true;
+
+        curr_input = state.input;
+        curr_old_input = state.old_input;
 
         for (int i = 0; i < 2; i++) {
             drag_particles[i].emitting = false;
