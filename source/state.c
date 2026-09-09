@@ -209,9 +209,6 @@ void init_player(Player *player) {
     player->upside_down = level_info.initial_upsidedown;
     player->timeElapsed = 0.f;
 
-    player->internal_hitbox.height = 9;
-    player->internal_hitbox.width = 9;
-
     player->cutscene_initial_player_x = 0;
     player->cutscene_initial_player_y = 0;
 
