@@ -23,7 +23,7 @@ Player *player_1 = &state.player;
 Player *player_2 = &state.player2;
 
 const float jump_heights_table[SPEED_COUNT][JUMP_TYPES_COUNT][GAMEMODE_COUNT][2] = {
-    { // SLOW               CUBE                   SHIP                  BALL                    UFO                 WAVE   },
+    { // SLOW                        CUBE                              SHIP                                BALL                               UFO            WAVE   },
     /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {573.48,   458.784},  {0, 0} },
     /* YELLOW ORB */ {{573.48,   458.784},  {573.48,   458.784},  {401.435993,  321.148795},  {573.48,   458.784},  {0, 0} },
     /* BLUE PAD   */ {{-345.6,   -276.48},  {-229.392, -183.519}, {-160.574397, -128.463298}, {-229.392, -183.519}, {0, 0} },
