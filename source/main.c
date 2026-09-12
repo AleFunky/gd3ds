@@ -71,6 +71,8 @@
 #define CITRA_TYPE 0x20000
 #define CITRA_VERSION 11
 
+u32 __ctru_linear_heap_size = 36 << 20;
+
 int game_state = STATE_MAIN_MENU;
 
 bool playing_menu_loop = false;
@@ -1357,8 +1359,23 @@ void game_assets_init() {
     glowSheet = C2D_SpriteSheetLoad("romfs:/gfx/glow.t3x");
     if (!glowSheet) svcBreak(USERBREAK_PANIC);
     
-    iconSheet = C2D_SpriteSheetLoad("romfs:/gfx/icons.t3x");
-    if (!iconSheet) svcBreak(USERBREAK_PANIC);
+    cube0Sheet = C2D_SpriteSheetLoad("romfs:/gfx/player_0.t3x");
+    if (!cube0Sheet) svcBreak(USERBREAK_PANIC);
+    
+    cube1Sheet = C2D_SpriteSheetLoad("romfs:/gfx/player_1.t3x");
+    if (!cube1Sheet) svcBreak(USERBREAK_PANIC);
+    
+    shipSheet = C2D_SpriteSheetLoad("romfs:/gfx/ship.t3x");
+    if (!shipSheet) svcBreak(USERBREAK_PANIC);
+    
+    ballSheet = C2D_SpriteSheetLoad("romfs:/gfx/player_ball.t3x");
+    if (!ballSheet) svcBreak(USERBREAK_PANIC);
+    
+    ufoSheet = C2D_SpriteSheetLoad("romfs:/gfx/bird.t3x");
+    if (!ufoSheet) svcBreak(USERBREAK_PANIC);
+    
+    waveSheet = C2D_SpriteSheetLoad("romfs:/gfx/dart.t3x");
+    if (!waveSheet) svcBreak(USERBREAK_PANIC);
 
     trailSheet = C2D_SpriteSheetLoad("romfs:/gfx/trails.t3x");
     if (!trailSheet) svcBreak(USERBREAK_PANIC);
@@ -1566,7 +1583,12 @@ int main(int argc, char* argv[]) {
     C2D_SpriteSheetFree(glowSheet);
     C2D_SpriteSheetFree(bgSheet);
     C2D_SpriteSheetFree(bg2Sheet);
-    C2D_SpriteSheetFree(iconSheet);
+    C2D_SpriteSheetFree(cube0Sheet);
+    C2D_SpriteSheetFree(cube1Sheet);
+    C2D_SpriteSheetFree(shipSheet);
+    C2D_SpriteSheetFree(ballSheet);
+    C2D_SpriteSheetFree(ufoSheet);
+    C2D_SpriteSheetFree(waveSheet);
     C2D_SpriteSheetFree(trailSheet);
     C2D_SpriteSheetFree(particleSheet);
     C2D_SpriteSheetFree(ui_sheet);
