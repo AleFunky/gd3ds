@@ -40,20 +40,27 @@ typedef struct PreciseSource {
 static bool pad_sample_jump(const PreciseSource *src, u32 slot);
 static bool touch_sample_jump(const PreciseSource *src, u32 slot);
 
+enum { SOURCE_PAD, SOURCE_TOUCH, SOURCE_COUNT };
+
 // https://www.3dbrew.org/wiki/HID_Shared_Memory#Offset_0x0
-static PreciseSource pad = {
-    .tick_word = 0,
-    .idx_word = 4,
-    .ring_buffer_offset = 0x28,
-    .sample_jump = pad_sample_jump,
-};
+#define PAD_SOURCE { \
+    .tick_word = 0, \
+    .idx_word = 4, \
+    .ring_buffer_offset = 0x28, \
+    .sample_jump = pad_sample_jump, \
+}
 
 // https://www.3dbrew.org/wiki/HID_Shared_Memory#Offset_0xA8
-static PreciseSource touch = {
-    .tick_word = 42,
-    .idx_word = 46,
-    .ring_buffer_offset = 0xA8 + 0x20,
-    .sample_jump = touch_sample_jump,
+#define TOUCH_SOURCE { \
+    .tick_word = 42, \
+    .idx_word = 46, \
+    .ring_buffer_offset = 0xA8 + 0x20, \
+    .sample_jump = touch_sample_jump, \
+}
+
+static PreciseSource sources[PI_PLAYER_COUNT][SOURCE_COUNT] = {
+    { [SOURCE_PAD] = PAD_SOURCE, [SOURCE_TOUCH] = TOUCH_SOURCE },
+    { [SOURCE_PAD] = PAD_SOURCE, [SOURCE_TOUCH] = TOUCH_SOURCE },
 };
 
 static vu32 *get_ring_buffer(const PreciseSource* src);
@@ -68,31 +75,39 @@ static void resync_from_ring(PreciseSource *src);
 static u32 substep_cutoff(u32 substep);
 
 void pi_set_touch_filter(bool (*filter)(u16 px, u16 py)){
-    touch.touch_filter = filter;
+    sources[0][SOURCE_TOUCH].touch_filter = filter;
 }
 
 void pi_set_jump_keys(u32 mask) {
-    pad.jump_keys = mask;
+    sources[0][SOURCE_PAD].jump_keys = mask;
 }
 
 void pi_reset(void) {
-    resync_from_ring(&pad);
-    resync_from_ring(&touch);
-    pad.suppress_hold_until_release = false;
-    pad.fake_press = false;
-    touch.suppress_hold_until_release = false;
-    touch.fake_press = false;
+    for (u32 player = 0; player < PI_PLAYER_COUNT; player++) {
+        for (u32 kind = 0; kind < SOURCE_COUNT; kind++) {
+            PreciseSource *src = &sources[player][kind];
+            resync_from_ring(src);
+            src->suppress_hold_until_release = false;
+            src->fake_press = false;
+        }
+    }
 }
 
 void pi_suppress_until_release(void) {
-    pad.suppress_hold_until_release = true;
-    touch.suppress_hold_until_release = true;
+    for (u32 player = 0; player < PI_PLAYER_COUNT; player++) {
+        for (u32 kind = 0; kind < SOURCE_COUNT; kind++) {
+            sources[player][kind].suppress_hold_until_release = true;
+        }
+    }
 }
 
 // poll to find the times that the clicks occured and schdule them for later application
 void pi_poll(void) {
-    poll_source(&pad);
-    poll_source(&touch);
+    for (u32 player = 0; player < PI_PLAYER_COUNT; player++) {
+        for (u32 kind = 0; kind < SOURCE_COUNT; kind++) {
+            poll_source(&sources[player][kind]);
+        }
+    }
 }
 
 void pi_begin_frame(u32 frame_start_tick, u32 frame_end_tick, u32 substeps) {
@@ -102,34 +117,41 @@ void pi_begin_frame(u32 frame_start_tick, u32 frame_end_tick, u32 substeps) {
 }
 
 void pi_apply_substep(u32 substep) {
-    apply_source(&pad, substep);
-    apply_source(&touch, substep);
+    for (u32 player = 0; player < PI_PLAYER_COUNT; player++) {
+        for (u32 kind = 0; kind < SOURCE_COUNT; kind++) {
+            apply_source(&sources[player][kind], substep);
+        }
+    }
 }
 
 bool pi_hold(void) {
-    bool pad_hold = pad.hold_state && !pad.suppress_hold_until_release;
-    bool touch_hold = touch.hold_state && !touch.suppress_hold_until_release;
+    PreciseSource *pad = &sources[0][SOURCE_PAD];
+    PreciseSource *touch = &sources[0][SOURCE_TOUCH];
+    bool pad_hold = pad->hold_state && !pad->suppress_hold_until_release;
+    bool touch_hold = touch->hold_state && !touch->suppress_hold_until_release;
     return pad_hold || touch_hold;
 }
 
 bool pi_pressed(void) {
-    return pad.pressed_edge || touch.pressed_edge;
+    return sources[0][SOURCE_PAD].pressed_edge || sources[0][SOURCE_TOUCH].pressed_edge;
 }
 
 u32 pi_pad_event_count(void) {
-    return pad.queue_count;
+    return sources[0][SOURCE_PAD].queue_count;
 }
 
 u32 pi_touch_event_count(void) {
-    return touch.queue_count;
+    return sources[0][SOURCE_TOUCH].queue_count;
 }
 
 PreciseInputEvent pi_pad_event_get(u32 index) {
-    return pad.queue[(pad.queue_head + index) % INPUT_QUEUE_SIZE];
+    PreciseSource *pad = &sources[0][SOURCE_PAD];
+    return pad->queue[(pad->queue_head + index) % INPUT_QUEUE_SIZE];
 }
 
 PreciseInputEvent pi_touch_event_get(u32 index) {
-    return touch.queue[(touch.queue_head + index) % INPUT_QUEUE_SIZE];
+    PreciseSource *touch = &sources[0][SOURCE_TOUCH];
+    return touch->queue[(touch->queue_head + index) % INPUT_QUEUE_SIZE];
 }
 
 static bool pad_sample_jump(const PreciseSource *src, u32 slot) {

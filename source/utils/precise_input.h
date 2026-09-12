@@ -2,6 +2,8 @@
 #include <3ds.h>
 #include <stdbool.h>
 
+#define PI_PLAYER_COUNT 2
+
 typedef struct {
     u32 tick;
     bool down;
