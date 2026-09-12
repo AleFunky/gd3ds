@@ -9,20 +9,19 @@
 
 bool pi_enabled = false;
 
-static u32 jump_keys;
-static bool (*touch_filter)(u16 px, u16 py);
-
 static u32 frame_start;
 static u32 frame_end;
 static u32 frame_substeps;
 
-typedef struct {
+typedef struct PreciseSource {
     u32 tick_word;
     u32 idx_word;
 
     u32 ring_buffer_offset;
 
-    bool (*sample_jump)(u32 slot);
+    bool (*sample_jump)(const struct PreciseSource *src, u32 slot);
+    u32 jump_keys;
+    bool (*touch_filter)(u16 px, u16 py);
 
     PreciseInputEvent queue[INPUT_QUEUE_SIZE];
     u32 queue_count;
@@ -38,8 +37,8 @@ typedef struct {
     bool pressed_edge;
 } PreciseSource;
 
-static bool pad_sample_jump(u32 slot);
-static bool touch_sample_jump(u32 slot);
+static bool pad_sample_jump(const PreciseSource *src, u32 slot);
+static bool touch_sample_jump(const PreciseSource *src, u32 slot);
 
 // https://www.3dbrew.org/wiki/HID_Shared_Memory#Offset_0x0
 static PreciseSource pad = {
@@ -57,7 +56,7 @@ static PreciseSource touch = {
     .sample_jump = touch_sample_jump,
 };
 
-static vu32 *get_ring_buffer(PreciseSource* src);
+static vu32 *get_ring_buffer(const PreciseSource* src);
 static u32 sample_interval(u32 latest_tick, u32 prev_tick);
 static u32 reconstruct_tick(u32 newest_time, u32 samples_ago, u32 interval);
 static bool push_event(PreciseSource *src, u32 tick, bool down);
@@ -69,11 +68,11 @@ static void resync_from_ring(PreciseSource *src);
 static u32 substep_cutoff(u32 substep);
 
 void pi_set_touch_filter(bool (*filter)(u16 px, u16 py)){
-    touch_filter = filter;
+    touch.touch_filter = filter;
 }
 
 void pi_set_jump_keys(u32 mask) {
-    jump_keys = mask;
+    pad.jump_keys = mask;
 }
 
 void pi_reset(void) {
@@ -133,13 +132,13 @@ PreciseInputEvent pi_touch_event_get(u32 index) {
     return touch.queue[(touch.queue_head + index) % INPUT_QUEUE_SIZE];
 }
 
-static bool pad_sample_jump(u32 slot) {
-    vu32 *pointer_to_ring_buffer = get_ring_buffer(&pad);
-    return (pointer_to_ring_buffer[PAD_RING_ENTRY_WORDS * slot] & jump_keys) != 0;
+static bool pad_sample_jump(const PreciseSource *src, u32 slot) {
+    vu32 *pointer_to_ring_buffer = get_ring_buffer(src);
+    return (pointer_to_ring_buffer[PAD_RING_ENTRY_WORDS * slot] & src->jump_keys) != 0;
 }
 
-static bool touch_sample_jump(u32 slot) {
-    vu32 *pointer_to_ring_buffer = get_ring_buffer(&touch);
+static bool touch_sample_jump(const PreciseSource *src, u32 slot) {
+    vu32 *pointer_to_ring_buffer = get_ring_buffer(src);
     u32 position = pointer_to_ring_buffer[TOUCH_RING_ENTRY_WORDS * slot];
     u32 valid = pointer_to_ring_buffer[(TOUCH_RING_ENTRY_WORDS * slot) + 1];
 
@@ -147,16 +146,16 @@ static bool touch_sample_jump(u32 slot) {
         return false;
     }
 
-    if (touch_filter) {
+    if (src->touch_filter) {
         u16 px = (u16)(position & 0xFFFF);
         u16 py = (u16)(position >> 16);
-        return touch_filter(px, py);
+        return src->touch_filter(px, py);
     }
 
     return true;
 }
 
-static vu32 *get_ring_buffer(PreciseSource* src) {
+static vu32 *get_ring_buffer(const PreciseSource* src) {
     return (vu32*)((u8*)hidSharedMem + src->ring_buffer_offset);
 }
 
@@ -237,7 +236,7 @@ static void poll_source(PreciseSource *src) {
 
     for(u32 i = idx_advanced; i-- > 0;){
         u32 slot = (current_idx - i) & (RING_BUFFER_ENTRIES - 1);
-        bool jump = src->sample_jump(slot);
+        bool jump = src->sample_jump(src, slot);
         if(jump != src->last_sample_jump){
             u32 input_tick = reconstruct_tick(newest_time, i, interval);
             if(!push_event(src, input_tick, jump)){
@@ -291,7 +290,7 @@ static void resync_from_ring(PreciseSource *src) {
 
     src->last_idx = hidSharedMem[src->idx_word];
 
-    src->hold_state = src->sample_jump(src->last_idx);   // is a jump key down NOW?
+    src->hold_state = src->sample_jump(src, src->last_idx);   // is a jump key down NOW?
     src->last_sample_jump = src->hold_state;
 
     if(!src->hold_state){
