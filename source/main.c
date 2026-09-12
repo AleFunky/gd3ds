@@ -604,8 +604,8 @@ static void handle_gameplay_input(touchPosition touchPos, u32 kDown, u32 kHeld) 
 }
 
 void sync_precise_input(bool suppress_held) {
-    pi_set_jump_keys(jump_key_mask());
-    pi_set_touch_filter(touch_jump_filter);
+    pi_set_jump_keys(0, jump_key_mask());
+    pi_set_touch_filter(0, touch_jump_filter);
     pi_reset();
     if (suppress_held) {
         pi_suppress_until_release();
@@ -822,8 +822,8 @@ void game_loop() {
                             state.old_input = state.input;
                             state.old_input_p2 = state.old_input;
 
-                            state.input.pressedJump = pi_pressed();
-                            state.input.holdJump = pi_hold() || state.input.pressedJump;
+                            state.input.pressedJump = pi_pressed(0);
+                            state.input.holdJump = pi_hold(0) || state.input.pressedJump;
                             state.input_p2 = state.input;
                             
                             /* I TRIED
@@ -838,13 +838,13 @@ void game_loop() {
                             state.old_input = state.input;
                             state.old_input_p2 = state.old_input;
 
-                            state.input.pressedJump = pi_pressed();
-                            state.input.holdJump = pi_hold() || state.input.pressedJump;
+                            state.input.pressedJump = pi_pressed(0);
+                            state.input.holdJump = pi_hold(0) || state.input.pressedJump;
 
                             state.input_p2 = state.input;
                         }
                         
-                        if (pi_pressed()){
+                        if (pi_pressed(0)){
                             pi_substep_presses[steps < PI_SUBSTEP_BUCKETS ? steps : PI_SUBSTEP_BUCKETS - 1]++;
                         }
                     }
