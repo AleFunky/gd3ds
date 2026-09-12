@@ -183,7 +183,7 @@ static void open_warning(){
         warning_title = (char *) warning_titles[warning_step]; 
     } else return;
 
-    YesNoPopupData *warning_data = malloc(sizeof(YesNoPopupData));
+    TwoOptionPopupData *warning_data = malloc(sizeof(TwoOptionPopupData));
     if(!warning_data) return;
 
     warning_data->text = strdup(warning);
@@ -259,7 +259,7 @@ void delete_level(){
 
 static void action_open_delete_level(){
     if (result == 0 || already_played_online_level){
-        YesNoPopupData *delete_level_data = malloc(sizeof(YesNoPopupData));
+        TwoOptionPopupData *delete_level_data = malloc(sizeof(TwoOptionPopupData));
         if(!delete_level_data) return;
 
         delete_level_data->text = strdup("Are you sure you want to\ndelete this level?");
@@ -267,7 +267,7 @@ static void action_open_delete_level(){
         delete_level_data->proceed_text = strdup("Yes");
         delete_level_data->cancel_text = strdup("No");
 
-        ui_stack_push(&two_option_pop_up_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+        ui_stack_push(&delete_pop_up_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
         ui_stack_push_data(delete_level_data);
     }
 }

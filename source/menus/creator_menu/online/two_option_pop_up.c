@@ -12,7 +12,7 @@
 #include "fonts/goldFont.h"
 
 static void two_option_pop_up_init(UIScreen *s) {
-    YesNoPopupData *pop_up_data = s->pair->data;
+    TwoOptionPopupData *pop_up_data = s->pair->data;
     if(!pop_up_data) return;
 
     UILabel *title = (UILabel *) ui_get_element_by_tag(s, "title");
@@ -37,7 +37,7 @@ static void two_option_pop_up_init(UIScreen *s) {
 }
 
 static void two_option_pop_up_free_data(void *data){
-    YesNoPopupData *pop_up_data = data;
+    TwoOptionPopupData *pop_up_data = data;
     if(!pop_up_data) return;
     free((void *)pop_up_data->text);
     free((void *)pop_up_data->title);
@@ -55,18 +55,43 @@ const UIScreenDefPair two_option_pop_up_def = {
     .free_data = two_option_pop_up_free_data,
 };
 
-static void advance_online_level_warning(UIElement *e, const UIPropertyList *args){
+//WARNING POPUP
+
+static void action_online_level_warning(UIElement *e, const UIPropertyList *args){
     check_warnings_and_play();
 }
 
 const UIActionDef warning_actions[] = {
-    { "on_confirm", advance_online_level_warning }
+    { "on_confirm", action_online_level_warning }
 };
 
 const UIScreenDefPair warning_pop_up_def = {
     .name = "warning_popup",
     .btm = {
         .path = "romfs:/menus/creator_menu/online/two_option_pop_up.txt",
+        .init = two_option_pop_up_init,
+        .action_list = {
+            .action_count = ARRAY_LEN(warning_actions),
+            .actions = warning_actions
+        }
+    },
+    .free_data = two_option_pop_up_free_data,
+};
+
+//DELETE POPUP
+
+static void action_delete_level(UIElement *e, const UIPropertyList *args){
+    delete_level();
+}
+
+const UIActionDef delete_actions[] = {
+    { "on_confirm", action_delete_level }
+};
+
+const UIScreenDefPair delete_pop_up_def = {
+    .name = "delete_popup",
+    .btm = {
+        .path = "romfs:/menus/creator_menu/online/delete_pop_up.txt",
         .init = two_option_pop_up_init,
         .action_list = {
             .action_count = ARRAY_LEN(warning_actions),

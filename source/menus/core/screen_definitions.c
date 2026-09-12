@@ -57,6 +57,7 @@ const UIScreenDefPair *defs[] = {
     &search_filters_def,
     &server_switcher_def,
     &two_option_pop_up_def,
+    &delete_pop_up_def,
     &warning_pop_up_def,
     &clear_filters_def,
     &online_infobox_def,
