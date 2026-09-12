@@ -6,9 +6,7 @@ typedef struct {
     const char *title;
     const char *cancel_text;
     const char *proceed_text;
-    void (*callback_func)(UIScreen *);
-} PopUpData;
-
-extern int pop_up_result;
+} YesNoPopupData;
 
 extern const UIScreenDefPair two_option_pop_up_def;
+extern const UIScreenDefPair warning_pop_up_def;

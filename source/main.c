@@ -662,8 +662,6 @@ void game_loop() {
         pause_playback_mp3();
     }
 
-    set_fade_status(FADE_STATUS_IN);
-
     bool being_faded = true;
 
     first_load_init_variables();
