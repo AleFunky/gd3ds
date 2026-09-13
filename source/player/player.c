@@ -1092,7 +1092,7 @@ void draw_player(Player *player) {
             );
             break;    
         case GAMEMODE_WAVE:
-            spawn_icon_at(GAMEMODE_WAVE, selected_wave, glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, false, scale, 
+            spawn_icon_at(GAMEMODE_WAVE, selected_wave, glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale, 
                 primary_color,
                 secondary_color,
                 C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
