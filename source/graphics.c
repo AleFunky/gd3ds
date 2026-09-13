@@ -1513,7 +1513,6 @@ C2D_SpriteSheet *get_icon_sheet(const IconPart *part, int gamemode) {
     }
     return NULL;
 }
-
 void spawn_icon_at(
     int gamemode,
     int id,
@@ -1548,19 +1547,20 @@ void spawn_icon_at(
 
     C2D_Sprite spr = { 0 };
 
-    C2D_ImageTint tints[icon.part_count];
+    int count = icon.part_count - 1;
 
-    for (size_t i = 0; i < icon.part_count; i++) {
+    C2D_ImageTint tints[count];
+
+    for (size_t i = 0; i < count; i++) {
         C2D_PlainImageTint(&tints[i], C2D_Color32(255, 255, 255, 255), 1.0f);
     }
 
-    int count = icon.part_count;
-
-    if (!glow) count--;
+    if (glow) {
+        spawn_glow_layer_at(gamemode, id, x, y, deg, flip_x, flip_y, scale, glow_color);
+    }
 
     C2D_PlainImageTint(&tints[0], p1_color, 1.0f);
     C2D_PlainImageTint(&tints[1], p2_color, 1.0f);
-    C2D_PlainImageTint(&tints[icon.part_count - 1], glow_color, 1.0f);
 
     for (size_t i = 0; i < count; i++) {
         size_t real_index = i;
