@@ -7,22 +7,29 @@
 #define TOUCH_RING_ENTRY_WORDS 2
 #define MAX_SAMPLE_INTERVAL_TICKS ((u32)(CPU_TICKS_PER_MSEC * 100))
 
-bool pi_enabled = false;
+#define PAD_SECTION_OFFSET 0x0
+#define TOUCH_SECTION_OFFSET 0xA8
+#define SECTION_TICKS_OFFSET 0x0
+#define SECTION_INDEX_OFFSET 0x10
+#define PAD_RING_OFFSET 0x28
+#define TOUCH_RING_OFFSET 0x20
+#define WORD_INDEX(byte_offset) ((byte_offset) / sizeof(u32))
 
-static u32 jump_keys;
-static bool (*touch_filter)(u16 px, u16 py);
+bool pi_enabled = false;
 
 static u32 frame_start;
 static u32 frame_end;
 static u32 frame_substeps;
 
-typedef struct {
+typedef struct PreciseSource {
     u32 tick_word;
     u32 idx_word;
 
     u32 ring_buffer_offset;
 
-    bool (*sample_jump)(u32 slot);
+    bool (*sample_jump)(const struct PreciseSource *src, u32 slot);
+    u32 jump_keys;
+    bool (*touch_filter)(u16 px, u16 py);
 
     PreciseInputEvent queue[INPUT_QUEUE_SIZE];
     u32 queue_count;
@@ -38,62 +45,94 @@ typedef struct {
     bool pressed_edge;
 } PreciseSource;
 
-static bool pad_sample_jump(u32 slot);
-static bool touch_sample_jump(u32 slot);
+typedef struct {
+    u32 now;
+    u32 latest_tick;
+    u32 prev_tick;
+    u32 current_idx;
+} RingSnapshot;
+
+static bool pad_sample_jump(const PreciseSource *src, u32 slot);
+static bool touch_sample_jump(const PreciseSource *src, u32 slot);
+
+enum { SOURCE_PAD, SOURCE_TOUCH, SOURCE_COUNT };
 
 // https://www.3dbrew.org/wiki/HID_Shared_Memory#Offset_0x0
-static PreciseSource pad = {
-    .tick_word = 0,
-    .idx_word = 4,
-    .ring_buffer_offset = 0x28,
-    .sample_jump = pad_sample_jump,
-};
+#define PAD_SOURCE { \
+    .tick_word = WORD_INDEX(PAD_SECTION_OFFSET + SECTION_TICKS_OFFSET), \
+    .idx_word = WORD_INDEX(PAD_SECTION_OFFSET + SECTION_INDEX_OFFSET), \
+    .ring_buffer_offset = PAD_SECTION_OFFSET + PAD_RING_OFFSET, \
+    .sample_jump = pad_sample_jump, \
+}
 
 // https://www.3dbrew.org/wiki/HID_Shared_Memory#Offset_0xA8
-static PreciseSource touch = {
-    .tick_word = 42,
-    .idx_word = 46,
-    .ring_buffer_offset = 0xA8 + 0x20,
-    .sample_jump = touch_sample_jump,
+#define TOUCH_SOURCE { \
+    .tick_word = WORD_INDEX(TOUCH_SECTION_OFFSET + SECTION_TICKS_OFFSET), \
+    .idx_word = WORD_INDEX(TOUCH_SECTION_OFFSET + SECTION_INDEX_OFFSET), \
+    .ring_buffer_offset = TOUCH_SECTION_OFFSET + TOUCH_RING_OFFSET, \
+    .sample_jump = touch_sample_jump, \
+}
+
+static PreciseSource sources[PI_PLAYER_COUNT][SOURCE_COUNT] = {
+    { [SOURCE_PAD] = PAD_SOURCE, [SOURCE_TOUCH] = TOUCH_SOURCE },
+    { [SOURCE_PAD] = PAD_SOURCE, [SOURCE_TOUCH] = TOUCH_SOURCE },
 };
 
-static vu32 *get_ring_buffer(PreciseSource* src);
+static vu32 *get_ring_buffer(const PreciseSource* src);
 static u32 sample_interval(u32 latest_tick, u32 prev_tick);
 static u32 reconstruct_tick(u32 newest_time, u32 samples_ago, u32 interval);
 static bool push_event(PreciseSource *src, u32 tick, bool down);
 static PreciseInputEvent peek_event(PreciseSource *src);
 static PreciseInputEvent pop_event(PreciseSource *src);
-static void poll_source(PreciseSource *src);
+static RingSnapshot snapshot_ring(const PreciseSource *src, u32 now);
+static void poll_source(PreciseSource *src, const RingSnapshot *snapshot);
 static void apply_source(PreciseSource *src, u32 substep);
 static void resync_from_ring(PreciseSource *src);
 static u32 substep_cutoff(u32 substep);
 
-void pi_set_touch_filter(bool (*filter)(u16 px, u16 py)){
-    touch_filter = filter;
+void pi_set_touch_filter(PreciseInputPlayer player, bool (*filter)(u16 px, u16 py)){
+    if (player >= PI_PLAYER_COUNT) {
+        return;
+    }
+    sources[player][SOURCE_TOUCH].touch_filter = filter;
 }
 
-void pi_set_jump_keys(u32 mask) {
-    jump_keys = mask;
+void pi_set_jump_keys(PreciseInputPlayer player, u32 mask) {
+    if (player >= PI_PLAYER_COUNT) {
+        return;
+    }
+    sources[player][SOURCE_PAD].jump_keys = mask;
 }
 
 void pi_reset(void) {
-    resync_from_ring(&pad);
-    resync_from_ring(&touch);
-    pad.suppress_hold_until_release = false;
-    pad.fake_press = false;
-    touch.suppress_hold_until_release = false;
-    touch.fake_press = false;
+    for (u32 player = 0; player < PI_PLAYER_COUNT; player++) {
+        for (u32 kind = 0; kind < SOURCE_COUNT; kind++) {
+            PreciseSource *src = &sources[player][kind];
+            resync_from_ring(src);
+            src->suppress_hold_until_release = false;
+            src->fake_press = false;
+            src->pressed_edge = false;
+        }
+    }
 }
 
 void pi_suppress_until_release(void) {
-    pad.suppress_hold_until_release = true;
-    touch.suppress_hold_until_release = true;
+    for (u32 player = 0; player < PI_PLAYER_COUNT; player++) {
+        for (u32 kind = 0; kind < SOURCE_COUNT; kind++) {
+            sources[player][kind].suppress_hold_until_release = true;
+        }
+    }
 }
 
 // poll to find the times that the clicks occured and schdule them for later application
 void pi_poll(void) {
-    poll_source(&pad);
-    poll_source(&touch);
+    u32 now = (u32)(svcGetSystemTick());
+    for (u32 kind = 0; kind < SOURCE_COUNT; kind++) {
+        RingSnapshot snapshot = snapshot_ring(&sources[PI_PLAYER_1][kind], now);
+        for (u32 player = 0; player < PI_PLAYER_COUNT; player++) {
+            poll_source(&sources[player][kind], &snapshot);
+        }
+    }
 }
 
 void pi_begin_frame(u32 frame_start_tick, u32 frame_end_tick, u32 substeps) {
@@ -103,43 +142,68 @@ void pi_begin_frame(u32 frame_start_tick, u32 frame_end_tick, u32 substeps) {
 }
 
 void pi_apply_substep(u32 substep) {
-    apply_source(&pad, substep);
-    apply_source(&touch, substep);
+    for (u32 player = 0; player < PI_PLAYER_COUNT; player++) {
+        for (u32 kind = 0; kind < SOURCE_COUNT; kind++) {
+            apply_source(&sources[player][kind], substep);
+        }
+    }
 }
 
-bool pi_hold(void) {
-    bool pad_hold = pad.hold_state && !pad.suppress_hold_until_release;
-    bool touch_hold = touch.hold_state && !touch.suppress_hold_until_release;
+bool pi_hold(PreciseInputPlayer player) {
+    if (player >= PI_PLAYER_COUNT) {
+        return false;
+    }
+    PreciseSource *pad = &sources[player][SOURCE_PAD];
+    PreciseSource *touch = &sources[player][SOURCE_TOUCH];
+    bool pad_hold = pad->hold_state && !pad->suppress_hold_until_release;
+    bool touch_hold = touch->hold_state && !touch->suppress_hold_until_release;
     return pad_hold || touch_hold;
 }
 
-bool pi_pressed(void) {
-    return pad.pressed_edge || touch.pressed_edge;
+bool pi_pressed(PreciseInputPlayer player) {
+    if (player >= PI_PLAYER_COUNT) {
+        return false;
+    }
+    return sources[player][SOURCE_PAD].pressed_edge || sources[player][SOURCE_TOUCH].pressed_edge;
 }
 
-u32 pi_pad_event_count(void) {
-    return pad.queue_count;
+u32 pi_pad_event_count(PreciseInputPlayer player) {
+    if (player >= PI_PLAYER_COUNT) {
+        return 0;
+    }
+    return sources[player][SOURCE_PAD].queue_count;
 }
 
-u32 pi_touch_event_count(void) {
-    return touch.queue_count;
+u32 pi_touch_event_count(PreciseInputPlayer player) {
+    if (player >= PI_PLAYER_COUNT) {
+        return 0;
+    }
+    return sources[player][SOURCE_TOUCH].queue_count;
 }
 
-PreciseInputEvent pi_pad_event_get(u32 index) {
-    return pad.queue[(pad.queue_head + index) % INPUT_QUEUE_SIZE];
+PreciseInputEvent pi_pad_event_get(PreciseInputPlayer player, u32 index) {
+    if (player >= PI_PLAYER_COUNT) {
+        return (PreciseInputEvent){ 0 };
+    }
+    PreciseSource *pad = &sources[player][SOURCE_PAD];
+    return pad->queue[(pad->queue_head + index) % INPUT_QUEUE_SIZE];
 }
 
-PreciseInputEvent pi_touch_event_get(u32 index) {
-    return touch.queue[(touch.queue_head + index) % INPUT_QUEUE_SIZE];
+PreciseInputEvent pi_touch_event_get(PreciseInputPlayer player, u32 index) {
+    if (player >= PI_PLAYER_COUNT) {
+        return (PreciseInputEvent){ 0 };
+    }
+    PreciseSource *touch = &sources[player][SOURCE_TOUCH];
+    return touch->queue[(touch->queue_head + index) % INPUT_QUEUE_SIZE];
 }
 
-static bool pad_sample_jump(u32 slot) {
-    vu32 *pointer_to_ring_buffer = get_ring_buffer(&pad);
-    return (pointer_to_ring_buffer[PAD_RING_ENTRY_WORDS * slot] & jump_keys) != 0;
+static bool pad_sample_jump(const PreciseSource *src, u32 slot) {
+    vu32 *pointer_to_ring_buffer = get_ring_buffer(src);
+    return (pointer_to_ring_buffer[PAD_RING_ENTRY_WORDS * slot] & src->jump_keys) != 0;
 }
 
-static bool touch_sample_jump(u32 slot) {
-    vu32 *pointer_to_ring_buffer = get_ring_buffer(&touch);
+static bool touch_sample_jump(const PreciseSource *src, u32 slot) {
+    vu32 *pointer_to_ring_buffer = get_ring_buffer(src);
     u32 position = pointer_to_ring_buffer[TOUCH_RING_ENTRY_WORDS * slot];
     u32 valid = pointer_to_ring_buffer[(TOUCH_RING_ENTRY_WORDS * slot) + 1];
 
@@ -147,16 +211,16 @@ static bool touch_sample_jump(u32 slot) {
         return false;
     }
 
-    if (touch_filter) {
+    if (src->touch_filter) {
         u16 px = (u16)(position & 0xFFFF);
         u16 py = (u16)(position >> 16);
-        return touch_filter(px, py);
+        return src->touch_filter(px, py);
     }
 
     return true;
 }
 
-static vu32 *get_ring_buffer(PreciseSource* src) {
+static vu32 *get_ring_buffer(const PreciseSource* src) {
     return (vu32*)((u8*)hidSharedMem + src->ring_buffer_offset);
 }
 
@@ -194,15 +258,23 @@ static PreciseInputEvent pop_event(PreciseSource *src) {
     return pie;
 }
 
-static void poll_source(PreciseSource *src) {
-    u32 now = (u32)(svcGetSystemTick());
-
+static RingSnapshot snapshot_ring(const PreciseSource *src, u32 now) {
+    RingSnapshot snapshot;
+    snapshot.now = now;
 
     // the hid sysmodule shares its button samples with every process (hidSharedMem),
     // so we can read its ring buffer directly to find when a button was clicked: https://www.3dbrew.org/wiki/HID_Shared_Memory#Offset_0x0
-    u32 latest_tick = (u32)(*(vu64*)&hidSharedMem[src->tick_word]);
-    u32 prev_tick = (u32)(*(vu64*)&hidSharedMem[src->tick_word + 2]);
-    u32 current_idx = hidSharedMem[src->idx_word];
+    snapshot.latest_tick = (u32)(*(vu64*)&hidSharedMem[src->tick_word]);
+    snapshot.prev_tick = (u32)(*(vu64*)&hidSharedMem[src->tick_word + 2]);
+    snapshot.current_idx = hidSharedMem[src->idx_word];
+    return snapshot;
+}
+
+static void poll_source(PreciseSource *src, const RingSnapshot *snapshot) {
+    u32 now = snapshot->now;
+    u32 latest_tick = snapshot->latest_tick;
+    u32 prev_tick = snapshot->prev_tick;
+    u32 current_idx = snapshot->current_idx;
 
     u32 interval = sample_interval(latest_tick, prev_tick);
 
@@ -237,7 +309,7 @@ static void poll_source(PreciseSource *src) {
 
     for(u32 i = idx_advanced; i-- > 0;){
         u32 slot = (current_idx - i) & (RING_BUFFER_ENTRIES - 1);
-        bool jump = src->sample_jump(slot);
+        bool jump = src->sample_jump(src, slot);
         if(jump != src->last_sample_jump){
             u32 input_tick = reconstruct_tick(newest_time, i, interval);
             if(!push_event(src, input_tick, jump)){
@@ -291,7 +363,7 @@ static void resync_from_ring(PreciseSource *src) {
 
     src->last_idx = hidSharedMem[src->idx_word];
 
-    src->hold_state = src->sample_jump(src->last_idx);   // is a jump key down NOW?
+    src->hold_state = src->sample_jump(src, src->last_idx);   // is a jump key down NOW?
     src->last_sample_jump = src->hold_state;
 
     if(!src->hold_state){
