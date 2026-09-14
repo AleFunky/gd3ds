@@ -10,41 +10,40 @@ Geometry Dash and its respective resources are by RobTop Games.
 
 
 ## Features
-- [x] Main levels up to Theory of Everything 2
-- [x] Gameplay
+### **In the current release**:
+- [x] All main levels up to Theory of Everything 2
+- [x] Gameplay features up to GD 1.9
 - [x] Accurate physics
-- [x] Hitbox display
-- [x] Click-On-Steps functionality
-- [x] Particles
-- [x] Player trails
+- [x] Accurate visuals and FX
+- [x] Custom level importing (via SD Card)
+- [x] Click-On-Steps input
 - [x] Practice mode
-- [x] Practice music sync
-- [x] Level coins
-- [x] Settings and Icon Saving
+- [x] Many QOL features (Practice music sync, show hitboxes)
+- [x] Icons up to GD 2.11 
 - [x] Progress tracking and Statistics
-- [x] 3D support
-- [x] Dual-screen UI
-- [x] 1.9 Custom Level Importing (via SD Card)
-- [x] Bottom screen tap effects 
-- [x] Icons on the Title Screen
-- [x] Various in-game visual effects and UI animations
-- [x] Auto-Checkpoints
-- [x] Better bottom screen HUD
-- [ ] Online support
+- [x] Stereoscopic 3D support
+### **Coming Soon**:
+- [ ] Online level downloading from both the main servers and 1.9 GDPS
+- [ ] Icons up to GD 2.2
 - [ ] Start position support
-
-## Features that aren't planned but may be added either way
+### **Other potential features**:
 - [ ] Achievements
-- [ ] Touchscreen-less navigation options
-- [ ] Dual death effect
-- [ ] Size portal lightning effect
-- [ ] Portal flash effect upon use
-- [ ] Gravity switch effect
-- [ ] Startpos switcher
-- [ ] Cheat display
+- [ ] Better menu navigation w/o touchscreen
+- [ ] More VFX
+- [ ] More QOL/Cheat features (StartPos switcher, Noclip accuracy, etc.)
 
-## Additional Credits
+## Credits
+ - __RobTop Games__ - Geometry Dash
+ - __AleFunky__ - Lead Developer
  - __camila314__ - Pathfinder Mod's physics
+ - __advexed__ - UI, VFX, Online
+ - __nittynatty__ - VFX
+ - __orionconstel__ - Concepts, Menus
+ - __cloud54__ - UI
+ - __novex__ - Optimizations
+ - __DiegoWarden__ - 240hz input
+ - __zylonity__ - Stereoscopic 3D support
+ - __Crafty Jumper__ - UI Assets
 
 ## Download
 The current release is available on Universal Updater. Alternatively, you can manually download both the .3dsx and the .cia files [here](https://github.com/AleFunky/gd3ds/releases/latest), or you can scan the QR code below in FBI to install the game to your home menu automatically.\
@@ -64,10 +63,10 @@ If you're playing on actual hardware this shouldn't be an issue as most 3DS home
 You'll need to either export a copy of your level of choice using the [GDShare Geode mod](https://geode-sdk.org/mods/hjfod.gdshare) or download an archive of said level from [GDHistory](https://history.geometrydash.eu/). If the level uses a custom song, you'll also need to either extract it from your Geometry Dash songs folder (```%localappdata%\GeometryDash``` on Windows), or download it separately from [Newgrounds](https://www.newgrounds.com/audio). Once you have the level .gmd (and song, renamed to its Newgrounds ID) prepared, copy them to ```\3ds\gd3ds\external_levels\``` and ```\3ds\gd3ds\saved_songs\``` on your SD Card respectively. Putting the level files into additional folders within the main ```\external_levels\``` directory is supported. Do keep in mind, however, that any objects from updates 2.0 and above will not load, and object-heavy levels are not guaranteed to be playable - especially on non-New 3DS models.
 
 ### Are you going to add a level editor?
-The short answer is no. The long answer is that it's simply too much work for something that would run poorly on the already underpowered 3DS hardware, would be unable to upload levels to the Geometry Dash servers and that 99% of people would not care about. 
+The answer for now is no. The idea of a level editor is something that is often thought over among the developers, especially in light of recent architectural improvements which would make its implementation more straightforward. While it's still not very likely of a feature due to its scope and questionable utility, it's not something that is immediately turned down. 
 
 ### Can you add X feature / X gamemode / X level?
-Everything that's planned to be implemented is listed in the planned features section above - in short, anything major from updates above 1.9 will not be added. However, if you come up with an improvement or a quality of life feature the game could use, you're welcome to suggest it in the Discord server.
+The current scope of the game is to have all gameplay features and main levels up to 1.9. The game currently supports importing .gmd files through the SD card (see above), and online level downloading is actively in development. For all intents and purposes, the game is largely feature-complete. Quality of Life features outside of gameplay and level additions are welcome as suggestions, which you can mention in our Discord server. (Please do not ping or DM developers to tell them your ideas. The GD3DS channel is active enough for you to pop in and talk to the developers.)
 
 ### Why not add 2.0 / 2.1 / 2.2 / whatever?
-Theoretically all features up to 2.1 ARE possible to implement, but they'd be a large undertaking to add in an adequately performant and accurate way. 2.2 only amplifies these concerns, not to mention it having some features that are fully impossible to have work faithfully on 3DS hardware (namely, shader triggers). Many 1.9 levels already struggle to run on the original 3DS, due to their high object counts, and future updates, with moving objects and much more decoration, exponentially worsen this issue. 
+Short answer: Performance concerns. An aspect of GD3DS that we do not want to leave behind is the support of the original 3DS systems. And, even then, many 1.9 levels still struggle to run on them. Updates 2.0+ only amplify these concerns. Moving objects are the main reason, as they require much more sophisticated trigger updating and per-frame math for potentially many, many objects at a time. Of course, both 2.0 and 2.1 are similar in this way. 2.2, naturally, blows those two out of the water. Not only is its feature set gargantuan, but many of its features are significantly more complex than even 2.1 systems, and it affects many more aspects of the game, such as physics, triggers, and rendering, making it effectively impossible to implement in full performantly and faithfully. 
