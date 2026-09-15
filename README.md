@@ -1,6 +1,6 @@
 # Geometry Dash for the 3DS
 
-This is a demake of the popular mobile game **Geometry Dash** for the **Nintendo 3DS**.
+This is a demake of the popular mobile game **Geometry Dash** for the **Nintendo 3DS**. The original fork is by AleFunky and his amazing team! This fork is meant as a personal fork to mess around and add actual useful features!
 
 Geometry Dash and its respective resources are by RobTop Games.
 <img width="1460" height="480" alt="Main Menu" src="https://github.com/user-attachments/assets/d802266b-2eb9-4115-870c-0073ed5a50ff" />
@@ -71,3 +71,6 @@ Everything that's planned to be implemented is listed in the planned features se
 
 ### Why not add 2.0 / 2.1 / 2.2 / whatever?
 Theoretically all features up to 2.1 ARE possible to implement, but they'd be a large undertaking to add in an adequately performant and accurate way. 2.2 only amplifies these concerns, not to mention it having some features that are fully impossible to have work faithfully on 3DS hardware (namely, shader triggers). Many 1.9 levels already struggle to run on the original 3DS, due to their high object counts, and future updates, with moving objects and much more decoration, exponentially worsen this issue. 
+
+### E ###
+Yes, enrique is in fact the most adrian (*whispered*)
