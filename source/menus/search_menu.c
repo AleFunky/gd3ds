@@ -130,7 +130,7 @@ void action_open_disclaimer(UIElement* e) {
     disclaimer_init();
 }
 
-void action_open_server_switcher(UIElement* e) {
+static void action_open_server_switcher(UIElement* e) {
     in_server_switcher = true;
     server_switcher_init();
 }
