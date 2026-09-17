@@ -28,7 +28,7 @@
 #include "state.h"
 #include "particles/object_particles.h"
 #include "particles/circles.h"
-#include "Server_Switcher.h"
+#include "server_switcher.h"
 
 #include "save/saving.h"
 
