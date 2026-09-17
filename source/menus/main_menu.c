@@ -28,6 +28,7 @@
 #include "state.h"
 #include "particles/object_particles.h"
 #include "particles/circles.h"
+#include "server_switcher.h"
 
 #include "save/saving.h"
 
@@ -54,6 +55,7 @@ static bool in_settings_hub = false;
 static bool in_statistics = false;
 static bool in_credits = false;
 static bool in_first_boot_disclaimer = false;
+static bool in_server_switcher = false;
 bool in_info_card = false;
 bool in_songs = false;
 
@@ -164,6 +166,11 @@ void open_soundtrack() {
     songs_init();
 }
 
+static void action_open_server_switcher(UIElement* e) {
+    in_server_switcher = true;
+    server_switcher_init();
+}
+
 static UIAction actions[] = {
     { "level_select", action_open_level_select },
     { "creator_menu", action_open_creator_menu },
@@ -171,6 +178,7 @@ static UIAction actions[] = {
     { "statistics", action_open_statistics },
     { "icon_kit", action_open_icon_kit },
     { "credits", action_open_credits },
+    { "Server_Switcher", action_open_server_switcher }
 };
 
 static UIAction actions_top[] = {
@@ -431,7 +439,7 @@ void main_menu_loop() {
             touch_x, touch_y, 9, 9, 0
         );
 
-        bool in_menu = in_settings_hub || in_first_boot_disclaimer || in_statistics || in_songs || in_credits || in_info_card;
+        bool in_menu = in_settings_hub || in_first_boot_disclaimer || in_statistics || in_songs || in_credits || in_info_card || in_server_switcher;
 
         // Ded
         if (kill && !state.dead && !in_menu) {
@@ -576,6 +584,15 @@ void main_menu_loop() {
                     in_info_card = false;
                 }
             }
+
+            if (in_server_switcher) {
+                int returned = server_switcher_loop();
+                if (returned) {
+                    in_server_switcher = false;
+                }
+            }
+
+            if (in_server_switcher) server_switcher_draw();
 
             change_blending(true);
             draw_touch_effect();
