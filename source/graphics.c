@@ -626,6 +626,8 @@ void spawn_object_at(
         vo->col_type = obj->color_type;
         vo->opacity = obj->opacity;
         vo->col_channel = get_color_channel(obj->color_type, obj_game, obj);
+        calc_quad_params(vo);
+
         sprite_count++;
     }
 
@@ -648,6 +650,7 @@ void spawn_object_at(
         vo->col_type = COLOR_TYPE_BASE;
         vo->opacity = obj->opacity;
         vo->col_channel = get_glow_channel(obj_game);
+        calc_quad_params(vo);
         sprite_count++;
     }
 
@@ -692,6 +695,7 @@ void spawn_object_at(
             vo->col_type = c->color_type;
             vo->opacity = c->opacity;
             vo->col_channel = get_color_channel(c->color_type, obj_game, obj);
+            calc_quad_params(vo);
             sprite_count++;
         }
     }
@@ -1205,6 +1209,11 @@ static bool ensure_render_cache(void) {
         return false;
     }
 
+    memset(current_objects, 0, sizeof(int) * objects.count);
+    memset(object_sprite_start, 0, sizeof(int) * objects.count);
+    memset(object_sprite_count, 0, sizeof(unsigned char) * objects.count);
+    memset(object_sprite_cache, 0, sizeof(SpriteObject) * cache_capacity);
+
     // Get offsets of each object
     int sprite_offset = 0;
     for (int obj = 0; obj < objects.count; obj++) {
@@ -1591,7 +1600,7 @@ void draw_objects() {
 
             change_blending(obj->blending);
             
-            C2D_DrawSpriteTinted(&obj->spr, &obj->tint);
+            C2D_DrawImageFast(obj->spr.image, obj->params, &obj->spr.params, &obj->tint);
         } else {   
             C2D_ViewRestore(&object_view);
             draw_player_graphics();

@@ -10,7 +10,7 @@
 
 #include "menus/core/ui_screen.h"
 
-static const u32 white = ABGR8(255, 255, 255, 255);
+static const u32 white_c = ABGR8(255, 255, 255, 255);
 static char wrap_buffer[4096];
 
 typedef struct {
@@ -85,7 +85,7 @@ static bool parse_color_tag(const char *tag, u32 *out) {
         return true;
 
     if (strcmp(tag, "/") == 0) {
-        *out = white;
+        *out = white_c;
         return true;
     }
 
@@ -467,7 +467,7 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
     float total_height = (line_count * line_height);
 
     C2D_ImageTint tint = { 0 };
-    u32 current_color = white;
+    u32 current_color = white_c;
 
     for (int i = 0; i < size; i++) {
         bool is_image = false;

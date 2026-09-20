@@ -2,6 +2,7 @@
 #include <citro2d.h>
 #include "level_loading.h"
 #include "color_channels.h"
+#include "utils/c2d_internal.h"
 
 #define FADING_OBJ_PADDING 45
 #define FADING_OBJ_WIDTH 180
@@ -32,10 +33,16 @@ typedef struct
     float dx, dy; // velocity
 } Sprite;
 
+typedef struct {
+    C2Di_Quad quadr;
+    float tcTopLeft[2], tcTopRight[2], tcBotLeft[2], tcBotRight[2];
+} QuadParams;
+
 typedef struct
 {
     C2D_Sprite spr;
     C2D_ImageTint tint;
+    QuadParams params;
     int obj;
     int layer;
     int col_type;

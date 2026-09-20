@@ -1432,6 +1432,8 @@ void load_sfx() {
 
 int main(int argc, char* argv[]) {
     // Init libs
+    init_trig_table();
+
     romfsInit();
     gfxInitDefault();
     C3D_Init(C3D_DEFAULT_CMDBUF_SIZE * 4);
