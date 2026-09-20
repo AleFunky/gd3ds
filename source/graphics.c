@@ -1209,11 +1209,6 @@ static bool ensure_render_cache(void) {
         return false;
     }
 
-    memset(current_objects, 0, sizeof(int) * objects.count);
-    memset(object_sprite_start, 0, sizeof(int) * objects.count);
-    memset(object_sprite_count, 0, sizeof(unsigned char) * objects.count);
-    memset(object_sprite_cache, 0, sizeof(SpriteObject) * cache_capacity);
-
     // Get offsets of each object
     int sprite_offset = 0;
     for (int obj = 0; obj < objects.count; obj++) {
