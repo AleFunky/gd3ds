@@ -1005,6 +1005,25 @@ void game_loop() {
             handle_practice_mode();
             handle_shake(delta);
 
+            if (state.mirroring) {
+                state.mirror_timer += delta;
+                if (state.mirror_timer > MIRROR_DURATION) {
+                    state.mirroring = false;
+                    state.mirror_factor = state.intended_mirror_factor;
+                    state.mirror_speed_factor = 1 - 2*state.mirror_factor;
+
+                    // When mirror transition ends, put a wave trail point
+                    if (state.player.gamemode == GAMEMODE_WAVE) {
+                        wave_trail_p1.positionR = (Vec2D){ state.player.x, state.player.y };
+                        MotionTrail_AddWavePoint(&wave_trail_p1);
+                    }
+                    if (state.dual && state.player2.gamemode == GAMEMODE_WAVE) {
+                        wave_trail_p2.positionR = (Vec2D){ state.player2.x, state.player2.y };
+                        MotionTrail_AddWavePoint(&wave_trail_p2);
+                    }
+                }
+            }
+
             u64 start_trig = svcGetSystemTick();
             handle_triggers();
             handle_col_triggers();
@@ -1097,24 +1116,6 @@ void game_loop() {
                 }
             }
 
-            if (state.mirroring) {
-                state.mirror_timer += delta;
-                if (state.mirror_timer > MIRROR_DURATION) {
-                    state.mirroring = false;
-                    state.mirror_factor = state.intended_mirror_factor;
-                    state.mirror_speed_factor = 1 - 2*state.mirror_factor;
-
-                    // When mirror transition ends, put a wave trail point
-                    if (state.player.gamemode == GAMEMODE_WAVE) {
-                        wave_trail_p1.positionR = (Vec2D){ state.player.x, state.player.y };
-                        MotionTrail_AddWavePoint(&wave_trail_p1);
-                    }
-                    if (state.dual && state.player2.gamemode == GAMEMODE_WAVE) {
-                        wave_trail_p2.positionR = (Vec2D){ state.player2.x, state.player2.y };
-                        MotionTrail_AddWavePoint(&wave_trail_p2);
-                    }
-                }
-            }
         } else{
             kHeldPaused = kHeld;
         }

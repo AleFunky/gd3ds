@@ -1119,6 +1119,9 @@ void free_arrays() {
     if (objects.flippedH)           { free(objects.flippedH);           objects.flippedH = NULL; }
     if (objects.flippedV)           { free(objects.flippedV);           objects.flippedV = NULL; }
     if (objects.toggled)            { free(objects.toggled);            objects.toggled = NULL; }
+    if (objects.dirty)              { free(objects.dirty);              objects.dirty = NULL; }
+    if (objects.render_visible)     { free(objects.render_visible);     objects.render_visible = NULL; }
+    if (objects.render_seen)        { free(objects.render_seen);        objects.render_seen = NULL; }
     if (objects.activated)          { free(objects.activated);          objects.activated = NULL; }
     if (objects.collided)           { free(objects.collided);           objects.collided = NULL; }
 }
@@ -1210,6 +1213,15 @@ bool init_arrays(int count) {
     
     objects.toggled = malloc(sizeof(bool) * count);
     if (!objects.toggled) return false;
+
+    objects.dirty = malloc(sizeof(bool) * count);
+    if (!objects.dirty) return false;
+
+    objects.render_visible = malloc(sizeof(bool) * count);
+    if (!objects.render_visible) return false;
+
+    objects.render_seen = malloc(sizeof(bool) * count);
+    if (!objects.render_seen) return false;
     
     objects.activated = malloc(sizeof(u8) * count);
     if (!objects.activated) return false;
@@ -1247,6 +1259,9 @@ bool init_arrays(int count) {
     memset(objects.flippedH,           0, sizeof(bool) * count);
     memset(objects.flippedV,           0, sizeof(bool) * count);
     memset(objects.toggled,            0, sizeof(bool) * count);
+    memset(objects.dirty,              1, sizeof(bool) * count); // Dirty by default (needs to be created lol)
+    memset(objects.render_visible,     0, sizeof(bool) * count);
+    memset(objects.render_seen,        0, sizeof(u8) * count);
     memset(objects.activated,          0, sizeof(u8) * count);
     memset(objects.collided,           0, sizeof(u8) * count);
 
@@ -1597,6 +1612,7 @@ void reload_level() {
 }
 
 void unload_level() {
+    reset_render_cache();
     free_arrays();
     free_sections();
     free_object_particles();

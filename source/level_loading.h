@@ -54,6 +54,9 @@ typedef struct {
     };
     bool *flippedH, *flippedV;
     bool *toggled;
+    bool *dirty;
+    bool *render_visible;
+    bool *render_seen;
 
     u8 *activated;
     u8 *collided;

@@ -42,6 +42,8 @@ typedef struct
     float opacity;
     int col_channel;
     int zlayer;
+    bool blending;
+    bool hidden;
 } SpriteObject;
 
 typedef struct {
@@ -118,6 +120,7 @@ inline float normalize_angle(float a)
 }
 
 void create_objects();
+void reset_render_cache();
 void change_blending(bool blending);
 Color get_white_if_black(Color color);
 Color get_p1_if_black(Color color);
