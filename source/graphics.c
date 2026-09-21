@@ -818,35 +818,35 @@ int get_object_layers(int id) {
     return count;
 }
 
-int obj_edge_fade(float x, int right_edge) {
+float obj_edge_fade(float x, int right_edge) {
     if (x < 0 || x > right_edge)
         return 0;
     else if (x < FADE_WIDTH)
-        return (int)(255.0f * (x / FADE_WIDTH));
+        return 255.0f * (x / FADE_WIDTH);
     else if (x > right_edge - FADE_WIDTH)
-        return (int)(255.0f * ((right_edge - x) / FADE_WIDTH));
+        return 255.0f * ((right_edge - x) / FADE_WIDTH);
     else
         return 255;
 }
 
 int get_xy_fade_offset(float x, int right_edge) {
-    int fade = obj_edge_fade(x, right_edge);
+    float fade = obj_edge_fade(x, right_edge);
     return (255 - fade) / 2;
 }
 
 float get_in_scale_fade(float x, int right_edge) {
-    int fade = obj_edge_fade(x, right_edge);
+    float fade = obj_edge_fade(x, right_edge);
     return (fade / 255.f);
 }
 
 float get_out_scale_fade(float x, int right_edge) {
-    int fade = 255 - obj_edge_fade(x, right_edge);
+    float fade = 255 - obj_edge_fade(x, right_edge);
     return 1 + ((fade / 255.f) / 2);
 }
 
 // Some objects dont change opacity on fade transitions
 int get_obj_opacity(int obj, float x) {
-    int opacity = obj_edge_fade(x, SCREEN_WIDTH / SCALE);
+    float opacity = obj_edge_fade(x, SCREEN_WIDTH / SCALE);
     bool blending;
 
     switch (objects.id[obj]) {
@@ -1397,6 +1397,19 @@ void create_objects() {
     for (int i = 0; i < current_object_count; i++) {
         int obj = current_objects[i];
         int id = objects.id[obj];
+        float calc_x = objects.x[obj] - state.camera_x;
+
+        float fade_val = obj_edge_fade(calc_x, SCREEN_WIDTH / SCALE);
+        if (fade_val == 255) {
+            objects.transition_applied[obj] = FADE_NONE;
+        } else if (objects.transition_applied[obj] == FADE_NONE) {
+            float calc_y = SCREEN_HEIGHT - (objects.y[obj] - state.camera_y);
+            handle_special_fading(obj, calc_x, calc_y);
+        }
+
+        if (objects.transition_applied[obj] != FADE_NONE && fade_val != 255) {
+            objects.dirty[obj] = true;
+        }
         
         // The rotating objects need to be recalculated
         float rotation_speed = get_rotation_speed(id);
@@ -1486,10 +1499,16 @@ void create_objects() {
         float calc_x = objects.x[obj] - state.camera_x;
         float calc_y = SCREEN_HEIGHT - (objects.y[obj] - state.camera_y);
 
-        int fade_val = obj_edge_fade(calc_x, SCREEN_WIDTH / SCALE);
+        float fade_val = obj_edge_fade(calc_x, SCREEN_WIDTH / SCALE);
         
-        // Fading at the edges
-        if (fade_val == 255 || fade_val == 0) handle_special_fading(obj, calc_x, calc_y);
+        if (fade_val == 255) {
+            objects.transition_applied[obj] = FADE_NONE;
+        }
+
+        // Fade when it reaches an edge
+        if (fade_val != 255 && objects.transition_applied[obj] == FADE_NONE) {
+            handle_special_fading(obj, calc_x, calc_y);
+        }
         
         int fade_x = 0;
         int fade_y = 0;
