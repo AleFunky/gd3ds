@@ -1,4 +1,5 @@
 #include "player.h"
+#include "profiling.h"
 #include "state.h"
 #include "icons.h"
 #include "graphics.h"
@@ -767,10 +768,6 @@ void run_player(Player *player) {
     player->buffer_ufo = false;
 }
 
-float collision_time = 0;
-float player_time = 0;
-float handle_player_time = 0;
-
 void handle_player(Player *player) {
     if (get_fade_status()) return;
 
@@ -819,7 +816,7 @@ void handle_player(Player *player) {
     collide_with_objects(player);
     u64 end = svcGetSystemTick();
     u64 ticks = end - start;
-    collision_time += ticks / CPU_TICKS_PER_MSEC;
+    snapshot.collision_ms += ticks / CPU_TICKS_PER_MSEC;
     
     if (state.noclip) state.dead = false;
     
@@ -850,7 +847,7 @@ void handle_player(Player *player) {
     run_player(player);
     end = svcGetSystemTick();
     ticks = end - start;
-    player_time += ticks / CPU_TICKS_PER_MSEC;
+    snapshot.play_ms += ticks / CPU_TICKS_PER_MSEC;
     
     if (state.noclip) state.dead = false;
     
@@ -864,7 +861,7 @@ void handle_player(Player *player) {
 
     // Add player hitboxes to hitbox trail
     if (state.hitbox_display == 2) add_new_hitbox(player);
-    handle_player_time += ticks / CPU_TICKS_PER_MSEC;
+    snapshot.handler_ms += ticks / CPU_TICKS_PER_MSEC;
 }
 
 void anim_player_to_wall(Player *player) {

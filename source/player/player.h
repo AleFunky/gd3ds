@@ -177,10 +177,6 @@ enum PlayerSpeeds {
 extern PlayerAction player_actions[2][MAX_ACTIONS];
 extern int num_actions[2];
 
-extern float collision_time;
-extern float player_time;
-extern float handle_player_time;
-
 extern MotionTrail *trail;
 extern MotionTrail trail_p1;
 extern MotionTrail trail_p2;

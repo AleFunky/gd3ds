@@ -115,10 +115,6 @@ extern SpriteTemplate sprite_templates[GAME_OBJECT_COUNT];
 
 extern const Color white;
 
-extern float object_creating_time;
-extern float object_sorting_time;
-extern float object_drawing_time;
-
 inline float normalize_angle(float a)
 {
     while (a < 0.0f)   a += 360.0f;

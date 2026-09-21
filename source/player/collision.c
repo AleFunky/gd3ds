@@ -3,6 +3,7 @@
 #include "player.h"
 #include <math.h>
 #include "practice.h"
+#include "profiling.h"
 #include "state.h"
 #include <citro3d.h>
 #include "graphics.h"
@@ -1286,7 +1287,7 @@ void collide_with_obj(Player *player, int obj) {
 
     if (!hitbox || objects.toggled[obj]) return;
 
-    number_of_collisions_checks++;
+    snapshot.collision_checks++;
 
     float x = objects.x[obj];
     float y = objects.y[obj];
@@ -1300,7 +1301,7 @@ void collide_with_obj(Player *player, int obj) {
         )) {
             handle_collision(player, obj, hitbox);
             SET_COLLIDED(obj, true);
-            number_of_collisions++;
+            snapshot.collisions++;
         } else {
             SET_COLLIDED(obj, false);
         }
@@ -1330,7 +1331,7 @@ void collide_with_obj(Player *player, int obj) {
         if (checkColl) {
             handle_collision(player, obj, hitbox);
             SET_COLLIDED(obj, true);
-            number_of_collisions++;
+            snapshot.collisions++;
         } else {
             SET_COLLIDED(obj, false);
         }
@@ -1364,9 +1365,6 @@ int hazard_count = 0;
 
 int potential_slopes_buffer[2][MAX_COLLIDED_OBJECTS];
 int potential_slopes[2];
-
-int number_of_collisions = 0;
-int number_of_collisions_checks = 0;
 
 void collide_with_objects(Player *player) {
     int sx = (int)(player->x / SECTION_SIZE);

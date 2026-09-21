@@ -13,6 +13,7 @@
 #include "menus/palette_kit.h"
 
 #include "player/player.h"
+#include "profiling.h"
 #include "state.h"
 #include "player/collision.h"
 
@@ -1168,10 +1169,6 @@ void draw_attempt_text() {
     }
 }
 
-float object_creating_time = 0;
-float object_sorting_time = 0;
-float object_drawing_time = 0;
-
 static bool ensure_render_cache(void) {
     if (render_object_capacity == objects.count) return true;
 
@@ -1186,16 +1183,31 @@ static bool ensure_render_cache(void) {
     object_sprite_start = malloc(sizeof(int) * objects.count);
     object_sprite_count = malloc(sizeof(unsigned char) * objects.count);
     
+    if (!current_objects || !object_sprite_start || !object_sprite_count) {
+        free(current_objects);
+        free(object_sprite_start);
+        free(object_sprite_count);
+        current_objects = NULL;
+        object_sprite_start = NULL;
+        object_sprite_count = NULL;
+        object_sprite_cache = NULL;
+        render_object_capacity = 0;
+        return false;
+    }
+
     // Count all layers
     int cache_capacity = 0;
     for (int obj = 0; obj < objects.count; obj++) {
         const GameObject *game_object = &game_objects[objects.id[obj]];
-        cache_capacity += get_object_layers(objects.id[obj]);
-        if (game_object->glow_frame >= 0) cache_capacity++;
+        int count = 0;
+        count += get_object_layers(objects.id[obj]);
+        if (game_object->glow_frame >= 0) count++;
+        cache_capacity += count;
+        object_sprite_count[obj] = count;
     }
 
     object_sprite_cache = malloc(sizeof(SpriteObject) * cache_capacity);
-    if (!current_objects || !object_sprite_start || !object_sprite_count || !object_sprite_cache) {
+    if (!object_sprite_cache) {
         // Today i discovered free ignores NULL
         free(current_objects);
         free(object_sprite_start);
@@ -1213,7 +1225,6 @@ static bool ensure_render_cache(void) {
     int sprite_offset = 0;
     for (int obj = 0; obj < objects.count; obj++) {
         object_sprite_start[obj] = sprite_offset;
-        object_sprite_count[obj] = 0;
         sprite_offset += get_object_layers(objects.id[obj]);
         if (game_objects[objects.id[obj]].glow_frame >= 0) sprite_offset++;
     }
@@ -1303,6 +1314,7 @@ static void update_current_objects(void) {
 }
 
 void update_tints() {
+    u64 start = svcGetSystemTick();
     for (size_t s = 0; s < sprite_count; s++) {
         SpriteObject *obj = viewable_objects_ptr[s];
         if (obj->obj != -1) {
@@ -1367,6 +1379,10 @@ void update_tints() {
             C2D_PlainImageTint(&obj->tint, C2D_Color32(col.color.r, col.color.g, col.color.b, real_opacity), 1.f);
         }
     }
+    
+    u64 end = svcGetSystemTick();
+    u64 ticks = end - start;
+    snapshot.tint_ms = ticks / CPU_TICKS_PER_MSEC;
 }
 
 
@@ -1397,7 +1413,9 @@ void create_objects() {
 
     update_current_objects();
 
-    
+    snapshot.draw_count = current_object_count;
+    snapshot.draw_dirty = 0;
+
     if (!mirror_changed && !render_list_changed) {
         // Check if theres dirty objects
         bool has_dirty_objects = false;
@@ -1412,8 +1430,8 @@ void create_objects() {
         if (!has_dirty_objects) {
             u64 start = svcGetSystemTick();
             render_mirror_factor = state.mirror_factor;
-            object_creating_time = (svcGetSystemTick() - start) / CPU_TICKS_PER_MSEC;
-            object_sorting_time = 0;
+            snapshot.creating_ms = (svcGetSystemTick() - start) / CPU_TICKS_PER_MSEC;
+            snapshot.sorting_ms = 0;
             update_tints();
             return;
         }
@@ -1446,13 +1464,17 @@ void create_objects() {
         int object_start = object_sprite_start[obj];
         unsigned char layer_count = object_sprite_count[obj];
 
-        if (!objects.dirty[obj] && layer_count > 0) {
+        if (layer_count <= 0) continue;
+
+        if (!objects.dirty[obj]) {
             // Not dirty, avoid recalculating it
             for (int layer = 0; layer < layer_count; layer++) {
                 viewable_objects_ptr[sprite_count++] = &object_sprite_cache[object_start + layer];
             }
             continue;
         }
+
+        snapshot.draw_dirty++;
 
         int visible_start = sprite_count;
         viewable_objects = object_sprite_cache + object_start;
@@ -1497,9 +1519,9 @@ void create_objects() {
             viewable_objects_ptr[visible_start + layer] = &object_sprite_cache[object_start + layer];
         }
         sprite_count = visible_start + layer_count;
-
+    
         // Objects in transition are dirty
-        objects.dirty[obj] = objects.transition_applied[obj] != FADE_NONE;
+        objects.dirty[obj] = objects.transition_applied[obj] != FADE_NONE && fade_val != 255;
     }
 
     viewable_objects = object_sprite_cache;
@@ -1509,13 +1531,13 @@ void create_objects() {
     
     u64 end = svcGetSystemTick();
     u64 ticks = end - start;
-    object_creating_time = ticks / CPU_TICKS_PER_MSEC;
+    snapshot.creating_ms = ticks / CPU_TICKS_PER_MSEC;
     
     start = svcGetSystemTick();
     sort_viewable_objects(viewable_objects_ptr, sprite_count);
     end = svcGetSystemTick();
     ticks = end - start;
-    object_sorting_time = ticks / CPU_TICKS_PER_MSEC;
+    snapshot.sorting_ms = ticks / CPU_TICKS_PER_MSEC;
     
     update_tints();
 }
@@ -1634,7 +1656,8 @@ void draw_objects() {
 
     u64 end = svcGetSystemTick();
     u64 ticks = end - start;
-    object_drawing_time = ticks / CPU_TICKS_PER_MSEC;
+    snapshot.drawing_ms = ticks / CPU_TICKS_PER_MSEC;
+    snapshot.rendering_ms += ticks / CPU_TICKS_PER_MSEC;
 }
 
 void update_touch_effect(float delta) {

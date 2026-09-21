@@ -6,10 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "3ds/console.h"
-#include "3ds/env.h"
-#include "3ds/services/cfgu.h"
-#include "objects.h"
+#include <3ds.h>
 #include "level_loading.h"
 #include "main.h"
 #include "graphics.h"
@@ -59,6 +56,7 @@
 #include "new_best.h"
 
 #include "math_helpers.h"
+#include "profiling.h"
 
 #include "utils/utils.h"
 #include "utils/precise_input.h"
@@ -255,11 +253,6 @@ void check_system_model() {
     u8 model = get_model();
     is_N3DS = model == CFG_MODEL_N2DSXL || model == CFG_MODEL_N3DS || model == CFG_MODEL_N3DSXL || is_citra();
 }
-
-float sprite_drawing_time = 0;
-float physics_calc_time = 0;
-float particle_calc_time = 0;
-float triggers_time = 0;
 
 float delta = 0;
 unsigned int level_frame = 0;
@@ -784,6 +777,8 @@ void game_loop() {
         
         global_volume = get_volume_slider();
 
+        snapshot.rendering_ms = 0;
+
         handle_gameplay_input(touchPos, kDown, kHeld);
         
         for (int i = 0; i < 2; i++) {
@@ -804,12 +799,12 @@ void game_loop() {
 
         if (state.death_timer <= 0)  {
             float physics_delta = delta;
-            physics_calc_time = 0;
-            number_of_collisions = 0;
-            number_of_collisions_checks = 0;
-            collision_time = 0;
-            player_time = 0;
-            handle_player_time = 0;
+            snapshot.physics_ms = 0;
+            snapshot.collisions = 0;
+            snapshot.collision_checks = 0;
+            snapshot.collision_ms = 0;
+            snapshot.play_ms = 0;
+            snapshot.handler_ms = 0;
             
             brick_destroy_particles.emitting = false;
             glitter_particles.emitting = false;
@@ -910,7 +905,7 @@ void game_loop() {
                     }
                     else frame_skipped = 0;
 
-                    physics_calc_time += physics_time;
+                    snapshot.physics_ms += physics_time;
 
                     accumulator -= STEPS_DT;
                     steps++;
@@ -1030,13 +1025,13 @@ void game_loop() {
             calculate_lbg();
             u64 end_trig = svcGetSystemTick();
             u64 ticks_trig = end_trig - start_trig;
-            triggers_time = ticks_trig / CPU_TICKS_PER_MSEC;
+            snapshot.triggers_ms = ticks_trig / CPU_TICKS_PER_MSEC;
 
             u64 start_obj = svcGetSystemTick();
             create_objects();
             u64 end_obj = svcGetSystemTick();
             u64 ticks_obj = end_obj - start_obj;
-            sprite_drawing_time = ticks_obj / CPU_TICKS_PER_MSEC;
+            snapshot.rendering_ms = ticks_obj / CPU_TICKS_PER_MSEC;
 
             u64 start_part = svcGetSystemTick();
             update_player_effects(delta);
@@ -1095,7 +1090,7 @@ void game_loop() {
             update_object_particles(delta);
             u64 end_part = svcGetSystemTick();
             u64 ticks_part = end_part - start_part;
-            particle_calc_time = ticks_part / CPU_TICKS_PER_MSEC;
+            snapshot.particles_ms = ticks_part / CPU_TICKS_PER_MSEC;
 
             // Update trails
             MotionTrail_Update(&trail_p1, delta);
@@ -1243,57 +1238,16 @@ void game_loop() {
             draw_level_complete();
 
             if (state.profiling) {
-                float processingTime = ((ticks / CPU_TICKS_PER_MSEC)) * 6;
-                float drawingTime = C3D_GetDrawingTime() * 6;
-                float fps = 1 / delta;
-                if (fps > 60) fps = 60;
+                float processingTime = ticks / CPU_TICKS_PER_MSEC;
+                ProfilerUpdateData data = {
+                    .processingTime = processingTime,
+                    .touchPos = touchPos,
+                    .kDown = kDown,
+                    .steps = steps
+                };
 
-                #define DEBUG_TEXT_SCALE 0.4f, 0.4f
-                
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 6,  DEBUG_TEXT_SCALE, 0, true, "CPU: %6.2f%% (%6.2f%% %6.2f%%)", (C3D_GetProcessingTime() * 6) + processingTime, C3D_GetProcessingTime() * 6, processingTime);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 18, DEBUG_TEXT_SCALE, 0, true, "GPU: %6.2f%%", drawingTime);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 30, DEBUG_TEXT_SCALE, 0, true, "FPS: %6.1f", fps);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 42, DEBUG_TEXT_SCALE, 0, true, "Linear free: %d", linearSpaceFree());
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 42, DEBUG_TEXT_SCALE, 0, true, "CMDBuf: %6.2f%%", C3D_GetCmdBufUsage()*100.0f);
-
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 66,  DEBUG_TEXT_SCALE, 0, true, "%d steps", steps);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 54,  DEBUG_TEXT_SCALE, 0, true, "Particle: %6.2f%%", particle_calc_time * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 78,  DEBUG_TEXT_SCALE, 0, true, "Triggers: %6.2f%%", triggers_time * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 90,  DEBUG_TEXT_SCALE, 0, true, "Collision %d/%d", number_of_collisions, number_of_collisions_checks);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 102, DEBUG_TEXT_SCALE, 0, true, "Physics: %6.2f%%", physics_calc_time * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 114, DEBUG_TEXT_SCALE, 0, true, " - Coll: %6.2f%%", collision_time * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 126, DEBUG_TEXT_SCALE, 0, true, " - Play: %6.2f%%", player_time * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 138, DEBUG_TEXT_SCALE, 0, true, " - Hndl: %6.2f%%", handle_player_time * 6);
-
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   54,  DEBUG_TEXT_SCALE, 0, true, "SprDraw:  %6.2f%%", (sprite_drawing_time) * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   66,  DEBUG_TEXT_SCALE, 0, true, " - Creating: %6.2f%%", (object_creating_time) * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   78,  DEBUG_TEXT_SCALE, 0, true, " - Sorting:  %6.2f%%", (object_sorting_time) * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   102,  DEBUG_TEXT_SCALE, 0, true, "Drawing:  %6.2f%%", (object_drawing_time) * 6);
-
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   114,  DEBUG_TEXT_SCALE, 0, true, "Touch:  %d, %d", touchPos.px, touchPos.py);
-
-                // im jut going to assume 60fps for this (4 buckets)
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   126,  DEBUG_TEXT_SCALE, 0, true, "InputTicks: %d|%d|%d|%d", (int)pi_substep_presses[0], (int)pi_substep_presses[1], (int)pi_substep_presses[2], (int)pi_substep_presses[3]);
-
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   138,  DEBUG_TEXT_SCALE, 0, true, "Player");
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   150,  DEBUG_TEXT_SCALE, 0, true, "- Tick: %d", state.player.frame);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   162,  DEBUG_TEXT_SCALE, 0, true, "- X: %.2f", state.player.x);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   174,  DEBUG_TEXT_SCALE, 0, true, "- Y: %.2f", state.player.y);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   186,  DEBUG_TEXT_SCALE, 0, true, "- VX: %.2f", state.player.vel_x * STEPS_DT);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   198,  DEBUG_TEXT_SCALE, 0, true, "- VY: %.2f", state.player.vel_y * STEPS_DT);
-
-                
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   138,  DEBUG_TEXT_SCALE, 0, true, "Camera");
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   150,  DEBUG_TEXT_SCALE, 0, true, "- X: %.2f", state.camera_x);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   162,  DEBUG_TEXT_SCALE, 0, true, "- Y: %.2f", state.camera_y);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   174,  DEBUG_TEXT_SCALE, 0, true, "- IntY: %.2f", state.camera_intended_y);
-                
-                struct mallinfo mi = mallinfo();
-                
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   138 + 50,  DEBUG_TEXT_SCALE, 0, true, "Heap");
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   150 + 50,  DEBUG_TEXT_SCALE, 0, true, "- Allocated: 0x%X bytes", mi.uordblks);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   162 + 50,  DEBUG_TEXT_SCALE, 0, true, "- Free:        0x%X bytes",  envGetHeapSize() - mi.uordblks);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   174 + 50,  DEBUG_TEXT_SCALE, 0, true, "- Arena:      0x%X bytes",  envGetHeapSize());
+                profiler_update(data);
+                profiler_draw();
             }
 
             if (state.noclip) {
