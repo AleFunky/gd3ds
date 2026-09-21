@@ -312,7 +312,7 @@ void first_load_init_variables() {
     
     state.camera_x = 0;
     state.camera_y = 0;
-    current_fading_effect = FADE_NONE;
+    current_fading_effect = FADE_SIMPLE;
 
     slow_speed_particles_timer = 0;
     normal_speed_particles_timer = 0;
@@ -367,7 +367,7 @@ void init_variables() {
 
     clear_use_effects(get_use_effect_array_ptr(GFX_TOP));
 
-    current_fading_effect = FADE_NONE;
+    current_fading_effect = FADE_SIMPLE;
     level_info.completing = false;
 
     init_player(&state.player);

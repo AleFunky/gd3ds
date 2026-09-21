@@ -235,8 +235,8 @@ void upload_color_to_buffer(int channel, u32 color, float seconds) {
 
 void run_trigger(int obj) {
     switch (objects.id[obj]) {
-        case TRIGGER_FADE_NONE:
-            current_fading_effect = FADE_NONE;
+        case TRIGGER_FADE_SIMPLE:
+            current_fading_effect = FADE_SIMPLE;
             break;
             
         case TRIGGER_FADE_UP:

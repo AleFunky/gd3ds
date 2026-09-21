@@ -60,6 +60,7 @@ typedef struct {
 
 enum FadingEffects {
     FADE_NONE,
+    FADE_SIMPLE,
     FADE_UP,
     FADE_DOWN,
     FADE_RIGHT,
