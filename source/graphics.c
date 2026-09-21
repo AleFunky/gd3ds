@@ -72,7 +72,7 @@ static bool render_list_changed;
 static SpriteObject player_sprite_cache;
 
 bool p1_trail = false;
-int current_fading_effect = FADE_NONE;
+int current_fading_effect = FADE_SIMPLE;
 int current_pulserod_ball_image = 0;
 
 SpriteTemplate sprite_templates[GAME_OBJECT_COUNT]; // global cache
@@ -861,12 +861,12 @@ int get_obj_opacity(int obj, float x) {
         case 311:
         case 687:
         case 688:
-            if (objects.transition_applied[obj] == FADE_NONE) opacity = 255;
+            if (objects.transition_applied[obj] == FADE_SIMPLE) opacity = 255;
             break;
             
         case 211:
             blending = channels[get_col_channel_index(objects.col_channel[obj])].blending;
-            if (!blending && objects.transition_applied[obj] == FADE_NONE) opacity = 255;
+            if (!blending && objects.transition_applied[obj] == FADE_SIMPLE) opacity = 255;
             break;
         case 207:
         case 208:
@@ -879,7 +879,7 @@ int get_obj_opacity(int obj, float x) {
         case 331:
         case 333:
             blending = channels[get_col_channel_index(objects.detail_col_channel[obj])].blending;
-            if (!blending && objects.transition_applied[obj] == FADE_NONE) opacity = 255;
+            if (!blending && objects.transition_applied[obj] == FADE_SIMPLE) opacity = 255;
             break;
     }
 
@@ -940,7 +940,7 @@ void handle_special_fading(int obj, float calc_x, float calc_y) {
 
 void get_fade_vars(int obj, float x, float *fade_x, float *fade_y, float *fade_scale) {
     switch (objects.transition_applied[obj]) {
-        case FADE_NONE:
+        case FADE_SIMPLE:
             break;
         case FADE_UP:
             *fade_y = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
@@ -1409,7 +1409,7 @@ void create_objects() {
             handle_special_fading(obj, calc_x, calc_y);
         }
 
-        if (objects.transition_applied[obj] != FADE_NONE && fade_val != 255) {
+        if (objects.transition_applied[obj] > FADE_SIMPLE && fade_val != 255) {
             objects.dirty[obj] = true;
         }
         
@@ -1545,7 +1545,7 @@ void create_objects() {
         sprite_count = visible_start + layer_count;
     
         // Objects in transition are dirty
-        objects.dirty[obj] = objects.transition_applied[obj] != FADE_NONE && fade_val != 255;
+        objects.dirty[obj] = objects.transition_applied[obj] > FADE_SIMPLE && fade_val != 255;
     }
 
     viewable_objects = object_sprite_cache;
