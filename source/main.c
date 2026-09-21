@@ -1408,7 +1408,7 @@ int main(int argc, char* argv[]) {
     reinitialize_screens();
 
     srand(time(NULL));
-    alt_title_screen = (rand() & (128 - 1)) == 0;
+    alt_title_screen = random_float(0, 1) < (1.f / 256);
     
     C2D_SetTintMode(C2D_TintMult);
     
