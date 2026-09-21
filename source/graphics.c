@@ -575,8 +575,8 @@ void spawn_object_at(
     const GameObject* obj = &game_objects[id];
 
     float rad = C3D_AngleFromDegrees(adjust_angle(deg, 0, state.mirror_mult < 0));
-    float cos_r = cosf(rad);
-    float sin_r = sinf(rad);
+    float cos_r = lut_cos(rad);
+    float sin_r = lut_sin(rad);
 
     int flip_x_mult = (flip_x ? -1 : 1);
     int flip_y_mult = (flip_y ? -1 : 1);
@@ -1407,6 +1407,9 @@ void create_objects() {
 
         // Check for pulsing objects, they are dirty
         if (object_has_pulse(id)) objects.dirty[obj] = true;
+
+        // Secret coin is animated
+        if (id == SECRET_COIN) objects.dirty[obj] = true;
 
         spawn_object_particles(obj);
     }
