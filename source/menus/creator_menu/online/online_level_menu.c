@@ -577,6 +577,8 @@ static void online_level_init (UIScreen *s) {
 
     screen = s;
 
+    if(gdps) ui_disable_element(ui_get_element_by_tag(s, "garage"));
+
     // Bottom screen elements
     normal_percent_label = (UILabel *) ui_get_element_by_tag(screen, "normalprogressvalue");
     practice_percent_label = (UILabel *) ui_get_element_by_tag(screen, "practiceprogressvalue");
