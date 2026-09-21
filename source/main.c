@@ -607,7 +607,7 @@ void ui_loop(){
             begin_eye_layer(DEPTH_UI);
             ui_stack_draw(SCREEN_TOP);
             draw_stack_fade();
-            draw_stack_debug();
+            //draw_stack_debug();
             end_eye_layer();
         }
         C2D_ViewReset();
@@ -1192,7 +1192,7 @@ void game_loop() {
             ui_stack_draw(SCREEN_TOP);
             draw_level_complete_top();
             draw_stack_fade();
-            draw_stack_debug();
+            //draw_stack_debug();
             end_eye_layer();
         }
 
