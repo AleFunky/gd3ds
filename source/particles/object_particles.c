@@ -127,8 +127,8 @@ void draw_object_particles() {
     for (size_t i = 0; i < MAX_OBJECT_PS; i++) {
         if (object_particle[i].occupied) {
             int obj = object_particle[i].id;
-            int fade_x = 0;
-            int fade_y = 0;
+            float fade_x = 0;
+            float fade_y = 0;
 
             float calc_x = ((objects.x[obj] - state.camera_x));
             
@@ -138,11 +138,7 @@ void draw_object_particles() {
             float fade_val = obj_edge_fade(calc_x, SCREEN_WIDTH / SCALE);
 
             // Calculate stationary fade positions
-            float new_offset = calc_x;
-            get_special_fading_vars(obj, fade_val, &new_offset);
-
-            // Add stationary fade offset
-            fade_x += (new_offset - calc_x);
+            fade_x += get_special_fading_vars(obj, fade_val);
 
             drawParticleSystem(&object_particle[i].ps, fade_x, fade_y, fade_val / 255.f);
         }

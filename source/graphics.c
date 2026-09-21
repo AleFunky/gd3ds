@@ -829,7 +829,7 @@ float obj_edge_fade(float x, int right_edge) {
         return 255;
 }
 
-int get_xy_fade_offset(float x, int right_edge) {
+float get_xy_fade_offset(float x, int right_edge) {
     float fade = obj_edge_fade(x, right_edge);
     return (255 - fade) / 2;
 }
@@ -938,7 +938,7 @@ void handle_special_fading(int obj, float calc_x, float calc_y) {
     }   
 }
 
-void get_fade_vars(int obj, float x, int *fade_x, int *fade_y, float *fade_scale) {
+void get_fade_vars(int obj, float x, float *fade_x, float *fade_y, float *fade_scale) {
     switch (objects.transition_applied[obj]) {
         case FADE_NONE:
             break;
@@ -985,16 +985,18 @@ void get_fade_vars(int obj, float x, int *fade_x, int *fade_y, float *fade_scale
     }
 }
 
-void get_special_fading_vars(int obj, float fade_val, float *calc_x) {
+float get_special_fading_vars(int obj, float fade_val) {
     if (objects.transition_applied[obj] == FADE_DOWN_STATIONARY || objects.transition_applied[obj] == FADE_UP_STATIONARY) {
         if (fade_val < 255) {
-            if (*calc_x > (SCREEN_WIDTH / SCALE) / 2) {
-                *calc_x = SCREEN_WIDTH / SCALE - FADE_WIDTH;
+            float calc_x = objects.x[obj] - state.camera_x;
+            if (calc_x > (SCREEN_WIDTH / SCALE) / 2) {
+                return (SCREEN_WIDTH / SCALE - FADE_WIDTH) - calc_x;
             } else {
-                *calc_x = FADE_WIDTH;
+                return FADE_WIDTH - calc_x;
             }
         }
     }
+    return 0;
 }
 
 void change_blending(bool blending) {
@@ -1510,13 +1512,13 @@ void create_objects() {
             handle_special_fading(obj, calc_x, calc_y);
         }
         
-        int fade_x = 0;
-        int fade_y = 0;
+        float fade_x = 0;
+        float fade_y = 0;
         float fade_scale = 1.f;
         get_fade_vars(obj, calc_x, &fade_x, &fade_y, &fade_scale);
 
         // Handle special fade types
-        get_special_fading_vars(obj, fade_val, &calc_x);
+        fade_x += get_special_fading_vars(obj, fade_val);
 
         float world_x = get_mirror_x(objects.x[obj], state.mirror_factor);
         float world_y = SCREEN_HEIGHT - objects.y[obj];
