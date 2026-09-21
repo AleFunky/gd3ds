@@ -768,8 +768,6 @@ float player_time = 0;
 float handle_player_time = 0;
 
 void handle_player(Player *player) {
-    if (get_fade_status()) return;
-
     u64 start_player = svcGetSystemTick();
     if (state.input.holdJump) {
         if (player->buffering_state == BUFFER_NONE) {

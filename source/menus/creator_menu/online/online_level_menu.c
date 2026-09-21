@@ -198,13 +198,15 @@ static void open_warning(){
 static void play_level() {
     play_sfx(&play_sound, 1);
 
-    // state.custom_level = true;
-    // state.online_level = true;
+    state.custom_level = true;
+    state.online_level = true;
 
     already_played_online_level = true;
 
     stop_mp3();
     playing_menu_loop = false;
+
+    ui_stack_push_game_state(STATE_GAME);
 }
 
 void check_warnings_and_play(){

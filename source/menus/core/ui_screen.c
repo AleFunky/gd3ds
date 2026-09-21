@@ -769,7 +769,7 @@ void ui_load_screen_old(UIScreen* screen, const UIActionDef* actions, size_t act
 
     screen->loaded = true;
 
-    screen->def = &dummy_def_temp;
+    if(!screen->def) screen->def = &dummy_def_temp;
 
     screen->disable_element_update = false;
     screen->transition.time = 0.f;

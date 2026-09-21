@@ -145,7 +145,6 @@ void loading_screen_update(float progress) {
 
     draw_background(20, SCREEN_HEIGHT-30);
     C2D_ViewScale(SCALE, SCALE);
-    draw_fade();
 
     C2D_ViewScale(1/SCALE, 1/SCALE);
     ui_screen_draw(&default_screen);

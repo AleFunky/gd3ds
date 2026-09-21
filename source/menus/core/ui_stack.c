@@ -4,25 +4,29 @@
 #include "mp3_player.h"
 #include "fonts/bigFont.h"
 
-static UIStack stack = { 0 };
+static UIStack *stack = NULL;
+
+void ui_stack_set_stack(UIStack *set_stack){
+    stack = set_stack;
+}
 
 static size_t ui_stack_min_index() {
-    return stack.current_root;
+    return stack->current_root;
 }
 
 static size_t ui_stack_max_index() {
-    if(stack.active_count == 0){
+    if(stack->active_count == 0){
         return 0;
     }
-    return stack.current_root + stack.active_count - 1;
+    return stack->current_root + stack->active_count - 1;
 }
 
 static size_t ui_stack_next_index() {
-    return stack.current_root + stack.active_count;
+    return stack->current_root + stack->active_count;
 }
 
 static void unload_screenpair(int index){
-    UIScreenPair *pair = stack.screen_stack[index];
+    UIScreenPair *pair = stack->screen_stack[index];
 
     if(!pair) return;
 
@@ -38,14 +42,14 @@ static void unload_screenpair(int index){
     }
 
     free(pair);
-    stack.screen_stack[index] = NULL;
+    stack->screen_stack[index] = NULL;
 }
 
 static void open_root(){
     //unload all active layers below new root
     for(size_t i = ui_stack_min_index(); i <= ui_stack_max_index(); i++){
         //basic unload of previous screens (do not unload entire screenpair)
-        UIScreenPair *pair = stack.screen_stack[i];
+        UIScreenPair *pair = stack->screen_stack[i];
         for(int j = 0; j < 2; j++){
             UIScreen *screen = &pair->screens[j];
             ui_unload_screen(screen);
@@ -54,12 +58,12 @@ static void open_root(){
 
     size_t index = ui_stack_next_index();
 
-    stack.current_root = index;
-    stack.active_count = 1;
+    stack->current_root = index;
+    stack->active_count = 1;
 }
 
 static void close_root(){
-    if(stack.current_root == 0) return;
+    if(stack->current_root == 0) return;
 
     //unload all active layers above root
     for(size_t i = ui_stack_min_index(); i <= ui_stack_max_index(); i++){
@@ -68,15 +72,15 @@ static void close_root(){
 
     //find previous root
     size_t new_root = 0;
-    for(size_t i = stack.current_root; i-- > 0; ){
-        if(stack.screen_stack[i]->root){
+    for(size_t i = stack->current_root; i-- > 0; ){
+        if(stack->screen_stack[i]->root){
             new_root = i;
             break;
         }
     }
 
-    for(size_t i = new_root; i < stack.current_root; i++){
-        UIScreenPair *pair = stack.screen_stack[i];
+    for(size_t i = new_root; i < stack->current_root; i++){
+        UIScreenPair *pair = stack->screen_stack[i];
         for(int j = 0; j < 2; j++){
             UIScreen *screen = &pair->screens[j];
             ui_load_screen(screen);
@@ -84,9 +88,9 @@ static void close_root(){
         }
     }
 
-    stack.active_count = stack.current_root - new_root;
+    stack->active_count = stack->current_root - new_root;
 
-    stack.current_root = new_root;
+    stack->current_root = new_root;
 }
 
 static bool resize_stack(size_t new_capacity){
@@ -94,7 +98,7 @@ static bool resize_stack(size_t new_capacity){
         return false;
     }
 
-    size_t capacity = stack.stack_capacity;
+    size_t capacity = stack->stack_capacity;
 
     if(new_capacity <= capacity){
         return true;
@@ -104,16 +108,16 @@ static bool resize_stack(size_t new_capacity){
         capacity += 4;
     }
 
-    UIScreenPair **temp = realloc(stack.screen_stack, sizeof(UIScreenPair *) * capacity);
+    UIScreenPair **temp = realloc(stack->screen_stack, sizeof(UIScreenPair *) * capacity);
 
     if(!temp){
         return false;
     }
 
-    memset(temp + stack.stack_capacity, 0, sizeof(UIScreenPair *) * (capacity - stack.stack_capacity));
+    memset(temp + stack->stack_capacity, 0, sizeof(UIScreenPair *) * (capacity - stack->stack_capacity));
 
-    stack.screen_stack = temp;
-    stack.stack_capacity = capacity;
+    stack->screen_stack = temp;
+    stack->stack_capacity = capacity;
 
     return true;
 }
@@ -134,7 +138,7 @@ static UIScreenPair *ui_stack_open(const UIScreenDefPair *defs){
 
     if(!pair) return NULL;
 
-    stack.screen_stack[index] = pair;
+    stack->screen_stack[index] = pair;
 
     pair->name = defs->name;
 
@@ -161,29 +165,30 @@ void ui_stack_push(
     UIAnimation btm_anim,
     UIStackPushType type
 ){
-    if(type == PUSH_NONE){
+    //neither of these types actually push a screen
+    if(type == PUSH_NONE || type == PUSH_GAME_STATE){
         return;
     }
 
-    if(stack.transition != UI_TRANSITION_NONE){
+    if(stack->root_transition != UI_TRANSITION_NONE){
         printf("Cannot push during transition!");
         return;
     }
 
-    if(stack.push.type != PUSH_NONE){
+    if(stack->push.type != PUSH_NONE){
         printf("Cannot queue multiple pushes!");
         return;
     }
 
-    stack.push.defs = defs;
-    stack.push.top_anim = top_anim;
-    stack.push.btm_anim = btm_anim;
-    stack.push.type = type;
+    stack->push.defs = defs;
+    stack->push.top_anim = top_anim;
+    stack->push.btm_anim = btm_anim;
+    stack->push.type = type;
 
     if(type == PUSH_ROOT){
-        stack.transition = UI_TRANSITION_OPENING;
-        stack.fade = FADE_STATUS_IN;
-        stack.fade_time = 0.f;
+        stack->root_transition = UI_TRANSITION_OPENING;
+        stack->fade = FADE_STATUS_IN;
+        stack->fade_time = 0.f;
     }
 }
 
@@ -204,10 +209,10 @@ void ui_stack_push_name(
 
 void ui_stack_push_data(void *data){
     //can't push data when there is no actual push
-    if(stack.push.type == PUSH_NONE) return;
+    if(stack->push.type == PUSH_NONE) return;
 
 
-    stack.push.data = data;
+    stack->push.data = data;
 }
 
 void ui_stack_push_root_instant(const UIScreenDefPair *defs){
@@ -231,19 +236,27 @@ void ui_stack_push_root_instant(const UIScreenDefPair *defs){
     finish_animation(btm);
 }
 
+void ui_stack_push_game_state(int game_state){
+    stack->next_game_state = game_state;
+    stack->push.type = PUSH_GAME_STATE;
+    stack->root_transition = UI_TRANSITION_OPENING;
+    stack->fade = FADE_STATUS_IN;
+    stack->fade_time = 0.f;
+}
+
 void ui_stack_pop(){
-    if(stack.transition != UI_TRANSITION_NONE) {
+    if(stack->root_transition != UI_TRANSITION_NONE) {
         printf("Cannot pop stack during transition!");
         return;
     }
 
-    if(stack.active_count == 0) return;
+    if(stack->active_count == 0) return;
 
-    UIScreenPair *pair = stack.screen_stack[ui_stack_max_index()];
+    UIScreenPair *pair = stack->screen_stack[ui_stack_max_index()];
     if(pair->root){
-       stack.transition = UI_TRANSITION_CLOSING;
-       stack.fade = FADE_STATUS_IN;
-       stack.fade_time = 0.f;
+       stack->root_transition = UI_TRANSITION_CLOSING;
+       stack->fade = FADE_STATUS_IN;
+       stack->fade_time = 0.f;
     } else{
         for(int i = 0; i < 2; i++){
             ui_screen_close(&pair->screens[i]);
@@ -253,25 +266,25 @@ void ui_stack_pop(){
 
 //pops all active screens
 void ui_stack_pop_context(){
-    if(stack.transition != UI_TRANSITION_NONE) {
+    if(stack->root_transition != UI_TRANSITION_NONE) {
         printf("Cannot pop stack during transition!");
         return;
     }
 
     for(size_t i = ui_stack_min_index() + 1; i < ui_stack_max_index(); i++){
         for(int j = 0; j < 2; j++){
-            UIScreen *screen = &stack.screen_stack[i]->screens[j];
+            UIScreen *screen = &stack->screen_stack[i]->screens[j];
             ui_screen_close(screen);
         }
     }
 
-    stack.transition = UI_TRANSITION_CLOSING;
-    stack.fade = FADE_STATUS_IN;
-    stack.fade_time = 0.f;
+    stack->root_transition = UI_TRANSITION_CLOSING;
+    stack->fade = FADE_STATUS_IN;
+    stack->fade_time = 0.f;
 }
 
 static void update_opening(){
-    UIStackPush *push = &stack.push;
+    UIStackPush *push = &stack->push;
 
     if(push->type == PUSH_NEXT){
         push->push_now = true;
@@ -305,7 +318,7 @@ static void update_opening(){
         if(pair->root){
             open_root();
         } else{
-            stack.active_count++;
+            stack->active_count++;
         }
 
         ui_load_screen(top);
@@ -317,7 +330,7 @@ static void update_opening(){
 }
 
 static void update_closing(){
-    UIScreenPair *pair = stack.screen_stack[ui_stack_max_index()];
+    UIScreenPair *pair = stack->screen_stack[ui_stack_max_index()];
 
     if(!pair) return;
 
@@ -328,13 +341,13 @@ static void update_closing(){
         bool top_closing = top->loaded ? top->closing : true;
         bool btm_closing = btm->loaded ? btm->closing : true;
 
-        if(stack.transition == UI_TRANSITION_NONE && top_closing && btm_closing){
+        if(stack->root_transition == UI_TRANSITION_NONE && top_closing && btm_closing){
             unload_screenpair(ui_stack_max_index());
 
-            stack.active_count--;
+            stack->active_count--;
 
-            if(stack.push.type == PUSH_AFTER_CLOSE){
-                stack.push.push_now = true;
+            if(stack->push.type == PUSH_AFTER_CLOSE){
+                stack->push.push_now = true;
             }
         }
     }
@@ -344,17 +357,17 @@ static void handle_stack_fading(){
     //root transition open/close slop
     //instant if the active count is 0 (main menu doesn't fade in)
     bool transition_switch = false;
-    if(stack.fade_time >= 255.f || stack.active_count == 0){
-        switch(stack.fade){
+    if(stack->fade_time >= 255.f || stack->active_count == 0){
+        switch(stack->fade){
             case FADE_STATUS_IN:
-                stack.fade_time = 0.f;
-                stack.fade = FADE_STATUS_OUT;
+                stack->fade_time = 0.f;
+                stack->fade = FADE_STATUS_OUT;
                 transition_switch = true;
                 break;
             case FADE_STATUS_OUT:
-                stack.fade_time = 0.f;
-                stack.fade = FADE_STATUS_NONE;
-                stack.transition = UI_TRANSITION_NONE;
+                stack->fade_time = 0.f;
+                stack->fade = FADE_STATUS_NONE;
+                stack->root_transition = UI_TRANSITION_NONE;
                 break;
             case FADE_STATUS_NONE:
                 break;
@@ -363,24 +376,32 @@ static void handle_stack_fading(){
 
     //when the fade is fully black, either go back to the previous root or open a new one depending on transition
     if(transition_switch) {
-        switch(stack.transition){
-            case UI_TRANSITION_OPENING:
-                if(stack.push.type == PUSH_ROOT) stack.push.push_now = true;
-                stack.fade_time = 0.f;
-                //don't fade out if opening the first menu
-                stack.fade = FADE_STATUS_OUT;
-                break;
-            case UI_TRANSITION_CLOSING:
-                close_root();
-                stack.fade_time = 0.f;
-                stack.fade = FADE_STATUS_OUT;
-                break;
-            case UI_TRANSITION_NONE:
-                break;
+        if(stack->push.type == PUSH_GAME_STATE){
+            game_state = stack->next_game_state;
+            escape_state = true;
+            stack->fade_time = 0.f;
+            stack->fade = FADE_STATUS_OUT;
+            stack->push.type = PUSH_NONE;
+        } else{
+            switch(stack->root_transition){
+                case UI_TRANSITION_OPENING:
+                    if(stack->push.type == PUSH_ROOT) stack->push.push_now = true;
+                    stack->fade_time = 0.f;
+                    stack->fade = FADE_STATUS_OUT;
+                    break;
+                case UI_TRANSITION_CLOSING:
+                    close_root();
+                    stack->fade_time = 0.f;
+                    stack->fade = FADE_STATUS_OUT;
+                    break;
+                case UI_TRANSITION_NONE:
+                    break;
+            }
         }
+    } else{
+        //make sure there's a frame of full black
+        stack->fade_time += FADE_SPEED * DT;
     }
-
-    stack.fade_time += FADE_SPEED * DT;
 }
 
 void ui_stack_update(UIInput *input){
@@ -388,13 +409,13 @@ void ui_stack_update(UIInput *input){
 
     update_opening();
 
-    if(stack.active_count > 0){
+    if(stack->active_count > 0){
         for(size_t i = ui_stack_min_index(); i <= ui_stack_max_index(); i++){
-            UIScreenPair *pair = stack.screen_stack[i];
+            UIScreenPair *pair = stack->screen_stack[i];
 
             if(!pair) continue;
 
-            bool updating_topmost = i == ui_stack_max_index() && stack.transition == UI_TRANSITION_NONE;
+            bool updating_topmost = i == ui_stack_max_index() && stack->root_transition == UI_TRANSITION_NONE;
         
             for(int j = 0; j < 2; j++) {
                 UIScreen *screen = &pair->screens[j];
@@ -411,12 +432,12 @@ void ui_stack_update(UIInput *input){
     }
 }
 
-static void draw_stack_debug(){
+void draw_stack_debug(){
     char debug[2048];
     size_t pos = 0;
 
     for (size_t i = 0; i <= ui_stack_max_index(); i++) {
-        UIScreenPair *pair = stack.screen_stack[i];
+        UIScreenPair *pair = stack->screen_stack[i];
 
         if(!pair) continue;
 
@@ -424,7 +445,7 @@ static void draw_stack_debug(){
         if(pair->root){
             r = 128;
         }
-        if(i == stack.current_root){
+        if(i == stack->current_root){
             r = 255;
         }
         int gb = 128;
@@ -444,13 +465,13 @@ static void draw_stack_debug(){
     }
 
     char rootSlop[] = "ROOT:....";
-    snprintf(rootSlop, sizeof(rootSlop), "ROOT: %d", stack.current_root);
+    snprintf(rootSlop, sizeof(rootSlop), "ROOT: %d", stack->current_root);
 
     char activeSlop[] = "Active:....";
-    snprintf(activeSlop, sizeof(activeSlop), "Active: %d", stack.active_count);
+    snprintf(activeSlop, sizeof(activeSlop), "Active: %d", stack->active_count);
 
     char capacitySlop[] = "Capacity:....";
-    snprintf(capacitySlop, sizeof(capacitySlop), "Capacity: %d", stack.stack_capacity);
+    snprintf(capacitySlop, sizeof(capacitySlop), "Capacity: %d", stack->stack_capacity);
 
     draw_text(&bigFont_fontCharset, &bigFont_sheet, SCREEN_BOT_WIDTH / 2, SCREEN_HEIGHT / 2, 0.5f, 0.5f, 0, true, debug);
     draw_text(&bigFont_fontCharset, &bigFont_sheet, 10, 10, 0.5f, 0.5f, 0, true, rootSlop);
@@ -458,11 +479,22 @@ static void draw_stack_debug(){
     draw_text(&bigFont_fontCharset, &bigFont_sheet, 10, 40, 0.5f, 0.5f, 0, true, capacitySlop);
 }
 
+void draw_stack_fade(){
+    float fade = 0;
+    if(stack->fade == FADE_STATUS_IN){
+        fade = stack->fade_time;
+    } else if(stack->fade == FADE_STATUS_OUT){
+        fade = 255 - stack->fade_time;
+    }
+
+    C2D_DrawRectSolid(0.f, 0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT, C2D_Color32(0, 0, 0, fade));
+}
+
 void ui_stack_draw(Screens target){
-    if(stack.active_count == 0) return;
+    if(stack->active_count == 0) return;
 
     for(size_t i = ui_stack_min_index(); i <= ui_stack_max_index(); i++){
-        UIScreenPair *pair = stack.screen_stack[i];
+        UIScreenPair *pair = stack->screen_stack[i];
 
         if(!pair) continue;
 
@@ -471,34 +503,22 @@ void ui_stack_draw(Screens target){
             ui_screen_draw(screen);
         }
     }
-
-    float fade = 0;
-    if(stack.fade == FADE_STATUS_IN){
-        fade = stack.fade_time;
-    } else if(stack.fade == FADE_STATUS_OUT){
-        fade = 255 - stack.fade_time;
-    }
-
-    //fade
-    C2D_DrawRectSolid(0.f, 0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT, C2D_Color32(0, 0, 0, fade));
-
-    if(target == SCREEN_TOP) draw_stack_debug();
 }
 
-void ui_stack_fini(){
-    for(size_t i = 0; i < stack.stack_capacity; i++){
+void ui_stack_clear(){
+    for(size_t i = 0; i < stack->stack_capacity; i++){
         unload_screenpair(i);
     }
 
-    free(stack.screen_stack);
-    stack.stack_capacity = 0;
+    free(stack->screen_stack);
+    *stack = (UIStack){ 0 };
 }
 
 UIScreen *ui_stack_get_screen(const char *name, Screens screen) {
     UIScreenPair *pair = NULL;
 
     for(size_t i = ui_stack_min_index(); i <= ui_stack_max_index(); i++){
-        UIScreenPair *pair1 = stack.screen_stack[i];
+        UIScreenPair *pair1 = stack->screen_stack[i];
 
         if(!pair1) continue;
 

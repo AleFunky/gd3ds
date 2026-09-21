@@ -311,10 +311,9 @@ void tint_ground(UIElement *e) {
 }
 
 void action_open_level(UIElement* e, const UIPropertyList *args) { 
-    play_sfx(&play_sound, 1);
     stop_mp3();
     playing_menu_loop = false;
-    //game_state = STATE_GAME;
+    ui_stack_push_game_state(STATE_GAME);
 }
 
 void action_move_right(UIElement* e, const UIPropertyList *args) { 
@@ -459,6 +458,10 @@ void level_select_init_top(UIScreen *s){
 }
 
 void level_select_update(UIScreen *s, UIInput *input){
+    if(!scroll_dir){
+        upload_color_to_buffer(0, default_lvl_colors[curr_level_id % NUM_MENU_COLORS], 0);
+    }
+
     handle_col_channel(0);
 
     ColorChannel channel = channels[0];

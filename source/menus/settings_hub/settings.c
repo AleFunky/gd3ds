@@ -456,6 +456,7 @@ void action_open_info(UIElement *e, const UIPropertyList *args){
     if(!text) return;
     
     InfoCardData *data = malloc(sizeof(InfoCardData));
+    *data = (InfoCardData){ 0 };
     if(!data) return;
     
     data->text = text;

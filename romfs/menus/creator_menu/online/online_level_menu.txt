@@ -11,11 +11,11 @@ label x=160 y=119 text="Normal mode" scale=0.45 align=CENTER tag="level_card"
 progressbar x=160 y=132 max_value=100 style=0 scale=0.65 tag="level_card,normalprogress"
 label x=160 y=133 text="0%" scale=0.4 align=CENTER tag="level_card,normalprogressvalue"
 
-label x=160 y=154 text="Practice mode" scale=0.45 align=CENTER tag=""
+label x=160 y=154 text="Practice mode" scale=0.45 align=CENTER
 progressbar x=160 y=167 max_value=100 style=0 scale=0.65 tag="practiceprogress"
 label x=160 y=168 text="0%" scale=0.4 align=CENTER tag="level_card,practiceprogressvalue"
 
-button x=160 y=70 id=139 sheet=0 scale=1 action="play" keyBinds="A,START" tag="playbutton"
+button x=160 y=70 id=139 sheet=0 scale=1 actions=play keyBinds="A,START" tag="playbutton"
 spinner x=160 y=70 id=53 sheet=1 scale=1 speed=240 tag="spinner"
 
 button x=235 y=23 id=323 sheet=0 scale=1 actions=open_menu[screen="icon_kit" btm_anim="bounce_down" top_anim="bounce_down"] anim="pull"

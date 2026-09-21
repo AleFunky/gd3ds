@@ -47,7 +47,7 @@ static void init_level_complete_popup();
 
 static LevelCompletePopup level_complete_popup;
 
-int handle_wall_cutscene(float delta) {
+int handle_wall_cutscene(float delta, UIInput *touch) {
     bool practice_mode_end_wall = state.practice_mode || cheated;
     // Init wall variables
     if (completion_timer == 0) {
@@ -159,7 +159,7 @@ int handle_wall_cutscene(float delta) {
         }
 
         // Handle level complete menu
-        int status = level_complete_loop(delta);
+        int status = level_complete_loop(touch);
         if (status) {
             LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
             if (!cheated) {
@@ -213,7 +213,6 @@ int handle_wall_cutscene(float delta) {
             // Exiting
             if (status == 1) {
                 stop_mp3();
-                set_fade_status(FADE_STATUS_OUT);
             } else if (status == 2) { // Restarting
                 level_data_sel->attempts += state.current_data.attempts;
                 level_data_sel->jumps += state.current_data.jumps;

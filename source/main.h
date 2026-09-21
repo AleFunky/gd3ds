@@ -44,8 +44,6 @@ extern unsigned int level_frame;
 
 extern bool song_loaded;
 
-extern bool exiting_level;
-
 extern bool alt_title_screen;
 extern bool is_N3DS;
 
@@ -76,16 +74,7 @@ extern float faster_speed_particles_timer;
 
 enum GameState {
     STATE_MENU,
-    STATE_LEVEL_SELECT,
-    STATE_ICON_KIT,
     STATE_GAME,
-    STATE_EXTERNAL_LEVELS,
-    STATE_SAVED_LEVELS,
-    STATE_ONLINE_LEVEL,
-    STATE_CREATOR_MENU,
-    STATE_SEARCH_MENU,
-    STATE_SOGGY,
-    STATE_ONLINE,
     STATE_EXIT
 };
 
@@ -108,6 +97,7 @@ extern C3D_RenderTarget* top_right;
 extern C3D_RenderTarget* bot;
 
 extern int game_state;
+extern bool escape_state;
 extern bool playing_menu_loop;
 extern char menu_loop_path[32];
 

@@ -4,7 +4,7 @@ window x=160 y=120 w=280 h=200 style=0
 
 button x=24 y=25 id=31 actions=close_menu keyBinds="B"
 
-button x=160 y=80 id=139 sheet=0 scale=1 action="play" keyBinds="A,START"
+button x=160 y=80 id=139 sheet=0 scale=1 actions=play,play_sound[sound="play"] keyBinds="A,START"
 
 button x=295 y=25 id=90 sheet=0 scale=1 actions=open_menu[screen="external_infobox" btm_anim="zoom"]
 

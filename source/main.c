@@ -72,6 +72,9 @@
 #define CITRA_VERSION 11
 
 int game_state = STATE_MENU;
+bool escape_state;
+
+static bool exiting_level;
 
 bool playing_menu_loop = false;
 char menu_loop_path[32];
@@ -126,6 +129,9 @@ float faster_speed_particles_timer = 0.f;
 bool alt_title_screen;
 
 bool is_N3DS;
+
+UIStack menu_stack = { 0 };
+UIStack gameplay_stack = { 0 };
 
 // Checks if the game is being emulated by citra/azahar
 bool is_citra() {
@@ -255,8 +261,6 @@ float triggers_time = 0;
 float delta = 0;
 unsigned int level_frame = 0;
 unsigned int frame_counter = 0;
-
-bool exiting_level = false;
 
 bool song_loaded;
 
@@ -554,6 +558,11 @@ void sync_precise_input(bool suppress_held) {
 }
 
 void ui_loop(){
+    playing_menu_loop = false;
+    play_menu_song();
+
+    ui_stack_set_stack(&menu_stack);
+
     while (aptMainLoop()) {
         hidScanInput();
 
@@ -587,6 +596,7 @@ void ui_loop(){
         C2D_SceneBegin(bot);
 
         ui_stack_draw(SCREEN_BTM);
+        draw_stack_fade();
 
         change_blending(true);
         draw_touch_effect();
@@ -596,10 +606,17 @@ void ui_loop(){
         for (int eye = 0; begin_top_eye(eye); eye++) {
             begin_eye_layer(DEPTH_UI);
             ui_stack_draw(SCREEN_TOP);
+            draw_stack_fade();
+            draw_stack_debug();
             end_eye_layer();
         }
         C2D_ViewReset();
         C3D_FrameEnd(0);
+
+        if(escape_state){
+            escape_state = false;
+            break;
+        }
     }
     C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
 }
@@ -619,8 +636,10 @@ void game_loop() {
         end_eye_layer();
     }
     C3D_FrameEnd(0);
-    
 
+    ui_stack_set_stack(&gameplay_stack);
+    ui_stack_clear();
+    ui_stack_push(&gameplay_def, ANIM_NONE, ANIM_NONE, PUSH_ROOT);
 
     update_player_colors();
 
@@ -631,7 +650,6 @@ void game_loop() {
             output_log("Failed %d\n", returned);
 
             state.online_level = false;
-            game_state = STATE_ONLINE_LEVEL;
             return;
         }
     } else {
@@ -647,7 +665,6 @@ void game_loop() {
         if (returned) {
             output_log("Failed %d\n", returned);
 
-            game_state = (state.custom_level ? STATE_EXTERNAL_LEVELS : STATE_LEVEL_SELECT);
             return;
         }
 
@@ -668,14 +685,11 @@ void game_loop() {
 
     init_op_system();
 
-    gameplay_screen_init();
-    
     // Particle
     allocate_particles();
     init_particles(p1_color, p2_color);
     clear_practice_mode();
 
-    exiting_level = false;
     fixed_dt = true;
 
     sync_precise_input(false);
@@ -693,17 +707,20 @@ void game_loop() {
 
         pi_poll();
         
+        UIInput touch;
         touchPosition touchPos;
         hidTouchRead(&touchPos);
-
-        u32 kDown = hidKeysDown();
-        u32 kHeld = hidKeysHeld();
-        u32 kUp = hidKeysUp();
+        touch.touchPosition = touchPos;
+        touch.interacted = false;
+        touch.down = hidKeysDown();
+        touch.held = hidKeysHeld();
+        touch.up = hidKeysUp();
+        hidCircleRead(&touch.cpad);
         static u32 kHeldPaused;
 
         state.hitbox_display = 0;
 
-        if (kDown & KEY_X && settingsState.enableDebugBindings) {
+        if (touch.down & KEY_X && settingsState.enableDebugBindings) {
             state.noclip ^= 1;
         }
 
@@ -712,10 +729,10 @@ void game_loop() {
             cheats_used[CHEAT_NOCLIP] = true;
         }
 
-        if ((kDown & KEY_L) && (kHeld & KEY_B) && settingsState.enableDebugBindings)
+        if ((touch.down & KEY_L) && (touch.held & KEY_B) && settingsState.enableDebugBindings)
             state.profiling ^= 1;
 
-        if ((kDown & KEY_R) && (kHeld & KEY_B) && settingsState.enableDebugBindings) {
+        if ((touch.down & KEY_R) && (touch.held & KEY_B) && settingsState.enableDebugBindings) {
             cheated = true;
             cheats_used[CHEAT_HITBOX_DISPLAY] = true;
             if (settingsState.hitboxesEnabled && settingsState.hitboxTrail) {
@@ -744,18 +761,18 @@ void game_loop() {
 
         bool in_bounds = touch_jump_filter(touchPos.px, touchPos.py);
         
-        kHeldPaused &= ~kUp;
+        kHeldPaused &= ~touch.up;
         if(!game_paused){
-            kHeld &= ~kHeldPaused;
+            touch.held &= ~kHeldPaused;
         }
         
         global_volume = get_volume_slider();
 
-        bool buttonPressed = (kDown & jump_key_mask()) != 0;
-        bool buttonHeld = (kHeld & jump_key_mask()) != 0;
+        bool buttonPressed = (touch.down & jump_key_mask()) != 0;
+        bool buttonHeld = (touch.held & jump_key_mask()) != 0;
 
-        bool touch_pressed = in_bounds && (kDown & KEY_TOUCH);
-        bool touch_held = in_bounds && (kHeld & KEY_TOUCH);
+        bool touch_pressed = in_bounds && (touch.down & KEY_TOUCH);
+        bool touch_held = in_bounds && (touch.held & KEY_TOUCH);
 
         if (!pi_enabled) {
             state.old_input = state.input;
@@ -1076,9 +1093,11 @@ void game_loop() {
                 }
             }
         } else{
-            kHeldPaused = kHeld;
+            kHeldPaused = touch.held;
         }
-        
+
+        ui_stack_update(&touch);
+
         // If the wide or 3D settings have been changed, reinitialize screens
         if (settingsState.wideEnabled != old_wide || settingsState.stereoEnabled != old_stereo) {
             gspWaitForVBlank();
@@ -1093,11 +1112,12 @@ void game_loop() {
         update_stereo_target();
 
         // Handle level being completed
-        if (level_info.completing) {
-            int status = handle_wall_cutscene(delta);
+        if (level_info.completing && !exiting_level) {
+            int status = handle_wall_cutscene(delta, &touch);
             // Exiting
             if (status == 1) {
                 exiting_level = true;
+                ui_stack_push_game_state(STATE_MENU);
                 // Restarting level
             } else if (status == 2) {
                 level_info.completing = false;
@@ -1110,165 +1130,169 @@ void game_loop() {
         u64 ticks = end - start;
 
         // Render the scene
-        do {
-            update_bottom_particles(delta);
-            update_touch_effect(delta);
+        update_bottom_particles(delta);
+        update_touch_effect(delta);
 
-            C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-            C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ZERO);
-            draw_fade();
+        C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+        C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ZERO);
 
-            // Top screen, drawn once per eye when 3D is on
-            for (int eye = 0; begin_top_eye(eye); eye++) {
-                begin_eye_layer(DEPTH_BACKGROUND);
-                draw_background(state.background_x / 8, -(state.camera_y / 8) + 200);
-                end_eye_layer();
-
-                C2D_ViewScale(SCALE, SCALE);
-                C2D_ViewTranslate(0, CAM_Y_MTX_OFFSET);
-
-                // The level rides in front of the screen, the background stays way back
-                begin_eye_layer(DEPTH_LEVEL);
-
-                draw_objects();
-
-                draw_end_wall(delta);
-
-                draw_attempt_text();
-
-                draw_ground(state.ground_x, state.camera_y, 0, false, SCREEN_WIDTH);
-
-                if (state.ground_y_gfx > 2) {
-                    if (state.camera_y - LEVEL_Y_OFFSET + state.ground_y_gfx > 0) draw_ground(state.ground_x, state.camera_y, state.camera_y + state.ground_y_gfx - LEVEL_Y_OFFSET, false, SCREEN_WIDTH);
-                    draw_ground(state.ground_x, state.camera_y, state.camera_y - LEVEL_Y_OFFSET + SCREEN_HEIGHT_AREA - state.ground_y_gfx, true, SCREEN_WIDTH);
-                }
-
-                change_blending(true);
-                draw_use_effects(get_use_effect_array_ptr(GFX_TOP_BUT_ABOVE_LEVEL));
-
-                if (level_info.wall_y > 0) {
-                    drawParticleSystem(&end_wall_firework, 0, 0, 1);
-                    drawParticleSystem(&level_complete_effect_p1, 0, 0, 1);
-                    drawParticleSystem(&level_complete_effect_p2, 0, 0, 1);
-                }
-
-                end_eye_layer();
-
-                change_blending(false);
-
-                if (level_info.wall_y > 0) {
-                    begin_eye_layer(DEPTH_POPUP);
-                    draw_level_complete_popup();
-                    end_eye_layer();
-                }
-
-                begin_eye_layer(DEPTH_POPUP);
-                draw_new_best_popup();
-                end_eye_layer();
-
-                C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
-                C2D_ViewScale(1/SCALE, 1/SCALE);
-
-                begin_eye_layer(DEPTH_POPUP);
-                gameplay_screen_top_loop();
-                draw_level_complete_top();
-                end_eye_layer();
-            }
-
-            // Bottom screen
-            C2D_SceneBegin(bot);
-            C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
-
-            draw_background((state.background_x / 8) + 40, 200);
+        // Top screen, drawn once per eye when 3D is on
+        for (int eye = 0; begin_top_eye(eye); eye++) {
+            begin_eye_layer(DEPTH_BACKGROUND);
+            draw_background(state.background_x / 8, -(state.camera_y / 8) + 200);
+            end_eye_layer();
 
             C2D_ViewScale(SCALE, SCALE);
             C2D_ViewTranslate(0, CAM_Y_MTX_OFFSET);
-            
+
+            // The level rides in front of the screen, the background stays way back
+            begin_eye_layer(DEPTH_LEVEL);
+
+            draw_objects();
+
+            draw_end_wall(delta);
+
+            draw_attempt_text();
+
+            draw_ground(state.ground_x, state.camera_y, 0, false, SCREEN_WIDTH);
+
+            if (state.ground_y_gfx > 2) {
+                if (state.camera_y - LEVEL_Y_OFFSET + state.ground_y_gfx > 0) draw_ground(state.ground_x, state.camera_y, state.camera_y + state.ground_y_gfx - LEVEL_Y_OFFSET, false, SCREEN_WIDTH);
+                draw_ground(state.ground_x, state.camera_y, state.camera_y - LEVEL_Y_OFFSET + SCREEN_HEIGHT_AREA - state.ground_y_gfx, true, SCREEN_WIDTH);
+            }
+
             change_blending(true);
-            draw_bottom_particles();
+            draw_use_effects(get_use_effect_array_ptr(GFX_TOP_BUT_ABOVE_LEVEL));
+
+            if (level_info.wall_y > 0) {
+                drawParticleSystem(&end_wall_firework, 0, 0, 1);
+                drawParticleSystem(&level_complete_effect_p1, 0, 0, 1);
+                drawParticleSystem(&level_complete_effect_p2, 0, 0, 1);
+            }
+
+            end_eye_layer();
+
             change_blending(false);
 
-            draw_ground(state.ground_x + 52.5f, 0.f, -71.f, false, SCREEN_BOT_WIDTH);
-            draw_ground(state.ground_x + 52.5f, 0.f, 210.f, true, SCREEN_BOT_WIDTH);
+            if (level_info.wall_y > 0) {
+                begin_eye_layer(DEPTH_POPUP);
+                draw_level_complete_popup();
+                end_eye_layer();
+            }
+
+            begin_eye_layer(DEPTH_POPUP);
+            draw_new_best_popup();
+            end_eye_layer();
 
             C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
             C2D_ViewScale(1/SCALE, 1/SCALE);
+
+            begin_eye_layer(DEPTH_POPUP);
+            //gameplay_screen_top_loop();
+            ui_stack_draw(SCREEN_TOP);
+            draw_level_complete_top();
+            draw_stack_fade();
+            draw_stack_debug();
+            end_eye_layer();
+        }
+
+        // Bottom screen
+        C2D_SceneBegin(bot);
+        C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
+
+        draw_background((state.background_x / 8) + 40, 200);
+
+        C2D_ViewScale(SCALE, SCALE);
+        C2D_ViewTranslate(0, CAM_Y_MTX_OFFSET);
+        
+        change_blending(true);
+        draw_bottom_particles();
+        change_blending(false);
+
+        draw_ground(state.ground_x + 52.5f, 0.f, -71.f, false, SCREEN_BOT_WIDTH);
+        draw_ground(state.ground_x + 52.5f, 0.f, 210.f, true, SCREEN_BOT_WIDTH);
+
+        C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
+        C2D_ViewScale(1/SCALE, 1/SCALE);
+        
+        change_blending(true);
+        draw_touch_effect();
+        change_blending(false);
+
+        //gameplay_screen_bot_loop();
+        ui_stack_draw(SCREEN_BTM);
+        draw_level_complete();
+        draw_stack_fade();
+
+        if (state.profiling) {
+            float processingTime = ((ticks / CPU_TICKS_PER_MSEC)) * 6;
+            float drawingTime = C3D_GetDrawingTime() * 6;
+            float fps = 1 / delta;
+            if (fps > 60) fps = 60;
+
+            #define DEBUG_TEXT_SCALE 0.4f, 0.4f
             
-            change_blending(true);
-            draw_touch_effect();
-            change_blending(false);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 6,  DEBUG_TEXT_SCALE, 0, true, "CPU: %6.2f%% (%6.2f%% %6.2f%%)", (C3D_GetProcessingTime() * 6) + processingTime, C3D_GetProcessingTime() * 6, processingTime);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 18, DEBUG_TEXT_SCALE, 0, true, "GPU: %6.2f%%", drawingTime);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 30, DEBUG_TEXT_SCALE, 0, true, "FPS: %6.1f", fps);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 42, DEBUG_TEXT_SCALE, 0, true, "Linear free: %d", linearSpaceFree());
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 42, DEBUG_TEXT_SCALE, 0, true, "CMDBuf: %6.2f%%", C3D_GetCmdBufUsage()*100.0f);
 
-            gameplay_screen_bot_loop();
-            draw_level_complete();
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 66,  DEBUG_TEXT_SCALE, 0, true, "%d steps", steps);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 54,  DEBUG_TEXT_SCALE, 0, true, "Particle: %6.2f%%", particle_calc_time * 6);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 78,  DEBUG_TEXT_SCALE, 0, true, "Triggers: %6.2f%%", triggers_time * 6);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 90,  DEBUG_TEXT_SCALE, 0, true, "Collision %d/%d", number_of_collisions, number_of_collisions_checks);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 102, DEBUG_TEXT_SCALE, 0, true, "Physics: %6.2f%%", physics_calc_time * 6);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 114, DEBUG_TEXT_SCALE, 0, true, " - Coll: %6.2f%%", collision_time * 6);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 126, DEBUG_TEXT_SCALE, 0, true, " - Play: %6.2f%%", player_time * 6);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 138, DEBUG_TEXT_SCALE, 0, true, " - Hndl: %6.2f%%", handle_player_time * 6);
 
-            if (state.profiling) {
-                float processingTime = ((ticks / CPU_TICKS_PER_MSEC)) * 6;
-                float drawingTime = C3D_GetDrawingTime() * 6;
-                float fps = 1 / delta;
-                if (fps > 60) fps = 60;
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   54,  DEBUG_TEXT_SCALE, 0, true, "SprDraw:  %6.2f%%", (sprite_drawing_time) * 6);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   66,  DEBUG_TEXT_SCALE, 0, true, " - Creating: %6.2f%%", (object_creating_time) * 6);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   78,  DEBUG_TEXT_SCALE, 0, true, " - Sorting:  %6.2f%%", (object_sorting_time) * 6);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   102,  DEBUG_TEXT_SCALE, 0, true, "Drawing:  %6.2f%%", (object_drawing_time) * 6);
 
-                #define DEBUG_TEXT_SCALE 0.4f, 0.4f
-                
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 6,  DEBUG_TEXT_SCALE, 0, true, "CPU: %6.2f%% (%6.2f%% %6.2f%%)", (C3D_GetProcessingTime() * 6) + processingTime, C3D_GetProcessingTime() * 6, processingTime);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 18, DEBUG_TEXT_SCALE, 0, true, "GPU: %6.2f%%", drawingTime);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 30, DEBUG_TEXT_SCALE, 0, true, "FPS: %6.1f", fps);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 42, DEBUG_TEXT_SCALE, 0, true, "Linear free: %d", linearSpaceFree());
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 42, DEBUG_TEXT_SCALE, 0, true, "CMDBuf: %6.2f%%", C3D_GetCmdBufUsage()*100.0f);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   114,  DEBUG_TEXT_SCALE, 0, true, "Touch:  %d, %d", touchPos.px, touchPos.py);
 
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 66,  DEBUG_TEXT_SCALE, 0, true, "%d steps", steps);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 54,  DEBUG_TEXT_SCALE, 0, true, "Particle: %6.2f%%", particle_calc_time * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 78,  DEBUG_TEXT_SCALE, 0, true, "Triggers: %6.2f%%", triggers_time * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 90,  DEBUG_TEXT_SCALE, 0, true, "Collision %d/%d", number_of_collisions, number_of_collisions_checks);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 102, DEBUG_TEXT_SCALE, 0, true, "Physics: %6.2f%%", physics_calc_time * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 114, DEBUG_TEXT_SCALE, 0, true, " - Coll: %6.2f%%", collision_time * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 126, DEBUG_TEXT_SCALE, 0, true, " - Play: %6.2f%%", player_time * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 138, DEBUG_TEXT_SCALE, 0, true, " - Hndl: %6.2f%%", handle_player_time * 6);
+            // im jut going to assume 60fps for this (4 buckets)
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   126,  DEBUG_TEXT_SCALE, 0, true, "InputTicks: %d|%d|%d|%d", (int)pi_substep_presses[0], (int)pi_substep_presses[1], (int)pi_substep_presses[2], (int)pi_substep_presses[3]);
 
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   54,  DEBUG_TEXT_SCALE, 0, true, "SprDraw:  %6.2f%%", (sprite_drawing_time) * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   66,  DEBUG_TEXT_SCALE, 0, true, " - Creating: %6.2f%%", (object_creating_time) * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   78,  DEBUG_TEXT_SCALE, 0, true, " - Sorting:  %6.2f%%", (object_sorting_time) * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   102,  DEBUG_TEXT_SCALE, 0, true, "Drawing:  %6.2f%%", (object_drawing_time) * 6);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   138,  DEBUG_TEXT_SCALE, 0, true, "Player");
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   150,  DEBUG_TEXT_SCALE, 0, true, "- Tick: %d", state.player.frame);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   162,  DEBUG_TEXT_SCALE, 0, true, "- X: %.2f", state.player.x);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   174,  DEBUG_TEXT_SCALE, 0, true, "- Y: %.2f", state.player.y);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   186,  DEBUG_TEXT_SCALE, 0, true, "- VX: %.2f", state.player.vel_x * STEPS_DT);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   198,  DEBUG_TEXT_SCALE, 0, true, "- VY: %.2f", state.player.vel_y * STEPS_DT);
 
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   114,  DEBUG_TEXT_SCALE, 0, true, "Touch:  %d, %d", touchPos.px, touchPos.py);
+            
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   138,  DEBUG_TEXT_SCALE, 0, true, "Camera");
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   150,  DEBUG_TEXT_SCALE, 0, true, "- X: %.2f", state.camera_x);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   162,  DEBUG_TEXT_SCALE, 0, true, "- Y: %.2f", state.camera_y);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   174,  DEBUG_TEXT_SCALE, 0, true, "- IntY: %.2f", state.camera_intended_y);
+            
+            struct mallinfo mi = mallinfo();
+            
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   138 + 50,  DEBUG_TEXT_SCALE, 0, true, "Heap");
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   150 + 50,  DEBUG_TEXT_SCALE, 0, true, "- Allocated: 0x%X bytes", mi.uordblks);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   162 + 50,  DEBUG_TEXT_SCALE, 0, true, "- Free:        0x%X bytes",  envGetHeapSize() - mi.uordblks);
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   174 + 50,  DEBUG_TEXT_SCALE, 0, true, "- Arena:      0x%X bytes",  envGetHeapSize());
+        }
 
-                // im jut going to assume 60fps for this (4 buckets)
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   126,  DEBUG_TEXT_SCALE, 0, true, "InputTicks: %d|%d|%d|%d", (int)pi_substep_presses[0], (int)pi_substep_presses[1], (int)pi_substep_presses[2], (int)pi_substep_presses[3]);
+        if (state.noclip) {
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 234, 0.5f, 0.5f, 0, true, "Noclip Activated");
+        }
+        C2D_ViewReset();
 
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   138,  DEBUG_TEXT_SCALE, 0, true, "Player");
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   150,  DEBUG_TEXT_SCALE, 0, true, "- Tick: %d", state.player.frame);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   162,  DEBUG_TEXT_SCALE, 0, true, "- X: %.2f", state.player.x);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   174,  DEBUG_TEXT_SCALE, 0, true, "- Y: %.2f", state.player.y);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   186,  DEBUG_TEXT_SCALE, 0, true, "- VX: %.2f", state.player.vel_x * STEPS_DT);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   198,  DEBUG_TEXT_SCALE, 0, true, "- VY: %.2f", state.player.vel_y * STEPS_DT);
-
-                
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   138,  DEBUG_TEXT_SCALE, 0, true, "Camera");
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   150,  DEBUG_TEXT_SCALE, 0, true, "- X: %.2f", state.camera_x);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   162,  DEBUG_TEXT_SCALE, 0, true, "- Y: %.2f", state.camera_y);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   174,  DEBUG_TEXT_SCALE, 0, true, "- IntY: %.2f", state.camera_intended_y);
-                
-                struct mallinfo mi = mallinfo();
-                
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   138 + 50,  DEBUG_TEXT_SCALE, 0, true, "Heap");
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   150 + 50,  DEBUG_TEXT_SCALE, 0, true, "- Allocated: 0x%X bytes", mi.uordblks);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   162 + 50,  DEBUG_TEXT_SCALE, 0, true, "- Free:        0x%X bytes",  envGetHeapSize() - mi.uordblks);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   174 + 50,  DEBUG_TEXT_SCALE, 0, true, "- Arena:      0x%X bytes",  envGetHeapSize());
-            }
-
-            if (state.noclip) {
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 234, 0.5f, 0.5f, 0, true, "Noclip Activated");
-            }
-            C2D_ViewReset();
-
-            C3D_FrameEnd(0);
-        } while (handle_fading());
+        C3D_FrameEnd(0);
 
         if (being_faded) {
             if (song_loaded) unpause_playback_mp3();
             being_faded = false;
         }
 
-        if (exiting_level) {
+        if (escape_state) {
+            exiting_level = false;
+            escape_state = false;
             game_paused = false;
             in_level_complete = false;
             break;
@@ -1307,16 +1331,10 @@ void game_loop() {
 
     level_complete_destroy();
 
-    ui_unload_screen(&default_screen);
-    ui_unload_screen(&default_screen_top);
-    
     if (song_loaded) unpause_playback_mp3();
 
     if (state.online_level) {
-        game_state = STATE_ONLINE_LEVEL;
         state.online_level = false;
-    } else {
-        game_state = (state.custom_level ? STATE_EXTERNAL_LEVELS : STATE_LEVEL_SELECT);
     }
 }
 
@@ -1443,6 +1461,9 @@ int main(int argc, char* argv[]) {
     // Set to known value
     change_blending(false);
 
+    ui_stack_set_stack(&menu_stack);
+    ui_stack_push_root_instant(&main_menu_def);
+
     bool exit = false;
     while (aptMainLoop() && !exit) {
         // Update color if changed menus
@@ -1479,8 +1500,6 @@ int main(int argc, char* argv[]) {
         faster_speed_particles_bottom.cfg.startColorGreen = 65 / 255.f;
         faster_speed_particles_bottom.cfg.startColorBlue = 255 / 255.f;
 
-        ui_stack_push_root_instant(&main_menu_def);
-
         switch (game_state) {
             case STATE_MENU:
                 ui_loop();
@@ -1494,7 +1513,8 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    ui_stack_fini();
+    ui_stack_set_stack(&menu_stack);
+    ui_stack_clear();
 
     close_log_file();
 

@@ -10,7 +10,6 @@
 #include "utils/gfx.h"
 #include "menus/icon_kit.h"
 #include "menus/settings_hub/settings.h"
-#include "menus/first_boot_disclaimer.h"
 #include "menus/creator_menu/soggy.h"
 #include "menus/creator_menu/search_menu.h"
 
@@ -69,7 +68,6 @@ void save_user_config(Config *cfg) {
 }
 
 void init_values() {
-    config_init_bool(&cfg, CONFIG_FLAGS "initialDisclaimerAccepted", false);
     config_init_bool(&cfg, CONFIG_FLAGS "sogged", false);
     config_init_bool(&cfg, CONFIG_FLAGS "gdps", false);
     
@@ -115,7 +113,6 @@ void cfg_init() {
 
     init_values();
 
-    initialDisclaimerAccepted = config_get_bool(&cfg, CONFIG_FLAGS "initialDisclaimerAccepted", false);
     gotSogged = config_get_bool(&cfg, CONFIG_FLAGS "sogged", false);
     gdps = config_get_bool(&cfg, CONFIG_FLAGS "gdps", false);
     strcpy(menu_loop_path, gdps ? "romfs:/songs/menuLoopGDPS.mp3" : "romfs:/songs/menuLoop.mp3");
@@ -158,7 +155,6 @@ void cfg_init() {
 }
 
 void cfg_save() {
-    config_set_bool(&cfg, CONFIG_FLAGS "initialDisclaimerAccepted", initialDisclaimerAccepted);
     config_set_bool(&cfg, CONFIG_FLAGS "sogged", gotSogged);
     config_set_bool(&cfg, CONFIG_FLAGS "gdps", gdps);
 

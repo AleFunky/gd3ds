@@ -41,8 +41,6 @@ const char *error_strings[] = {
     "Couldn't parse objects."
 };
 
-bool external_start_level = false;
-
 static bool reload_pending;
 static char reload_path[320];
 
@@ -221,8 +219,6 @@ static void show_error_message() {
 }
 
 static void external_levels_init(UIScreen *s) {
-    external_start_level = false;
-
     load_level_folder(current_path, s);
 
     play_menu_song();

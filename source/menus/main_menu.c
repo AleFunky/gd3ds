@@ -22,7 +22,6 @@
 #include "menus/settings_hub/credits.h"
 #include "menus/settings_hub/songs.h"
 #include "menus/settings_hub/how_to_play.h"
-#include "menus/first_boot_disclaimer.h"
 #include "menus/settings_hub/info_card.h"
 
 #include "particles/object_particles.h"

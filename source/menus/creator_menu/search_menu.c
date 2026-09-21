@@ -20,8 +20,6 @@
 #include "menus/creator_menu/search/search_filters.h"
 #include "menus/creator_menu/search/clear_search_filters.h"
 #include "menus/creator_menu/search/song_filter.h"
-#include "menus/generic_disclaimer.h"
-
 
 bool search_needs_refresh = true;
 bool gdps = false;

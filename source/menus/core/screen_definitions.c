@@ -8,9 +8,7 @@
 #include "menus/creator_menu/external/external_level_infobox.h"
 #include "menus/creator_menu/external/external_levels.h"
 #include "menus/creator_menu/external/external_popup.h"
-#include "menus/first_boot_disclaimer.h"
 #include "menus/gameplay.h"
-#include "menus/generic_disclaimer.h"
 #include "menus/settings_hub/how_to_play.h"
 #include "menus/icon_kit.h"
 #include "menus/settings_hub/info_card.h"
@@ -38,6 +36,7 @@ const UIScreenDefPair *defs[] = {
     &main_menu_def,
     &icon_kit_def,
     &level_select_def,
+    &gameplay_def,
     &creator_menu_def,
     &palette_kit_def,
     &credits_def,

@@ -57,13 +57,11 @@ const int difficulty_stars[MAX_STARS + 1] = {
 };
 
 static void open_level(UIElement *e, const UIPropertyList *args) {
-    play_sfx(&play_sound, 1);
-
     state.custom_level = true;
 
-    set_fade_status(FADE_STATUS_OUT);
-    
-    external_start_level = true; 
+    stop_mp3();
+    playing_menu_loop = false;
+    ui_stack_push_game_state(STATE_GAME);
 }
 
 static UIActionDef external_popup_actions[] = {
