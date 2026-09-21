@@ -14,7 +14,7 @@ jobs:
     name: Compile ROM
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Make application

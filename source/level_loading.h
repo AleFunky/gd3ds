@@ -54,6 +54,9 @@ typedef struct {
     };
     bool *flippedH, *flippedV;
     bool *toggled;
+    bool *dirty;
+    bool *render_visible;
+    bool *render_seen;
 
     u8 *activated;
     u8 *collided;
@@ -98,6 +101,8 @@ typedef struct {
     unsigned char initial_speed;
     bool initial_dual;
     bool initial_upsidedown;
+
+    bool two_player_mode;
 
     char level_name[256];
     char creator_name[256];

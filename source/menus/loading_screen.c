@@ -79,7 +79,8 @@ char *splash_texts[] = {
     "free(people_array[get_SSN(\"KandoWontu\")])",
     "Have you encountered the nightmare men?",
     "who is cloud5474",
-    "Can you do um maybe like um... stuff"
+    "Can you do um maybe like um... stuff",
+    "Not vibecoded!" // Hopefully reduces people that think this the game is vibecoded lol
 };
 
 void loading_screen_init() {

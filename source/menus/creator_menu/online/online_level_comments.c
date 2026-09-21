@@ -67,6 +67,12 @@ static void handle_comment_errors(int code) {
             update_comment_arrows(true);
             break;
 
+        case 28:
+            ui_label_set_text(error_label, "Connection timed out!");
+            update_comment_arrows(true);
+            break;
+        case 42:
+            break;
         default:
             snprintf(temp, sizeof(temp), "An unknown error has\noccurred.\n\nError code: %d", code);
             ui_label_set_text(error_label, temp);
@@ -123,9 +129,19 @@ void populate_comments() {
                 
                 user_icon->glow = comment_entries[i].glow;
                 ui_icon_set_gamemode_index(user_icon, iconType, iconIndex);
-                ui_icon_set_glow(user_icon, colors[gd_to_gd3ds_color_table[comment_entries[i].glowCol]]);
-                ui_icon_set_p1(user_icon, colors[gd_to_gd3ds_color_table[comment_entries[i].col1]]);
-                ui_icon_set_p2(user_icon, colors[gd_to_gd3ds_color_table[comment_entries[i].col2]]);
+
+                int glow_col = comment_entries[i].glowCol;
+                if (glow_col < 0 || glow_col >= NUM_COLORS) glow_col = 12;
+                
+                int p1_col = comment_entries[i].col1;
+                if (p1_col < 0 || p1_col >= NUM_COLORS) p1_col = 12;
+                
+                int p2_col = comment_entries[i].col2;
+                if (p2_col < 0 || p2_col >= NUM_COLORS) p2_col = 12;
+
+                ui_icon_set_glow(user_icon, colors[gd_to_gd3ds_color_table[glow_col]]);
+                ui_icon_set_p1(user_icon, colors[gd_to_gd3ds_color_table[p1_col]]);
+                ui_icon_set_p2(user_icon, colors[gd_to_gd3ds_color_table[p2_col]]);
                 
                 ui_element_set_position((UIElement *)user_icon, -list_width + 20, -list_height + 15);
                 ui_element_set_scale((UIElement *)user_icon, 0.5f);
@@ -259,6 +275,7 @@ static void action_refresh_comments(UIElement* e, const UIPropertyList *args) {
     ui_list_reset(list);
     ui_disable_element((UIElement *) error_label);
     ui_enable_element((UIElement *)spinner);
+    update_comment_arrows(true);
     
     thread = create_network_thread(&comments_task);
 }
@@ -267,7 +284,7 @@ static void action_change_comments_page(UIElement* e, const UIPropertyList *args
     current_comments_page += ui_prop_int(&e->custom_properties, "page", 0);
     
     ui_list_reset(list);
-    update_comment_arrows(false);
+    update_comment_arrows(true);
     ui_enable_element((UIElement *)spinner);
     thread = create_network_thread(&comments_task);
 }

@@ -439,7 +439,11 @@ static void handle_errors(int code) {
         case 7:
             snprintf(error_message, sizeof(error_message), "No <#41e24e>Internet</> connection!");
             break;
-
+        case 28:
+            snprintf(error_message, sizeof(error_message), "Connection timed out!");
+            break;
+        case 42:
+            break;
         default:
             snprintf(error_message, sizeof(error_message), "An unknown error has occurred.\nError code: %d", result);
             break;
@@ -482,6 +486,9 @@ static void handle_song_codes(int code) {
         case 42:
             snprintf(message, sizeof(message), "<#f93219>Download cancelled.</>");
             break;
+        case 28:
+            snprintf(message, sizeof(message), "Connection timed out!");
+            break;
         default:
             snprintf(message, sizeof(message), "<#f93219>Unknown error. Code: %d</>", code);
             break;
@@ -512,6 +519,9 @@ static void handle_song_data_errors(int code) {
             break;
         case 42:
             snprintf(message, sizeof(message), "<#f93219>Download cancelled.</>");
+            break;
+        case 28:
+            snprintf(message, sizeof(message), "Connection timed out!");
             break;
         default:
             snprintf(message, sizeof(message), "<#f93219>Unknown error. Code: %d</>", result);

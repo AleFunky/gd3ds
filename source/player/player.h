@@ -177,10 +177,6 @@ enum PlayerSpeeds {
 extern PlayerAction player_actions[2][MAX_ACTIONS];
 extern int num_actions[2];
 
-extern float collision_time;
-extern float player_time;
-extern float handle_player_time;
-
 extern MotionTrail *trail;
 extern MotionTrail trail_p1;
 extern MotionTrail trail_p2;
@@ -204,13 +200,18 @@ extern ParticleSystem fast_speed_particles;
 extern ParticleSystem faster_speed_particles;
 extern ParticleSystem coin_pickup_particles;
 
+typedef struct KeyInput KeyInput;
+
+extern KeyInput curr_input;
+extern KeyInput curr_old_input;
+
 extern const float player_speeds[SPEED_COUNT];
 
 inline float getTop(Player *player)  { return player->y + player->height / 2; }
 inline float getBottom(Player *player)  { return player->y - player->height / 2; }
 
-inline float getGroundTop(Player *player)  { return player->y + (player->height / 2) + ((player->gamemode == GAMEMODE_DART) ? (player->mini ? 3 : 5) : 0); }
-inline float getGroundBottom(Player *player)  { return player->y - (player->height / 2) - ((player->gamemode == GAMEMODE_DART) ? (player->mini ? 3 : 5) : 0); }
+inline float getGroundTop(Player *player)  { return player->y + (player->height / 2) + ((player->gamemode == GAMEMODE_WAVE) ? (player->mini ? 3 : 5) : 0); }
+inline float getGroundBottom(Player *player)  { return player->y - (player->height / 2) - ((player->gamemode == GAMEMODE_WAVE) ? (player->mini ? 3 : 5) : 0); }
 
 inline float getRight(Player *player)  { return player->x + player->width / 2; }
 inline float getLeft(Player *player)  { return player->x - player->width / 2; }

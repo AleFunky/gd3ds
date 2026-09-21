@@ -356,6 +356,137 @@ bool C2D_DrawTriangleUV(float x0, float y0, float u0, float v0, u32 clr0, float 
 	return true;
 }
 
+#define TRIG_TABLE_BITS 12
+#define TRIG_TABLE_SIZE (1 << TRIG_TABLE_BITS)
+#define TRIG_TABLE_MASK (TRIG_TABLE_SIZE - 1)
+#define TRIG_QUARTER (TRIG_TABLE_SIZE / 4)
+
+static float sin_table[TRIG_TABLE_SIZE];
+
+void init_trig_table() {
+    for (int i = 0; i < TRIG_TABLE_SIZE; i++)
+        sin_table[i] = sinf((M_PI * 2) * i / TRIG_TABLE_SIZE);
+}
+
+float lut_sin(float angle) {
+    const float scaled = angle * (TRIG_TABLE_SIZE / (M_PI * 2));
+    const int index = (int)(scaled) & TRIG_TABLE_MASK;
+
+    return sin_table[index];
+}
+
+float lut_cos(float angle) {
+    const float scaled = angle * (TRIG_TABLE_SIZE / (M_PI * 2));
+    const int index = (int)(scaled) & TRIG_TABLE_MASK;
+    
+    return sin_table[(index + TRIG_QUARTER) & TRIG_TABLE_MASK];
+}
+
+
+void C2D_Fast_CalcQuad(C2Di_Quad* quad, const C2D_DrawParams* params) {
+    const float width = fabsf(params->pos.w);
+    const float height = fabsf(params->pos.h);
+    const float centerX = params->center.x;
+    const float centerY = params->center.y;
+    const float positionX = params->pos.x;
+    const float positionY = params->pos.y;
+
+    float topLeftX;
+    float topLeftY;
+    float widthX;
+    float widthY;
+    float heightX;
+    float heightY;
+
+    if (params->angle == 0.0f) {
+        topLeftX = positionX - centerX;
+        topLeftY = positionY - centerY;
+        widthX = width;
+        widthY = 0.0f;
+        heightX = 0.0f;
+        heightY = height;
+    } else {   
+        float sine = lut_sin(params->angle);
+        float cosine = lut_cos(params->angle);
+
+        topLeftX = positionX - centerX * cosine + centerY * sine;
+        topLeftY = positionY - centerY * cosine - centerX * sine;
+
+        widthX = width * cosine;
+        widthY = width * sine;
+        heightX = -height * sine;
+        heightY = height * cosine;
+    }
+
+    quad->topLeft[0] = topLeftX;
+    quad->topLeft[1] = topLeftY;
+
+    quad->topRight[0] = topLeftX + widthX;
+    quad->topRight[1] = topLeftY + widthY;
+
+    quad->botLeft[0] = topLeftX + heightX;
+    quad->botLeft[1] = topLeftY + heightY;
+
+    quad->botRight[0] = topLeftX + widthX + heightX;
+    quad->botRight[1] = topLeftY + widthY + heightY;
+}
+
+void calc_quad_params(SpriteObject *vo) {
+    C2D_Fast_CalcQuad(&vo->params.quadr, &vo->spr.params);
+
+    // Calculate texcoords
+	float tcTopLeft[2], tcTopRight[2], tcBotLeft[2], tcBotRight[2];
+	Tex3DS_SubTextureTopLeft    (vo->spr.image.subtex, &tcTopLeft[0],  &tcTopLeft[1]);
+	Tex3DS_SubTextureTopRight   (vo->spr.image.subtex, &tcTopRight[0], &tcTopRight[1]);
+	Tex3DS_SubTextureBottomLeft (vo->spr.image.subtex, &tcBotLeft[0],  &tcBotLeft[1]);
+	Tex3DS_SubTextureBottomRight(vo->spr.image.subtex, &tcBotRight[0], &tcBotRight[1]);
+
+	// Perform flip if needed
+	if (vo->spr.params.pos.w < 0) {
+		C2Di_SwapUV(tcTopLeft, tcTopRight);
+		C2Di_SwapUV(tcBotLeft, tcBotRight);
+	}
+	if (vo->spr.params.pos.h < 0) {
+		C2Di_SwapUV(tcTopLeft, tcBotLeft);
+		C2Di_SwapUV(tcTopRight, tcBotRight);
+    }
+
+    for (int i = 0; i < 2; i++) {
+        
+        vo->params.tcBotLeft[i] = tcBotLeft[i];
+        vo->params.tcBotRight[i] = tcBotRight[i];
+        vo->params.tcTopLeft[i] = tcTopLeft[i];
+        vo->params.tcTopRight[i] = tcTopRight[i];
+    }
+}
+
+bool C2D_DrawImageFast(C2D_Image img, const QuadParams quad_params, const C2D_DrawParams* params, const C2D_ImageTint* tint) {
+	C2Di_Context* ctx = C2Di_GetContext();
+	if (!(ctx->flags & C2DiF_Active))
+		return false;
+	if (!C2Di_CheckBufSpace(ctx, 6, 4))
+		return false;
+
+	C2Di_SetMode((ctx->flags & C2DiF_TintMode_Mask) >> (C2DiF_TintMode_Shift - C2DiF_Mode_Shift));
+	C2Di_SetTex(img.tex);
+	C2Di_Update();
+
+	// Calculate colors
+	const C2D_Tint* tintTopLeft  = &tint->corners[C2D_TopLeft];
+	const C2D_Tint* tintTopRight = &tint->corners[C2D_TopRight];
+	const C2D_Tint* tintBotLeft  = &tint->corners[C2D_BotLeft];
+	const C2D_Tint* tintBotRight = &tint->corners[C2D_BotRight];
+
+    const C2Di_Quad quadr = quad_params.quadr;
+
+	C2Di_AppendQuad();
+	C2Di_AppendVtx(quadr.topLeft[0],  quadr.topLeft[1],  params->depth, quad_params.tcTopLeft[0],  quad_params.tcTopLeft[1],  0, tintTopLeft->blend,  tintTopLeft->color);
+	C2Di_AppendVtx(quadr.topRight[0], quadr.topRight[1], params->depth, quad_params.tcTopRight[0], quad_params.tcTopRight[1], 0, tintTopRight->blend, tintTopRight->color);
+	C2Di_AppendVtx(quadr.botLeft[0],  quadr.botLeft[1],  params->depth, quad_params.tcBotLeft[0],  quad_params.tcBotLeft[1],  0, tintBotLeft->blend,  tintBotLeft->color);
+	C2Di_AppendVtx(quadr.botRight[0], quadr.botRight[1], params->depth, quad_params.tcBotRight[0], quad_params.tcBotRight[1], 0, tintBotRight->blend, tintBotRight->color);
+	return true;
+}
+
 float calc_x_on_screen(float val) {
     return get_mirror_x(val - state.camera_x, state.mirror_factor); 
 }

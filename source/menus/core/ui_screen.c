@@ -178,13 +178,23 @@ C2D_SpriteSheet *get_sheet(int sheet) {
         case 6:
             return &groundSheet;
         case 7:
-            return &iconSheet;
+            return &cube0Sheet;
         case 8:
             return &bg2Sheet;
         case 9:
             return &bar_sheet;
         case 10:
             return &bg_gradient_sheet;
+        case 11: 
+            return &cube1Sheet;
+        case 12:
+            return &shipSheet;
+        case 13:
+            return &ballSheet;
+        case 14:
+            return &ufoSheet;
+        case 15:
+            return &waveSheet;
     }
     return NULL;
 }

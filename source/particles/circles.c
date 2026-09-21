@@ -437,8 +437,8 @@ void draw_use_effects(UseEffectPool *pool) {
             float b = effect->def.colorB;
             float a = effect->opacity;
 
-            int fade_x = 0;
-            int fade_y = 0;
+            float fade_x = 0;
+            float fade_y = 0;
 
             float fade_scale = 1.f;
             float opacity = 1.f;

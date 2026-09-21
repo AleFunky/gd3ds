@@ -2,6 +2,10 @@
 #include <3ds.h>
 #include <citro2d.h>
 
+#include "c2d_internal.h"
+
+#include "graphics.h"
+
 #include <math.h>
 #include "player/collision.h"
 
@@ -12,6 +16,12 @@ enum StereoEye {
     EYE_LEFT,
     EYE_RIGHT
 };
+
+void init_trig_table();
+float lut_cos(float angle);
+float lut_sin(float angle);
+
+void C2D_Fast_CalcQuad(C2Di_Quad* quad, const C2D_DrawParams* params);
 
 // Where each layer sits relative to the screen (negative goes into it, positive pops out)
 #define DEPTH_BACKGROUND (-1.f)
@@ -60,3 +70,6 @@ void custom_circunference (const float x, const float y, const float radius,
                      const u32 color, const float lineWidth);
 void custom_circle (const float x, const float y, const float radius,
                      const u32 color);
+
+void calc_quad_params(SpriteObject *vo);
+bool C2D_DrawImageFast(C2D_Image img, const QuadParams quad_params, const C2D_DrawParams* params, const C2D_ImageTint* tint);

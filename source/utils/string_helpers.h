@@ -11,3 +11,4 @@ void strip_character(char* s, char character);
 void strip_enclosures(char* s);
 char *url_decode(const char *str);
 void url_convert_to_http(char *str);
+void remove_char(char *str, char character);

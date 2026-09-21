@@ -445,44 +445,44 @@ void initParticleSystem(ParticleSystem* ps, const ParticleDefinition* cfg) {
 
 void freeParticleData(ParticleData* d) {
     // Free deez nuts
-    free(d->timeToLive);
-    free(d->totalTimeToLive);
+    if (d->timeToLive) free(d->timeToLive);
+    if (d->totalTimeToLive) free(d->totalTimeToLive);
 
-    free(d->posx);
-    free(d->posy);
+    if (d->posx) free(d->posx);
+    if (d->posy) free(d->posy);
+    
+    if (d->relx) free(d->relx);
+    if (d->rely) free(d->rely);
+    
+    if (d->dirX) free(d->dirX);
+    if (d->dirY) free(d->dirY);
+    
+    if (d->gravityX) free(d->gravityX);
+    if (d->gravityY) free(d->gravityY);
+    
+    if (d->radialAccel) free(d->radialAccel);
+    if (d->tangentialAccel) free(d->tangentialAccel);
+    
+    if (d->colorR) free(d->colorR);
+    if (d->colorG) free(d->colorG);
+    if (d->colorB) free(d->colorB);
+    if (d->colorA) free(d->colorA);
+    
+    if (d->deltaColorR) free(d->deltaColorR);
+    if (d->deltaColorG) free(d->deltaColorG);
+    if (d->deltaColorB) free(d->deltaColorB);
+    if (d->deltaColorA) free(d->deltaColorA);
+    
+    if (d->size) free(d->size);
+    if (d->deltaSize) free(d->deltaSize);
 
-    free(d->relx);
-    free(d->rely);
+    if (d->rotation) free(d->rotation);
+    if (d->deltaRotation) free(d->deltaRotation);
 
-    free(d->dirX);
-    free(d->dirY);
-
-    free(d->gravityX);
-    free(d->gravityY);
-
-    free(d->radialAccel);
-    free(d->tangentialAccel);
-
-    free(d->colorR);
-    free(d->colorG);
-    free(d->colorB);
-    free(d->colorA);
-
-    free(d->deltaColorR);
-    free(d->deltaColorG);
-    free(d->deltaColorB);
-    free(d->deltaColorA);
-
-    free(d->size);
-    free(d->deltaSize);
-
-    free(d->rotation);
-    free(d->deltaRotation);
-
-    free(d->angle);
-    free(d->degreesPerSecond);
-    free(d->radius);
-    free(d->deltaRadius);
+    if (d->angle) free(d->angle);
+    if (d->degreesPerSecond) free(d->degreesPerSecond);
+    if (d->radius) free(d->radius);
+    if (d->deltaRadius) free(d->deltaRadius);
 }
 
 void drawParticleSystem(ParticleSystem* ps, float x_offset, float y_offset, float opacity) {

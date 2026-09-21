@@ -68,7 +68,7 @@ extern Color glow_color;
 #define THREEDL_TRIGGER 744
 #define COL_TRIGGER 899
 
-#define TRIGGER_FADE_NONE 22
+#define TRIGGER_FADE_SIMPLE 22
 #define TRIGGER_FADE_UP 23
 #define TRIGGER_FADE_DOWN 24
 #define TRIGGER_FADE_RIGHT 26

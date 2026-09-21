@@ -10,6 +10,8 @@ enum SlopeOrientations {
     ORIENT_UD_UP
 };
 
+#define SLOPE_HEAD_TOLERANCE 2.f
+
 float slope_angle(int obj, Player *player);
 void slope_collide(int obj, Player *player);
 int grav_slope_orient(int obj, Player *player);

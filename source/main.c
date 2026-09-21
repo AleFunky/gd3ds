@@ -6,10 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "3ds/console.h"
-#include "3ds/env.h"
-#include "3ds/services/cfgu.h"
-#include "objects.h"
+#include <3ds.h>
 #include "level_loading.h"
 #include "main.h"
 #include "graphics.h"
@@ -59,6 +56,7 @@
 #include "new_best.h"
 
 #include "math_helpers.h"
+#include "profiling.h"
 
 #include "utils/utils.h"
 #include "utils/precise_input.h"
@@ -70,6 +68,8 @@
 
 #define CITRA_TYPE 0x20000
 #define CITRA_VERSION 11
+
+u32 __ctru_linear_heap_size = 36 << 20;
 
 int game_state = STATE_MENU;
 bool escape_state;
@@ -252,11 +252,6 @@ void check_system_model() {
     u8 model = get_model();
     is_N3DS = model == CFG_MODEL_N2DSXL || model == CFG_MODEL_N3DS || model == CFG_MODEL_N3DSXL || is_citra();
 }
-
-float sprite_drawing_time = 0;
-float physics_calc_time = 0;
-float particle_calc_time = 0;
-float triggers_time = 0;
 
 float delta = 0;
 unsigned int level_frame = 0;
@@ -538,19 +533,94 @@ void init_particles(Color p1_color, Color p2_color) {
     level_complete_effect_p2.cfg.finishColorBlue  = p2_not_white.b / 255.f;
 }
 
-u32 jump_key_mask(void) {
-    return (settingsState.yJump ? KEY_Y : KEY_A) | KEY_UP;
-}
-
 static bool touch_jump_filter(u16 px, u16 py) {
-    bool on_pause_button = px > 320 - 30 && py < 30;
+    bool on_pause_button = px > 300-32/2 && py < 20+32/2;
     bool on_practice_ui = state.practice_mode && (px > 92 && px < 222 && py > 175 && py < 222);
     return !(on_pause_button || on_practice_ui);
 }
 
+static bool touch_left_half(u16 px) {
+    return px < SCREEN_BOT_WIDTH / 2;
+}
+
+static bool touch_jump_filter_p1(u16 px, u16 py) {
+    return touch_jump_filter(px, py) && touch_left_half(px);
+}
+
+static bool touch_jump_filter_p2(u16 px, u16 py) {
+    return touch_jump_filter(px, py) && !touch_left_half(px);
+}
+
+static bool touch_jump_filter_none(UNUSED u16 px, UNUSED u16 py) {
+    return false;
+}
+
+u32 jump_key_mask_p1(void) {
+    return (settingsState.yJump ? KEY_Y : KEY_A);
+}
+
+u32 jump_key_mask_p2(void) {
+    return KEY_UP;
+}
+
+u32 jump_key_mask(void) {
+    return jump_key_mask_p1() | jump_key_mask_p2();
+}
+
+static void handle_gameplay_input(touchPosition touchPos, u32 kDown, u32 kHeld) {
+    bool in_bounds = touch_jump_filter(touchPos.px, touchPos.py);
+    bool left_side = touch_left_half(touchPos.px);
+
+    bool touch_pressed = in_bounds && (kDown & KEY_TOUCH);
+    bool touch_held = in_bounds && (kHeld & KEY_TOUCH);
+
+    // CBF not enabled
+    if (!pi_enabled) {
+        if (level_info.two_player_mode) {
+            bool buttonPressed = (kDown & jump_key_mask_p1()) != 0;
+            bool buttonHeld = (kHeld & jump_key_mask_p1()) != 0;
+
+            bool buttonPressedP2 = (kDown & jump_key_mask_p2()) != 0;
+            bool buttonHeldP2 = (kHeld & jump_key_mask_p2()) != 0;
+
+            state.old_input = state.input;
+            
+            state.input.pressedJump = (buttonPressed || (touch_pressed && left_side)) == true;
+            state.input.holdJump = (state.input.pressedJump || buttonHeld || (touch_held && left_side)) == true;
+
+            state.old_input_p2 = state.input_p2;
+
+            state.input_p2.pressedJump = (buttonPressedP2 || (touch_pressed && !left_side)) == true;
+            state.input_p2.holdJump = (state.input_p2.pressedJump || buttonHeldP2 || (touch_held && !left_side)) == true;
+        } else {
+            bool buttonPressed = (kDown & jump_key_mask()) != 0;
+            bool buttonHeld = (kHeld & jump_key_mask()) != 0;
+            
+            state.old_input = state.input;
+            
+            state.input.pressedJump = (buttonPressed || touch_pressed) == true;
+            state.input.holdJump = (state.input.pressedJump || buttonHeld || touch_held) == true;
+            
+            state.old_input_p2 = state.input;
+
+            state.input_p2.pressedJump = state.input.pressedJump;
+            state.input_p2.holdJump = state.input.holdJump;
+        }
+    }
+}
+
 void sync_precise_input(bool suppress_held) {
-    pi_set_jump_keys(jump_key_mask());
-    pi_set_touch_filter(touch_jump_filter);
+    if (level_info.two_player_mode) {
+        pi_set_jump_keys(PI_PLAYER_1, jump_key_mask_p1());
+        pi_set_touch_filter(PI_PLAYER_1, touch_jump_filter_p1);
+        pi_set_jump_keys(PI_PLAYER_2, jump_key_mask_p2());
+        pi_set_touch_filter(PI_PLAYER_2, touch_jump_filter_p2);
+    } else {
+        pi_set_jump_keys(PI_PLAYER_1, jump_key_mask());
+        pi_set_touch_filter(PI_PLAYER_1, touch_jump_filter);
+        pi_set_jump_keys(PI_PLAYER_2, 0);
+        pi_set_touch_filter(PI_PLAYER_2, touch_jump_filter_none);
+    }
     pi_reset();
     if (suppress_held) {
         pi_suppress_until_release();
@@ -758,8 +828,6 @@ void game_loop() {
         }
         
         int steps = 0;
-
-        bool in_bounds = touch_jump_filter(touchPos.px, touchPos.py);
         
         kHeldPaused &= ~touch.up;
         if(!game_paused){
@@ -768,17 +836,9 @@ void game_loop() {
         
         global_volume = get_volume_slider();
 
-        bool buttonPressed = (touch.down & jump_key_mask()) != 0;
-        bool buttonHeld = (touch.held & jump_key_mask()) != 0;
+        snapshot.rendering_ms = 0;
 
-        bool touch_pressed = in_bounds && (touch.down & KEY_TOUCH);
-        bool touch_held = in_bounds && (touch.held & KEY_TOUCH);
-
-        if (!pi_enabled) {
-            state.old_input = state.input;
-            state.input.pressedJump = (buttonPressed || touch_pressed) == true;
-            state.input.holdJump = (state.input.pressedJump || buttonHeld || touch_held) == true;
-        }
+        handle_gameplay_input(touchPos, touch.down, touch.held);
         
         for (int i = 0; i < 2; i++) {
             drag_particles[i].emitting = false;
@@ -798,12 +858,12 @@ void game_loop() {
 
         if (state.death_timer <= 0)  {
             float physics_delta = delta;
-            physics_calc_time = 0;
-            number_of_collisions = 0;
-            number_of_collisions_checks = 0;
-            collision_time = 0;
-            player_time = 0;
-            handle_player_time = 0;
+            snapshot.physics_ms = 0;
+            snapshot.collisions = 0;
+            snapshot.collision_checks = 0;
+            snapshot.collision_ms = 0;
+            snapshot.play_ms = 0;
+            snapshot.handler_ms = 0;
             
             brick_destroy_particles.emitting = false;
             glitter_particles.emitting = false;
@@ -836,16 +896,30 @@ void game_loop() {
 
                     if (pi_enabled) {
                         pi_apply_substep((u32)steps);
+
                         state.old_input = state.input;
-                        state.input.pressedJump = pi_pressed() == true;
-                        state.input.holdJump = (pi_hold() || state.input.pressedJump) == true;
-                        if (pi_pressed()){
+                        state.old_input_p2 = state.input_p2;
+
+                        state.input.pressedJump = pi_pressed(PI_PLAYER_1);
+                        state.input.holdJump = pi_hold(PI_PLAYER_1) || state.input.pressedJump;
+
+                        if (level_info.two_player_mode) {
+                            state.input_p2.pressedJump = pi_pressed(PI_PLAYER_2);
+                            state.input_p2.holdJump = pi_hold(PI_PLAYER_2) || state.input_p2.pressedJump;
+                        } else {
+                            state.input_p2 = state.input;
+                        }
+
+                        if (pi_pressed(PI_PLAYER_1) || pi_pressed(PI_PLAYER_2)) {
                             pi_substep_presses[steps < PI_SUBSTEP_BUCKETS ? steps : PI_SUBSTEP_BUCKETS - 1]++;
                         }
                     }
 
                     state.current_player = 0;
                     state.old_player = state.player;
+                    
+                    curr_input = state.input;
+                    curr_old_input = state.old_input;
 
                     trail = &trail_p1;
                     wave_trail = &wave_trail_p1;
@@ -869,6 +943,9 @@ void game_loop() {
                         state.current_player = 1;
                         trail = &trail_p2;
                         wave_trail = &wave_trail_p2;
+
+                        curr_input = state.input_p2;
+                        curr_old_input = state.old_input_p2;
                         handle_player(&state.player2);
 
                         if (state.dead) break;
@@ -887,7 +964,7 @@ void game_loop() {
                     }
                     else frame_skipped = 0;
 
-                    physics_calc_time += physics_time;
+                    snapshot.physics_ms += physics_time;
 
                     accumulator -= STEPS_DT;
                     steps++;
@@ -932,7 +1009,7 @@ void game_loop() {
 
                 fade_to_amplitude(0);
 
-                if (state.player.gamemode == GAMEMODE_DART) {
+                if (state.player.gamemode == GAMEMODE_WAVE) {
                     if (wave_trail_p1.opacity > 0) wave_trail_p1.opacity -= 0.02f * 4;
             
                     if (wave_trail_p1.opacity <= 0) {
@@ -941,7 +1018,7 @@ void game_loop() {
                     }
                 }
 
-                if (state.player2.gamemode == GAMEMODE_DART) {
+                if (state.player2.gamemode == GAMEMODE_WAVE) {
                     if (wave_trail_p2.opacity > 0) wave_trail_p2.opacity -= 0.02f * 4;
 
                     if (wave_trail_p2.opacity <= 0) {
@@ -966,7 +1043,7 @@ void game_loop() {
 
                         if (get_checkpoint_count() > 0) {
                             restore_checkpoint();
-                        } else {
+                        } else if (settingsState.practiceMusicSync) {
                             seek_mp3(level_info.song_offset);
                         }
                     }
@@ -982,19 +1059,38 @@ void game_loop() {
             handle_practice_mode();
             handle_shake(delta);
 
+            if (state.mirroring) {
+                state.mirror_timer += delta;
+                if (state.mirror_timer > MIRROR_DURATION) {
+                    state.mirroring = false;
+                    state.mirror_factor = state.intended_mirror_factor;
+                    state.mirror_speed_factor = 1 - 2*state.mirror_factor;
+
+                    // When mirror transition ends, put a wave trail point
+                    if (state.player.gamemode == GAMEMODE_WAVE) {
+                        wave_trail_p1.positionR = (Vec2D){ state.player.x, state.player.y };
+                        MotionTrail_AddWavePoint(&wave_trail_p1);
+                    }
+                    if (state.dual && state.player2.gamemode == GAMEMODE_WAVE) {
+                        wave_trail_p2.positionR = (Vec2D){ state.player2.x, state.player2.y };
+                        MotionTrail_AddWavePoint(&wave_trail_p2);
+                    }
+                }
+            }
+
             u64 start_trig = svcGetSystemTick();
             handle_triggers();
             handle_col_triggers();
             calculate_lbg();
             u64 end_trig = svcGetSystemTick();
             u64 ticks_trig = end_trig - start_trig;
-            triggers_time = ticks_trig / CPU_TICKS_PER_MSEC;
+            snapshot.triggers_ms = ticks_trig / CPU_TICKS_PER_MSEC;
 
             u64 start_obj = svcGetSystemTick();
             create_objects();
             u64 end_obj = svcGetSystemTick();
             u64 ticks_obj = end_obj - start_obj;
-            sprite_drawing_time = ticks_obj / CPU_TICKS_PER_MSEC;
+            snapshot.rendering_ms = ticks_obj / CPU_TICKS_PER_MSEC;
 
             u64 start_part = svcGetSystemTick();
             update_player_effects(delta);
@@ -1053,7 +1149,7 @@ void game_loop() {
             update_object_particles(delta);
             u64 end_part = svcGetSystemTick();
             u64 ticks_part = end_part - start_part;
-            particle_calc_time = ticks_part / CPU_TICKS_PER_MSEC;
+            snapshot.particles_ms = ticks_part / CPU_TICKS_PER_MSEC;
 
             // Update trails
             MotionTrail_Update(&trail_p1, delta);
@@ -1074,24 +1170,6 @@ void game_loop() {
                 }
             }
 
-            if (state.mirroring) {
-                state.mirror_timer += delta;
-                if (state.mirror_timer > MIRROR_DURATION) {
-                    state.mirroring = false;
-                    state.mirror_factor = state.intended_mirror_factor;
-                    state.mirror_speed_factor = 1 - 2*state.mirror_factor;
-
-                    // When mirror transition ends, put a wave trail point
-                    if (state.player.gamemode == GAMEMODE_DART) {
-                        wave_trail_p1.positionR = (Vec2D){ state.player.x, state.player.y };
-                        MotionTrail_AddWavePoint(&wave_trail_p1);
-                    }
-                    if (state.dual && state.player2.gamemode == GAMEMODE_DART) {
-                        wave_trail_p2.positionR = (Vec2D){ state.player2.x, state.player2.y };
-                        MotionTrail_AddWavePoint(&wave_trail_p2);
-                    }
-                }
-            }
         } else{
             kHeldPaused = touch.held;
         }
@@ -1225,57 +1303,16 @@ void game_loop() {
         draw_stack_fade();
 
         if (state.profiling) {
-            float processingTime = ((ticks / CPU_TICKS_PER_MSEC)) * 6;
-            float drawingTime = C3D_GetDrawingTime() * 6;
-            float fps = 1 / delta;
-            if (fps > 60) fps = 60;
+            float processingTime = ticks / CPU_TICKS_PER_MSEC;
+            ProfilerUpdateData data = {
+                .processingTime = processingTime,
+                .touchPos = touchPos,
+                .kDown = touch.down,
+                .steps = steps
+            };
 
-            #define DEBUG_TEXT_SCALE 0.4f, 0.4f
-            
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 6,  DEBUG_TEXT_SCALE, 0, true, "CPU: %6.2f%% (%6.2f%% %6.2f%%)", (C3D_GetProcessingTime() * 6) + processingTime, C3D_GetProcessingTime() * 6, processingTime);
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 18, DEBUG_TEXT_SCALE, 0, true, "GPU: %6.2f%%", drawingTime);
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 30, DEBUG_TEXT_SCALE, 0, true, "FPS: %6.1f", fps);
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 42, DEBUG_TEXT_SCALE, 0, true, "Linear free: %d", linearSpaceFree());
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 42, DEBUG_TEXT_SCALE, 0, true, "CMDBuf: %6.2f%%", C3D_GetCmdBufUsage()*100.0f);
-
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 66,  DEBUG_TEXT_SCALE, 0, true, "%d steps", steps);
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 54,  DEBUG_TEXT_SCALE, 0, true, "Particle: %6.2f%%", particle_calc_time * 6);
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 78,  DEBUG_TEXT_SCALE, 0, true, "Triggers: %6.2f%%", triggers_time * 6);
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 90,  DEBUG_TEXT_SCALE, 0, true, "Collision %d/%d", number_of_collisions, number_of_collisions_checks);
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 102, DEBUG_TEXT_SCALE, 0, true, "Physics: %6.2f%%", physics_calc_time * 6);
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 114, DEBUG_TEXT_SCALE, 0, true, " - Coll: %6.2f%%", collision_time * 6);
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 126, DEBUG_TEXT_SCALE, 0, true, " - Play: %6.2f%%", player_time * 6);
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 138, DEBUG_TEXT_SCALE, 0, true, " - Hndl: %6.2f%%", handle_player_time * 6);
-
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   54,  DEBUG_TEXT_SCALE, 0, true, "SprDraw:  %6.2f%%", (sprite_drawing_time) * 6);
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   66,  DEBUG_TEXT_SCALE, 0, true, " - Creating: %6.2f%%", (object_creating_time) * 6);
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   78,  DEBUG_TEXT_SCALE, 0, true, " - Sorting:  %6.2f%%", (object_sorting_time) * 6);
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   102,  DEBUG_TEXT_SCALE, 0, true, "Drawing:  %6.2f%%", (object_drawing_time) * 6);
-
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   114,  DEBUG_TEXT_SCALE, 0, true, "Touch:  %d, %d", touchPos.px, touchPos.py);
-
-            // im jut going to assume 60fps for this (4 buckets)
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   126,  DEBUG_TEXT_SCALE, 0, true, "InputTicks: %d|%d|%d|%d", (int)pi_substep_presses[0], (int)pi_substep_presses[1], (int)pi_substep_presses[2], (int)pi_substep_presses[3]);
-
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   138,  DEBUG_TEXT_SCALE, 0, true, "Player");
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   150,  DEBUG_TEXT_SCALE, 0, true, "- Tick: %d", state.player.frame);
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   162,  DEBUG_TEXT_SCALE, 0, true, "- X: %.2f", state.player.x);
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   174,  DEBUG_TEXT_SCALE, 0, true, "- Y: %.2f", state.player.y);
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   186,  DEBUG_TEXT_SCALE, 0, true, "- VX: %.2f", state.player.vel_x * STEPS_DT);
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   198,  DEBUG_TEXT_SCALE, 0, true, "- VY: %.2f", state.player.vel_y * STEPS_DT);
-
-            
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   138,  DEBUG_TEXT_SCALE, 0, true, "Camera");
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   150,  DEBUG_TEXT_SCALE, 0, true, "- X: %.2f", state.camera_x);
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   162,  DEBUG_TEXT_SCALE, 0, true, "- Y: %.2f", state.camera_y);
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   174,  DEBUG_TEXT_SCALE, 0, true, "- IntY: %.2f", state.camera_intended_y);
-            
-            struct mallinfo mi = mallinfo();
-            
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   138 + 50,  DEBUG_TEXT_SCALE, 0, true, "Heap");
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   150 + 50,  DEBUG_TEXT_SCALE, 0, true, "- Allocated: 0x%X bytes", mi.uordblks);
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   162 + 50,  DEBUG_TEXT_SCALE, 0, true, "- Free:        0x%X bytes",  envGetHeapSize() - mi.uordblks);
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   174 + 50,  DEBUG_TEXT_SCALE, 0, true, "- Arena:      0x%X bytes",  envGetHeapSize());
+            profiler_update(data);
+            profiler_draw();
         }
 
         if (state.noclip) {
@@ -1349,8 +1386,23 @@ void game_assets_init() {
     glowSheet = C2D_SpriteSheetLoad("romfs:/gfx/glow.t3x");
     if (!glowSheet) svcBreak(USERBREAK_PANIC);
     
-    iconSheet = C2D_SpriteSheetLoad("romfs:/gfx/icons.t3x");
-    if (!iconSheet) svcBreak(USERBREAK_PANIC);
+    cube0Sheet = C2D_SpriteSheetLoad("romfs:/gfx/player_0.t3x");
+    if (!cube0Sheet) svcBreak(USERBREAK_PANIC);
+    
+    cube1Sheet = C2D_SpriteSheetLoad("romfs:/gfx/player_1.t3x");
+    if (!cube1Sheet) svcBreak(USERBREAK_PANIC);
+    
+    shipSheet = C2D_SpriteSheetLoad("romfs:/gfx/ship.t3x");
+    if (!shipSheet) svcBreak(USERBREAK_PANIC);
+    
+    ballSheet = C2D_SpriteSheetLoad("romfs:/gfx/player_ball.t3x");
+    if (!ballSheet) svcBreak(USERBREAK_PANIC);
+    
+    ufoSheet = C2D_SpriteSheetLoad("romfs:/gfx/bird.t3x");
+    if (!ufoSheet) svcBreak(USERBREAK_PANIC);
+    
+    waveSheet = C2D_SpriteSheetLoad("romfs:/gfx/dart.t3x");
+    if (!waveSheet) svcBreak(USERBREAK_PANIC);
 
     trailSheet = C2D_SpriteSheetLoad("romfs:/gfx/trails.t3x");
     if (!trailSheet) svcBreak(USERBREAK_PANIC);
@@ -1385,6 +1437,8 @@ void game_assets_init() {
 
 int main(int argc, char* argv[]) {
     // Init libs
+    init_trig_table();
+
     romfsInit();
     gfxInitDefault();
     C3D_Init(C3D_DEFAULT_CMDBUF_SIZE * 4);
@@ -1405,7 +1459,7 @@ int main(int argc, char* argv[]) {
     reinitialize_screens();
 
     srand(time(NULL));
-    alt_title_screen = (rand() & (128 - 1)) == 0;
+    alt_title_screen = random_float(0, 1) < (1.f / 256);
     
     C2D_SetTintMode(C2D_TintMult);
     
@@ -1528,7 +1582,12 @@ int main(int argc, char* argv[]) {
     C2D_SpriteSheetFree(glowSheet);
     C2D_SpriteSheetFree(bgSheet);
     C2D_SpriteSheetFree(bg2Sheet);
-    C2D_SpriteSheetFree(iconSheet);
+    C2D_SpriteSheetFree(cube0Sheet);
+    C2D_SpriteSheetFree(cube1Sheet);
+    C2D_SpriteSheetFree(shipSheet);
+    C2D_SpriteSheetFree(ballSheet);
+    C2D_SpriteSheetFree(ufoSheet);
+    C2D_SpriteSheetFree(waveSheet);
     C2D_SpriteSheetFree(trailSheet);
     C2D_SpriteSheetFree(particleSheet);
     C2D_SpriteSheetFree(ui_sheet);

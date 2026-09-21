@@ -130,7 +130,7 @@ void run_camera() {
 
 void set_hitbox_size(Player *player, int gamemode) {
     float scale = (player->mini) ? 0.6f : 1.f;
-    if (gamemode != GAMEMODE_DART) {
+    if (gamemode != GAMEMODE_WAVE) {
         player->height = 30 * scale;
         player->width = 30 * scale;
         
@@ -209,9 +209,6 @@ void init_player(Player *player) {
     player->upside_down = level_info.initial_upsidedown;
     player->timeElapsed = 0.f;
 
-    player->internal_hitbox.height = 9;
-    player->internal_hitbox.width = 9;
-
     player->cutscene_initial_player_x = 0;
     player->cutscene_initial_player_y = 0;
 
@@ -267,12 +264,12 @@ void init_state() {
 void init_level_bounds() {
     switch (level_info.initial_gamemode) {
         case GAMEMODE_SHIP:
-        case GAMEMODE_BIRD:
-        case GAMEMODE_DART:
+        case GAMEMODE_UFO:
+        case GAMEMODE_WAVE:
             state.ceiling_y = state.ground_y + 300;
             set_intended_ceiling();
             break;
-        case GAMEMODE_PLAYER_BALL:
+        case GAMEMODE_BALL:
             state.ceiling_y = state.ground_y + 240;
             set_intended_ceiling();
             break;
@@ -315,7 +312,7 @@ void first_load_init_variables() {
     
     state.camera_x = 0;
     state.camera_y = 0;
-    current_fading_effect = FADE_NONE;
+    current_fading_effect = FADE_SIMPLE;
 
     slow_speed_particles_timer = 0;
     normal_speed_particles_timer = 0;
@@ -370,7 +367,7 @@ void init_variables() {
 
     clear_use_effects(get_use_effect_array_ptr(GFX_TOP));
 
-    current_fading_effect = FADE_NONE;
+    current_fading_effect = FADE_SIMPLE;
     level_info.completing = false;
 
     init_player(&state.player);

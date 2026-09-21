@@ -2,6 +2,7 @@
 #include <citro2d.h>
 #include "level_loading.h"
 #include "color_channels.h"
+#include "utils/c2d_internal.h"
 
 #define FADING_OBJ_PADDING 45
 #define FADING_OBJ_WIDTH 180
@@ -38,16 +39,24 @@ typedef struct
     float dx, dy; // velocity
 } Sprite;
 
+typedef struct {
+    C2Di_Quad quadr;
+    float tcTopLeft[2], tcTopRight[2], tcBotLeft[2], tcBotRight[2];
+} QuadParams;
+
 typedef struct
 {
     C2D_Sprite spr;
     C2D_ImageTint tint;
+    QuadParams params;
     int obj;
     int layer;
     int col_type;
     float opacity;
     int col_channel;
     int zlayer;
+    bool blending;
+    bool hidden;
 } SpriteObject;
 
 typedef struct {
@@ -57,6 +66,7 @@ typedef struct {
 
 enum FadingEffects {
     FADE_NONE,
+    FADE_SIMPLE,
     FADE_UP,
     FADE_DOWN,
     FADE_RIGHT,
@@ -85,9 +95,9 @@ typedef struct {
 
 void cache_all_sprites();
 void free_cached_sprites();
-void get_fade_vars(int obj, float x, int *fade_x, int *fade_y, float *fade_scale);
-int obj_edge_fade(float x, int right_edge);
-void get_special_fading_vars(int obj, float fade_val, float *calc_x);
+void get_fade_vars(int obj, float x, float *fade_x, float *fade_y, float *fade_scale);
+float obj_edge_fade(float x, int right_edge);
+float get_special_fading_vars(int obj, float fade_val);
 
 extern bool p1_trail;
 extern int current_fading_effect;
@@ -99,17 +109,18 @@ extern C2D_SpriteSheet glowSheet;
 extern C2D_SpriteSheet bgSheet;
 extern C2D_SpriteSheet bg2Sheet;
 extern C2D_SpriteSheet groundSheet;
-extern C2D_SpriteSheet iconSheet;
+extern C2D_SpriteSheet cube0Sheet;
+extern C2D_SpriteSheet cube1Sheet;
+extern C2D_SpriteSheet shipSheet;
+extern C2D_SpriteSheet ballSheet;
+extern C2D_SpriteSheet ufoSheet;
+extern C2D_SpriteSheet waveSheet;
 extern C2D_SpriteSheet trailSheet;
 extern C2D_SpriteSheet particleSheet;
 
 extern SpriteTemplate sprite_templates[GAME_OBJECT_COUNT];
 
 extern const Color white;
-
-extern float object_creating_time;
-extern float object_sorting_time;
-extern float object_drawing_time;
 
 inline float normalize_angle(float a)
 {
@@ -119,6 +130,7 @@ inline float normalize_angle(float a)
 }
 
 void create_objects();
+void reset_render_cache();
 void change_blending(bool blending);
 Color get_white_if_black(Color color);
 Color get_p1_if_black(Color color);

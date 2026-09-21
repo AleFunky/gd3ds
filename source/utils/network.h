@@ -13,6 +13,8 @@
 #define GDPS_COMMENTS_API "https://19gdps.com/gdapi/getGJComments21.php"
 #define GDPS_SONGS_API "https://19gdps.com/gdapi/getGJSongInfo.php"
 
+#define TIMEOUT_DURATION 15
+
 typedef struct SearchFilters {
     bool uncompleted:1;
     bool completed:1;

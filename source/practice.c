@@ -221,15 +221,15 @@ void handle_auto_checkpoints(float delta) {
     if (checkpoint_timer <= 0) {
         switch (state.player.gamemode) {
             case GAMEMODE_PLAYER:
-            case GAMEMODE_PLAYER_BALL:
+            case GAMEMODE_BALL:
                 if (state.player.landed_from_jump) {
                     new_checkpoint();
                 }
                 break;
 
             case GAMEMODE_SHIP:
-            case GAMEMODE_BIRD:
-            case GAMEMODE_DART:
+            case GAMEMODE_UFO:
+            case GAMEMODE_WAVE:
                 new_checkpoint();
                 pseudo_checkpoint_exists = true;
                 break;

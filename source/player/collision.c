@@ -3,6 +3,7 @@
 #include "player.h"
 #include <math.h>
 #include "practice.h"
+#include "profiling.h"
 #include "state.h"
 #include <citro3d.h>
 #include "graphics.h"
@@ -23,7 +24,7 @@ Player *player_1 = &state.player;
 Player *player_2 = &state.player2;
 
 const float jump_heights_table[SPEED_COUNT][JUMP_TYPES_COUNT][GAMEMODE_COUNT][2] = {
-    { // SLOW               CUBE                   SHIP                  BALL                    UFO                 WAVE   },
+    { // SLOW                        CUBE                              SHIP                                BALL                               UFO            WAVE   },
     /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {573.48,   458.784},  {0, 0} },
     /* YELLOW ORB */ {{573.48,   458.784},  {573.48,   458.784},  {401.435993,  321.148795},  {573.48,   458.784},  {0, 0} },
     /* BLUE PAD   */ {{-345.6,   -276.48},  {-229.392, -183.519}, {-160.574397, -128.463298}, {-229.392, -183.519}, {0, 0} },
@@ -55,6 +56,14 @@ const float jump_heights_table[SPEED_COUNT][JUMP_TYPES_COUNT][GAMEMODE_COUNT][2]
     /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0} },
     /* PINK ORB   */ {{436.644,  349.272},  {224.37,   179.496},  {326.85659,   261.5004},    {254.718,  203.742},  {0, 0} },
     }
+};
+
+const float gamemode_heights[GAMEMODE_COUNT] = {
+    999999,  // Cube
+    300, // Ship
+    240,  // Ball
+    300, // Ufo
+    300 // Wave
 };
 
 const int dual_gamemode_heights[GAMEMODE_COUNT] = {
@@ -217,7 +226,7 @@ static const bool gamemode_linked_gravity[GAMEMODE_COUNT][GAMEMODE_COUNT] = {
 #undef N
 
 void flip_other_player(int current_player) {
-    if (state.dual && gamemode_linked_gravity[state.player.gamemode][state.player2.gamemode] && state.player.upside_down == state.player2.upside_down) {
+    if (!level_info.two_player_mode && state.dual && gamemode_linked_gravity[state.player.gamemode][state.player2.gamemode] && state.player.upside_down == state.player2.upside_down) {
         if (current_player == 0) {
             state.player2.upside_down = !state.player.upside_down;
             state.player2.vel_y /= -2;
@@ -233,7 +242,7 @@ void flip_other_player(int current_player) {
 void do_ball_reflection() {
     Player *player_1 = &state.player;
     Player *player_2 = &state.player2;
-    if (state.dual && player_1->gamemode == GAMEMODE_PLAYER_BALL && player_2->gamemode == GAMEMODE_PLAYER_BALL) {
+    if (state.dual && player_1->gamemode == GAMEMODE_BALL && player_2->gamemode == GAMEMODE_BALL) {
         if (player_1->upside_down == player_2->upside_down) {
             bool ballsIntersecting = intersect(
                 player_1->x, player_1->y, player_1->width, player_1->height, 0,
@@ -369,7 +378,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     break;
 
                 MotionTrail_ResumeStroke(trail);
-                if (player->gamemode == GAMEMODE_DART) MotionTrail_AddWavePoint(wave_trail);
+                if (player->gamemode == GAMEMODE_WAVE) MotionTrail_AddWavePoint(wave_trail);
                 player->left_ground = true;
 
                 player->gravObj_id = obj;
@@ -395,7 +404,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case YELLOW_ORB:
             if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if (!GET_ACTIVATED(obj) && (state.input.holdJump) && player->buffering_state == BUFFER_READY) {
+            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
                 MotionTrail_ResumeStroke(trail);
                 player->vel_y = jump_heights_table[state.speed][JUMP_YELLOW_ORB][player->gamemode][player->mini];
                 
@@ -423,7 +432,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case PINK_ORB:
             if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if (!GET_ACTIVATED(obj) && (state.input.holdJump) && player->buffering_state == BUFFER_READY) {
+            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
                 MotionTrail_ResumeStroke(trail);
                 player->vel_y = jump_heights_table[state.speed][JUMP_PINK_ORB][player->gamemode][player->mini];
                 
@@ -450,10 +459,11 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             } 
             break;
         case BLUE_ORB:
+            if (GET_ACTIVATED(obj)) player->gravObj_id = obj;
             if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if (!GET_ACTIVATED(obj) && (state.input.holdJump) && player->buffering_state == BUFFER_READY) {    
+            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {    
                 MotionTrail_ResumeStroke(trail);
-                if (player->gamemode == GAMEMODE_DART) MotionTrail_AddWavePoint(wave_trail);
+                if (player->gamemode == GAMEMODE_WAVE) MotionTrail_AddWavePoint(wave_trail);
                 player->gravObj_id = obj;
                 update_rotation_direction(player);
                 
@@ -489,13 +499,13 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             if (!GET_ACTIVATED(obj)) {
                 player->ceiling_inv_time = CEILING_INVUL_TIME;
                 if (player->upside_down) {
-                    if (player->gamemode != GAMEMODE_PLAYER_BALL) MotionTrail_ResumeStroke(trail);
-                    if (player->gamemode == GAMEMODE_DART) MotionTrail_AddWavePoint(wave_trail);
+                    if (player->gamemode != GAMEMODE_BALL) MotionTrail_ResumeStroke(trail);
+                    if (player->gamemode == GAMEMODE_WAVE) MotionTrail_AddWavePoint(wave_trail);
                     player->vel_y /= -2;
                     player->upside_down = false;
                     player->inverse_rotation = false;
 
-                    if (player->gamemode == GAMEMODE_BIRD) 
+                    if (player->gamemode == GAMEMODE_UFO) 
                         player->rotation = 0;
                     else
                         player->snap_rotation = true;
@@ -518,13 +528,13 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             if (!GET_ACTIVATED(obj)) {
                 player->ceiling_inv_time = CEILING_INVUL_TIME;
                 if (!player->upside_down) {
-                    if (player->gamemode != GAMEMODE_PLAYER_BALL) MotionTrail_ResumeStroke(trail);
-                    if (player->gamemode == GAMEMODE_DART) MotionTrail_AddWavePoint(wave_trail);
+                    if (player->gamemode != GAMEMODE_BALL) MotionTrail_ResumeStroke(trail);
+                    if (player->gamemode == GAMEMODE_WAVE) MotionTrail_AddWavePoint(wave_trail);
                     player->vel_y /= -2;
                     player->upside_down = true;
                     player->inverse_rotation = false;
 
-                    if (player->gamemode == GAMEMODE_BIRD) 
+                    if (player->gamemode == GAMEMODE_UFO) 
                         player->rotation = 0;
                     else
                         player->snap_rotation = true;
@@ -708,13 +718,13 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 state.ground_y = 0;
                 state.ceiling_y = 999999;
                 if (player->gamemode != GAMEMODE_PLAYER) {
-                    if (player->gamemode != GAMEMODE_PLAYER_BALL) {
+                    if (player->gamemode != GAMEMODE_BALL) {
                         player->vel_y /= 2;
                     }
 
-                    if (player->gamemode == GAMEMODE_DART) player->vel_y *= 0.9f;
+                    if (player->gamemode == GAMEMODE_WAVE) player->vel_y *= 0.9f;
                     
-                    player->ceiling_inv_time = CEILING_INVUL_TIME;
+                    player->ceiling_inv_time = GAMEMODE_INVUL_TIME;
                     player->snap_rotation = true;
                     set_gamemode(player, GAMEMODE_PLAYER);
                     set_checkpoint_timer(0);
@@ -732,13 +742,13 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case SHIP_PORTAL: 
             if (!GET_ACTIVATED(obj)) {
-                state.ground_y = fmaxf(0, ip1_ceilf((objects.y[obj] - 180) / 30.f)) * 30;
-                state.ceiling_y = state.ground_y + 300;
+                state.ground_y = fmaxf(0, ip1_ceilf((objects.y[obj] - ((gamemode_heights[GAMEMODE_SHIP] + 60.f) / 2.f)) / 30.f)) * 30;
+                state.ceiling_y = state.ground_y + gamemode_heights[GAMEMODE_SHIP];
                 set_intended_ceiling();
 
                 if (player->gamemode != GAMEMODE_SHIP) {
-                    if (player->gamemode == GAMEMODE_DART) player->vel_y *= 0.9f;
-                    player->vel_y /= (player->gamemode == GAMEMODE_BIRD || player->gamemode == GAMEMODE_DART) ? 4 : 2;
+                    if (player->gamemode == GAMEMODE_WAVE) player->vel_y *= 0.9f;
+                    player->vel_y /= (player->gamemode == GAMEMODE_UFO || player->gamemode == GAMEMODE_WAVE) ? 4 : 2;
                     
                     // No pseudo checkpoint if coming from non flying gamemode
                     if (!player_gamemode_is_flying(player)) {
@@ -776,27 +786,27 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case BALL_PORTAL: 
             if (!GET_ACTIVATED(obj)) {
-                state.ground_y = fmaxf(0, ip1_ceilf((objects.y[obj] - 150) / 30.f)) * 30;
-                state.ceiling_y = state.ground_y + 240;
+                state.ground_y = fmaxf(0, ip1_ceilf((objects.y[obj] - ((gamemode_heights[GAMEMODE_BALL] + 60.f) / 2.f)) / 30.f)) * 30;
+                state.ceiling_y = state.ground_y + gamemode_heights[GAMEMODE_BALL];
                 set_intended_ceiling();
 
-                if (player->gamemode != GAMEMODE_PLAYER_BALL) {
+                if (player->gamemode != GAMEMODE_BALL) {
                     player->ball_rotation_speed = -BALL_SLOW_ROTATION;
 
                     switch (player->gamemode) {
-                        case GAMEMODE_DART:
+                        case GAMEMODE_WAVE:
                             player->vel_y *= 0.9f;
                             player->vel_y /= 2;
                         case GAMEMODE_SHIP:
-                        case GAMEMODE_BIRD:
+                        case GAMEMODE_UFO:
                             player->vel_y /= 2;
                             break;
                     }
-                    set_gamemode(player, GAMEMODE_PLAYER_BALL);
+                    set_gamemode(player, GAMEMODE_BALL);
                     set_checkpoint_timer(0);
                     pseudo_checkpoint_exists = false;
 
-                    if (state.input.holdJump && state.old_player.gamemode == GAMEMODE_SHIP) {
+                    if (curr_input.holdJump && state.old_player.gamemode == GAMEMODE_SHIP) {
                         player->buffering_state = BUFFER_READY;
                     }
 
@@ -820,26 +830,26 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case UFO_PORTAL:
             if (!GET_ACTIVATED(obj)) {
-                state.ground_y = fmaxf(0, ip1_ceilf((objects.y[obj] - 180) / 30.f)) * 30;
-                state.ceiling_y = state.ground_y + 300;
+                state.ground_y = fmaxf(0, ip1_ceilf((objects.y[obj] - ((gamemode_heights[GAMEMODE_UFO] + 60.f) / 2.f)) / 30.f)) * 30;
+                state.ceiling_y = state.ground_y + gamemode_heights[GAMEMODE_UFO];
                 set_intended_ceiling();
                 
-                if (player->gamemode != GAMEMODE_BIRD) {
-                    if (player->gamemode == GAMEMODE_DART) player->vel_y *= 0.9f;
-                    player->vel_y /= (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_DART) ? 4 : 2;
+                if (player->gamemode != GAMEMODE_UFO) {
+                    if (player->gamemode == GAMEMODE_WAVE) player->vel_y *= 0.9f;
+                    player->vel_y /= (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_WAVE) ? 4 : 2;
                     
                     // No pseudo checkpoint if coming from non flying gamemode
                     if (!player_gamemode_is_flying(player)) {
                         pseudo_checkpoint_exists = false;
                     }
 
-                    set_gamemode(player, GAMEMODE_BIRD);
+                    set_gamemode(player, GAMEMODE_UFO);
                     set_checkpoint_timer(AUTO_CHECKPOINT_TIME);
                     player->inverse_rotation = false;
                     player->rotation = 0;
                     flip_other_player(state.current_player ^ 1);
 
-                    if (state.old_player.gamemode == GAMEMODE_SHIP || state.old_player.gamemode == GAMEMODE_DART) {
+                    if (state.old_player.gamemode == GAMEMODE_SHIP || state.old_player.gamemode == GAMEMODE_WAVE) {
                         player->buffering_state = BUFFER_READY;
                     }
 
@@ -859,21 +869,20 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case WAVE_PORTAL:
             if (!GET_ACTIVATED(obj)) {
-                state.ground_y = fmaxf(0, ip1_ceilf((objects.y[obj] - 180) / 30.f)) * 30;
-                state.ceiling_y = state.ground_y + 300;
+                state.ground_y = fmaxf(0, ip1_ceilf((objects.y[obj] - ((gamemode_heights[GAMEMODE_WAVE] + 60.f) / 2.f)) / 30.f)) * 30;
+                state.ceiling_y = state.ground_y + gamemode_heights[GAMEMODE_WAVE];
                 set_intended_ceiling();
 
-                if (player->gamemode != GAMEMODE_DART) {
+                if (player->gamemode != GAMEMODE_WAVE) {
                     // No pseudo checkpoint if coming from non flying gamemode
                     if (!player_gamemode_is_flying(player)) {
                         pseudo_checkpoint_exists = false;
                     }
                     
-                    set_gamemode(player, GAMEMODE_DART);
+                    set_gamemode(player, GAMEMODE_WAVE);
                     set_checkpoint_timer(AUTO_CHECKPOINT_TIME);
                     player->inverse_rotation = false;
                     player->snap_rotation = true;
-                    flip_other_player(state.current_player ^ 1);
                     UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
                     if (effect) {
                         effect->def.colorR = 255 / 255.f;
@@ -910,7 +919,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     if (state.current_player == 0) state.player2.x = state.old_player.x; // Sync them
                 }
                 set_dual_bounds();
-                if (state.player2.gamemode == GAMEMODE_DART) {
+                if (state.player2.gamemode == GAMEMODE_WAVE) {
                     wave_trail_p2.positionR = (Vec2D){state.player2.x, state.player2.y};  
                     wave_trail_p2.startingPositionInitialized = true;
                     MotionTrail_AddWavePoint(&wave_trail_p2);
@@ -935,12 +944,10 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                             state.ceiling_y = 999999;
                             break;
                         case GAMEMODE_SHIP:
-                        case GAMEMODE_BIRD:
-                            state.ceiling_y = state.ground_y + 300;
-                            set_intended_ceiling();
-                            break;
-                        case GAMEMODE_PLAYER_BALL:
-                            state.ceiling_y = state.ground_y + 240;
+                        case GAMEMODE_UFO:
+                        case GAMEMODE_BALL:
+                            state.ground_y = fmaxf(0, ip1_ceilf((state.dual_portal_y - ((gamemode_heights[state.player.gamemode] + 60.f) / 2.f)) / 30.f)) * 30;
+                            state.ceiling_y = state.ground_y + gamemode_heights[state.player.gamemode];
                             set_intended_ceiling();
                     }
                     
@@ -1149,7 +1156,7 @@ bool circle_rect_collision(float cx, float cy, float radius,
 void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
     InternalHitbox internal = player->internal_hitbox;
 
-    float clip = (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_BIRD) ? 7 : 10;
+    float clip = (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_UFO) ? 7 : 10;
     switch (hitbox->collision_type) {
         //case HITBOX_BREAKABLE_BLOCK:
         case HITBOX_SOLID: 
@@ -1157,9 +1164,8 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
 
             // This is equal to using the old player y position (a frame of snap leeway)
             clip += fabsf(player->vel_y) * STEPS_DT;
-
             
-            if (player->gravObj_id >= 0 && GET_HITBOX_COUNTER(player->gravObj_id) == 1) {
+            if (player->ceiling_inv_time > 0) {
                 // Only do the funny grav snap if player is touching a gravity object and internal hitbox is touching block
                 bool internalCollidingBlock = intersect(
                     player->x, player->y, internal.width, internal.height, 0, 
@@ -1168,13 +1174,13 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
 
                 float diff = obj_gravBottom(player, obj) - gravInternalBottom(player);
 
-                gravSnap = (!state.old_player.on_ground || player->ceiling_inv_time > 0) && internalCollidingBlock && (diff >= 0 && diff <= clip);
+                gravSnap = internalCollidingBlock && (diff >= 0 && diff <= clip);
             }
 
             bool safeZone = player->mini && ((obj_gravTop(player, obj) - gravBottom(player) <= clip) || (gravTop(player) - obj_gravBottom(player, obj) <= clip));
             
             // Check collision with internal hitbox
-            if ((player->gamemode == GAMEMODE_DART || (!gravSnap && !safeZone)) && intersect(
+            if ((player->gamemode == GAMEMODE_WAVE || (!gravSnap && !safeZone)) && intersect(
                 player->x, player->y, internal.width, internal.height, 0, 
                 objects.x[obj], objects.y[obj], hitbox->width, hitbox->height, objects.rotation[obj]
             )) {
@@ -1227,7 +1233,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
             }
 
             // Check snap for player bottom
-            if (obj_gravTop(player, obj) - bottom <= clip && player->vel_y <= 0 && player->gamemode != GAMEMODE_DART) {
+            if (obj_gravTop(player, obj) - bottom <= clip && player->vel_y <= 0 && player->gamemode != GAMEMODE_WAVE) {
                 player->y = grav(player, obj_gravTop(player, obj)) + grav(player, player->height / 2);
                 if (player->vel_y <= 0) player->vel_y = 0;
                 player->on_ground = true;
@@ -1248,9 +1254,9 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                     player->snap_data.player_snap_diff = player->x - objects.x[obj];
                 }
             // Check snap for player top
-            } else if (player->gamemode != GAMEMODE_DART) {
+            } else if (player->gamemode != GAMEMODE_WAVE) {
                 // Ufo can break breakable blocks from above, so dont use as a ceiling
-                if (player->gamemode == GAMEMODE_BIRD && objects.id[obj] == BREAKABLE_BLOCK) {
+                if (player->gamemode == GAMEMODE_UFO && objects.id[obj] == BREAKABLE_BLOCK) {
                     break;
                 }
                 // Behave normally
@@ -1260,7 +1266,6 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                         else player->vel_y = 0;
                         player->inverse_rotation = false;
                         player->time_since_ground = 0;
-                        player->ceiling_inv_time = 0;
                         player->y = grav(player, obj_gravBottom(player, obj)) - grav(player, player->height / 2);
                         if (player->vel_y >= 0) player->vel_y = 0;
                     }
@@ -1282,7 +1287,7 @@ void collide_with_obj(Player *player, int obj) {
 
     if (!hitbox || objects.toggled[obj]) return;
 
-    number_of_collisions_checks++;
+    snapshot.collision_checks++;
 
     float x = objects.x[obj];
     float y = objects.y[obj];
@@ -1296,7 +1301,7 @@ void collide_with_obj(Player *player, int obj) {
         )) {
             handle_collision(player, obj, hitbox);
             SET_COLLIDED(obj, true);
-            number_of_collisions++;
+            snapshot.collisions++;
         } else {
             SET_COLLIDED(obj, false);
         }
@@ -1326,7 +1331,7 @@ void collide_with_obj(Player *player, int obj) {
         if (checkColl) {
             handle_collision(player, obj, hitbox);
             SET_COLLIDED(obj, true);
-            number_of_collisions++;
+            snapshot.collisions++;
         } else {
             SET_COLLIDED(obj, false);
         }
@@ -1360,9 +1365,6 @@ int hazard_count = 0;
 
 int potential_slopes_buffer[2][MAX_COLLIDED_OBJECTS];
 int potential_slopes[2];
-
-int number_of_collisions = 0;
-int number_of_collisions_checks = 0;
 
 void collide_with_objects(Player *player) {
     int sx = (int)(player->x / SECTION_SIZE);
