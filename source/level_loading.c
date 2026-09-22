@@ -1473,7 +1473,7 @@ void load_online_level_info(char *level_string) {
 
 int load_online_level(LevelEntry *level) {
     bool compressed = true;
-    int out_code;
+    int out_code = LOAD_NO_ERROR;
 
     // Base64 doesn't allow semicolons, so if theres one, its not compressed
     if (strchr(level->levelString, ';')) compressed = false;
@@ -1569,7 +1569,7 @@ void load_level_info(char *data, char *level_string) {
 }
 
 int load_level(char *path) {
-    int out_code;
+    int out_code = LOAD_NO_ERROR;
 
     size_t out;
     char *level = read_file(path, &out);

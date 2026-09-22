@@ -400,6 +400,7 @@ static void handle_stack_fading(){
                     break;
             }
         }
+        fixed_dt = true;
     } else{
         //make sure there's a frame of full black
         stack->fade_time += FADE_SPEED * DT;

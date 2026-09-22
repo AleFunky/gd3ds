@@ -637,9 +637,13 @@ void ui_loop(){
     ui_stack_set_stack(&menu_stack);
 
     while (aptMainLoop()) {
-
         u64 now = svcGetSystemTick();
-        delta = (now - lastTime) / (CPU_TICKS_PER_MSEC * 1000);
+        if (fixed_dt) {
+            fixed_dt = false;
+            delta = 1/60.f;
+        } else {
+            delta = (now - lastTime) / (CPU_TICKS_PER_MSEC * 1000);
+        }
         lastTime = now;
         hidScanInput();
 
