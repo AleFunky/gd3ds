@@ -456,8 +456,8 @@ void action_open_info(UIElement *e, const UIPropertyList *args){
     if(!text) return;
     
     InfoCardData *data = malloc(sizeof(InfoCardData));
-    *data = (InfoCardData){ 0 };
     if(!data) return;
+    *data = (InfoCardData){ 0 };
     
     data->text = text;
     data->copied = false;

@@ -8,6 +8,7 @@
 #include "level_loading.h"
 #include "main.h"
 #include "graphics.h"
+#include "menus/creator_menu/online/two_option_pop_up.h"
 #include "mp3_player.h"
 #include "state.h"
 
@@ -148,8 +149,11 @@ static void action_version_warning(UIElement* e, const UIPropertyList *args){
     if(!data) return;
 
     data->text = strdup(buffer);
+    data->title = strdup("Version Warning");
+    data->customTitle = true;
     data->copied = true;
 
+    ui_stack_push(&info_card_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
     ui_stack_push_data(data);
 }
 
