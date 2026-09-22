@@ -3,6 +3,8 @@
 #include <stdlib.h>
 
 #include "main.h"
+#include "menus/core/ui_element.h"
+#include "menus/settings_hub/info_card.h"
 #include "state.h"
 #include "save/saving.h"
 #include "utils/string_helpers.h"
@@ -42,6 +44,14 @@ static UILabel *practice_progress_val;
 
 static int stars_num = 0;
 
+const char *error_strings[] = {
+    "Invalid gmd.",
+    "Invalid level data.",
+    "Level string missing sections.",
+    "Out of memory.",
+    "Couldn't parse objects."
+};
+
 const int difficulty_stars[MAX_STARS + 1] = {
     NA_FACE,
     AUTO_FACE,
@@ -68,6 +78,19 @@ static UIActionDef external_popup_actions[] = {
     { "play", open_level },
 };
 
+static void set_progress() {
+    normal_progress->value = level_data.normal_progress;
+    practice_progress->value = level_data.practice_progress;
+
+    char normal[32];
+    char practice[32];
+    snprintf(normal, sizeof(normal), "%d%%", level_data.normal_progress);
+    snprintf(practice, sizeof(practice), "%d%%", level_data.practice_progress);
+
+    ui_label_set_text(normal_progress_val, normal);
+    ui_label_set_text(practice_progress_val, practice);
+}
+
 static void set_name_creator(char *gmd) {
     char *name = extract_gmd_key((const char *) gmd, "k2", "s");
     if (name) {
@@ -93,6 +116,7 @@ static void set_name_creator(char *gmd) {
     char file[516];
     snprintf(file, sizeof(file), "ext_%s_%s", level_info.level_name, level_info.creator_name);
     load_level_progress(file);
+    set_progress();
 }
 
 static void set_description(char *gmd) {
@@ -240,19 +264,6 @@ static void set_song_id(char *gmd) {
     ui_label_set_text(song_label, tmp);
 }
 
-static void set_progress() {
-    normal_progress->value = level_data.normal_progress;
-    practice_progress->value = level_data.practice_progress;
-
-    char normal[32];
-    char practice[32];
-    snprintf(normal, sizeof(normal), "%d%%", level_data.normal_progress);
-    snprintf(practice, sizeof(practice), "%d%%", level_data.practice_progress);
-
-    ui_label_set_text(normal_progress_val, normal);
-    ui_label_set_text(practice_progress_val, practice);
-}
-
 static void set_difficulty() {
     int face = difficulty_stars[0];
     if (IN_BOUNDS(stars_num, difficulty_stars)) {
@@ -273,6 +284,42 @@ static void external_popup_init_top(UIScreen *s) {
     level_id_label  = (UILabel *) ui_get_element_by_tag(screen_top, "levelid");
     like_image      = (UIImage *) ui_get_element_by_tag(screen_top, "likeimage");
 }
+static void show_error_message() {
+    // Level gave error
+    char tmp[512];
+
+    int message_id = level_result - 1;
+    char *message = "Ultra unknown error.";
+    if (IN_BOUNDS(message_id, error_strings)) {
+        message = (char *) error_strings[message_id]; 
+    }
+
+    snprintf(tmp, sizeof(tmp), message);
+
+    InfoCardData *ext_error_data = malloc(sizeof(InfoCardData));
+    if(!ext_error_data) return;
+
+    ext_error_data->text = strdup(tmp);
+    ext_error_data->copied = true;
+    ext_error_data->title = strdup("Error");
+    ext_error_data->customTitle = true;
+
+    ui_stack_push(&info_card_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+    ui_stack_push_data(ext_error_data);
+
+    level_result = 0;
+}
+
+void external_popup_update(UIScreen *s, UIInput *u) {
+    if (level_result) {
+        show_error_message();
+    }
+
+    if (exiting_level) {
+        set_progress();
+        exiting_level = false;
+    }
+}
 
 void external_popup_init(UIScreen *s) {
     screen = s;
@@ -288,7 +335,6 @@ void external_popup_init(UIScreen *s) {
     size_t out_size;
     char *gmd = read_file(state.custom_level_path, &out_size);
     if (!gmd) return;
-    set_progress();
     set_name_creator(gmd);
     set_description(gmd);
     set_downloads_likes(gmd);
@@ -313,6 +359,7 @@ const UIScreenDefPair external_popup_def = {
     .btm = {
         .path = "romfs:/menus/creator_menu/external/external_pop_up.txt",
         .init = external_popup_init,
+        .update = external_popup_update,
         .exit = external_popup_exit,
         .action_list = {
             .action_count = ARRAY_LEN(external_popup_actions),

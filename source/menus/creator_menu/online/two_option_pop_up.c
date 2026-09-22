@@ -94,8 +94,8 @@ const UIScreenDefPair delete_pop_up_def = {
         .path = "romfs:/menus/creator_menu/online/delete_pop_up.txt",
         .init = two_option_pop_up_init,
         .action_list = {
-            .action_count = ARRAY_LEN(warning_actions),
-            .actions = warning_actions
+            .action_count = ARRAY_LEN(delete_actions),
+            .actions = delete_actions
         }
     },
     .free_data = two_option_pop_up_free_data,

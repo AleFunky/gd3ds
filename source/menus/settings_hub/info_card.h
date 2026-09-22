@@ -1,5 +1,6 @@
 #pragma once
 #include <3ds.h>
+#include "menus/core/ui_screen.h"
 
 typedef struct {
     bool copied;

@@ -42,6 +42,8 @@ extern unsigned int frame_counter;
 
 extern unsigned int level_frame;
 
+extern bool exiting_level;
+
 extern bool song_loaded;
 
 extern bool alt_title_screen;

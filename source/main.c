@@ -11,6 +11,7 @@
 #include "main.h"
 #include "graphics.h"
 #include "color_channels.h"
+#include "menus/core/ui_element.h"
 #include "mp3_player.h"
 #include "fonts/bigFont.h"
 
@@ -74,7 +75,7 @@ u32 __ctru_linear_heap_size = 36 << 20;
 int game_state = STATE_MENU;
 bool escape_state;
 
-static bool exiting_level;
+bool exiting_level;
 
 bool playing_menu_loop = false;
 char menu_loop_path[32];
@@ -719,13 +720,20 @@ void game_loop() {
 
     update_player_colors();
 
+    exiting_level = false;
+        
+    UIInput touch;
+
     if (state.online_level) {
         int returned = load_online_level(level_entry);
         level_result = returned;
         if (returned) {
             output_log("Failed %d\n", returned);
 
+            ui_stack_push_game_state(STATE_MENU);
+            ui_stack_update(&touch);
             state.online_level = false;
+            exiting_level = true;
             return;
         }
     } else {
@@ -740,7 +748,10 @@ void game_loop() {
         level_result = returned;
         if (returned) {
             output_log("Failed %d\n", returned);
-
+            
+            ui_stack_push_game_state(STATE_MENU);
+            ui_stack_update(&touch);
+            exiting_level = true;
             return;
         }
 
@@ -782,8 +793,6 @@ void game_loop() {
         hidScanInput();
 
         pi_poll();
-        
-        UIInput touch;
         touchPosition touchPos;
         hidTouchRead(&touchPos);
         touch.touchPosition = touchPos;
@@ -1335,7 +1344,6 @@ void game_loop() {
         }
 
         if (escape_state) {
-            exiting_level = false;
             escape_state = false;
             game_paused = false;
             in_level_complete = false;

@@ -33,14 +33,6 @@
 
 #include "fonts/bigFont.h"
 
-const char *error_strings[] = {
-    "Invalid gmd.",
-    "Invalid level data.",
-    "Level string missing sections.",
-    "Out of memory.",
-    "Couldn't parse objects."
-};
-
 static bool reload_pending;
 static char reload_path[320];
 
@@ -192,32 +184,6 @@ static UIActionDef external_actions[] = {
     {"go_back", action_go_back },
 };
 
-static void show_error_message() {
-    // Level gave error
-    char tmp[512];
-
-    int message_id = level_result - 1;
-    char *message = "Ultra unknown error.";
-    if (IN_BOUNDS(message_id, error_strings)) {
-        message = (char *) error_strings[message_id]; 
-    }
-
-    snprintf(tmp, sizeof(tmp), message);
-
-    InfoCardData *ext_error_data = malloc(sizeof(InfoCardData));
-    if(!ext_error_data) return;
-
-    ext_error_data->text = strdup(tmp);
-    ext_error_data->copied = true;
-    ext_error_data->title = strdup("Error");
-    ext_error_data->customTitle = true;
-
-    ui_stack_push(&info_card_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
-    ui_stack_push_data(ext_error_data);
-
-    level_result = 0;
-}
-
 static void external_levels_init(UIScreen *s) {
     load_level_folder(current_path, s);
 
@@ -227,9 +193,6 @@ static void external_levels_init(UIScreen *s) {
 static void external_levels_update(UIScreen *s, UIInput *i) {
     if (reload_pending) {
         load_level_folder(reload_path, s);
-        if (level_result) {
-            show_error_message();
-        }
 
         reload_pending = false;
     }
