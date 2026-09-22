@@ -126,7 +126,8 @@ static void update_arrows(UIScreen *s) {
 static void action_change_page(UIElement* e, const UIPropertyList *args) {
     filters.currentPage += ui_prop_int(&e->custom_properties, "page", 0);
     search_needs_refresh = true;
-    update_arrows(e->screen);
+    ui_run_func_on_tag(e->screen, "nextpage", ui_disable_element);
+    ui_run_func_on_tag(e->screen, "prevpage", ui_disable_element);
     thread = create_network_thread(&search_task);
     ui_enable_element((UIElement *) spinner);
     if (list) ui_list_reset(list);
