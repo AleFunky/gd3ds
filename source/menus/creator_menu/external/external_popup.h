@@ -18,4 +18,6 @@ extern const int difficulty_stars[MAX_STARS + 1];
 
 #define MAX_DESCRIPTION_WIDTH 300
 
+void show_level_load_error_message();
+
 extern const UIScreenDefPair external_popup_def;

@@ -108,6 +108,20 @@ typedef struct {
     char creator_name[256];
 } LoadedLevelInfo;
 
+
+typedef enum {
+    LOAD_NO_ERROR,
+    LOAD_INVALID_GMD,
+    LOAD_INVALID_LEVEL_DATA,
+    LOAD_LEVEL_STRING_MISSING_SECTIONS,
+    LOAD_OUT_OF_MEMORY,
+    LOAD_COULDNT_PARSE_OBJECTS,
+    LOAD_INVALID_BASE64,
+    LOAD_ERROR_COUNT,
+} LevelLoadError;
+
+extern const char *error_strings[LOAD_ERROR_COUNT - 1];
+
 extern LoadedLevelInfo level_info;
 
 extern const char *default_name;
@@ -120,7 +134,7 @@ extern const char *level_lengths[5];
 extern ObjectsArray objects;
 
 char *read_file(const char *filepath, size_t *out_size);
-char *decompress_level(char *data);
+char *decompress_level(char *data, int *out_code);
 
 int load_level(char *path);
 int load_online_level(LevelEntry *level);

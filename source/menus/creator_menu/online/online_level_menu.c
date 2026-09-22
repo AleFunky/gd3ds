@@ -617,6 +617,10 @@ static void online_level_init (UIScreen *s) {
 }
 
 static void online_level_menu_update(UIScreen *s, UIInput *i) {
+    if (level_result) {
+        show_level_load_error_message();
+    }
+
     if (song_data_task.finished) {
         int song_data_result = -3;
         song_data_result = song_data_task.result;

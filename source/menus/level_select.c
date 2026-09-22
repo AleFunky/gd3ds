@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <3ds.h>
 #include <citro2d.h>
+#include "level_loading.h"
 #include "menus/core/common_setters.h"
 
 #include "menus/core/ui_screen.h"
@@ -25,6 +26,15 @@
 #include "menus/gameplay.h"
 
 #include "state.h"
+
+const char *error_strings[LOAD_ERROR_COUNT - 1] = {
+    "Invalid gmd.",
+    "Invalid level data.",
+    "Level string missing sections.",
+    "Out of memory.",
+    "Couldn't parse objects.",
+    "Invalid Base64."
+};
 
 static bool start_level = false;
 
@@ -458,6 +468,7 @@ void level_select_init_top(UIScreen *s){
 }
 
 void level_select_update(UIScreen *s, UIInput *input){
+    exiting_level = false;
     if(!scroll_dir){
         upload_color_to_buffer(0, default_lvl_colors[curr_level_id % NUM_MENU_COLORS], 0);
     }

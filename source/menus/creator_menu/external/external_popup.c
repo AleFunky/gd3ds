@@ -44,14 +44,6 @@ static UILabel *practice_progress_val;
 
 static int stars_num = 0;
 
-const char *error_strings[] = {
-    "Invalid gmd.",
-    "Invalid level data.",
-    "Level string missing sections.",
-    "Out of memory.",
-    "Couldn't parse objects."
-};
-
 const int difficulty_stars[MAX_STARS + 1] = {
     NA_FACE,
     AUTO_FACE,
@@ -284,7 +276,8 @@ static void external_popup_init_top(UIScreen *s) {
     level_id_label  = (UILabel *) ui_get_element_by_tag(screen_top, "levelid");
     like_image      = (UIImage *) ui_get_element_by_tag(screen_top, "likeimage");
 }
-static void show_error_message() {
+
+void show_level_load_error_message() {
     // Level gave error
     char tmp[512];
 
@@ -294,7 +287,7 @@ static void show_error_message() {
         message = (char *) error_strings[message_id]; 
     }
 
-    snprintf(tmp, sizeof(tmp), message);
+    snprintf(tmp, sizeof(tmp), "%s", message);
 
     InfoCardData *ext_error_data = malloc(sizeof(InfoCardData));
     if(!ext_error_data) return;
@@ -312,7 +305,7 @@ static void show_error_message() {
 
 void external_popup_update(UIScreen *s, UIInput *u) {
     if (level_result) {
-        show_error_message();
+        show_level_load_error_message();
     }
 
     if (exiting_level) {

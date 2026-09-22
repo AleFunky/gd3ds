@@ -247,7 +247,7 @@ uLongf get_uncompressed_size(unsigned char *data, int data_len) {
 }
 
 
-char *decompress_data(unsigned char *data, int data_len, uLongf *out_len) {
+char *decompress_data(unsigned char *data, int data_len, uLongf *out_len, int *out_code) {
     uLongf final_size = get_uncompressed_size(data, data_len);
     printf("Decompressing to a final size of %lu bytes...\n", (unsigned long)final_size);
 
@@ -257,6 +257,7 @@ char *decompress_data(unsigned char *data, int data_len, uLongf *out_len) {
 
     if (inflateInit2(&strm, 15 | 32) != Z_OK) {   // auto-detect gzip/zlib
         output_log("Failed to initialize zlib stream for GZIP\n");
+        *out_code = LOAD_INVALID_LEVEL_DATA;
         return NULL;
     }
 
@@ -265,6 +266,7 @@ char *decompress_data(unsigned char *data, int data_len, uLongf *out_len) {
     if (!out) {
         output_log("malloc failed for %lu bytes\n", (unsigned long)final_size);
         inflateEnd(&strm);
+        *out_code = LOAD_OUT_OF_MEMORY;
         return NULL;
     }
 
@@ -276,6 +278,7 @@ char *decompress_data(unsigned char *data, int data_len, uLongf *out_len) {
         output_log("inflate failed with code %d\n", ret);
         free(out);
         inflateEnd(&strm);
+        *out_code = LOAD_INVALID_LEVEL_DATA;
         return NULL;
     }
 
@@ -322,7 +325,7 @@ char *get_metadata_value(const char *levelString, const char *key) {
     return NULL;
 }
 
-char *decompress_online_level(char *data) {
+char *decompress_online_level(char *data, int *out_code) {
     printf("Loading level data...\n");
 
     fix_base64_url(data);
@@ -335,6 +338,7 @@ char *decompress_online_level(char *data) {
     unsigned char *decoded = malloc(strlen(data));
 
     if (!decoded) {
+        *out_code = LOAD_OUT_OF_MEMORY;
         return NULL;
     }
     
@@ -342,11 +346,12 @@ char *decompress_online_level(char *data) {
     if (decoded_len <= 0) {
         output_log("Failed to decode base64\n");
         free(decoded);
+        *out_code = LOAD_INVALID_BASE64;
         return NULL;
     }
 
     uLongf decompressed_len;
-    char *decompressed = decompress_data(decoded, decoded_len, &decompressed_len);
+    char *decompressed = decompress_data(decoded, decoded_len, &decompressed_len, out_code);
     if (!decompressed) {
         output_log("Decompression failed (check zlib error above)\n");
         free(decoded);
@@ -358,13 +363,16 @@ char *decompress_online_level(char *data) {
     return decompressed;
 }
 
-char *decompress_level(char *data) {
+char *decompress_level(char *data, int *out_code) {
     printf("Loading level data...\n");
     
     char *b64 = extract_gmd_key((const char *) data, "k4", "s");
     if (!b64) {
         // Empty level
         char *temp = strdup(data);
+        if (!temp) {
+            *out_code = LOAD_OUT_OF_MEMORY;
+        }
         return temp;
     }
 
@@ -374,16 +382,21 @@ char *decompress_level(char *data) {
     fix_base64_url(b64);
 
     unsigned char *decoded = malloc(strlen(b64));
+    if (!decoded) {
+        *out_code = LOAD_OUT_OF_MEMORY;
+        return NULL;
+    }
     int decoded_len = base64_decode(b64, decoded);
     if (decoded_len <= 0) {
         output_log("Failed to decode base64\n");
         free(b64);
         free(decoded);
+        *out_code = LOAD_OUT_OF_MEMORY;
         return NULL;
     }
 
     uLongf decompressed_len;
-    char *decompressed = decompress_data(decoded, decoded_len, &decompressed_len);
+    char *decompressed = decompress_data(decoded, decoded_len, &decompressed_len, out_code);
     if (!decompressed) {
         output_log("Decompression failed (check zlib error above)\n");
         free(decoded);
@@ -505,10 +518,11 @@ void parse_color_channel(GDColorChannel *channels, int i, char *channel_string) 
     free_string_array(kvs, kvCount);
 }
 
-int parse_old_channels(char *level_string, GDColorChannel **outArray) {
+int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_code) {
     GDColorChannel *channels = malloc(sizeof(GDColorChannel) * 2);
     if (!channels) {
         output_log("Couldn't alloc initial pre 2.0 color channels\n");
+        *out_code = LOAD_OUT_OF_MEMORY;
         return 0;
     }
 
@@ -714,18 +728,22 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray) {
     return i;
 }
 
-int parse_color_channels(const char *colorString, GDColorChannel **outArray) {
+int parse_color_channels(const char *colorString, GDColorChannel **outArray, int *out_code) {
     if (!colorString || !outArray) return 0;
 
     int count = 0;
     // Split string into each channel
     char **entries = split_string(colorString, '|', &count, false);
-    if (!entries) return 0;
+    if (!entries) {
+        *out_code = LOAD_OUT_OF_MEMORY;
+        return 0;
+    }
 
     GDColorChannel *channels = malloc(sizeof(GDColorChannel) * count);
     if (!channels) {
         output_log("Couldn't alloc color channels\n");
         free_string_array(entries, count);
+        *out_code = LOAD_OUT_OF_MEMORY;
         return 0;
     }
 
@@ -1284,7 +1302,7 @@ int parse_string(const char *levelString) {
     if (sectionCount < 1) {
         output_log("Level string missing sections!\n");
         free_string_array(sections, sectionCount);
-        return 3;
+        return LOAD_LEVEL_STRING_MISSING_SECTIONS;
     }
     
     int objectCount = sectionCount - 1;
@@ -1294,7 +1312,7 @@ int parse_string(const char *levelString) {
     if (!init_arrays(objectCount)) {
         free_arrays();
         output_log("Failed to allocate object array\n");
-        return 4;
+        return LOAD_OUT_OF_MEMORY;
     }
 
     objects.count = objectCount;
@@ -1309,7 +1327,7 @@ int parse_string(const char *levelString) {
         if (!parse_gd_object(sections[i + 1], i)) {
             output_log("Failed to parse object %d\n", i);
             free_string_array(sections, sectionCount);
-            return 5;
+            return LOAD_COULDNT_PARSE_OBJECTS;
         }
 
         assign_object_to_section(i);
@@ -1327,7 +1345,7 @@ int parse_string(const char *levelString) {
 
     free_string_array(sections, sectionCount);
 
-    return 0;
+    return LOAD_NO_ERROR;
 }
 
 void set_color_channels() {
@@ -1455,26 +1473,33 @@ void load_online_level_info(char *level_string) {
 
 int load_online_level(LevelEntry *level) {
     bool compressed = true;
+    int out_code;
 
     // Base64 doesn't allow semicolons, so if theres one, its not compressed
     if (strchr(level->levelString, ';')) compressed = false;
-    
     char *data;
     if (compressed) {
-        data = decompress_online_level(level->levelString);
-        if (!data) return 2;
+        data = decompress_online_level(level->levelString, &out_code);
+        if (!data) return out_code;
     } else {
         data = strdup(level->levelString);
-        if (!data) return 2;
+        if (!data) return LOAD_OUT_OF_MEMORY;
     }
 
     // Get level starting colors
     char *metaStr = get_metadata_value(data, "kS38");
-    channelCount = parse_color_channels(metaStr, &colorChannels);
-
+    if (metaStr) {
+        channelCount = parse_color_channels(metaStr, &colorChannels, &out_code);
+        if (out_code) {
+            return out_code;
+        }
+    }
     // Fallback to pre 2.0 color keys
-    if (!channelCount) {
-        channelCount = parse_old_channels(data, &colorChannels);
+    else {
+        channelCount = parse_old_channels(data, &colorChannels, &out_code);
+        if (out_code) {
+            return out_code;
+        }
     }
 
     load_online_level_info(data);
@@ -1504,7 +1529,7 @@ int load_online_level(LevelEntry *level) {
     C2D_SpriteFromSheet(&sprite_templates[17].child_templates[0], spriteSheet, current_pulserod_ball_image);
     C2D_SpriteSetCenter(&sprite_templates[17].child_templates[0], 0.5f, 0.5f);
 
-    return 0;
+    return LOAD_NO_ERROR;
 }
 
 void load_level_info(char *data, char *level_string) {
@@ -1544,23 +1569,32 @@ void load_level_info(char *data, char *level_string) {
 }
 
 int load_level(char *path) {
+    int out_code;
+
     size_t out;
     char *level = read_file(path, &out);
     if (!level) return 1;
 
-    char *data = decompress_level(level);
+    char *data = decompress_level(level, &out_code);
     if (!data) {
         free(level);
-        return 2;
+        return out_code;
     }
 
     // Get level starting colors
     char *metaStr = get_metadata_value(data, "kS38");
-    channelCount = parse_color_channels(metaStr, &colorChannels);
-
+    if (metaStr) {
+        channelCount = parse_color_channels(metaStr, &colorChannels, &out_code);
+        if (out_code) {
+            return out_code;
+        }
+    }
     // Fallback to pre 2.0 color keys
-    if (!channelCount) {
-        channelCount = parse_old_channels(data, &colorChannels);
+    else {
+        channelCount = parse_old_channels(data, &colorChannels, &out_code);
+        if (out_code) {
+            return out_code;
+        }
     }
 
     load_level_info(level, data);
@@ -1591,7 +1625,7 @@ int load_level(char *path) {
     C2D_SpriteFromSheet(&sprite_templates[17].child_templates[0], spriteSheet, current_pulserod_ball_image);
     C2D_SpriteSetCenter(&sprite_templates[17].child_templates[0], 0.5f, 0.5f);
 
-    return 0;
+    return LOAD_NO_ERROR;
 }
 
 void reload_level() {
