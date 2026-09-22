@@ -119,8 +119,22 @@ static void update_arrows(UIScreen *s) {
     if (searchEntriesLength == page_entry->amount) ui_run_func_on_tag(s, "nextpage", ui_enable_element); else ui_run_func_on_tag(s, "nextpage", ui_disable_element);
     if ((filters.currentPage) >= 1) ui_run_func_on_tag(s, "prevpage", ui_enable_element); else ui_run_func_on_tag(s, "prevpage", ui_disable_element);
 
-    char pageInfo[32];
-    snprintf(pageInfo, 42 - 1, "%d to %d of %d", page_entry->currentOffset + 1, page_entry->currentOffset + page_entry->amount, page_entry->totalPages * page_entry->amount - 1);
+    int total = page_entry->totalPages * page_entry->amount - 1;
+    int current = page_entry->currentOffset + 1;
+    int to = page_entry->currentOffset + page_entry->amount;
+
+    // Cap to amount
+    if (current > total) {
+        current = total;
+    }
+
+    // Cap to amount
+    if (to > total) {
+        to = total;
+    }
+
+    char pageInfo[42];
+    snprintf(pageInfo, sizeof(pageInfo), "%d to %d of %d", current, to, total);
     ui_label_set_text(page_info_label, pageInfo);
 }
 
