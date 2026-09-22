@@ -1,9 +1,11 @@
 #include "ui_stack.h"
 #include "main.h"
+#include "menus/core/ui_element.h"
 #include "ui_screen.h"
 #include "screen_definitions.h"
 #include "mp3_player.h"
 #include "fonts/bigFont.h"
+#include <string.h>
 
 static UIStack *stack = NULL;
 
@@ -170,12 +172,6 @@ void ui_stack_push(
     if(type == PUSH_NONE || type == PUSH_GAME_STATE){
         return;
     }
-
-    // Hi cloud, this seems to be kinda limiting and it works so :vglue:
-    //if(stack->root_transition != UI_TRANSITION_NONE){
-    //    output_log("Cannot push during transition!\n");
-    //    return;
-    //}
 
     if(stack->push.type != PUSH_NONE){
         output_log("Cannot queue multiple pushes!\n");
@@ -433,6 +429,41 @@ void ui_stack_update(UIInput *input){
 
         update_closing();
     }
+}
+
+bool ui_stack_check_loaded_root(const UIScreenDefPair *screen) {
+    if (!screen) return false; 
+
+    UIScreenPair *pair = stack->screen_stack[stack->current_root];
+
+    if (strcmp(screen->name, pair->name) == 0) {
+        return true;
+    }
+    return false;
+}
+
+bool ui_stack_check_loaded_screen_in_root(const UIScreenDefPair *screen) {
+    if (!screen) return false; 
+    
+    for (size_t i = ui_stack_min_index() + 1; i <= ui_stack_max_index(); i++) {
+        UIScreenPair *pair = stack->screen_stack[i];
+        if (strcmp(screen->name, pair->name) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+UIScreenPair *ui_stack_get_loaded_screen(const UIScreenDefPair *screen) {
+    if (!screen) return NULL; 
+
+    for (size_t i = 0; i <= ui_stack_max_index(); i++) {
+        UIScreenPair *pair = stack->screen_stack[i];
+        if (strcmp(screen->name, pair->name) == 0) {
+            return pair;
+        }
+    }
+    return NULL;
 }
 
 void draw_stack_debug(){

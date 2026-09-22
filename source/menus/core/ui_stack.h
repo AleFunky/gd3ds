@@ -51,6 +51,10 @@ typedef struct {
     int next_game_state;
 } UIStack;
 
+bool ui_stack_check_loaded_root(const UIScreenDefPair *screen);
+bool ui_stack_check_loaded_screen_in_root(const UIScreenDefPair *screen);
+UIScreenPair *ui_stack_get_loaded_screen(const UIScreenDefPair *screen);
+
 void ui_stack_set_stack(UIStack *set_stack);
 
 void ui_stack_push(const UIScreenDefPair *defs, UIAnimation top_anim, UIAnimation btm_anim, UIStackPushType type);

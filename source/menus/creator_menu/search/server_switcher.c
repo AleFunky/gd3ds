@@ -1,7 +1,9 @@
+#include "menus/creator_menu/search/server_switcher.h"
 #include <3ds.h>
 #include <citro2d.h>
 
 #include "main.h"
+#include "menus/core/ui_screen.h"
 #include "mp3_player.h"
 
 #include "utils/server_utils.h"
@@ -53,14 +55,21 @@ static void action_switch_server(UIElement* e, const UIPropertyList *args) {
         playing_menu_loop = false;
         play_menu_song();
 
-        if(gdps){
+        if (gdps) {
             filters.difficultyFilters = filters.isDemon ? 0 : filters.difficultyFilters;
-            disable_demons(e->screen);
-        } else if(!gdps && filters.isDemon){
-            enable_demons(e->screen);
         }
 
-        update_difficulty_tints(e->screen);
+        if (ui_stack_check_loaded_root(&search_menu_def)) {
+            UIScreenPair *screenPair = ui_stack_get_loaded_screen(&search_menu_def);
+            UIScreen *screen = &screenPair->screens[SCREEN_BTM];
+            if(gdps){
+                disable_demons(screen);
+            } else if(!gdps && filters.isDemon){
+                enable_demons(screen);
+            }
+
+            update_difficulty_tints(screen);
+        }
     }
 
     filters.super = filters.super && gdps;
