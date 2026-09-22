@@ -1,0 +1,40 @@
+bggradient color=#326fff
+
+button x=24 y=28 id=6 actions=close_menu keyBinds="B"
+
+image x=36 y=205 id=178
+image x=284 y=205 id=178 sx=-1.0
+
+#Progress bars
+
+label x=160 y=119 text="Normal mode" scale=0.45 align=CENTER tag="level_card"
+progressbar x=160 y=132 max_value=100 style=0 scale=0.65 tag="level_card,normalprogress"
+label x=160 y=133 text="0%" scale=0.4 align=CENTER tag="level_card,normalprogressvalue"
+
+label x=160 y=154 text="Practice mode" scale=0.45 align=CENTER
+progressbar x=160 y=167 max_value=100 style=0 scale=0.65 tag="practiceprogress"
+label x=160 y=168 text="0%" scale=0.4 align=CENTER tag="level_card,practiceprogressvalue"
+
+button x=160 y=70 id=139 sheet=0 scale=1 actions=play keyBinds="A,START" tag="playbutton"
+spinner x=160 y=70 id=53 sheet=1 scale=1 speed=240 tag="spinner"
+
+button x=235 y=23 id=323 sheet=0 scale=1 actions=open_menu[screen="icon_kit" btm_anim="bounce_down" top_anim="bounce_down"] anim="pull" tag="garage"
+
+button x=295 y=25 id=49 sheet=0 scale=1 actions="delete"
+button x=295 y=75 id=202 sheet=0 scale=1 action="reload"
+button x=295 y=125 id=24 sheet=0 scale=1 actions=open_menu[screen="online_level_comments" btm_anim="zoom_subtle" top_anim="zoom_subtle"]
+
+button x=25 y=215 id=90 sheet=0 scale=1 actions=open_menu[screen="online_infobox" btm_anim="zoom" top_anim="zoom"]
+
+#Song download
+
+window x=160 y=210 w=216 h=60 style=0
+
+label x=61 y=195 text="Song Name Here" font=0 scale=0.55 align=LEFT tag="songname" w=160
+label x=61 y=207 text="By: Song Artist" font=2 scale=0.55 align=LEFT tag="songartist" w=160
+progressbar x=142 y=218 max_value=100 style=2 scale=0.75 tag="progressbar"
+label x=61 y=218 text="slop" font=0 scale=0.41 align=LEFT tag="songstatus" w=160
+label x=61 y=229 text="ID: 123456" font=0 scale=0.35 align=LEFT tag="songid"
+label x=61 y=229 text="Speed: 0KB/s" font=0 scale=0.35 align=LEFT tag="speed" w=100
+label x=230 y=229 text="Size: 0.00MB" font=0 scale=0.35 align=RIGHT tag="songsize"
+button x=245 y=215 id=57 sheet=0 scale=0.9 action="download" tag="downloadbtn"

@@ -7,7 +7,7 @@
 #include "player/collision.h"
 #include "particles/circles.h"
 #include "particles/particles.h"
-#include "menus/settings.h"
+#include "menus/settings_hub/settings.h"
 #include "menus/icon_kit.h"
 #include "practice.h"
 #include "utils/json_config.h"

@@ -1,5 +1,5 @@
 #include "menus/components/ui_button.h"
-#include "menus/core/ui_element.h"
+
 #include <citro2d.h>
 #include "ui_color_button.h"
 #include "menus/core/ui_screen.h"
@@ -19,7 +19,7 @@ static void ui_color_button_draw(UIElement* e, UITransform *transform) {
     UIColor *color = (UIColor *) e;
     UIButton *button = (UIButton *) e;
 
-    float scale = button->hoverScale;
+    float scale = button->hoverProgress;
 
     int color_idx = color->color_index;
 
@@ -54,7 +54,7 @@ static void ui_color_button_destroy(UIElement *e) {
     }
 }
 
-UIColor *ui_create_color_button(const UIContext *ctx) {
+UIColor *ui_create_color_button(UIScreen *screen) {
     UIColor *e = malloc(sizeof(UIColor));
 
     if (!e) return NULL;
@@ -69,9 +69,9 @@ UIColor *ui_create_color_button(const UIContext *ctx) {
     button->base.draw = ui_color_button_draw;
     button->base.destroy = ui_color_button_destroy;
     
-    ui_element_apply_default_properties(&button->base, ctx);
+    ui_element_apply_default_properties(&button->base, screen);
     
-    button->hoverScale = 1;
+    button->hoverProgress = 1;
     button->hoverFactor = 1;
 
     C2D_SpriteFromSheet(&e->image.sprite, ui_sheet, 175);
@@ -83,14 +83,14 @@ UIColor *ui_create_color_button(const UIContext *ctx) {
     return e;
 }
 
-UIElement *ui_create_color_button_from_props(const UIContext *ctx, const UIPropertyList *props) {
-    UIColor *color_button = ui_create_color_button(ctx);
+UIElement *ui_create_color_button_from_props(UIScreen *screen, const UIPropertyList *props) {
+    UIColor *color_button = ui_create_color_button(screen);
 
     if (!color_button) return NULL;
     
     UIButton *button = (UIButton *) color_button;
 
-    ui_element_apply_properties(&button->base, ctx, props);
+    ui_element_apply_properties(&button->base, screen, props);
     
     ui_element_set_size(&button->base, 30, 30);
 

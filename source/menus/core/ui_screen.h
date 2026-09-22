@@ -5,57 +5,7 @@
 
 #define MAX_ELEMENT_PROPERTIES 64
 
-typedef enum {
-    ANIM_NONE,
-    ANIM_ZOOM,
-    ANIM_ZOOM_SUBTLE,
-    ANIM_SLIDE_RIGHT,
-    ANIM_SLIDE_DOWN,
-
-    NUM_OPEN_ANIMS
-} UIAnimation;
-
-typedef enum {
-    UI_TRANSITION_NONE,
-    UI_TRANSITION_OPENING,
-    UI_TRANSITION_CLOSING
-} UITransitionState;
-
-typedef struct {
-    UIAnimation animation;
-    UITransitionState state;
-
-    float time;
-    float duration;
-
-    bool done;
-} UITransition;
-
-typedef struct UIContext {
-    UIScreen *screen;
-} UIContext;
-
-typedef struct {
-    const char* name;
-    UIActionFn fn;
-} UIAction;
-
-typedef struct UIScreen {
-    UIElement **elements;
-    size_t count;
-    size_t capacity;
-
-    const UIAction* actions;
-    size_t action_count;
-
-    UITransition transition;
-    bool isBottom;
-    bool disable_element_update;
-
-    bool loaded;
-
-    UIContext ctx;
-} UIScreen;
+typedef struct UIScreenPair UIScreenPair;
 
 typedef struct {
     const Charset *charset;
@@ -70,9 +20,81 @@ enum Fonts {
     NUM_FONTS
 };
 
+typedef enum {
+    ANIM_NONE,
+    ANIM_ZOOM,
+    ANIM_ZOOM_SUBTLE,
+    ANIM_BOUNCE_DOWN,
+    ANIM_BOUNCE_DOWN_SLOW,
+    ANIM_SLIDE_RIGHT,
+    ANIM_SLIDE_DOWN,
+
+    NUM_OPEN_ANIMS
+} UIAnimation;
+
+typedef enum {
+    UI_TRANSITION_NONE,
+    UI_TRANSITION_OPENING,
+    UI_TRANSITION_CLOSING
+} UITransitionState;
+
+typedef enum {
+    UI_DRAW_BEFORE,
+    UI_DRAW_AFTER
+} UIDrawPhase;
+
+typedef struct {
+    UIAnimation animation;
+    UITransitionState state;
+
+    float time;
+    float duration;
+    //determined based on the animation specified (only really applies to the slide down anim for out_duration = 0.5)
+    float in_duration;
+    float out_duration;
+    //amount of time it takes the (fullscreen) darken to fade in/out relative to the screen opening animation
+    float darken_frac;
+
+    bool done;
+} UITransition;
+
+typedef struct {
+    const char* path;
+
+    void (*init)(UIScreen *);
+    void (*update)(UIScreen *, UIInput *);
+    void (*draw)(UIScreen *, UIDrawPhase);
+    void (*exit)(UIScreen *);
+
+    UIActionList action_list;
+} UIScreenDefinition;
+
+typedef struct {
+    const char *name;
+    UIScreenDefinition top;
+    UIScreenDefinition btm;
+    void (*free_data)(void *data);
+} UIScreenDefPair;
+
+typedef struct UIScreen {
+    UIScreenPair *pair;
+    const UIScreenDefinition *def;
+
+    UIElement **elements;
+    size_t count;
+    size_t capacity;
+
+    UITransition transition;
+    bool isBottom:1;
+    bool disable_element_update:1;
+
+    bool loaded:1;
+    bool closing:1;
+} UIScreen;
+
 typedef void (*UIElementVisitor)(UIElement *element, void *userdata);
 typedef bool (*UIElementPredicate)(UIElement *, void *);
-typedef UIElement *(*UICreateFn)(const UIContext *ctx, const UIPropertyList *);
+typedef UIElement *(*UICreateFn)(UIScreen *screen, const UIPropertyList *);
 
 extern C2D_SpriteSheet ui_sheet;
 extern C2D_SpriteSheet ui_2_sheet;
@@ -96,45 +118,26 @@ void ui_assets_init();
 C2D_SpriteSheet *get_sheet(int sheet);
 
 void copy_tag_array(UIElement *e, const char *tags);
-void ui_load_screen(UIScreen* screen, const UIAction* actions, size_t count, const char* path);
-void ui_unload_screen(UIScreen *screen);
 
 void finish_animation(UIScreen *screen);
 
 void ui_screen_open(UIScreen *screen, UIAnimation animation);
 void ui_screen_close(UIScreen *screen);
 
-void ui_screen_update(UIScreen* screen, UIInput* touch);
-void ui_screen_draw(UIScreen* screen);
 UIElement *ui_get_element_by_tag(UIScreen *screen, const char *tag);
 void ui_run_func_on_tag(UIScreen *screen, const char *tag, void (*func)(UIElement *e));
 
 void ui_set_pos_on_tag(UIScreen *screen, float x, float y, const char *tag);
 
-// Premade functions for on "ui_run_func_on_tag"
-void ui_enable_element(UIElement *e);
-void ui_disable_element(UIElement *e);
-
-void ui_element_set_userdata(UIElement *element, void *userdata);
-
-bool ui_element_basic_bound_check(UIElement *e, UIInput *touch, UITransform *transform);
-
 char* next_token(char** cursor);
-void collect_properties(UIPropertyList *props, char *token, char **cursor, bool strip);
-
-UITransform ui_transform_combine(UITransform *parent, UIElement *e);
-
-void ui_update_tree(UIElement *e, UIInput *input, UITransform *parent);
-void ui_draw_tree(UIElement *e, UITransform *parent);
-void ui_destroy_tree(UIElement *e);
-
-void ui_element_add_child(UIElement *parent, UIElement *child);
-void ui_element_remove(UIElement *element);
+void collect_properties(UIPropertyList *props, char *token, char **cursor);
 
 void add_ui_particle_system(ParticleSystem *particle);
 void free_ui_particle_systems();
 
-UIElement *ui_get_child_by_type(UIElement *parent, UIElementType type);
-
-void ui_element_apply_default_properties(UIElement *e, const UIContext *ctx);
-void ui_element_apply_properties(UIElement *e, const UIContext *ctx, const UIPropertyList *props);
+void ui_load_screen(UIScreen* screen);
+void ui_load_screen_old(UIScreen* screen, const UIActionDef* actions, size_t action_count, const char* path);
+void ui_screen_update_transition(UIScreen *screen, float dt);
+void ui_screen_update(UIScreen* screen, UIInput* touch);
+void ui_screen_draw(UIScreen* screen);
+void ui_unload_screen(UIScreen *screen);

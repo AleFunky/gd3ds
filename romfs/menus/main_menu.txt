@@ -1,8 +1,6 @@
-button x=160 y=100 id=1 sheet=1 action="level_select" keyBinds="A,START"
-button x=60 y=120 id=79 action="icon_kit" keyBinds="X"
-button x=260 y=120 id=2 sheet=1 action="creator_menu" keyBinds="Y"
+button x=160 y=100 id=1 sheet=1 keyBinds="A,START" actions=open_menu[screen="level_select" type="root"]
+button x=60 y=120 id=79 keyBinds="X" actions=open_menu[screen="icon_kit" type="root"]
+button x=260 y=120 id=2 keyBinds="Y" sheet=1 actions=open_menu[screen="creator_menu" type="root"]
 
-button x=160 y=208 id=12 sheet=1 text="" action="statistics"
-button x=100 y=208 id=11 sheet=1 text="" action="settings"
-button x=220 y=208 id=424 scale=1 action="Server_Switcher"
-# button x=220 y=208 id=13 sheet=1 text="" action="credits"
+button x=190 y=208 id=12 sheet=1 actions=open_menu[screen="statistics" top_anim="slide_down" btm_anim="slide_down"]
+button x=130 y=208 id=11 sheet=1 actions=open_menu[screen="settings_hub" btm_anim="slide_down"]

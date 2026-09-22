@@ -1,4 +1,4 @@
-#include "menus/core/ui_element.h"
+
 #include <citro2d.h>
 #include "ui_button.h"
 #include "text.h"
@@ -50,7 +50,7 @@ static void ui_checkbox_destroy(UIElement *e) {
     }
 }
 
-static void ui_checkbox_pre_action(UIElement *e) {
+static void ui_checkbox_pre_action(UIElement *e, const UIPropertyList *args) {
     UICheckBox *checkbox = (UICheckBox *) e;
 
     checkbox->checked ^= 1;
@@ -60,11 +60,11 @@ static void ui_checkbox_pre_action(UIElement *e) {
 static void ui_checkbox_on_disable(UIElement *e) {
     UIButton *checkbox = (UIButton *) e;
     checkbox->hovered = false;
-    checkbox->hoverScale = 1.f;
+    checkbox->hoverProgress = 1.f;
     checkbox->hoverTimer = 0.f;
 }
 
-UICheckBox *ui_create_checkbox(const UIContext *ctx) {
+UICheckBox *ui_create_checkbox(UIScreen *screen) {
     UICheckBox *e = malloc(sizeof(UICheckBox));
 
     if (!e) return NULL;
@@ -84,9 +84,9 @@ UICheckBox *ui_create_checkbox(const UIContext *ctx) {
 
     button->base.on_disable = ui_checkbox_on_disable;
 
-    ui_element_apply_default_properties(&button->base, ctx);
+    ui_element_apply_default_properties(&button->base, screen);
     
-    button->hoverScale = 1;
+    button->hoverProgress = 1;
     button->hoverFactor = 1;
 
     set_checkbox_texture(e, e->checked);
@@ -94,14 +94,14 @@ UICheckBox *ui_create_checkbox(const UIContext *ctx) {
     return e;
 }
 
-UIElement *ui_create_checkbox_from_props(const UIContext *ctx, const UIPropertyList *props) {
-    UICheckBox *checkbox = ui_create_checkbox(ctx);
+UIElement *ui_create_checkbox_from_props(UIScreen *screen, const UIPropertyList *props) {
+    UICheckBox *checkbox = ui_create_checkbox(screen);
 
     if (!checkbox) return NULL;
 
     UIButton *button = (UIButton* ) checkbox;
 
-    ui_element_apply_properties(&button->base, ctx, props);
+    ui_element_apply_properties(&button->base, screen, props);
     
     checkbox->checked = ui_prop_bool(props, "checked", false);
     

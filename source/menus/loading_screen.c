@@ -1,6 +1,6 @@
 #include <3ds.h>
 #include <citro2d.h>
-#include "menus/core/ui_element.h"
+
 #include "menus/core/ui_screen.h"
 #include "math_helpers.h"
 #include "menus/components/ui_image.h"
@@ -83,17 +83,9 @@ char *splash_texts[] = {
     "Not vibecoded!" // Hopefully reduces people that think this the game is vibecoded lol
 };
 
-static UIAction actions[] = {
-
-};
-
-static UIAction actions_top[] = {
-
-};
-
 void loading_screen_init() {
-    ui_load_screen(&default_screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/loading_screen.txt");
-    ui_load_screen(&default_screen_top, actions_top, sizeof(actions_top) / sizeof(actions_top[0]), "romfs:/menus/loading_screen_top.txt");
+    ui_load_screen_old(&default_screen, NULL, 0, "romfs:/menus/loading_screen.txt");
+    ui_load_screen_old(&default_screen_top, NULL, 0, "romfs:/menus/loading_screen_top.txt");
 
     Color col;
     col.r = 0;
@@ -132,7 +124,6 @@ void loading_screen_update(float progress) {
     touchPosition touchPos;
     hidTouchRead(&touchPos);
     touch.touchPosition = touchPos;
-    touch.did_something = false;
     touch.interacted = false;
 
     ui_screen_update(&default_screen_top, &touch);
@@ -155,7 +146,6 @@ void loading_screen_update(float progress) {
 
     draw_background(20, SCREEN_HEIGHT-30);
     C2D_ViewScale(SCALE, SCALE);
-    draw_fade();
 
     C2D_ViewScale(1/SCALE, 1/SCALE);
     ui_screen_draw(&default_screen);

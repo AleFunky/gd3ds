@@ -1,5 +1,5 @@
 #include "icons.h"
-#include "menus/core/ui_element.h"
+
 #include <citro2d.h>
 #include "menus/core/ui_screen.h"
 #include "menus/core/ui_props.h"
@@ -7,12 +7,6 @@
 #include "graphics.h"
 
 #define ICON_WIDTH 30
-
-static void ui_palette_icons_update(UIElement* e, UIInput* touch, UITransform *transform) {
-    bool inside = ui_element_basic_bound_check(e, touch, transform);
-    
-    if (inside) touch->did_something = true;
-}
 
 static void ui_palette_icons_draw(UIElement* e, UITransform *transform) {
     UIPaletteIcons *palette_icons = (UIPaletteIcons *) e;
@@ -41,7 +35,7 @@ static void ui_palette_icons(UIElement *e) {
     }
 }
 
-UIPaletteIcons *ui_create_palette_icons(const UIContext *ctx) {
+UIPaletteIcons *ui_create_palette_icons(UIScreen *screen) {
     UIPaletteIcons *e = malloc(sizeof(UIPaletteIcons));
 
     if (!e) return NULL;
@@ -50,21 +44,20 @@ UIPaletteIcons *ui_create_palette_icons(const UIContext *ctx) {
     e->base.type = UI_PALETTE_ICONS;
     e->base.enabled = true;
 
-    e->base.update = ui_palette_icons_update;
     e->base.draw = ui_palette_icons_draw;
     e->base.destroy = ui_palette_icons;
     
-    ui_element_apply_default_properties(&e->base, ctx);
+    ui_element_apply_default_properties(&e->base, screen);
 
     return e;
 }
 
-UIElement *ui_create_palette_icons_from_props(const UIContext *ctx, const UIPropertyList *props) {
-    UIPaletteIcons *palette_icons = ui_create_palette_icons(ctx);
+UIElement *ui_create_palette_icons_from_props(UIScreen *screen, const UIPropertyList *props) {
+    UIPaletteIcons *palette_icons = ui_create_palette_icons(screen);
 
     if (!palette_icons) return NULL;
 
-    ui_element_apply_properties(&palette_icons->base, ctx, props);
+    ui_element_apply_properties(&palette_icons->base, screen, props);
 
     palette_icons->spacing = ui_prop_float(props, "spacing", 20);
 

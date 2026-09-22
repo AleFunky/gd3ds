@@ -1,15 +1,8 @@
-#include "menus/core/ui_element.h"
+
 #include <citro2d.h>
 #include "menus/core/ui_screen.h"
 #include "menus/core/ui_props.h"
 #include "math_helpers.h"
-
-static void ui_progress_bar_update(UIElement* e, UIInput* touch, UITransform *transform) {
-    bool inside = ui_element_basic_bound_check(e, touch, transform);
-    
-    // Mask background elements
-    if (inside) touch->did_something = true;
-}
 
 static void draw_frame(UIProgressBar *e, UITransform *transform) {
     C2D_SpriteSetCenter(&e->frame.sprite, 0.5f, 0.5f);
@@ -135,7 +128,7 @@ void ui_progress_bar_set_images(UIProgressBar *e, int style) {
     }
 }
 
-UIProgressBar *ui_create_progress_bar(const UIContext *ctx) {
+UIProgressBar *ui_create_progress_bar(UIScreen *screen) {
     UIProgressBar *e = malloc(sizeof(UIProgressBar));
 
     if (!e) return NULL;
@@ -145,24 +138,23 @@ UIProgressBar *ui_create_progress_bar(const UIContext *ctx) {
     e->base.enabled = true;
     e->useTint = false;
 
-    ui_element_apply_default_properties(&e->base, ctx);
+    ui_element_apply_default_properties(&e->base, screen);
 
     e->value = 0;
     e->max_value = 100;
 
-    e->base.update = ui_progress_bar_update;
     e->base.draw = ui_progress_bar_draw;
     e->base.destroy = ui_progress_bar_destroy;
 
     return e;
 }
 
-UIElement *ui_create_progress_bar_from_props(const UIContext *ctx, const UIPropertyList *props) {
-    UIProgressBar *progress_bar = ui_create_progress_bar(ctx);
+UIElement *ui_create_progress_bar_from_props(UIScreen *screen, const UIPropertyList *props) {
+    UIProgressBar *progress_bar = ui_create_progress_bar(screen);
 
     if (!progress_bar) return NULL;
 
-    ui_element_apply_properties(&progress_bar->base, ctx, props);
+    ui_element_apply_properties(&progress_bar->base, screen, props);
     
     progress_bar->style = ui_prop_int(props, "style", 0);
 

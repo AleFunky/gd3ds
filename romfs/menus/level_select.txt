@@ -6,7 +6,7 @@ image x=160 y=13 id=198 sx=0.75 sy=0.75
 
 # current menu
 
-windowbutton x=160 y=80 w=220 h=80 style=2 hoverFactor=0.5 action="open_level" tag="level_card,card_window"
+windowbutton x=160 y=80 w=220 h=80 style=2 hoverFactor=0.5 actions=play_sound[sound="play"],open_level tag="level_card,card_window"
 {
     label x=0 y=0 text="" align=CENTER tag="level_title" w=178
     image x=100 y=-30 id=408
@@ -58,7 +58,7 @@ progressbar x=160 y=182 max_value=100 style=0 scale=0.65 tag="level_card_2,pract
 
 label x=160 y=183 text="0%" scale=0.4 align=CENTER tag="level_card_2,practiceprogressvalue_2"
 
-button x=160 y=80 w=220 h=80 invisible=1 action="open_level"
+button x=160 y=80 w=220 h=80 invisible=1 actions=open_level,play_sound[sound="play"]
 
 button x=20 y=120 id=376 action="move_left" tag="left" sx=-1.0 keyBinds="L,ZL,LEFT,CSLEFT,CPLEFT"
 button x=300 y=120 id=376 action="move_right" tag="right" keyBinds="R,ZR,RIGHT,CSRIGHT,CPRIGHT"
@@ -72,4 +72,4 @@ image x=160 y=211 id=0 sheet=6 sx=0.727272 sy=0.727272
 image x=36 y=205 id=178
 image x=284 y=205 id=178 sx=-1.0
 
-button x=24 y=28 id=6 action="exit" keyBinds="B"
+button x=24 y=28 id=6 actions=close_menu keyBinds="B"

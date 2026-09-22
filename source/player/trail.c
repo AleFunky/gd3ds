@@ -15,7 +15,7 @@
 #include "math_helpers.h"
 #include "utils/gfx.h"
 
-#include "menus/settings.h"
+#include "menus/settings_hub/settings.h"
 
 const MotionTrailConfig trail_properties[TRAIL_COUNT] = {
     //default trail

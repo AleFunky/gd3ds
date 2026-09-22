@@ -1,7 +1,7 @@
 #pragma once
 #include <citro2d.h>
 #include "level_loading.h"
-#include "wav_player.h"
+#include "sounds.h"
 
 #include "particles/particles.h"
 #include "color_channels.h"
@@ -44,8 +44,6 @@ extern unsigned int level_frame;
 
 extern bool song_loaded;
 
-extern bool exiting_level;
-
 extern bool alt_title_screen;
 extern bool is_N3DS;
 
@@ -75,17 +73,8 @@ extern float faster_speed_particles_timer;
 #define SCREEN_HEIGHT 240
 
 enum GameState {
-    STATE_MAIN_MENU,
-    STATE_LEVEL_SELECT,
-    STATE_ICON_KIT,
+    STATE_MENU,
     STATE_GAME,
-    STATE_EXTERNAL_LEVELS,
-    STATE_SAVED_LEVELS,
-    STATE_ONLINE_LEVEL,
-    STATE_CREATOR_MENU,
-    STATE_SEARCH_MENU,
-    STATE_SOGGY,
-    STATE_ONLINE,
     STATE_EXIT
 };
 
@@ -95,10 +84,10 @@ typedef enum Cheats {
     CHEAT_COUNT
 } Cheats;
 
-typedef enum CurrentScreenTarget {
+typedef enum Screens {
     SCREEN_TOP,
-    SCREEN_BOTTOM
-} CurrentScreenTarget;
+    SCREEN_BTM
+} Screens;
 
 extern bool cheats_used[CHEAT_COUNT];
 extern const char *cheat_names[CHEAT_COUNT];
@@ -108,15 +97,9 @@ extern C3D_RenderTarget* top_right;
 extern C3D_RenderTarget* bot;
 
 extern int game_state;
+extern bool escape_state;
 extern bool playing_menu_loop;
 extern char menu_loop_path[32];
-
-extern SFX play_sound;
-extern SFX quit_sound;
-extern SFX explode_sound;
-extern SFX end_sound;
-extern SFX honk;
-extern SFX coin_sound;
 
 extern int level_result;
 

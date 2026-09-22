@@ -1,4 +1,4 @@
-#include "menus/core/ui_element.h"
+
 #include <citro2d.h>
 #include "menus/core/ui_screen.h"
 #include "menus/core/ui_props.h"
@@ -8,12 +8,6 @@ static const UIFloatEnumEntry alignment_table[] = {
     { "CENTER", 0.5f },
     { "RIGHT",  1.f }
 };
-
-static void ui_label_update(UIElement* e, UIInput* touch, UITransform *transform) {
-    // Do absolutely nothing
-    (void)e;
-    (void)touch;
-}
 
 static void ui_label_draw(UIElement* e, UITransform *transform) {
     UILabel *label = (UILabel *) e;
@@ -52,7 +46,7 @@ void ui_label_set_text(UILabel *e, const char *text) {
     strncpy(e->text, text, sizeof(e->text) - 1);
 }
 
-UILabel *ui_create_label(const UIContext *ctx) {
+UILabel *ui_create_label(UIScreen *screen) {
     UILabel *e = malloc(sizeof(UILabel));
 
     if (!e) return NULL;
@@ -61,23 +55,22 @@ UILabel *ui_create_label(const UIContext *ctx) {
     e->base.type = UI_LABEL;
     e->base.enabled = true;
     
-    ui_element_apply_default_properties(&e->base, ctx);
+    ui_element_apply_default_properties(&e->base, screen);
 
     e->parse_tags = true;
 
-    e->base.update = ui_label_update;
     e->base.draw = ui_label_draw;
     e->base.destroy = ui_label_destroy;
 
     return e;
 }
 
-UIElement *ui_create_label_from_props(const UIContext *ctx, const UIPropertyList *props) {
-    UILabel *label = ui_create_label(ctx);
+UIElement *ui_create_label_from_props(UIScreen *screen, const UIPropertyList *props) {
+    UILabel *label = ui_create_label(screen);
 
     if (!label) return NULL;
 
-    ui_element_apply_properties(&label->base, ctx, props);
+    ui_element_apply_properties(&label->base, screen, props);
 
     ui_label_set_text(label, ui_prop_string(props, "text", ""));
     

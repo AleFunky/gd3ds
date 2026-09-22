@@ -9,7 +9,7 @@
 #include "state.h"
 #include "math_helpers.h"
 #include "utils/gfx.h"
-#include "menus/settings.h"
+#include "menus/settings_hub/settings.h"
 
 static float randf() {
     return (float)rand() / RAND_MAX;

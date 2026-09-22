@@ -1,4 +1,4 @@
-#include "menus/core/ui_element.h"
+
 #include <citro2d.h>
 #include "menus/core/ui_screen.h"
 #include "graphics.h"
@@ -70,7 +70,7 @@ static void ui_use_effect_destroy(UIElement *e) {
     }
 }
 
-UIUseEffect *ui_create_use_effect(const UIContext *ctx) {
+UIUseEffect *ui_create_use_effect(UIScreen *screen) {
     UIUseEffect *e = malloc(sizeof(UIUseEffect));
 
     if (!e) return NULL;
@@ -85,7 +85,7 @@ UIUseEffect *ui_create_use_effect(const UIContext *ctx) {
         e->yPos[i] = 0;
     }
     
-    ui_element_apply_default_properties(&e->base, ctx);
+    ui_element_apply_default_properties(&e->base, screen);
 
     e->base.type = UI_USE_EFFECT;
     e->base.enabled = true;
@@ -97,12 +97,12 @@ UIUseEffect *ui_create_use_effect(const UIContext *ctx) {
     return e;
 }
 
-UIElement *ui_create_use_effect_from_props(const UIContext *ctx, const UIPropertyList *props) {
-    UIUseEffect *use_effect = ui_create_use_effect(ctx);
+UIElement *ui_create_use_effect_from_props(UIScreen *screen, const UIPropertyList *props) {
+    UIUseEffect *use_effect = ui_create_use_effect(screen);
 
     if (!use_effect) return NULL;
 
-    ui_element_apply_properties(&use_effect->base, ctx, props);
+    ui_element_apply_properties(&use_effect->base, screen, props);
 
     return &use_effect->base;
 }

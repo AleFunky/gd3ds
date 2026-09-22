@@ -1,4 +1,4 @@
-bggradient tag="gradient" 
+bggradient color=#a7a7a7
 
 image x=200 y=150 id=0 sheet=6 scale=0.75
 
@@ -10,3 +10,5 @@ label x=370 y=36 text="0" align=RIGHT scale=0.5 tag="secretcoins_text"
 image x=36 y=35 id=178 sy=-1.0
 image x=36 y=205 id=178
 image x=364 y=205 id=178 sx=-1.0
+
+icon x=200 y=120 scale=2.0 tag="big_icon"

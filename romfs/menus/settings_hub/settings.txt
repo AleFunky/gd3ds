@@ -1,0 +1,21 @@
+darken opacity=0.4
+
+window x=160 y=120 w=300 h=220 style=0
+{
+    # Categories
+    
+    windowbutton x=-102 y=-65 text="Graphics" w=110 h=30 style=5 scale=0.65 textScale=0.6 action="category" custom=[page=0] tag="category,graphics"
+    windowbutton x=-102 y=-40 text="Input" w=110 h=30 style=5 scale=0.65 textScale=0.6    action="category" custom=[page=1] tag="category,input"
+    windowbutton x=-102 y=-15 text="Misc" w=110 h=30 style=5 scale=0.65 textScale=0.6     action="category" custom=[page=2] tag="category,misc"
+    windowbutton x=-102 y=10 text="Gameplay" w=110 h=30 style=5 scale=0.65 textScale=0.6  action="category" custom=[page=3] tag="category,gameplay"
+    windowbutton x=-102 y=35 text="Cosmetic" w=110 h=30 style=5 scale=0.65 textScale=0.6  action="category" custom=[page=4] tag="category,cosmetic"
+
+    # List
+
+    window x=42 y=10 w=200 h=180 style=9
+    list w=190 h=170 x=42 y=10 tag="list" bgColor="#bf723e"
+
+    label x=42 y=-92 scale=0.6 text="Graphics" tag="listlabel" align=CENTER
+
+    button x=-140 y=-100 id=31 scale=0.8 actions=close_menu keyBinds="B"
+}

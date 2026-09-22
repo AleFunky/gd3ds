@@ -1,5 +1,5 @@
 #include "menus/components/ui_button.h"
-#include "menus/core/ui_element.h"
+
 #include <citro2d.h>
 #include "ui_image.h"
 #include "text.h"
@@ -10,7 +10,7 @@
 #include "easing.h"
 #include "math_helpers.h"
 #include "menus/core/ui_screen.h"
-#include "menus/settings.h"
+#include "menus/settings_hub/settings.h"
 #include "menus/gameplay.h"
 #include "state.h"
 #include "menus/core/ui_props.h"
@@ -49,7 +49,7 @@ static void ui_window_button_destroy(UIElement *e) {
 static void ui_window_button_on_disable(UIElement *e) {
     UIButton *button = (UIButton *) e;
     button->hovered = false;
-    button->hoverScale = 1.f;
+    button->hoverProgress = 1.f;
     button->hoverTimer = 0.f;
 }
 
@@ -61,7 +61,7 @@ void ui_window_button_set_style(UIWindowButton *e, int style) {
     e->border = e->atlas.subtex->width / 3;
 }
 
-UIWindowButton *ui_create_window_button(const UIContext *ctx) {
+UIWindowButton *ui_create_window_button(UIScreen *screen) {
     UIWindowButton *e = malloc(sizeof(UIWindowButton));
 
     if (!e) return NULL;
@@ -79,9 +79,9 @@ UIWindowButton *ui_create_window_button(const UIContext *ctx) {
 
     button->base.on_disable = ui_window_button_on_disable;
 
-    ui_element_apply_default_properties(&button->base, ctx);
+    ui_element_apply_default_properties(&button->base, screen);
     
-    button->hoverScale = 1;
+    button->hoverProgress = 1;
     button->hoverFactor = 1;
 
     ui_window_button_set_tint(e, C2D_Color32(255, 255, 255, 255));
@@ -91,14 +91,14 @@ UIWindowButton *ui_create_window_button(const UIContext *ctx) {
     return e;
 }
 
-UIElement *ui_create_window_button_from_props(const UIContext *ctx, const UIPropertyList *props) {
-    UIWindowButton *window_button = ui_create_window_button(ctx);
+UIElement *ui_create_window_button_from_props(UIScreen *screen, const UIPropertyList *props) {
+    UIWindowButton *window_button = ui_create_window_button(screen);
 
     if (!window_button) return NULL;
     
     UIButton *button = (UIButton *) window_button;
 
-    ui_element_apply_properties(&button->base, ctx, props);
+    ui_element_apply_properties(&button->base, screen, props);
 
     button->font = ui_prop_int(props, "font", 0);
     button->textScale = ui_prop_float(props, "textScale", 0);

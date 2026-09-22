@@ -2,21 +2,17 @@
 #include "c2d/sprite.h"
 #include "c3d/maths.h"
 #include "graphics.h"
-#include "menus/core/ui_element.h"
+
 #include "menus/core/ui_props.h"
 #include "menus/core/ui_screen.h"
 #include "ui_image.h"
 #include "math_helpers.h"
 
-static void ui_spinner_update(UIElement* e, UIInput* touch, UITransform *transform) {
-    ui_image_update(e, touch, transform);
-}
-
 static void ui_spinner_draw(UIElement* e, UITransform *transform) {
     UIImage *image = (UIImage *) e;
     UISpinner *spinner = (UISpinner *) image;
     
-    C2D_SpriteRotate(&image->image.sprite, C3D_AngleFromDegrees(spinner->rotation_speed * DT)); // Cloud pls save us all and do screen rewrite
+    C2D_SpriteRotate(&image->image.sprite, C3D_AngleFromDegrees(spinner->rotation_speed * DT)); // Cloud pls save us all and do screen rewrite //Why would that help this
     
     change_blending(spinner->blending);
     ui_image_draw(e, transform);
@@ -31,7 +27,7 @@ void ui_spinner_destroy(UIElement *e) {
 }
 
 
-UISpinner *ui_create_spinner(const UIContext *ctx) {
+UISpinner *ui_create_spinner(UIScreen *s) {
     UISpinner *e = malloc(sizeof(UISpinner));
 
     if (!e) return NULL;
@@ -42,28 +38,27 @@ UISpinner *ui_create_spinner(const UIContext *ctx) {
     image->base.type = UI_IMAGE;
     image->base.enabled = true;
 
-    ui_element_apply_default_properties(&image->base, ctx);
+    ui_element_apply_default_properties(&image->base, s);
 
     ui_image_clear_tint(image);
     ui_image_set_image(image, 53, 1);
 
     e->blending = true;
 
-    image->base.update = ui_spinner_update;
     image->base.draw = ui_spinner_draw;
     image->base.destroy = ui_spinner_destroy;
 
     return e;
 }
 
-UIElement *ui_create_spinner_from_props(const UIContext *ctx, const UIPropertyList *props) {
-    UISpinner *spinner = ui_create_spinner(ctx);
+UIElement *ui_create_spinner_from_props(UIScreen *s, const UIPropertyList *props) {
+    UISpinner *spinner = ui_create_spinner(s);
     
     if (!spinner) return NULL;
 
     UIImage *image = (UIImage *) spinner;
 
-    ui_element_apply_properties(&image->base, ctx, props);
+    ui_element_apply_properties(&image->base, s, props);
 
     ui_image_set_image(image, 
         ui_prop_int(props, "id", 53),

@@ -1,6 +1,6 @@
 #pragma once
 #include "ui_button.h"
-#include "menus/core/ui_element.h"
+
 
 
 #define WINDOW_BUTTON_HOVER_SCALE BUTTON_HOVER_SCALE
@@ -8,5 +8,5 @@
 
 void ui_window_button_set_tint(UIWindowButton* e, u32 color);
 void ui_window_button_set_style(UIWindowButton *e, int style);
-UIWindowButton *ui_create_window_button(const UIContext *ctx);
-UIElement *ui_create_window_button_from_props(const UIContext *ctx, const UIPropertyList *props);
+UIWindowButton *ui_create_window_button(UIScreen *screen);
+UIElement *ui_create_window_button_from_props(UIScreen *screen, const UIPropertyList *props);

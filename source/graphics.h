@@ -26,6 +26,12 @@
 
 extern int current_pulserod_ball_image;
 
+typedef enum {
+    FADE_STATUS_NONE,
+    FADE_STATUS_OUT,
+    FADE_STATUS_IN
+} FadeStatus;
+
 // Simple sprite struct
 typedef struct
 {

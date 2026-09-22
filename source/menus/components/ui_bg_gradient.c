@@ -1,19 +1,12 @@
 #include "menus/components/ui_image.h"
 #include "menus/core/common_setters.h"
-#include "menus/core/ui_element.h"
+
 #include <citro2d.h>
 #include "menus/core/ui_screen.h"
 #include "menus/core/ui_props.h"
 #include "ui_bg_gradient.h"
 #include "math_helpers.h"
-#include "menus/search_menu.h"
-
-static void ui_bg_gradient_update(UIElement* e, UIInput* touch, UITransform *transform) {
-    bool inside = ui_element_basic_bound_check(e, touch, transform);
-
-    // Mask background elements
-    if (inside) touch->did_something = true;
-}
+#include "menus/creator_menu/search_menu.h"
 
 static void ui_bg_gradient_draw(UIElement* e, UITransform *transform) {
     UIImage *image = (UIImage *) e;
@@ -32,7 +25,7 @@ static void ui_bg_gradient_destroy(UIElement *e) {
     }
 }
 
-UIImage *ui_create_bg_gradient(const UIContext *ctx) {
+UIImage *ui_create_bg_gradient(UIScreen *screen) {
     UIImage *e = malloc(sizeof(UIImage));
 
     if (!e) return NULL;
@@ -43,7 +36,7 @@ UIImage *ui_create_bg_gradient(const UIContext *ctx) {
     e->base.y = 0;
     e->base.enabled = true;
     
-    ui_element_apply_default_properties(&e->base, ctx);
+    ui_element_apply_default_properties(&e->base, screen);
 
     C2D_SpriteFromSheet(&e->image.sprite, bg_gradient_sheet, 0);
 
@@ -54,19 +47,18 @@ UIImage *ui_create_bg_gradient(const UIContext *ctx) {
 
     ui_image_clear_tint(e);
 
-    e->base.update = ui_bg_gradient_update;
     e->base.draw = ui_bg_gradient_draw;
     e->base.destroy = ui_bg_gradient_destroy;
 
     return e;
 }
 
-UIElement *ui_create_bg_gradient_from_props(const UIContext *ctx, const UIPropertyList *props) {
-    UIImage *bg_gradient = ui_create_bg_gradient(ctx);
+UIElement *ui_create_bg_gradient_from_props(UIScreen *screen, const UIPropertyList *props) {
+    UIImage *bg_gradient = ui_create_bg_gradient(screen);
 
     if (!bg_gradient) return NULL;
     
-    ui_element_apply_properties(&bg_gradient->base, ctx, props);
+    ui_element_apply_properties(&bg_gradient->base, screen, props);
 
     // Those have to be hardcoded
     ui_element_set_position((UIElement *) bg_gradient, 0, 0);

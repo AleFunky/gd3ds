@@ -4,14 +4,6 @@
 #include <citro2d.h>
 #include <string.h>
 #include "level_loading.h"
-#include "menus/components/ui_window_button.h"
-#include "menus/core/ui_element.h"
-#include "menus/core/ui_screen.h"
-#include "menus/components/ui_list.h"
-#include "menus/components/ui_image.h"
-#include "menus/components/ui_label.h"
-#include "menus/components/ui_button.h"
-#include "menus/components/ui_rectangle.h"
 #include "main.h"
 #include "mp3_player.h"
 #include "graphics.h"
@@ -19,10 +11,18 @@
 #include "utils/server_utils.h"
 #include "network.h"
 #include "utils/string_helpers.h"
-#include "menus/search_menu.h"
-#include "menus/online_menu.h"
-#include "menus/online_level_menu.h"
-#include "menus/online_level_comments.h"
+
+#include "menus/core/ui_screen.h"
+#include "menus/components/ui_list.h"
+#include "menus/components/ui_image.h"
+#include "menus/components/ui_label.h"
+#include "menus/components/ui_button.h"
+#include "menus/components/ui_rectangle.h"
+#include "menus/components/ui_window_button.h"
+#include "menus/creator_menu/search_menu.h"
+#include "menus/creator_menu/online/online_menu.h"
+#include "menus/creator_menu/online/online_level_menu.h"
+#include "menus/creator_menu/online/online_level_comments.h"
 
 SearchEntry *search_entries = NULL;
 CreatorEntry *creator_entries = NULL;

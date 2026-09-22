@@ -9,7 +9,7 @@
 #include "math_helpers.h"
 #include "color_channels.h"
 #include "utils/gfx.h"
-#include "menus/settings.h"
+#include "menus/settings_hub/settings.h"
 
 #define MAX_CHECKPOINTS 100
 #define CHECKPOINT_GFX_ID 6

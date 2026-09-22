@@ -1,4 +1,4 @@
-darken x=0 y=0 opacity=0.4 darkenTime=0.5 tag="darken"
+darken x=0 y=0 opacity=0.4 tag="darken"
 
 image x=160 y=120 id=21 sheet=1 scale=0
 
@@ -8,7 +8,7 @@ image x=240 y=-4 id=121 scale=0.8 sheet=3 tag="window"
 
 # window x=160 y=120 w=256 h=176 style=0 scale=0.8
 image x=160 y=120 id=21 sheet=1 scale=0.9
-button x=24 y=28 id=8 action="exit" keyBinds="B"
+button x=24 y=28 id=8 actions=close_menu keyBinds="B"
 
 # Labelling
 

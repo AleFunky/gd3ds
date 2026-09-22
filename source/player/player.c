@@ -15,7 +15,7 @@
 #include "main.h"
 
 #include "mp3_player.h"
-#include "menus/settings.h"
+#include "menus/settings_hub/settings.h"
 #include "utils/gfx.h"
 
 #include "easing.h"
@@ -769,8 +769,6 @@ void run_player(Player *player) {
 }
 
 void handle_player(Player *player) {
-    if (get_fade_status()) return;
-
     u64 start_player = svcGetSystemTick();
     if (curr_input.holdJump) {
         if (player->buffering_state == BUFFER_NONE) {

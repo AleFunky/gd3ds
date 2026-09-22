@@ -1,4 +1,5 @@
 #pragma once
+#include "menus/core/ui_element.h"
 
 #include <stdbool.h>
 
@@ -27,7 +28,7 @@
 #define LVL_COMPLETE_STATE_2_DURATION 0.22f
 #define LVL_COMPLETE_STATE_2_TARGET_SCALE 0.01f
 
-int handle_wall_cutscene(float delta);
+int handle_wall_cutscene(float delta, UIInput *touch);
 
 void clear_level_complete_popup();
 void handle_level_complete_popup(float delta);

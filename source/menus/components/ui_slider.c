@@ -1,5 +1,5 @@
 #include "menus/core/common_setters.h"
-#include "menus/core/ui_element.h"
+
 #include <citro2d.h>
 #include "menus/core/ui_screen.h"
 #include "menus/core/ui_props.h"
@@ -110,9 +110,9 @@ static void ui_slider_update(UIElement* e, UIInput* touch, UITransform *transfor
 
     bool inside = slider_touching_button(s, touch, transform);
 
-    bool pressedTouch = hidKeysDown() & KEY_TOUCH;
-    bool heldTouch = hidKeysHeld() & KEY_TOUCH;
-    bool releasedTouch = hidKeysUp() & KEY_TOUCH;
+    bool pressedTouch = touch->down & KEY_TOUCH;
+    bool heldTouch = touch->held & KEY_TOUCH;
+    bool releasedTouch = touch->up & KEY_TOUCH;
 
     if (pressedTouch && inside) {
         s->dragging = true;
@@ -131,7 +131,6 @@ static void ui_slider_update(UIElement* e, UIInput* touch, UITransform *transfor
     // Mask background elements
     if (inside) {
         touch->interacted = true;
-        touch->did_something = true;
     }
 }
 
@@ -167,7 +166,7 @@ static void ui_slider_init_graphics(UISlider *e) {
     e->base.h = e->track.image.subtex->height;
 }
 
-UISlider *ui_create_slider(const UIContext *ctx) {
+UISlider *ui_create_slider(UIScreen *screen) {
     UISlider *e = malloc(sizeof(UISlider));
 
     if (!e) return NULL;
@@ -176,7 +175,7 @@ UISlider *ui_create_slider(const UIContext *ctx) {
     e->base.type = UI_SLIDER;
     e->base.enabled = true;
     
-    ui_element_apply_default_properties(&e->base, ctx);
+    ui_element_apply_default_properties(&e->base, screen);
 
     ui_slider_init_graphics(e);
 
@@ -190,12 +189,12 @@ UISlider *ui_create_slider(const UIContext *ctx) {
     return e;
 }
 
-UIElement *ui_create_slider_from_props(const UIContext *ctx, const UIPropertyList *props) {
-    UISlider *slider = ui_create_slider(ctx);
+UIElement *ui_create_slider_from_props(UIScreen *screen, const UIPropertyList *props) {
+    UISlider *slider = ui_create_slider(screen);
 
     if (!slider) return NULL;
 
-    ui_element_apply_properties(&slider->base, ctx, props);
+    ui_element_apply_properties(&slider->base, screen, props);
 
     slider->max_value = ui_prop_float(props, "max_value", 100);
 

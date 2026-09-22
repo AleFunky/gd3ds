@@ -8,7 +8,7 @@
 #include "save/config.h"
 
 #include "menus/core/ui_screen.h"
-#include "menus/settings.h"
+#include "menus/settings_hub/settings.h"
 #include "menus/level_select.h"
 
 #include "fonts/goldFont.h"

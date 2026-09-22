@@ -4,25 +4,24 @@
 #include "level_complete.h"
 
 #include "menus/core/common_setters.h"
-#include "menus/core/ui_element.h"
-#include "menus/core/ui_screen.h"
+
 #include "math_helpers.h"
-#include "menus/components/ui_list.h"
-#include "menus/components/ui_image.h"
-#include "menus/components/ui_label.h"
 #include "fonts/bigFont.h"
 #include "main.h"
 #include "easing.h"
 #include "mp3_player.h"
 #include "level_select.h"
 #include "state.h"
-#include "menus/components/ui_darken.h"
-#include "main.h"
 #include "particles/circles.h"
+
+#include "menus/components/ui_darken.h"
+#include "menus/components/ui_list.h"
+#include "menus/components/ui_image.h"
+#include "menus/components/ui_label.h"
 #include "menus/components/ui_particle.h"
 #include "menus/components/ui_use_effect.h"
+#include "menus/settings_hub/settings.h"
 
-#include "menus/settings.h"
 #include "utils/string_helpers.h"
 
 #include "save/saving.h"
@@ -104,7 +103,7 @@ char *completion_texts[] = {
 };
 
 
-static void exit_level_complete(UIElement* e) {
+static void exit_level_complete(UIElement* e, const UIPropertyList *args) {
     if (!animating_up) {
         play_sfx(&quit_sound, 1);
         yes_exit = true;
@@ -114,10 +113,8 @@ static void exit_level_complete(UIElement* e) {
     }
 }
 
-static void restart_level(UIElement* e) {
+static void restart_level(UIElement* e, const UIPropertyList *args) {
     if (!animating_up) {
-        ui_get_element_by_tag(&screen, "endDarken")->opacity = 0.f;
-        
         play_sfx(&play_sound, 1);
         animating_up = true;
         animating_down = false;
@@ -134,7 +131,7 @@ static void scale_bottom_buttons_anim(UIElement* e){
     ui_element_set_scale((UIElement *) button, fade_value_scale);
 }
 
-static UIAction actions[] = {
+static UIActionDef actions[] = {
     { "restart", restart_level },
     { "exit", exit_level_complete },
 };
@@ -277,6 +274,13 @@ static void run_end_animation(float delta) {
 
 #define COMPLETION_TEXT_MAX_WIDTH 250.f
 
+static const UIScreenDefinition level_complete_def = {
+    .action_list = {
+        .actions = actions,
+        .action_count = ARRAY_LEN(actions)
+    }
+};
+
 void level_complete_init() {
     init = true;
     in_level_complete = true;
@@ -284,8 +288,10 @@ void level_complete_init() {
     ui_unload_screen(&screen);
     ui_unload_screen(&screen_top);
     
-    ui_load_screen(&screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/level_complete_top.txt");
-    ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/level_complete.txt");
+    screen.def = &level_complete_def;
+
+    ui_load_screen_old(&screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/level_complete_top.txt");
+    ui_load_screen_old(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/level_complete.txt");
 
     state.current_data.time_end = svcGetSystemTick() / (CPU_TICKS_PER_MSEC * 1000);
 
@@ -457,12 +463,12 @@ void level_complete_init() {
     ui_get_element_by_tag(&screen, "endDarken")->opacity = 0.f;
 }
 
-int level_complete_loop(float delta) {
+int level_complete_loop(UIInput *touch) {
     if (!init) return 0;
 
-    if (animating_down) run_start_animation(delta);
-    if (animating_reward && !state.practice_mode && !cheated) run_rewards_animation(delta);
-    if (animating_up) run_end_animation(delta);
+    if (animating_down) run_start_animation(1.f / 60.f);
+    if (animating_reward && !state.practice_mode && !cheated) run_rewards_animation(1.f / 60.f);
+    if (animating_up) run_end_animation(1.f / 60.f);
 
     if (yes_exit) {
         return 1;
@@ -472,14 +478,8 @@ int level_complete_loop(float delta) {
         return 2;
     }
 
-    UIInput touch;
-    touchPosition touchPos;
-    hidTouchRead(&touchPos);
-    touch.touchPosition = touchPos;
-    touch.did_something = false;
-    touch.interacted = false;
-    ui_screen_update(&screen, &touch);
-    ui_screen_update(&screen_top, &touch);
+    ui_screen_update(&screen, touch);
+    ui_screen_update(&screen_top, touch);
 
     return 0;
 }
@@ -490,20 +490,11 @@ void level_complete_destroy() {
 
 void draw_level_complete() {
     if (init) {
-        if (get_fade_status()) {
-            level_complete_loop(1.f/60);
-        }
-
         ui_screen_draw(&screen);
     }
 }
 void draw_level_complete_top() {
     if (init) {
-        // Only tick once, no matter how many eyes are drawn
-        if (get_fade_status() && !is_extra_eye()) {
-            level_complete_loop(1.f/60);
-        }
-        
         ui_screen_draw(&screen_top);
     }
 }

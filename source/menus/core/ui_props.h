@@ -1,6 +1,8 @@
 #pragma once
-
 #include <3ds/types.h>
+
+typedef struct UIAction UIAction;
+typedef struct UIActionDef UIActionDef;
 
 typedef struct {
     const char *key;
@@ -45,3 +47,6 @@ float ui_prop_float_enum(const UIPropertyList *props, const char *key, const UIF
 u32 ui_prop_color(const UIPropertyList *props, const char *key, u32 default_value);
 
 UIPropertyList ui_prop_list(const UIPropertyList *props, const char *key);
+
+UIAction *parse_actions(char *value, const UIActionDef *action_defs, const size_t actions_count, size_t *out_entry_count);
+UIAction *ui_prop_actions(const UIPropertyList *props, const UIActionDef *action_defs, const size_t actions_count, const char *key, size_t *out_entry_count);

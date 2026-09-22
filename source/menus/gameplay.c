@@ -1,32 +1,29 @@
 #include <3ds.h>
 #include <citro2d.h>
 #include "utils/precise_input.h"
+
+#include "main.h"
+#include "graphics.h"
+#include "state.h"
+#include "color_channels.h"
+#include "easing.h"
+#include "mp3_player.h"
+#include "particles/circles.h"
+
 #include "menus/core/common_setters.h"
-#include "menus/core/ui_element.h"
 #include "menus/core/ui_screen.h"
+#include "menus/components/ui_use_effect.h"
 #include "menus/components/ui_list.h"
 #include "menus/components/ui_window.h"
 #include "menus/components/ui_image.h"
 #include "menus/components/ui_progress_bar.h"
 #include "menus/components/ui_label.h"
 #include "menus/components/ui_button.h"
-#include "main.h"
-#include "easing.h"
-#include "color_channels.h"
-#include "mp3_player.h"
-#include "graphics.h"
-#include "main_menu.h"
-#include "level_select.h"
-#include "state.h"
-#include "menus/components/ui_use_effect.h"
-#include "particles/circles.h"
-
-#include "settings.h"
-#include "generic_disclaimer.h"
-
-#include "gameplay.h"
-
-#include "info_card.h"
+#include "menus/settings_hub/settings.h"
+#include "menus/settings_hub/info_card.h"
+#include "menus/gameplay.h"
+#include "menus/main_menu.h"
+#include "menus/level_select.h"
 
 #include "practice.h"
 
@@ -34,8 +31,6 @@
 
 bool game_paused = false;
 bool in_level_complete = false;
-static bool in_disclaimer = false;
-static bool in_settings = false;
 
 static UIImage *bg_gradient;
 static UIProgressBar *progress_bar;
@@ -62,6 +57,9 @@ static bool coins_circles_spawned[3];
 static UIImage *coin_1_top;
 static UIImage *coin_2_top;
 static UIImage *coin_3_top;
+
+static UIScreen *screen_top;
+static UIScreen *screen;
 
 int decimal;
 
@@ -97,7 +95,7 @@ static void reset_coin(LevelData *level_data_sel, int i){
 void reset_coins(){
     LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
 
-    ui_use_effect_clear((UIUseEffect *) ui_get_element_by_tag(&default_screen, "coin_circle"));
+    ui_use_effect_clear((UIUseEffect *) ui_get_element_by_tag(screen, "coin_circle"));
 
     for(int i = 0; i < 3; i++){
         reset_coin(level_data_sel, i);
@@ -114,21 +112,20 @@ void pause_game() {
     game_paused = true;
     if (song_loaded || state.practice_mode) pause_playback_mp3();
     if (!state.custom_level){
-        ui_run_func_on_tag(&default_screen_top, "coin_1", ui_enable_element);
-        ui_run_func_on_tag(&default_screen_top, "coin_2", ui_enable_element);
-        ui_run_func_on_tag(&default_screen_top, "coin_3", ui_enable_element);
-        ui_run_func_on_tag(&default_screen, "coin_1", ui_disable_element);
-        ui_run_func_on_tag(&default_screen, "coin_2", ui_disable_element);
-        ui_run_func_on_tag(&default_screen, "coin_3", ui_disable_element);
-        ui_run_func_on_tag(&default_screen, "coin_1_full", ui_disable_element);
-        ui_run_func_on_tag(&default_screen, "coin_2_full", ui_disable_element);
-        ui_run_func_on_tag(&default_screen, "coin_3_full", ui_disable_element);
-        ui_run_func_on_tag(&default_screen, "coin_circle", ui_disable_element);
+        ui_run_func_on_tag(screen_top, "coin_1", ui_enable_element);
+        ui_run_func_on_tag(screen_top, "coin_2", ui_enable_element);
+        ui_run_func_on_tag(screen_top, "coin_3", ui_enable_element);
+        ui_run_func_on_tag(screen, "coin_1", ui_disable_element);
+        ui_run_func_on_tag(screen, "coin_2", ui_disable_element);
+        ui_run_func_on_tag(screen, "coin_3", ui_disable_element);
+        ui_run_func_on_tag(screen, "coin_1_full", ui_disable_element);
+        ui_run_func_on_tag(screen, "coin_2_full", ui_disable_element);
+        ui_run_func_on_tag(screen, "coin_3_full", ui_disable_element);
+        ui_run_func_on_tag(screen, "coin_circle", ui_disable_element);
     }
-    ui_run_func_on_tag(&default_screen_top, "pause_menu", ui_enable_element);
-    ui_run_func_on_tag(&default_screen, "paused", ui_enable_element);
-    ui_run_func_on_tag(&default_screen, "not_paused", ui_disable_element);
-    in_settings = false;
+    ui_run_func_on_tag(screen_top, "pause_menu", ui_enable_element);
+    ui_run_func_on_tag(screen, "paused", ui_enable_element);
+    ui_run_func_on_tag(screen, "not_paused", ui_disable_element);
 }
 
 void unpause_game() {
@@ -140,32 +137,29 @@ void unpause_game() {
         unpause_playback_mp3();
     }
     if (!state.custom_level){
-        ui_run_func_on_tag(&default_screen_top, "coin_1", ui_disable_element);
-        ui_run_func_on_tag(&default_screen_top, "coin_2", ui_disable_element);
-        ui_run_func_on_tag(&default_screen_top, "coin_3", ui_disable_element);
-        ui_run_func_on_tag(&default_screen, "coin_1", ui_enable_element);
-        ui_run_func_on_tag(&default_screen, "coin_2", ui_enable_element);
-        ui_run_func_on_tag(&default_screen, "coin_3", ui_enable_element);
+        ui_run_func_on_tag(screen_top, "coin_1", ui_disable_element);
+        ui_run_func_on_tag(screen_top, "coin_2", ui_disable_element);
+        ui_run_func_on_tag(screen_top, "coin_3", ui_disable_element);
+        ui_run_func_on_tag(screen, "coin_1", ui_enable_element);
+        ui_run_func_on_tag(screen, "coin_2", ui_enable_element);
+        ui_run_func_on_tag(screen, "coin_3", ui_enable_element);
         for(int i = 0; i < 3; i++){
             reset_coin((state.custom_level ? &level_data : &main_level_data[curr_level_id]), i);
         }
-        ui_run_func_on_tag(&default_screen, "coin_circle", ui_enable_element);
+        ui_run_func_on_tag(screen, "coin_circle", ui_enable_element);
     }
-    ui_run_func_on_tag(&default_screen_top, "pause_menu", ui_disable_element);
-    ui_run_func_on_tag(&default_screen, "paused", ui_disable_element);
-    ui_run_func_on_tag(&default_screen, "not_paused", ui_enable_element);
+    ui_run_func_on_tag(screen_top, "pause_menu", ui_disable_element);
+    ui_run_func_on_tag(screen, "paused", ui_disable_element);
+    ui_run_func_on_tag(screen, "not_paused", ui_enable_element);
     
     if (!state.practice_mode) {
-        ui_run_func_on_tag(&default_screen, "practice_buttons", ui_disable_element);
+        ui_run_func_on_tag(screen, "practice_buttons", ui_disable_element);
     }
-    in_settings = false;
 }
 
 static void exit_level() {
-    if (!exiting_level && game_paused){
-        play_sfx(&quit_sound, 1);
-        exiting_level = true;
-        set_fade_status(FADE_STATUS_OUT);
+    if (game_paused){
+        ui_stack_push_game_state(STATE_MENU);
     }
 }
 
@@ -190,126 +184,118 @@ static void restart_level() {
     unpause_game();
 }
 
-void open_settings() {
-    in_settings = true;
-    settings_init();
-}
-
-static void action_pause(UIElement *e) { 
+static void action_pause(UIElement *e, const UIPropertyList *args) { 
     pause_game();
 }
 
-static void action_unpause(UIElement *e) {
+static void action_unpause(UIElement *e, const UIPropertyList *args) {
     unpause_game();
 }
 
-static void action_exit(UIElement *e) {
+static void action_exit(UIElement *e, const UIPropertyList *args) {
     exit_level();
 }
 
-static void action_restart(UIElement *e) {
+static void action_restart(UIElement *e, const UIPropertyList *args) {
     restart_level();
 }
 
-static void action_open_settings(UIElement *e) {
-    open_settings();
-}
-
-static void action_practice_mode(UIElement *e) {
+static void action_practice_mode(UIElement *e, const UIPropertyList *args) {
     if (!state.practice_mode) {
         start_practice_mode();
     } else {
         exit_practice_mode();
     }
 
-    action_unpause(e);
+    action_unpause(e, NULL);
 }
 
-static void action_add_checkpoint(UIElement *e) {
+static void action_add_checkpoint(UIElement *e, const UIPropertyList *args) {
     new_checkpoint();
 }
-static void action_remove_checkpoint(UIElement *e) {
+static void action_remove_checkpoint(UIElement *e, const UIPropertyList *args) {
     delete_last_checkpoint();
 }
 
-static UIAction actions[] = {
+static UIActionDef gameplay_actions[] = {
     {"pause", action_pause },
     {"unpause", action_unpause },
     {"exit", action_exit },
     {"restart", action_restart },
-    {"settings", action_open_settings },
     {"practice", action_practice_mode },
     {"add_check", action_add_checkpoint },
     {"remove_check", action_remove_checkpoint },
 };
 
-void gameplay_screen_init() {
-    ui_load_screen(&default_screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/gameplay.txt");
-    bg_gradient = (UIImage *) ui_get_element_by_tag(&default_screen, "gradient");
+void gameplay_init_top(UIScreen *s){
+    screen_top = s;
 
-    ui_load_screen(&default_screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/gameplay_top.txt");;
-    progress_bar = (UIProgressBar *) ui_get_element_by_tag(&default_screen_top, "progressalert");
-    percent = (UILabel *) ui_get_element_by_tag(&default_screen_top, "percent");
-    level_name = (UILabel *) ui_get_element_by_tag(&default_screen_top, "level_title");
+    progress_bar = (UIProgressBar *) ui_get_element_by_tag(screen_top, "progressalert");
+    percent = (UILabel *) ui_get_element_by_tag(screen_top, "percent");
+    level_name = (UILabel *) ui_get_element_by_tag(screen_top, "level_title");
 
     Color color = get_white_if_black(p1_color);
 
     ui_progress_bar_set_tint(progress_bar, C2D_Color32(color.r, color.g, color.b, 255));
     
-    ui_window_set_tint((UIWindow *) ui_get_element_by_tag(&default_screen_top, "bgwindow"), C2D_Color32(0, 0, 0, 150));
-    ui_window_set_tint((UIWindow *) ui_get_element_by_tag(&default_screen, "bgwindow"), C2D_Color32(0, 0, 0, 150));
+    ui_window_set_tint((UIWindow *) ui_get_element_by_tag(screen_top, "bgwindow"), C2D_Color32(0, 0, 0, 150));
 
     ui_label_set_text(level_name, level_info.level_name);
 
-    normal_progress = (UIProgressBar *) ui_get_element_by_tag(&default_screen_top, "normalprogress");
-    normal_progress_val = (UILabel *) ui_get_element_by_tag(&default_screen_top, "normalprogressvalue");
-    practice_progress = (UIProgressBar *) ui_get_element_by_tag(&default_screen_top, "practiceprogress");
-    practice_progress_val = (UILabel *) ui_get_element_by_tag(&default_screen_top, "practiceprogressvalue");
+    normal_progress = (UIProgressBar *) ui_get_element_by_tag(screen_top, "normalprogress");
+    normal_progress_val = (UILabel *) ui_get_element_by_tag(screen_top, "normalprogressvalue");
+    practice_progress = (UIProgressBar *) ui_get_element_by_tag(screen_top, "practiceprogress");
+    practice_progress_val = (UILabel *) ui_get_element_by_tag(screen_top, "practiceprogressvalue");
     
     ui_progress_bar_set_tint(normal_progress, C2D_Color32(0, 255, 0, 255));
     ui_progress_bar_set_tint(practice_progress, C2D_Color32(0, 255, 255, 255));
 
+    // Hide pause menu
+    ui_run_func_on_tag(screen_top, "coin_1", ui_disable_element);
+    ui_run_func_on_tag(screen_top, "coin_2", ui_disable_element);
+    ui_run_func_on_tag(screen_top, "coin_3", ui_disable_element);
+    ui_run_func_on_tag(screen_top, "pause_menu", ui_disable_element);
+
+    coin_1_top = (UIImage *) ui_get_element_by_tag(screen_top, "coin_1");
+    coin_2_top = (UIImage *) ui_get_element_by_tag(screen_top, "coin_2");
+    coin_3_top = (UIImage *) ui_get_element_by_tag(screen_top, "coin_3");
+}
+
+void gameplay_init(UIScreen *s) {
+    screen = s;
+
+    bg_gradient = (UIImage *) ui_get_element_by_tag(s, "gradient");
+
+    ui_window_set_tint((UIWindow *) ui_get_element_by_tag(s, "bgwindow"), C2D_Color32(0, 0, 0, 150));
+
     // hide coins if level is a custom level
     if(state.custom_level == true){
-        ui_run_func_on_tag(&default_screen, "coin_1", ui_disable_element);
-        ui_run_func_on_tag(&default_screen, "coin_2", ui_disable_element);
-        ui_run_func_on_tag(&default_screen, "coin_3", ui_disable_element);
+        ui_run_func_on_tag(s, "coin_1", ui_disable_element);
+        ui_run_func_on_tag(s, "coin_2", ui_disable_element);
+        ui_run_func_on_tag(s, "coin_3", ui_disable_element);
     }
     
-    // Hide pause menu
-    ui_run_func_on_tag(&default_screen_top, "coin_1", ui_disable_element);
-    ui_run_func_on_tag(&default_screen_top, "coin_2", ui_disable_element);
-    ui_run_func_on_tag(&default_screen_top, "coin_3", ui_disable_element);
-    ui_run_func_on_tag(&default_screen_top, "pause_menu", ui_disable_element);
-    ui_run_func_on_tag(&default_screen, "paused", ui_disable_element);
-    ui_run_func_on_tag(&default_screen, "practice_buttons", ui_disable_element);
+    ui_run_func_on_tag(s, "paused", ui_disable_element);
+    ui_run_func_on_tag(s, "practice_buttons", ui_disable_element);
 
-    coin_1 = (UIImage *) ui_get_element_by_tag(&default_screen, "coin_1");
-    coin_2 = (UIImage *) ui_get_element_by_tag(&default_screen, "coin_2");
-    coin_3 = (UIImage *) ui_get_element_by_tag(&default_screen, "coin_3");
+    coin_1 = (UIImage *) ui_get_element_by_tag(s, "coin_1");
+    coin_2 = (UIImage *) ui_get_element_by_tag(s, "coin_2");
+    coin_3 = (UIImage *) ui_get_element_by_tag(s, "coin_3");
 
-    coins_full[0] = (UIImage *) ui_get_element_by_tag(&default_screen, "coin_1_full");
-    coins_full[1] = (UIImage *) ui_get_element_by_tag(&default_screen, "coin_2_full");
-    coins_full[2] = (UIImage *) ui_get_element_by_tag(&default_screen, "coin_3_full");
+    coins_full[0] = (UIImage *) ui_get_element_by_tag(s, "coin_1_full");
+    coins_full[1] = (UIImage *) ui_get_element_by_tag(s, "coin_2_full");
+    coins_full[2] = (UIImage *) ui_get_element_by_tag(s, "coin_3_full");
     
     reset_coins();
 
-    coin_1_top = (UIImage *) ui_get_element_by_tag(&default_screen_top, "coin_1");
-    coin_2_top = (UIImage *) ui_get_element_by_tag(&default_screen_top, "coin_2");
-    coin_3_top = (UIImage *) ui_get_element_by_tag(&default_screen_top, "coin_3");
-
-    music_slider_bar = (UISlider*) ui_get_element_by_tag(&default_screen, "music_slider");
-    sound_slider_bar = (UISlider*) ui_get_element_by_tag(&default_screen, "sound_slider");
+    music_slider_bar = (UISlider*) ui_get_element_by_tag(s, "music_slider");
+    sound_slider_bar = (UISlider*) ui_get_element_by_tag(s, "sound_slider");
 
     if (music_slider_bar) music_slider_bar->value = music_volume;
     if (sound_slider_bar) sound_slider_bar->value = sound_volume;
 }
 
-int gameplay_screen_top_loop() { 
-    UIInput touch;
-    touchPosition touchPos;
-    hidTouchRead(&touchPos);
-
+void gameplay_update_top(UIScreen *s, UIInput *touch) { 
     decimal = 0;
     if (settingsState.decimalPercent) decimal = 2;
     if (settingsState.ultraDecimalPercent) decimal = MAX_DECIMAL_PERCENT;
@@ -317,33 +303,23 @@ int gameplay_screen_top_loop() {
     progress_bar->value = state.level_progress;
     snprintf(percent->text, 32, "%.*f%%", decimal, state.level_progress);
 
-    ui_run_func_on_tag(&default_screen_top, "progressalert", ui_disable_element);
-    ui_run_func_on_tag(&default_screen_top, "percent", ui_disable_element);
-    ui_set_pos_on_tag(&default_screen_top, 200, 8, "percent");
+    ui_run_func_on_tag(s, "progressalert", ui_disable_element);
+    ui_run_func_on_tag(s, "percent", ui_disable_element);
+    ui_set_pos_on_tag(s, 200, 8, "percent");
     percent->alignment = 0.5;
 
     if (settingsState.showProgressBar) {
-        ui_run_func_on_tag(&default_screen_top, "progressalert", ui_enable_element);
-        ui_set_pos_on_tag(&default_screen_top, 282, 8, "percent");
+        ui_run_func_on_tag(s, "progressalert", ui_enable_element);
+        ui_set_pos_on_tag(s, 282, 8, "percent");
         percent->alignment = 0;
     }
 
     if (settingsState.showProgressPercent) {
-        ui_run_func_on_tag(&default_screen_top, "percent", ui_enable_element);
+        ui_run_func_on_tag(s, "percent", ui_enable_element);
     }
-
-    // Extra eyes only redraw, updating twice would run the animations at double speed
-    if (!is_extra_eye()) ui_screen_update(&default_screen_top, &touch);
-    ui_screen_draw(&default_screen_top);
-
-    return false;
 }
 
-int gameplay_screen_bot_loop() {
-    UIInput touch;
-    touchPosition touchPos;
-    hidTouchRead(&touchPos);
-
+void gameplay_update(UIScreen *s, UIInput *touch) {
     LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
 
     coins_got[0] = state.current_data.coin1 && !level_data_sel->coin1;
@@ -363,7 +339,7 @@ int gameplay_screen_bot_loop() {
                 if(!coins_circles_spawned[i]){
                     ui_set_use_effect_col(
                         ui_add_use_effect(
-                            (UIUseEffect *) ui_get_element_by_tag(&default_screen, "coin_circle"), 
+                            (UIUseEffect *) ui_get_element_by_tag(s, "coin_circle"), 
                         coins_full[i]->base.x, coins_full[i]->base.y, &end_wall_firework_circle),
                     1.f, 0.75f, 0.f);
                     
@@ -394,50 +370,36 @@ int gameplay_screen_bot_loop() {
     coins_full[1]->base.y = complete_y_offset;
     coins_full[2]->base.y = complete_y_offset;
 
-    UIElement *pause_btn = ui_get_element_by_tag(&default_screen, "pause_btn");
+    UIElement *pause_btn = ui_get_element_by_tag(s, "pause_btn");
     pause_btn->y = complete_y_offset;
     
-    UIElement *add_checkpoint = ui_get_element_by_tag(&default_screen, "add_checkpoint");
-    UIElement *remove_checkpoint = ui_get_element_by_tag(&default_screen, "remove_checkpoint");
+    UIElement *add_checkpoint = ui_get_element_by_tag(s, "add_checkpoint");
+    UIElement *remove_checkpoint = ui_get_element_by_tag(s, "remove_checkpoint");
     add_checkpoint->y = complete_y_offset_practice;
     remove_checkpoint->y = complete_y_offset_practice;
 
     if (state.practice_mode) {
-        ui_button_set_image((UIButton *) ui_get_element_by_tag(&default_screen, "practice_mode"), 124, 0);
+        ui_button_set_image((UIButton *) ui_get_element_by_tag(s, "practice_mode"), 124, 0);
     } else {
-        ui_run_func_on_tag(&default_screen, "practice_buttons", ui_disable_element);
-        ui_button_set_image((UIButton *) ui_get_element_by_tag(&default_screen, "practice_mode"), 146, 0);
+        ui_run_func_on_tag(s, "practice_buttons", ui_disable_element);
+        ui_button_set_image((UIButton *) ui_get_element_by_tag(s, "practice_mode"), 146, 0);
     }
-
-    touch.touchPosition = touchPos;
-    touch.did_something = false;
-    touch.interacted = false;
-    if (!in_settings && !in_disclaimer && !in_info_card) {
-        ui_screen_update(&default_screen, &touch);
-    }
-
-    ui_screen_draw(&default_screen);
-
-    if (in_settings) {
-        int returned = settings_loop();
-        if (returned) {
-            in_settings = false;
-        }
-    }
-
-    if (in_disclaimer) {
-        int returned = disclaimer_loop();
-        if (returned) {
-            in_disclaimer = false;
-        }
-    }
-
-    if (in_info_card) {
-        int returned = info_card_loop();
-        if (returned) {
-            in_info_card = false;
-        }
-    }
-
-    return false;
 }
+
+const UIScreenDefPair gameplay_def = {
+    .name = "gameplay",
+    .top = {
+        .path = "romfs:/menus/gameplay_top.txt",
+        .init = gameplay_init_top,
+        .update = gameplay_update_top
+    },
+    .btm = {
+        .path = "romfs:/menus/gameplay.txt",
+        .init = gameplay_init,
+        .update = gameplay_update,
+        .action_list = {
+            .action_count = ARRAY_LEN(gameplay_actions),
+            .actions = gameplay_actions
+        }
+    }
+};

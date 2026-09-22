@@ -1,7 +1,7 @@
-darken opacity=0.4 darkenTime=0.15
+darken opacity=0.4
 window x=160 y=120 w=260 h=200 style=3
-button x=33 y=24 id=31 scale=0.8 action="exit" keyBinds="B"
-window x=160 y=70 w=200 h=40 style=2 tag="bg_window"
+button x=33 y=24 id=31 scale=0.8 actions=close_menu keyBinds="B"
+window x=160 y=70 w=200 h=40 style=2 color=#00000040
 
 windowbutton x=92 y=38 w=65 h=20 style=5 text="Color 1" hoverFactor=0.5 tag="color_buttons,p1" action="action_p1" textScale=0.4
 windowbutton x=160 y=38 w=65 h=20 style=4 text="Color 2" hoverFactor=0.5 tag="color_buttons,p2" action="action_p2" textScale=0.4
@@ -26,7 +26,7 @@ colorbutton x=63 y=166 scale=0.7 action="category_selected" tag="category"
 
 #Colors 
 
-window x=217 y=152 w=115 h=115 style=2 tag="color_window"
+window x=217 y=152 w=115 h=115 style=2 color=#00000040
 
 colorbutton x=176 y=112 scale=0.7 action="color_selected" tag="color"
 colorbutton x=203 y=112 scale=0.7 action="color_selected" tag="color"

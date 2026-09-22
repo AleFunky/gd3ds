@@ -1,5 +1,5 @@
 #include "c2d/base.h"
-#include "menus/core/ui_element.h"
+
 #include <citro2d.h>
 #include "menus/core/ui_props.h"
 #include "ui_image.h"
@@ -26,13 +26,6 @@ void ui_window_set_atlas(UIWindow* e, int index) {
     }
 }
 
-static void ui_window_update(UIElement* e, UIInput* touch, UITransform *transform) {
-    bool inside = ui_element_basic_bound_check(e, touch, transform);
-    
-    // Mask background elements
-    if (inside) touch->did_something = true;
-}
-
 static void ui_window_draw(UIElement* e, UITransform *transform) {
     UIWindow *window = (UIWindow *) e;
 
@@ -46,7 +39,7 @@ static void ui_window_destroy(UIElement *e) {
     }
 }
 
-UIWindow *ui_create_window(const UIContext *ctx) {
+UIWindow *ui_create_window(UIScreen *screen) {
     UIWindow *e = malloc(sizeof(UIWindow));
 
     if (!e) return NULL;
@@ -55,11 +48,10 @@ UIWindow *ui_create_window(const UIContext *ctx) {
     e->base.type = UI_WINDOW;
     e->base.enabled = true;
 
-    e->base.update = ui_window_update;
     e->base.draw = ui_window_draw;
     e->base.destroy = ui_window_destroy;
     
-    ui_element_apply_default_properties(&e->base, ctx);
+    ui_element_apply_default_properties(&e->base, screen);
 
     ui_window_set_atlas(e, 0);
     ui_window_set_tint(e, C2D_Color32(255, 255, 255, 255));
@@ -67,12 +59,12 @@ UIWindow *ui_create_window(const UIContext *ctx) {
     return e;
 }
 
-UIElement *ui_create_window_from_props(const UIContext *ctx, const UIPropertyList *props) {
-    UIWindow *window = ui_create_window(ctx);
+UIElement *ui_create_window_from_props(UIScreen *screen, const UIPropertyList *props) {
+    UIWindow *window = ui_create_window(screen);
 
     if (!window) return NULL;
 
-    ui_element_apply_properties(&window->base, ctx, props);
+    ui_element_apply_properties(&window->base, screen, props);
 
     ui_window_set_atlas(window, ui_prop_int(props, "style", 0));
 

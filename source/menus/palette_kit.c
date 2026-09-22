@@ -1,7 +1,7 @@
 #include <3ds.h>
 #include <citro2d.h>
 #include "main.h"
-#include "menus/core/ui_element.h"
+
 #include "menus/core/ui_screen.h"
 #include "math_helpers.h"
 #include "menus/components/ui_list.h"
@@ -11,12 +11,6 @@
 #include "graphics.h"
 #include "palette_kit.h"
 #include "menus/components/ui_checkbox.h"
-
-static bool yes_exit = false;
-
-static UIScreen screen = {
-    .isBottom = true
-};
 
 const u32 colors[] = {
     // Reds
@@ -328,6 +322,8 @@ static int color_page = 0;
 
 static void disable_glow_setting(UIElement *e) {
     e->enabled = false;
+
+    show_glow = (player_glow_enabled || ((p1_color.r | p1_color.g | p1_color.b) == 0));
 }
 
 static void enable_glow_setting(UIElement *e) {
@@ -358,7 +354,7 @@ static void set_category_index(UIElement *e) {
     category_counter++;
 }
 
-static void reset_indices(){
+static void reset_indices(UIScreen *s){
     category_counter = 0;
     color_counter = 0;
 
@@ -368,29 +364,27 @@ static void reset_indices(){
         starting_color_index += category_counts[i];
     }
 
-    ui_run_func_on_tag(&screen, "category", set_category_index);
-    ui_run_func_on_tag(&screen, "color", set_color_index);
+    ui_run_func_on_tag(s, "category", set_category_index);
+    ui_run_func_on_tag(s, "color", set_color_index);
 }
 
-static void action_category_selected(UIElement *e){
+static void action_category_selected(UIElement *e, const UIPropertyList *args){
     UIColor *color = (UIColor *) e;
 
     selected_category = color->index;
 
-    reset_indices();
+    reset_indices(e->screen);
 }
 
-static void action_color_selected(UIElement *e) {
+static void action_color_selected(UIElement *e, const UIPropertyList *args) {
     UIColor *color = (UIColor *) e;
 
     *current_colors[color_page] = color->color_index;
     update_player_colors();
 
-    reset_indices();
-}
+    show_glow = (player_glow_enabled || ((p1_color.r | p1_color.g | p1_color.b) == 0));
 
-void exit_palette_kit(UIElement* e) {
-    yes_exit = true;
+    reset_indices(e->screen);
 }
 
 static void disable_all_color_buttons(UIElement *e) {
@@ -411,40 +405,50 @@ static void reset_selected_category(){
     }
 }
 
-static void set_p1_page(UIElement *e) {    
-    ui_run_func_on_tag(&screen, "color_buttons", disable_all_color_buttons);
+static void set_p1_page(UIElement *e, const UIPropertyList *args) {    
+    ui_run_func_on_tag(e->screen, "color_buttons", disable_all_color_buttons);
     ui_window_button_set_style((UIWindowButton *) e, 5);
     color_page = 0;
-    ui_run_func_on_tag(&screen, "glow_option", disable_glow_setting);
+    ui_run_func_on_tag(e->screen, "glow_option", disable_glow_setting);
     reset_selected_category();
-    reset_indices();
+    reset_indices(e->screen);
 }
 
-static void set_p2_page(UIElement *e) {
-    ui_run_func_on_tag(&screen, "color_buttons", disable_all_color_buttons);
+static void set_p2_page(UIElement *e, const UIPropertyList *args) {
+    ui_run_func_on_tag(e->screen, "color_buttons", disable_all_color_buttons);
     ui_window_button_set_style((UIWindowButton *) e, 5);
     color_page = 1;
-    ui_run_func_on_tag(&screen, "glow_option", disable_glow_setting);
+    ui_run_func_on_tag(e->screen, "glow_option", disable_glow_setting);
     reset_selected_category();
-    reset_indices();
+    reset_indices(e->screen);
 }
 
-static void set_glow_page(UIElement *e) {
-    ui_run_func_on_tag(&screen, "color_buttons", disable_all_color_buttons);
+static void set_glow_page(UIElement *e, const UIPropertyList *args) {
+    ui_run_func_on_tag(e->screen, "color_buttons", disable_all_color_buttons);
     ui_window_button_set_style((UIWindowButton *) e, 5);
     color_page = 2;
-    ui_run_func_on_tag(&screen, "glow_option", enable_glow_setting);
+    ui_run_func_on_tag(e->screen, "glow_option", enable_glow_setting);
     reset_selected_category();
-    reset_indices();
+    reset_indices(e->screen);
 }
 
-void player_glow_settings(UIElement* e) {
+void player_glow_settings(UIElement* e, const UIPropertyList *args) {
     UICheckBox *checkbox = (UICheckBox *) e;
     player_glow_enabled = checkbox->checked;
+    show_glow = (player_glow_enabled || ((p1_color.r | p1_color.g | p1_color.b) == 0));
 }
 
-static UIAction actions[] = {
-    {"exit", exit_palette_kit},
+static void palette_kit_init(UIScreen *s) {
+    color_page = 0;
+
+    reset_selected_category();
+    reset_indices(s);
+
+    ui_set_checkbox_checked((UICheckBox *) ui_get_element_by_tag(s, "check_glow"), player_glow_enabled);
+    ui_run_func_on_tag(s, "glow_option", disable_glow_setting);
+}
+
+static const UIActionDef palette_kit_actions[] = {
     {"color_selected", action_color_selected},
     {"action_p1", set_p1_page},
     {"action_p2", set_p2_page},
@@ -453,37 +457,17 @@ static UIAction actions[] = {
     {"category_selected", action_category_selected}
 };
 
-
-void palette_kit_init() {
-    ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/palette_kit.txt");
-    ui_screen_open(&screen, ANIM_SLIDE_RIGHT);
-    yes_exit = false;
-    ui_window_set_tint((UIWindow *) ui_get_element_by_tag(&screen, "bg_window"), C2D_Color32(0, 0, 0, 64));
-    ui_window_set_tint((UIWindow *) ui_get_element_by_tag(&screen, "color_window"), C2D_Color32(0, 0, 0, 64));
-
-    color_page = 0;
-
-    reset_selected_category();
-    reset_indices();
-
-    ui_set_checkbox_checked((UICheckBox *) ui_get_element_by_tag(&screen, "check_glow"), player_glow_enabled);
-    ui_run_func_on_tag(&screen, "glow_option", disable_glow_setting);
-}
-
-int palette_kit_loop() {
-    if (yes_exit) {  
-        ui_unload_screen(&screen);
-        return true;
+const UIScreenDefPair palette_kit_def = {
+    .name = "palette_kit",
+    .top = {
+        0
+    },
+    .btm = {
+        .path = "romfs:/menus/palette_kit.txt",
+        .init = palette_kit_init,
+        .action_list = {
+            .action_count = ARRAY_LEN(palette_kit_actions),
+            .actions = palette_kit_actions
+        }
     }
-
-    UIInput touch;
-    touchPosition touchPos;
-    hidTouchRead(&touchPos);
-    touch.touchPosition = touchPos;
-    touch.did_something = false;
-    touch.interacted = false;
-    ui_screen_update(&screen, &touch);
-    ui_screen_draw(&screen);
-
-    return false;
-}
+};

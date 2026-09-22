@@ -1,15 +1,8 @@
 #include <citro2d.h>
-#include "menus/core/ui_element.h"
+
 #include "menus/core/ui_screen.h"
 #include "menus/core/ui_props.h"
 #include "math_helpers.h"
-
-void ui_image_update(UIElement* e, UIInput* touch, UITransform *transform) {
-    bool inside = ui_element_basic_bound_check(e, touch, transform);
-    
-    // Mask background elements
-    if (inside) touch->did_something = true;
-}
 
 void ui_image_draw(UIElement* e, UITransform *transform) {
     UIImage *image = (UIImage *) e;
@@ -49,7 +42,7 @@ void ui_image_set_image(UIImage *e, int sprite_index, int sheet) {
     e->base.h = e->image.sprite.image.subtex->height;
 }
 
-UIImage *ui_create_image(const UIContext *ctx) {
+UIImage *ui_create_image(UIScreen *screen) {
     UIImage *e = malloc(sizeof(UIImage));
 
     if (!e) return NULL;
@@ -58,23 +51,22 @@ UIImage *ui_create_image(const UIContext *ctx) {
     e->base.type = UI_IMAGE;
     e->base.enabled = true;
 
-    ui_element_apply_default_properties(&e->base, ctx);
+    ui_element_apply_default_properties(&e->base, screen);
 
     ui_image_clear_tint(e);
 
-    e->base.update = ui_image_update;
     e->base.draw = ui_image_draw;
     e->base.destroy = ui_image_destroy;
 
     return e;
 }
 
-UIElement *ui_create_image_from_props(const UIContext *ctx, const UIPropertyList *props) {
-    UIImage *image = ui_create_image(ctx);
+UIElement *ui_create_image_from_props(UIScreen *screen, const UIPropertyList *props) {
+    UIImage *image = ui_create_image(screen);
     
     if (!image) return NULL;
 
-    ui_element_apply_properties(&image->base, ctx, props);
+    ui_element_apply_properties(&image->base, screen, props);
 
     ui_image_set_image(image, 
         ui_prop_int(props, "id", 0),

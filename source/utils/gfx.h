@@ -12,12 +12,6 @@
 #define FADE_DURATION 0.25f
 #define FADE_SPEED (255 / FADE_DURATION)
 
-enum FadeStatus {
-    FADE_STATUS_NONE,
-    FADE_STATUS_OUT,
-    FADE_STATUS_IN
-};
-
 enum StereoEye {
     EYE_LEFT,
     EYE_RIGHT
@@ -48,11 +42,6 @@ float calc_x_on_screen(float val);
 float mirror_x_on_screen(float val);
 float calc_y_on_screen(float val);
 
-// Fading
-bool handle_fading();
-void draw_fade();
-void set_fade_status(int status);
-int get_fade_status();
 C3D_RenderTarget* C2D_CreateScreenTargetExt(gfxScreen_t screen, gfx3dSide_t side, bool aa);
 
 void set_wide(bool wide);

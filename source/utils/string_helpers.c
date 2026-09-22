@@ -87,6 +87,21 @@ void strip_character(char* s, char character) {
     }
 }
 
+// This strips any bracket or quote characters enclosing the value
+void strip_enclosures(char* s) {
+    size_t length = strlen(s);
+
+    if (length < 2)
+        return;
+
+    if ((s[0] == '[' && s[length - 1] == ']') ||
+        (s[0] == '"' && s[length - 1] == '"'))
+    {
+        memmove(s, s + 1, length - 1);
+        s[length - 2] = '\0';
+    }
+}
+
 void url_convert_to_http(char *str) {
     size_t length = strlen(str);
 

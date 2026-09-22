@@ -3,7 +3,7 @@
 #include "graphics.h"
 #include "main.h"
 #include "state.h"
-#include "menus/settings.h"
+#include "menus/settings_hub/settings.h"
 #include "utils/utils.h"
 
 void set_scissor(GPU_SCISSORMODE mode, int x, int y, int width, int height) {
@@ -173,37 +173,6 @@ C3D_RenderTarget* C2D_CreateScreenTargetExt(gfxScreen_t screen, gfx3dSide_t side
 
 int fade_status = FADE_STATUS_NONE;
 float opacity = 0;
-
-bool handle_fading() {
-    if (!fade_status) return false;
-
-    if (fade_status == FADE_STATUS_OUT) {
-        opacity += FADE_SPEED * DT;
-        if (opacity >= 255) {
-            opacity = 255;
-            fade_status = FADE_STATUS_NONE;
-        }
-    } else if (fade_status == FADE_STATUS_IN) {
-        opacity -= FADE_SPEED * DT;
-        if (opacity <= 0) {
-            opacity = 0;
-            fade_status = FADE_STATUS_NONE;
-        }
-    }
-    return true;
-}
-
-void draw_fade() {
-    if (opacity) C2D_Fade(C2D_Color32(0, 0, 0, (int) opacity));
-}
-
-void set_fade_status(int status) {
-    fade_status = status;
-}
-
-int get_fade_status() {
-    return fade_status;
-}
 
 // How far apart both eyes get at most, in pixels
 #define MAX_EYE_SHIFT 10.f

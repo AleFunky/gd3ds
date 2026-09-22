@@ -23,7 +23,7 @@
 #include "particles/circles.h"
 #include "particles/coin_effect.h"
 
-#include "menus/settings.h"
+#include "menus/settings_hub/settings.h"
 #include "menus/gameplay.h"
 
 #include "menus/core/ui_screen.h"
@@ -1693,7 +1693,7 @@ void update_touch_effect(float delta) {
 
     touch_drag_particles.emitting = false;
 
-    if ((settingsState.touchEffectEverywhere || (game_state == STATE_GAME && !game_paused)) && (kHeld & KEY_TOUCH) && !get_fade_status()) {
+    if ((settingsState.touchEffectEverywhere || (game_state == STATE_GAME && !game_paused)) && (kHeld & KEY_TOUCH)) {
         // Flipped for particles
         float flipped_y = SCREEN_HEIGHT - pos.py;
 
@@ -1748,7 +1748,7 @@ void update_bottom_particles(float delta) {
     if (state.dual) flying_gamemode = flying_gamemode || (state.player2.gamemode == GAMEMODE_SHIP || state.player2.gamemode == GAMEMODE_UFO || state.player2.gamemode == GAMEMODE_WAVE);
 
     // If in game and not paused and not fading, update the particles spawning
-    if (((game_state == STATE_GAME && !game_paused)) && !get_fade_status()) {
+    if (((game_state == STATE_GAME && !game_paused))) {
         if (flying_gamemode) {
             glitter_particles_bottom.emitterX = state.camera_x_middle;
             glitter_particles_bottom.emitterY = 240/2;

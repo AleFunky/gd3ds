@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include "color_channels.h"
 #include "main.h"
-#include "menus/online_menu.h"
+#include "menus/creator_menu/online/online_menu.h"
 #include "objects.h"
 #include "mp3_player.h"
 #include "graphics.h"

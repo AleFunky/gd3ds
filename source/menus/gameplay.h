@@ -8,8 +8,7 @@
 #define PAUSE_COIN_UNFILLED_ID 419
 
 void reset_coins();
-void gameplay_screen_init();
-int gameplay_screen_top_loop();
-int gameplay_screen_bot_loop();
 void unpause_game();
 void pause_game();
+
+extern const UIScreenDefPair gameplay_def;
