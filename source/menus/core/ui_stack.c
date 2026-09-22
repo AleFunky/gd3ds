@@ -1,4 +1,5 @@
 #include "ui_stack.h"
+#include "main.h"
 #include "ui_screen.h"
 #include "screen_definitions.h"
 #include "mp3_player.h"
@@ -170,13 +171,14 @@ void ui_stack_push(
         return;
     }
 
-    if(stack->root_transition != UI_TRANSITION_NONE){
-        printf("Cannot push during transition!");
-        return;
-    }
+    // Hi cloud, this seems to be kinda limiting and it works so :vglue:
+    //if(stack->root_transition != UI_TRANSITION_NONE){
+    //    output_log("Cannot push during transition!\n");
+    //    return;
+    //}
 
     if(stack->push.type != PUSH_NONE){
-        printf("Cannot queue multiple pushes!");
+        output_log("Cannot queue multiple pushes!\n");
         return;
     }
 
@@ -246,7 +248,7 @@ void ui_stack_push_game_state(int game_state){
 
 void ui_stack_pop(){
     if(stack->root_transition != UI_TRANSITION_NONE) {
-        printf("Cannot pop stack during transition!");
+        output_log("Cannot pop stack during transition!\n");
         return;
     }
 
@@ -267,7 +269,7 @@ void ui_stack_pop(){
 //pops all active screens
 void ui_stack_pop_context(){
     if(stack->root_transition != UI_TRANSITION_NONE) {
-        printf("Cannot pop stack during transition!");
+        output_log("Cannot pop stack during transition!\n");
         return;
     }
 

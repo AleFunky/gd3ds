@@ -159,6 +159,7 @@ void unpause_game() {
 
 static void exit_level() {
     if (game_paused){
+        exiting_level = true;
         ui_stack_push_game_state(STATE_MENU);
     }
 }

@@ -55,12 +55,12 @@ static void action_switch_server(UIElement* e, const UIPropertyList *args) {
 
         if(gdps){
             filters.difficultyFilters = filters.isDemon ? 0 : filters.difficultyFilters;
-            disable_demons();
+            disable_demons(e->screen);
         } else if(!gdps && filters.isDemon){
-            enable_demons();
+            enable_demons(e->screen);
         }
 
-        update_difficulty_tints();
+        update_difficulty_tints(e->screen);
     }
 
     filters.super = filters.super && gdps;
