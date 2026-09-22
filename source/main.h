@@ -9,7 +9,7 @@
 
 #define CAM_SPEED 5.19300155f
 
-#define DT (1.f/60)
+#define DT (delta)
 
 #define CAMERA_X_OFFSET (0)
 #define CAMERA_X_WALL_OFFSET (2 * 30.F)

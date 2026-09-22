@@ -630,10 +630,16 @@ void sync_precise_input(bool suppress_held) {
 void ui_loop(){
     playing_menu_loop = false;
     play_menu_song();
+    
+    u64 lastTime = svcGetSystemTick();
 
     ui_stack_set_stack(&menu_stack);
 
     while (aptMainLoop()) {
+
+        u64 now = svcGetSystemTick();
+        delta = (now - lastTime) / (CPU_TICKS_PER_MSEC * 1000);
+        lastTime = now;
         hidScanInput();
 
         UIInput touch;
@@ -1292,15 +1298,14 @@ void game_loop() {
 
         C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
         C2D_ViewScale(1/SCALE, 1/SCALE);
-        
-        change_blending(true);
-        draw_touch_effect();
-        change_blending(false);
 
         //gameplay_screen_bot_loop();
         ui_stack_draw(SCREEN_BTM);
         draw_level_complete();
-        draw_stack_fade();
+        
+        change_blending(true);
+        draw_touch_effect();
+        change_blending(false);
 
         if (state.profiling) {
             float processingTime = ticks / CPU_TICKS_PER_MSEC;
@@ -1314,6 +1319,8 @@ void game_loop() {
             profiler_update(data);
             profiler_draw();
         }
+
+        draw_stack_fade();
 
         if (state.noclip) {
             draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 234, 0.5f, 0.5f, 0, true, "Noclip Activated");
