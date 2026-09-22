@@ -322,8 +322,7 @@ static void main_menu_update(UIScreen *s, UIInput *input){
         upload_color_to_buffer(CHANNEL_GROUND, default_lvl_colors[main_menu_color_index % NUM_MENU_COLORS], 4.f);
         main_menu_color_index++;
     }
-
-    update_touch_effect(DT); 
+    
     bg_scroll += 5.19300155f;
 }
 
