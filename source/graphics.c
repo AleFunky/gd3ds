@@ -1253,6 +1253,31 @@ void reset_render_cache(void) {
     viewable_objects = NULL;
 }
 
+static int insert_sorted_object(int obj) {
+    int idx = current_object_count;
+
+    while (idx > 0) {
+        int prev = current_objects[idx - 1];
+
+        // keep the list sorted by object index
+        if (prev < obj) break;
+
+        current_objects[idx] = prev;
+        idx--;
+    }
+
+    current_objects[idx] = obj;
+    current_object_count++;
+    return idx;
+}
+
+static void remove_object_at(int index) {
+    for (int i = index; i + 1 < current_object_count; i++) {
+        current_objects[i] = current_objects[i + 1];
+    }
+    current_object_count--;
+}
+
 static void update_current_objects(void) {
     // Mark everything as unseen, everything that is actually on screen will mark it as seen again
     for (int i = 0; i < current_object_count; i++) {
@@ -1288,7 +1313,7 @@ static void update_current_objects(void) {
                     objects.render_visible[obj] = true;
                     objects.dirty[obj] = true;
                     render_list_changed = true;
-                    current_objects[current_object_count++] = obj;
+                    insert_sorted_object(obj);
                 }
 
                 // Mark as seen again
@@ -1311,7 +1336,7 @@ static void update_current_objects(void) {
         objects.render_visible[obj] = false;
         objects.dirty[obj] = true;
         render_list_changed = true;
-        current_objects[i] = current_objects[--current_object_count];
+        remove_object_at(i);
     }
 }
 
