@@ -236,12 +236,12 @@ static void main_menu_update(UIScreen *s, UIInput *input){
         old_stereo = settingsState.stereoEnabled;
     }
 
-    //icons slop
-    float delta = 1/60.f;
-
     state.old_input = state.input;
     state.input.pressedJump = (started) == true;
     state.input.holdJump = (state.input.pressedJump || holding) == true;
+    
+    curr_input = state.input;
+    curr_old_input = state.old_input;
 
     for (int i = 0; i < 2; i++) {
         drag_particles[i].emitting = false;
