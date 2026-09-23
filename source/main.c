@@ -134,6 +134,11 @@ bool is_N3DS;
 UIStack menu_stack = { 0 };
 UIStack gameplay_stack = { 0 };
 
+ExternalLevelFile external_file;
+ServerFile gd_server_file;
+ServerFile gdps_file;
+ServerFile *current_server_file;
+
 // Checks if the game is being emulated by citra/azahar
 bool is_citra() {
     s64 version = 0;
@@ -999,7 +1004,7 @@ void game_loop() {
                 state.death_timer = (settingsState.quickRetry ? 0.5f : 1.f);
                 bool had_new_best = false;
                 if (!cheated) {
-                    LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
+                    LevelData *level_data_sel = &current_level_entry->data;
                     // Save new best
                     int progress = (int)state.level_progress;
                     if (state.practice_mode) {
@@ -1356,7 +1361,7 @@ void game_loop() {
     }
 
     if (!state.online_level) { // TODO: IMPLEMENT SAVING
-        LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
+        LevelData *level_data_sel = &current_level_entry->data;
 
         level_data_sel->attempts += state.current_data.attempts;
         level_data_sel->jumps += state.current_data.jumps;
@@ -1368,11 +1373,11 @@ void game_loop() {
     total_jumps += state.current_data.jumps;
 
     if (state.online_level) {
-        ; // Nothing for now
+        save_current_save_file(LEVEL_LIST_ONLINE);
     } else if (state.custom_level) {
-        save_level_progress();
+        save_current_save_file(LEVEL_LIST_EXTERNAL);
     } else {
-        save_main_level_progress(curr_level_id);
+        save_current_save_file(LEVEL_LIST_MAIN_LEVELS);
     }
 
     cfg_save();
@@ -1498,7 +1503,13 @@ int main(int argc, char* argv[]) {
     game_assets_init();
     loading_screen_update(10);
 
-    load_main_level_progress();
+    load_save_file(SAVE_ROBTOP_SERVER_FILE, &gd_server_file);
+    load_save_file(SAVE_1P9_SERVER_FILE, &gdps_file);
+    load_external_file(SAVE_EXTERNAL_LEVELS_FILE, &external_file);
+
+    current_server_file = (gdps ? &gdps_file : &gd_server_file);
+
+    migrate_old_data();
     
     loading_screen_update(25);
 
@@ -1592,8 +1603,6 @@ int main(int argc, char* argv[]) {
     close_log_file();
 
     free_cached_sprites();
-
-    free_main_level_progress();
 
     // Delete graphics
     C2D_SpriteSheetFree(spriteSheet);

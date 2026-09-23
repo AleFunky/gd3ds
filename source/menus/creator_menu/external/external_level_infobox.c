@@ -8,7 +8,7 @@ static void external_level_infobox_init(UIScreen *s) {
 
     ui_label_set_text(name, level_info.level_name);
 
-    LevelData *data = &level_data;
+    LevelData *data = &current_level_entry->data;
 
     char attempts[256];
     snprintf(attempts, sizeof(attempts), "<#40e348>Total Attempts</>: %d", data->attempts);

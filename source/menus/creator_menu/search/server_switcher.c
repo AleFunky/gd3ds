@@ -75,6 +75,8 @@ static void action_switch_server(UIElement* e, const UIPropertyList *args) {
     filters.super = filters.super && gdps;
 
     update_server_buttons(e->screen);
+
+    current_server_file = (gdps ? &gdps_file : &gd_server_file);
 }
 
 static UIActionDef server_switcher_actions[] = {

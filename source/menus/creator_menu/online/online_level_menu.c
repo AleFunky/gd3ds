@@ -1,11 +1,14 @@
 #include <3ds.h>
 #include <citro2d.h>
+#include <stdio.h>
 #include "3ds/thread.h"
 #include "3ds/types.h"
 
 #include "main.h"
+#include "menus/core/ui_element.h"
 #include "mp3_player.h"
 #include "graphics.h"
+#include "save/saving.h"
 #include "state.h"
 #include "utils/folders.h"
 #include "utils/server_utils.h"
@@ -105,6 +108,9 @@ static UILabel *description_label;
 static UILabel *level_id_label;
 static UIImage *difficulty_face_image;
 static UIImage *featured_glow_image;
+
+static UIProgressBar *normal_percent_prog;
+static UIProgressBar *practice_percent_prog;
 
 static UISpinner *spinner;
 static UIButton *play_button;
@@ -274,6 +280,20 @@ static void action_open_delete_level(){
     }
 }
 
+static void update_progress_bars() {
+    LevelData *data = &current_level_entry->data;
+    normal_percent_prog->value = data->normal_progress;
+    practice_percent_prog->value = data->practice_progress;
+
+    char normal[16];
+    char practice[16];
+    snprintf(normal, sizeof(normal), "%d%%", data->normal_progress);
+    snprintf(practice, sizeof(practice), "%d%%", data->practice_progress);
+
+    ui_label_set_text(normal_percent_label, normal);
+    ui_label_set_text(practice_percent_label, practice);
+}
+
 static void populate_level_info() {
     SearchEntry *entry_srch = &search_entries[curr_search_id];
     CreatorEntry *entry_c = &creator_entries[entry_srch->creatorIndex];
@@ -423,6 +443,13 @@ static void populate_level_info() {
     } else {
         ui_disable_element((UIElement *)high_obj_icon_image);
     }
+    
+    char key[16];
+    snprintf(key, sizeof(key), "%d", entry_srch->levelId);
+    
+    current_level_entry = get_or_add_level_to_server_file(current_server_file, key, LEVEL_LIST_ONLINE);
+
+    update_progress_bars();
 }
 
 static void handle_errors(int code) {
@@ -580,6 +607,8 @@ static void online_level_init (UIScreen *s) {
     if(gdps) ui_disable_element(ui_get_element_by_tag(s, "garage"));
 
     // Bottom screen elements
+    normal_percent_prog = (UIProgressBar *) ui_get_element_by_tag(screen, "normalprogress");
+    practice_percent_prog = (UIProgressBar *) ui_get_element_by_tag(screen, "practiceprogress");
     normal_percent_label = (UILabel *) ui_get_element_by_tag(screen, "normalprogressvalue");
     practice_percent_label = (UILabel *) ui_get_element_by_tag(screen, "practiceprogressvalue");
 
@@ -594,8 +623,11 @@ static void online_level_init (UIScreen *s) {
 
     spinner = (UISpinner *) ui_get_element_by_tag(screen, "spinner");
     play_button = (UIButton *) ui_get_element_by_tag(screen, "playbutton");
-    
+
+    ui_progress_bar_set_tint(normal_percent_prog, C2D_Color32(0, 255, 0, 255));
+    ui_progress_bar_set_tint(practice_percent_prog, C2D_Color32(0, 255, 255, 255));
     ui_progress_bar_set_tint(song_progress_bar, C2D_Color32(50, 190, 240, 255));
+
     ui_disable_element((UIElement *) song_progress_bar);
     ui_disable_element((UIElement *) song_status_label);
     ui_disable_element((UIElement *) speed_label);
@@ -619,6 +651,11 @@ static void online_level_init (UIScreen *s) {
 static void online_level_menu_update(UIScreen *s, UIInput *i) {
     if (level_result) {
         show_level_load_error_message();
+    }
+
+    if (exiting_level) {
+        update_progress_bars();
+        exiting_level = false;
     }
 
     if (song_data_task.finished) {

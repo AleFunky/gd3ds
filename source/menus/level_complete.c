@@ -190,7 +190,7 @@ static void run_rewards_animation(float delta){
         ui_use_effect_update_pos((UIUseEffect *) ui_get_element_by_tag(&screen_top, "rewardCircle"));
     }
 
-    LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
+    LevelData *level_data_sel = &current_level_entry->data;
     UIImage *rewardCenter = NULL;
 
     float scale_value = easeValue(BOUNCE_OUT, 3.f, 1.f, rewardAnimTime, 0.35f, 1.f);
@@ -349,7 +349,7 @@ void level_complete_init() {
     // Set completion text
     completion_text = (UILabel *) ui_get_element_by_tag(&screen_top, "funnytext");
     
-    LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
+    LevelData *level_data_sel = &current_level_entry->data;
 
     UILabel *star_text = (UILabel *) ui_get_element_by_tag(&screen_top, "startext");
 

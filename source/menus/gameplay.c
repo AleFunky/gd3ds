@@ -64,7 +64,7 @@ static UIScreen *screen;
 int decimal;
 
 static void update_progress_bars() {
-    LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
+    LevelData *level_data_sel = &current_level_entry->data;
 
     normal_progress->value = level_data_sel->normal_progress;
     practice_progress->value = level_data_sel->practice_progress;
@@ -93,7 +93,7 @@ static void reset_coin(LevelData *level_data_sel, int i){
 }
 
 void reset_coins(){
-    LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
+    LevelData *level_data_sel = &current_level_entry->data;
 
     ui_use_effect_clear((UIUseEffect *) ui_get_element_by_tag(screen, "coin_circle"));
 
@@ -144,7 +144,7 @@ void unpause_game() {
         ui_run_func_on_tag(screen, "coin_2", ui_enable_element);
         ui_run_func_on_tag(screen, "coin_3", ui_enable_element);
         for(int i = 0; i < 3; i++){
-            reset_coin((state.custom_level ? &level_data : &main_level_data[curr_level_id]), i);
+            reset_coin(&current_level_entry->data, i);
         }
         ui_run_func_on_tag(screen, "coin_circle", ui_enable_element);
     }
@@ -321,7 +321,7 @@ void gameplay_update_top(UIScreen *s, UIInput *touch) {
 }
 
 void gameplay_update(UIScreen *s, UIInput *touch) {
-    LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
+    LevelData *level_data_sel = &current_level_entry->data;
 
     coins_got[0] = state.current_data.coin1 && !level_data_sel->coin1;
     coins_got[1] = state.current_data.coin2 && !level_data_sel->coin2;

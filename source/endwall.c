@@ -161,7 +161,7 @@ int handle_wall_cutscene(float delta, UIInput *touch) {
         // Handle level complete menu
         int status = level_complete_loop(touch);
         if (status) {
-            LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
+            LevelData *level_data_sel = &current_level_entry->data;
             if (!cheated) {
                 if (state.practice_mode) {
                     state.current_data.max_practice = 100;

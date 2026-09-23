@@ -114,6 +114,12 @@ UIScreen *btm_screen = NULL;
 #define DOTS_WIDTH 8
 #define DOTS_MARGIN 8
 
+static void update_current_level(int level) {
+    char key[18];
+    snprintf(key, sizeof(key), "main_%d", level);
+    current_level_entry = get_or_add_level_to_server_file(current_server_file, key, LEVEL_LIST_MAIN_LEVELS);
+}
+
 static void draw_dots(int level_id) {
     C2D_Sprite spr = { 0 };
     C2D_SpriteFromSheet(&spr, ui_sheet, 421);
@@ -162,13 +168,18 @@ void update_level_progress(int level, int card) {
     if (level < 0) level = MAIN_LEVELS_NUM-1;
     if (level >= MAIN_LEVELS_NUM) level = 0;
 
-    LevelData *data = &main_level_data[level]; 
+    update_current_level(level);
+
+    LevelData data = { 0 }; 
+    if (current_level_entry) {
+        data = current_level_entry->data;
+    }
 
     char normal[256];
-    snprintf(normal, sizeof(normal), "<#ff00ff>Normal</>: %d%%", data->normal_progress);
+    snprintf(normal, sizeof(normal), "<#ff00ff>Normal</>: %d%%", data.normal_progress);
     
     char practice[256];
-    snprintf(practice, sizeof(practice), "<#ffa54b>Practice</>: %d%%", data->practice_progress);
+    snprintf(practice, sizeof(practice), "<#ffa54b>Practice</>: %d%%", data.practice_progress);
 
     UIProgressBar *normal_prog = (card) ? level_card_2_normal_progress : level_card_normal_progress;
     UIProgressBar *practice_prog = (card) ? level_card_2_practice_progress : level_card_practice_progress;
@@ -179,18 +190,18 @@ void update_level_progress(int level, int card) {
     UIImage *coin_2 = (card) ? level_card_2_coin_2 : level_card_coin_2;
     UIImage *coin_3 = (card) ? level_card_2_coin_3 : level_card_coin_3;
 
-    normal_prog->value = data->normal_progress;
-    practice_prog->value = data->practice_progress;
+    normal_prog->value = data.normal_progress;
+    practice_prog->value = data.practice_progress;
 
-    snprintf(normal, sizeof(normal), "%d%%", data->normal_progress);
-    snprintf(practice, sizeof(practice), "%d%%", data->practice_progress);
+    snprintf(normal, sizeof(normal), "%d%%", data.normal_progress);
+    snprintf(practice, sizeof(practice), "%d%%", data.practice_progress);
 
     ui_label_set_text(normal_progval, normal);
     ui_label_set_text(practice_progval, practice);
     
-    ui_image_set_image(coin_1, (data->coin1 ? MENU_COIN_FILLED_ID : MENU_COIN_UNFILLED_ID), 0);
-    ui_image_set_image(coin_2, (data->coin2 ? MENU_COIN_FILLED_ID : MENU_COIN_UNFILLED_ID), 0);
-    ui_image_set_image(coin_3, (data->coin3 ? MENU_COIN_FILLED_ID : MENU_COIN_UNFILLED_ID), 0);
+    ui_image_set_image(coin_1, (data.coin1 ? MENU_COIN_FILLED_ID : MENU_COIN_UNFILLED_ID), 0);
+    ui_image_set_image(coin_2, (data.coin2 ? MENU_COIN_FILLED_ID : MENU_COIN_UNFILLED_ID), 0);
+    ui_image_set_image(coin_3, (data.coin3 ? MENU_COIN_FILLED_ID : MENU_COIN_UNFILLED_ID), 0);
 }
 
 void update_level_name(int level, int card) {
@@ -222,7 +233,7 @@ void update_level_face(int level) {
     ui_image_set_image(level_card_face, 239 + main_levels[level].difficulty, 0);
 }
 void update_level_top(int level){
-    LevelData *data = &main_level_data[level]; 
+    LevelData *data = &current_level_entry->data;
 
     char attempts[256];
     snprintf(attempts, sizeof(attempts), "<#40e348>Total Attempts</>: %d", data->attempts);
@@ -424,6 +435,8 @@ void level_select_init(UIScreen *s){
     level_card_2_coin_1 = (UIImage *) ui_get_element_by_tag(s, "coin_1_2");
     level_card_2_coin_2 = (UIImage *) ui_get_element_by_tag(s, "coin_2_2");
     level_card_2_coin_3 = (UIImage *) ui_get_element_by_tag(s, "coin_3_2");
+
+    update_current_level(curr_level_id);
 
     ui_progress_bar_set_tint(level_card_normal_progress, C2D_Color32(0, 255, 0, 255));
     ui_progress_bar_set_tint(level_card_2_normal_progress, C2D_Color32(0, 255, 0, 255));

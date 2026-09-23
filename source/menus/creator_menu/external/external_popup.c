@@ -71,13 +71,13 @@ static UIActionDef external_popup_actions[] = {
 };
 
 static void set_progress() {
-    normal_progress->value = level_data.normal_progress;
-    practice_progress->value = level_data.practice_progress;
+    normal_progress->value = current_level_entry->data.normal_progress;
+    practice_progress->value = current_level_entry->data.practice_progress;
 
     char normal[32];
     char practice[32];
-    snprintf(normal, sizeof(normal), "%d%%", level_data.normal_progress);
-    snprintf(practice, sizeof(practice), "%d%%", level_data.practice_progress);
+    snprintf(normal, sizeof(normal), "%d%%", current_level_entry->data.normal_progress);
+    snprintf(practice, sizeof(practice), "%d%%", current_level_entry->data.practice_progress);
 
     ui_label_set_text(normal_progress_val, normal);
     ui_label_set_text(practice_progress_val, practice);
@@ -107,7 +107,9 @@ static void set_name_creator(char *gmd) {
     // Load data
     char file[516];
     snprintf(file, sizeof(file), "ext_%s_%s", level_info.level_name, level_info.creator_name);
-    load_level_progress(file);
+    
+    current_level_entry = get_or_add_level_to_external_file(&external_file, file);
+    
     set_progress();
 }
 
@@ -199,9 +201,8 @@ static void set_stars(char *gmd) {
             stars_num = 0;
         }
 
-        if (level_data.stars != stars_num) {
-            level_data.stars = stars_num;
-            save_level_progress();
+        if (current_level_entry->data.stars != stars_num) {
+            current_level_entry->data.stars = stars_num;
         }
 
         free(stars);
@@ -339,10 +340,6 @@ void external_popup_init(UIScreen *s) {
     free(gmd);
 }
 
-static void external_popup_exit() {
-    free_level_progress();
-}
-
 const UIScreenDefPair external_popup_def = {
     .name = "external_popup",
     .top = {
@@ -353,7 +350,6 @@ const UIScreenDefPair external_popup_def = {
         .path = "romfs:/menus/creator_menu/external/external_pop_up.txt",
         .init = external_popup_init,
         .update = external_popup_update,
-        .exit = external_popup_exit,
         .action_list = {
             .action_count = ARRAY_LEN(external_popup_actions),
             .actions = external_popup_actions

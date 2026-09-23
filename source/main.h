@@ -6,6 +6,7 @@
 #include "particles/particles.h"
 #include "color_channels.h"
 
+#include "save/saving.h"
 
 #define CAM_SPEED 5.19300155f
 
@@ -129,3 +130,9 @@ u32 jump_key_mask(void);
 void sync_precise_input(bool suppress_held);
 
 bool is_citra();
+
+extern ServerFile *current_server_file;
+
+extern ExternalLevelFile external_file;
+extern ServerFile gd_server_file;
+extern ServerFile gdps_file;
