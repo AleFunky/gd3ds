@@ -2,6 +2,7 @@
 #include "json-c/json_object.h"
 #include "json-c/json_object_iterator.h"
 #include "json-c/json_tokener.h"
+#include "json-c/json_types.h"
 #include "json-c/json_util.h"
 #include "level_loading.h"
 #include "main.h"
@@ -19,6 +20,7 @@
 #include <unistd.h>
 
 #include "math_helpers.h"
+#include "utils/utils.h"
 
 LevelDataEntry *current_level_entry;
 
@@ -217,6 +219,7 @@ static bool parse_level_data_list(LevelDataList *level_data, struct json_object 
 
     json_object_object_foreach(object, key, value)
     {
+
         struct json_object *level_id = NULL;
         struct json_object *attempts = NULL;
         struct json_object *jumps = NULL;
@@ -227,20 +230,6 @@ static bool parse_level_data_list(LevelDataList *level_data, struct json_object 
         struct json_object *coin2 = NULL;
         struct json_object *coin3 = NULL;
 
-        if (
-            !json_object_object_get_ex(value, "level_id", &level_id) ||
-            !json_object_object_get_ex(value, "attempts", &attempts) ||
-            !json_object_object_get_ex(value, "jumps", &jumps) || 
-            !json_object_object_get_ex(value, "normal_progress", &normal_progress) || 
-            !json_object_object_get_ex(value, "practice_progress", &practice_progress) || 
-            !json_object_object_get_ex(value, "stars", &stars) || 
-            !json_object_object_get_ex(value, "coin1", &coin1) || 
-            !json_object_object_get_ex(value, "coin2", &coin2) || 
-            !json_object_object_get_ex(value, "coin3", &coin3) 
-        ) {
-            continue;
-        }
-
         LevelDataEntry *entry = &level_data->list[level_data->count];
 
         entry->key = strdup(key);
@@ -249,17 +238,46 @@ static bool parse_level_data_list(LevelDataList *level_data, struct json_object 
             return false;
         }
 
-        entry->data.level_id = json_object_get_int(level_id);
-        entry->data.attempts = json_object_get_int(attempts);
-        entry->data.jumps = json_object_get_int(jumps);
-        entry->data.normal_progress = json_object_get_int(normal_progress);
-        entry->data.practice_progress = json_object_get_int(practice_progress);
-        entry->data.stars = json_object_get_int(stars);
-        entry->data.coin1 = json_object_get_boolean(coin1);
-        entry->data.coin2 = json_object_get_boolean(coin2);
-        entry->data.coin3 = json_object_get_boolean(coin3);
+        entry->data.level_id = 0;
+        entry->data.attempts = 0;
+        entry->data.jumps = 0;
+        entry->data.normal_progress = 0;
+        entry->data.practice_progress = 0;
+        entry->data.stars = 0;
+        entry->data.coin1 = false;
+        entry->data.coin2 = false;
+        entry->data.coin3 = false;
+
+
+        if (json_object_object_get_ex(value, "level_id", &level_id))
+            entry->data.level_id = json_object_get_int(level_id);
+
+        if (json_object_object_get_ex(value, "attempts", &attempts))
+            entry->data.attempts = json_object_get_int(attempts);
+
+        if (json_object_object_get_ex(value, "jumps", &jumps))
+            entry->data.jumps = json_object_get_int(jumps);
+
+        if (json_object_object_get_ex(value, "normal_progress", &normal_progress))
+            entry->data.normal_progress = json_object_get_int(normal_progress);
+
+        if (json_object_object_get_ex(value, "practice_progress", &practice_progress))
+            entry->data.practice_progress = json_object_get_int(practice_progress);
+
+        if (json_object_object_get_ex(value, "stars", &stars))
+            entry->data.stars = json_object_get_int(stars);
+
+        if (json_object_object_get_ex(value, "coin1", &coin1))
+            entry->data.coin1 = json_object_get_boolean(coin1);
+
+        if (json_object_object_get_ex(value, "coin2", &coin2))
+            entry->data.coin2 = json_object_get_boolean(coin2);
+
+        if (json_object_object_get_ex(value, "coin3", &coin3))
+            entry->data.coin3 = json_object_get_boolean(coin3);
 
         level_data->count++;
+
     }
 
     return true;
@@ -374,8 +392,18 @@ bool load_save_file(const char *path, ServerFile *save_data) {
         server_file_init(save_data);
         return save_save_file(path, save_data);
     }
-    
-    struct json_object *root = json_tokener_parse(file);
+
+    size_t out_len;
+    int out_code;
+    char *decompressed = decompress_data((unsigned char *) file, out_size, &out_len, &out_code);
+    if (!decompressed) {
+        free(file);
+        return false;
+    }
+
+    free(file);
+
+    struct json_object *root = json_tokener_parse(decompressed);
     if (!root) {
         return false;
     }
@@ -434,6 +462,14 @@ bool save_save_file(const char *path, const ServerFile *save_data) {
 
     const char *json = json_object_to_json_string_ext(root, JSON_C_TO_STRING_PRETTY);
 
+    size_t out_len;
+    int out_code;
+    unsigned char *compressed = compress_data((const unsigned char *) json, strlen(json), &out_len, &out_code);
+    if (!compressed) {
+        json_object_put(root);
+        return false;
+    }
+
     char tmp_file[273];
     snprintf(tmp_file, sizeof(tmp_file), "%s.temp", path);
 
@@ -444,9 +480,8 @@ bool save_save_file(const char *path, const ServerFile *save_data) {
     }
 
     bool success = true;
-    size_t length = strlen(json);
 
-    if (fwrite(json, 1, length, file) != length) {
+    if (fwrite(compressed, 1, out_len, file) != out_len) {
         success = false;
     }
 
@@ -473,8 +508,18 @@ bool load_external_file(const char *path, ExternalLevelFile *save_data) {
         external_file_init(save_data);
         return save_external_file(path, save_data);
     }
+
+    size_t out_len;
+    int out_code;
+    char *decompressed = decompress_data((unsigned char *) file, out_size, &out_len, &out_code);
+    if (!decompressed) {
+        free(file);
+        return false;
+    }
+
+    free(file);
     
-    struct json_object *root = json_tokener_parse(file);
+    struct json_object *root = json_tokener_parse(decompressed);
     if (!root) {
         return false;
     }
@@ -515,6 +560,14 @@ bool save_external_file(const char *path, const ExternalLevelFile *save_data) {
     char tmp_file[273];
     snprintf(tmp_file, sizeof(tmp_file), "%s.temp", path);
 
+    size_t out_len;
+    int out_code;
+    unsigned char *compressed = compress_data((const unsigned char *) json, strlen(json), &out_len, &out_code);
+    if (!compressed) {
+        json_object_put(root);
+        return false;
+    }
+
     FILE *file = fopen(tmp_file, "w");
     if (!file) {
         json_object_put(root);
@@ -522,9 +575,8 @@ bool save_external_file(const char *path, const ExternalLevelFile *save_data) {
     }
 
     bool success = true;
-    size_t length = strlen(json);
 
-    if (fwrite(json, 1, length, file) != length) {
+    if (fwrite(compressed, 1, out_len, file) != out_len) {
         success = false;
     }
 

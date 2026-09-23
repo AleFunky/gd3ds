@@ -20,6 +20,7 @@
 #include "utils/string_helpers.h"
 
 #include "player/collision.h"
+#include "utils/utils.h"
 
 ObjectsArray objects = { 0 };
 
@@ -217,79 +218,6 @@ int base64_decode(const char *in, unsigned char *out) {
     return len;
 }
 
-uLongf get_uncompressed_size(unsigned char *data, int data_len) {
-    z_stream strm;
-    memset(&strm, 0, sizeof(strm));
-    strm.next_in = data;
-    strm.avail_in = data_len;
-
-    if (inflateInit2(&strm, 15 | 32) != Z_OK) {  // auto-detect gzip/zlib
-        return 0;
-    }
-
-    uLongf total_out = 0;
-    unsigned char buf[4096];
-
-    do {
-        strm.next_out = buf;
-        strm.avail_out = sizeof(buf);
-        int ret = inflate(&strm, Z_NO_FLUSH);
-        if (ret == Z_STREAM_ERROR || ret == Z_DATA_ERROR || ret == Z_MEM_ERROR) {
-            inflateEnd(&strm);
-            return 0;
-        }
-        total_out += sizeof(buf) - strm.avail_out;
-        if (ret == Z_STREAM_END) break;
-    } while (strm.avail_in > 0);
-
-    inflateEnd(&strm);
-    return total_out;
-}
-
-
-char *decompress_data(unsigned char *data, int data_len, uLongf *out_len, int *out_code) {
-    uLongf final_size = get_uncompressed_size(data, data_len);
-    printf("Decompressing to a final size of %lu bytes...\n", (unsigned long)final_size);
-
-    z_stream strm = {0};
-    strm.next_in = data;
-    strm.avail_in = data_len;
-
-    if (inflateInit2(&strm, 15 | 32) != Z_OK) {   // auto-detect gzip/zlib
-        output_log("Failed to initialize zlib stream for GZIP\n");
-        *out_code = LOAD_INVALID_LEVEL_DATA;
-        return NULL;
-    }
-
-    // Allocate exactly enough memory (+1 for null terminator if needed)
-    char *out = malloc(final_size + 1);
-    if (!out) {
-        output_log("malloc failed for %lu bytes\n", (unsigned long)final_size);
-        inflateEnd(&strm);
-        *out_code = LOAD_OUT_OF_MEMORY;
-        return NULL;
-    }
-
-    strm.next_out = (Bytef *)out;
-    strm.avail_out = final_size;
-
-    int ret = inflate(&strm, Z_FINISH);
-    if (ret != Z_STREAM_END) {
-        output_log("inflate failed with code %d\n", ret);
-        free(out);
-        inflateEnd(&strm);
-        *out_code = LOAD_INVALID_LEVEL_DATA;
-        return NULL;
-    }
-
-    *out_len = strm.total_out;
-    out[*out_len] = '\0'; // Null-terminate if treating as string
-
-    inflateEnd(&strm);
-
-    printf("Decompressed %lu bytes successfully\n", (unsigned long)*out_len);
-    return out;
-}
 
 char *get_metadata_value(const char *levelString, const char *key) {
     if (!levelString || !key) return NULL;
@@ -350,7 +278,7 @@ char *decompress_online_level(char *data, int *out_code) {
         return NULL;
     }
 
-    uLongf decompressed_len;
+    size_t decompressed_len;
     char *decompressed = decompress_data(decoded, decoded_len, &decompressed_len, out_code);
     if (!decompressed) {
         output_log("Decompression failed (check zlib error above)\n");
@@ -395,7 +323,7 @@ char *decompress_level(char *data, int *out_code) {
         return NULL;
     }
 
-    uLongf decompressed_len;
+    size_t decompressed_len;
     char *decompressed = decompress_data(decoded, decoded_len, &decompressed_len, out_code);
     if (!decompressed) {
         output_log("Decompression failed (check zlib error above)\n");
