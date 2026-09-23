@@ -44,17 +44,33 @@ uint64_t fnv1a64(const char* str) {
     return hash;
 }
 
-int is_main_level(const char *filename) {
-    for (size_t i = 0; i < 32; i++) {
+// Those functions check if the old save data is a main level or a gdps main level
+
+bool is_gdps_main_level(const char *filename) {
+    // Thumper to Streetwise
+    for (size_t i = 18; i < 23; i++) {
         char file[16];
         snprintf(file, sizeof(file), "main_%d", i);
         char tmp[17];
         snprintf(tmp, sizeof(tmp), "%016llX", fnv1a64(file));
         if (strncmp(filename, tmp, 16) == 0) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
+}
+
+bool is_main_level(const char *filename) {
+    for (size_t i = 0; i < 18; i++) {
+        char file[16];
+        snprintf(file, sizeof(file), "main_%d", i);
+        char tmp[17];
+        snprintf(tmp, sizeof(tmp), "%016llX", fnv1a64(file));
+        if (strncmp(filename, tmp, 16) == 0) {
+            return true;
+        }
+    }
+    return false;
 }
 
 static void calculate_stats_level_list(LevelDataList *list, bool is_main_level, const MainLevelPack *pack) {
@@ -759,9 +775,17 @@ bool migrate_old_data() {
                 free(hash);
                 continue;
             }
-
+            
+            bool main_gdps_level = is_gdps_main_level(filename);
             bool main_level = is_main_level(filename);
-            if (main_level) {
+            if (main_gdps_level) {
+                // Main gdps levels go to 1p9 gdps server
+                if (!level_data_list_add(&gdps_file.main_levels, hash, data)) {
+                    free(hash);
+                    closedir(dir);
+                    return false;
+                }
+            } else if (main_level) {
                 // Main levels go to robtop server
                 if (!level_data_list_add(&gd_server_file.main_levels, hash, data)) {
                     free(hash);
