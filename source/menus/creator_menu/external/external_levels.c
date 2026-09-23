@@ -1,10 +1,12 @@
 #include <3ds.h>
 #include <citro2d.h>
+#include <stdlib.h>
 
 #include "math_helpers.h"
 #include "main.h"
 #include "easing.h"
 #include "color_channels.h"
+#include "menus/core/ui_element.h"
 #include "mp3_player.h"
 #include "graphics.h"
 #include "state.h"
@@ -33,6 +35,9 @@
 
 #include "fonts/bigFont.h"
 
+#include "utils/network.h"
+#include "utils/utils.h"
+
 static bool reload_pending;
 static char reload_path[320];
 
@@ -44,6 +49,26 @@ typedef struct {
     bool is_dir;
 } LevelCardData;
 
+static UILabel *path_label = NULL;
+static UIList *list = NULL;
+static UISpinner *spinner = NULL;
+
+static Thread thread;
+
+static FileOrFolder *entries = NULL;
+static int count = 0;
+
+static char *tmp_folder;
+
+static int load_levels(GenericTask *task) {
+    entries = load_folder(task, tmp_folder, &count);
+    return entries == NULL;
+}
+
+static GenericTask task = {
+    .func = load_levels
+};
+
 static void open_folder(UIElement *e, const UIPropertyList* args);
 
 static void open_external_popup(UIElement *e, const UIPropertyList* args) {
@@ -52,20 +77,24 @@ static void open_external_popup(UIElement *e, const UIPropertyList* args) {
     ui_stack_push(&external_popup_def, ANIM_ZOOM_SUBTLE, ANIM_ZOOM_SUBTLE, PUSH_NEXT);
 }
 
-void load_level_folder(char *folder, UIScreen *s) {
-    UIList *list = (UIList *) ui_get_element_by_tag(s, "list");
-    UILabel *path_label = (UILabel *) ui_get_element_by_tag(s, "path");
-    
-    ui_run_func_on_tag(s, "no_levels", ui_disable_element);
+void start_load(char *folder, UIScreen *s) {
+    tmp_folder = folder;
 
     char path[320+5];
     sprintf(path, "Root/%s", current_path);
     truncate_filename_start(path, 27, sizeof(path));
     
     ui_label_set_text(path_label,path);
+    thread = create_generic_thread(&task);
+    ui_list_reset(list);
+    ui_run_func_on_tag(s, "no_levels", ui_disable_element);
+    ui_run_func_on_tag(s, "spinner", ui_enable_element);
+}
 
-    int count = 0;
-    FileOrFolder *entries = load_folder(folder, &count);
+void load_level_folder(char *folder, UIScreen *s) { 
+    ui_run_func_on_tag(s, "spinner", ui_disable_element);
+    ui_run_func_on_tag(s, "no_levels", ui_disable_element);
+
     char level_name[256];
 
     ui_list_reset(list);
@@ -151,8 +180,12 @@ void load_level_folder(char *folder, UIScreen *s) {
 
 static void action_go_back(UIElement *e, const UIPropertyList *args) {
     if (strlen(current_path) > 0) {
+        if (task.running) {
+            task.cancelled = true;
+            threadJoin(thread, U64_MAX);
+        }
         go_back_directory(current_path);
-        load_level_folder(current_path, e->screen);
+        start_load(current_path, e->screen);
     }
 }
 
@@ -185,16 +218,32 @@ static UIActionDef external_actions[] = {
 };
 
 static void external_levels_init(UIScreen *s) {
-    load_level_folder(current_path, s);
+    list = (UIList *) ui_get_element_by_tag(s, "list");
+    spinner = (UISpinner *) ui_get_element_by_tag(s, "spinner");
+    path_label = (UILabel *) ui_get_element_by_tag(s, "path");
+
+    start_load(current_path, s);
 
     play_menu_song();
 }
 
 static void external_levels_update(UIScreen *s, UIInput *i) {
     if (reload_pending) {
-        load_level_folder(reload_path, s);
+        start_load(reload_path, s);
 
         reload_pending = false;
+    }
+
+    if (task.finished) {
+        load_level_folder(tmp_folder, s);
+        task.finished = false;
+    }
+}
+
+static void external_levels_exit(UIScreen *s) {
+    if (task.running) {
+        task.cancelled = true;
+        threadJoin(thread, U64_MAX);
     }
 }
 
@@ -207,6 +256,7 @@ const UIScreenDefPair external_def = {
         .path = "romfs:/menus/creator_menu/external/external_levels.txt",
         .init = external_levels_init,
         .update = external_levels_update,
+        .exit = external_levels_exit,
         .action_list = {
             .action_count = ARRAY_LEN(external_actions),
             .actions = external_actions

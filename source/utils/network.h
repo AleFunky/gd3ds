@@ -39,19 +39,7 @@ typedef struct SearchFilters {
     char searchQuery[20];
 } SearchFilters;
 
-typedef struct NetworkTask NetworkTask;
-
-typedef int (*NetworkFunc)(NetworkTask *);
-
-typedef struct NetworkTask {
-    NetworkFunc func;
-
-    volatile int result;
-    
-    volatile bool running;
-    volatile bool finished;
-    volatile bool cancelled;
-} NetworkTask;
+typedef struct GenericTask GenericTask;
 
 typedef struct {
     volatile float progress;
@@ -68,20 +56,19 @@ typedef struct {
 
     char *path;
     char *url;
-    char *song_id;
+    char song_id[16];
 } DownloadTask;
 
 Thread create_download_song_thread(DownloadTask *task);
-Thread create_network_thread(NetworkTask *task);
 
 int soc_init();
 
-int get_level_from_id(NetworkTask *task, char **out_data, int id, bool useGdps);
+int get_level_from_id(GenericTask *task, char **out_data, int id, bool useGdps);
 
-int get_search_results(NetworkTask *task, char **out_data, int gameVer, SearchFilters f, bool useGdps);
+int get_search_results(GenericTask *task, char **out_data, int gameVer, SearchFilters f, bool useGdps);
 
-int get_comments_from_id(NetworkTask *task, char **out_data, int id, int page, int mode, bool useGdps);
+int get_comments_from_id(GenericTask *task, char **out_data, int id, int page, int mode, bool useGdps);
 
-int get_song_info_from_id(NetworkTask *task, char **out_data, int songId, bool useGdps);
+int get_song_info_from_id(GenericTask *task, char **out_data, int songId, bool useGdps);
 
 void soc_exit();

@@ -322,7 +322,7 @@ void first_load_init_variables() {
     clear_new_best_popup();
     init_variables();
     
-    LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
+    LevelData *level_data_sel = &current_level_entry->data;
     state.current_data.time_start = svcGetSystemTick() / (CPU_TICKS_PER_MSEC * 1000);
     state.current_data.max_normal = level_data_sel->normal_progress;
     state.current_data.max_practice = level_data_sel->practice_progress;
@@ -489,8 +489,8 @@ void play_level_song(float seek) {
 
         if (state.custom_level) song_id = level_info.song_id;
 
-        if (song_id < MAIN_LEVELS_NUM) {
-            song_loaded = play_mp3(main_levels[song_id].song_path, false, seek);
+        if (song_id < current_main_level_pack->count) {
+            song_loaded = play_mp3(current_main_level_pack->levels[song_id].song_path, false, seek);
         } else {
             song_loaded = false;
         }
@@ -591,7 +591,7 @@ bool is_coin_collected(int obj) {
 
     if (objects.id[obj] != SECRET_COIN) return false;
 
-    LevelData *level_data = &main_level_data[curr_level_id];
+    LevelData *level_data = &current_level_entry->data;
 
     switch (objects.coin_id[obj]) {
         case 0:

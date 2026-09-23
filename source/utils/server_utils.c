@@ -618,7 +618,7 @@ void fill_gdps_comment_author_entries(char **authorStrings, int authorStringCoun
     }
 }
 
-int search_levels_internal(NetworkTask *task, bool useGdps) {
+int search_levels_internal(GenericTask *task, bool useGdps) {
     char *outdata;
     int result = get_search_results(task, &outdata, 22, filters, useGdps);
 
@@ -689,7 +689,7 @@ int search_levels_internal(NetworkTask *task, bool useGdps) {
     return 0;
 }
 
-int get_level_data_internal(NetworkTask *task, int id, bool refresh, int currentId, bool useGdps) {
+int get_level_data_internal(GenericTask *task, int id, bool refresh, int currentId, bool useGdps) {
     char *outdata;
     int result = get_level_from_id(task, &outdata, id, useGdps);
 
@@ -750,7 +750,7 @@ float derive_gj_version(int version) {
     return 0;
 }
 
-int get_comments_internal(NetworkTask *task, int id, int page, int sortType, bool useGdps) {
+int get_comments_internal(GenericTask *task, int id, int page, int sortType, bool useGdps) {
     char *outdata;
     int result = get_comments_from_id(task, &outdata, id, page, sortType, useGdps);
 
@@ -819,7 +819,7 @@ int get_comments_internal(NetworkTask *task, int id, int page, int sortType, boo
     return 0;
 }
 
-int get_song_data_internal(NetworkTask *task, int songId, int targetSongEntry, bool useGdps) {
+int get_song_data_internal(GenericTask *task, int songId, int targetSongEntry, bool useGdps) {
     char *outdata;
     int result = get_song_info_from_id(task, &outdata, songId, useGdps);
 
@@ -839,22 +839,22 @@ int get_song_data_internal(NetworkTask *task, int songId, int targetSongEntry, b
 
 //intermediate functions
 
-int search_levels(NetworkTask *task) {
+int search_levels(GenericTask *task) {
     int result = search_levels_internal(task, gdps);
     return result;
 }
 
-int get_level(NetworkTask *task) {
+int get_level(GenericTask *task) {
     int result = get_level_data_internal(task, search_entries[curr_search_id].levelId, refresh, curr_search_id, gdps);
     return result;
 }
 
-int get_comments(NetworkTask *task) {
+int get_comments(GenericTask *task) {
     int result = get_comments_internal(task, search_entries[curr_search_id].levelId, current_comments_page, comments_sort_type, gdps);
     return result;
 }
 
-int get_song_data(NetworkTask *task) {
+int get_song_data(GenericTask *task) {
     int result = get_song_data_internal(task, search_entries[curr_search_id].songId, search_entries[curr_search_id].songIndex, gdps);
     return result;
 }

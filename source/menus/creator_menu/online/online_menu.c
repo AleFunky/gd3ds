@@ -10,6 +10,7 @@
 #include "graphics.h"
 #include "menus/creator_menu/online/two_option_pop_up.h"
 #include "mp3_player.h"
+#include "save/saving.h"
 #include "state.h"
 
 #include "utils/folders.h"
@@ -37,6 +38,7 @@
 
 #include "fonts/bigFont.h"
 #include "fonts/goldFont.h"
+#include "utils/utils.h"
 
 int curr_search_id;
 
@@ -49,7 +51,7 @@ static UIList *list;
 
 static Thread thread;
 
-static NetworkTask search_task = {
+static GenericTask search_task = {
     .func = search_levels
 };
 
@@ -143,7 +145,7 @@ static void action_change_page(UIElement* e, const UIPropertyList *args) {
     search_needs_refresh = true;
     ui_run_func_on_tag(e->screen, "nextpage", ui_disable_element);
     ui_run_func_on_tag(e->screen, "prevpage", ui_disable_element);
-    thread = create_network_thread(&search_task);
+    thread = create_generic_thread(&search_task);
     ui_enable_element((UIElement *) spinner);
     if (list) ui_list_reset(list);
 }
@@ -207,8 +209,8 @@ static void populate_list() {
                 song_name = song_entries[entry->songIndex].songTitle;
             }
         } else if (entry->songIndex != -1) {
-            if (IN_BOUNDS(entry->mainSongId, main_songs)) {
-                song_name = (char *) main_songs[entry->mainSongId].title;
+            if (entry->mainSongId >= 0 && entry->mainSongId < current_main_level_pack->count) {
+                song_name = (char *) current_main_level_pack->levels[entry->mainSongId].song_data.title;
             }
         }
 
@@ -466,6 +468,18 @@ static void populate_list() {
                 ui_element_add_child(card, (UIElement *)button);
             }
 
+            LevelDataEntry *level_data = get_online_level_data(entry->levelId);
+            if (level_data && level_data->data.normal_progress == 100) {
+                UIImage *completed_icon = ui_create_image(&default_screen);
+                if (completed_icon) {
+                    ui_image_set_image(completed_icon, 40, 0);
+                    ui_element_set_position((UIElement *)completed_icon, list_width - 62, -17);
+                    ui_element_set_scale((UIElement *)completed_icon, 0.7f);
+
+                    ui_element_add_child(card, (UIElement *)completed_icon);
+                }
+            }
+
             ui_list_add(list, card);
         }
     }  
@@ -511,7 +525,7 @@ static void online_menu_init(UIScreen *s) {
     search_result = -2;
     
     if (search_needs_refresh) {
-        thread = create_network_thread(&search_task);
+        thread = create_generic_thread(&search_task);
     } else {
         if (list) { // No errors
             populate_list();

@@ -2,6 +2,7 @@
 #include <citro2d.h>
 #include <stdlib.h>
 
+#include "level/main_levels.h"
 #include "main.h"
 #include "menus/core/ui_element.h"
 #include "menus/settings_hub/info_card.h"
@@ -18,6 +19,7 @@
 #include "menus/settings_hub/songs.h"
 #include "menus/creator_menu/external/external_level_infobox.h"
 #include "menus/creator_menu/external/external_popup.h"
+#include "utils/utils.h"
 
 #include "fonts/chatFont.h"
 
@@ -42,6 +44,8 @@ static UILabel *normal_progress_val;
 static UIProgressBar *practice_progress;
 static UILabel *practice_progress_val;
 
+static Thread thread;
+
 static int stars_num = 0;
 
 const int difficulty_stars[MAX_STARS + 1] = {
@@ -58,6 +62,9 @@ const int difficulty_stars[MAX_STARS + 1] = {
     DEMON_FACE
 };
 
+static char *gmd = NULL;
+
+
 static void open_level(UIElement *e, const UIPropertyList *args) {
     state.custom_level = true;
 
@@ -71,13 +78,13 @@ static UIActionDef external_popup_actions[] = {
 };
 
 static void set_progress() {
-    normal_progress->value = level_data.normal_progress;
-    practice_progress->value = level_data.practice_progress;
+    normal_progress->value = current_level_entry->data.normal_progress;
+    practice_progress->value = current_level_entry->data.practice_progress;
 
     char normal[32];
     char practice[32];
-    snprintf(normal, sizeof(normal), "%d%%", level_data.normal_progress);
-    snprintf(practice, sizeof(practice), "%d%%", level_data.practice_progress);
+    snprintf(normal, sizeof(normal), "%d%%", current_level_entry->data.normal_progress);
+    snprintf(practice, sizeof(practice), "%d%%", current_level_entry->data.practice_progress);
 
     ui_label_set_text(normal_progress_val, normal);
     ui_label_set_text(practice_progress_val, practice);
@@ -107,7 +114,9 @@ static void set_name_creator(char *gmd) {
     // Load data
     char file[516];
     snprintf(file, sizeof(file), "ext_%s_%s", level_info.level_name, level_info.creator_name);
-    load_level_progress(file);
+    
+    current_level_entry = get_or_add_level_to_external_file(&external_file, file);
+    
     set_progress();
 }
 
@@ -199,9 +208,8 @@ static void set_stars(char *gmd) {
             stars_num = 0;
         }
 
-        if (level_data.stars != stars_num) {
-            level_data.stars = stars_num;
-            save_level_progress();
+        if (current_level_entry->data.stars != stars_num) {
+            current_level_entry->data.stars = stars_num;
         }
 
         free(stars);
@@ -247,8 +255,8 @@ static void set_song_id(char *gmd) {
         }
     } else {
         char *song_name = "Unknown";
-        if (IN_BOUNDS(song_id, main_songs)) {
-            song_name = main_songs[song_id].title;
+        if (song_id >= 0 && song_id < current_main_level_pack->count) {
+            song_name = current_main_level_pack->levels[song_id].song_data.title;
         }
         snprintf(tmp, sizeof(tmp), "Using song: %s", song_name);
     }
@@ -264,6 +272,28 @@ static void set_difficulty() {
     ui_image_set_image(difficulty_face, face, 0);
 }
 
+
+static int load_gmd(GenericTask *task) {
+    size_t out_size;
+    gmd = read_file(state.custom_level_path, &out_size);
+    
+    if (gmd == NULL) return 1;
+
+    set_name_creator(gmd);
+    set_description(gmd);
+    set_downloads_likes(gmd);
+    set_stars(gmd);
+    set_difficulty();
+    set_level_id(gmd);
+    set_song_id(gmd);
+
+    return 0;
+}
+
+static GenericTask task = {
+    .func = load_gmd
+};
+
 static void external_popup_init_top(UIScreen *s) {
     screen_top = s;
     level_name      = (UILabel *) ui_get_element_by_tag(screen_top, "levelname");
@@ -275,6 +305,7 @@ static void external_popup_init_top(UIScreen *s) {
     difficulty_face = (UIImage *) ui_get_element_by_tag(screen_top, "difficultyface");
     level_id_label  = (UILabel *) ui_get_element_by_tag(screen_top, "levelid");
     like_image      = (UIImage *) ui_get_element_by_tag(screen_top, "likeimage");
+    ui_run_func_on_tag(screen_top, "info", ui_disable_element);
 }
 
 void show_level_load_error_message() {
@@ -325,22 +356,21 @@ void external_popup_init(UIScreen *s) {
     ui_progress_bar_set_tint(normal_progress, C2D_Color32(0, 255, 0, 255));
     ui_progress_bar_set_tint(practice_progress, C2D_Color32(0, 255, 255, 255));
 
-    size_t out_size;
-    char *gmd = read_file(state.custom_level_path, &out_size);
-    if (!gmd) return;
-    set_name_creator(gmd);
-    set_description(gmd);
-    set_downloads_likes(gmd);
-    set_stars(gmd);
-    set_difficulty();
-    set_level_id(gmd);
-    set_song_id(gmd);
-    
+    thread = create_generic_thread(&task);
+    ui_run_func_on_tag(screen, "info", ui_disable_element);
+
     free(gmd);
 }
 
-static void external_popup_exit() {
-    free_level_progress();
+void external_popup_update_top(UIScreen *s, UIInput *u) {
+    if (task.finished) {
+        ui_run_func_on_tag(screen, "spinner", ui_disable_element);
+        ui_run_func_on_tag(screen, "info", ui_enable_element);
+        ui_run_func_on_tag(screen_top, "info", ui_enable_element);
+        ui_run_func_on_tag(screen_top, "spinner", ui_disable_element);
+
+        task.finished = false;
+    }
 }
 
 const UIScreenDefPair external_popup_def = {
@@ -348,12 +378,12 @@ const UIScreenDefPair external_popup_def = {
     .top = {
         .path = "romfs:/menus/creator_menu/external/external_pop_up_top.txt",
         .init = external_popup_init_top,
+        .update = external_popup_update_top
     },
     .btm = {
         .path = "romfs:/menus/creator_menu/external/external_pop_up.txt",
         .init = external_popup_init,
         .update = external_popup_update,
-        .exit = external_popup_exit,
         .action_list = {
             .action_count = ARRAY_LEN(external_popup_actions),
             .actions = external_popup_actions

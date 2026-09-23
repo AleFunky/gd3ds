@@ -21,7 +21,7 @@ static UILabel *jumps;
 static UILabel *normal_percent;
 static UILabel *practice_percent;
 
-void populate_online_info() {
+static void populate_online_info() {
     SearchEntry *curr_entry = &search_entries[curr_search_id];  
 
     char buffer[256];
@@ -49,6 +49,27 @@ void populate_online_info() {
     ui_label_set_text(game_ver, buffer);
 }
 
+static void populate_stats() {
+    LevelData *data = &current_level_entry->data;
+
+    char attempts_count[256];
+    snprintf(attempts_count, sizeof(attempts_count), "<#40e348>Total Attempts</>: %d", data->attempts);
+    
+    char jumps_count[256];
+    snprintf(jumps_count, sizeof(jumps_count), "<#60abef>Total Jumps</>: %d", data->jumps);
+
+    char normal[256];
+    snprintf(normal, sizeof(normal), "<#ff00ff>Normal</>: %d%%", data->normal_progress);
+    
+    char practice[256];
+    snprintf(practice, sizeof(practice), "<#ffa54b>Practice</>: %d%%", data->practice_progress);
+
+    ui_label_set_text(attempts, attempts_count);
+    ui_label_set_text(jumps, jumps_count);
+    ui_label_set_text(normal_percent, normal);
+    ui_label_set_text(practice_percent, practice);
+}
+
 static void online_level_infobox_init_top(UIScreen *screen_top) {
     level_name = (UILabel *) ui_get_element_by_tag(screen_top, "name");
     level_creator = (UILabel *) ui_get_element_by_tag(screen_top, "creator");
@@ -56,6 +77,8 @@ static void online_level_infobox_init_top(UIScreen *screen_top) {
     updated_ago = (UILabel *) ui_get_element_by_tag(screen_top, "lastupdated");
     requested_stars = (UILabel *) ui_get_element_by_tag(screen_top, "requestedstars");
     game_ver = (UILabel *) ui_get_element_by_tag(screen_top, "gdversion");
+    
+    if (level_entry) populate_online_info();
 }
 
 static void online_level_infobox_init (UIScreen *screen) {
@@ -64,7 +87,7 @@ static void online_level_infobox_init (UIScreen *screen) {
     normal_percent = (UILabel *) ui_get_element_by_tag(screen, "normalprogressvalue");
     practice_percent = (UILabel *) ui_get_element_by_tag(screen, "practiceprogressvalue");
 
-    if (level_entry) populate_online_info();
+    populate_stats();
 }
 
 const UIScreenDefPair online_infobox_def = {

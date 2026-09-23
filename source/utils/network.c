@@ -20,6 +20,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#include "utils.h"
 #define SOC_ALIGN       0x1000
 #define SOC_BUFFERSIZE  0x100000
 
@@ -32,7 +33,7 @@ struct MemoryStruct {
 };
 
 static int cancelCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
-    NetworkTask *task = clientp;
+    GenericTask *task = clientp;
 
     if (task->cancelled) {
         return 1;
@@ -75,7 +76,7 @@ int soc_init() {
     return ret;
 }
 
-int get_level_from_id(NetworkTask *task, char **out_data, int id, bool useGdps) {
+int get_level_from_id(GenericTask *task, char **out_data, int id, bool useGdps) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -141,7 +142,7 @@ static void unpack_bitfield_digits(int field, int bit_count, char *string, int o
     string[pos] = '\0';
 }
 
-int get_search_results(NetworkTask *task, char **out_data, int gameVer, SearchFilters f, bool useGdps) {
+int get_search_results(GenericTask *task, char **out_data, int gameVer, SearchFilters f, bool useGdps) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -243,7 +244,7 @@ int get_search_results(NetworkTask *task, char **out_data, int gameVer, SearchFi
     return 2;
 }
 
-int get_comments_from_id(NetworkTask *task, char **out_data, int id, int page, int mode, bool useGdps) {
+int get_comments_from_id(GenericTask *task, char **out_data, int id, int page, int mode, bool useGdps) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -293,7 +294,7 @@ int get_comments_from_id(NetworkTask *task, char **out_data, int id, int page, i
     return 2;
 }
 
-int get_song_info_from_id(NetworkTask *task, char **out_data, int songId, bool useGdps) {
+int get_song_info_from_id(GenericTask *task, char **out_data, int songId, bool useGdps) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -443,35 +444,6 @@ static int download_song(DownloadTask *task) {
     return -2;
 }
 
-static void network_thread(void *arg) {
-    NetworkTask *task = arg;
-
-    task->result = task->func(task);
-
-    task->running = false;
-    task->finished = true;
-}
-
-Thread create_network_thread(NetworkTask *task) {
-    int32_t priority = 0x30;
-    svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
-    priority += 1;
-    priority = priority < 0x18 ? 0x18 : priority;
-    priority = priority > 0x3F ? 0x3F : priority;
-
-    task->finished = false;
-    task->running = true;
-    task->cancelled = false;
-    
-    return threadCreate(
-        network_thread,
-        task,
-        32 * 1024,
-        priority,
-        (is_N3DS ? 2 : 0),
-        true
-    );
-}
 
 static void download_thread(void *arg) {
     DownloadTask *task = arg;

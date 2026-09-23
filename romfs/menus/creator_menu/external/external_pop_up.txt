@@ -2,20 +2,22 @@ darken opacity=0.4
 
 window x=160 y=120 w=280 h=200 style=0
 
-button x=24 y=25 id=31 actions=close_menu keyBinds="B"
+button x=24 y=25 id=31 actions=close_menu tag="info" keyBinds="B"
 
-button x=160 y=80 id=139 sheet=0 scale=1 actions=play,play_sound[sound="play"] keyBinds="A,START"
+button x=160 y=80 id=139 sheet=0 scale=1 tag="info" actions=play,play_sound[sound="play"] keyBinds="A,START"
 
-button x=295 y=25 id=90 sheet=0 scale=1 actions=open_menu[screen="external_infobox" btm_anim="zoom"]
+button x=295 y=25 id=90 sheet=0 scale=1 tag="info" actions=open_menu[screen="external_infobox" btm_anim="zoom"]
 
-label x=160 y=139 text="Normal mode" scale=0.45 align=CENTER tag="level_card"
-progressbar x=160 y=152 max_value=100 style=0 scale=0.65 tag="level_card,normalprogress"
+label x=160 y=139 text="Normal mode" scale=0.45 align=CENTER tag="info,level_card"
+progressbar x=160 y=152 max_value=100 style=0 scale=0.65 tag="info,level_card,normalprogress"
 
-label x=160 y=153 text="0%" scale=0.4 align=CENTER tag="level_card,normalprogressvalue"
+label x=160 y=153 text="0%" scale=0.4 align=CENTER tag="info,level_card,normalprogressvalue"
 
-label x=160 y=174 text="Practice mode" scale=0.45 align=CENTER tag=""
-progressbar x=160 y=187 max_value=100 style=0 scale=0.65 tag="practiceprogress"
+label x=160 y=174 text="Practice mode" scale=0.45 align=CENTER tag="info"
+progressbar x=160 y=187 max_value=100 style=0 scale=0.65 tag="info,practiceprogress"
 
-label x=160 y=188 text="0%" scale=0.4 align=CENTER tag="level_card,practiceprogressvalue"
+label x=160 y=188 text="0%" scale=0.4 align=CENTER tag="info,level_card,practiceprogressvalue"
 
-label x=160 y=230 text="Using song: N/A" scale=0.76 align=CENTER tag="songid" font=1 opacity=0.6
+label x=160 y=230 text="Using song: N/A" scale=0.76 align=CENTER tag="info,songid" font=1 opacity=0.6
+
+spinner x=160 y=120 tag="spinner"

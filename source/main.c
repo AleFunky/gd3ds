@@ -18,6 +18,7 @@
 #include "save/config.h"
 
 #include <curl/curl.h>
+#include "text.h"
 #include "utils/network.h"
 
 #include "player/collision.h"
@@ -133,6 +134,16 @@ bool is_N3DS;
 
 UIStack menu_stack = { 0 };
 UIStack gameplay_stack = { 0 };
+
+ExternalLevelFile external_file;
+ServerFile gd_server_file;
+ServerFile gdps_file;
+ServerFile *current_server_file;
+
+void load_gdps_info() {
+    current_server_file = (gdps ? &gdps_file : &gd_server_file);
+    current_main_level_pack = (gdps ? &gdps_levels : &robtop_levels);
+}
 
 // Checks if the game is being emulated by citra/azahar
 bool is_citra() {
@@ -671,6 +682,11 @@ void ui_loop(){
         C2D_SceneBegin(bot);
 
         ui_stack_draw(SCREEN_BTM);
+
+        if(is_saving()) {
+            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 234, 0.5f, 0.5f, 0, false, "Saving...");
+        }
+
         draw_stack_fade();
 
         change_blending(true);
@@ -739,7 +755,7 @@ void game_loop() {
         if (state.custom_level) {
             path = state.custom_level_path;
         } else {
-            path = main_levels[curr_level_id].gmd_path;
+            path = current_main_level_pack->levels[curr_level_id].gmd_path;
         }
 
         int returned = load_level(path);
@@ -754,7 +770,7 @@ void game_loop() {
         }
 
         if (!state.custom_level) {
-            snprintf(level_info.level_name, sizeof(level_info.level_name), "%s", main_levels[curr_level_id].level_name);
+            snprintf(level_info.level_name, sizeof(level_info.level_name), "%s", current_main_level_pack->levels[curr_level_id].level_name);
         }
     }
 
@@ -993,7 +1009,7 @@ void game_loop() {
                 state.death_timer = (settingsState.quickRetry ? 0.5f : 1.f);
                 bool had_new_best = false;
                 if (!cheated) {
-                    LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
+                    LevelData *level_data_sel = &current_level_entry->data;
                     // Save new best
                     int progress = (int)state.level_progress;
                     if (state.practice_mode) {
@@ -1349,24 +1365,22 @@ void game_loop() {
         }
     }
 
-    if (!state.online_level) { // TODO: IMPLEMENT SAVING
-        LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
+    LevelData *level_data_sel = &current_level_entry->data;
 
-        level_data_sel->attempts += state.current_data.attempts;
-        level_data_sel->jumps += state.current_data.jumps;
-        level_data_sel->normal_progress = state.current_data.max_normal;
-        level_data_sel->practice_progress = state.current_data.max_practice;
-    }
+    level_data_sel->attempts += state.current_data.attempts;
+    level_data_sel->jumps += state.current_data.jumps;
+    level_data_sel->normal_progress = state.current_data.max_normal;
+    level_data_sel->practice_progress = state.current_data.max_practice;
 
     total_attempts += state.current_data.attempts;
     total_jumps += state.current_data.jumps;
 
     if (state.online_level) {
-        ; // Nothing for now
+        save_current_save_file(LEVEL_LIST_ONLINE);
     } else if (state.custom_level) {
-        save_level_progress();
+        save_current_save_file(LEVEL_LIST_EXTERNAL);
     } else {
-        save_main_level_progress(curr_level_id);
+        save_current_save_file(LEVEL_LIST_MAIN_LEVELS);
     }
 
     cfg_save();
@@ -1484,23 +1498,33 @@ int main(int argc, char* argv[]) {
 
     loading_screen_init();
 
-    u64 start = svcGetSystemTick();
-
     loading_screen_update(0);
 
     ui_assets_init();
     game_assets_init();
     loading_screen_update(10);
 
-    load_main_level_progress();
+    load_save_file(SAVE_ROBTOP_SERVER_FILE, &gd_server_file);
     
-    loading_screen_update(25);
+    loading_screen_update(20);
+
+    load_save_file(SAVE_1P9_SERVER_FILE, &gdps_file);
+
+    loading_screen_update(30);
+
+    load_external_file(SAVE_EXTERNAL_LEVELS_FILE, &external_file);
+
+    load_gdps_info();
+
+    migrate_old_data();
+    
+    loading_screen_update(40);
 
     calculate_stats();
 
     cache_all_sprites();
 
-    loading_screen_update(40);
+    loading_screen_update(55);
     
     init_default_use_effect_pools();
     update_player_colors();
@@ -1510,15 +1534,7 @@ int main(int argc, char* argv[]) {
     load_sfx();
 
     memset(&level_info, 0, sizeof(LoadedLevelInfo));
-    
-    loading_screen_update(90);
 
-    u64 end = svcGetSystemTick();
-    float loading_time = (end - start) / (CPU_TICKS_PER_MSEC) / 1000;
-    
-    // Wait a minimum of 3 seconds
-    long waiting = (long)((3 - loading_time) * 1e9);
-    if (waiting > 0) svcSleepThread(waiting);
     loading_screen_update(100);
 
     // Unload loading screen
@@ -1586,8 +1602,6 @@ int main(int argc, char* argv[]) {
     close_log_file();
 
     free_cached_sprites();
-
-    free_main_level_progress();
 
     // Delete graphics
     C2D_SpriteSheetFree(spriteSheet);

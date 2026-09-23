@@ -166,7 +166,7 @@ int handle_wall_cutscene(float delta, UIInput *touch) {
         }
 
         if(status){
-            LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
+            LevelData *level_data_sel = &current_level_entry->data;
             if (!cheated) {
                 if (state.practice_mode) {
                     state.current_data.max_practice = 100;
@@ -187,10 +187,10 @@ int handle_wall_cutscene(float delta, UIInput *touch) {
                             }
                         } else {
                             completed_main_levels++;
-                            stars = main_levels[curr_level_id].stars;
+                            stars = current_main_level_pack->levels[curr_level_id].stars;
 
                             // Add if demon
-                            if (main_levels[curr_level_id].difficulty == MAIN_DIFF_DEMON) {
+                            if (current_main_level_pack->levels[curr_level_id].difficulty == MAIN_DIFF_DEMON) {
                                 total_demons++;
                             }
                         }

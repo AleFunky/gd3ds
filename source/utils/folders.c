@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "utils.h"
 #include "main.h"
 
 FileOrFolder sd_level_paths[MAX_SD_LEVELS];
@@ -28,7 +29,7 @@ int compare_entries(const void *a, const void *b) {
     return strcasecmp(ea->name, eb->name);
 }
 
-FileOrFolder *load_folder(char *dir, int *count) {
+FileOrFolder *load_folder(GenericTask *task, char *dir, int *count) {
     sd_level_count = 0;
 
     char directory[256];
@@ -53,6 +54,9 @@ FileOrFolder *load_folder(char *dir, int *count) {
     struct stat statbuf;
 
     while ((pent = readdir(level_dir)) != NULL && sd_level_count < MAX_SD_LEVELS) {
+        if (task->cancelled) {
+            return NULL;
+        }
 
         // Skip dot and dot dot
         if (strcmp(pent->d_name, ".") == 0 || strcmp(pent->d_name, "..") == 0)
