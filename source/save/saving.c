@@ -424,8 +424,6 @@ bool load_save_file(const char *path, ServerFile *save_data) {
 
     free(file);
 
-    output_log(decompressed);
-
     struct json_object *root = json_tokener_parse(decompressed);
     if (!root) {
         return false;
