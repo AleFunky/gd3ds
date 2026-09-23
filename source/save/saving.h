@@ -112,6 +112,8 @@ extern LevelDataEntry *current_level_entry;
 
 bool migrate_old_data();
 
+LevelDataEntry *level_data_list_find(LevelDataList *level_data, const char *key);
+LevelDataEntry *get_online_level_data(int level_id);
 void save_current_save_file(LevelListType type);
 
 void calculate_stats();

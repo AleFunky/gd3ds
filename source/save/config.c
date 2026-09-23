@@ -95,7 +95,7 @@ void init_values() {
     config_init_bool(&cfg, CONFIG_FILTERS_PATH "rated",  false);
     config_init_bool(&cfg, CONFIG_FILTERS_PATH "featured", false);
     config_init_bool(&cfg, CONFIG_FILTERS_PATH "super", false);
-    config_init_bool(&cfg, CONFIG_FILTERS_PATH "length", false);
+    config_init_int(&cfg, CONFIG_FILTERS_PATH "length", false);
     config_init_bool(&cfg, CONFIG_FILTERS_PATH "song", false);
     config_init_bool(&cfg, CONFIG_FILTERS_PATH "customSelected", false);
     config_init_int(&cfg, CONFIG_FILTERS_PATH "normalId", 0);

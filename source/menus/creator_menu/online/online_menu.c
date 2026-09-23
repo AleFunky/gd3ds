@@ -10,6 +10,7 @@
 #include "graphics.h"
 #include "menus/creator_menu/online/two_option_pop_up.h"
 #include "mp3_player.h"
+#include "save/saving.h"
 #include "state.h"
 
 #include "utils/folders.h"
@@ -465,6 +466,18 @@ static void populate_list() {
                 ui_element_set_action((UIElement *)button, action_open_online_level_menu);
                 ui_element_set_userdata((UIElement *) button, data);
                 ui_element_add_child(card, (UIElement *)button);
+            }
+
+            LevelDataEntry *level_data = get_online_level_data(entry->levelId);
+            if (level_data && level_data->data.normal_progress == 100) {
+                UIImage *completed_icon = ui_create_image(&default_screen);
+                if (completed_icon) {
+                    ui_image_set_image(completed_icon, 40, 0);
+                    ui_element_set_position((UIElement *)completed_icon, list_width - 62, -17);
+                    ui_element_set_scale((UIElement *)completed_icon, 0.7f);
+
+                    ui_element_add_child(card, (UIElement *)completed_icon);
+                }
             }
 
             ui_list_add(list, card);

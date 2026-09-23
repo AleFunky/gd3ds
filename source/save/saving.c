@@ -49,6 +49,16 @@ uint64_t fnv1a64(const char* str) {
     return hash;
 }
 
+LevelDataEntry *level_data_list_find(LevelDataList *level_data, const char *key) {
+    for (size_t i = 0; i < level_data->count; i++) {
+        if (strcmp(level_data->list[i].key, key) == 0) {
+            return &level_data->list[i];
+        }
+    }
+
+    return NULL;
+}
+
 // Those functions check if the old save data is a main level or a gdps main level
 
 bool is_gdps_main_level(const char *filename) {
@@ -76,6 +86,14 @@ bool is_main_level(const char *filename) {
         }
     }
     return false;
+}
+
+LevelDataEntry *get_online_level_data(int level_id) {
+    char file[16];
+    snprintf(file, sizeof(file), "%d", level_id);
+    char tmp[17];
+    snprintf(tmp, sizeof(tmp), "%016llX", fnv1a64(file));
+    return level_data_list_find(&current_server_file->online_levels, tmp);
 }
 
 static void calculate_stats_level_list(LevelDataList *list, bool is_main_level, const MainLevelPack *pack) {
@@ -345,16 +363,6 @@ static void external_file_init(ExternalLevelFile *save_data) {
     save_data->external_levels.list = NULL;
     save_data->external_levels.capacity = 0;
     save_data->external_levels.count = 0;
-}
-
-static LevelDataEntry *level_data_list_find(LevelDataList *level_data, const char *key) {
-    for (size_t i = 0; i < level_data->count; i++) {
-        if (strcmp(level_data->list[i].key, key) == 0) {
-            return &level_data->list[i];
-        }
-    }
-
-    return NULL;
 }
 
 static LevelDataEntry *level_data_list_get_or_add(LevelDataList *level_data, const char *key) {
