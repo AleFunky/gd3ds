@@ -118,6 +118,7 @@ static void update_current_level(int level) {
     char key[18];
     snprintf(key, sizeof(key), "main_%d", level);
     current_level_entry = get_or_add_level_to_server_file(current_server_file, key, LEVEL_LIST_MAIN_LEVELS);
+    current_level_entry->data.stars = current_main_level_pack->levels[level].stars;
 }
 
 static void draw_dots(int level_id) {

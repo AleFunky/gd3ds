@@ -354,7 +354,7 @@ void level_complete_init() {
     UILabel *star_text = (UILabel *) ui_get_element_by_tag(&screen_top, "startext");
 
     char star_count[4];
-    int stars = state.custom_level ? level_data_sel->stars : current_main_level_pack->levels[curr_level_id].stars;
+    int stars = level_data_sel->stars;
     snprintf(star_count, sizeof(star_count), "+%d", stars);
     ui_label_set_text(star_text, star_count);
 

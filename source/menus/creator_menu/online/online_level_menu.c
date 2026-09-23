@@ -451,6 +451,7 @@ static void populate_level_info() {
     current_level_entry = get_or_add_level_to_server_file(current_server_file, key, LEVEL_LIST_ONLINE);
 
     current_level_entry->data.level_id = entry_srch->levelId;
+    current_level_entry->data.stars = entry_srch->stars;
 
     update_progress_bars();
 }
