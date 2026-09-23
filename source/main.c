@@ -1203,7 +1203,7 @@ void game_loop() {
         update_stereo_target();
 
         // Handle level being completed
-        if (level_info.completing && !exiting_level) {
+        if (level_info.completing) {
             int status = handle_wall_cutscene(delta, &touch);
             // Exiting
             if (status == 1) {

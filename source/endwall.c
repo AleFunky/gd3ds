@@ -48,109 +48,116 @@ static void init_level_complete_popup();
 static LevelCompletePopup level_complete_popup;
 
 int handle_wall_cutscene(float delta, UIInput *touch) {
-    bool practice_mode_end_wall = state.practice_mode || cheated;
-    // Init wall variables
-    if (completion_timer == 0) {
-        fireworks_spawned = 0;
-        circunferences_spawned = 0;
-
-        // Skip rays and co
-        if (practice_mode_end_wall) {
-            completion_timer = FIREWORK_SPAWN_TIME;
-            return 0;
-        }
-
-        start_shake(FIREWORK_SPAWN_TIME, 3);
-        
-        UseEffect *effect = add_use_effect(level_info.wall_x, level_info.wall_y, USE_EFFECT_OBJ_NOTHING, &end_wall_filled_first, get_use_effect_array_ptr(GFX_TOP));
-        if (effect) {
-            Color p1_white = get_white_if_black(p1_color);
-            effect->def.colorR = p1_white.r / 255.f;
-            effect->def.colorG = p1_white.g / 255.f;
-            effect->def.colorB = p1_white.b / 255.f;
-        }
-        
-        play_sfx(&end_sound, 1);
-
-        rays_start();
-    }
-
-    // Make circunferences
-    if (circunference_timer >= (circunferences_spawned * CIRCUNFERENCE_SPAWN_DELAY) && circunferences_spawned < CIRCUNFERENCE_COUNT && !practice_mode_end_wall) {        
-        UseEffect *effect = add_use_effect(level_info.wall_x, level_info.wall_y, USE_EFFECT_OBJ_NOTHING, &end_wall_circunference, get_use_effect_array_ptr(GFX_TOP));
-        if (effect) {
-            Color p1_white = get_white_if_black(p1_color);
-            effect->def.colorR = p1_white.r / 255.f;
-            effect->def.colorG = p1_white.g / 255.f;
-            effect->def.colorB = p1_white.b / 255.f;
-        }
-        circunferences_spawned++;
-    }
-
-    // Handle level complete text and co
-    if (completion_timer >= FIREWORK_SPAWN_TIME && completion_timer <= MENU_TIME) {
-        // Init circles
-        if (fireworks_spawned == 0) {
-            rays_start_fade();
-
-            init_level_complete_popup();
-
-            // Spawn again circunferences
+    if(!exiting_level){
+        bool practice_mode_end_wall = state.practice_mode || cheated;
+        // Init wall variables
+        if (completion_timer == 0) {
+            fireworks_spawned = 0;
             circunferences_spawned = 0;
-            circunference_timer = 0.0f;
 
-            // Endwall circle
-            UseEffect *effect = add_use_effect(level_info.wall_x, level_info.wall_y, USE_EFFECT_OBJ_NOTHING, &end_wall_filled_second, get_use_effect_array_ptr(GFX_TOP));
+            // Skip rays and co
+            if (practice_mode_end_wall) {
+                completion_timer = FIREWORK_SPAWN_TIME;
+                return 0;
+            }
+
+            start_shake(FIREWORK_SPAWN_TIME, 3);
+            
+            UseEffect *effect = add_use_effect(level_info.wall_x, level_info.wall_y, USE_EFFECT_OBJ_NOTHING, &end_wall_filled_first, get_use_effect_array_ptr(GFX_TOP));
             if (effect) {
                 Color p1_white = get_white_if_black(p1_color);
                 effect->def.colorR = p1_white.r / 255.f;
                 effect->def.colorG = p1_white.g / 255.f;
                 effect->def.colorB = p1_white.b / 255.f;
             }
-
-            // Pop up circle
-            float calc_x = state.camera_x + (SCREEN_WIDTH_AREA / 2);
-            float calc_y = state.camera_y + (SCREEN_HEIGHT - (SCREEN_HEIGHT_AREA / 2));
-            UseEffect *effect2 = add_use_effect(calc_x, calc_y, USE_EFFECT_OBJ_NOTHING, &end_wall_filled_title, get_use_effect_array_ptr(GFX_TOP_BUT_ABOVE_LEVEL));
-            if (effect2) {
-                Color p1_white = get_white_if_black(p1_color);
-                effect2->def.colorR = p1_white.r / 255.f;
-                effect2->def.colorG = p1_white.g / 255.f;
-                effect2->def.colorB = p1_white.b / 255.f;
-            }
-
-            level_complete_effect_p1.emitterX = SCREEN_WIDTH_AREA / 2;
-            level_complete_effect_p1.emitterY = SCREEN_HEIGHT_AREA / 2;
-            level_complete_effect_p2.emitterX = SCREEN_WIDTH_AREA / 2;
-            level_complete_effect_p2.emitterY = SCREEN_HEIGHT_AREA / 2;
-
-            spawnMultipleParticles(&level_complete_effect_p1, 200);
-            spawnMultipleParticles(&level_complete_effect_p2, 200);
             
-            if (practice_mode_end_wall) fireworks_spawned++;
+            play_sfx(&end_sound, 1);
+
+            rays_start();
         }
 
-        // Fireworks
-        if (!practice_mode_end_wall && completion_timer >= FIREWORK_SPAWN_TIME + (fireworks_spawned * FIREWORK_SPAWN_DELAY)) {
-            float calc_x = state.camera_x + 100 + random_float(0, SCREEN_WIDTH_AREA - 200);
-            float y = random_float(0, SCREEN_HEIGHT_AREA);
-            float calc_y = state.camera_y + (SCREEN_HEIGHT - y);
-            UseEffect *effect = add_use_effect(calc_x, calc_y, USE_EFFECT_OBJ_NOTHING, &end_wall_firework_circle, get_use_effect_array_ptr(GFX_TOP_BUT_ABOVE_LEVEL));
+        // Make circunferences
+        if (circunference_timer >= (circunferences_spawned * CIRCUNFERENCE_SPAWN_DELAY) && circunferences_spawned < CIRCUNFERENCE_COUNT && !practice_mode_end_wall) {        
+            UseEffect *effect = add_use_effect(level_info.wall_x, level_info.wall_y, USE_EFFECT_OBJ_NOTHING, &end_wall_circunference, get_use_effect_array_ptr(GFX_TOP));
             if (effect) {
-                Color p2_white = get_white_if_black(p2_color);
-                effect->def.colorR = p2_white.r / 255.f;
-                effect->def.colorG = p2_white.g / 255.f;
-                effect->def.colorB = p2_white.b / 255.f;
+                Color p1_white = get_white_if_black(p1_color);
+                effect->def.colorR = p1_white.r / 255.f;
+                effect->def.colorG = p1_white.g / 255.f;
+                effect->def.colorB = p1_white.b / 255.f;
+            }
+            circunferences_spawned++;
+        }
+
+        // Handle level complete text and co
+        if (completion_timer >= FIREWORK_SPAWN_TIME && completion_timer <= MENU_TIME) {
+            // Init circles
+            if (fireworks_spawned == 0) {
+                rays_start_fade();
+
+                init_level_complete_popup();
+
+                // Spawn again circunferences
+                circunferences_spawned = 0;
+                circunference_timer = 0.0f;
+
+                // Endwall circle
+                UseEffect *effect = add_use_effect(level_info.wall_x, level_info.wall_y, USE_EFFECT_OBJ_NOTHING, &end_wall_filled_second, get_use_effect_array_ptr(GFX_TOP));
+                if (effect) {
+                    Color p1_white = get_white_if_black(p1_color);
+                    effect->def.colorR = p1_white.r / 255.f;
+                    effect->def.colorG = p1_white.g / 255.f;
+                    effect->def.colorB = p1_white.b / 255.f;
+                }
+
+                // Pop up circle
+                float calc_x = state.camera_x + (SCREEN_WIDTH_AREA / 2);
+                float calc_y = state.camera_y + (SCREEN_HEIGHT - (SCREEN_HEIGHT_AREA / 2));
+                UseEffect *effect2 = add_use_effect(calc_x, calc_y, USE_EFFECT_OBJ_NOTHING, &end_wall_filled_title, get_use_effect_array_ptr(GFX_TOP_BUT_ABOVE_LEVEL));
+                if (effect2) {
+                    Color p1_white = get_white_if_black(p1_color);
+                    effect2->def.colorR = p1_white.r / 255.f;
+                    effect2->def.colorG = p1_white.g / 255.f;
+                    effect2->def.colorB = p1_white.b / 255.f;
+                }
+
+                level_complete_effect_p1.emitterX = SCREEN_WIDTH_AREA / 2;
+                level_complete_effect_p1.emitterY = SCREEN_HEIGHT_AREA / 2;
+                level_complete_effect_p2.emitterX = SCREEN_WIDTH_AREA / 2;
+                level_complete_effect_p2.emitterY = SCREEN_HEIGHT_AREA / 2;
+
+                spawnMultipleParticles(&level_complete_effect_p1, 200);
+                spawnMultipleParticles(&level_complete_effect_p2, 200);
+                
+                if (practice_mode_end_wall) fireworks_spawned++;
             }
 
-            end_wall_firework.emitterX = calc_x;
-            end_wall_firework.emitterY = calc_y;
-            spawnMultipleParticles(&end_wall_firework, 25);
-            
-            fireworks_spawned++;
+            // Fireworks
+            if (!practice_mode_end_wall && completion_timer >= FIREWORK_SPAWN_TIME + (fireworks_spawned * FIREWORK_SPAWN_DELAY)) {
+                float calc_x = state.camera_x + 100 + random_float(0, SCREEN_WIDTH_AREA - 200);
+                float y = random_float(0, SCREEN_HEIGHT_AREA);
+                float calc_y = state.camera_y + (SCREEN_HEIGHT - y);
+                UseEffect *effect = add_use_effect(calc_x, calc_y, USE_EFFECT_OBJ_NOTHING, &end_wall_firework_circle, get_use_effect_array_ptr(GFX_TOP_BUT_ABOVE_LEVEL));
+                if (effect) {
+                    Color p2_white = get_white_if_black(p2_color);
+                    effect->def.colorR = p2_white.r / 255.f;
+                    effect->def.colorG = p2_white.g / 255.f;
+                    effect->def.colorB = p2_white.b / 255.f;
+                }
+
+                end_wall_firework.emitterX = calc_x;
+                end_wall_firework.emitterY = calc_y;
+                spawnMultipleParticles(&end_wall_firework, 25);
+                
+                fireworks_spawned++;
+            }
         }
+
+        completion_timer += delta;
+        circunference_timer += delta;
     }
 
+    static int status = 0;
+    
     // End the level!
     if (completion_timer > MENU_TIME) {
         if (!level_complete_initialized) {
@@ -158,9 +165,7 @@ int handle_wall_cutscene(float delta, UIInput *touch) {
             level_complete_initialized = true;
         }
 
-        // Handle level complete menu
-        int status = level_complete_loop(touch);
-        if (status) {
+        if(status){
             LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
             if (!cheated) {
                 if (state.practice_mode) {
@@ -239,8 +244,9 @@ int handle_wall_cutscene(float delta, UIInput *touch) {
         }
     }
 
-    completion_timer += delta;
-    circunference_timer += delta;
+    //level complete loop is done after init so it doesn't flicker for a frame
+    status = level_complete_loop(touch);
+
     return 0;
 }
 

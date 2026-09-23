@@ -4,4 +4,4 @@ button x=260 y=120 id=2 keyBinds="Y" sheet=1 actions=open_menu[screen="creator_m
 
 button x=160 y=208  id=12 sheet=1 actions=open_menu[screen="statistics" top_anim="slide_down" btm_anim="slide_down"]
 button x=100 y=208  id=11 sheet=1 actions=open_menu[screen="settings_hub" btm_anim="slide_down"]
-button x=220 y=208 id=57 sheet=1 scale=1 actions=open_menu[screen="server_switcher" btm_anim="zoom"]
+button x=220 y=208 id=57 sheet=1 scale=1 actions=open_menu[screen="server_switcher" btm_anim="slide_right"]
