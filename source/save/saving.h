@@ -58,6 +58,38 @@ typedef enum {
     LEVEL_LIST_ONLINE,
 } LevelListType;
 
+typedef enum {
+    SAVE_ROBTOP,
+    SAVE_1P9_GDPS,
+    SAVE_EXTERNAL,
+    SAVE_CONFIG,
+    SAVE_TYPE_COUNT,
+} SaveType;
+
+typedef struct SavingTask {
+    const char *data;
+    char file[256];
+    char tmp_file[256];
+    SaveType type;
+    volatile bool running;
+} SavingTask;
+
+typedef enum {
+    SAVE_ERROR_NONE,
+    SAVE_ERROR_JSON_FAIL,
+    SAVE_ERROR_MAKE_DATA_LIST,
+    SAVE_ERROR_DECOMPRESS,
+    SAVE_ERROR_COMPRESS,
+    SAVE_ERROR_OPEN_FILE,
+    SAVE_ERROR_WRITING_FILE,
+    SAVE_ERROR_REMOVE_FILE,
+    SAVE_ERROR_RENAME_FILE,
+    SAVE_ERROR_DATA,
+} SavingError;
+
+void begin_saving(SaveType type);
+bool is_saving();
+
 extern int total_stars;
 extern int total_coins;
 extern int total_attempts;
@@ -68,10 +100,10 @@ extern int completed_external_levels;
 extern int players_destroyed;
 
 bool load_external_file(const char *path, ExternalLevelFile *save_data);
-bool save_external_file(const char *path, const ExternalLevelFile *save_data);
+SavingError save_external_file(const char *path, const ExternalLevelFile *save_data);
 
 bool load_save_file(const char *path, ServerFile *save_data);
-bool save_save_file(const char *path, const ServerFile *save_data);
+SavingError save_save_file(const char *path, const ServerFile *save_data);
 
 LevelDataEntry *get_or_add_level_to_external_file(ExternalLevelFile *save_data, const char *key);
 LevelDataEntry *get_or_add_level_to_server_file(ServerFile *save_data, const char *key, LevelListType type);

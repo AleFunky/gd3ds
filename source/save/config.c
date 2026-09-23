@@ -192,7 +192,7 @@ void cfg_save() {
     config_set_int(&cfg, CONFIG_FILTERS_PATH "normalId", filters.mainSong);
     config_set_string(&cfg, CONFIG_FILTERS_PATH "songId", filters.customSongQuery);
 
-    config_save(&cfg);
+    begin_saving(SAVE_CONFIG);
 }
 
 void cfg_fini() {

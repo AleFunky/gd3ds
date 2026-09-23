@@ -233,6 +233,8 @@ void update_level_face(int level) {
     ui_image_set_image(level_card_face, 239 + current_main_level_pack->levels[level].difficulty, 0);
 }
 void update_level_top(int level){
+    update_current_level(level);
+
     LevelData *data = &current_level_entry->data;
 
     char attempts[256];
@@ -481,6 +483,9 @@ void level_select_init_top(UIScreen *s){
 }
 
 void level_select_update(UIScreen *s, UIInput *input){
+    if (exiting_level) {
+        update_level_top(curr_level_id);
+    }
     exiting_level = false;
     if(!scroll_dir){
         upload_color_to_buffer(0, default_lvl_colors[curr_level_id % NUM_MENU_COLORS], 0);

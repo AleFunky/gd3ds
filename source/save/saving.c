@@ -7,7 +7,10 @@
 #include "level_loading.h"
 #include "main.h"
 #include "menus/creator_menu/search_menu.h"
+#include "save/config.h"
+#include "utils/folders.h"
 #include "utils/json_config.h"
+#include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -23,6 +26,8 @@
 #include "utils/utils.h"
 
 LevelDataEntry *current_level_entry;
+
+static SavingTask tasks[SAVE_TYPE_COUNT] = { 0 };
 
 int total_stars = 0;
 int total_coins = 0;
@@ -419,6 +424,8 @@ bool load_save_file(const char *path, ServerFile *save_data) {
 
     free(file);
 
+    output_log(decompressed);
+
     struct json_object *root = json_tokener_parse(decompressed);
     if (!root) {
         return false;
@@ -451,68 +458,6 @@ bool load_save_file(const char *path, ServerFile *save_data) {
     json_object_put(root);
 
     return true;
-}
-
-bool save_save_file(const char *path, const ServerFile *save_data) {
-    struct json_object *root = json_object_new_object();
-    if (!root) {
-        return false;
-    }
-
-    struct json_object *online = make_level_data_list_json(&save_data->online_levels);
-    if (!online) {
-        json_object_put(root);
-        return false;
-    }
-
-    json_object_object_add(root, SAVE_ONLINE_KEY, online);
-
-    struct json_object *main_levels = make_level_data_list_json(&save_data->main_levels);
-
-    if (!main_levels) {
-        json_object_put(root);
-        return false;
-    }
-
-    json_object_object_add(root, SAVE_MAIN_LEVEL_KEY, main_levels);
-
-    const char *json = json_object_to_json_string_ext(root, JSON_C_TO_STRING_PRETTY);
-
-    size_t out_len;
-    int out_code;
-    unsigned char *compressed = compress_data((const unsigned char *) json, strlen(json), &out_len, &out_code);
-    if (!compressed) {
-        json_object_put(root);
-        return false;
-    }
-
-    char tmp_file[273];
-    snprintf(tmp_file, sizeof(tmp_file), "%s.temp", path);
-
-    FILE *file = fopen(tmp_file, "w");
-    if (!file) {
-        json_object_put(root);
-        return false;
-    }
-
-    bool success = true;
-
-    if (fwrite(compressed, 1, out_len, file) != out_len) {
-        success = false;
-    }
-
-    if (fclose(file) != 0) {
-        success = false;
-    }
-
-    if (success) {
-        remove(path);
-        rename(tmp_file, path);
-    }
-
-    json_object_put(root);
-
-    return success;
 }
 
 bool load_external_file(const char *path, ExternalLevelFile *save_data) {
@@ -557,57 +502,79 @@ bool load_external_file(const char *path, ExternalLevelFile *save_data) {
     return true;
 }
 
-bool save_external_file(const char *path, const ExternalLevelFile *save_data) {
+SavingError save_save_file(const char *path, const ServerFile *save_data) {
     struct json_object *root = json_object_new_object();
     if (!root) {
-        return false;
+        return SAVE_ERROR_JSON_FAIL;
+    }
+
+    struct json_object *online = make_level_data_list_json(&save_data->online_levels);
+    if (!online) {
+        json_object_put(root);
+        return SAVE_ERROR_MAKE_DATA_LIST;
+    }
+
+    json_object_object_add(root, SAVE_ONLINE_KEY, online);
+
+    struct json_object *main_levels = make_level_data_list_json(&save_data->main_levels);
+
+    if (!main_levels) {
+        json_object_put(root);
+        return SAVE_ERROR_MAKE_DATA_LIST;
+    }
+
+    json_object_object_add(root, SAVE_MAIN_LEVEL_KEY, main_levels);
+
+    const char *json = json_object_to_json_string_ext(root, JSON_C_TO_STRING_PLAIN);
+
+    SaveType type = (save_data == &gdps_file ? SAVE_1P9_GDPS : SAVE_ROBTOP);
+
+    SavingTask *task = &tasks[type];
+
+    char tmp_path[250];
+    snprintf(tmp_path, sizeof(tmp_path), "%s", path);
+    strncpy(task->file, tmp_path, sizeof(task->file));
+    strip_extension(tmp_path);
+
+    snprintf(task->tmp_file, sizeof(task->tmp_file), "%s.tmp", tmp_path);
+
+    task->data = strdup(json);
+    
+    begin_saving(type);
+
+    return SAVE_ERROR_NONE;
+}
+
+SavingError save_external_file(const char *path, const ExternalLevelFile *save_data) {
+    struct json_object *root = json_object_new_object();
+    if (!root) {
+        return SAVE_ERROR_JSON_FAIL;
     }
 
     struct json_object *external = make_level_data_list_json(&save_data->external_levels);
     if (!external) {
         json_object_put(root);
-        return false;
+        return SAVE_ERROR_MAKE_DATA_LIST;
     }
 
     json_object_object_add(root, SAVE_EXTERNAL_KEY, external);
 
-    const char *json = json_object_to_json_string_ext(root, JSON_C_TO_STRING_PRETTY);
+    const char *json = json_object_to_json_string_ext(root, JSON_C_TO_STRING_PLAIN);
 
-    char tmp_file[273];
-    snprintf(tmp_file, sizeof(tmp_file), "%s.temp", path);
+    SavingTask *task = &tasks[SAVE_EXTERNAL];
 
-    size_t out_len;
-    int out_code;
-    unsigned char *compressed = compress_data((const unsigned char *) json, strlen(json), &out_len, &out_code);
-    if (!compressed) {
-        json_object_put(root);
-        return false;
-    }
+    char tmp_path[250];
+    snprintf(tmp_path, sizeof(tmp_path), "%s", path);
+    strncpy(task->file, tmp_path, sizeof(task->file));
+    strip_extension(tmp_path);
 
-    FILE *file = fopen(tmp_file, "w");
-    if (!file) {
-        json_object_put(root);
-        return false;
-    }
+    snprintf(task->tmp_file, sizeof(task->tmp_file), "%s.tmp", tmp_path);
 
-    bool success = true;
+    task->data = strdup(json);
+    
+    begin_saving(SAVE_EXTERNAL);
 
-    if (fwrite(compressed, 1, out_len, file) != out_len) {
-        success = false;
-    }
-
-    if (fclose(file) != 0) {
-        success = false;
-    }
-
-    if (success) {
-        remove(path);
-        rename(tmp_file, path);
-    }
-
-    json_object_put(root);
-
-    return success;
+    return SAVE_ERROR_NONE;
 }
 
 void save_current_save_file(LevelListType type) {
@@ -805,8 +772,24 @@ bool migrate_old_data() {
 
         closedir(dir);
         
-        bool did_it = save_save_file(SAVE_ROBTOP_SERVER_FILE, current_server_file) && save_external_file(SAVE_EXTERNAL_LEVELS_FILE, &external_file);
-        if (!did_it) return false;
+        
+        SavingError error_code = save_save_file(SAVE_ROBTOP_SERVER_FILE, &gd_server_file);
+        if (error_code) {
+            output_log("Failed to migrate robtop: %x\n", error_code);
+            return false;
+        }
+
+        error_code = save_save_file(SAVE_1P9_SERVER_FILE, &gdps_file);
+        if (error_code) {
+            output_log("Failed to migrate gdps: %x\n", error_code);
+            return false;
+        }
+        
+        error_code = save_external_file(SAVE_EXTERNAL_LEVELS_FILE, &external_file);
+        if (error_code) {
+            output_log("Failed to migrate external: %x\n", error_code);
+            return false;
+        }
 
         // Data has been succesfully migrated!
         remove_old_data();
@@ -816,4 +799,120 @@ bool migrate_old_data() {
 
     // Nothing to migrate
     return true;
+}
+
+static SavingError threaded_save(SavingTask *task) {
+    if (!task->data) {
+        return SAVE_ERROR_DATA;
+    }
+
+    const char *json = task->data;
+    size_t out_len;
+    int out_code;
+    unsigned char *compressed = compress_data((const unsigned char *) json, strlen(json), &out_len, &out_code);
+    if (!compressed) {
+        return SAVE_ERROR_COMPRESS;
+    }
+
+    FILE *file = fopen(task->tmp_file, "wb");
+    if (!file) {
+        return SAVE_ERROR_OPEN_FILE;
+    }
+
+    bool success = true;
+
+    if (fwrite(compressed, 1, out_len, file) != out_len) {
+        success = false;
+    }
+
+    if (fclose(file) != 0) {
+        success = false;
+    }
+    
+    free(compressed);
+    
+    if (success) {
+        if (remove(task->file) != 0) {
+            if (errno != ENOENT) {
+                output_log(
+                    "Failed to remove %s: errno=%d (%s)\n",
+                    task->file,
+                    errno,
+                    strerror(errno)
+                );
+                remove(task->tmp_file);
+                return SAVE_ERROR_REMOVE_FILE;
+            }
+        }
+
+        int result = rename(task->tmp_file, task->file);
+        if (result != 0) {
+            output_log(
+                "Failed to rename %s -> %s: result=%d, errno=%d\n",
+                task->tmp_file,
+                task->file,
+                result,
+                errno
+            );
+            remove(task->tmp_file);
+            return SAVE_ERROR_RENAME_FILE;
+        }
+
+        return SAVE_ERROR_NONE;
+    } else {
+        return SAVE_ERROR_WRITING_FILE;
+    } 
+}
+
+static void saving_thread(void *arg) {
+    SavingTask *task = arg;
+    SavingError error = SAVE_ERROR_NONE;
+
+    switch (task->type) {
+        case SAVE_ROBTOP:
+        case SAVE_1P9_GDPS:
+        case SAVE_EXTERNAL:
+            error = threaded_save(task);
+            free((void *) task->data);
+            break;
+        case SAVE_CONFIG:
+            config_save(&cfg);
+            break;
+        default: break;
+    }
+
+    if (error) {
+        output_log("An error has occured while saving: %d\n", error);
+    }
+
+    task->running = false;
+}
+
+bool is_saving() {
+    for (int i = 0; i < SAVE_TYPE_COUNT; i++) {
+        if (tasks[i].running) return true;
+    }
+    return false;
+}
+
+void begin_saving(SaveType type) {
+    if (!tasks[type].running) {   
+        int32_t priority = 0x30;
+        svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
+        priority += 1;
+        priority = priority < 0x18 ? 0x18 : priority;
+        priority = priority > 0x3F ? 0x3F : priority;
+
+        tasks[type].type = type;
+        tasks[type].running = true;
+    
+        threadCreate(
+            saving_thread,
+            &tasks[type],
+            32 * 1024,
+            priority,
+            (is_N3DS ? 2 : 0),
+            true
+        );
+    }
 }

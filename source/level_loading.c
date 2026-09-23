@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include "level_loading.h"
@@ -103,7 +104,7 @@ void assign_object_to_section(int obj) {
 char *read_file(const char *filepath, size_t *out_size) {
     FILE *f = fopen(filepath, "rb");
     if (!f) {
-        output_log("Failed to open file: %s\n", filepath);
+        output_log("Failed to open file: %s (%x)\n", filepath, errno);
         return NULL;
     }
     fseek(f, 0, SEEK_END);

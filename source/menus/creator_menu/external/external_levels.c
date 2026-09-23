@@ -185,6 +185,8 @@ static UIActionDef external_actions[] = {
 };
 
 static void external_levels_init(UIScreen *s) {
+    
+
     load_level_folder(current_path, s);
 
     play_menu_song();
