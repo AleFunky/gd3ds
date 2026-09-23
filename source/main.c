@@ -657,12 +657,6 @@ void ui_loop(){
         touch.up = hidKeysUp();
         hidCircleRead(&touch.cpad);
 
-        if (touch.down & KEY_SELECT) {
-            game_state = STATE_EXIT;
-            stop_mp3();
-            break; // break in order to return to hbmenu
-        }
-
         ui_stack_update(&touch);
         
         // Frees a render target, so keep it out of the frame below

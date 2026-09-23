@@ -67,6 +67,6 @@ button x=275 y=170 id=267 scale=0.6 action="auto" tag="auto"
 
 button x=120 y=215 id=144 scale=0.8 actions=open_menu[screen="search_filters" btm_anim="zoom"]
 button x=160 y=215 id=31 scale=0.8 actions=open_menu[screen="clear_filters" btm_anim="zoom"]
-button x=200 y=215 id=424 scale=0.8 actions=open_menu[screen="server_switcher" btm_anim="zoom"]
+button x=200 y=215 id=57 sheet=1 scale=0.8 actions=open_menu[screen="server_switcher" btm_anim="zoom"]
 
 

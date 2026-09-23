@@ -222,7 +222,7 @@ static void main_menu_init_top(UIScreen *s){
 
 static void main_menu_update(UIScreen *s, UIInput *input){
     if (input->down & KEY_SELECT) {
-        game_state = STATE_EXIT;
+        ui_stack_push_game_state(STATE_EXIT);
         stop_mp3();
         return;
     }
