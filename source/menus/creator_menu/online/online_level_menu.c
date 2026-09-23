@@ -666,12 +666,9 @@ static void online_level_menu_update(UIScreen *s, UIInput *i) {
         song_data_result = song_data_task.result;
         // Handle result
         if (song_data_result == 0) {
-            char songId[10];
-            snprintf(songId, sizeof(songId), "%d", search_entries[curr_search_id].songId);
             song_data_task.finished = false;
+            snprintf(song_task.song_id, sizeof(song_task.song_id), "%d", search_entries[curr_search_id].songId);
             song_task.url = song_entries[search_entries[curr_search_id].songIndex].songLink;
-            song_task.song_id = songId;
-
             song_thread = create_download_song_thread(&song_task);
         } else { handle_song_data_errors(song_data_result); }
         

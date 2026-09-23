@@ -56,7 +56,7 @@ typedef struct {
 
     char *path;
     char *url;
-    char *song_id;
+    char song_id[16];
 } DownloadTask;
 
 Thread create_download_song_thread(DownloadTask *task);
