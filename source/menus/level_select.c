@@ -488,7 +488,8 @@ void level_select_update(UIScreen *s, UIInput *input){
         update_level_top(curr_level_id);
     }
     exiting_level = false;
-    if(!scroll_dir){
+    
+    if(!scroll_dir && !dragging){
         upload_color_to_buffer(0, default_lvl_colors[curr_level_id % NUM_MENU_COLORS], 0);
     }
 
