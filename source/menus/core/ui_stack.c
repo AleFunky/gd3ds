@@ -1,5 +1,6 @@
 #include "ui_stack.h"
 #include "main.h"
+#include "math_helpers.h"
 #include "menus/core/ui_element.h"
 #include "ui_screen.h"
 #include "screen_definitions.h"
@@ -397,10 +398,9 @@ static void handle_stack_fading(){
             }
         }
         fixed_dt = true;
-    } else{
-        //make sure there's a frame of full black
-        stack->fade_time += FADE_SPEED * DT;
     }
+    
+    stack->fade_time += FADE_SPEED * DT;
 }
 
 void ui_stack_update(UIInput *input){
@@ -516,9 +516,9 @@ void draw_stack_debug(){
 void draw_stack_fade(){
     float fade = 0;
     if(stack->fade == FADE_STATUS_IN){
-        fade = stack->fade_time;
+        fade = CLAMP(stack->fade_time, 0, 255);
     } else if(stack->fade == FADE_STATUS_OUT){
-        fade = 255 - stack->fade_time;
+        fade = CLAMP(255 - stack->fade_time, 0, 255);
     }
 
     C2D_DrawRectSolid(0.f, 0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT, C2D_Color32(0, 0, 0, fade));
