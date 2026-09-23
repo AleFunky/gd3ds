@@ -70,13 +70,15 @@ static void action_switch_server(UIElement* e, const UIPropertyList *args) {
 
             update_difficulty_tints(screen);
         }
-    }
 
-    filters.super = filters.super && gdps;
+        filters.super = filters.super && gdps;
+        filters.mainSong = 0;
+        filters.songFilter = false;
+    }
 
     update_server_buttons(e->screen);
 
-    current_server_file = (gdps ? &gdps_file : &gd_server_file);
+    load_gdps_info();
 }
 
 static UIActionDef server_switcher_actions[] = {

@@ -139,6 +139,11 @@ ServerFile gd_server_file;
 ServerFile gdps_file;
 ServerFile *current_server_file;
 
+void load_gdps_info() {
+    current_server_file = (gdps ? &gdps_file : &gd_server_file);
+    current_main_level_pack = (gdps ? &gdps_levels : &robtop_levels);
+}
+
 // Checks if the game is being emulated by citra/azahar
 bool is_citra() {
     s64 version = 0;
@@ -750,7 +755,7 @@ void game_loop() {
         if (state.custom_level) {
             path = state.custom_level_path;
         } else {
-            path = main_levels[curr_level_id].gmd_path;
+            path = current_main_level_pack->levels[curr_level_id].gmd_path;
         }
 
         int returned = load_level(path);
@@ -765,7 +770,7 @@ void game_loop() {
         }
 
         if (!state.custom_level) {
-            snprintf(level_info.level_name, sizeof(level_info.level_name), "%s", main_levels[curr_level_id].level_name);
+            snprintf(level_info.level_name, sizeof(level_info.level_name), "%s", current_main_level_pack->levels[curr_level_id].level_name);
         }
     }
 
@@ -1507,7 +1512,7 @@ int main(int argc, char* argv[]) {
     load_save_file(SAVE_1P9_SERVER_FILE, &gdps_file);
     load_external_file(SAVE_EXTERNAL_LEVELS_FILE, &external_file);
 
-    current_server_file = (gdps ? &gdps_file : &gd_server_file);
+    load_gdps_info();
 
     migrate_old_data();
     

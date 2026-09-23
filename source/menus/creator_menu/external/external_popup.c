@@ -2,6 +2,7 @@
 #include <citro2d.h>
 #include <stdlib.h>
 
+#include "level/main_levels.h"
 #include "main.h"
 #include "menus/core/ui_element.h"
 #include "menus/settings_hub/info_card.h"
@@ -248,8 +249,8 @@ static void set_song_id(char *gmd) {
         }
     } else {
         char *song_name = "Unknown";
-        if (IN_BOUNDS(song_id, main_songs)) {
-            song_name = main_songs[song_id].title;
+        if (song_id >= 0 && song_id < current_main_level_pack->count) {
+            song_name = current_main_level_pack->levels[song_id].song_data.title;
         }
         snprintf(tmp, sizeof(tmp), "Using song: %s", song_name);
     }

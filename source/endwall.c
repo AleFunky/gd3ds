@@ -182,10 +182,10 @@ int handle_wall_cutscene(float delta, UIInput *touch) {
                             }
                         } else {
                             completed_main_levels++;
-                            stars = main_levels[curr_level_id].stars;
+                            stars = current_main_level_pack->levels[curr_level_id].stars;
 
                             // Add if demon
-                            if (main_levels[curr_level_id].difficulty == MAIN_DIFF_DEMON) {
+                            if (current_main_level_pack->levels[curr_level_id].difficulty == MAIN_DIFF_DEMON) {
                                 total_demons++;
                             }
                         }

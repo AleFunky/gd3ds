@@ -343,9 +343,9 @@ static void populate_level_info() {
         update_download_button();
     } else {
         // Main level song
-        if (IN_BOUNDS(entry_srch->mainSongId, main_songs)) {
-            song_name = (char *) main_songs[entry_srch->mainSongId].title;
-            song_artist_name = (char *) main_songs[entry_srch->mainSongId].artist;
+        if (entry_srch->mainSongId >= 0 && entry_srch->mainSongId < current_main_level_pack->count) {
+            song_name = (char *) current_main_level_pack->levels[entry_srch->mainSongId].song_data.title;
+            song_artist_name = (char *) current_main_level_pack->levels[entry_srch->mainSongId].song_data.artist;
         }
         
         ui_disable_element((UIElement *) song_size_label);
@@ -448,6 +448,8 @@ static void populate_level_info() {
     snprintf(key, sizeof(key), "%d", entry_srch->levelId);
     
     current_level_entry = get_or_add_level_to_server_file(current_server_file, key, LEVEL_LIST_ONLINE);
+
+    current_level_entry->data.level_id = entry_srch->levelId;
 
     update_progress_bars();
 }

@@ -21,6 +21,7 @@
 #define SAVE_EXTERNAL_KEY "external_levels"
 
 typedef struct LevelData {
+    int level_id;
     int attempts;
     int jumps;
     int normal_progress;

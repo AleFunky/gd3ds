@@ -19,7 +19,7 @@ void switch_song(int song, UIScreen *s) {
     UILabel *label = (UILabel *)ui_get_element_by_tag(s, "normal_song_text");
     if(label){
         char tmp[64];
-        snprintf(tmp, sizeof(tmp) - 1, "%02d. %s\n", song + 1, main_songs[song].title);
+        snprintf(tmp, sizeof(tmp) - 1, "%02d. %s\n", song + 1, current_main_level_pack->levels[song].song_data.title);
         ui_label_set_text(label, tmp);
     }
 }
@@ -27,7 +27,7 @@ void switch_song(int song, UIScreen *s) {
 void action_left_song(UIElement* e, const UIPropertyList *props) {
     filters.mainSong--;
     if (filters.mainSong < 0) {
-        filters.mainSong = ARRAY_LEN(main_songs) - 1;
+        filters.mainSong = current_main_level_pack->count - 1;
     }
 
     switch_song(filters.mainSong, e->screen);
@@ -35,7 +35,7 @@ void action_left_song(UIElement* e, const UIPropertyList *props) {
 
 void action_right_song(UIElement* e, const UIPropertyList *props) {
     filters.mainSong++;
-    if (filters.mainSong >= ARRAY_LEN(main_songs)) {
+    if (filters.mainSong >= current_main_level_pack->count) {
         filters.mainSong = 0;
     }
 

@@ -131,6 +131,8 @@ void sync_precise_input(bool suppress_held);
 
 bool is_citra();
 
+void load_gdps_info();
+
 extern ServerFile *current_server_file;
 
 extern ExternalLevelFile external_file;

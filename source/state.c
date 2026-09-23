@@ -489,8 +489,8 @@ void play_level_song(float seek) {
 
         if (state.custom_level) song_id = level_info.song_id;
 
-        if (song_id < MAIN_LEVELS_NUM) {
-            song_loaded = play_mp3(main_levels[song_id].song_path, false, seek);
+        if (song_id < current_main_level_pack->count) {
+            song_loaded = play_mp3(current_main_level_pack->levels[song_id].song_path, false, seek);
         } else {
             song_loaded = false;
         }

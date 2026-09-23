@@ -131,9 +131,9 @@ static void draw_dots(int level_id) {
 
     C2D_PlainImageTint(&tint, C2D_Color32(125, 125, 125, 255), 1.f);
 
-    int left_side = DOTS_X - ((DOTS_WIDTH * MAIN_LEVELS_NUM) + (DOTS_MARGIN * (MAIN_LEVELS_NUM - 1))) * DOTS_SCALE / 2;
+    int left_side = DOTS_X - ((DOTS_WIDTH * current_main_level_pack->count) + (DOTS_MARGIN * (current_main_level_pack->count - 1))) * DOTS_SCALE / 2;
 
-    for (int i = 0; i < MAIN_LEVELS_NUM; i++) {
+    for (int i = 0; i < current_main_level_pack->count; i++) {
         C2D_SpriteSetPos(&spr, left_side + i * (DOTS_WIDTH + DOTS_MARGIN) * DOTS_SCALE, DOTS_Y);
         
         // Do not tint if current level
@@ -165,8 +165,8 @@ void level_card_move_left(UIElement *e) {
 }
 
 void update_level_progress(int level, int card) {
-    if (level < 0) level = MAIN_LEVELS_NUM-1;
-    if (level >= MAIN_LEVELS_NUM) level = 0;
+    if (level < 0) level = current_main_level_pack->count-1;
+    if (level >= current_main_level_pack->count) level = 0;
 
     update_current_level(level);
 
@@ -205,32 +205,32 @@ void update_level_progress(int level, int card) {
 }
 
 void update_level_name(int level, int card) {
-    if (level < 0) level = MAIN_LEVELS_NUM-1;
-    if (level >= MAIN_LEVELS_NUM) level = 0;
+    if (level < 0) level = current_main_level_pack->count-1;
+    if (level >= current_main_level_pack->count) level = 0;
 
     UILabel *e = (card) ? level_card_2_title : level_card_title;
     level_card_title_top = (UILabel *) ui_get_element_by_tag(top_screen, "levelname");
 
     ui_element_set_scale((UIElement *) e, 1.f);
 
-    ui_label_set_text(e, main_levels[level].level_name);
+    ui_label_set_text(e, current_main_level_pack->levels[level].level_name);
 }
 
 void update_level_stars(int level, int card) {
-    if (level < 0) level = MAIN_LEVELS_NUM-1;
-    if (level >= MAIN_LEVELS_NUM) level = 0;
+    if (level < 0) level = current_main_level_pack->count-1;
+    if (level >= current_main_level_pack->count) level = 0;
 
     UILabel *e = (card) ? level_card_2_stars : level_card_stars;
     char stars[10] = { 0 };
-    snprintf(stars, 9, "%d", main_levels[level].stars);
+    snprintf(stars, 9, "%d", current_main_level_pack->levels[level].stars);
     ui_label_set_text(e, stars);
 }
 
 void update_level_face(int level) {
-    if (level < 0) level = MAIN_LEVELS_NUM-1;
-    if (level >= MAIN_LEVELS_NUM) level = 0;
+    if (level < 0) level = current_main_level_pack->count-1;
+    if (level >= current_main_level_pack->count) level = 0;
 
-    ui_image_set_image(level_card_face, 239 + main_levels[level].difficulty, 0);
+    ui_image_set_image(level_card_face, 239 + current_main_level_pack->levels[level].difficulty, 0);
 }
 void update_level_top(int level){
     LevelData *data = &current_level_entry->data;
@@ -247,7 +247,7 @@ void update_level_top(int level){
     char practice[256];
     snprintf(practice, sizeof(practice), "<#ffa54b>Practice</>: %d%%", data->practice_progress);
 
-    ui_label_set_text(level_card_title_top, main_levels[level].level_name);
+    ui_label_set_text(level_card_title_top, current_main_level_pack->levels[level].level_name);
     ui_label_set_text((UILabel *) ui_get_element_by_tag(top_screen, "totalattempts"), attempts);
     ui_label_set_text((UILabel *) ui_get_element_by_tag(top_screen, "totaljumps"), jumps);
     ui_label_set_text((UILabel *) ui_get_element_by_tag(top_screen, "normalprogress"), normal);
@@ -300,7 +300,7 @@ void peek_right(){
     ui_run_func_on_tag(btm_screen, "level_card_2", enable_card_2);
 
     int card2id = curr_level_id + 1;
-    if (card2id >= MAIN_LEVELS_NUM) card2id = 0;
+    if (card2id >= current_main_level_pack->count) card2id = 0;
 
     update_level_name(card2id, 1);
     update_level_stars(card2id, 1);
@@ -315,7 +315,7 @@ void peek_left(){
     ui_run_func_on_tag(btm_screen, "level_card_2", enable_card_2);
 
     int card2id = curr_level_id - 1;
-    if (card2id < 0) card2id = MAIN_LEVELS_NUM-1;
+    if (card2id < 0) card2id = current_main_level_pack->count-1;
 
     update_level_name(card2id, 1);
     update_level_stars(card2id, 1);
@@ -343,7 +343,7 @@ void action_move_right(UIElement* e, const UIPropertyList *args) {
     anim_time = 0;
     anim_duration = 1.f;
     
-    if (curr_level_id >= MAIN_LEVELS_NUM) curr_level_id = 0;
+    if (curr_level_id >= current_main_level_pack->count) curr_level_id = 0;
     
     ui_set_pos_on_tag(btm_screen, 160, LEVEL_CARD_Y_POS, "level_card");
     ui_run_func_on_tag(btm_screen, "level_card_2", enable_card_2);
@@ -369,7 +369,7 @@ void action_move_left(UIElement* e, const UIPropertyList *args) {
     anim_time = 0;
     anim_duration = 1.f;
 
-    if (curr_level_id < 0) curr_level_id = MAIN_LEVELS_NUM-1;
+    if (curr_level_id < 0) curr_level_id = current_main_level_pack->count-1;
 
     ui_set_pos_on_tag(btm_screen, 160, LEVEL_CARD_Y_POS, "level_card");
     ui_run_func_on_tag(btm_screen, "level_card_2", enable_card_2);

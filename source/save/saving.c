@@ -43,7 +43,7 @@ uint64_t fnv1a64(const char* str) {
 }
 
 int is_main_level(const char *filename) {
-    for (size_t i = 0; i < MAIN_LEVELS_NUM; i++) {
+    for (size_t i = 0; i < 32; i++) {
         char file[16];
         snprintf(file, sizeof(file), "main_%d", i);
         char tmp[17];
@@ -55,7 +55,7 @@ int is_main_level(const char *filename) {
     return 0;
 }
 
-static void calculate_stats_level_list(LevelDataList *list, bool is_main_level) {
+static void calculate_stats_level_list(LevelDataList *list, bool is_main_level, const MainLevelPack *pack) {
     for (int i = 0; i < list->count; i++) {
         LevelData *data = &list->list[i].data;
         total_attempts += data->attempts;
@@ -64,13 +64,13 @@ static void calculate_stats_level_list(LevelDataList *list, bool is_main_level) 
         if (data->normal_progress == 100) {
             if (is_main_level) {
                 completed_main_levels++;
-                total_stars += main_levels[i].stars;
+                total_stars += data->stars;
                 total_coins += data->coin1;
                 total_coins += data->coin2;
                 total_coins += data->coin3;
 
                 // Check for demon
-                if (main_levels[i].difficulty == MAIN_DIFF_DEMON) {
+                if (pack->levels[i].difficulty == MAIN_DIFF_DEMON) {
                     total_demons++;
                 }
             } else {
@@ -96,13 +96,13 @@ void calculate_stats() {
     completed_external_levels = 0;
 
     // Calculate stats
-    calculate_stats_level_list(&gd_server_file.main_levels, true);
-    calculate_stats_level_list(&gd_server_file.online_levels, false);
+    calculate_stats_level_list(&gd_server_file.main_levels, true, &robtop_levels);
+    calculate_stats_level_list(&gd_server_file.online_levels, false, NULL);
     
-    calculate_stats_level_list(&gdps_file.main_levels, true);
-    calculate_stats_level_list(&gdps_file.online_levels, false);
+    calculate_stats_level_list(&gdps_file.main_levels, true, &gdps_levels);
+    calculate_stats_level_list(&gdps_file.online_levels, false, NULL);
 
-    calculate_stats_level_list(&external_file.external_levels, false);
+    calculate_stats_level_list(&external_file.external_levels, false, NULL);
 }
 
 /*
@@ -136,6 +136,12 @@ static struct json_object *make_level_data_list_json(const LevelDataList *level_
             json_object_put(object);
             return NULL;
         }
+        
+        json_object_object_add(
+            data,
+            "level_id",
+            json_object_new_int(entry->data.level_id)
+        );
 
         json_object_object_add(
             data,
@@ -211,6 +217,7 @@ static bool parse_level_data_list(LevelDataList *level_data, struct json_object 
 
     json_object_object_foreach(object, key, value)
     {
+        struct json_object *level_id = NULL;
         struct json_object *attempts = NULL;
         struct json_object *jumps = NULL;
         struct json_object *normal_progress = NULL;
@@ -221,6 +228,7 @@ static bool parse_level_data_list(LevelDataList *level_data, struct json_object 
         struct json_object *coin3 = NULL;
 
         if (
+            !json_object_object_get_ex(value, "level_id", &level_id) ||
             !json_object_object_get_ex(value, "attempts", &attempts) ||
             !json_object_object_get_ex(value, "jumps", &jumps) || 
             !json_object_object_get_ex(value, "normal_progress", &normal_progress) || 
@@ -241,6 +249,7 @@ static bool parse_level_data_list(LevelDataList *level_data, struct json_object 
             return false;
         }
 
+        entry->data.level_id = json_object_get_int(level_id);
         entry->data.attempts = json_object_get_int(attempts);
         entry->data.jumps = json_object_get_int(jumps);
         entry->data.normal_progress = json_object_get_int(normal_progress);
@@ -316,6 +325,7 @@ static LevelDataEntry *level_data_list_get_or_add(LevelDataList *level_data, con
     }
 
     LevelData data = {
+        .level_id = 0,
         .attempts = 0,
         .jumps = 0,
         .normal_progress = 0,
