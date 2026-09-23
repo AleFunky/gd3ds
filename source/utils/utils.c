@@ -1,5 +1,6 @@
 #include "utils.h"
 #include "level_loading.h"
+#include "main.h"
 #include <stdio.h>
 #include <string.h>
 #include <zlib.h>
@@ -124,4 +125,34 @@ char *decompress_data(unsigned char *data, size_t data_len, size_t *out_len, int
 
     *out_code = LOAD_NO_ERROR;
     return out;
+}
+
+static void generic_thread(void *arg) {
+    GenericTask *task = arg;
+
+    task->result = task->func(task);
+
+    task->running = false;
+    task->finished = true;
+}
+
+Thread create_generic_thread(GenericTask *task) {
+    int32_t priority = 0x30;
+    svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
+    priority += 1;
+    priority = priority < 0x18 ? 0x18 : priority;
+    priority = priority > 0x3F ? 0x3F : priority;
+
+    task->finished = false;
+    task->running = true;
+    task->cancelled = false;
+    
+    return threadCreate(
+        generic_thread,
+        task,
+        32 * 1024,
+        priority,
+        (is_N3DS ? 2 : 0),
+        true
+    );
 }

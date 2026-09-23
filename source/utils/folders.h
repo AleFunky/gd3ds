@@ -10,7 +10,10 @@ typedef struct {
     bool is_dir;
 } FileOrFolder;
 
-FileOrFolder *load_folder(char *dir, int *count);
+
+typedef struct GenericTask GenericTask;
+
+FileOrFolder *load_folder(GenericTask *task, char *dir, int *count);
 void go_back_directory(char *path);
 char *strip_filename(char *path);
 void strip_extension(char *path);

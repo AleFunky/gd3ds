@@ -38,6 +38,7 @@
 
 #include "fonts/chatFont.h"
 #include "fonts/goldFont.h"
+#include "utils/utils.h"
 
 #define EASY_DEMON_FACE_1 259
 #define MEDIUM_DEMON_FACE_1 261
@@ -63,13 +64,13 @@ const int demon_face_featured_offsets[] = {
     -8
 };
 
-static NetworkTask level_task = {
+static GenericTask level_task = {
     .func = get_level
 };
 
 static Thread level_thread;
 
-static NetworkTask song_data_task = {
+static GenericTask song_data_task = {
     .func = get_song_data
 };
 
@@ -164,7 +165,7 @@ static void action_download(){
         ui_enable_element((UIElement *) speed_label);
         snprintf(download_speed, sizeof(download_speed), "Speed: 0 B/s");
         ui_label_set_text(speed_label, download_speed);
-        song_data_thread = create_network_thread(&song_data_task);
+        song_data_thread = create_generic_thread(&song_data_task);
     } else {
         if (song_data_task.running) {
             song_data_task.cancelled = true;
@@ -564,7 +565,7 @@ static void action_refresh_level(UIElement *e, const UIPropertyList *props) {
     refresh = true;
     ui_enable_element((UIElement *)spinner);
     ui_disable_element((UIElement *)play_button);
-    level_thread = create_network_thread(&level_task);
+    level_thread = create_generic_thread(&level_task);
 }
 
 static UIActionDef online_level_actions[] = {
@@ -646,7 +647,7 @@ static void online_level_init (UIScreen *s) {
     populate_level_info();
 
     if (!already_played_online_level) {
-        level_thread = create_network_thread(&level_task);
+        level_thread = create_generic_thread(&level_task);
     }
 }
 

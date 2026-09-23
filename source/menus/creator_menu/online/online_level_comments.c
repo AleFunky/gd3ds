@@ -23,6 +23,7 @@
 #include "menus/palette_kit.h"
 
 #include "state.h"
+#include "utils/utils.h"
 
 bool comments_need_refresh = true;
 int comments_sort_type = 1;
@@ -40,7 +41,7 @@ static UISpinner *spinner;
 
 static Thread thread;
 
-static NetworkTask comments_task = {
+static GenericTask comments_task = {
     .func = get_comments
 };
 
@@ -277,7 +278,7 @@ static void action_refresh_comments(UIElement* e, const UIPropertyList *args) {
     ui_enable_element((UIElement *)spinner);
     update_comment_arrows(true);
     
-    thread = create_network_thread(&comments_task);
+    thread = create_generic_thread(&comments_task);
 }
 
 static void action_change_comments_page(UIElement* e, const UIPropertyList *args) {
@@ -286,7 +287,7 @@ static void action_change_comments_page(UIElement* e, const UIPropertyList *args
     ui_list_reset(list);
     update_comment_arrows(true);
     ui_enable_element((UIElement *)spinner);
-    thread = create_network_thread(&comments_task);
+    thread = create_generic_thread(&comments_task);
 }
 
 static UIActionDef online_comments_actions[] = {
@@ -319,7 +320,7 @@ void online_comments_init(UIScreen *s) {
         ui_enable_element((UIElement *)spinner);
         current_comments_page = 0;
         comments_sort_type = 1;
-        create_network_thread(&comments_task);
+        create_generic_thread(&comments_task);
     } else {
         if (list) { // No need to fetch new comments
             ui_label_set_text(error_label, "");

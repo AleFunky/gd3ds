@@ -37,6 +37,7 @@
 
 #include "fonts/bigFont.h"
 #include "fonts/goldFont.h"
+#include "utils/utils.h"
 
 int curr_search_id;
 
@@ -49,7 +50,7 @@ static UIList *list;
 
 static Thread thread;
 
-static NetworkTask search_task = {
+static GenericTask search_task = {
     .func = search_levels
 };
 
@@ -143,7 +144,7 @@ static void action_change_page(UIElement* e, const UIPropertyList *args) {
     search_needs_refresh = true;
     ui_run_func_on_tag(e->screen, "nextpage", ui_disable_element);
     ui_run_func_on_tag(e->screen, "prevpage", ui_disable_element);
-    thread = create_network_thread(&search_task);
+    thread = create_generic_thread(&search_task);
     ui_enable_element((UIElement *) spinner);
     if (list) ui_list_reset(list);
 }
@@ -511,7 +512,7 @@ static void online_menu_init(UIScreen *s) {
     search_result = -2;
     
     if (search_needs_refresh) {
-        thread = create_network_thread(&search_task);
+        thread = create_generic_thread(&search_task);
     } else {
         if (list) { // No errors
             populate_list();
