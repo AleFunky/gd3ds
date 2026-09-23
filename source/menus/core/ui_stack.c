@@ -421,7 +421,7 @@ void ui_stack_update(UIInput *input){
 
                 UIInput dummy_input = { 0 };
                 //only update top screen with input
-                UIInput *input_to_use = updating_topmost && screen->transition.done ? input : &dummy_input;
+                UIInput *input_to_use = updating_topmost && screen->transition.done && j == SCREEN_BTM ? input : &dummy_input;
 
                 ui_screen_update(screen, input_to_use);
             }
