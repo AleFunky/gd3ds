@@ -423,6 +423,35 @@ void free_string_array(char **arr, int count) {
     free(arr);
 }
 
+void parse_ints(short *int_array, const char *string) {
+    int count = 0;
+    char **ints = split_string(string, '.', &count, false);
+
+    for (int j = 0; j < MAX_GROUPS_PER_OBJECT; j++) {
+        if (j < count) int_array[j] = (short) atoi(ints[j]);
+        else int_array[j] = 0;
+    }
+
+    free_string_array(ints, count);
+}
+
+HSV parse_hsv_string(const char *string) {
+    int count = 0;
+    char **hsv_string = split_string(string, 'a', &count, false);
+    HSV obtained = { 0 };
+
+    if (count >= 5) {
+        obtained.h = atoi(hsv_string[0]);
+        obtained.s = atof(hsv_string[1]);
+        obtained.v = atof(hsv_string[2]);
+        obtained.sChecked = parse_bool(hsv_string[3]);
+        obtained.vChecked = parse_bool(hsv_string[4]);
+    }
+
+    free_string_array(hsv_string, count);
+    return obtained;
+}
+
 void parse_color_channel(GDColorChannel *channels, int i, char *channel_string) {
     GDColorChannel channel = {0};  // Zero-initialize
     int kvCount = 0;
@@ -962,6 +991,14 @@ int parse_gd_object(const char *objStr, int obj) {
             case GD_VAL_BOOL:
                 val.b = parse_bool(valStr);
                 fill_object_data(obj, key, GD_VAL_BOOL, val);
+                break;
+            case GD_VAL_HSV:
+                val.hsv = parse_hsv_string(valStr);
+                fill_object_data(obj, key, GD_VAL_HSV, val);
+                break;
+            case GD_VAL_INT_ARRAY:
+                parse_ints(val.int_array, valStr);
+                fill_object_data(obj, key, GD_VAL_INT_ARRAY, val);
                 break;
             default:
                 break;
