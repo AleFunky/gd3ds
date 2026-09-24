@@ -7,6 +7,7 @@
 #include "main.h"
 #include "mp3_player.h"
 #include "graphics.h"
+#include "save/saving.h"
 #include "utils/folders.h"
 #include "utils/server_utils.h"
 #include "network.h"
@@ -249,6 +250,8 @@ static void fill_level_entries(char **levelsStrings, int songStringCount, int cr
 static void fill_level_entry(char **levelStrings, int levelStringsCount, bool fillSearchEntry, int searchId) {
     int levelKeyCount = 0;
 
+    SavedLevelDataEntry *entry = get_saved_level_data(online_menu_level_id);
+
     char **levelKeys = split_string(levelStrings[0], ':', &levelKeyCount, true);
     if (!levelKeys) return;
     for (int j = 0; j + 1 < levelKeyCount; j += 2) {
@@ -380,14 +383,19 @@ static void fill_level_entry(char **levelStrings, int levelStringsCount, bool fi
         case 4:
             // base64 encoded probably compressed level string
             level_entry->levelString = strdup(valStr);
+
+            // Save level string
+            save_saved_level(online_menu_level_id, gdps, level_entry->levelString);
             break;
         case 28:
             // time since upload
             strncpy(level_entry->uploadDate, valStr, sizeof(level_entry->uploadDate) - 1);
+            strncpy(entry->level_entry.uploadDate, valStr, sizeof(entry->level_entry.uploadDate) - 1);
             break;
         case 29:
             // time since last
             strncpy(level_entry->updateDate, valStr, sizeof(level_entry->updateDate) - 1);
+            strncpy(entry->level_entry.uploadDate, valStr, sizeof(entry->level_entry.uploadDate) - 1);
             break;
         }
     }

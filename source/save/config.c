@@ -108,6 +108,8 @@ void cfg_init() {
     mkdir(CONFIG_ROOT, 0777);
     mkdir(USER_LEVELS_DIR, 0777);
     mkdir(USER_SONGS_DIR, 0777);
+    mkdir(USER_SONGS_DIR, 0777);
+    mkdir(SAVED_LEVELS_DIR, 0777);
 
     config_load(&cfg, CONFIG_FILE);
 

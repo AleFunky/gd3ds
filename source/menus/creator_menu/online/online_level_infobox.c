@@ -8,6 +8,7 @@
 #include "menus/components/ui_label.h"
 #include "menus/creator_menu/online/online_menu.h"
 #include "menus/creator_menu/search_menu.h"
+#include "online_level_menu.h"
 
 static UILabel *level_name;
 static UILabel *level_creator;
@@ -22,25 +23,42 @@ static UILabel *normal_percent;
 static UILabel *practice_percent;
 
 static void populate_online_info() {
-    SearchEntry *curr_entry = &search_entries[curr_search_id];  
+    SearchEntry *curr_entry;
+    CreatorEntry *creator_entry;
+    LevelEntry *lvl_entry;
+    SavedLevelDataEntry *data = get_saved_level_data(online_menu_level_id);
+    if (data) {
+        curr_entry = &data->search_entry;
+        creator_entry = &data->creator_entry;
+        lvl_entry = &data->level_entry;
+    } else {
+        curr_entry = &search_entries[curr_search_id];
+        creator_entry = &creator_entries[curr_entry->creatorIndex];
+        lvl_entry = level_entry;
+    }
 
     char buffer[256];
 
     snprintf(buffer, sizeof(buffer), "<#ffff00>%s</>", curr_entry->name);
     ui_label_set_text(level_name, buffer);
 
-    snprintf(buffer, sizeof(buffer), "By: <#ffff00>%s</>", creator_entries[curr_entry->creatorIndex].creatorName);
+    snprintf(buffer, sizeof(buffer), "By: <#ffff00>%s</>", creator_entry->creatorName);
     ui_label_set_text(level_creator, buffer);
     
-    snprintf(
-        buffer, sizeof(buffer), 
-        gdps ? "Uploaded: <#ffff00>%s</>" : "Uploaded: <#ffff00>%s ago</>", 
-        level_entry->uploadDate
-    );
-    ui_label_set_text(uploaded_ago, buffer);
-    
-    snprintf(buffer, sizeof(buffer), "Updated: <#ffff00>%s ago</>", level_entry->updateDate);
-    ui_label_set_text(updated_ago, buffer);
+    if (lvl_entry) {
+        snprintf(
+            buffer, sizeof(buffer), 
+            gdps ? "Uploaded: <#ffff00>%s</>" : "Uploaded: <#ffff00>%s ago</>", 
+            lvl_entry->uploadDate
+        );
+        ui_label_set_text(uploaded_ago, buffer);
+        
+        snprintf(buffer, sizeof(buffer), "Updated: <#ffff00>%s ago</>", lvl_entry->updateDate);
+        ui_label_set_text(updated_ago, buffer);
+    } else {
+        ui_label_set_text(uploaded_ago, "Uploaded: <#ffff00>N/A</>");
+        ui_label_set_text(updated_ago, "Updated: <#ffff00>N/A</>");
+    }
 
     snprintf(buffer, sizeof(buffer), "Stars Requested: <#ffff00>%d</>", curr_entry->reqStars);
     ui_label_set_text(requested_stars, buffer);
@@ -78,7 +96,7 @@ static void online_level_infobox_init_top(UIScreen *screen_top) {
     requested_stars = (UILabel *) ui_get_element_by_tag(screen_top, "requestedstars");
     game_ver = (UILabel *) ui_get_element_by_tag(screen_top, "gdversion");
     
-    if (level_entry) populate_online_info();
+    populate_online_info();
 }
 
 static void online_level_infobox_init (UIScreen *screen) {

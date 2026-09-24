@@ -739,7 +739,7 @@ void game_loop() {
     UIInput touch;
 
     if (state.online_level) {
-        int returned = load_online_level(level_entry);
+        int returned = load_online_level(curr_level_string);
         level_result = returned;
         if (returned) {
             output_log("Failed %d\n", returned);

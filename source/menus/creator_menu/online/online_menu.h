@@ -14,6 +14,7 @@
 #define MYTHIC_GLOW 70
 
 extern int curr_search_id;
+extern int redownload;
 
 extern const int difficulty_faces[6];
 extern const int epics[4];

@@ -37,10 +37,10 @@ typedef struct CreatorEntry {
 
 typedef struct SongEntry {
     int ngSongId;
-    char songTitle[128];
-    char artistName[128];
+    char songTitle[64];
+    char artistName[32];
     float songSize;
-    char songLink[512];
+    char songLink[256];
 } SongEntry;
 
 typedef struct PageEntry {
@@ -53,8 +53,8 @@ typedef struct PageEntry {
 typedef struct LevelEntry {
     int levelId;
     char *levelString;
-    char uploadDate[128];
-    char updateDate[128];
+    char uploadDate[32];
+    char updateDate[32];
 } LevelEntry;
 
 typedef struct CommentEntry {

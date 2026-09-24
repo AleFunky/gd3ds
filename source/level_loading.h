@@ -131,13 +131,15 @@ extern const char *level_lengths[5];
 #define BG_COUNT 7
 #define G_COUNT 7
 
+extern char *curr_level_string;
+
 extern ObjectsArray objects;
 
 char *read_file(const char *filepath, size_t *out_size);
 char *decompress_level(char *data, int *out_code);
 
 int load_level(char *path);
-int load_online_level(LevelEntry *level);
+int load_online_level(char *level_string);
 void reload_level();
 void unload_level();
 

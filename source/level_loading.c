@@ -37,6 +37,8 @@ GDColorChannel *colorChannels = NULL;
 
 LoadedLevelInfo level_info;
 
+char *curr_level_string = NULL;
+
 const char *level_lengths[] = {
     "Tiny",
     "Short",
@@ -1400,18 +1402,18 @@ void load_online_level_info(char *level_string) {
     snprintf(level_info.creator_name, sizeof(level_info.level_name), "%s", creator_entries[search_entries[curr_search_id].creatorIndex].creatorName);
 }
 
-int load_online_level(LevelEntry *level) {
+int load_online_level(char *level_string) {
     bool compressed = true;
     int out_code = LOAD_NO_ERROR;
 
     // Base64 doesn't allow semicolons, so if theres one, its not compressed
-    if (strchr(level->levelString, ';')) compressed = false;
+    if (strchr(level_string, ';')) compressed = false;
     char *data;
     if (compressed) {
-        data = decompress_online_level(level->levelString, &out_code);
+        data = decompress_online_level(level_string, &out_code);
         if (!data) return out_code;
     } else {
-        data = strdup(level->levelString);
+        data = strdup(level_string);
         if (!data) return LOAD_OUT_OF_MEMORY;
     }
 

@@ -41,6 +41,7 @@
 #include "utils/utils.h"
 
 int curr_search_id;
+int redownload = false;
 
 static UILabel *error_label;
 static UILabel *page_info_label;
@@ -84,6 +85,8 @@ const int epics[4] = {
 
 typedef struct {
     int entryId;
+    int levelId;
+    int redownload;
 } OnlineCardData;
 
 typedef struct {
@@ -93,7 +96,9 @@ typedef struct {
 
 static void action_clear_data(UIElement* e, const UIPropertyList *args) {
     if (search_entries) {
-        if (search_entries->description) free(search_entries->description);
+        for (int i = 0; i < searchEntriesLength; i++) {
+            free(search_entries[i].description);
+        }
         free(search_entries);
         search_entries = NULL;
     }
@@ -114,6 +119,8 @@ static void action_clear_data(UIElement* e, const UIPropertyList *args) {
 static void action_open_online_level_menu(UIElement* e, const UIPropertyList *args) {
     OnlineCardData *entry = e->userdata;
     curr_search_id = entry->entryId;
+    online_menu_level_id = entry->levelId;
+    redownload = entry->redownload; 
     ui_stack_push(&online_level_menu_def, ANIM_NONE, ANIM_NONE, PUSH_ROOT);
 }
 
@@ -455,11 +462,27 @@ static void populate_list() {
                 OnlineCardData *data = malloc(sizeof(*data));
 
                 data->entryId = i;
+                data->levelId = entry->levelId;
+                data->redownload = false;
 
-                ui_window_button_set_style(button, 5);
-                ui_button_set_text((UIButton *)button, "View");
+                SavedLevelDataEntry *saved_data = get_saved_level_data(entry->levelId);
+                if (!saved_data) {
+                    ui_window_button_set_style(button, 10);
+                    ui_button_set_text((UIButton *)button, "Get");
+                    button->base.textScale = 0.48f;
+                } else {
+                    if (saved_data->search_entry.levelVersion != entry->levelVersion) {
+                        ui_window_button_set_style(button, 14);
+                        ui_button_set_text((UIButton *)button, "Update");
+                        button->base.textScale = 0.30f;
+                        data->redownload = true;
+                    } else {
+                        ui_window_button_set_style(button, 5);
+                        ui_button_set_text((UIButton *)button, "View");
+                        button->base.textScale = 0.48f;
+                    }
+                }
 
-                button->base.textScale = 0.48f;
 
                 ui_element_set_position((UIElement *)button, list_width - 32, 0);
                 ui_element_set_size((UIElement *)button, 48, 28);
@@ -557,6 +580,8 @@ static void online_menu_exit() {
         search_task.cancelled = true;
         threadJoin(thread, U64_MAX);
     }
+    
+    save_current_save_file(LEVEL_LIST_ONLINE);
 }
 
 

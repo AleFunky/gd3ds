@@ -23,6 +23,7 @@
 #include <unistd.h>
 
 #include "math_helpers.h"
+#include "utils/server_utils.h"
 #include "utils/utils.h"
 
 LevelDataEntry *current_level_entry;
@@ -50,6 +51,16 @@ uint64_t fnv1a64(const char* str) {
 }
 
 LevelDataEntry *level_data_list_find(LevelDataList *level_data, const char *key) {
+    for (size_t i = 0; i < level_data->count; i++) {
+        if (strcmp(level_data->list[i].key, key) == 0) {
+            return &level_data->list[i];
+        }
+    }
+
+    return NULL;
+}
+
+SavedLevelDataEntry *saved_level_data_list_find(SavedLevelDataList *level_data, const char *key) {
     for (size_t i = 0; i < level_data->count; i++) {
         if (strcmp(level_data->list[i].key, key) == 0) {
             return &level_data->list[i];
@@ -94,6 +105,14 @@ LevelDataEntry *get_online_level_data(int level_id) {
     char tmp[17];
     snprintf(tmp, sizeof(tmp), "%016llX", fnv1a64(file));
     return level_data_list_find(&current_server_file->online_levels, tmp);
+}
+
+SavedLevelDataEntry *get_saved_level_data(int level_id) {
+    char file[16];
+    snprintf(file, sizeof(file), "%d", level_id);
+    char tmp[17];
+    snprintf(tmp, sizeof(tmp), "%016llX", fnv1a64(file));
+    return saved_level_data_list_find(&current_server_file->saved_levels, tmp);
 }
 
 static void calculate_stats_level_list(LevelDataList *list, bool is_main_level, const MainLevelPack *pack) {
@@ -146,21 +165,6 @@ void calculate_stats() {
     calculate_stats_level_list(&external_file.external_levels, false, NULL);
 }
 
-/*
-{
-    "online": [
-        "level1": {
-            "attempts": 133,
-            "jumps": 30
-        },
-        "level2": {
-            "attempts": 40,
-            "jumps": 10
-        }
-    ]
-}
-*/
-
 // New save file format
 
 static struct json_object *make_level_data_list_json(const LevelDataList *level_data) {
@@ -178,57 +182,39 @@ static struct json_object *make_level_data_list_json(const LevelDataList *level_
             return NULL;
         }
         
-        json_object_object_add(
-            data,
-            "level_id",
+        json_object_object_add(data, "level_id",
             json_object_new_int(entry->data.level_id)
         );
 
-        json_object_object_add(
-            data,
-            "attempts",
+        json_object_object_add(data, "attempts",
             json_object_new_int(entry->data.attempts)
         );
 
-        json_object_object_add(
-            data,
-            "jumps",
+        json_object_object_add(data, "jumps",
             json_object_new_int(entry->data.jumps)
         );
 
-        json_object_object_add(
-            data,
-            "normal_progress",
+        json_object_object_add(data, "normal_progress",
             json_object_new_int(entry->data.normal_progress)
         );
 
-        json_object_object_add(
-            data,
-            "practice_progress",
+        json_object_object_add(data, "practice_progress",
             json_object_new_int(entry->data.practice_progress)
         );
 
-        json_object_object_add(
-            data,
-            "stars",
+        json_object_object_add(data, "stars",
             json_object_new_int(entry->data.stars)
         );
 
-        json_object_object_add(
-            data,
-            "coin1",
+        json_object_object_add(data, "coin1",
             json_object_new_boolean(entry->data.coin1)
         );
 
-        json_object_object_add(
-            data,
-            "coin2",
+        json_object_object_add(data, "coin2",
             json_object_new_boolean(entry->data.coin2)
         );
 
-        json_object_object_add(
-            data,
-            "coin3",
+        json_object_object_add(data, "coin3",
             json_object_new_boolean(entry->data.coin3)
         );
 
@@ -238,7 +224,233 @@ static struct json_object *make_level_data_list_json(const LevelDataList *level_
     return object;
 }
 
+
+static struct json_object *search_entry_to_json(const SearchEntry *entry) {
+    struct json_object *obj = json_object_new_object();
+    if (!obj)
+        return NULL;
+
+    json_object_object_add(obj, "name",
+        json_object_new_string(entry->name)
+    );
+
+    json_object_object_add(obj, "description",
+        json_object_new_string(entry->description ? entry->description : "")
+    );
+
+    json_object_object_add(obj, "levelId",
+        json_object_new_int(entry->levelId)
+    );
+
+    json_object_object_add(obj, "creatorId",
+        json_object_new_int(entry->creatorId)
+    );
+
+    json_object_object_add(obj, "songId",
+        json_object_new_int(entry->songId)
+    );
+
+    json_object_object_add(obj, "mainSongId",
+        json_object_new_int(entry->mainSongId)
+    );
+
+    json_object_object_add(obj, "lengthNum",
+        json_object_new_int(entry->lengthNum)
+    );
+
+    json_object_object_add(obj, "downloads",
+        json_object_new_int(entry->downloads)
+    );
+
+    json_object_object_add(obj, "likes",
+        json_object_new_int(entry->likes)
+    );
+
+    json_object_object_add(obj, "stars",
+        json_object_new_int(entry->stars)
+    );
+
+    json_object_object_add(obj, "reqStars",
+        json_object_new_int(entry->reqStars)
+    );
+
+    json_object_object_add(obj, "difficulty",
+        json_object_new_int(entry->difficulty)
+    );
+
+    json_object_object_add(obj, "objCount",
+        json_object_new_int(entry->objCount)
+    );
+
+    json_object_object_add(obj, "levelVersion",
+        json_object_new_int(entry->levelVersion)
+    );
+
+    json_object_object_add(obj, "gameVersion",
+        json_object_new_int(entry->gameVersion)
+    );
+
+    json_object_object_add(obj, "epic",
+        json_object_new_int(entry->epic)
+    );
+
+    json_object_object_add(obj, "featureScore",
+        json_object_new_int(entry->featureScore)
+    );
+
+    json_object_object_add(obj, "originalId",
+        json_object_new_int(entry->originalId)
+    );
+
+    json_object_object_add(obj, "isTwoPlayer",
+        json_object_new_boolean(entry->isTwoPlayer)
+    );
+
+    json_object_object_add(obj, "isDemon",
+        json_object_new_boolean(entry->isDemon)
+    );
+
+    json_object_object_add(obj, "isAuto",
+        json_object_new_boolean(entry->isAuto)
+    );
+
+    json_object_object_add(obj, "creatorIndex",
+        json_object_new_int(entry->creatorIndex)
+    );
+
+    json_object_object_add(obj, "songIndex",
+        json_object_new_int(entry->songIndex)
+    );
+
+    return obj;
+}
+
+static struct json_object *creator_entry_to_json(const CreatorEntry *entry) {
+    struct json_object *obj = json_object_new_object();
+    if (!obj)
+        return NULL;
+
+    json_object_object_add(obj, "userId",
+        json_object_new_int(entry->userId)
+    );
+
+    json_object_object_add(obj, "creatorName",
+        json_object_new_string(entry->creatorName)
+    );
+
+    json_object_object_add(obj, "accountId",
+        json_object_new_int(entry->accountId)
+    );
+
+    return obj;
+}
+
+static struct json_object *song_entry_to_json(const SongEntry *entry) {
+    struct json_object *obj = json_object_new_object();
+    if (!obj)
+        return NULL;
+
+    json_object_object_add(obj, "ngSongId",
+        json_object_new_int(entry->ngSongId)
+    );
+
+    json_object_object_add(obj, "songTitle",
+        json_object_new_string(entry->songTitle)
+    );
+
+    json_object_object_add(obj, "artistName",
+        json_object_new_string(entry->artistName)
+    );
+
+    json_object_object_add(obj, "songSize",
+        json_object_new_double(entry->songSize)
+    );
+
+    json_object_object_add(obj, "songLink",
+        json_object_new_string(entry->songLink)
+    );
+
+    return obj;
+}
+
+static struct json_object *level_entry_to_json(const LevelEntry *entry) {
+    struct json_object *obj = json_object_new_object();
+    if (!obj)
+        return NULL;
+
+    json_object_object_add(obj, "uploadDate",
+        json_object_new_string(entry->uploadDate)
+    );
+    json_object_object_add(obj, "updateDate",
+        json_object_new_string(entry->updateDate)
+    );
+
+    return obj;
+}
+
+
+static struct json_object *make_saved_level_data_list_json(const SavedLevelDataList *level_data) {
+    struct json_object *object = json_object_new_object();
+    if (!object) {
+        return NULL;
+    }
+
+    for (size_t i = 0; i < level_data->count; i++) {
+        const SavedLevelDataEntry *entry = &level_data->list[i];
+
+        struct json_object *data = json_object_new_object();
+        if (!data) {
+            json_object_put(object);
+            return NULL;
+        }
+
+        struct json_object *search = search_entry_to_json(&entry->search_entry);
+        struct json_object *creator = creator_entry_to_json(&entry->creator_entry);
+        
+        struct json_object *song = NULL;
+        struct json_object *level = NULL;
+        if (entry->song_entry.ngSongId >= 0) song = song_entry_to_json(&entry->song_entry);
+        if (true) level = level_entry_to_json(&entry->level_entry);
+
+        if (!search || !creator) {
+            if (search) json_object_put(search);
+            if (creator) json_object_put(creator);
+            if (song) json_object_put(song);
+            json_object_put(data);
+            json_object_put(object);
+            return NULL;
+        }
+
+        json_object_object_add(data, "search", search);
+        json_object_object_add(data, "creator", creator);
+        if (song) json_object_object_add(data, "song", song);
+        if (level) json_object_object_add(data, "level", level);
+
+        json_object_object_add(object, entry->key, data);
+    }
+
+    return object;
+}
+
 static void free_level_data_list(LevelDataList *level_data) {
+    if (level_data->list) {
+        for (int i = 0; i < level_data->count; i++) {
+            free(level_data->list[i].key);
+        }
+    }
+    free(level_data->list);
+    level_data->list = NULL;
+    level_data->count = 0;
+    level_data->capacity = 0;
+}
+
+
+static void free_saved_level_data_list(SavedLevelDataList *level_data) {
+    if (level_data->list) {
+        for (int i = 0; i < level_data->count; i++) {
+            free(level_data->list[i].key);
+        }
+    }
     free(level_data->list);
     level_data->list = NULL;
     level_data->count = 0;
@@ -258,7 +470,6 @@ static bool parse_level_data_list(LevelDataList *level_data, struct json_object 
 
     json_object_object_foreach(object, key, value)
     {
-
         struct json_object *level_id = NULL;
         struct json_object *attempts = NULL;
         struct json_object *jumps = NULL;
@@ -322,6 +533,203 @@ static bool parse_level_data_list(LevelDataList *level_data, struct json_object 
     return true;
 }
 
+static bool parse_saved_level_data_list(SavedLevelDataList *level_data, struct json_object *object) {
+    size_t count = json_object_object_length(object);
+
+    level_data->list = calloc(count, sizeof(SavedLevelDataEntry));
+    if (!level_data->list) {
+        return false;
+    }
+
+    level_data->capacity = count;
+    level_data->count = 0;
+
+    json_object_object_foreach(object, key, value)
+    {
+        struct json_object *search = NULL;
+        struct json_object *creator = NULL;
+        struct json_object *song = NULL;
+        struct json_object *level = NULL;
+
+        SavedLevelDataEntry *entry = &level_data->list[level_data->count];
+
+        entry->key = strdup(key);
+        if (!entry->key) {
+            free_saved_level_data_list(level_data);
+            return false;
+        }
+
+        memset(&entry->search_entry, 0, sizeof(entry->search_entry));
+        memset(&entry->creator_entry, 0, sizeof(entry->creator_entry));
+        memset(&entry->song_entry, 0, sizeof(entry->song_entry));
+        memset(&entry->level_entry, 0, sizeof(entry->level_entry));
+
+        // Level entry
+        if (json_object_object_get_ex(value, "search", &search)) {
+            struct json_object *name = NULL;
+            struct json_object *description = NULL;
+            struct json_object *level_id = NULL;
+            struct json_object *creator_id = NULL;
+            struct json_object *song_id = NULL;
+            struct json_object *main_song_id = NULL;
+            struct json_object *length_num = NULL;
+            struct json_object *downloads = NULL;
+            struct json_object *likes = NULL;
+            struct json_object *stars = NULL;
+            struct json_object *req_stars = NULL;
+            struct json_object *difficulty = NULL;
+            struct json_object *obj_count = NULL;
+            struct json_object *level_version = NULL;
+            struct json_object *game_version = NULL;
+            struct json_object *epic = NULL;
+            struct json_object *feature_score = NULL;
+            struct json_object *original_id = NULL;
+            struct json_object *is_two_player = NULL;
+            struct json_object *is_demon = NULL;
+            struct json_object *is_auto = NULL;
+            struct json_object *creator_index = NULL;
+            struct json_object *song_index = NULL;
+
+            if (json_object_object_get_ex(search, "name", &name))
+                snprintf(entry->search_entry.name, sizeof(entry->search_entry.name), "%s", json_object_get_string(name));
+
+            if (json_object_object_get_ex(search, "description", &description)) {
+                const char *str = json_object_get_string(description);
+
+                entry->search_entry.description = strdup(str);
+                if (!entry->search_entry.description) {
+                    free_saved_level_data_list(level_data);
+                    return false;
+                }
+            }
+
+            if (json_object_object_get_ex(search, "levelId", &level_id))
+                entry->search_entry.levelId = json_object_get_int(level_id);
+
+            if (json_object_object_get_ex(search, "creatorId", &creator_id))
+                entry->search_entry.creatorId = json_object_get_int(creator_id);
+
+            if (json_object_object_get_ex(search, "songId", &song_id))
+                entry->search_entry.songId = json_object_get_int(song_id);
+
+            if (json_object_object_get_ex(search, "mainSongId", &main_song_id))
+                entry->search_entry.mainSongId = json_object_get_int(main_song_id);
+
+            if (json_object_object_get_ex(search, "lengthNum", &length_num))
+                entry->search_entry.lengthNum = json_object_get_int(length_num);
+
+            if (json_object_object_get_ex(search, "downloads", &downloads))
+                entry->search_entry.downloads = json_object_get_int(downloads);
+
+            if (json_object_object_get_ex(search, "likes", &likes))
+                entry->search_entry.likes = json_object_get_int(likes);
+
+            if (json_object_object_get_ex(search, "stars", &stars))
+                entry->search_entry.stars = json_object_get_int(stars);
+
+            if (json_object_object_get_ex(search, "reqStars", &req_stars))
+                entry->search_entry.reqStars = json_object_get_int(req_stars);
+
+            if (json_object_object_get_ex(search, "difficulty", &difficulty))
+                entry->search_entry.difficulty = json_object_get_int(difficulty);
+
+            if (json_object_object_get_ex(search, "objCount", &obj_count))
+                entry->search_entry.objCount = json_object_get_int(obj_count);
+
+            if (json_object_object_get_ex(search, "levelVersion", &level_version))
+                entry->search_entry.levelVersion = json_object_get_int(level_version);
+
+            if (json_object_object_get_ex(search, "gameVersion", &game_version))
+                entry->search_entry.gameVersion = json_object_get_int(game_version);
+
+            if (json_object_object_get_ex(search, "epic", &epic))
+                entry->search_entry.epic = json_object_get_int(epic);
+
+            if (json_object_object_get_ex(search, "featureScore", &feature_score))
+                entry->search_entry.featureScore = json_object_get_int(feature_score);
+
+            if (json_object_object_get_ex(search, "originalId", &original_id))
+                entry->search_entry.originalId = json_object_get_int(original_id);
+
+            if (json_object_object_get_ex(search, "isTwoPlayer", &is_two_player))
+                entry->search_entry.isTwoPlayer = json_object_get_boolean(is_two_player);
+
+            if (json_object_object_get_ex(search, "isDemon", &is_demon))
+                entry->search_entry.isDemon = json_object_get_boolean(is_demon);
+
+            if (json_object_object_get_ex(search, "isAuto", &is_auto))
+                entry->search_entry.isAuto = json_object_get_boolean(is_auto);
+
+            if (json_object_object_get_ex(search, "creatorIndex", &creator_index))
+                entry->search_entry.creatorIndex = json_object_get_int(creator_index);
+
+            if (json_object_object_get_ex(search, "songIndex", &song_index))
+                entry->search_entry.songIndex = json_object_get_int(song_index);
+        }
+
+        // Creator entry
+        if (json_object_object_get_ex(value, "creator", &creator)) {
+            struct json_object *user_id = NULL;
+            struct json_object *creator_name = NULL;
+            struct json_object *account_id = NULL;
+
+            if (json_object_object_get_ex(creator, "userId", &user_id))
+                entry->creator_entry.userId = json_object_get_int(user_id);
+
+            if (json_object_object_get_ex(creator, "creatorName", &creator_name))
+                snprintf(entry->creator_entry.creatorName, sizeof(entry->creator_entry.creatorName), "%s", json_object_get_string(creator_name));
+
+            if (json_object_object_get_ex(creator, "accountId", &account_id))
+                entry->creator_entry.accountId = json_object_get_int(account_id);
+        }
+
+        // Song entry
+        if (json_object_object_get_ex(value, "song", &song)) {
+            struct json_object *ng_song_id = NULL;
+            struct json_object *song_title = NULL;
+            struct json_object *artist_name = NULL;
+            struct json_object *song_size = NULL;
+            struct json_object *song_link = NULL;
+
+            if (json_object_object_get_ex(song, "ngSongId", &ng_song_id))
+                entry->song_entry.ngSongId = json_object_get_int(ng_song_id);
+
+            if (json_object_object_get_ex(song, "songTitle", &song_title))
+                snprintf(entry->song_entry.songTitle, sizeof(entry->song_entry.songTitle), "%s", json_object_get_string(song_title));
+
+            if (json_object_object_get_ex(song, "artistName", &artist_name))
+                snprintf(entry->song_entry.artistName, sizeof(entry->song_entry.artistName), "%s", json_object_get_string(artist_name));
+
+            if (json_object_object_get_ex(song, "songSize", &song_size))
+                entry->song_entry.songSize = (float)json_object_get_double(song_size);
+
+            if (json_object_object_get_ex(song, "songLink", &song_link))
+                snprintf(entry->song_entry.songLink, sizeof(entry->song_entry.songLink), "%s", json_object_get_string(song_link));
+        } else {
+            entry->song_entry.ngSongId = -1;
+        }
+
+        // Level entry
+        if (json_object_object_get_ex(value, "level", &level)) {
+            struct json_object *upload_date = NULL;
+            struct json_object *update_date = NULL;
+            if (json_object_object_get_ex(level, "uploadDate", &upload_date))
+                snprintf(entry->level_entry.uploadDate, sizeof(entry->level_entry.uploadDate), "%s", json_object_get_string(upload_date));
+
+            if (json_object_object_get_ex(level, "updateDate", &update_date))
+                snprintf(entry->level_entry.updateDate, sizeof(entry->level_entry.updateDate), "%s", json_object_get_string(update_date));
+        } else {
+            snprintf(entry->level_entry.uploadDate, sizeof(entry->level_entry.uploadDate), "%s", "N/A");
+            snprintf(entry->level_entry.updateDate, sizeof(entry->level_entry.updateDate), "%s", "N/A");
+        }
+
+
+        level_data->count++;
+    }
+
+    return true;
+}
+
 static bool level_data_list_add(LevelDataList *level_data, const char *key, const LevelData data) {
     if (level_data->count >= level_data->capacity) {
         size_t new_capacity = level_data->capacity == 0 ? 8 : level_data->capacity + 4;
@@ -343,6 +751,49 @@ static bool level_data_list_add(LevelDataList *level_data, const char *key, cons
     }
 
     entry->data = data;
+
+    level_data->count++;
+
+    return true;
+}
+
+static bool saved_level_data_list_add(SavedLevelDataList *level_data, const char *key, const SearchEntry *search, const CreatorEntry *creator, const SongEntry *song) {
+    if (level_data->count >= level_data->capacity) {
+        size_t new_capacity = level_data->capacity == 0 ? 8 : level_data->capacity + 4;
+
+        SavedLevelDataEntry *new_list = realloc(level_data->list, new_capacity * sizeof(SavedLevelDataEntry));
+        if (!new_list) {
+            return false;
+        }
+
+        level_data->list = new_list;
+        level_data->capacity = new_capacity;
+    }
+
+    SavedLevelDataEntry *entry = &level_data->list[level_data->count];
+
+    entry->key = strdup(key);
+    if (!entry->key) {
+        return false;
+    }
+
+    entry->search_entry = *search;
+    entry->creator_entry = *creator;
+    if (song) {
+        entry->song_entry = *song;
+    } else {
+        // Missing song entry
+        entry->song_entry = (SongEntry) { 0 };
+        entry->song_entry.ngSongId = -1;
+    }
+
+    // Copy here
+    if (search->description) {
+        entry->search_entry.description = strdup(search->description);
+        if (!entry->key) {
+            return false;
+        }
+    }
 
     level_data->count++;
 
@@ -390,6 +841,27 @@ static LevelDataEntry *level_data_list_get_or_add(LevelDataList *level_data, con
     return &level_data->list[level_data->count - 1];
 }
 
+static bool saved_data_list_add(SavedLevelDataList *level_data, const char *key, const SearchEntry *search, const CreatorEntry *creator, const SongEntry *song) {
+    SavedLevelDataEntry *entry = saved_level_data_list_find(level_data, key);
+    if (entry) {
+        return true;
+    }
+    
+    if (!saved_level_data_list_add(level_data, key, search, creator, song)) {
+        return false;
+    }
+
+    return true;
+}
+
+bool save_level_to_server_file(ServerFile *save_data, int level_id, const SearchEntry *search, const CreatorEntry *creator, const SongEntry *song) {
+    char file[16];
+    snprintf(file, sizeof(file), "%d", level_id);
+    char tmp[17];
+    snprintf(tmp, sizeof(tmp), "%016llX", fnv1a64(file));
+    return saved_data_list_add(&save_data->saved_levels, tmp, search, creator, song);
+}
+
 LevelDataEntry *get_or_add_level_to_server_file(ServerFile *save_data, const char *key, LevelListType type) {
     char hash[17];
     snprintf(hash, sizeof(hash), "%016llX", fnv1a64(key));
@@ -434,8 +906,11 @@ bool load_save_file(const char *path, ServerFile *save_data) {
 
     struct json_object *root = json_tokener_parse(decompressed);
     if (!root) {
+        free(decompressed);
         return false;
     }
+
+    free(decompressed);
 
     struct json_object *online = NULL;
 
@@ -459,6 +934,15 @@ bool load_save_file(const char *path, ServerFile *save_data) {
     if (!parse_level_data_list(&save_data->main_levels, main_levels)) {
         json_object_put(root);
         return false;
+    }
+
+    struct json_object *saved_levels = NULL;
+
+    if (json_object_object_get_ex(root, SAVE_SAVED_LEVEL_KEY, &saved_levels)) {
+        if (!parse_saved_level_data_list(&save_data->saved_levels, saved_levels)) {
+            json_object_put(root);
+            return false;
+        }
     }
 
     json_object_put(root);
@@ -488,8 +972,11 @@ bool load_external_file(const char *path, ExternalLevelFile *save_data) {
     
     struct json_object *root = json_tokener_parse(decompressed);
     if (!root) {
+        free(decompressed);
         return false;
     }
+    
+    free(decompressed);
 
     struct json_object *external = NULL;
 
@@ -531,6 +1018,15 @@ SavingError save_save_file(const char *path, const ServerFile *save_data) {
 
     json_object_object_add(root, SAVE_MAIN_LEVEL_KEY, main_levels);
 
+    struct json_object *saved_levels = make_saved_level_data_list_json(&save_data->saved_levels);
+
+    if (!saved_levels) {
+        json_object_put(root);
+        return SAVE_ERROR_MAKE_SAVE_DATA_LIST;
+    }
+
+    json_object_object_add(root, SAVE_SAVED_LEVEL_KEY, saved_levels);
+
     const char *json = json_object_to_json_string_ext(root, JSON_C_TO_STRING_PLAIN);
 
     SaveType type = (save_data == &gdps_file ? SAVE_1P9_GDPS : SAVE_ROBTOP);
@@ -544,6 +1040,7 @@ SavingError save_save_file(const char *path, const ServerFile *save_data) {
 
     snprintf(task->tmp_file, sizeof(task->tmp_file), "%s.tmp", tmp_path);
 
+    task->root = root;
     task->data = strdup(json);
     
     begin_saving(type);
@@ -576,6 +1073,7 @@ SavingError save_external_file(const char *path, const ExternalLevelFile *save_d
 
     snprintf(task->tmp_file, sizeof(task->tmp_file), "%s.tmp", tmp_path);
 
+    task->root = root;
     task->data = strdup(json);
     
     begin_saving(SAVE_EXTERNAL);
@@ -879,7 +1377,7 @@ static void saving_thread(void *arg) {
         case SAVE_1P9_GDPS:
         case SAVE_EXTERNAL:
             error = threaded_save(task);
-            free((void *) task->data);
+            json_object_put(task->root);
             break;
         case SAVE_CONFIG:
             config_save(&cfg);
@@ -891,6 +1389,7 @@ static void saving_thread(void *arg) {
         output_log("An error has occured while saving: %d\n", error);
     }
 
+    free((void *) task->data);
     task->running = false;
 }
 
@@ -921,4 +1420,56 @@ void begin_saving(SaveType type) {
             true
         );
     }
+}
+
+// Offline levels
+
+char *load_saved_level(int level_id, bool gdps, size_t *out_size) {
+    char key[16];
+    snprintf(key, sizeof(key), "%d_%d", level_id, (int) gdps);
+    char path[256];
+    snprintf(path, sizeof(path), "%s/%llu.saved", SAVED_LEVELS_DIR, fnv1a64(key));
+
+    return read_file(path, out_size);
+}
+
+bool save_saved_level(int level_id, bool gdps, const char *data) {
+    char key[16];
+    snprintf(key, sizeof(key), "%d_%d", level_id, (int) gdps);
+    char path[256];
+    snprintf(path, sizeof(path), "%s/%llu.saved", SAVED_LEVELS_DIR, fnv1a64(key));
+
+    FILE *file = fopen(path, "wb");
+    if (!file) {
+        return false;
+    }
+
+    size_t len = strlen(data);
+
+    if (fwrite(data, 1, len, file) != len) {
+        fclose(file);
+        return false;
+    }
+
+    if (fclose(file) != 0) {
+        return false;
+    }
+
+    return true;
+}
+
+bool saved_level_exists(int level_id, bool gdps) {
+    char key[16];
+    snprintf(key, sizeof(key), "%d_%d", level_id, (int) gdps);
+    char path[256];
+    snprintf(path, sizeof(path), "%s/%llu.saved", SAVED_LEVELS_DIR, fnv1a64(key));
+
+    FILE *file = fopen(path, "rb");
+
+    if (!file) {
+        return false;
+    }
+
+    fclose(file);
+    return true;
 }

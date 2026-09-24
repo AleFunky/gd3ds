@@ -4,6 +4,7 @@
 #include "3ds/thread.h"
 #include "3ds/types.h"
 
+#include "level_loading.h"
 #include "main.h"
 #include "menus/core/ui_element.h"
 #include "mp3_player.h"
@@ -64,6 +65,16 @@ const int demon_face_featured_offsets[] = {
     -8
 };
 
+static bool has_saved_level = false;
+static char *loaded_level_string = NULL;
+int online_menu_level_id = 0;
+
+int get_saved_level(GenericTask *task) {
+    size_t out_size;
+    loaded_level_string = load_saved_level(online_menu_level_id, gdps, &out_size);
+    return loaded_level_string == NULL;
+}
+
 static GenericTask level_task = {
     .func = get_level
 };
@@ -78,6 +89,12 @@ static Thread song_data_thread;
 
 static DownloadTask song_task = {
     .path = USER_SONGS_DIR
+};
+
+static Thread saved_level_thread;
+
+static GenericTask saved_level_task = {
+    .func = get_saved_level
 };
 
 static Thread song_thread;
@@ -213,6 +230,13 @@ static void play_level() {
     stop_mp3();
     playing_menu_loop = false;
 
+
+    if (has_saved_level) {
+        curr_level_string = loaded_level_string;
+    } else {
+        curr_level_string = level_entry->levelString;
+    }
+
     ui_stack_push_game_state(STATE_GAME);
 }
 
@@ -295,10 +319,26 @@ static void update_progress_bars() {
     ui_label_set_text(practice_percent_label, practice);
 }
 
-static void populate_level_info() {
-    SearchEntry *entry_srch = &search_entries[curr_search_id];
-    CreatorEntry *entry_c = &creator_entries[entry_srch->creatorIndex];
-    SongEntry *entry_sng = &song_entries[entry_srch->songIndex];
+static void populate_level_info(int level_id) {
+
+    SearchEntry *entry_srch;
+    CreatorEntry *entry_c;
+    SongEntry *entry_sng;
+
+    SavedLevelDataEntry *data = get_saved_level_data(level_id);
+    if (data && !refresh) {
+        entry_srch = &data->search_entry;
+        entry_c = &data->creator_entry;
+        entry_sng = &data->song_entry;
+    } else {
+        entry_srch = &search_entries[curr_search_id];
+        entry_c = &creator_entries[entry_srch->creatorIndex];
+        entry_sng = (entry_srch->songId != 0) ? &song_entries[entry_srch->songIndex] : NULL;
+        bool could_save = save_level_to_server_file(current_server_file, level_id, entry_srch, entry_c, entry_sng);
+        if (!could_save) {
+            output_log("Oops, couldn't save da level!\n");
+        }
+    }
 
     char *downloads = truncate_number(entry_srch->downloads);
     ui_label_set_text(downloads_label, downloads);
@@ -319,7 +359,7 @@ static void populate_level_info() {
 
     // Level ID
     char lvlid[32];
-    snprintf(lvlid, sizeof(lvlid), "<#78aaf0>ID: %d", entry_srch->levelId);
+    snprintf(lvlid, sizeof(lvlid), "<#78aaf0>ID: %d", level_id);
     ui_label_set_text(level_id_label, lvlid);
 
     // Creator
@@ -645,10 +685,16 @@ static void online_level_init (UIScreen *s) {
         ui_enable_element((UIElement *)play_button);
     }
 
-    populate_level_info();
+    populate_level_info(online_menu_level_id);
 
     if (!already_played_online_level) {
-        level_thread = create_generic_thread(&level_task);
+        if (saved_level_exists(online_menu_level_id, gdps) && !redownload) {
+            has_saved_level = true;
+            saved_level_thread = create_generic_thread(&saved_level_task);
+        } else {
+            has_saved_level = false;
+            level_thread = create_generic_thread(&level_task);
+        }
     }
 }
 
@@ -704,11 +750,19 @@ static void online_level_menu_update(UIScreen *s, UIInput *i) {
             ui_disable_element((UIElement *) spinner);
             ui_enable_element((UIElement *) play_button);
             if (refresh == true) {
-                populate_level_info();
+                populate_level_info(online_menu_level_id);
                 refresh = false;
             }
         }
         level_task.finished = false;
+    }
+
+    if (saved_level_task.finished) {
+        result = saved_level_task.result;
+        already_played_online_level = true;
+        ui_disable_element((UIElement *) spinner);
+        ui_enable_element((UIElement *) play_button);
+        saved_level_task.finished = false;
     }
 }
 
@@ -720,8 +774,8 @@ static void online_level_menu_exit() {
     }
     
     if (comment_entries) {
-        comment_entries = NULL;
         free(comment_entries);
+        comment_entries = NULL;
     }
 
     if (level_task.running) {

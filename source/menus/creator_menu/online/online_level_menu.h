@@ -4,6 +4,8 @@
 void delete_level();
 void check_warnings_and_play();
 
+extern int online_menu_level_id;
+
 extern bool refresh;
 
 extern const UIScreenDefPair online_level_menu_def;

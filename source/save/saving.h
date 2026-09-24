@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 #include "level/main_levels.h"
+#include "utils/server_utils.h"
 
 #define DATA_ATTEMPTS "attempts"
 #define DATA_JUMPS "jumps"
@@ -19,6 +20,7 @@
 #define SAVE_ONLINE_KEY "online"
 #define SAVE_MAIN_LEVEL_KEY "main_levels"
 #define SAVE_EXTERNAL_KEY "external_levels"
+#define SAVE_SAVED_LEVEL_KEY "saved_levels"
 
 typedef struct LevelData {
     int level_id;
@@ -31,6 +33,20 @@ typedef struct LevelData {
     bool coin2;
     bool coin3;
 } LevelData;
+
+typedef struct SavedLevelDataEntry {
+    char *key;
+    SearchEntry search_entry;
+    CreatorEntry creator_entry;
+    SongEntry song_entry;
+    LevelEntry level_entry;
+} SavedLevelDataEntry;
+
+typedef struct SavedLevelDataList {
+    SavedLevelDataEntry *list;
+    size_t capacity;
+    size_t count;
+} SavedLevelDataList;
 
 typedef struct LevelDataEntry {
     char *key;
@@ -46,6 +62,7 @@ typedef struct LevelDataList {
 typedef struct ServerFile {
     LevelDataList online_levels;
     LevelDataList main_levels;
+    SavedLevelDataList saved_levels;
 } ServerFile;
 
 typedef struct ExternalLevelFile {
@@ -68,6 +85,7 @@ typedef enum {
 
 typedef struct SavingTask {
     const char *data;
+    struct json_object *root;
     char file[256];
     char tmp_file[256];
     SaveType type;
@@ -85,6 +103,7 @@ typedef enum {
     SAVE_ERROR_REMOVE_FILE,
     SAVE_ERROR_RENAME_FILE,
     SAVE_ERROR_DATA,
+    SAVE_ERROR_MAKE_SAVE_DATA_LIST,
 } SavingError;
 
 void begin_saving(SaveType type);
@@ -114,6 +133,14 @@ bool migrate_old_data();
 
 LevelDataEntry *level_data_list_find(LevelDataList *level_data, const char *key);
 LevelDataEntry *get_online_level_data(int level_id);
+SavedLevelDataEntry *saved_level_data_list_find(SavedLevelDataList *level_data, const char *key);
+SavedLevelDataEntry *get_saved_level_data(int level_id);
+bool save_level_to_server_file(ServerFile *save_data, int level_id, const SearchEntry *search, const CreatorEntry *creator, const SongEntry *song);
 void save_current_save_file(LevelListType type);
+
+
+bool saved_level_exists(int level_id, bool gdps);
+char *load_saved_level(int level_id, bool gdps, size_t *out_size);
+bool save_saved_level(int level_id, bool gdps, const char *data);
 
 void calculate_stats();
