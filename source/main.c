@@ -71,7 +71,7 @@
 #define CITRA_TYPE 0x20000
 #define CITRA_VERSION 11
 
-u32 __ctru_linear_heap_size = 36 << 20;
+u32 __ctru_linear_heap_size = 44 << 20;
 
 int game_state = STATE_MENU;
 bool escape_state;
