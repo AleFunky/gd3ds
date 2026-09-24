@@ -84,9 +84,17 @@ typedef struct {
     int playerColor;
     bool blending;
     int channelID;
+    float fromOpacity;
+    bool toggleOpacity;
+    int inheritedChannelID;
+    HSV hsv;
     int toRed;
     int toGreen;
     int toBlue;
+    float deltaTime;
+    float toOpacity;
+    float duration;
+    bool copyOpacity;
 } GDColorChannel;
 
 
@@ -149,6 +157,9 @@ extern const char *level_lengths[5];
 extern char *curr_level_string;
 
 extern ObjectsArray objects;
+
+extern int channelCount;
+extern GDColorChannel *colorChannels;
 
 char *read_file(const char *filepath, size_t *out_size);
 char *decompress_level(char *data, int *out_code);

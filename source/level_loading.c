@@ -469,9 +469,17 @@ void parse_color_channel(GDColorChannel *channels, int i, char *channel_string) 
             case 4:  channel.playerColor = atoi(valStr); break;
             case 5:  channel.blending = atoi(valStr) != 0; break;
             case 6:  channel.channelID = atoi(valStr); break;
+            case 7:  channel.fromOpacity = atof(valStr); break;
+            case 8:  channel.toggleOpacity = atoi(valStr) != 0; break;
+            case 9:  channel.inheritedChannelID = atoi(valStr); break;
+            case 10: channel.hsv = parse_hsv_string(valStr); break;
             case 11: channel.toRed = atoi(valStr); break;
             case 12: channel.toGreen = atoi(valStr); break;
             case 13: channel.toBlue = atoi(valStr); break;
+            case 14: channel.deltaTime = atof(valStr); break;
+            case 15: channel.toOpacity = atof(valStr); break;
+            case 16: channel.duration = atof(valStr); break;
+            case 17: channel.copyOpacity = atoi(valStr) != 0; break;
         }
     }
 
@@ -1358,28 +1366,45 @@ void set_color_channels() {
                 break;
 
             default:
-                if (!(id > COL_4 && id < CHANNEL_BG) && id < CHANNEL_P1) {
+                if (id >= 0 && id < COL_CHANNEL_NUM) {
                     int chan = get_col_channel_index(id);
 
-                    memset(&channels[chan], 0, sizeof(ColorChannel));
                     Color color;
                     color.r = colorChannel.fromRed;
                     color.g = colorChannel.fromGreen;
                     color.b = colorChannel.fromBlue;
 
                     channels[chan].blending = colorChannel.blending;
-
                     channels[chan].color = color;
+                    channels[chan].non_pulse_color = color;
+                    channels[chan].alpha = colorChannel.fromOpacity < 0.0f ? 0.0f : (colorChannel.fromOpacity > 1.0f ? 1.0f : colorChannel.fromOpacity);
 
-                    if (colorChannel.playerColor == 1) channels[chan].color = get_p2_if_black(p1_color);
-                    if (colorChannel.playerColor == 2) channels[chan].color = get_p1_if_black(p2_color); 
+                    if (colorChannel.inheritedChannelID > 0) {
+                        channels[chan].copy_color_id = colorChannel.inheritedChannelID;
+                        channels[chan].hsv = colorChannel.hsv;
+                    } else {
+                        channels[chan].copy_color_id = 0;
+                    }
+
+                    if (colorChannel.playerColor == 1) {
+                        channels[chan].color = get_p2_if_black(p1_color);
+                        channels[chan].non_pulse_color = channels[chan].color;
+                    }
+                    if (colorChannel.playerColor == 2) {
+                        channels[chan].color = get_p1_if_black(p2_color);
+                        channels[chan].non_pulse_color = channels[chan].color;
+                    }
 
                     if (id == CHANNEL_OBJ) {
                         channels[get_col_channel_index(CHANNEL_OBJ_BLENDING)].color = color;
+                        channels[get_col_channel_index(CHANNEL_OBJ_BLENDING)].non_pulse_color = color;
                     }
                 }
         }
     }
+
+    for (int i = 0; i < COL_CHANNEL_NUM; i++)
+        channels[i].non_pulse_color = channels[i].color;
 }
 
 void load_level_string_info(char *level_string) {

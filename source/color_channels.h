@@ -22,15 +22,21 @@ enum ColorChannelIDs {
     CHANNEL_P2,
     CHANNEL_LBG,
     CHANNEL_LBG_NOLERP,
-    CHANNEL_OBJ_BLENDING,
-    CHANNEL_YELLOW_GLOW,
+    CHANNEL_GROUND_2,
+    CHANNEL_BLACK,
+    CHANNEL_WHITE,
+    CHANNEL_LIGHTER,
     CHANNEL_BLUE_GLOW,
     CHANNEL_PINK_GLOW,
-    CHANNEL_WHITE,
     CHANNEL_INVISIBLE_GLOW,
+    CHANNEL_WHITE_GLOW,
+    CHANNEL_OBJ_BLENDING,
+    CHANNEL_YELLOW_GLOW_INTERNAL,
     COL_CHANNEL_LAST,
-    COL_CHANNEL_NUM = (COL_CHANNEL_LAST - CHANNEL_BG) + CHANNEL_NORMAL_END,
+    COL_CHANNEL_NUM = 1024,
 };
+
+#define MAX_PULSES_PER_CHANNEL 10
 
 typedef struct {
     unsigned char r,g,b;
@@ -38,15 +44,25 @@ typedef struct {
 
 typedef struct {
     Color color;
+    Color non_pulse_color;
+    float alpha;
     bool blending;
+    HSV hsv;
+    int copy_color_id;
+    Color pulses[MAX_PULSES_PER_CHANNEL];
+    int num_pulses;
 } ColorChannel;
 
 typedef struct {
     bool active;
     Color old_color;
     Color new_color;
+    float old_alpha;
+    float new_alpha;
     float seconds;
     float time_run;
+    int copied_color_id;
+    HSV copied_hsv;
 } ColTriggerBuffer;
 
 extern ColorChannel channels[COL_CHANNEL_NUM];
@@ -83,6 +99,8 @@ extern Color glow_color;
 #define GET_R(color) (color & 0xff)
 #define GET_G(color) ((color >> 8) & 0xff)
 #define GET_B(color) ((color >> 16) & 0xff)
+
+Color HSV_combine(Color base, HSV hsv);
 
 void calculate_lbg();
 int get_col_channel_index(int channel);

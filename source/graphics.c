@@ -399,7 +399,7 @@ int get_glow_channel(int obj) {
             return CHANNEL_LBG;
         case 35:
         case 36:
-            return CHANNEL_YELLOW_GLOW;
+            return CHANNEL_YELLOW_GLOW_INTERNAL;
         case 67:
         case 84:
             return CHANNEL_BLUE_GLOW;
