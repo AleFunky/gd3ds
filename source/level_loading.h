@@ -9,6 +9,12 @@
 
 #define SECTION_SIZE 128
 
+#define MAX_PULSES_PER_GROUP 5
+
+typedef struct {
+    unsigned char r,g,b;
+} Color;
+
 typedef struct {
     float h;
     float s;
@@ -52,6 +58,63 @@ typedef struct {
     unsigned short *col_channel;
     unsigned short *detail_col_channel;
     unsigned short *target_color_id;
+
+    bool *spawn_triggered;
+    bool *multi_triggered;
+    float *spawn_delay;
+    int *target_group;
+    bool *activate_group;
+    float *alpha_trigger_opacity;
+    float *trigger_opacity;
+
+    float *move_offset_x;
+    float *move_offset_y;
+    int *move_easing;
+    bool *lock_to_player_x;
+    bool *lock_to_player_y;
+
+    float *original_x;
+    float *original_y;
+
+    Color (*main_pulses)[MAX_PULSES_PER_GROUP];
+    Color (*detail_pulses)[MAX_PULSES_PER_GROUP];
+    u8 *num_main_pulses;
+    u8 *num_detail_pulses;
+    bool *main_being_pulsed;
+    bool *detail_being_pulsed;
+    Color *main_non_pulse_color;
+    Color *detail_non_pulse_color;
+    Color *main_color;
+    Color *detail_color;
+
+    float *pulse_fade_in;
+    float *pulse_hold;
+    float *pulse_fade_out;
+    int *pulse_mode;
+    int *copied_color_id;
+    HSV *copied_hsv;
+    bool *main_col_HSV_enabled;
+    bool *detail_col_HSV_enabled;
+    HSV *main_col_HSV;
+    HSV *detail_col_HSV;
+    int *pulse_target_type;
+    bool *pulse_main_only;
+    bool *pulse_detail_only;
+
+    Color *cached_main_hsv_src_color;
+    Color *cached_detail_hsv_src_color;
+    Color *cached_main_hsv_color;
+    Color *cached_detail_hsv_color;
+    bool *cached_main_hsv_valid;
+    bool *cached_detail_hsv_valid;
+
+    float *scale_x, *scale_y;
+    float *original_scale_x, *original_scale_y;
+
+    int *child_object;
+    float *tp_y_offset;
+    int *section_x;
+    int *section_y;
 
     unsigned char *transition_applied;
     unsigned char *trig_colorR, *trig_colorG, *trig_colorB;
@@ -174,10 +237,13 @@ int base64_decode(const char *in, unsigned char *out);
 
 Section *get_section(int x, int y);
 Section *get_or_create_section(int x, int y);
+void assign_object_to_section(int obj);
+void update_object_section(int obj);
 bool obj_has_main(const GameObject *obj);
 bool obj_has_detail(const GameObject *obj);
 
 bool is_valid_object(int id);
+bool is_trigger_object(int id);
 
 char *get_level_name(char *data_ptr);
 char *load_user_song(int id, size_t *out_size); 
