@@ -1470,7 +1470,7 @@ void create_objects() {
         }
 
         // No dirty objects, do nothing
-        if (!has_dirty_objects) {
+        if (!has_dirty_objects && current_object_count > 0) {
             u64 start = svcGetSystemTick();
             render_mirror_factor = state.mirror_factor;
             snapshot.creating_ms = (svcGetSystemTick() - start) / CPU_TICKS_PER_MSEC;
