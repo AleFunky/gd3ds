@@ -3,6 +3,7 @@
 #include "level_loading.h"
 #include "color_channels.h"
 #include "utils/c2d_internal.h"
+#include "animations.h"
 
 #define FADING_OBJ_PADDING 45
 #define FADING_OBJ_WIDTH 180
@@ -183,6 +184,10 @@ void spawn_glow_layer_at(
 );
 
 Color get_color_abgr8(u32 color);
+
+const SlotFrames* find_slot_frames(const GameObject* obj, int slot);
+int get_child_group(const GameObject* obj, int child_index);
+const Animation* get_animation_for_object(int id);
 
 void handle_mirror_transition();
 

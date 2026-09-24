@@ -266,9 +266,9 @@ void check_system_model() {
 }
 
 float delta = 0;
+float frame_timer = 0;
 unsigned int level_frame = 0;
 unsigned int frame_counter = 0;
-
 bool song_loaded;
 
 void update_player_effects(float delta) {
@@ -776,6 +776,7 @@ void game_loop() {
 
     play_level_song(level_info.song_offset);
 
+    frame_timer = 0;
     if (song_loaded) {
         pause_playback_mp3();
     }
@@ -1004,6 +1005,7 @@ void game_loop() {
 
         if (!game_paused) {
             frame_counter++;
+            frame_timer += delta;
 
             if (state.dead && state.death_timer <= 0.f) {
                 state.death_timer = (settingsState.quickRetry ? 0.5f : 1.f);
