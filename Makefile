@@ -109,7 +109,7 @@ endif
 export DEPSDIR := $(CURDIR)/$(BUILD)
 export VPATH := $(foreach dir,$(SOURCES),$(CURDIR)/$(dir) $(call recurse,d,$(CURDIR)/$(dir),*)) \
 				$(foreach dir,$(DATA),$(CURDIR)/$(dir) $(call recurse,d,$(CURDIR)/$(dir),*)) \
-				$(foreach dir,$(GRAPHICS),$(CURDIR)/$(dir)) $(call recurse,d,$(CURDIR)/$(dir),*))
+				$(foreach dir,$(GRAPHICS),$(CURDIR)/$(dir)) $(call recurse,d,$(CURDIR)/$(dir),*) )
 
 export TOPDIR := $(CURDIR)
 OUTPUT_DIR := $(TOPDIR)/$(OUTPUT)

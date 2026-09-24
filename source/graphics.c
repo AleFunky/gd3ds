@@ -43,6 +43,8 @@ static bool blending_state = false;
 
 C2D_SpriteSheet spriteSheet;
 C2D_SpriteSheet spriteSheet2;
+C2D_SpriteSheet spriteSheet3;
+C2D_SpriteSheet animatedSheet;
 C2D_SpriteSheet glowSheet;
 C2D_SpriteSheet bgSheet;
 C2D_SpriteSheet bg2Sheet;
@@ -86,9 +88,21 @@ static C2D_SpriteSheet *get_sprite_sheet(int index, int *rel_index) {
         return &spriteSheet;
     }
 
-    // Return spritesheet 2 (portals)
-    *rel_index = index - SPRITESHEET2_START;
-    return &spriteSheet2;
+    if (index < SPRITESHEET3_START) {
+        // Return spritesheet 2 (portals)
+        *rel_index = index - SPRITESHEET2_START;
+        return &spriteSheet2;
+    }
+
+    if (index < ANIMATEDSHEET_START) {
+        // Return spritesheet 3 (2.0 objects)
+        *rel_index = index - SPRITESHEET3_START;
+        return &spriteSheet3;
+    }
+
+    // Return spritesheet 4 (animated objects)
+    *rel_index = index - ANIMATEDSHEET_START;
+    return &animatedSheet;
 }
 
 Color get_color_abgr8(u32 color) {
