@@ -102,6 +102,29 @@ void assign_object_to_section(int obj) {
         sec->objects = realloc(sec->objects, sizeof(int) * sec->object_capacity);
     }
     sec->objects[sec->object_count++] = obj;
+    objects.section_x[obj] = sx;
+    objects.section_y[obj] = sy;
+}
+
+void update_object_section(int obj) {
+    int new_sx = (int)(objects.x[obj] / SECTION_SIZE);
+    int new_sy = (int)(objects.y[obj] / SECTION_SIZE);
+    int old_sx = objects.section_x[obj];
+    int old_sy = objects.section_y[obj];
+
+    if (new_sx == old_sx && new_sy == old_sy) return;
+
+    Section *old_sec = get_section(old_sx, old_sy);
+    if (old_sec) {
+        for (int i = 0; i < old_sec->object_count; i++) {
+            if (old_sec->objects[i] == obj) {
+                old_sec->objects[i] = old_sec->objects[--old_sec->object_count];
+                break;
+            }
+        }
+    }
+
+    assign_object_to_section(obj);
 }
 
 char *read_file(const char *filepath, size_t *out_size) {
@@ -748,7 +771,35 @@ GDValueType get_value_type_for_key(int key) {
         case 23: return GD_VAL_INT;    // (Color trigger) Target color ID
         case 24: return GD_VAL_INT;    // Zlayer
         case 25: return GD_VAL_INT;    // Zorder
-        case 57: return GD_VAL_INT_ARRAY; // Groups
+        case 28: return GD_VAL_FLOAT;  // move offset X
+        case 29: return GD_VAL_FLOAT;  // move offset Y
+        case 30: return GD_VAL_INT;    // move easing
+        case 32: return GD_VAL_FLOAT;  // scale (uniform)
+        case 35: return GD_VAL_FLOAT;  // opacity (alpha trigger)
+        case 41: return GD_VAL_BOOL;   // main_col_HSV_enabled
+        case 42: return GD_VAL_BOOL;   // detail_col_HSV_enabled
+        case 43: return GD_VAL_HSV;    // main_col_HSV
+        case 44: return GD_VAL_HSV;    // detail_col_HSV
+        case 45: return GD_VAL_FLOAT;  // pulse fade_in
+        case 46: return GD_VAL_FLOAT;  // pulse hold
+        case 47: return GD_VAL_FLOAT;  // pulse fade_out
+        case 48: return GD_VAL_INT;    // pulse_mode
+        case 49: return GD_VAL_HSV;    // copied_hsv
+        case 50: return GD_VAL_INT;    // copied_color_id
+        case 51: return GD_VAL_INT;    // target group (triggers)
+        case 52: return GD_VAL_INT;    // pulse_target_type
+        case 54: return GD_VAL_FLOAT;  // teleport portal Y offset
+        case 56: return GD_VAL_BOOL;   // activate group (toggle trigger)
+        case 58: return GD_VAL_BOOL;   // lock to player X (move trigger)
+        case 59: return GD_VAL_BOOL;   // lock to player Y (move trigger)
+        case 62: return GD_VAL_BOOL;   // spawn_triggered
+        case 63: return GD_VAL_FLOAT;  // spawn_delay
+        case 65: return GD_VAL_BOOL;   // pulse main_only
+        case 66: return GD_VAL_BOOL;   // pulse detail_only
+        case 87: return GD_VAL_BOOL;   // multi_triggered
+        case 128: return GD_VAL_FLOAT; // scale X
+        case 129: return GD_VAL_FLOAT; // scale Y
+        case 57: return GD_VAL_INT_ARRAY; // groups
         default:
             return GD_VAL_INT; // Default fallback
     }
@@ -889,10 +940,16 @@ void fill_object_data(int object, int key, GDValueType type, GDValue val) {
             if (type == GD_VAL_INT) objects.id[object] = convert_object(val.i);
             break;
         case 2:  // X
-            if (type == GD_VAL_FLOAT) objects.x[object] = val.f;
+            if (type == GD_VAL_FLOAT) {
+                objects.x[object] = val.f;
+                objects.original_x[object] = val.f;
+            }
             break;
         case 3:  // Y
-            if (type == GD_VAL_FLOAT) objects.y[object] = val.f;
+            if (type == GD_VAL_FLOAT) {
+                objects.y[object] = val.f;
+                objects.original_y[object] = val.f;
+            }
             break;
         case 4:  // FlippedH
             if (type == GD_VAL_BOOL) objects.flippedH[object] = val.b;
@@ -948,6 +1005,99 @@ void fill_object_data(int object, int key, GDValueType type, GDValue val) {
         case 25: // Z order
             if (type == GD_VAL_INT) objects.zorder[object] = val.i;
             break;
+        case 28: // Move offset X
+            if (type == GD_VAL_FLOAT) objects.move_offset_x[object] = val.f;
+            break;
+        case 29: // Move offset Y
+            if (type == GD_VAL_FLOAT) objects.move_offset_y[object] = val.f;
+            break;
+        case 30: // Move easing
+            if (type == GD_VAL_INT) objects.move_easing[object] = val.i;
+            break;
+        case 32: // Scale (uniform)
+            if (type == GD_VAL_FLOAT) {
+                objects.scale_x[object] = objects.scale_y[object] = val.f;
+                objects.original_scale_x[object] = objects.original_scale_y[object] = val.f;
+            }
+            break;
+        case 35: // Opacity (alpha trigger)
+            if (type == GD_VAL_FLOAT) objects.trigger_opacity[object] = val.f;
+            break;
+        case 41: // main_col_HSV_enabled
+            if (type == GD_VAL_BOOL) objects.main_col_HSV_enabled[object] = val.b;
+            break;
+        case 42: // detail_col_HSV_enabled
+            if (type == GD_VAL_BOOL) objects.detail_col_HSV_enabled[object] = val.b;
+            break;
+        case 43: // main_col_HSV
+            if (type == GD_VAL_HSV) objects.main_col_HSV[object] = val.hsv;
+            break;
+        case 44: // detail_col_HSV
+            if (type == GD_VAL_HSV) objects.detail_col_HSV[object] = val.hsv;
+            break;
+        case 45: // pulse fade_in
+            if (type == GD_VAL_FLOAT) objects.pulse_fade_in[object] = val.f;
+            break;
+        case 46: // pulse hold
+            if (type == GD_VAL_FLOAT) objects.pulse_hold[object] = val.f;
+            break;
+        case 47: // pulse fade_out
+            if (type == GD_VAL_FLOAT) objects.pulse_fade_out[object] = val.f;
+            break;
+        case 48: // pulse_mode
+            if (type == GD_VAL_INT) objects.pulse_mode[object] = val.i;
+            break;
+        case 49: // copied_hsv
+            if (type == GD_VAL_HSV) objects.copied_hsv[object] = val.hsv;
+            break;
+        case 50: // copied_color_id
+            if (type == GD_VAL_INT) objects.copied_color_id[object] = val.i;
+            break;
+        case 51: // Target group
+            if (type == GD_VAL_INT) objects.target_group[object] = val.i;
+            break;
+        case 52: // pulse_target_type
+            if (type == GD_VAL_INT) objects.pulse_target_type[object] = val.i;
+            break;
+        case 54: // teleport portal Y offset
+            if (type == GD_VAL_FLOAT) objects.tp_y_offset[object] = val.f;
+            break;
+        case 56: // Activate group
+            if (type == GD_VAL_BOOL) objects.activate_group[object] = val.b;
+            break;
+        case 58: // Lock to player X
+            if (type == GD_VAL_BOOL) objects.lock_to_player_x[object] = val.b;
+            break;
+        case 59: // Lock to player Y
+            if (type == GD_VAL_BOOL) objects.lock_to_player_y[object] = val.b;
+            break;
+        case 62: // spawn_triggered
+            if (type == GD_VAL_BOOL) objects.spawn_triggered[object] = val.b;
+            break;
+        case 63: // spawn_delay
+            if (type == GD_VAL_FLOAT) objects.spawn_delay[object] = val.f;
+            break;
+        case 65: // pulse main_only
+            if (type == GD_VAL_BOOL) objects.pulse_main_only[object] = val.b;
+            break;
+        case 66: // pulse detail_only
+            if (type == GD_VAL_BOOL) objects.pulse_detail_only[object] = val.b;
+            break;
+        case 87: // multi_triggered
+            if (type == GD_VAL_BOOL) objects.multi_triggered[object] = val.b;
+            break;
+        case 128: // Scale X
+            if (type == GD_VAL_FLOAT) {
+                objects.scale_x[object] = val.f;
+                objects.original_scale_x[object] = val.f;
+            }
+            break;
+        case 129: // Scale Y
+            if (type == GD_VAL_FLOAT) {
+                objects.scale_y[object] = val.f;
+                objects.original_scale_y[object] = val.f;
+            }
+            break;
         case 57: // Groups
             if (type == GD_VAL_INT_ARRAY) {
                 int gcount = 0;
@@ -981,6 +1131,15 @@ bool obj_has_detail(const GameObject *obj) {
 
 bool is_valid_object(int id) {
     return id >= 1 && id < GAME_OBJECT_COUNT;
+}
+
+bool is_trigger_object(int id) {
+    return id == COL_TRIGGER
+        || id == MOVE_TRIGGER
+        || id == ALPHA_TRIGGER
+        || id == TOGGLE_TRIGGER
+        || id == PULSE_TRIGGER
+        || id == SPAWN_TRIGGER;
 }
 
 int parse_gd_object(const char *objStr, int obj) {
@@ -1086,7 +1245,7 @@ int parse_gd_object(const char *objStr, int obj) {
         if (objects.x[obj] > level_info.last_obj_x) {
             level_info.last_obj_x = objects.x[obj];
         }
-    } else if (obj_id != COL_TRIGGER) { // Do not replace 2.0 col trigger
+    } else if (!is_trigger_object(obj_id)) { // Keep trigger objects even if outside the table
         // Invalid object
         objects.id[obj] = 0;
     }
@@ -1127,6 +1286,57 @@ void free_arrays() {
     if (objects.toggled)            { free(objects.toggled);            objects.toggled = NULL; }
     if (objects.groups)             { free(objects.groups);             objects.groups = NULL; }
     if (objects.group_count)        { free(objects.group_count);        objects.group_count = NULL; }
+    if (objects.spawn_triggered)        { free(objects.spawn_triggered);        objects.spawn_triggered = NULL; }
+    if (objects.multi_triggered)        { free(objects.multi_triggered);        objects.multi_triggered = NULL; }
+    if (objects.spawn_delay)            { free(objects.spawn_delay);            objects.spawn_delay = NULL; }
+    if (objects.target_group)           { free(objects.target_group);           objects.target_group = NULL; }
+    if (objects.activate_group)         { free(objects.activate_group);         objects.activate_group = NULL; }
+    if (objects.alpha_trigger_opacity)  { free(objects.alpha_trigger_opacity);  objects.alpha_trigger_opacity = NULL; }
+    if (objects.trigger_opacity)        { free(objects.trigger_opacity);        objects.trigger_opacity = NULL; }
+    if (objects.move_offset_x)          { free(objects.move_offset_x);          objects.move_offset_x = NULL; }
+    if (objects.move_offset_y)          { free(objects.move_offset_y);          objects.move_offset_y = NULL; }
+    if (objects.move_easing)            { free(objects.move_easing);            objects.move_easing = NULL; }
+    if (objects.lock_to_player_x)       { free(objects.lock_to_player_x);       objects.lock_to_player_x = NULL; }
+    if (objects.lock_to_player_y)       { free(objects.lock_to_player_y);       objects.lock_to_player_y = NULL; }
+    if (objects.original_x)             { free(objects.original_x);             objects.original_x = NULL; }
+    if (objects.original_y)             { free(objects.original_y);             objects.original_y = NULL; }
+    if (objects.main_pulses)            { free(objects.main_pulses);            objects.main_pulses = NULL; }
+    if (objects.detail_pulses)          { free(objects.detail_pulses);          objects.detail_pulses = NULL; }
+    if (objects.num_main_pulses)        { free(objects.num_main_pulses);        objects.num_main_pulses = NULL; }
+    if (objects.num_detail_pulses)      { free(objects.num_detail_pulses);      objects.num_detail_pulses = NULL; }
+    if (objects.main_being_pulsed)      { free(objects.main_being_pulsed);      objects.main_being_pulsed = NULL; }
+    if (objects.detail_being_pulsed)    { free(objects.detail_being_pulsed);    objects.detail_being_pulsed = NULL; }
+    if (objects.main_non_pulse_color)   { free(objects.main_non_pulse_color);   objects.main_non_pulse_color = NULL; }
+    if (objects.detail_non_pulse_color) { free(objects.detail_non_pulse_color); objects.detail_non_pulse_color = NULL; }
+    if (objects.main_color)             { free(objects.main_color);             objects.main_color = NULL; }
+    if (objects.detail_color)           { free(objects.detail_color);           objects.detail_color = NULL; }
+    if (objects.pulse_fade_in)          { free(objects.pulse_fade_in);          objects.pulse_fade_in = NULL; }
+    if (objects.pulse_hold)             { free(objects.pulse_hold);             objects.pulse_hold = NULL; }
+    if (objects.pulse_fade_out)         { free(objects.pulse_fade_out);         objects.pulse_fade_out = NULL; }
+    if (objects.pulse_mode)             { free(objects.pulse_mode);             objects.pulse_mode = NULL; }
+    if (objects.copied_color_id)        { free(objects.copied_color_id);        objects.copied_color_id = NULL; }
+    if (objects.copied_hsv)             { free(objects.copied_hsv);             objects.copied_hsv = NULL; }
+    if (objects.main_col_HSV_enabled)   { free(objects.main_col_HSV_enabled);   objects.main_col_HSV_enabled = NULL; }
+    if (objects.detail_col_HSV_enabled) { free(objects.detail_col_HSV_enabled); objects.detail_col_HSV_enabled = NULL; }
+    if (objects.main_col_HSV)           { free(objects.main_col_HSV);           objects.main_col_HSV = NULL; }
+    if (objects.detail_col_HSV)         { free(objects.detail_col_HSV);         objects.detail_col_HSV = NULL; }
+    if (objects.pulse_target_type)      { free(objects.pulse_target_type);      objects.pulse_target_type = NULL; }
+    if (objects.pulse_main_only)        { free(objects.pulse_main_only);        objects.pulse_main_only = NULL; }
+    if (objects.pulse_detail_only)      { free(objects.pulse_detail_only);      objects.pulse_detail_only = NULL; }
+    if (objects.cached_main_hsv_src_color)   { free(objects.cached_main_hsv_src_color);   objects.cached_main_hsv_src_color = NULL; }
+    if (objects.cached_detail_hsv_src_color) { free(objects.cached_detail_hsv_src_color); objects.cached_detail_hsv_src_color = NULL; }
+    if (objects.cached_main_hsv_color)       { free(objects.cached_main_hsv_color);       objects.cached_main_hsv_color = NULL; }
+    if (objects.cached_detail_hsv_color)     { free(objects.cached_detail_hsv_color);     objects.cached_detail_hsv_color = NULL; }
+    if (objects.cached_main_hsv_valid)       { free(objects.cached_main_hsv_valid);       objects.cached_main_hsv_valid = NULL; }
+    if (objects.cached_detail_hsv_valid)     { free(objects.cached_detail_hsv_valid);     objects.cached_detail_hsv_valid = NULL; }
+    if (objects.scale_x)                { free(objects.scale_x);                objects.scale_x = NULL; }
+    if (objects.scale_y)                { free(objects.scale_y);                objects.scale_y = NULL; }
+    if (objects.original_scale_x)       { free(objects.original_scale_x);       objects.original_scale_x = NULL; }
+    if (objects.original_scale_y)       { free(objects.original_scale_y);       objects.original_scale_y = NULL; }
+    if (objects.child_object)           { free(objects.child_object);           objects.child_object = NULL; }
+    if (objects.tp_y_offset)            { free(objects.tp_y_offset);            objects.tp_y_offset = NULL; }
+    if (objects.section_x)              { free(objects.section_x);              objects.section_x = NULL; }
+    if (objects.section_y)              { free(objects.section_y);              objects.section_y = NULL; }
     if (objects.dirty)              { free(objects.dirty);              objects.dirty = NULL; }
     if (objects.render_visible)     { free(objects.render_visible);     objects.render_visible = NULL; }
     if (objects.render_seen)        { free(objects.render_seen);        objects.render_seen = NULL; }
@@ -1243,6 +1453,159 @@ bool init_arrays(int count) {
     objects.collided = malloc(sizeof(u8) * count);
     if (!objects.collided) return false;
 
+    objects.original_x = malloc(sizeof(float) * count);
+    if (!objects.original_x) return false;
+
+    objects.original_y = malloc(sizeof(float) * count);
+    if (!objects.original_y) return false;
+
+    objects.spawn_triggered = malloc(sizeof(bool) * count);
+    if (!objects.spawn_triggered) return false;
+
+    objects.multi_triggered = malloc(sizeof(bool) * count);
+    if (!objects.multi_triggered) return false;
+
+    objects.spawn_delay = malloc(sizeof(float) * count);
+    if (!objects.spawn_delay) return false;
+
+    objects.target_group = malloc(sizeof(int) * count);
+    if (!objects.target_group) return false;
+
+    objects.activate_group = malloc(sizeof(bool) * count);
+    if (!objects.activate_group) return false;
+
+    objects.alpha_trigger_opacity = malloc(sizeof(float) * count);
+    if (!objects.alpha_trigger_opacity) return false;
+
+    objects.trigger_opacity = malloc(sizeof(float) * count);
+    if (!objects.trigger_opacity) return false;
+
+    objects.move_offset_x = malloc(sizeof(float) * count);
+    if (!objects.move_offset_x) return false;
+
+    objects.move_offset_y = malloc(sizeof(float) * count);
+    if (!objects.move_offset_y) return false;
+
+    objects.move_easing = malloc(sizeof(int) * count);
+    if (!objects.move_easing) return false;
+
+    objects.lock_to_player_x = malloc(sizeof(bool) * count);
+    if (!objects.lock_to_player_x) return false;
+
+    objects.lock_to_player_y = malloc(sizeof(bool) * count);
+    if (!objects.lock_to_player_y) return false;
+
+    objects.main_pulses = malloc(sizeof(Color[MAX_PULSES_PER_GROUP]) * count);
+    if (!objects.main_pulses) return false;
+
+    objects.detail_pulses = malloc(sizeof(Color[MAX_PULSES_PER_GROUP]) * count);
+    if (!objects.detail_pulses) return false;
+
+    objects.num_main_pulses = malloc(sizeof(u8) * count);
+    if (!objects.num_main_pulses) return false;
+
+    objects.num_detail_pulses = malloc(sizeof(u8) * count);
+    if (!objects.num_detail_pulses) return false;
+
+    objects.main_being_pulsed = malloc(sizeof(bool) * count);
+    if (!objects.main_being_pulsed) return false;
+
+    objects.detail_being_pulsed = malloc(sizeof(bool) * count);
+    if (!objects.detail_being_pulsed) return false;
+
+    objects.main_non_pulse_color = malloc(sizeof(Color) * count);
+    if (!objects.main_non_pulse_color) return false;
+
+    objects.detail_non_pulse_color = malloc(sizeof(Color) * count);
+    if (!objects.detail_non_pulse_color) return false;
+
+    objects.main_color = malloc(sizeof(Color) * count);
+    if (!objects.main_color) return false;
+
+    objects.detail_color = malloc(sizeof(Color) * count);
+    if (!objects.detail_color) return false;
+
+    objects.pulse_fade_in = malloc(sizeof(float) * count);
+    if (!objects.pulse_fade_in) return false;
+
+    objects.pulse_hold = malloc(sizeof(float) * count);
+    if (!objects.pulse_hold) return false;
+
+    objects.pulse_fade_out = malloc(sizeof(float) * count);
+    if (!objects.pulse_fade_out) return false;
+
+    objects.pulse_mode = malloc(sizeof(int) * count);
+    if (!objects.pulse_mode) return false;
+
+    objects.copied_color_id = malloc(sizeof(int) * count);
+    if (!objects.copied_color_id) return false;
+
+    objects.copied_hsv = malloc(sizeof(HSV) * count);
+    if (!objects.copied_hsv) return false;
+
+    objects.main_col_HSV_enabled = malloc(sizeof(bool) * count);
+    if (!objects.main_col_HSV_enabled) return false;
+
+    objects.detail_col_HSV_enabled = malloc(sizeof(bool) * count);
+    if (!objects.detail_col_HSV_enabled) return false;
+
+    objects.main_col_HSV = malloc(sizeof(HSV) * count);
+    if (!objects.main_col_HSV) return false;
+
+    objects.detail_col_HSV = malloc(sizeof(HSV) * count);
+    if (!objects.detail_col_HSV) return false;
+
+    objects.cached_main_hsv_src_color = malloc(sizeof(Color) * count);
+    if (!objects.cached_main_hsv_src_color) return false;
+
+    objects.cached_detail_hsv_src_color = malloc(sizeof(Color) * count);
+    if (!objects.cached_detail_hsv_src_color) return false;
+
+    objects.cached_main_hsv_color = malloc(sizeof(Color) * count);
+    if (!objects.cached_main_hsv_color) return false;
+
+    objects.cached_detail_hsv_color = malloc(sizeof(Color) * count);
+    if (!objects.cached_detail_hsv_color) return false;
+
+    objects.cached_main_hsv_valid = malloc(sizeof(bool) * count);
+    if (!objects.cached_main_hsv_valid) return false;
+
+    objects.cached_detail_hsv_valid = malloc(sizeof(bool) * count);
+    if (!objects.cached_detail_hsv_valid) return false;
+
+    objects.pulse_target_type = malloc(sizeof(int) * count);
+    if (!objects.pulse_target_type) return false;
+
+    objects.pulse_main_only = malloc(sizeof(bool) * count);
+    if (!objects.pulse_main_only) return false;
+
+    objects.pulse_detail_only = malloc(sizeof(bool) * count);
+    if (!objects.pulse_detail_only) return false;
+
+    objects.scale_x = malloc(sizeof(float) * count);
+    if (!objects.scale_x) return false;
+
+    objects.scale_y = malloc(sizeof(float) * count);
+    if (!objects.scale_y) return false;
+
+    objects.original_scale_x = malloc(sizeof(float) * count);
+    if (!objects.original_scale_x) return false;
+
+    objects.original_scale_y = malloc(sizeof(float) * count);
+    if (!objects.original_scale_y) return false;
+
+    objects.child_object = malloc(sizeof(int) * count);
+    if (!objects.child_object) return false;
+
+    objects.tp_y_offset = malloc(sizeof(float) * count);
+    if (!objects.tp_y_offset) return false;
+
+    objects.section_x = malloc(sizeof(int) * count);
+    if (!objects.section_x) return false;
+
+    objects.section_y = malloc(sizeof(int) * count);
+    if (!objects.section_y) return false;
+
     // Initialize the values
     memset(objects.random,             0, sizeof(int) * count);
     memset(objects.id,                 0, sizeof(int) * count);
@@ -1281,6 +1644,76 @@ bool init_arrays(int count) {
     memset(objects.activated,          0, sizeof(u8) * count);
     memset(objects.collided,           0, sizeof(u8) * count);
 
+    for (int i = 0; i < count; i++) {
+        objects.alpha_trigger_opacity[i] = 1.0f;
+        objects.trigger_opacity[i] = 1.0f;
+        objects.scale_x[i] = 1.0f;
+        objects.scale_y[i] = 1.0f;
+        objects.original_scale_x[i] = 1.0f;
+        objects.original_scale_y[i] = 1.0f;
+    }
+
+    memset(objects.spawn_triggered,    0, sizeof(bool) * count);
+    memset(objects.multi_triggered,    0, sizeof(bool) * count);
+    memset(objects.spawn_delay,        0, sizeof(float) * count);
+    memset(objects.target_group,       0, sizeof(int) * count);
+    memset(objects.activate_group,     0, sizeof(bool) * count);
+    memset(objects.move_offset_x,      0, sizeof(float) * count);
+    memset(objects.move_offset_y,      0, sizeof(float) * count);
+    memset(objects.move_easing,        0, sizeof(int) * count);
+    memset(objects.lock_to_player_x,   0, sizeof(bool) * count);
+    memset(objects.lock_to_player_y,   0, sizeof(bool) * count);
+
+    memset(objects.main_pulses,        0, sizeof(Color[MAX_PULSES_PER_GROUP]) * count);
+    memset(objects.detail_pulses,      0, sizeof(Color[MAX_PULSES_PER_GROUP]) * count);
+    memset(objects.num_main_pulses,    0, sizeof(u8) * count);
+    memset(objects.num_detail_pulses,  0, sizeof(u8) * count);
+    memset(objects.main_being_pulsed,  0, sizeof(bool) * count);
+    memset(objects.detail_being_pulsed,0, sizeof(bool) * count);
+
+    for (int i = 0; i < count; i++) {
+        objects.main_non_pulse_color[i].r = 255;
+        objects.main_non_pulse_color[i].g = 255;
+        objects.main_non_pulse_color[i].b = 255;
+        objects.detail_non_pulse_color[i].r = 255;
+        objects.detail_non_pulse_color[i].g = 255;
+        objects.detail_non_pulse_color[i].b = 255;
+        objects.main_color[i].r = 255;
+        objects.main_color[i].g = 255;
+        objects.main_color[i].b = 255;
+        objects.detail_color[i].r = 255;
+        objects.detail_color[i].g = 255;
+        objects.detail_color[i].b = 255;
+    }
+
+    memset(objects.pulse_fade_in,      0, sizeof(float) * count);
+    memset(objects.pulse_hold,         0, sizeof(float) * count);
+    memset(objects.pulse_fade_out,     0, sizeof(float) * count);
+    memset(objects.pulse_mode,         0, sizeof(int) * count);
+    memset(objects.copied_color_id,    0, sizeof(int) * count);
+    memset(objects.copied_hsv,             0, sizeof(HSV) * count);
+    memset(objects.main_col_HSV_enabled,   0, sizeof(bool) * count);
+    memset(objects.detail_col_HSV_enabled, 0, sizeof(bool) * count);
+    memset(objects.main_col_HSV,           0, sizeof(HSV) * count);
+    memset(objects.detail_col_HSV,         0, sizeof(HSV) * count);
+    memset(objects.cached_main_hsv_src_color,  0, sizeof(Color) * count);
+    memset(objects.cached_detail_hsv_src_color, 0, sizeof(Color) * count);
+    memset(objects.cached_main_hsv_color,       0, sizeof(Color) * count);
+    memset(objects.cached_detail_hsv_color,     0, sizeof(Color) * count);
+    memset(objects.cached_main_hsv_valid,       0, sizeof(bool) * count);
+    memset(objects.cached_detail_hsv_valid,     0, sizeof(bool) * count);
+    memset(objects.pulse_target_type,      0, sizeof(int) * count);
+    memset(objects.pulse_main_only,    0, sizeof(bool) * count);
+    memset(objects.pulse_detail_only,  0, sizeof(bool) * count);
+
+    for (int i = 0; i < count; i++) {
+        objects.child_object[i] = -1;
+        objects.tp_y_offset[i] = 0.0f;
+    }
+
+    memset(objects.section_x,           0, sizeof(int) * count);
+    memset(objects.section_y,           0, sizeof(int) * count);
+
     return true;
 }
 
@@ -1291,7 +1724,7 @@ int compare_coins(const void *a, const void *b) {
     return objects.x[*c1] - objects.x[*c2];
 }
 
-int parse_string(const char *levelString) {
+int parse_string(const char *levelString, int extra_slots, int *out_object_count) {
     int sectionCount = 0;
 
     // Split the string in object sections
@@ -1307,13 +1740,15 @@ int parse_string(const char *levelString) {
 
     printf("%d\n", objectCount);
     
-    if (!init_arrays(objectCount)) {
+    if (!init_arrays(objectCount + extra_slots)) {
         free_arrays();
         output_log("Failed to allocate object array\n");
         return LOAD_OUT_OF_MEMORY;
     }
 
-    objects.count = objectCount;
+    objects.count = objectCount + extra_slots;
+
+    if (out_object_count) *out_object_count = objectCount;
 
     printf("Parsing string and converting objects...\n");
     printf("Aproximately %d bytes of pure objects\n", sizeof(ObjectsArray) * objectCount);
@@ -1495,6 +1930,45 @@ void load_online_level_info(char *level_string) {
     snprintf(level_info.creator_name, sizeof(level_info.level_name), "%s", creator_entries[search_entries[curr_search_id].creatorIndex].creatorName);
 }
 
+static void generate_orange_portals(int orange_start) {
+    int next_orange = orange_start;
+    for (int i = 0; i < orange_start; i++) {
+        if (objects.id[i] != BLUE_TP_PORTAL) continue;
+
+        float angle_rad = objects.rotation[i] * (M_PI / 180.0f);
+        float x_off = 10.0f * fabsf(cosf(angle_rad));
+
+        int oi = next_orange++;
+        objects.id[oi]           = ORANGE_TP_PORTAL;
+        objects.x[oi]            = objects.x[i] - x_off;
+        objects.y[oi]            = objects.y[i] + objects.tp_y_offset[i];
+        objects.rotation[oi]     = objects.rotation[i] + 180.0f;
+        objects.flippedH[oi]     = false;
+        objects.flippedV[oi]     = false;
+        objects.opacity[oi]      = 1.0f;
+        objects.toggled[oi]      = false;
+        objects.activated[oi]    = 0;
+        objects.collided[oi]     = 0;
+        objects.child_object[oi] = -1;
+        objects.tp_y_offset[oi]  = 0.0f;
+        objects.original_x[oi]   = objects.x[oi];
+        objects.original_y[oi]   = objects.y[oi];
+        objects.child_object[i]  = oi;
+
+        // Copy groups from blue portal to orange portal
+        objects.group_count[oi] = objects.group_count[i];
+        for (int g = 0; g < objects.group_count[i] && g < MAX_GROUPS_PER_OBJECT; g++) {
+            objects.groups[oi][g] = objects.groups[i][g];
+            if (objects.groups[i][g] > 0) {
+                add_to_group(oi, objects.groups[i][g]);
+            }
+        }
+
+        assign_object_to_section(oi);
+    }
+    objects.count = next_orange;
+}
+
 int load_online_level(char *level_string) {
     bool compressed = true;
     int out_code = LOAD_NO_ERROR;
@@ -1531,12 +2005,23 @@ int load_online_level(char *level_string) {
     // Minimum size
     level_info.last_obj_x = 570.f;
 
-    int returned = parse_string(data);
+    // Count blue teleport portals to reserve extra object slots
+    int extra_slots = 0;
+    const char *scan = data;
+    while ((scan = strstr(scan, "1,747,")) != NULL) {
+        extra_slots++;
+        scan++;
+    }
+    int orange_start = 0;
+
+    int returned = parse_string(data, extra_slots, &orange_start);
 
     free(data);
     free(metaStr);
 
     if (returned) return returned;
+
+    generate_orange_portals(orange_start);
 
     init_col_channels();
     set_color_channels();
@@ -1626,14 +2111,25 @@ int load_level(char *path) {
     // Minimum size
     level_info.last_obj_x = 570.f;
 
-    int returned = parse_string(data);
+    // Count blue teleport portals to reserve extra object slots
+    int extra_slots = 0;
+    const char *scan = data;
+    while ((scan = strstr(scan, "1,747,")) != NULL) {
+        extra_slots++;
+        scan++;
+    }
+    int orange_start = 0;
+
+    int returned = parse_string(data, extra_slots, &orange_start);
 
     free(data);
     free(metaStr);
     free(level);
 
     if (returned) return returned;
-    
+
+    generate_orange_portals(orange_start);
+
     init_col_channels();
     set_color_channels();
 
@@ -1662,6 +2158,25 @@ void reload_level() {
         objects.transition_applied[i] = FADE_NONE;
         objects.toggled[i] = false;
         objects.opacity[i] = 1.f;
+        objects.x[i] = objects.original_x[i];
+        objects.y[i] = objects.original_y[i];
+        objects.alpha_trigger_opacity[i] = 1.0f;
+        objects.scale_x[i] = objects.original_scale_x[i];
+        objects.scale_y[i] = objects.original_scale_y[i];
+        objects.num_main_pulses[i] = 0;
+        objects.num_detail_pulses[i] = 0;
+        objects.main_being_pulsed[i] = false;
+        objects.detail_being_pulsed[i] = false;
+        objects.main_color[i] = (Color){255, 255, 255};
+        objects.detail_color[i] = (Color){255, 255, 255};
+        objects.child_object[i] = -1;
+        objects.tp_y_offset[i] = 0.0f;
+        objects.cached_main_hsv_valid[i] = false;
+        objects.cached_detail_hsv_valid[i] = false;
+    }
+
+    for (int i = 0; i < objects.count; i++) {
+        update_object_section(i);
     }
 
     accumulator = 0.f;

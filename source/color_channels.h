@@ -39,10 +39,6 @@ enum ColorChannelIDs {
 #define MAX_PULSES_PER_CHANNEL 10
 
 typedef struct {
-    unsigned char r,g,b;
-} Color;
-
-typedef struct {
     Color color;
     Color non_pulse_color;
     float alpha;
@@ -72,6 +68,8 @@ extern Color p1_color;
 extern Color p2_color;
 extern Color glow_color;
 
+extern float g_trigger_dt;
+
 #define BG_TRIGGER 29
 #define GROUND_TRIGGER 30
 #define LINE_TRIGGER 104
@@ -83,6 +81,11 @@ extern Color glow_color;
 #define COL4_TRIGGER 743
 #define THREEDL_TRIGGER 744
 #define COL_TRIGGER 899
+#define MOVE_TRIGGER 901
+#define ALPHA_TRIGGER 1007
+#define TOGGLE_TRIGGER 1049
+#define PULSE_TRIGGER 1006
+#define SPAWN_TRIGGER 1268
 
 #define TRIGGER_FADE_SIMPLE 22
 #define TRIGGER_FADE_UP 23

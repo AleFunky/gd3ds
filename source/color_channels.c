@@ -16,6 +16,8 @@ Color p1_color;
 Color p2_color;
 Color glow_color;
 
+float g_trigger_dt = 0.f;
+
 ColorChannel channels[COL_CHANNEL_NUM];
 
 ColTriggerBuffer col_trigger_buffer[COL_CHANNEL_NUM];
