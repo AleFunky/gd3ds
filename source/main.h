@@ -39,6 +39,7 @@ typedef struct {
 } Vec2D;
 
 extern float delta;
+extern float frame_timer;
 extern unsigned int frame_counter;
 
 extern unsigned int level_frame;

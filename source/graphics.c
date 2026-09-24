@@ -2,6 +2,7 @@
 #include "c2d/base.h"
 #include "c2d/spritesheet.h"
 #include "objects.h"
+#include "animations.h"
 #include "main.h"
 #include "math_helpers.h"
 #include "color_channels.h"
@@ -103,6 +104,32 @@ static C2D_SpriteSheet *get_sprite_sheet(int index, int *rel_index) {
     // Return spritesheet 4 (animated objects)
     *rel_index = index - ANIMATEDSHEET_START;
     return &animatedSheet;
+}
+
+const SlotFrames* find_slot_frames(const GameObject* obj, int slot) {
+    for (int i = 0; i < obj->slot_count; i++) {
+        if (obj->slot_frames[i].slot == slot) return &obj->slot_frames[i];
+    }
+    return NULL;
+}
+
+int get_child_group(const GameObject* obj, int child_index) {
+    for (int g = 0; g < obj->group_count; g++) {
+        int end = obj->groups[g].start + obj->groups[g].count;
+        if (child_index >= obj->groups[g].start && child_index < end)
+            return g;
+    }
+    return -1;
+}
+
+const Animation* get_animation_for_object(int id) {
+    switch (id) {
+        case 918: return &animations[ANIM_GJBEAST01_BITE];
+        case 919: return &animations[ANIM_BLACKSLUDGE_LOOP];
+        case 1327: return &animations[ANIM_GJBEAST02_IDLE01];
+        case 1328: return &animations[ANIM_GJBEAST03_IDLE01];
+        default:  return NULL;
+    }
 }
 
 Color get_color_abgr8(u32 color) {
@@ -606,11 +633,23 @@ void spawn_object_at(
     float sx = scale * flip_x_mult;
     float sy = scale * flip_y_mult;
 
+    // get anim for this object
+    const AnimFrame* anim_keyframe = NULL;
+    if (obj->animation_type == ANIMATION_MOVEMENT && obj->group_count > 0) {
+        const Animation* anim = get_animation_for_object(id);
+        if (anim && anim->frame_count > 0) {
+            float time = frame_timer * anim->fps;
+            anim_keyframe = &anim->frames[(int)time % anim->frame_count];
+        }
+    }
+
     if (sprite_count >= MAX_SPRITES - 1) return;
 
     // Spawn parent, skip if no texture
     if (obj->texture >= 0) {
         SpriteObject *vo = &viewable_objects[sprite_count];
+
+        vo->hidden = false;
 
         float local_x = obj->x * flip_x_mult;
         float local_y = obj->y * flip_y_mult;
@@ -655,6 +694,8 @@ void spawn_object_at(
 
         SpriteObject *vo = &viewable_objects[sprite_count];
 
+        vo->hidden = false;
+
         vo->spr = sprite_templates[id].glow_template;
 
         float pulse_scale = get_object_pulse(amplitude, id, 1);
@@ -682,6 +723,8 @@ void spawn_object_at(
         if (c->texture >= 0) {    
             SpriteObject *vo = &viewable_objects[sprite_count];
 
+            vo->hidden = false;
+
             float c_local_x = c->x * flip_x_mult;
             float c_local_y = c->y * flip_y_mult;
 
@@ -694,18 +737,78 @@ void spawn_object_at(
             int c_flip_x_mult = (c->flip_x ? -1 : 1);
             int c_flip_y_mult = (c->flip_y ? -1 : 1);
 
-            vo->spr = sprite_templates[id].child_templates[i]; 
+            float c_rot = C3D_AngleFromDegrees(c->rot) + rad;
+            float c_sx = c->scale_x * sx;
+            float c_sy = c->scale_y * sy;
+
+            // handle movement anims
+            if (anim_keyframe) {
+                int group = get_child_group(obj, i);
+                if (group >= 0) {
+                    const AnimSprite* anim_sprite = NULL;
+                    for (int k = 0; k < anim_keyframe->sprite_count; k++) {
+                        if (anim_keyframe->sprites[k].child_slot == group) {
+                            anim_sprite = &anim_keyframe->sprites[k];
+                            break;
+                        }
+                    }
+
+                    if (anim_sprite) {
+                        float a_local_x = anim_sprite->x * flip_x_mult;
+                        float a_local_y = anim_sprite->y * flip_y_mult;
+
+                        float a_rot_x = a_local_x * m00 + a_local_y * m01;
+                        float a_rot_y = a_local_x * m10 + a_local_y * m11;
+
+                        // TODO: use scale per object
+                        c_x = x + a_rot_x * scale;
+                        c_y = y + a_rot_y * scale;
+
+                        c_rot = C3D_AngleFromDegrees(anim_sprite->rot) + rad;
+
+                        c_sx *= anim_sprite->scale_x;
+                        c_sy *= anim_sprite->scale_y;
+
+                        c_flip_x_mult ^= anim_sprite->flip_x;
+                        c_flip_y_mult ^= anim_sprite->flip_y;
+                    }
+                }
+            }
+
+            // handle frame swap anims
+            if (obj->animation_type == ANIMATION_FRAME_SWAP && obj->frame_count > 0) {
+                const SlotFrames* slot_frames = find_slot_frames(obj, i + 1);
+                if (slot_frames) {
+                    float time = frame_timer * slot_frames->fps;
+                    int index = (int)time % slot_frames->count;
+                    const SwapFrame* swap_frame = &obj->swap_frames[slot_frames->start + index];
+
+                    int rel_index;
+                    C2D_SpriteSheet *sheet = get_sprite_sheet(swap_frame->texture, &rel_index);
+                    C2D_SpriteFromSheet(&vo->spr, *sheet, rel_index);
+                    C2D_SpriteSetCenter(&vo->spr, 0.5f, 0.5f);
+
+                    c_sx *= (swap_frame->flip_x ? -1 : 1);
+                    c_sy *= (swap_frame->flip_y ? -1 : 1);
+                } else {
+                    if (!sprite_templates[id].child_templates) continue;
+                    vo->spr = sprite_templates[id].child_templates[i];
+                }
+            } else {
+                if (!sprite_templates[id].child_templates) continue;
+                vo->spr = sprite_templates[id].child_templates[i];
+            }
 
             float pulse_scale = get_object_pulse(amplitude, id, i + 2);
 
             C2D_SpriteSetPos(&vo->spr, c_x, c_y);
             if (id < 15 || id > 17) {
-                C2D_SpriteSetScale(&vo->spr, c->scale_x * c_flip_x_mult * sx * pulse_scale,
-                                          c->scale_y * c_flip_y_mult * sy * pulse_scale);
-                C2D_SpriteSetRotation(&vo->spr, C3D_AngleFromDegrees(c->rot) + rad);
+                C2D_SpriteSetScale(&vo->spr, c_sx * c_flip_x_mult * pulse_scale,
+                                          c_sy * c_flip_y_mult * pulse_scale);
+                C2D_SpriteSetRotation(&vo->spr, c_rot);
             } else {
-                C2D_SpriteSetScale(&vo->spr, fabsf(c->scale_x * c_flip_x_mult * sx * pulse_scale),
-                                          fabsf(c->scale_y * c_flip_y_mult * sy * pulse_scale));
+                C2D_SpriteSetScale(&vo->spr, fabsf(c_sx * c_flip_x_mult * pulse_scale),
+                                          fabsf(c_sy * c_flip_y_mult * pulse_scale));
             }
 
             vo->obj = obj_game;
@@ -1464,6 +1567,10 @@ void create_objects() {
 
         // Check for pulsing objects, they are dirty
         if (object_has_pulse(id)) objects.dirty[obj] = true;
+
+        // animated objs need to be respawned every frame
+        if (game_objects[id].animation_type == ANIMATION_MOVEMENT)
+            objects.dirty[obj] = true;
 
         // Secret coin is animated
         if (id == SECRET_COIN) objects.dirty[obj] = true;
