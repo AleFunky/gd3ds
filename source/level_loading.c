@@ -10,6 +10,7 @@
 #include "main.h"
 #include "menus/creator_menu/online/online_menu.h"
 #include "objects.h"
+#include "groups.h"
 #include "mp3_player.h"
 #include "graphics.h"
 #include "math_helpers.h"
@@ -739,6 +740,7 @@ GDValueType get_value_type_for_key(int key) {
         case 23: return GD_VAL_INT;    // (Color trigger) Target color ID
         case 24: return GD_VAL_INT;    // Zlayer
         case 25: return GD_VAL_INT;    // Zorder
+        case 57: return GD_VAL_INT_ARRAY; // Groups
         default:
             return GD_VAL_INT; // Default fallback
     }
@@ -938,6 +940,16 @@ void fill_object_data(int object, int key, GDValueType type, GDValue val) {
         case 25: // Z order
             if (type == GD_VAL_INT) objects.zorder[object] = val.i;
             break;
+        case 57: // Groups
+            if (type == GD_VAL_INT_ARRAY) {
+                int gcount = 0;
+                for (int i = 0; i < MAX_GROUPS_PER_OBJECT; i++) {
+                    objects.groups[object][i] = val.int_array[i];
+                    if (val.int_array[i] != 0) gcount++;
+                }
+                objects.group_count[object] = gcount;
+            }
+            break;
     }
 }
 
@@ -1105,6 +1117,8 @@ void free_arrays() {
     if (objects.flippedH)           { free(objects.flippedH);           objects.flippedH = NULL; }
     if (objects.flippedV)           { free(objects.flippedV);           objects.flippedV = NULL; }
     if (objects.toggled)            { free(objects.toggled);            objects.toggled = NULL; }
+    if (objects.groups)             { free(objects.groups);             objects.groups = NULL; }
+    if (objects.group_count)        { free(objects.group_count);        objects.group_count = NULL; }
     if (objects.dirty)              { free(objects.dirty);              objects.dirty = NULL; }
     if (objects.render_visible)     { free(objects.render_visible);     objects.render_visible = NULL; }
     if (objects.render_seen)        { free(objects.render_seen);        objects.render_seen = NULL; }
@@ -1200,6 +1214,12 @@ bool init_arrays(int count) {
     objects.toggled = malloc(sizeof(bool) * count);
     if (!objects.toggled) return false;
 
+    objects.groups = malloc(sizeof(short[MAX_GROUPS_PER_OBJECT]) * count);
+    if (!objects.groups) return false;
+
+    objects.group_count = malloc(sizeof(u8) * count);
+    if (!objects.group_count) return false;
+
     objects.dirty = malloc(sizeof(bool) * count);
     if (!objects.dirty) return false;
 
@@ -1245,6 +1265,8 @@ bool init_arrays(int count) {
     memset(objects.flippedH,           0, sizeof(bool) * count);
     memset(objects.flippedV,           0, sizeof(bool) * count);
     memset(objects.toggled,            0, sizeof(bool) * count);
+    memset(objects.groups,             0, sizeof(short[MAX_GROUPS_PER_OBJECT]) * count);
+    memset(objects.group_count,        0, sizeof(u8) * count);
     memset(objects.dirty,              1, sizeof(bool) * count); // Dirty by default (needs to be created lol)
     memset(objects.render_visible,     0, sizeof(bool) * count);
     memset(objects.render_seen,        0, sizeof(u8) * count);
@@ -1299,6 +1321,15 @@ int parse_string(const char *levelString) {
         }
 
         assign_object_to_section(i);
+    }
+
+    for (int i = 0; i < objectCount; i++) {
+        for (int g = 0; g < objects.group_count[i]; g++) {
+            int group_id = objects.groups[i][g];
+            if (group_id > 0) {
+                add_to_group(i, group_id);
+            }
+        }
     }
 
     qsort(coin_ids, coin_count, sizeof(int), compare_coins);
@@ -1597,6 +1628,8 @@ int load_level(char *path) {
 }
 
 void reload_level() {
+    clear_groups();
+
     for (int i = 0; i < objects.count; i++) {
         objects.activated[i] = false;
         objects.collided[i] = false;
@@ -1611,9 +1644,19 @@ void reload_level() {
 
     init_col_channels();
     set_color_channels();
+
+    for (int i = 0; i < objects.count; i++) {
+        for (int g = 0; g < objects.group_count[i]; g++) {
+            int group_id = objects.groups[i][g];
+            if (group_id > 0) {
+                add_to_group(i, group_id);
+            }
+        }
+    }
 }
 
 void unload_level() {
+    clear_groups();
     reset_render_cache();
     free_arrays();
     free_sections();

@@ -66,6 +66,9 @@ typedef struct {
     };
     bool *flippedH, *flippedV;
     bool *toggled;
+
+    short (*groups)[MAX_GROUPS_PER_OBJECT];
+    u8 *group_count;
     bool *dirty;
     bool *render_visible;
     bool *render_seen;
