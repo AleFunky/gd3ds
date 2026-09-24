@@ -398,9 +398,10 @@ static void handle_stack_fading(){
             }
         }
         fixed_dt = true;
+    } else{
+        //make sure there's at least a frame of black
+        stack->fade_time += FADE_SPEED * DT;
     }
-    
-    stack->fade_time += FADE_SPEED * DT;
 }
 
 void ui_stack_update(UIInput *input){

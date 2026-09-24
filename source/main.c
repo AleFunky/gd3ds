@@ -668,12 +668,6 @@ void ui_loop(){
         touch.up = hidKeysUp();
         hidCircleRead(&touch.cpad);
 
-        if (touch.down & KEY_SELECT) {
-            game_state = STATE_EXIT;
-            stop_mp3();
-            break; // break in order to return to hbmenu
-        }
-
         ui_stack_update(&touch);
         
         // Frees a render target, so keep it out of the frame below
@@ -1225,7 +1219,7 @@ void game_loop() {
         update_stereo_target();
 
         // Handle level being completed
-        if (level_info.completing && !exiting_level) {
+        if (level_info.completing) {
             int status = handle_wall_cutscene(delta, &touch);
             // Exiting
             if (status == 1) {
