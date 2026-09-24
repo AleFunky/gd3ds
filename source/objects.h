@@ -15,6 +15,12 @@ typedef enum {
 } CollisionShape;
 
 typedef enum {
+   ANIMATION_NONE = 0,
+   ANIMATION_MOVEMENT,
+   ANIMATION_FRAME_SWAP
+} AnimationType;
+
+typedef enum {
    COLOR_TYPE_BASE = 0,
    COLOR_TYPE_DETAIL,
    COLOR_TYPE_BLACK,
@@ -41,6 +47,23 @@ typedef struct {
 } ChildSprite;
 
 typedef struct {
+    int start;
+    int count;
+} ChildGroup;
+
+typedef struct {
+    int texture;
+    int flip_x, flip_y;
+} SwapFrame;
+
+typedef struct {
+    int slot;
+    float fps;
+    int start;
+    int count;
+} SlotFrames;
+
+typedef struct {
    int collision_type;
    float x, y;
    float width, height;
@@ -54,15 +77,23 @@ typedef struct {
     int z_layer;
     int z_order;
     int base_color;
+    int detail_color;
     int color_type;
     int swap_base_detail;
     float opacity;
     int child_count;
     const ChildSprite* children;
     const ObjectHitbox* hitbox;
+    int animation_type;
+    int group_count;
+    const ChildGroup* groups;
+    int frame_count;
+    const SwapFrame* swap_frames;
+    int slot_count;
+    const SlotFrames* slot_frames;
 } GameObject;
 
 #define TEXTURE_COUNT 1574
-#define GAME_OBJECT_COUNT 746
+#define GAME_OBJECT_COUNT 1330
 
 extern const GameObject game_objects[GAME_OBJECT_COUNT];
