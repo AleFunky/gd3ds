@@ -170,14 +170,17 @@ void cache_all_sprites() {
         const GameObject* obj = &game_objects[id];
 
         // Skip if object has no texture
-        if (obj->texture < 0) continue;
+        if (obj->texture < 0 && obj->child_count == 0) continue;
 
-        int tex;
-        C2D_SpriteSheet *sheet = get_sprite_sheet(obj->texture, &tex);
+        // parent template (if object has a parent textur
+        if (obj->texture >= 0) {
+            int tex;
+            C2D_SpriteSheet *sheet = get_sprite_sheet(obj->texture, &tex);
 
-        C2D_SpriteFromSheet(&sprite_templates[id].parent_template, *sheet, tex);
-        C3D_TexSetFilter(sprite_templates[id].parent_template.image.tex, GPU_LINEAR, GPU_LINEAR);
-        C2D_SpriteSetCenter(&sprite_templates[id].parent_template, 0.5f, 0.5f);
+            C2D_SpriteFromSheet(&sprite_templates[id].parent_template, *sheet, tex);
+            C3D_TexSetFilter(sprite_templates[id].parent_template.image.tex, GPU_LINEAR, GPU_LINEAR);
+            C2D_SpriteSetCenter(&sprite_templates[id].parent_template, 0.5f, 0.5f);
+        }
 
         // Get glow frame
         if (obj->glow_frame >= 0) {
