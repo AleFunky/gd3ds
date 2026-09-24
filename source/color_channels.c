@@ -22,23 +22,17 @@ ColTriggerBuffer col_trigger_buffer[COL_CHANNEL_NUM];
 
 // Convert channel id to buffer index
 int get_col_channel_index(int channel) {
-    if (channel >= CHANNEL_SPECIAL_START) {
-        return (channel - CHANNEL_SPECIAL_START) + CHANNEL_NORMAL_END;
-    } else if (channel < 0 || channel >= CHANNEL_NORMAL_END) {
+    if (channel < 0 || channel >= COL_CHANNEL_NUM) {
         return 0;
     }
-
     return channel;
 }
 
 // Convert from buffer index to channel id
 int get_col_channel_from_index(int index) {
-    if (index >= CHANNEL_NORMAL_END) {
-        return (index - CHANNEL_NORMAL_END) + CHANNEL_SPECIAL_START;
-    } else if (index < 0 || index >= COL_CHANNEL_NUM) {
+    if (index < 0 || index >= COL_CHANNEL_NUM) {
         return 0;
     }
-
     return index;
 }
 
@@ -57,19 +51,93 @@ int convert_one_point_nine_channel(int channel) {
     return channel;
 }
 
+Color HSV_combine(Color base, HSV hsv) {
+    if (hsv.h == 0 && hsv.s == 0 && hsv.v == 0)
+        return base;
+
+    float r = base.r / 255.f;
+    float g = base.g / 255.f;
+    float b = base.b / 255.f;
+
+    float cmax = fmaxf(fmaxf(r, g), b);
+    float cmin = fminf(fminf(r, g), b);
+    float delta = cmax - cmin;
+
+    float hue = 0.f;
+    if (delta != 0.f) {
+        if (cmax == r) hue = 60.f * fmodf((g - b) / delta, 6.f);
+        else if (cmax == g) hue = 60.f * ((b - r) / delta + 2.f);
+        else hue = 60.f * ((r - g) / delta + 4.f);
+    }
+    if (hue < 0.f) hue += 360.f;
+
+    float sat = (cmax == 0.f) ? 0.f : delta / cmax;
+    float val = cmax;
+
+    hue += hsv.h;
+    if (hsv.sChecked) sat += hsv.s;
+    else sat *= hsv.s;
+    if (hsv.vChecked) val += hsv.v;
+    else val *= hsv.v;
+
+    while (hue < 0.f) hue += 360.f;
+    while (hue >= 360.f) hue -= 360.f;
+    sat = fminf(fmaxf(sat, 0.f), 1.f);
+    val = fminf(fmaxf(val, 0.f), 1.f);
+
+    if (sat == 0.f) {
+        unsigned char v = (unsigned char)(val * 255.f);
+        Color c = { v, v, v };
+        return c;
+    }
+
+    float h = hue / 60.f;
+    float hi = floorf(h);
+    float f = h - hi;
+    float p = val * (1.f - sat);
+    float q = val * (1.f - sat * f);
+    float t = val * (1.f - sat * (1.f - f));
+
+    float rr, gg, bb;
+    switch ((int)hi) {
+        case 0: case 6: rr = val; gg = t;   bb = p; break;
+        case 1:         rr = q;   gg = val; bb = p; break;
+        case 2:         rr = p;   gg = val; bb = t; break;
+        case 3:         rr = p;   gg = q;   bb = val; break;
+        case 4:         rr = t;   gg = p;   bb = val; break;
+        default:        rr = val; gg = p;   bb = q; break;
+    }
+
+    Color result = {
+        (unsigned char)(fminf(rr, 1.f) * 255.f),
+        (unsigned char)(fminf(gg, 1.f) * 255.f),
+        (unsigned char)(fminf(bb, 1.f) * 255.f)
+    };
+    return result;
+}
+
 void init_col_channels() {
     memset(col_trigger_buffer, 0, sizeof(col_trigger_buffer));
 
     channels[0].color.r = 0;
     channels[0].color.g = 0;
     channels[0].color.b = 0;
+    channels[0].alpha = 1.0f;
     channels[0].blending = false;
+    channels[0].copy_color_id = 0;
+    memset(&channels[0].hsv, 0, sizeof(HSV));
 
     for (size_t chan = 1; chan < COL_CHANNEL_NUM; chan++) {
         channels[chan].color.r = 255;
         channels[chan].color.g = 255;
         channels[chan].color.b = 255;
+        channels[chan].non_pulse_color = channels[chan].color;
+        channels[chan].alpha = 1.0f;
         channels[chan].blending = false;
+        channels[chan].copy_color_id = 0;
+        channels[chan].num_pulses = 0;
+        memset(channels[chan].pulses, 0, sizeof(channels[chan].pulses));
+        memset(&channels[chan].hsv, 0, sizeof(HSV));
         col_trigger_buffer[chan].active = false;
     }
 
@@ -119,35 +187,51 @@ void init_col_channels() {
     channels[lbg].color.b = 255;
     channels[lbg].blending = true;
 
+    
+    int black_chn = get_col_channel_index(CHANNEL_BLACK);
+    channels[black_chn].color.r = 0;
+    channels[black_chn].color.g = 0;
+    channels[black_chn].color.b = 0;
+    channels[black_chn].blending = false;
+
+    int white_chn = get_col_channel_index(CHANNEL_WHITE);
+    channels[white_chn].color.r = 255;
+    channels[white_chn].color.g = 255;
+    channels[white_chn].color.b = 255;
+    channels[white_chn].blending = false;
+
+    int yellow_glow = get_col_channel_index(CHANNEL_YELLOW_GLOW_INTERNAL);
+    channels[yellow_glow].color.r = 255;
+    channels[yellow_glow].color.g = 255;
+    channels[yellow_glow].color.b = 0;
+    channels[yellow_glow].blending = true;
+
     int blue_glow = get_col_channel_index(CHANNEL_BLUE_GLOW);
     channels[blue_glow].color.r = 0;
     channels[blue_glow].color.g = 255;
     channels[blue_glow].color.b = 255;
     channels[blue_glow].blending = true;
 
-    int yellow_glow = get_col_channel_index(CHANNEL_YELLOW_GLOW);
-    channels[yellow_glow].color.r = 255;
-    channels[yellow_glow].color.g = 255;
-    channels[yellow_glow].color.b = 0;
-    channels[yellow_glow].blending = true;
-
     int pink_glow = get_col_channel_index(CHANNEL_PINK_GLOW);
     channels[pink_glow].color.r = 255;
     channels[pink_glow].color.g = 0;
     channels[pink_glow].color.b = 255;
     channels[pink_glow].blending = true;
-
-    int white_chn = get_col_channel_index(CHANNEL_WHITE);
-    channels[white_chn].color.r = 255;
-    channels[white_chn].color.g = 255;
-    channels[white_chn].color.b = 255;
-    channels[white_chn].blending = true;
     
     int invis_glow = get_col_channel_index(CHANNEL_INVISIBLE_GLOW);
     channels[invis_glow].color.r = 255;
     channels[invis_glow].color.g = 255;
     channels[invis_glow].color.b = 255;
     channels[invis_glow].blending = true;
+    
+    int white_glow = get_col_channel_index(CHANNEL_WHITE_GLOW);
+    channels[white_glow].color.r = 255;
+    channels[white_glow].color.g = 255;
+    channels[white_glow].color.b = 255;
+    channels[white_glow].blending = true;
+
+    for (int i = 0; i < COL_CHANNEL_NUM; i++)
+        channels[i].non_pulse_color = channels[i].color;
 }
 
 void handle_col_channel(int chan) {

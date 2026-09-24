@@ -1,5 +1,6 @@
 #include "practice.h"
 #include "icons.h"
+#include <stdlib.h>
 #include "level_loading.h"
 #include "main.h"
 #include "graphics.h"
@@ -12,6 +13,7 @@
 #include "menus/settings_hub/settings.h"
 
 #define MAX_CHECKPOINTS 100
+#define MAX_CHECKPOINT_CHANNELS (COL_CHANNEL_LAST + 256)
 #define CHECKPOINT_GFX_ID 6
 
 typedef struct CheckpointData {
@@ -47,9 +49,13 @@ typedef struct CheckpointData {
     int current_fading_effect;
     bool p1_trail;
 
-    ColorChannel channels[COL_CHANNEL_NUM];
-    ColTriggerBuffer col_trigger_buffer[COL_CHANNEL_NUM];
-    
+    // snapshot only of the color channels actually used by the level to avoid a 1024 entry copy per checkpoint
+    // allocated dynamically in new_checkpoint() (tis is great)
+    int channel_snapshot_count;
+    int *channel_indices;
+    ColorChannel *channel_snapshot;
+    ColTriggerBuffer *trigger_snapshot;
+
     float song_offset;
 
 } CheckpointData;
@@ -59,6 +65,54 @@ int checkpoint_count = 0;
 int checkpoint_pointer = 0;
 float checkpoint_timer = 0;
 bool pseudo_checkpoint_exists = false;
+
+// max number of distinct channel indices a level can use: built-in special
+// channels + a generous cap for the level's own channels
+#define MAX_CHECKPOINT_CHANNELS (COL_CHANNEL_LAST + 256)
+
+// collects the array indices of every color channel that the level can touch
+// and returns how many unique indices were written to 'out'
+static int collect_used_channels(int *out) {
+    int n = 0;
+
+    // normal player channels
+    out[n++] = get_col_channel_index(NONE);
+    out[n++] = get_col_channel_index(COL_1);
+    out[n++] = get_col_channel_index(COL_2);
+    out[n++] = get_col_channel_index(COL_3);
+    out[n++] = get_col_channel_index(COL_4);
+
+    // built-in special channels
+    for (int id = CHANNEL_BG; id < COL_CHANNEL_LAST; id++) {
+        int idx = get_col_channel_index(id);
+        bool seen = false;
+        for (int i = 0; i < n; i++) {
+            if (out[i] == idx) { seen = true; break; }
+        }
+        if (!seen && idx < COL_CHANNEL_NUM) out[n++] = idx;
+    }
+
+    // channels declared in the level
+    for (int i = 0; i < channelCount && n < MAX_CHECKPOINT_CHANNELS; i++) {
+        int idx = get_col_channel_index(colorChannels[i].channelID);
+        if (idx < 0 || idx >= COL_CHANNEL_NUM) continue;
+        bool seen = false;
+        for (int j = 0; j < n; j++) {
+            if (out[j] == idx) { seen = true; break; }
+        }
+        if (!seen) out[n++] = idx;
+    }
+
+    return n;
+}
+
+// frees the dynamic snapshot buffers of a checkpoint
+static void free_checkpoint_snapshot(CheckpointData *check) {
+    if (check->channel_indices) { free(check->channel_indices); check->channel_indices = NULL; }
+    if (check->channel_snapshot) { free(check->channel_snapshot); check->channel_snapshot = NULL; }
+    if (check->trigger_snapshot) { free(check->trigger_snapshot); check->trigger_snapshot = NULL; }
+    check->channel_snapshot_count = 0;
+}
 
 // static const int checkpoint_size = sizeof(checkpoints);
 
@@ -84,6 +138,9 @@ void new_checkpoint() {
     if (++checkpoint_count > MAX_CHECKPOINTS) checkpoint_count = MAX_CHECKPOINTS;
 
     CheckpointData *check = &checkpoints[checkpoint_pointer];
+
+    // release the snapshot of the checkpoint we are about to overwrite
+    free_checkpoint_snapshot(check);
 
     check->camera_x = state.camera_x;
     check->camera_y = state.camera_y;
@@ -117,8 +174,26 @@ void new_checkpoint() {
 
     check->song_offset = level_info.song_offset + state.player.timeElapsed;
 
-    memcpy(check->channels, channels, sizeof(channels));
-    memcpy(check->col_trigger_buffer, col_trigger_buffer, sizeof(col_trigger_buffer));
+    // snapshot only the channels used by this level
+    int used[MAX_CHECKPOINT_CHANNELS];
+    int used_count = collect_used_channels(used);
+
+    check->channel_indices = malloc(sizeof(int) * used_count);
+    check->channel_snapshot = malloc(sizeof(ColorChannel) * used_count);
+    check->trigger_snapshot = malloc(sizeof(ColTriggerBuffer) * used_count);
+    check->channel_snapshot_count = used_count;
+
+    if (!check->channel_indices || !check->channel_snapshot || !check->trigger_snapshot) {
+        free_checkpoint_snapshot(check);
+        return;
+    }
+
+    for (int i = 0; i < used_count; i++) {
+        int idx = used[i];
+        check->channel_indices[i] = idx;
+        check->channel_snapshot[i] = channels[idx];
+        check->trigger_snapshot[i] = col_trigger_buffer[idx];
+    }
 
     set_checkpoint_timer(AUTO_CHECKPOINT_TIME);
 }
@@ -164,8 +239,11 @@ void restore_checkpoint() {
 
     if (settingsState.practiceMusicSync) seek_mp3(check->song_offset);
     
-    memcpy(channels, check->channels, sizeof(channels));
-    memcpy(col_trigger_buffer, check->col_trigger_buffer, sizeof(col_trigger_buffer));
+    for (int i = 0; i < check->channel_snapshot_count; i++) {
+        int idx = check->channel_indices[i];
+        channels[idx] = check->channel_snapshot[i];
+        col_trigger_buffer[idx] = check->trigger_snapshot[i];
+    }
 
     update_attempt_text_pos();
 
@@ -180,16 +258,23 @@ void delete_last_checkpoint() {
         if (checkpoint_pointer-- == 0) {
             checkpoint_pointer = MAX_CHECKPOINTS - 1;
         }
+
+        free_checkpoint_snapshot(&checkpoints[checkpoint_pointer]);
     }
 }
 
 void clear_practice_mode() {
+    for (int i = 0; i < MAX_CHECKPOINTS; i++) {
+        free_checkpoint_snapshot(&checkpoints[i]);
+    }
     checkpoint_count = 0;
     checkpoint_pointer = 0;
     state.practice_mode = false;
 }
-
 void start_practice_mode() {
+    for (int i = 0; i < MAX_CHECKPOINTS; i++) {
+        free_checkpoint_snapshot(&checkpoints[i]);
+    }
     checkpoint_count = 0;
     checkpoint_pointer = 0;
     pseudo_checkpoint_exists = false;
