@@ -9,10 +9,20 @@
 
 #define SECTION_SIZE 128
 
+typedef struct {
+    float h;
+    float s;
+    float v;
+    bool sChecked;
+    bool vChecked;
+} HSV;
+
 typedef enum {
     GD_VAL_INT,
     GD_VAL_FLOAT,
     GD_VAL_BOOL,
+    GD_VAL_HSV,
+    GD_VAL_INT_ARRAY,
     GD_VAL_UNKNOWN
 } GDValueType;
 
@@ -20,6 +30,8 @@ typedef union {
     int i;
     float f;
     bool b;
+    HSV hsv;
+    short int_array[MAX_GROUPS_PER_OBJECT];
 } GDValue;
 
 typedef struct {
