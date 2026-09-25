@@ -1527,9 +1527,11 @@ void update_tints() {
                 col.color.r = 255;
                 col.color.g = 255;
                 col.color.b = 255;
+                col.alpha = 1.0f;
                 col.blending = false;
             } else if (col_channel == CHANNEL_INVISIBLE_GLOW) { // Handle invisible blocks color lerping
                 int chan = get_col_channel_index(CHANNEL_LBG_NOLERP);
+                col.alpha = channels[chan].alpha;
 
                 Color lbg = channels[chan].color;
                 Color p1 = get_white_if_black(p1_color);
@@ -1579,7 +1581,7 @@ void update_tints() {
                 else opacity *= fading_opacity;
             }
 
-            int real_opacity = get_obj_opacity(game_object, x) * opacity;
+            int real_opacity = get_obj_opacity(game_object, x) * opacity * col.alpha;
 
             // Set opacity here
             if (obj->layer == 0) objects.opacity[game_object] = real_opacity / 255.f;

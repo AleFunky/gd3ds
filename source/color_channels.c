@@ -243,22 +243,35 @@ void handle_col_channel(int chan) {
 
     if (buffer->active) {
         Color lerped_color;
+        float lerped_alpha;
         Color color_to_lerp = buffer->new_color;
+
+        if (buffer->copied_color_id > 0) {
+            int src = get_col_channel_index(buffer->copied_color_id);
+            color_to_lerp = channels[src].color;
+            buffer->new_alpha = channels[src].alpha;
+        }
 
         if (buffer->seconds > 0) {
             float multiplier = buffer->time_run / buffer->seconds;
             lerped_color = color_lerp(buffer->old_color, color_to_lerp, multiplier);
+            lerped_alpha = (buffer->new_alpha - buffer->old_alpha) * multiplier + buffer->old_alpha;
         } else {
             lerped_color = color_to_lerp;
+            lerped_alpha = buffer->new_alpha;
         }
 
         channels[channel].color = lerped_color;
+        channels[channel].non_pulse_color = lerped_color;
+        channels[channel].alpha = lerped_alpha;
 
-        buffer->time_run += DT;
+        buffer->time_run += g_trigger_dt;
 
         if (buffer->time_run > buffer->seconds) {
             buffer->active = false;
             channels[channel].color = color_to_lerp;
+            channels[channel].non_pulse_color = color_to_lerp;
+            channels[channel].alpha = buffer->new_alpha;
         }
     }
 }
@@ -273,20 +286,47 @@ void handle_col_triggers() {
     }
 }
 
+void handle_copy_channels() {
+    for (int chan = 0; chan < COL_CHANNEL_NUM; chan++) {
+        int copy_id = channels[chan].copy_color_id;
+        if (copy_id > 0) {
+            int src = get_col_channel_index(copy_id);
+            Color color = channels[src].color;
+            channels[chan].color = HSV_combine(color, channels[chan].hsv);
+            channels[chan].non_pulse_color = channels[chan].color;
+        }
+    }
+}
+
 void upload_to_buffer(int obj, int channel) {
     if (channel == 0) channel = 1;
     int buffer_channel = get_col_channel_index(channel);
 
     ColTriggerBuffer *buffer = &col_trigger_buffer[buffer_channel];
     buffer->old_color = channels[buffer_channel].color;
+    buffer->old_alpha = channels[buffer_channel].alpha;
     if (objects.p1_color[obj]) {
         buffer->new_color = get_p2_if_black(p1_color);
+        buffer->new_alpha = 1.0f;
     } else if (objects.p2_color[obj]) {
         buffer->new_color = get_p1_if_black(p2_color);
+        buffer->new_alpha = 1.0f;
     } else {
         buffer->new_color.r = objects.trig_colorR[obj];
         buffer->new_color.g = objects.trig_colorG[obj];
         buffer->new_color.b = objects.trig_colorB[obj];
+        buffer->new_alpha = objects.trigger_opacity[obj];
+    }
+
+    int copy_id = objects.copied_color_id[obj];
+    if (copy_id > 0) {
+        buffer->copied_color_id = copy_id;
+        buffer->copied_hsv = objects.copied_hsv[obj];
+        channels[buffer_channel].copy_color_id = copy_id;
+        channels[buffer_channel].hsv = objects.copied_hsv[obj];
+    } else {
+        buffer->copied_color_id = 0;
+        channels[buffer_channel].copy_color_id = 0;
     }
 
     if (channel < CHANNEL_BG) {
@@ -297,7 +337,15 @@ void upload_to_buffer(int obj, int channel) {
     if (objects.trig_duration[obj] == 0) {
         Color color_to_lerp = buffer->new_color;
 
+        if (buffer->copied_color_id > 0) {
+            int src = get_col_channel_index(buffer->copied_color_id);
+            color_to_lerp = channels[src].color;
+            buffer->new_alpha = channels[src].alpha;
+        }
+
         channels[buffer_channel].color = color_to_lerp;
+        channels[buffer_channel].non_pulse_color = color_to_lerp;
+        channels[buffer_channel].alpha = buffer->new_alpha;
         return;
     }
     
@@ -311,9 +359,11 @@ void upload_color_to_buffer(int channel, u32 color, float seconds) {
 
     ColTriggerBuffer *buffer = &col_trigger_buffer[buffer_channel];
     buffer->old_color = channels[buffer_channel].color;
+    buffer->old_alpha = channels[buffer_channel].alpha;
     buffer->new_color.r = GET_R(color);
     buffer->new_color.g = GET_G(color);
     buffer->new_color.b = GET_B(color);
+    buffer->new_alpha = 1.0f;
     buffer->seconds = seconds;
     buffer->time_run = 0;
     buffer->active = true;
@@ -401,6 +451,10 @@ void run_trigger(int obj) {
             
         case THREEDL_TRIGGER: // 3DL
             upload_to_buffer(obj, CHANNEL_3DL);
+            break;
+
+        case GROUND_2_TRIGGER:
+            upload_to_buffer(obj, CHANNEL_GROUND_2);
             break;
 
         case ENABLE_TRAIL:
