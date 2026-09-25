@@ -1619,7 +1619,6 @@ int main(int argc, char* argv[]) {
     C2D_SpriteSheetFree(animatedSheet);
     C2D_SpriteSheetFree(glowSheet);
     C2D_SpriteSheetFree(bgSheet);
-    C2D_SpriteSheetFree(bg2Sheet);
     C2D_SpriteSheetFree(cube0Sheet);
     C2D_SpriteSheetFree(cube1Sheet);
     C2D_SpriteSheetFree(shipSheet);

@@ -56,7 +56,7 @@ C2D_SpriteSheet spriteSheet3;
 C2D_SpriteSheet animatedSheet;
 C2D_SpriteSheet glowSheet;
 C2D_SpriteSheet bgSheet;
-C2D_SpriteSheet bg2Sheet;
+int loaded_bg_sheet = 0;
 C2D_SpriteSheet groundSheet;
 C2D_SpriteSheet cube0Sheet;
 C2D_SpriteSheet cube1Sheet;
@@ -1177,6 +1177,10 @@ void draw_background(float x, float y) {
     float draw_y = -y;
 
     int bg_id = level_info.background_id;
+    int bg_idx = bg_id & 0b11;
+
+    // guard against an out-of-range sprite index for the loaded sheet
+    if (bgSheet == NULL || (size_t)bg_idx >= C2D_SpriteSheetCount(bgSheet)) return;
 
     for (int i = -1; i < 3; i++) {
         C2D_Sprite bg = { 0 };
@@ -1184,13 +1188,15 @@ void draw_background(float x, float y) {
         float draw_x = -calc_x + i * offset;
 
         
-        C2D_SpriteFromSheet(&bg, bg_id < 4 ? bgSheet : bg2Sheet, bg_id & 0b11);
+        C2D_SpriteFromSheet(&bg, bgSheet, bg_idx);
         C3D_TexSetFilter(bg.image.tex, GPU_LINEAR, GPU_LINEAR);
         C2D_SpriteSetPos(&bg, (int)draw_x, (int)draw_y);
         C2D_SpriteSetScale(&bg, BACKGROUND_SCALE, BACKGROUND_SCALE);
         C2D_DrawSpriteTinted(&bg, &tint);
     }
 }
+
+const int ground_indexes[G_COUNT] = {1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14};
 
 void draw_ground(float cam_x, float cam_y, float y, bool is_ceiling, int screen_width) {
     change_blending(false);
@@ -1200,19 +1206,53 @@ void draw_ground(float cam_x, float cam_y, float y, bool is_ceiling, int screen_
     Color col = channels[get_col_channel_index(CHANNEL_GROUND)].color;
     C2D_PlainImageTint(&tint, C2D_Color32(col.r, col.g, col.b, 255), 1.f);
 
+    int ground_id = ground_indexes[level_info.ground_id];
+    bool has_l2 = level_info.ground_id >= 7;
+
+    C2D_Sprite ground = { 0 };
+    C2D_SpriteFromSheet(&ground, groundSheet, ground_id);
+    C3D_TexSetFilter(ground.image.tex, GPU_LINEAR, GPU_LINEAR);
+
     if (is_ceiling) y += GROUND_SIZE;
+
+    float g_y = y;
+
+    if (has_l2) {
+        if (!is_ceiling) {
+            g_y -= GROUND_SIZE - ground.image.subtex->height - 1;
+        } else {
+            g_y -= 1;
+        }
+    }
 
     // First draw the ground
     float calc_x = 0 - positive_fmodf(cam_x, GROUND_SIZE);
     float calc_y = SCREEN_HEIGHT - ((y - cam_y));
+    float ground_calc_y = SCREEN_HEIGHT - ((g_y - cam_y));
 
     for (float i = -GROUND_SIZE; i < (screen_width / SCALE) + GROUND_SIZE; i += GROUND_SIZE) {
-        C2D_Sprite ground = { 0 };
-        C2D_SpriteFromSheet(&ground, groundSheet, level_info.ground_id + 1);
-        C3D_TexSetFilter(ground.image.tex, GPU_LINEAR, GPU_LINEAR);
-        C2D_SpriteSetPos(&ground, calc_x + i, calc_y);
+        C2D_SpriteSetPos(&ground, calc_x + i, ground_calc_y);
         C2D_SpriteSetScale(&ground, 1.f, mult);
         C2D_DrawSpriteTinted(&ground, &tint);
+    }
+
+    if (has_l2) {
+        col = channels[get_col_channel_index(CHANNEL_GROUND_2)].color;
+        C2D_PlainImageTint(&tint, C2D_Color32(col.r, col.g, col.b, 255), 1.f);
+
+        C2D_Sprite ground2 = { 0 };
+        C2D_SpriteFromSheet(&ground2, groundSheet, ground_id + 1);
+        C3D_TexSetFilter(ground2.image.tex, GPU_LINEAR, GPU_LINEAR);
+
+        float g2_y = y;
+        if (is_ceiling) g2_y -= GROUND_SIZE - ground2.image.subtex->height;
+
+        ground_calc_y = SCREEN_HEIGHT - ((g2_y - cam_y));
+        for (float i = -GROUND_SIZE; i < (screen_width / SCALE) + GROUND_SIZE; i += GROUND_SIZE) {
+            C2D_SpriteSetPos(&ground2, calc_x + i, ground_calc_y);
+            C2D_SpriteSetScale(&ground2, 1.f, mult);
+            C2D_DrawSpriteTinted(&ground2, &tint);
+        }
     }
 
     C2D_PlainImageTint(&tint, C2D_Color32(0, 0, 0, 100), 1.f);
