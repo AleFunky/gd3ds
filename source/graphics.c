@@ -38,6 +38,14 @@
 
 const Color white = { 255, 255, 255 };
 
+static const HSV lighter_hsv = {
+    .h = 0.0f,
+    .s = 0.65f,
+    .v = 1.30f,
+    .sChecked = false,
+    .vChecked = false
+};
+
 int sprite_count = 0;
 
 static bool blending_state = false;
@@ -440,7 +448,7 @@ int get_glow_channel(int obj) {
         case 201:
         case 202:
         case 203:
-            return CHANNEL_WHITE;
+            return CHANNEL_WHITE_GLOW;
         case 397:
         case 398:
         case 399:
@@ -540,6 +548,7 @@ float get_object_pulse(float amplitude, int id, int layer) {
         case 36:
         case 84:
         case 141:
+        case 1022:
             return map_range(amplitude, 0.f, 1.f, 0.3f, 1.2f);
         case 15:
         case 16:
@@ -590,6 +599,7 @@ static bool object_has_pulse(int id) {
         case 133:
         case 136:
         case 141:
+        case 1022:
         case 148:
         case 149:
         case 150:
@@ -630,8 +640,11 @@ void spawn_object_at(
     float m10 = sin_r;
     float m11 = -cos_r;
 
-    float sx = scale * flip_x_mult;
-    float sy = scale * flip_y_mult;
+    float obj_scale_x = objects.scale_x[obj_game];
+    float obj_scale_y = objects.scale_y[obj_game];
+
+    float sx = scale * flip_x_mult * obj_scale_x;
+    float sy = scale * flip_y_mult * obj_scale_y;
 
     // get anim for this object
     const AnimFrame* anim_keyframe = NULL;
@@ -657,8 +670,8 @@ void spawn_object_at(
         float rot_x = local_x * m00 + local_y * m01;
         float rot_y = local_x * m10 + local_y * m11;
 
-        float p_x = x + rot_x * scale;
-        float p_y = y + rot_y * scale;
+        float p_x = x + rot_x * scale * obj_scale_x;
+        float p_y = y + rot_y * scale * obj_scale_y;
 
         int random_layer = get_obj_random_layer(obj_game, id);
         if (random_layer < 0) {
@@ -731,8 +744,8 @@ void spawn_object_at(
             float c_rot_x = c_local_x * m00 + c_local_y * m01;
             float c_rot_y = c_local_x * m10 + c_local_y * m11;
 
-            float c_x = x + c_rot_x * scale;
-            float c_y = y + c_rot_y * scale;
+            float c_x = x + c_rot_x * scale * obj_scale_x;
+            float c_y = y + c_rot_y * scale * obj_scale_y;
 
             int c_flip_x_mult = (c->flip_x ? -1 : 1);
             int c_flip_y_mult = (c->flip_y ? -1 : 1);
@@ -760,9 +773,8 @@ void spawn_object_at(
                         float a_rot_x = a_local_x * m00 + a_local_y * m01;
                         float a_rot_y = a_local_x * m10 + a_local_y * m11;
 
-                        // TODO: use scale per object
-                        c_x = x + a_rot_x * scale;
-                        c_y = y + a_rot_y * scale;
+                        c_x = x + a_rot_x * scale * obj_scale_x;
+                        c_y = y + a_rot_y * scale * obj_scale_y;
 
                         c_rot = C3D_AngleFromDegrees(anim_sprite->rot) + rad;
 
@@ -1428,6 +1440,10 @@ static void update_current_objects(void) {
                 if (!is_valid_object(objects.id[obj]) || objects.toggled[obj]) 
                     continue;
 
+                // 0 scale objects are invisible
+                if (objects.scale_x[obj] == 0.f || objects.scale_y[obj] == 0.f)
+                    continue;
+
                 // This object has just entered the screen
                 if (!objects.render_visible[obj]) {
                     objects.render_visible[obj] = true;
@@ -1496,6 +1512,16 @@ void update_tints() {
                     col.color.b = CLAMP(b, 0, 255);
                     col.blending = true;
                 }
+            } else if (col_channel == CHANNEL_LIGHTER && obj->layer != 1) {
+                // LIGHTER: derive the detail color from the object's main channel + lighter_hsv
+                int main_ch = objects.col_channel[obj->obj];
+                if (main_ch == 0 || main_ch == CHANNEL_LIGHTER)
+                    main_ch = game_objects[objects.id[obj->obj]].base_color;
+                main_ch = get_col_channel_index(main_ch);
+                col = channels[main_ch];
+                col.color = HSV_combine(col.color, lighter_hsv);
+                col.blending = false;
+                // TODO: pulse interaction
             } else {
                 col = channels[get_col_channel_index(col_channel)];
             }
