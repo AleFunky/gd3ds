@@ -776,7 +776,7 @@ void spawn_object_at(
                         c_x = x + a_rot_x * scale * obj_scale_x;
                         c_y = y + a_rot_y * scale * obj_scale_y;
 
-                        c_rot = C3D_AngleFromDegrees(anim_sprite->rot) + rad;
+                        c_rot = C3D_AngleFromDegrees(anim_sprite->rot) * (flip_x_mult * flip_y_mult) + rad;
 
                         c_sx *= anim_sprite->scale_x;
                         c_sy *= anim_sprite->scale_y;
