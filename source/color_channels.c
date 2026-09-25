@@ -11,6 +11,7 @@
 #include "player/collision.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "state.h"
 
@@ -122,6 +123,20 @@ Color HSV_combine(Color base, HSV hsv) {
         (unsigned char)(fminf(bb, 1.f) * 255.f)
     };
     return result;
+}
+
+int trigger_pool_add(TriggerPool *pool, size_t element_size) {
+    if (pool->count >= pool->capacity) {
+        int new_capacity = pool->capacity ? pool->capacity + 8 : 8;
+
+        pool->data = realloc(pool->data, new_capacity * element_size);
+        if (!pool->data) return -1;
+
+        pool->capacity = new_capacity;
+    }
+    
+    memset((char *)pool->data + pool->count * element_size, 0, element_size);
+    return pool->count++;
 }
 
 void init_col_channels() {
@@ -305,12 +320,13 @@ void handle_copy_channels() {
 }
 
 void upload_to_alpha_buffer(int obj) {
-    int target_group = objects.target_group[obj];
+    AlphaTrigger *trigger = get_alpha_trigger(obj);
+    int target_group = trigger->target_group;
     GroupNode *p = get_group(target_group);
     if (!p) return;
 
-    if (objects.trig_duration[obj] == 0) {
-        float alpha = objects.trigger_opacity[obj];
+    if (trigger->trig_duration == 0) {
+        float alpha = trigger->trigger_opacity;
         for (GroupNode *cur = p; cur; cur = cur->next) {
             objects.alpha_trigger_opacity[cur->obj] = alpha;
         }
@@ -336,9 +352,9 @@ void upload_to_alpha_buffer(int obj) {
 
     AlphaTriggerBuffer *buffer = &alpha_trigger_buffer[slot];
     buffer->target_group = target_group;
-    buffer->new_alpha = objects.trigger_opacity[obj];
+    buffer->new_alpha = trigger->trigger_opacity;
     buffer->old_alpha = objects.alpha_trigger_opacity[p->obj];
-    buffer->seconds = objects.trig_duration[obj];
+    buffer->seconds = trigger->trig_duration;
     buffer->time_run = 0;
     buffer->active = true;
 }
@@ -397,7 +413,8 @@ static int convert_ease(int easing) {
 }
 
 void upload_to_move_buffer(int obj) {
-    int target_group = objects.target_group[obj];
+    MoveTrigger *trigger = get_move_trigger(obj);
+    int target_group = trigger->target_group;
     if (!get_group(target_group)) return;
 
     int slot = -1;
@@ -409,12 +426,12 @@ void upload_to_move_buffer(int obj) {
 
     MoveTriggerBuffer *buffer = &move_trigger_buffer[slot];
     buffer->target_group = target_group;
-    buffer->offset_x = objects.move_offset_x[obj];
-    buffer->offset_y = objects.move_offset_y[obj];
-    buffer->easing = objects.move_easing[obj];
-    buffer->lock_to_player_x = objects.lock_to_player_x[obj];
-    buffer->lock_to_player_y = objects.lock_to_player_y[obj];
-    buffer->seconds = objects.trig_duration[obj];
+    buffer->offset_x = trigger->move_offset_x;
+    buffer->offset_y = trigger->move_offset_y;
+    buffer->easing = trigger->move_easing;
+    buffer->lock_to_player_x = trigger->lock_to_player_x;
+    buffer->lock_to_player_y = trigger->lock_to_player_y;
+    buffer->seconds = trigger->trig_duration;
     buffer->move_last_x = 0;
     buffer->move_last_y = 0;
     buffer->time_run = 0;
@@ -475,38 +492,41 @@ void upload_to_buffer(int obj, int channel) {
     int buffer_channel = get_col_channel_index(channel);
 
     ColTriggerBuffer *buffer = &col_trigger_buffer[buffer_channel];
+    ColorTrigger *trigger =  get_color_trigger(obj);
+
     buffer->old_color = channels[buffer_channel].color;
     buffer->old_alpha = channels[buffer_channel].alpha;
-    if (objects.p1_color[obj]) {
+    if (trigger && trigger->p1_color) {
         buffer->new_color = get_p2_if_black(p1_color);
         buffer->new_alpha = 1.0f;
-    } else if (objects.p2_color[obj]) {
+    } else if (trigger && trigger->p2_color) {
         buffer->new_color = get_p1_if_black(p2_color);
         buffer->new_alpha = 1.0f;
     } else {
-        buffer->new_color.r = objects.trig_colorR[obj];
-        buffer->new_color.g = objects.trig_colorG[obj];
-        buffer->new_color.b = objects.trig_colorB[obj];
-        buffer->new_alpha = objects.trigger_opacity[obj];
+        buffer->new_color.r = trigger->trig_colorR;
+        buffer->new_color.g = trigger->trig_colorG;
+        buffer->new_color.b = trigger->trig_colorB;
+        buffer->new_alpha = trigger->opacity;
     }
 
-    int copy_id = objects.copied_color_id[obj];
+    int copy_id = trigger->copied_color_id;
     if (copy_id > 0) {
         buffer->copied_color_id = copy_id;
-        buffer->copied_hsv = objects.copied_hsv[obj];
+        buffer->copied_hsv = trigger->copied_hsv;
         channels[buffer_channel].copy_color_id = copy_id;
-        channels[buffer_channel].hsv = objects.copied_hsv[obj];
+        channels[buffer_channel].hsv = trigger->copied_hsv;
     } else {
         buffer->copied_color_id = 0;
         channels[buffer_channel].copy_color_id = 0;
     }
 
     if (channel < CHANNEL_BG) {
-        channels[buffer_channel].blending = objects.blending[obj];
+        channels[buffer_channel].blending = trigger->blending;
     }
     
     
-    if (objects.trig_duration[obj] == 0) {
+    float duration = trigger->trig_duration;
+    if (duration == 0) {
         Color color_to_lerp = buffer->new_color;
 
         if (buffer->copied_color_id > 0) {
@@ -521,7 +541,7 @@ void upload_to_buffer(int obj, int channel) {
         return;
     }
     
-    buffer->seconds = objects.trig_duration[obj];
+    buffer->seconds = duration;
     buffer->time_run = 0;
     buffer->active = true;
 }
@@ -589,7 +609,7 @@ void run_trigger(int obj) {
 
         case BG_TRIGGER:
             upload_to_buffer(obj, CHANNEL_BG);
-            if (!objects.tintGround[obj]) break;
+            if (!get_color_trigger(obj)->tintGround) break;
         
         case GROUND_TRIGGER:
             upload_to_buffer(obj, CHANNEL_GROUND);
@@ -638,7 +658,7 @@ void run_trigger(int obj) {
             break;
 
         case COL_TRIGGER: // 2.0 color trigger
-            upload_to_buffer(obj, objects.target_color_id[obj]);
+            upload_to_buffer(obj, get_color_trigger(obj)->target_color_id);
             break;
         case ALPHA_TRIGGER:
             upload_to_alpha_buffer(obj);
