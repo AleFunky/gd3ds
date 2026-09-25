@@ -61,8 +61,20 @@ typedef struct {
     HSV copied_hsv;
 } ColTriggerBuffer;
 
+#define MAX_ALPHA_TRIGGERS 50
+
+typedef struct {
+    bool active;
+    int target_group;
+    float old_alpha;
+    float new_alpha;
+    float seconds;
+    float time_run;
+} AlphaTriggerBuffer;
+
 extern ColorChannel channels[COL_CHANNEL_NUM];
 extern ColTriggerBuffer col_trigger_buffer[COL_CHANNEL_NUM];
+extern AlphaTriggerBuffer alpha_trigger_buffer[MAX_ALPHA_TRIGGERS];
 
 extern Color p1_color;
 extern Color p2_color;
@@ -114,6 +126,8 @@ void handle_col_channel(int chan);
 void handle_col_triggers();
 void handle_copy_channels();
 void handle_triggers();
+void upload_to_alpha_buffer(int obj);
+void handle_alpha_triggers(void);
 void upload_color_to_buffer(int channel, u32 color, float seconds);
 void upload_to_buffer(int obj, int channel);
 int convert_one_point_nine_channel(int channel);
