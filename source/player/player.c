@@ -1141,8 +1141,8 @@ void draw_hitbox(int obj) {
 
     float x = objects.x[obj];
     float y = objects.y[obj];
-    float w = hitbox->width;
-    float h = hitbox->height;
+    float w = objects.width[obj];
+    float h = objects.height[obj];
 
     unsigned int color = C2D_Color32(0x00, 0xff, 0xff, 0xff);
 
@@ -1163,7 +1163,7 @@ void draw_hitbox(int obj) {
 
         draw_triangle_from_rect(rect, 3 - objects.orientation[obj], color);
     } else if (hitbox->type == COLLISION_CIRCLE) {
-        float calc_radius = hitbox->width;
+        float calc_radius = objects.width[obj];
 
         custom_circunference(mirror_x_on_screen(x), calc_y_on_screen(y), calc_radius, color, 2.f);
     } else if (w != 0 && h != 0) {

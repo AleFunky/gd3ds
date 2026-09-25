@@ -494,6 +494,45 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 SET_ACTIVATED(obj, true);
             } 
             break;
+        case GREEN_ORB:
+            if (GET_ACTIVATED(obj)) player->gravObj_id = obj;
+            if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
+            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
+                MotionTrail_ResumeStroke(trail);
+                player->gravObj_id = obj;
+                update_rotation_direction(player);
+
+                player->upside_down ^= 1;
+                player->vel_y = jump_heights_table[state.speed][JUMP_YELLOW_ORB][player->gamemode][player->mini];
+
+                if (player->gamemode == GAMEMODE_SHIP) player->vel_y *= 0.7f;
+
+                flip_other_player(state.current_player);
+
+                state.current_data.jumps++;
+
+                player->ball_rotation_speed = -BALL_SLOW_ROTATION;
+
+                // TODO: robot jump animation (robot_anim_timer/id/frame, ROBOT_ANIM_JUMP_START)
+
+                player->on_ground = false;
+                player->on_ceiling = false;
+                player->inverse_rotation = false;
+                player->left_ground = true;
+                player->buffering_state = BUFFER_END;
+                player->ceiling_inv_time = 0.5f;
+                player->jumped = true;
+
+                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                if (effect) {
+                    effect->def.colorR = 0;
+                    effect->def.colorG = 255 / 255.f;
+                    effect->def.colorB = 0;
+                }
+
+                SET_ACTIVATED(obj, true);
+            } 
+            break;
         case BLUE_GRAVITY_PORTAL:
             player->gravObj_id = obj;
             if (!GET_ACTIVATED(obj)) {
@@ -1169,7 +1208,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                 // Only do the funny grav snap if player is touching a gravity object and internal hitbox is touching block
                 bool internalCollidingBlock = intersect(
                     player->x, player->y, internal.width, internal.height, 0, 
-                    objects.x[obj], objects.y[obj], hitbox->width, hitbox->height, objects.rotation[obj]
+                    objects.x[obj], objects.y[obj], objects.width[obj], objects.height[obj], objects.rotation[obj]
                 );
 
                 float diff = obj_gravBottom(player, obj) - gravInternalBottom(player);
@@ -1182,7 +1221,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
             // Check collision with internal hitbox
             if ((player->gamemode == GAMEMODE_WAVE || (!gravSnap && !safeZone)) && intersect(
                 player->x, player->y, internal.width, internal.height, 0, 
-                objects.x[obj], objects.y[obj], hitbox->width, hitbox->height, objects.rotation[obj]
+                objects.x[obj], objects.y[obj], objects.width[obj], objects.height[obj], objects.rotation[obj]
             )) {
                 if (objects.id[obj] == BREAKABLE_BLOCK) {
                     // Spawn breakable brick particles
@@ -1289,15 +1328,20 @@ void collide_with_obj(Player *player, int obj) {
 
     snapshot.collision_checks++;
 
-    float x = objects.x[obj];
-    float y = objects.y[obj];
+    // hitbox offset by object rotation
+    float rot_rad = C3D_AngleFromDegrees(objects.rotation[obj]);
+    float cos_r = cosf(rot_rad), sin_r = sinf(rot_rad);
+    float off_x = hitbox->x * cos_r - hitbox->y * sin_r;
+    float off_y = hitbox->x * sin_r + hitbox->y * cos_r;
+    float x = objects.x[obj] + off_x;
+    float y = objects.y[obj] + off_y;
     float width = objects.width[obj];
     float height = objects.height[obj];
 
     if (UNLIKELY(hitbox->type == COLLISION_CIRCLE)) {
         if (intersect_rect_circle(
             player->x, player->y, player->width, player->height, 0, 
-            x, y, hitbox->width
+            x, y, objects.width[obj]
         )) {
             handle_collision(player, obj, hitbox);
             SET_COLLIDED(obj, true);
@@ -1343,8 +1387,8 @@ void collide_with_slope(Player *player, int obj, bool has_slope) {
     
     if (!hitbox) return;
     
-    float width = hitbox->width;
-    float height = hitbox->height;
+    float width = objects.width[obj];
+    float height = objects.height[obj];
 
     if (intersect(
         player->x, player->y, player->width, player->height, 0, 
