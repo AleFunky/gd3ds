@@ -858,11 +858,13 @@ static inline uint32_t make_sort_key(SpriteObject *s)
         zlayer--;
     }
 
+    int child_z = 0;
     int tex = game_obj->texture;
 
     // If layer is a glow layer, it does something for sure
     if (s->layer > 1) {
         const ChildSprite *child = &game_obj->children[s->layer - 2];
+        child_z = child->z - 1;
         tex = child->texture;
         zlayer += child->z_layer_offset;
     }
@@ -889,7 +891,7 @@ static inline uint32_t make_sort_key(SpriteObject *s)
     uint32_t zb = (uint32_t)(blending);       // fits in 1 bit
     uint32_t zs = (uint32_t)(sheet);          // fits in 1 bit
     uint32_t zo = (uint32_t)(zorder + 128);   // fits in 8 bits
-    uint32_t cz = 128;  // fits in 8 bits (constant for stable sort)
+    uint32_t cz = (uint32_t)(child_z + 128);  // fits in 8 bits
 
     return (zl << 18) | (zb << 17) | (zs << 16) | (zo << 8) | cz;
 }
