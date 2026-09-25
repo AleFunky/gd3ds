@@ -2193,6 +2193,7 @@ void reload_level() {
     clear_groups();
 
     memset(alpha_trigger_buffer, 0, sizeof(alpha_trigger_buffer));
+    memset(move_trigger_buffer, 0, sizeof(move_trigger_buffer));
 
     for (int i = 0; i < objects.count; i++) {
         objects.activated[i] = false;
@@ -2244,6 +2245,7 @@ void unload_level() {
     free_arrays();
 
     memset(alpha_trigger_buffer, 0, sizeof(alpha_trigger_buffer));
+    memset(move_trigger_buffer, 0, sizeof(move_trigger_buffer));
     free_sections();
     free_object_particles();
     
