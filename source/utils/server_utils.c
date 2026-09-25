@@ -395,7 +395,7 @@ static void fill_level_entry(char **levelStrings, int levelStringsCount, bool fi
         case 29:
             // time since last
             strncpy(level_entry->updateDate, valStr, sizeof(level_entry->updateDate) - 1);
-            strncpy(entry->level_entry.uploadDate, valStr, sizeof(entry->level_entry.uploadDate) - 1);
+            strncpy(entry->level_entry.updateDate, valStr, sizeof(entry->level_entry.updateDate) - 1);
             break;
         }
     }
