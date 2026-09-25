@@ -119,6 +119,14 @@ void action_set_query(UIElement* e, const UIPropertyList *args){
     snprintf(filters.searchQuery, sizeof(filters.searchQuery), "%.*s", (int)sizeof(filters.searchQuery) - 1, ((UITextbox *)e)->text);
 }
 
+static void action_clear_search(UIElement* e, const UIPropertyList *args){
+    UITextbox *searchBox = ((UITextbox *)ui_get_element_by_tag(e->screen, "searchbox"));
+    if (!searchBox) return;
+
+    searchBox->text[0] = '\0';
+    filters.searchQuery[0] = '\0';
+}
+
 static void action_search(UIElement* e, const UIPropertyList *args) {
     filters.searchType = ui_prop_int(&e->custom_properties, "type", 0);
     filters.currentPage = 0;
@@ -128,6 +136,7 @@ static void action_search(UIElement* e, const UIPropertyList *args) {
 
 static UIActionDef search_actions[] = {
     {"search", action_search },
+    {"clearsearch", action_clear_search },
     {"searchtext", action_set_query},
     {"difficulty", action_set_difficulty },
     {"na", action_na },
