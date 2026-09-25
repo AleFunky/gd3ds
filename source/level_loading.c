@@ -478,6 +478,7 @@ HSV parse_hsv_string(const char *string) {
 
 void parse_color_channel(GDColorChannel *channels, int i, char *channel_string) {
     GDColorChannel channel = {0};  // Zero-initialize
+    channel.fromOpacity = 1.0f;
     int kvCount = 0;
     char **kvs = split_string(channel_string, '_', &kvCount, false);
 
@@ -609,6 +610,7 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
     int bg_b = atoi(get_metadata_value(level_string, "kS3"));
 
     GDColorChannel bg_channel = {0};
+    bg_channel.fromOpacity = 1.0f;
     bg_channel.channelID = CHANNEL_BG;
     bg_channel.fromRed = bg_r;
     bg_channel.fromGreen = bg_g;
@@ -629,6 +631,7 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
     int g_b = atoi(get_metadata_value(level_string, "kS6"));
 
     GDColorChannel g_channel = {0};
+    g_channel.fromOpacity = 1.0f;
     g_channel.channelID = CHANNEL_GROUND;
     g_channel.fromRed = g_r;
     g_channel.fromGreen = g_g;
@@ -649,6 +652,7 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
 
     if (line_r && line_g && line_b) {
         GDColorChannel line_channel = {0};
+        line_channel.fromOpacity = 1.0f;
         line_channel.channelID = CHANNEL_LINE;
         line_channel.fromRed = atoi(line_r);
         line_channel.fromGreen = atoi(line_g);
@@ -671,6 +675,7 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
 
     if (obj_r && obj_g && obj_b) {
         GDColorChannel obj_channel = {0};
+        obj_channel.fromOpacity = 1.0f;
         obj_channel.channelID = CHANNEL_OBJ;
         obj_channel.fromRed = atoi(obj_r);
         obj_channel.fromGreen = atoi(obj_g);
@@ -693,6 +698,7 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
 
     if (obj_2_r && obj_2_g && obj_2_b) {
         GDColorChannel obj_2_channel = {0};
+        obj_2_channel.fromOpacity = 1.0f;
         obj_2_channel.channelID = 1;
         obj_2_channel.fromRed = atoi(obj_2_r);
         obj_2_channel.fromGreen = atoi(obj_2_g);

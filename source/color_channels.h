@@ -81,6 +81,7 @@ extern float g_trigger_dt;
 #define COL4_TRIGGER 743
 #define THREEDL_TRIGGER 744
 #define COL_TRIGGER 899
+#define GROUND_2_TRIGGER 900
 #define MOVE_TRIGGER 901
 #define ALPHA_TRIGGER 1007
 #define TOGGLE_TRIGGER 1049
@@ -111,6 +112,7 @@ int get_col_channel_from_index(int index);
 void init_col_channels();
 void handle_col_channel(int chan);
 void handle_col_triggers();
+void handle_copy_channels();
 void handle_triggers();
 void upload_color_to_buffer(int channel, u32 color, float seconds);
 void upload_to_buffer(int obj, int channel);
