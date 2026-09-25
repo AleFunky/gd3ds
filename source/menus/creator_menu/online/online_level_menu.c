@@ -287,7 +287,7 @@ static void action_open_info(UIElement *e, const UIPropertyList *args) {
 }
 
 void delete_level(){
-    // logic to delete level (post save revamp slop)
+   remove_saved_level(online_menu_level_id, gdps);
 }
 
 static void action_open_delete_level(){

@@ -138,6 +138,7 @@ SavedLevelDataEntry *get_saved_level_data(int level_id);
 bool save_level_to_server_file(ServerFile *save_data, int level_id, const SearchEntry *search, const CreatorEntry *creator, const SongEntry *song);
 void save_current_save_file(LevelListType type);
 
+bool remove_saved_level(int level_id, bool gdps);
 
 bool saved_level_exists(int level_id, bool gdps);
 char *load_saved_level(int level_id, bool gdps, size_t *out_size);

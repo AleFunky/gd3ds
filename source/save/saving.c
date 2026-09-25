@@ -757,6 +757,33 @@ static bool level_data_list_add(LevelDataList *level_data, const char *key, cons
     return true;
 }
 
+static void free_saved_level_data_entry(SavedLevelDataEntry *entry) {
+    if (!entry) return;
+
+    free(entry->search_entry.description);
+}
+
+static bool saved_level_data_list_remove(SavedLevelDataList *level_data, const char *key) {
+    if (!level_data->list) return false;
+
+    SavedLevelDataEntry *search = saved_level_data_list_find(level_data, key);
+    if (!search) return false;
+
+    for (size_t i = 0; i < level_data->count; i++) {
+        SavedLevelDataEntry *entry = &level_data->list[i];
+        if (entry == search) {
+            free_saved_level_data_entry(entry);
+            if (i + 1 < level_data->count) {
+                int count = level_data->count - i - 1;
+                memmove(&level_data->list[i], &level_data->list[i + 1], sizeof(SavedLevelDataEntry) * count);
+            }
+            level_data->count--;
+            return true;
+        }
+    }
+    return false;
+}
+
 static bool saved_level_data_list_add(SavedLevelDataList *level_data, const char *key, const SearchEntry *search, const CreatorEntry *creator, const SongEntry *song) {
     if (level_data->count >= level_data->capacity) {
         size_t new_capacity = level_data->capacity == 0 ? 8 : level_data->capacity + 4;
@@ -808,6 +835,10 @@ static void server_file_init(ServerFile *save_data) {
     save_data->main_levels.list = NULL;
     save_data->main_levels.capacity = 0;
     save_data->main_levels.count = 0;
+
+    save_data->saved_levels.list = NULL;
+    save_data->saved_levels.capacity = 0;
+    save_data->saved_levels.count = 0;
 }
 
 static void external_file_init(ExternalLevelFile *save_data) {
@@ -860,6 +891,34 @@ bool save_level_to_server_file(ServerFile *save_data, int level_id, const Search
     char tmp[17];
     snprintf(tmp, sizeof(tmp), "%016llX", fnv1a64(file));
     return saved_data_list_add(&save_data->saved_levels, tmp, search, creator, song);
+}
+
+bool remove_saved_level(int level_id, bool gdps) {
+    char tmp[16];
+    char bigger_tmp[256];
+    snprintf(tmp, sizeof(tmp), "%d", level_id);
+    snprintf(bigger_tmp, sizeof(bigger_tmp), "%016llX", fnv1a64(tmp));
+    saved_level_data_list_remove((gdps ? &gdps_file.saved_levels : &gd_server_file.saved_levels), bigger_tmp);
+
+
+    snprintf(tmp, sizeof(tmp), "%d_%d", level_id, (int) gdps);
+    snprintf(bigger_tmp, sizeof(bigger_tmp), "%s/%llu.saved", SAVED_LEVELS_DIR, fnv1a64(tmp));
+
+    char *path = bigger_tmp;
+
+    FILE *file = fopen(path, "wb");
+    if (!file) {
+        return false;
+    }
+
+    if (remove(path) != 0) {
+        if (errno == ENOENT)
+            return true;
+
+        return false;
+    }
+
+    return true;
 }
 
 LevelDataEntry *get_or_add_level_to_server_file(ServerFile *save_data, const char *key, LevelListType type) {
