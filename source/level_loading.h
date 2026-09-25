@@ -41,6 +41,82 @@ typedef union {
 } GDValue;
 
 typedef struct {
+    bool spawn_triggered;
+    bool multi_triggered;
+    float trig_duration;
+    int target_group;
+    unsigned char trig_colorR, trig_colorG, trig_colorB;
+    bool p1_color, p2_color;
+    bool tintGround;
+    bool blending;
+    unsigned short target_color_id;
+    int copied_color_id;
+    float opacity;
+    HSV copied_hsv;
+} ColorTrigger;
+
+typedef struct {
+    bool spawn_triggered;
+    bool multi_triggered;
+    float trig_duration;
+    int target_group;
+    float move_offset_x;
+    float move_offset_y;
+    int move_easing;
+    bool lock_to_player_x;
+    bool lock_to_player_y;
+} MoveTrigger;
+
+typedef struct {
+    bool spawn_triggered;
+    bool multi_triggered;
+    float trig_duration;
+    int target_group;
+    float trigger_opacity;
+} AlphaTrigger;
+
+typedef struct {
+    bool spawn_triggered;
+    bool multi_triggered;
+    float trig_duration;
+    int target_group;
+    unsigned char trig_colorR, trig_colorG, trig_colorB;
+    unsigned short target_color_id;
+    float opacity;
+    int copied_color_id;
+    HSV copied_hsv;
+
+    float pulse_fade_in;
+    float pulse_hold;
+    float pulse_fade_out;
+    int pulse_mode;
+
+    int pulse_target_type;
+    bool pulse_main_only;
+    bool pulse_detail_only;
+} PulseTrigger;
+
+typedef struct {
+    bool spawn_triggered;
+    bool multi_triggered;
+    int target_group;
+    bool activate_group;
+} ToggleTrigger;
+
+typedef struct {
+    bool spawn_triggered;
+    bool multi_triggered;
+    int target_group;
+    float spawn_delay;
+} SpawnTrigger;
+
+typedef struct {
+    void *data;
+    size_t count;
+    size_t capacity;
+} TriggerPool;
+
+typedef struct {
     int count;
 
     int *random;
@@ -49,29 +125,16 @@ typedef struct {
     float *x, *y;
     float *rotation;
     int *zlayer, *zorder;
-    float *trig_duration;
     float *opacity;
+    float *alpha_trigger_opacity;
 
     float *width, *height;
 
     unsigned short *v1p9_col_channel;
     unsigned short *col_channel;
     unsigned short *detail_col_channel;
-    unsigned short *target_color_id;
 
-    bool *spawn_triggered;
-    bool *multi_triggered;
-    float *spawn_delay;
-    int *target_group;
-    bool *activate_group;
-    float *alpha_trigger_opacity;
-    float *trigger_opacity;
-
-    float *move_offset_x;
-    float *move_offset_y;
-    int *move_easing;
-    bool *lock_to_player_x;
-    bool *lock_to_player_y;
+    int *trigger_index;
 
     float *original_x;
     float *original_y;
@@ -87,19 +150,10 @@ typedef struct {
     Color *main_color;
     Color *detail_color;
 
-    float *pulse_fade_in;
-    float *pulse_hold;
-    float *pulse_fade_out;
-    int *pulse_mode;
-    int *copied_color_id;
-    HSV *copied_hsv;
     bool *main_col_HSV_enabled;
     bool *detail_col_HSV_enabled;
     HSV *main_col_HSV;
     HSV *detail_col_HSV;
-    int *pulse_target_type;
-    bool *pulse_main_only;
-    bool *pulse_detail_only;
 
     Color *cached_main_hsv_src_color;
     Color *cached_detail_hsv_src_color;
@@ -117,12 +171,8 @@ typedef struct {
     int *section_y;
 
     unsigned char *transition_applied;
-    unsigned char *trig_colorR, *trig_colorG, *trig_colorB;
     unsigned char *orientation;
     unsigned char *hitbox_counter;
-    bool *tintGround;
-    bool *p1_color, *p2_color;
-    bool *blending;
     union {
         bool *touch_triggered;
         u8 *coin_id;
@@ -206,6 +256,20 @@ typedef enum {
     LOAD_ERROR_COUNT,
 } LevelLoadError;
 
+extern TriggerPool col_pool;
+extern TriggerPool move_pool;
+extern TriggerPool alpha_pool;
+extern TriggerPool pulse_pool;
+extern TriggerPool toggle_pool;
+extern TriggerPool spawn_pool;
+
+ColorTrigger *get_color_trigger(int obj);
+PulseTrigger *get_pulse_trigger(int obj);
+AlphaTrigger *get_alpha_trigger(int obj);
+MoveTrigger *get_move_trigger(int obj);
+ToggleTrigger *get_toggle_trigger(int obj);
+SpawnTrigger *get_spawn_trigger(int obj);
+
 extern const char *error_strings[LOAD_ERROR_COUNT - 1];
 
 extern LoadedLevelInfo level_info;
@@ -244,6 +308,7 @@ bool obj_has_detail(const GameObject *obj);
 
 bool is_valid_object(int id);
 bool is_trigger_object(int id);
+bool is_color_trigger(int id);
 
 char *get_level_name(char *data_ptr);
 char *load_user_song(int id, size_t *out_size); 
