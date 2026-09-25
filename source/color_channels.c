@@ -492,12 +492,8 @@ void upload_to_buffer(int obj, int channel) {
     int buffer_channel = get_col_channel_index(channel);
 
     ColTriggerBuffer *buffer = &col_trigger_buffer[buffer_channel];
-    ColorTrigger *trigger = is_color_trigger(objects.id[obj])
-        ? get_color_trigger(obj)
-        : NULL;
-    PulseTrigger *pulse = objects.id[obj] == PULSE_TRIGGER
-        ? get_pulse_trigger(obj)
-        : NULL;
+    ColorTrigger *trigger =  get_color_trigger(obj);
+
     buffer->old_color = channels[buffer_channel].color;
     buffer->old_alpha = channels[buffer_channel].alpha;
     if (trigger && trigger->p1_color) {
@@ -507,29 +503,29 @@ void upload_to_buffer(int obj, int channel) {
         buffer->new_color = get_p1_if_black(p2_color);
         buffer->new_alpha = 1.0f;
     } else {
-        buffer->new_color.r = trigger ? trigger->trig_colorR : pulse->trig_colorR;
-        buffer->new_color.g = trigger ? trigger->trig_colorG : pulse->trig_colorG;
-        buffer->new_color.b = trigger ? trigger->trig_colorB : pulse->trig_colorB;
-        buffer->new_alpha = trigger ? trigger->opacity : pulse->opacity;
+        buffer->new_color.r = trigger->trig_colorR;
+        buffer->new_color.g = trigger->trig_colorG;
+        buffer->new_color.b = trigger->trig_colorB;
+        buffer->new_alpha = trigger->opacity;
     }
 
-    int copy_id = trigger ? trigger->copied_color_id : pulse->copied_color_id;
+    int copy_id = trigger->copied_color_id;
     if (copy_id > 0) {
         buffer->copied_color_id = copy_id;
-        buffer->copied_hsv = trigger ? trigger->copied_hsv : pulse->copied_hsv;
+        buffer->copied_hsv = trigger->copied_hsv;
         channels[buffer_channel].copy_color_id = copy_id;
-        channels[buffer_channel].hsv = trigger ? trigger->copied_hsv : pulse->copied_hsv;
+        channels[buffer_channel].hsv = trigger->copied_hsv;
     } else {
         buffer->copied_color_id = 0;
         channels[buffer_channel].copy_color_id = 0;
     }
 
     if (channel < CHANNEL_BG) {
-        channels[buffer_channel].blending = trigger ? trigger->blending : false;
+        channels[buffer_channel].blending = trigger->blending;
     }
     
     
-    float duration = trigger ? trigger->trig_duration : pulse->trig_duration;
+    float duration = trigger->trig_duration;
     if (duration == 0) {
         Color color_to_lerp = buffer->new_color;
 
