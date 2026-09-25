@@ -6,6 +6,7 @@
 #include "level_loading.h"
 #include "main.h"
 #include "graphics.h"
+#include "groups.h"
 #include "player/collision.h"
 
 #include <stdlib.h>
@@ -21,6 +22,7 @@ float g_trigger_dt = 0.f;
 ColorChannel channels[COL_CHANNEL_NUM];
 
 ColTriggerBuffer col_trigger_buffer[COL_CHANNEL_NUM];
+AlphaTriggerBuffer alpha_trigger_buffer[MAX_ALPHA_TRIGGERS];
 
 // Convert channel id to buffer index
 int get_col_channel_index(int channel) {
@@ -298,6 +300,73 @@ void handle_copy_channels() {
     }
 }
 
+void upload_to_alpha_buffer(int obj) {
+    int target_group = objects.target_group[obj];
+    GroupNode *p = get_group(target_group);
+    if (!p) return;
+
+    if (objects.trig_duration[obj] == 0) {
+        float alpha = objects.trigger_opacity[obj];
+        for (GroupNode *cur = p; cur; cur = cur->next) {
+            objects.alpha_trigger_opacity[cur->obj] = alpha;
+        }
+        return;
+    }
+
+    int slot = -1;
+    for (int i = 0; i < MAX_ALPHA_TRIGGERS; i++) {
+        if (!alpha_trigger_buffer[i].active) {
+            slot = i;
+            break;
+        }
+    }
+
+    for (int i = 0; i < MAX_ALPHA_TRIGGERS; i++) {
+        if (alpha_trigger_buffer[i].active && alpha_trigger_buffer[i].target_group == target_group) {
+            slot = i;
+            break;
+        }
+    }
+
+    if (slot < 0) return;
+
+    AlphaTriggerBuffer *buffer = &alpha_trigger_buffer[slot];
+    buffer->target_group = target_group;
+    buffer->new_alpha = objects.trigger_opacity[obj];
+    buffer->old_alpha = objects.alpha_trigger_opacity[p->obj];
+    buffer->seconds = objects.trig_duration[obj];
+    buffer->time_run = 0;
+    buffer->active = true;
+}
+
+void handle_alpha_triggers(void) {
+    for (int slot = 0; slot < MAX_ALPHA_TRIGGERS; slot++) {
+        AlphaTriggerBuffer *buffer = &alpha_trigger_buffer[slot];
+        if (!buffer->active) continue;
+
+        float multiplier = buffer->time_run / buffer->seconds;
+        float lerped = buffer->old_alpha + (buffer->new_alpha - buffer->old_alpha) * multiplier;
+
+        GroupNode *p = get_group(buffer->target_group);
+        if (p) {
+            for (GroupNode *cur = p; cur; cur = cur->next) {
+                objects.alpha_trigger_opacity[cur->obj] = lerped;
+            }
+        }
+
+        buffer->time_run += g_trigger_dt;
+        if (buffer->time_run >= buffer->seconds) {
+            GroupNode *pg = get_group(buffer->target_group);
+            if (pg) {
+                for (GroupNode *cur = pg; cur; cur = cur->next) {
+                    objects.alpha_trigger_opacity[cur->obj] = buffer->new_alpha;
+                }
+            }
+            buffer->active = false;
+        }
+    }
+}
+
 void upload_to_buffer(int obj, int channel) {
     if (channel == 0) channel = 1;
     int buffer_channel = get_col_channel_index(channel);
@@ -467,6 +536,9 @@ void run_trigger(int obj) {
 
         case COL_TRIGGER: // 2.0 color trigger
             upload_to_buffer(obj, objects.target_color_id[obj]);
+            break;
+        case ALPHA_TRIGGER:
+            upload_to_alpha_buffer(obj);
             break;
         default:
             return;

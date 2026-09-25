@@ -1114,6 +1114,7 @@ void game_loop() {
             handle_triggers();
             handle_col_triggers();
             handle_copy_channels();
+            handle_alpha_triggers();
             calculate_lbg();
             u64 end_trig = svcGetSystemTick();
             u64 ticks_trig = end_trig - start_trig;

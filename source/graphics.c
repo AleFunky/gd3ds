@@ -1581,7 +1581,7 @@ void update_tints() {
                 else opacity *= fading_opacity;
             }
 
-            int real_opacity = get_obj_opacity(game_object, x) * opacity * col.alpha;
+            int real_opacity = get_obj_opacity(game_object, x) * opacity * col.alpha * objects.alpha_trigger_opacity[game_object];
 
             // Set opacity here
             if (obj->layer == 0) objects.opacity[game_object] = real_opacity / 255.f;
