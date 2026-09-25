@@ -7,6 +7,7 @@
 #include "main.h"
 #include "graphics.h"
 #include "groups.h"
+#include "easing.h"
 #include "player/collision.h"
 
 #include <stdlib.h>
@@ -23,6 +24,9 @@ ColorChannel channels[COL_CHANNEL_NUM];
 
 ColTriggerBuffer col_trigger_buffer[COL_CHANNEL_NUM];
 AlphaTriggerBuffer alpha_trigger_buffer[MAX_ALPHA_TRIGGERS];
+MoveTriggerBuffer move_trigger_buffer[MAX_MOVE_TRIGGERS];
+float move_lock_player_x_delta = 0.0f;
+float move_lock_player_y_delta = 0.0f;
 
 // Convert channel id to buffer index
 int get_col_channel_index(int channel) {
@@ -367,6 +371,105 @@ void handle_alpha_triggers(void) {
     }
 }
 
+static int convert_ease(int easing) {
+    switch (easing) {
+        case 0: return EASE_LINEAR;
+        case 1: return EASE_IN_OUT;
+        case 2: return EASE_IN;
+        case 3: return EASE_OUT;
+        case 4: return ELASTIC_IN_OUT;
+        case 5: return ELASTIC_IN;
+        case 6: return ELASTIC_OUT;
+        case 7: return BOUNCE_IN_OUT;
+        case 8: return BOUNCE_IN;
+        case 9: return BOUNCE_OUT;
+        case 10: return EXPO_IN_OUT;
+        case 11: return EXPO_IN;
+        case 12: return EXPO_OUT;
+        case 13: return SINE_IN_OUT;
+        case 14: return SINE_IN;
+        case 15: return SINE_OUT;
+        case 16: return BACK_IN_OUT;
+        case 17: return BACK_IN;
+        case 18: return BACK_OUT;
+    }
+    return EASE_LINEAR;
+}
+
+void upload_to_move_buffer(int obj) {
+    int target_group = objects.target_group[obj];
+    if (!get_group(target_group)) return;
+
+    int slot = -1;
+    for (int i = 0; i < MAX_MOVE_TRIGGERS; i++) {
+        if (!move_trigger_buffer[i].active) { slot = i; break; }
+    }
+
+    if (slot < 0) return;
+
+    MoveTriggerBuffer *buffer = &move_trigger_buffer[slot];
+    buffer->target_group = target_group;
+    buffer->offset_x = objects.move_offset_x[obj];
+    buffer->offset_y = objects.move_offset_y[obj];
+    buffer->easing = objects.move_easing[obj];
+    buffer->lock_to_player_x = objects.lock_to_player_x[obj];
+    buffer->lock_to_player_y = objects.lock_to_player_y[obj];
+    buffer->seconds = objects.trig_duration[obj];
+    buffer->move_last_x = 0;
+    buffer->move_last_y = 0;
+    buffer->time_run = 0;
+    buffer->active = true;
+}
+
+void handle_move_triggers(void) {
+    for (int slot = 0; slot < MAX_MOVE_TRIGGERS; slot++) {
+        MoveTriggerBuffer *buffer = &move_trigger_buffer[slot];
+        if (!buffer->active) continue;
+
+        float t = easeTime(convert_ease(buffer->easing),
+                           buffer->time_run, buffer->seconds, 2.0f);
+        float delta_x, delta_y;
+        if (buffer->lock_to_player_x) {
+            delta_x = move_lock_player_x_delta;
+        } else {
+            float current_x = buffer->offset_x * t;
+            delta_x = current_x - buffer->move_last_x;
+            buffer->move_last_x = current_x;
+        }
+        if (buffer->lock_to_player_y) {
+            delta_y = move_lock_player_y_delta;
+        } else {
+            float current_y = buffer->offset_y * t;
+            delta_y = current_y - buffer->move_last_y;
+            buffer->move_last_y = current_y;
+        }
+
+        bool zero_delta = (delta_x == 0.f && delta_y == 0.f);
+
+        GroupNode *p = get_group(buffer->target_group);
+        if (p && !zero_delta) {
+            for (GroupNode *cur = p; cur; cur = cur->next) {
+                int group_obj = cur->obj;
+                int old_sx = objects.section_x[group_obj];
+                int old_sy = objects.section_y[group_obj];
+                objects.x[group_obj] += delta_x;
+                objects.y[group_obj] += delta_y;
+                objects.dirty[group_obj] = true;
+                int new_sx = (int)(objects.x[group_obj] / SECTION_SIZE);
+                int new_sy = (int)(objects.y[group_obj] / SECTION_SIZE);
+                if (new_sx != old_sx || new_sy != old_sy) {
+                    update_object_section(group_obj);
+                }
+            }
+        }
+
+        buffer->time_run += g_trigger_dt;
+        if (buffer->time_run >= buffer->seconds) {
+            buffer->active = false;
+        }
+    }
+}
+
 void upload_to_buffer(int obj, int channel) {
     if (channel == 0) channel = 1;
     int buffer_channel = get_col_channel_index(channel);
@@ -539,6 +642,9 @@ void run_trigger(int obj) {
             break;
         case ALPHA_TRIGGER:
             upload_to_alpha_buffer(obj);
+            break;
+        case MOVE_TRIGGER:
+            upload_to_move_buffer(obj);
             break;
         default:
             return;

@@ -72,9 +72,28 @@ typedef struct {
     float time_run;
 } AlphaTriggerBuffer;
 
+#define MAX_MOVE_TRIGGERS 50
+
+typedef struct {
+    bool active;
+    int target_group;
+    float offset_x;
+    float offset_y;
+    int easing;
+    bool lock_to_player_x;
+    bool lock_to_player_y;
+    float move_last_x;
+    float move_last_y;
+    float seconds;
+    float time_run;
+} MoveTriggerBuffer;
+
 extern ColorChannel channels[COL_CHANNEL_NUM];
 extern ColTriggerBuffer col_trigger_buffer[COL_CHANNEL_NUM];
 extern AlphaTriggerBuffer alpha_trigger_buffer[MAX_ALPHA_TRIGGERS];
+extern MoveTriggerBuffer move_trigger_buffer[MAX_MOVE_TRIGGERS];
+extern float move_lock_player_x_delta;
+extern float move_lock_player_y_delta;
 
 extern Color p1_color;
 extern Color p2_color;
@@ -128,6 +147,8 @@ void handle_copy_channels();
 void handle_triggers();
 void upload_to_alpha_buffer(int obj);
 void handle_alpha_triggers(void);
+void upload_to_move_buffer(int obj);
+void handle_move_triggers(void);
 void upload_color_to_buffer(int channel, u32 color, float seconds);
 void upload_to_buffer(int obj, int channel);
 int convert_one_point_nine_channel(int channel);

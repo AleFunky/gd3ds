@@ -920,6 +920,9 @@ void game_loop() {
                 u32 planned = (u32)(accumulator / STEPS_DT_UNMOD);
                 pi_begin_frame((u32)frame_window_start, (u32)now, planned ? planned : 1);
 
+                float player_x_before_physics = state.player.x;
+                float acc_delta_y = 0.0f;
+
                 // Run simulation in fixed steps
                 while (accumulator >= STEPS_DT_UNMOD) {
                     u64 start_physics = svcGetSystemTick();
@@ -981,6 +984,8 @@ void game_loop() {
                         if (state.dead) break;
                     }
                     
+                    acc_delta_y += state.player.delta_y;
+
                     run_camera();
                     handle_bg_flash();
                     handle_respawn_effect();
@@ -1000,6 +1005,9 @@ void game_loop() {
                     steps++;
                     level_frame++;
                 }
+
+                move_lock_player_x_delta = state.player.x - player_x_before_physics;
+                move_lock_player_y_delta = acc_delta_y;
             }
         }
 
@@ -1115,6 +1123,7 @@ void game_loop() {
             handle_col_triggers();
             handle_copy_channels();
             handle_alpha_triggers();
+            handle_move_triggers();
             calculate_lbg();
             u64 end_trig = svcGetSystemTick();
             u64 ticks_trig = end_trig - start_trig;
