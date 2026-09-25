@@ -110,7 +110,7 @@ extern C2D_SpriteSheet spriteSheet3;
 extern C2D_SpriteSheet animatedSheet;
 extern C2D_SpriteSheet glowSheet;
 extern C2D_SpriteSheet bgSheet;
-extern C2D_SpriteSheet bg2Sheet;
+extern int loaded_bg_sheet;
 extern C2D_SpriteSheet groundSheet;
 extern C2D_SpriteSheet cube0Sheet;
 extern C2D_SpriteSheet cube1Sheet;

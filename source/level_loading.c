@@ -1862,6 +1862,13 @@ void set_color_channels() {
         channels[i].non_pulse_color = channels[i].color;
 }
 
+const char *bg_sheet_paths[] = {
+    "romfs:/gfx/bg_sheet_01.t3x",
+    "romfs:/gfx/bg_sheet_02.t3x",
+    "romfs:/gfx/bg_sheet_03.t3x",
+    "romfs:/gfx/bg_sheet_04.t3x"
+};
+
 void load_level_string_info(char *level_string) {
     char *gmd_song_offset = get_metadata_value(level_string, "kA13");
     if (gmd_song_offset) {
@@ -1877,6 +1884,14 @@ void load_level_string_info(char *level_string) {
         free(background_data);
     } else {
         level_info.background_id = 0;
+    }
+
+    // load the background sheet on demand
+    int new_sheet = level_info.background_id / 4;
+    if (loaded_bg_sheet != new_sheet) {
+        C2D_SpriteSheetFree(bgSheet);
+        bgSheet = C2D_SpriteSheetLoad(bg_sheet_paths[new_sheet]);
+        loaded_bg_sheet = new_sheet;
     }
 
     char *ground_data = get_metadata_value(level_string, "kA7");
