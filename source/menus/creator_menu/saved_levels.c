@@ -452,6 +452,7 @@ static void saved_levels_init(UIScreen *s) {
         populate_list();
     } else {
         ui_label_set_text(error_label, "No saved levels found!");
+        ui_disable_element((UIElement *)page_info_label);
         update_arrows();
     }
 

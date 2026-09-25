@@ -569,8 +569,6 @@ static void online_menu_exit() {
         search_task.cancelled = true;
         threadJoin(thread, U64_MAX);
     }
-    
-    save_current_save_file(LEVEL_LIST_ONLINE);
 }
 
 
