@@ -53,6 +53,7 @@ static float get_object_particle_depth(int id) {
         case YELLOW_ORB:
         case BLUE_ORB:
         case PINK_ORB:
+        case GREEN_ORB:
         case SECRET_COIN:
             return 0.7f;
     }
@@ -184,6 +185,17 @@ void spawn_object_particles(int obj) {
                 index = load_object_particles(obj, &ring_effect, false);
                 if (index >= 0) {
                     set_particle_color(&object_particle[index].ps.cfg, 1, 0, 1);
+
+                    object_particle[index].ps.emitterX = objects.x[obj];
+                    object_particle[index].ps.emitterY = objects.y[obj];
+                }
+            }
+            break;
+        case GREEN_ORB:
+            if (!is_ps_already_loaded(obj)) {
+                index = load_object_particles(obj, &ring_effect, false);
+                if (index >= 0) {
+                    set_particle_color(&object_particle[index].ps.cfg, 0, 1, 0);
 
                     object_particle[index].ps.emitterX = objects.x[obj];
                     object_particle[index].ps.emitterY = objects.y[obj];
