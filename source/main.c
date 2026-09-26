@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <3ds.h>
+#include "c3d/renderqueue.h"
 #include "level_loading.h"
 #include "main.h"
 #include "graphics.h"
@@ -1254,117 +1255,118 @@ void game_loop() {
         update_bottom_particles(delta);
         update_touch_effect(delta);
 
-        C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-        C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ZERO);
+        if(C3D_FrameBegin(settingsState.vsync ? C3D_FRAME_SYNCDRAW : C3D_FRAME_NONBLOCK)){
+            C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ZERO);
 
-        // Top screen, drawn once per eye when 3D is on
-        for (int eye = 0; begin_top_eye(eye); eye++) {
-            begin_eye_layer(DEPTH_BACKGROUND);
-            draw_background(state.background_x / 8, -(state.camera_y / 8) + 200);
-            end_eye_layer();
+            // Top screen, drawn once per eye when 3D is on
+            for (int eye = 0; begin_top_eye(eye); eye++) {
+                begin_eye_layer(DEPTH_BACKGROUND);
+                draw_background(state.background_x / 8, -(state.camera_y / 8) + 200);
+                end_eye_layer();
 
-            C2D_ViewScale(SCALE, SCALE);
-            C2D_ViewTranslate(0, CAM_Y_MTX_OFFSET);
+                C2D_ViewScale(SCALE, SCALE);
+                C2D_ViewTranslate(0, CAM_Y_MTX_OFFSET);
 
-            // The level rides in front of the screen, the background stays way back
-            begin_eye_layer(DEPTH_LEVEL);
+                // The level rides in front of the screen, the background stays way back
+                begin_eye_layer(DEPTH_LEVEL);
 
-            draw_objects();
+                draw_objects();
 
-            draw_end_wall(delta);
+                draw_end_wall(delta);
 
-            draw_attempt_text();
+                draw_attempt_text();
 
-            draw_ground(state.ground_x, state.camera_y, 0, false, SCREEN_WIDTH);
+                draw_ground(state.ground_x, state.camera_y, 0, false, SCREEN_WIDTH);
 
-            if (state.ground_y_gfx > 2) {
-                if (state.camera_y - LEVEL_Y_OFFSET + state.ground_y_gfx > 0) draw_ground(state.ground_x, state.camera_y, state.camera_y + state.ground_y_gfx - LEVEL_Y_OFFSET, false, SCREEN_WIDTH);
-                draw_ground(state.ground_x, state.camera_y, state.camera_y - LEVEL_Y_OFFSET + SCREEN_HEIGHT_AREA - state.ground_y_gfx, true, SCREEN_WIDTH);
-            }
+                if (state.ground_y_gfx > 2) {
+                    if (state.camera_y - LEVEL_Y_OFFSET + state.ground_y_gfx > 0) draw_ground(state.ground_x, state.camera_y, state.camera_y + state.ground_y_gfx - LEVEL_Y_OFFSET, false, SCREEN_WIDTH);
+                    draw_ground(state.ground_x, state.camera_y, state.camera_y - LEVEL_Y_OFFSET + SCREEN_HEIGHT_AREA - state.ground_y_gfx, true, SCREEN_WIDTH);
+                }
 
-            change_blending(true);
-            draw_use_effects(get_use_effect_array_ptr(GFX_TOP_BUT_ABOVE_LEVEL));
+                change_blending(true);
+                draw_use_effects(get_use_effect_array_ptr(GFX_TOP_BUT_ABOVE_LEVEL));
 
-            if (level_info.wall_y > 0) {
-                drawParticleSystem(&end_wall_firework, 0, 0, 1);
-                drawParticleSystem(&level_complete_effect_p1, 0, 0, 1);
-                drawParticleSystem(&level_complete_effect_p2, 0, 0, 1);
-            }
+                if (level_info.wall_y > 0) {
+                    drawParticleSystem(&end_wall_firework, 0, 0, 1);
+                    drawParticleSystem(&level_complete_effect_p1, 0, 0, 1);
+                    drawParticleSystem(&level_complete_effect_p2, 0, 0, 1);
+                }
 
-            end_eye_layer();
+                end_eye_layer();
 
-            change_blending(false);
+                change_blending(false);
 
-            if (level_info.wall_y > 0) {
+                if (level_info.wall_y > 0) {
+                    begin_eye_layer(DEPTH_POPUP);
+                    draw_level_complete_popup();
+                    end_eye_layer();
+                }
+
                 begin_eye_layer(DEPTH_POPUP);
-                draw_level_complete_popup();
+                draw_new_best_popup();
+                end_eye_layer();
+
+                C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
+                C2D_ViewScale(1/SCALE, 1/SCALE);
+
+                begin_eye_layer(DEPTH_POPUP);
+                //gameplay_screen_top_loop();
+                ui_stack_draw(SCREEN_TOP);
+                draw_level_complete_top();
+                draw_stack_fade();
+                //draw_stack_debug();
                 end_eye_layer();
             }
 
-            begin_eye_layer(DEPTH_POPUP);
-            draw_new_best_popup();
-            end_eye_layer();
+            // Bottom screen
+            C2D_SceneBegin(bot);
+            C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
+
+            draw_background((state.background_x / 8) + 40, 200);
+
+            C2D_ViewScale(SCALE, SCALE);
+            C2D_ViewTranslate(0, CAM_Y_MTX_OFFSET);
+            
+            change_blending(true);
+            draw_bottom_particles();
+            change_blending(false);
+
+            draw_ground(state.ground_x + 52.5f, 0.f, -71.f, false, SCREEN_BOT_WIDTH);
+            draw_ground(state.ground_x + 52.5f, 0.f, 210.f, true, SCREEN_BOT_WIDTH);
 
             C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
             C2D_ViewScale(1/SCALE, 1/SCALE);
 
-            begin_eye_layer(DEPTH_POPUP);
-            //gameplay_screen_top_loop();
-            ui_stack_draw(SCREEN_TOP);
-            draw_level_complete_top();
+            //gameplay_screen_bot_loop();
+            ui_stack_draw(SCREEN_BTM);
+            draw_level_complete();
+            
+            change_blending(true);
+            draw_touch_effect();
+            change_blending(false);
+
+            if (state.profiling) {
+                float processingTime = ticks / CPU_TICKS_PER_MSEC;
+                ProfilerUpdateData data = {
+                    .processingTime = processingTime,
+                    .touchPos = touchPos,
+                    .kDown = touch.down,
+                    .steps = steps
+                };
+
+                profiler_update(data);
+                profiler_draw();
+            }
+
             draw_stack_fade();
-            //draw_stack_debug();
-            end_eye_layer();
+
+            if (state.noclip) {
+                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 234, 0.5f, 0.5f, 0, true, "Noclip Activated");
+            }
+            C2D_ViewReset();
+
+            C3D_FrameEnd(0);
         }
-
-        // Bottom screen
-        C2D_SceneBegin(bot);
-        C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
-
-        draw_background((state.background_x / 8) + 40, 200);
-
-        C2D_ViewScale(SCALE, SCALE);
-        C2D_ViewTranslate(0, CAM_Y_MTX_OFFSET);
-        
-        change_blending(true);
-        draw_bottom_particles();
-        change_blending(false);
-
-        draw_ground(state.ground_x + 52.5f, 0.f, -71.f, false, SCREEN_BOT_WIDTH);
-        draw_ground(state.ground_x + 52.5f, 0.f, 210.f, true, SCREEN_BOT_WIDTH);
-
-        C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
-        C2D_ViewScale(1/SCALE, 1/SCALE);
-
-        //gameplay_screen_bot_loop();
-        ui_stack_draw(SCREEN_BTM);
-        draw_level_complete();
-        
-        change_blending(true);
-        draw_touch_effect();
-        change_blending(false);
-
-        if (state.profiling) {
-            float processingTime = ticks / CPU_TICKS_PER_MSEC;
-            ProfilerUpdateData data = {
-                .processingTime = processingTime,
-                .touchPos = touchPos,
-                .kDown = touch.down,
-                .steps = steps
-            };
-
-            profiler_update(data);
-            profiler_draw();
-        }
-
-        draw_stack_fade();
-
-        if (state.noclip) {
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 234, 0.5f, 0.5f, 0, true, "Noclip Activated");
-        }
-        C2D_ViewReset();
-
-        C3D_FrameEnd(0);
 
         if (being_faded) {
             if (song_loaded) unpause_playback_mp3();

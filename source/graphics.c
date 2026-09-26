@@ -83,6 +83,7 @@ static bool render_list_changed;
 static SpriteObject player_sprite_cache;
 
 bool p1_trail = false;
+float p1_trail_timer = 0;
 int current_fading_effect = FADE_SIMPLE;
 int current_pulserod_ball_image = 0;
 

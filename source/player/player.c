@@ -936,14 +936,19 @@ void spawn_p1_trail(Player *player, int player_id) {
     }
 }
 
+#define P1_TRAIL_RATE 0.05f
+
 void update_p1_trail(Player *player, int player_id) {
-    // Spawn new p1 icon every 3 frames (the division hurts)
-    if (!state.dead && p1_trail && (frame_counter % 3) == 0) {
+    // Spawn new p1 icon 
+    if (!state.dead && p1_trail && p1_trail_timer <= 0) {
+        p1_trail_timer = P1_TRAIL_RATE;
         // If current player is player 2, dual must be true
         if (player_id == 0 || state.dual) {
             spawn_p1_trail(player, player_id);
         }
     }
+
+    p1_trail_timer -= delta;
 
     for (size_t i = 0; i < P1_TRAIL_LENGTH; i++) {
         P1Trail *trail_data = &state.p1_trail_data[player_id][i];

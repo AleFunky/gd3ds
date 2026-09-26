@@ -202,7 +202,7 @@ APP_ROMFS := $(TOPDIR)/$(ROMFS)
 
 COMMON_MAKEROM_PARAMS := -rsf $(RSF) -target t -exefslogo -elf $(OUTPUT_FILE).elf -icon icon.icn -banner banner.bnr \
 	-DAPP_TITLE="$(APP_TITLE)" -DAPP_PRODUCT_CODE="$(APP_PRODUCT_CODE)" -DAPP_UNIQUE_ID="$(APP_UNIQUE_ID)" \
-	-DAPP_ROMFS="$(APP_ROMFS)" -DAPP_SYSTEM_MODE="64MB" -DAPP_SYSTEM_MODE_EXT="124MB" -major "$(APP_VER_MAJOR)" \
+	-DAPP_ROMFS="$(APP_ROMFS)" -DAPP_SYSTEM_MODE="80MB" -DAPP_SYSTEM_MODE_EXT="124MB" -major "$(APP_VER_MAJOR)" \
 	-minor "$(APP_VER_MINOR)" -micro "$(APP_VER_MICRO)"
 
 ifeq ($(OS),Windows_NT)
