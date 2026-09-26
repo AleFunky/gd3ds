@@ -784,6 +784,7 @@ static void online_level_menu_exit() {
     }
 
     already_played_online_level = false;
+    save_current_save_file(LEVEL_LIST_ONLINE);
 }
 
 const UIScreenDefPair online_level_menu_def = {
