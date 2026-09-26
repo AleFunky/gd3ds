@@ -144,7 +144,7 @@ void draw_object_particles() {
             // Calculate stationary fade positions
             fade_x += get_special_fading_vars(obj, fade_val);
 
-            drawParticleSystem(&object_particle[i].ps, fade_x, fade_y, fade_val / 255.f);
+            drawParticleSystem(&object_particle[i].ps, fade_x, fade_y, (fade_val / 255.f) * objects.alpha_trigger_opacity[obj]);
         }
     }
 }
