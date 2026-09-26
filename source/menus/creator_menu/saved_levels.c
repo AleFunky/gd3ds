@@ -55,7 +55,6 @@ static SavedLevelDataList *saved_levels;
 
 int currentPage;
 int maxPages;
-int currentEntryCount;
 bool needsRefresh;
 
 static void action_open_online_level_menu(UIElement* e, const UIPropertyList *args) {
@@ -95,12 +94,12 @@ static void action_change_page(UIElement* e, const UIPropertyList *args) {
 }
 
 static void update_arrows() {
-    if (currentPage < maxPages) ui_run_func_on_tag(screen, "nextpage", ui_enable_element); else ui_run_func_on_tag(screen, "nextpage", ui_disable_element);
+    if (currentPage < maxPages - 1) ui_run_func_on_tag(screen, "nextpage", ui_enable_element); else ui_run_func_on_tag(screen, "nextpage", ui_disable_element);
     if ((currentPage) >= 1) ui_run_func_on_tag(screen, "prevpage", ui_enable_element); else ui_run_func_on_tag(screen, "prevpage", ui_disable_element);
 
     int total = saved_levels->count;
-    int current = currentPage * MAX_LEVELS_PER_PAGE;
-    int to = currentPage * MAX_LEVELS_PER_PAGE + currentEntryCount;
+    int current = currentPage * MAX_LEVELS_PER_PAGE + 1;
+    int to = (currentPage + 1) * MAX_LEVELS_PER_PAGE;
 
     // Cap to amount
     if (current > total) {
@@ -125,9 +124,9 @@ static UIActionDef saved_levels_actions[] = {
 
 static void populate_list() {
     ui_list_reset(list);
-    int start = currentPage * MAX_LEVELS_PER_PAGE;
-    for (int i = start; (i < start + MAX_LEVELS_PER_PAGE) && (i < saved_levels->count); i++) {
-        currentEntryCount = i - start + 1;
+    int from = currentPage * MAX_LEVELS_PER_PAGE;
+    int start = saved_levels->count - from - 1;
+    for (int i = start; (i > start - MAX_LEVELS_PER_PAGE) && (i >= 0); i--) {
         char tmp_name[32];
         char tmp_creator[36];
         char tmp_song[256];
@@ -444,8 +443,7 @@ static void saved_levels_init(UIScreen *s) {
     ui_run_func_on_tag(s, "spinner", ui_disable_element);
 
     currentPage = 0;
-    maxPages = (int)ceilf(saved_levels->count / 10);
-    currentEntryCount = 0;
+    maxPages = (int)ceilf(saved_levels->count / (float)MAX_LEVELS_PER_PAGE);
     needsRefresh = false;
 
     if (saved_levels->count > 0) {

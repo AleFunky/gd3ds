@@ -94,7 +94,7 @@ static void fill_song_entries(char **songStrings, int songStringCount) {
     }
 }
 
-static void fill_song_entry(char *songString, int targetEntry) {
+static void fill_song_entry(char *songString, SongEntry *targetEntry) {
         int songKeyCount = 0;
 
         char **songKeys = split_string_str_del(songString, "~|~", &songKeyCount, true);
@@ -106,7 +106,7 @@ static void fill_song_entry(char *songString, int targetEntry) {
             switch (key) {
                 case 10:
                     // song link
-                    strncpy(song_entries[targetEntry].songLink, valStr, sizeof(song_entries[targetEntry].songLink) - 1);
+                    strncpy(targetEntry->songLink, valStr, sizeof(targetEntry->songLink) - 1);
                     break;
             }
         }
@@ -261,124 +261,122 @@ static void fill_level_entry(char **levelStrings, int levelStringsCount, bool fi
         case 1:
             // level id
             if (fillSearchEntry)
-                search_entries[searchId].levelId = atoi(valStr);
+                current_search_entry->levelId = atoi(valStr);
             break;
         case 2:
             // level name
             if (fillSearchEntry)
-                strncpy(search_entries[searchId].name, valStr, sizeof(search_entries[searchId].name) - 1);
+                strncpy(current_search_entry->name, valStr, sizeof(current_search_entry->name) - 1);
             break;
         case 3:
             // level description
             if (fillSearchEntry)
             {
-
-                
                 if (valStr[0] == '\0')
                 {
-                    search_entries[searchId].description = strdup("No description provided.");
+                    current_search_entry->description = strdup("No description provided.");
                     break;
                 }
                 if (gdps) {
-                    search_entries[searchId].description = strdup(valStr);
+                    current_search_entry->description = strdup(valStr);
                     break;
                 };
                 fix_base64_url(valStr);
-                search_entries[searchId].description = malloc(strlen(valStr) + 1);
-                int decoded_len = base64_decode(valStr, (unsigned char *)search_entries[searchId].description);
+                current_search_entry->description = malloc(strlen(valStr) + 1);
+                int decoded_len = base64_decode(valStr, (unsigned char *)current_search_entry->description);
                 if (decoded_len > 0)
                 {
-                    search_entries[searchId].description[decoded_len] = '\0';
+                    current_search_entry->description[decoded_len] = '\0';
                 }
             }
             break;
         case 5:
             // level version
             if (fillSearchEntry)
-                search_entries[searchId].levelVersion = atoi(valStr);
+                current_search_entry->levelVersion = atoi(valStr);
             break;
         case 6:
             // creator player id
             if (fillSearchEntry)
-                search_entries[searchId].creatorId = atoi(valStr);
+                current_search_entry->creatorId = atoi(valStr);
             break;
         case 9:
             // level difficulty
-            search_entries[searchId].difficulty = atoi(valStr) / 10;
+            current_search_entry->difficulty = atoi(valStr) / 10;
             break;
         case 10:
             // level downloads
             if (fillSearchEntry)
-                search_entries[searchId].downloads = atoi(valStr);
+                current_search_entry->downloads = atoi(valStr);
             break;
         case 12:
             // main level song, 0 if custom song is present
             if (fillSearchEntry)
-                search_entries[searchId].mainSongId = atoi(valStr);
+                current_search_entry->mainSongId = atoi(valStr);
             break;
         case 13:
             // game version the level was uploaded in
             if (fillSearchEntry)
-                search_entries[searchId].gameVersion = atoi(valStr);
+                current_search_entry->gameVersion = atoi(valStr);
             break;
         case 14:
             // level likes, formula is likes - dislikes
             if (fillSearchEntry)
-                search_entries[searchId].likes = atoi(valStr);
+                current_search_entry->likes = atoi(valStr);
             break;
         case 15:
             // level length
             if (fillSearchEntry)
-                search_entries[searchId].lengthNum = atoi(valStr);
+                current_search_entry->lengthNum = atoi(valStr);
             break;
         case 17:
             // demon status
             if (fillSearchEntry)
-                search_entries[searchId].isDemon = parse_bool(valStr);
+                current_search_entry->isDemon = parse_bool(valStr);
             break;
         case 18:
             // stars
             if (fillSearchEntry)
-                search_entries[searchId].stars = atoi(valStr);
+                current_search_entry->stars = atoi(valStr);
             break;
         case 19:
             // feature score
             if (fillSearchEntry)
-                search_entries[searchId].featureScore = atoi(valStr);
+                current_search_entry->featureScore = atoi(valStr);
             break;
         case 25:
             // auto status
             if (fillSearchEntry)
-                search_entries[searchId].isAuto = parse_bool(valStr);
+                current_search_entry->isAuto = parse_bool(valStr);
             break;
         case 30:
             // if level is a copy, id of original level
             if (fillSearchEntry)
-                search_entries[searchId].originalId = atoi(valStr);
+                current_search_entry->originalId = atoi(valStr);
             break;
         case 31:
             // two player status
             if (fillSearchEntry)
-                search_entries[searchId].isTwoPlayer = parse_bool(valStr);
+                current_search_entry->isTwoPlayer = parse_bool(valStr);
             break;
         case 35:
             // newgrounds song id
             if (fillSearchEntry)
-                search_entries[searchId].songId = atoi(valStr);
+                current_search_entry->songId = atoi(valStr);
             break;
         case 39:
             // stars requested
             if (fillSearchEntry)
-                search_entries[searchId].reqStars = atoi(valStr);
+                current_search_entry->reqStars = atoi(valStr);
             break;
         case 42:
             // epic, legendary, mythic
             if (fillSearchEntry)
-                search_entries[searchId].epic = atoi(valStr);
+                current_search_entry->epic = atoi(valStr);
         case 45:
             // object count, caps at 65535
             if (fillSearchEntry)
-                search_entries[searchId].objCount = atoi(valStr);
+                current_search_entry->objCount = atoi(valStr);
             break;
         case 4:
             // base64 encoded probably compressed level string
@@ -827,7 +825,7 @@ int get_comments_internal(GenericTask *task, int id, int page, int sortType, boo
     return 0;
 }
 
-int get_song_data_internal(GenericTask *task, int songId, int targetSongEntry, bool useGdps) {
+int get_song_data_internal(GenericTask *task, int songId, SongEntry *targetSongEntry, bool useGdps) {
     char *outdata;
     int result = get_song_info_from_id(task, &outdata, songId, useGdps);
 
@@ -853,16 +851,16 @@ int search_levels(GenericTask *task) {
 }
 
 int get_level(GenericTask *task) {
-    int result = get_level_data_internal(task, search_entries[curr_search_id].levelId, refresh, curr_search_id, gdps);
+    int result = get_level_data_internal(task, online_menu_level_id, refresh, curr_search_id, gdps);
     return result;
 }
 
 int get_comments(GenericTask *task) {
-    int result = get_comments_internal(task, search_entries[curr_search_id].levelId, current_comments_page, comments_sort_type, gdps);
+    int result = get_comments_internal(task, online_menu_level_id, current_comments_page, comments_sort_type, gdps);
     return result;
 }
 
 int get_song_data(GenericTask *task) {
-    int result = get_song_data_internal(task, search_entries[curr_search_id].songId, search_entries[curr_search_id].songIndex, gdps);
+    int result = get_song_data_internal(task, current_search_entry->songId, current_song_entry, gdps);
     return result;
 }

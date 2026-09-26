@@ -23,6 +23,8 @@
 #include "player/collision.h"
 #include "utils/utils.h"
 
+#include "menus/creator_menu/online/online_level_menu.h"
+
 ObjectsArray objects = { 0 };
 
 Section empty_section = { 0 };
@@ -1396,10 +1398,10 @@ const char *default_name = "Unknown";
 void load_online_level_info(char *level_string) {
     load_level_string_info(level_string);
     
-    level_info.song_id = search_entries[curr_search_id].mainSongId;
-    level_info.custom_song_id = search_entries[curr_search_id].songId;
-    snprintf(level_info.level_name, sizeof(level_info.level_name), "%s", search_entries[curr_search_id].name);
-    snprintf(level_info.creator_name, sizeof(level_info.level_name), "%s", creator_entries[search_entries[curr_search_id].creatorIndex].creatorName);
+    level_info.song_id = current_search_entry->mainSongId;
+    level_info.custom_song_id = current_search_entry->songId;
+    snprintf(level_info.level_name, sizeof(level_info.level_name), "%s", current_search_entry->name);
+    snprintf(level_info.creator_name, sizeof(level_info.level_name), "%s",current_creator_entry->creatorName);
 }
 
 int load_online_level(char *level_string) {

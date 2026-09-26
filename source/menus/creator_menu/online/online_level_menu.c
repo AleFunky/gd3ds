@@ -68,6 +68,9 @@ const int demon_face_featured_offsets[] = {
 static bool has_saved_level = false;
 static char *loaded_level_string = NULL;
 int online_menu_level_id = 0;
+SearchEntry *current_search_entry = NULL;
+CreatorEntry *current_creator_entry = NULL;
+SongEntry *current_song_entry = NULL;
 
 int get_saved_level(GenericTask *task) {
     size_t out_size;
@@ -165,8 +168,8 @@ const char* warnings[] = {
     "This level uses a <#4c8cc7>custom song</> that\nhas not been <#36c244>downloaded</> yet. Play\nwithout music?"
 };
 
-static void update_download_button(){
-    bool song_exists = check_song(search_entries[curr_search_id].songId);
+static void update_download_button(SearchEntry *entry){
+    bool song_exists = check_song(entry->songId);
     if (song_exists) {
         ui_disable_element((UIElement *)song_download_button);
     }
@@ -250,13 +253,13 @@ void check_warnings_and_play(){
             switch(warning_step){
                 case WARNING_HIGH_OBJECT:
                     int obj_count = (is_N3DS ? 44000 : 14000);
-                    should_warn = search_entries[curr_search_id].objCount >= obj_count;
+                    should_warn = current_search_entry->objCount >= obj_count;
                     break;
                 case WARNING_VERSION:
-                    should_warn = derive_gj_version(search_entries[curr_search_id].gameVersion) > GD_VERSION;
+                    should_warn = derive_gj_version(current_search_entry->gameVersion) > GD_VERSION;
                     break;
                 case WARNING_MISSING_SONG:
-                    int song_id = search_entries[curr_search_id].songId;
+                    int song_id = current_search_entry->songId;
                     should_warn = !(song_id == 0 || check_song(song_id));
                 default:
                     break;
@@ -320,25 +323,9 @@ static void update_progress_bars() {
 }
 
 static void populate_level_info(int level_id) {
-
-    SearchEntry *entry_srch;
-    CreatorEntry *entry_c;
-    SongEntry *entry_sng;
-
-    SavedLevelDataEntry *data = get_saved_level_data(level_id);
-    if (data && !refresh) {
-        entry_srch = &data->search_entry;
-        entry_c = &data->creator_entry;
-        entry_sng = &data->song_entry;
-    } else {
-        entry_srch = &search_entries[curr_search_id];
-        entry_c = &creator_entries[entry_srch->creatorIndex];
-        entry_sng = (entry_srch->songId != 0) ? &song_entries[entry_srch->songIndex] : NULL;
-        bool could_save = save_level_to_server_file(current_server_file, level_id, entry_srch, entry_c, entry_sng);
-        if (!could_save) {
-            output_log("Oops, couldn't save da level!\n");
-        }
-    }
+    SearchEntry *entry_srch = current_search_entry;
+    CreatorEntry *entry_c = current_creator_entry;
+    SongEntry *entry_sng = current_song_entry;
 
     char *downloads = truncate_number(entry_srch->downloads);
     ui_label_set_text(downloads_label, downloads);
@@ -377,11 +364,11 @@ static void populate_level_info(int level_id) {
         snprintf(tmp_songsize, sizeof(tmp_songsize), "Size: %.1fMB", entry_sng->songSize);
         ui_label_set_text(song_size_label, tmp_songsize);
 
-        if (entry_srch->songIndex < songEntriesLength) {
+        if (current_song_entry) {
             song_name = entry_sng->songTitle;
             song_artist_name = entry_sng->artistName;
         }
-        update_download_button();
+        update_download_button(entry_srch);
     } else {
         // Main level song
         if (entry_srch->mainSongId >= 0 && entry_srch->mainSongId < current_main_level_pack->count) {
@@ -389,7 +376,7 @@ static void populate_level_info(int level_id) {
             song_artist_name = (char *) current_main_level_pack->levels[entry_srch->mainSongId].song_data.artist;
         }
         
-        ui_disable_element((UIElement *) song_size_label);
+        ui_disable_element((UIElement *)song_size_label);
         ui_disable_element((UIElement *)song_download_button);
     }
 
@@ -675,6 +662,21 @@ static void online_level_init (UIScreen *s) {
     ui_disable_element((UIElement *) song_progress_bar);
     ui_disable_element((UIElement *) song_status_label);
     ui_disable_element((UIElement *) speed_label);
+
+    SavedLevelDataEntry *data = get_saved_level_data(online_menu_level_id);
+    if (data && !refresh) {
+        current_search_entry = &data->search_entry;
+        current_creator_entry = &data->creator_entry;
+        current_song_entry = &data->song_entry;
+    } else {
+        current_search_entry = &search_entries[curr_search_id];
+        current_creator_entry = &creator_entries[current_search_entry->creatorIndex];
+        current_song_entry = (current_search_entry->songId != 0) ? &song_entries[current_search_entry->songIndex] : NULL;
+        bool could_save = save_level_to_server_file(current_server_file, online_menu_level_id, current_search_entry, current_creator_entry, current_song_entry);
+        if (!could_save) {
+            output_log("Oops, couldn't save da level!\n");
+        }
+    }
     
     play_menu_song();
     
@@ -714,8 +716,8 @@ static void online_level_menu_update(UIScreen *s, UIInput *i) {
         // Handle result
         if (song_data_result == 0) {
             song_data_task.finished = false;
-            snprintf(song_task.song_id, sizeof(song_task.song_id), "%d", search_entries[curr_search_id].songId);
-            song_task.url = song_entries[search_entries[curr_search_id].songIndex].songLink;
+            snprintf(song_task.song_id, sizeof(song_task.song_id), "%d", current_search_entry->songId);
+            song_task.url = current_song_entry->songLink;
             song_thread = create_download_song_thread(&song_task);
         } else { handle_song_data_errors(song_data_result); }
         
