@@ -240,9 +240,9 @@ $(OUTPUT_FILE).elf: $(OFILES) $(T3XFILES)
 
 $(OUTPUT_FILE).3dsx: $(OUTPUT_FILE).elf $(OUTPUT_FILE).smdh
 	@echo "dump  ... $(notdir $<)"
-#	$(SILENT)$(OBJDUMP) -h -C -S --visualize-jumps $< > $(DUMPFILE)
+	$(SILENT)$(OBJDUMP) -h -C -S --visualize-jumps $< > $(DUMPFILE)
 	@echo "hex   ... $(notdir $<)"
-#	$(SILENT)$(OBJDUMP) -h -C -S -s -j .rodata $< > $(DUMPFILE_HEX)
+	$(SILENT)$(OBJDUMP) -h -C -S -s -j .rodata $< > $(DUMPFILE_HEX)
 	@echo "built ... $(notdir $@)"
 	$(SILENT)3dsxtool $< $@ $(_3DSXFLAGS)
 
