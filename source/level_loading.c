@@ -1109,6 +1109,9 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                         case PULSE_TRIGGER:
                             get_pulse_trigger(object)->trig_duration = val.f;
                             break;
+                        case SPAWN_TRIGGER:
+                            get_spawn_trigger(object)->trig_duration = val.f;
+                            break;
                     }
                 }
             }
@@ -1425,6 +1428,30 @@ bool is_trigger_object(int id) {
         || id == TOGGLE_TRIGGER
         || id == PULSE_TRIGGER
         || id == SPAWN_TRIGGER;
+}
+
+bool trigger_is_spawn_triggered(int id, int obj) {
+    if (is_color_trigger(id)) return get_color_trigger(obj)->spawn_triggered;
+    switch (id) {
+        case MOVE_TRIGGER:   return get_move_trigger(obj)->spawn_triggered;
+        case ALPHA_TRIGGER:  return get_alpha_trigger(obj)->spawn_triggered;
+        case PULSE_TRIGGER:  return get_pulse_trigger(obj)->spawn_triggered;
+        case TOGGLE_TRIGGER: return get_toggle_trigger(obj)->spawn_triggered;
+        case SPAWN_TRIGGER:  return get_spawn_trigger(obj)->spawn_triggered;
+    }
+    return false;
+}
+
+bool trigger_is_multi_triggered(int id, int obj) {
+    if (is_color_trigger(id)) return get_color_trigger(obj)->multi_triggered;
+    switch (id) {
+        case MOVE_TRIGGER:   return get_move_trigger(obj)->multi_triggered;
+        case ALPHA_TRIGGER:  return get_alpha_trigger(obj)->multi_triggered;
+        case PULSE_TRIGGER:  return get_pulse_trigger(obj)->multi_triggered;
+        case TOGGLE_TRIGGER: return get_toggle_trigger(obj)->multi_triggered;
+        case SPAWN_TRIGGER:  return get_spawn_trigger(obj)->multi_triggered;
+    }
+    return false;
 }
 
 int parse_gd_object(const char *objStr, int obj) {
@@ -2354,6 +2381,7 @@ void reload_level() {
 
     memset(alpha_trigger_buffer, 0, sizeof(alpha_trigger_buffer));
     memset(move_trigger_buffer, 0, sizeof(move_trigger_buffer));
+    memset(spawn_trigger_buffer, 0, sizeof(spawn_trigger_buffer));
 
     for (int i = 0; i < objects.count; i++) {
         objects.activated[i] = false;
@@ -2406,6 +2434,7 @@ void unload_level() {
 
     memset(alpha_trigger_buffer, 0, sizeof(alpha_trigger_buffer));
     memset(move_trigger_buffer, 0, sizeof(move_trigger_buffer));
+    memset(spawn_trigger_buffer, 0, sizeof(spawn_trigger_buffer));
     free_sections();
     free_object_particles();
     

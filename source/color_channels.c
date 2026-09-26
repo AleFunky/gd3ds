@@ -26,6 +26,7 @@ ColorChannel channels[COL_CHANNEL_NUM];
 ColTriggerBuffer col_trigger_buffer[COL_CHANNEL_NUM];
 AlphaTriggerBuffer alpha_trigger_buffer[MAX_ALPHA_TRIGGERS];
 MoveTriggerBuffer move_trigger_buffer[MAX_MOVE_TRIGGERS];
+SpawnTriggerBuffer spawn_trigger_buffer[MAX_SPAWN_TRIGGERS];
 float move_lock_player_x_delta = 0.0f;
 float move_lock_player_y_delta = 0.0f;
 
@@ -487,6 +488,51 @@ void handle_move_triggers(void) {
     }
 }
 
+static int obtain_free_spawn_slot(void) {
+    for (int i = 0; i < MAX_SPAWN_TRIGGERS; i++) {
+        if (!spawn_trigger_buffer[i].active) return i;
+    }
+    return -1;
+}
+
+void upload_to_spawn_buffer(int obj) {
+    int slot = obtain_free_spawn_slot();
+    if (slot < 0) return;
+
+    SpawnTrigger *trigger = get_spawn_trigger(obj);
+    SpawnTriggerBuffer *buffer = &spawn_trigger_buffer[slot];
+    buffer->target_group = trigger->target_group;
+    buffer->source_obj = obj;
+    buffer->seconds = trigger->spawn_delay ? trigger->spawn_delay : trigger->trig_duration;
+    buffer->time_run = 0;
+    buffer->active = true;
+}
+
+void handle_spawn_triggers(void) {
+    for (int slot = 0; slot < MAX_SPAWN_TRIGGERS; slot++) {
+        SpawnTriggerBuffer *buffer = &spawn_trigger_buffer[slot];
+        if (!buffer->active) continue;
+
+        buffer->time_run += g_trigger_dt;
+        if (buffer->time_run > buffer->seconds) {
+            // deactivate before running the group: a spawned spawn trigger enqueues
+            // via obtain_free_spawn_slot() (first free slot) which is always <= slot
+            // so it can't be reprocessed in this same pass
+            buffer->active = false;
+
+            for (GroupNode *p = get_group(buffer->target_group); p; p = p->next) {
+                int obj_idx = p->obj;
+                if (trigger_is_spawn_triggered(objects.id[obj_idx], obj_idx)
+                    && is_trigger_object(objects.id[obj_idx])
+                    && (trigger_is_multi_triggered(objects.id[obj_idx], obj_idx) || !GET_ACTIVATED(obj_idx))
+                    && !objects.toggled[obj_idx]) {
+                    run_trigger(obj_idx);
+                }
+            }
+        }
+    }
+}
+
 void upload_to_buffer(int obj, int channel) {
     if (channel == 0) channel = 1;
     int buffer_channel = get_col_channel_index(channel);
@@ -666,6 +712,9 @@ void run_trigger(int obj) {
         case MOVE_TRIGGER:
             upload_to_move_buffer(obj);
             break;
+        case SPAWN_TRIGGER:
+            upload_to_spawn_buffer(obj);
+            break;
         default:
             return;
     }
@@ -722,7 +771,7 @@ void handle_triggers() {
                         )) {
                             run_trigger(obj);
                         }
-                    } else if (objects.x[obj] < state.player.x) {
+                    } else if (!trigger_is_spawn_triggered(objects.id[obj], obj) && objects.x[obj] < state.player.x) {
                         if (trigger_count < TRIGGER_BUFFER_SIZE) {
                             triggers_buffer[trigger_count++] = obj;
                         }

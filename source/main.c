@@ -1121,6 +1121,7 @@ void game_loop() {
 
             u64 start_trig = svcGetSystemTick();
             handle_triggers();
+            handle_spawn_triggers();
             handle_col_triggers();
             handle_copy_channels();
             handle_alpha_triggers();

@@ -108,6 +108,7 @@ typedef struct {
     bool multi_triggered;
     int target_group;
     float spawn_delay;
+    float trig_duration;
 } SpawnTrigger;
 
 typedef struct {
@@ -269,6 +270,9 @@ AlphaTrigger *get_alpha_trigger(int obj);
 MoveTrigger *get_move_trigger(int obj);
 ToggleTrigger *get_toggle_trigger(int obj);
 SpawnTrigger *get_spawn_trigger(int obj);
+
+bool trigger_is_spawn_triggered(int id, int obj);
+bool trigger_is_multi_triggered(int id, int obj);
 
 extern const char *error_strings[LOAD_ERROR_COUNT - 1];
 
