@@ -118,6 +118,9 @@ void update_object_particles(float dt) {
                 object_particle[i].ps.emitting = false;
             }
 
+            object_particle[i].ps.emitterX = objects.x[obj];
+            object_particle[i].ps.emitterY = objects.y[obj];
+
             updateParticleSystem(&object_particle[i].ps, dt);
         }
     }
