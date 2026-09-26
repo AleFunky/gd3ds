@@ -1,3 +1,5 @@
+# This branch is not playable or finished, do not report issues about this
+
 # Geometry Dash for the 3DS
 
 This is a demake of the popular mobile game **Geometry Dash** for the **Nintendo 3DS**.
