@@ -715,6 +715,14 @@ void run_trigger(int obj) {
         case SPAWN_TRIGGER:
             upload_to_spawn_buffer(obj);
             break;
+        case TOGGLE_TRIGGER:
+        {
+            ToggleTrigger *trigger = get_toggle_trigger(obj);
+            for (GroupNode *p = get_group(trigger->target_group); p; p = p->next) {
+                objects.toggled[p->obj] = !trigger->activate_group;
+            }
+            break;
+        }
         default:
             return;
     }
