@@ -746,8 +746,12 @@ static void online_level_menu_update(UIScreen *s, UIInput *i) {
     if (level_task.finished) {
         result = level_task.result;
         // Handle result
-        if (result != 0 && !already_played_online_level) {
+        if (result != 0) {
             handle_errors(result);
+            if (has_saved_level) {
+                result = 0;
+                ui_enable_element((UIElement *) play_button);
+            }
         } else { // No errors
             ui_disable_element((UIElement *) spinner);
             ui_enable_element((UIElement *) play_button);
