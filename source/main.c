@@ -1241,7 +1241,7 @@ void game_loop() {
         update_bottom_particles(delta);
         update_touch_effect(delta);
 
-        if(C3D_FrameBegin(C3D_FRAME_NONBLOCK)){
+        if(C3D_FrameBegin(settingsState.vsync ? C3D_FRAME_SYNCDRAW : C3D_FRAME_NONBLOCK)){
             C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ZERO);
 
             // Top screen, drawn once per eye when 3D is on
@@ -1352,13 +1352,6 @@ void game_loop() {
             C2D_ViewReset();
 
             C3D_FrameEnd(0);
-        }
-
-        u64 frame_ticks = svcGetSystemTick() - start;
-        u64 maximum_ticks = (CPU_TICKS_PER_MSEC * 1000) / 60;
-
-        if (frame_ticks < maximum_ticks) {
-            gspWaitForVBlank();
         }
 
         if (being_faded) {

@@ -112,6 +112,16 @@ Setting settings[] = {
         .key = CONFIG_GRAPHICS_PATH "glowEnabled"
     },
     {
+        .id = "vsyncEnabled",
+        .label = "VSync",
+        .additionalInfo = "Disables vertical sync and uncaps FPS.",
+        .page = PAGE_GRAPHICS, 
+
+        .defaultValue = true,
+        .var = &settingsState.vsync,
+        .key = CONFIG_GRAPHICS_PATH "vsyncEnabled",
+    },
+    {
         .id = "yButton",
         .label = "Y to jump",
         .additionalInfo = "Swaps your jump input to Y.",
