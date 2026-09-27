@@ -262,6 +262,8 @@ void init_col_channels() {
 void handle_col_channel(int chan) {
     int channel = get_col_channel_index(chan);
 
+    if (channel == get_col_channel_index(CHANNEL_BLACK)) return;
+
     ColTriggerBuffer *buffer = &col_trigger_buffer[channel];
 
     if (buffer->active) {
@@ -311,6 +313,7 @@ void handle_col_triggers() {
 
 void handle_copy_channels() {
     for (int chan = 0; chan < COL_CHANNEL_NUM; chan++) {
+        if (chan == get_col_channel_index(CHANNEL_BLACK)) continue;
         int copy_id = channels[chan].copy_color_id;
         if (copy_id > 0) {
             int src = get_col_channel_index(copy_id);
@@ -1007,6 +1010,7 @@ void run_trigger(int obj) {
             break;
 
         case COL_TRIGGER: // 2.0 color trigger
+            if (get_col_channel_index(get_color_trigger(obj)->target_color_id) == get_col_channel_index(CHANNEL_BLACK)) break;
             upload_to_buffer(obj, get_color_trigger(obj)->target_color_id);
             break;
         case ALPHA_TRIGGER:
@@ -1019,6 +1023,8 @@ void run_trigger(int obj) {
             upload_to_spawn_buffer(obj);
             break;
         case PULSE_TRIGGER:
+            if (get_pulse_trigger(obj)->pulse_target_type == PULSE_TARGET_CHANNEL &&
+                get_col_channel_index(get_pulse_trigger(obj)->target_group) == get_col_channel_index(CHANNEL_BLACK)) break;
             upload_to_pulse_buffer(obj);
             break;
         case TOGGLE_TRIGGER:

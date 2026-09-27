@@ -2008,6 +2008,8 @@ void set_color_channels() {
         GDColorChannel colorChannel = colorChannels[i];
         int id = colorChannel.channelID;
 
+        if (id == CHANNEL_BLACK) continue;
+
         switch (id) {
             case CHANNEL_P1:
             case CHANNEL_P2:
