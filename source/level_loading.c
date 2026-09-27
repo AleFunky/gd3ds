@@ -1599,6 +1599,11 @@ int parse_gd_object(const char *objStr, int obj) {
         objects.id[obj] = 0;
     }
 
+    if (is_trigger_object(obj_id)) {
+        objects.width[obj] = 30 * fabsf(objects.scale_x[obj]);
+        objects.height[obj] = 30 * fabsf(objects.scale_y[obj]);
+    }
+
     free_string_array(tokens, count);
     return 1;
 }

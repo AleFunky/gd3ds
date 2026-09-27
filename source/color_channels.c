@@ -2,6 +2,7 @@
 #include "color_channels.h"
 #include "color.h"
 #include "math_helpers.h"
+#include <float.h>
 #include <math.h>
 #include "level_loading.h"
 #include "main.h"
@@ -1051,6 +1052,8 @@ int compare_triggers(const void *a, const void *b) {
     return yb - ya;
 }
 
+#define TOUCH_TRIGGER_EPSILON 0.5f
+
 int triggers_buffer[TRIGGER_BUFFER_SIZE];
 int trigger_count;
 
@@ -1073,14 +1076,14 @@ void handle_triggers() {
                         // Try p1
                         if (intersect(
                             state.player.x, state.player.y, state.player.width, state.player.height, 0, 
-                            objects.x[obj], objects.y[obj], 30, 30, objects.rotation[obj]
+                            objects.x[obj], objects.y[obj], objects.width[obj] + TOUCH_TRIGGER_EPSILON, objects.height[obj] + TOUCH_TRIGGER_EPSILON, objects.rotation[obj]
                         )) {
                             run_trigger(obj);
                         } else
                         // Try now p2
                         if (intersect(
                             state.player2.x, state.player2.y, state.player2.width, state.player2.height, 0, 
-                            objects.x[obj], objects.y[obj], 30, 30, objects.rotation[obj]
+                            objects.x[obj], objects.y[obj], objects.width[obj] + TOUCH_TRIGGER_EPSILON, objects.height[obj] + TOUCH_TRIGGER_EPSILON, objects.rotation[obj]
                         )) {
                             run_trigger(obj);
                         }
