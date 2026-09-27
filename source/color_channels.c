@@ -28,6 +28,7 @@ AlphaTriggerBuffer alpha_trigger_buffer[MAX_ALPHA_TRIGGERS];
 MoveTriggerBuffer move_trigger_buffer[MAX_MOVE_TRIGGERS];
 SpawnTriggerBuffer spawn_trigger_buffer[MAX_SPAWN_TRIGGERS];
 PulseTriggerBuffer pulse_trigger_buffer[MAX_PULSE_TRIGGERS];
+static unsigned int pulse_activation_counter = 0;
 float move_lock_player_x_delta = 0.0f;
 float move_lock_player_y_delta = 0.0f;
 
@@ -632,6 +633,7 @@ void upload_to_pulse_buffer(int obj) {
 
     buffer->time_run = 0;
     buffer->seconds = trigger->pulse_fade_in + trigger->pulse_hold + trigger->pulse_fade_out;
+    buffer->activation_order = pulse_activation_counter++;
     buffer->active = true;
 }
 
@@ -659,7 +661,7 @@ void handle_pulse_triggers(void) {
         int idx = buffer->pulse_index;
         if (idx < 0 || idx >= chan->num_pulses) continue;
 
-        Color base_color = (idx == 0) ? chan->non_pulse_color : chan->color;
+        Color base_color = chan->non_pulse_color;
 
         Color result_color;
         if (buffer->time_run <= buffer->fade_in) {
@@ -687,92 +689,77 @@ void handle_pulse_triggers(void) {
         chan->color = result_color;
     }
 
-    // process group pulses
+    // process group pulses in ascending activation_order
+    int group_order[MAX_PULSE_TRIGGERS];
+    int group_order_count = 0;
     for (int i = 0; i < MAX_PULSE_TRIGGERS; i++) {
-        PulseTriggerBuffer *buffer = &pulse_trigger_buffer[i];
-        if (!buffer->active || buffer->pulse_target_type != PULSE_TARGET_GROUP) continue;
+        PulseTriggerBuffer *b = &pulse_trigger_buffer[i];
+        if (!b->active || b->pulse_target_type != PULSE_TARGET_GROUP) continue;
+        group_order[group_order_count++] = i;
+    }
+    // insertion sort by activation_order ascending
+    for (int a = 1; a < group_order_count; a++) {
+        int key = group_order[a];
+        unsigned int key_order = pulse_trigger_buffer[key].activation_order;
+        int b = a - 1;
+        while (b >= 0 && pulse_trigger_buffer[group_order[b]].activation_order > key_order) {
+            group_order[b + 1] = group_order[b];
+            b--;
+        }
+        group_order[b + 1] = key;
+    }
 
+    for (int gi = 0; gi < group_order_count; gi++) {
+        PulseTriggerBuffer *buffer = &pulse_trigger_buffer[group_order[gi]];
         bool both = !buffer->main_only && !buffer->detail_only;
-        int index = 0;
         for (GroupNode *p = get_group(buffer->target_group); p; p = p->next) {
             int obj_idx = p->obj;
-            if (obj_idx < 0 || obj_idx >= objects.count) { index++; continue; }
-
-            if (buffer->time_run <= buffer->fade_in) {
-                float fade_time = 1.f;
-                if (buffer->fade_in > 0) fade_time = buffer->time_run / buffer->fade_in;
-
-                if (both || buffer->main_only) {
-                    int main_pulse_index = buffer->main_pulse_index[index];
-
-                    Color channel_color = objects.main_non_pulse_color[obj_idx];
-                    if (main_pulse_index > 0) channel_color = objects.main_color[obj_idx];
-
-                    float r = (buffer->color.r - (buffer->color.r - channel_color.r) * (1.f - fade_time));
-                    float g = (buffer->color.g - (buffer->color.g - channel_color.g) * (1.f - fade_time));
-                    float b = (buffer->color.b - (buffer->color.b - channel_color.b) * (1.f - fade_time));
-                    objects.main_color[obj_idx].r = (unsigned char)r;
-                    objects.main_color[obj_idx].g = (unsigned char)g;
-                    objects.main_color[obj_idx].b = (unsigned char)b;
-                    objects.main_being_pulsed[obj_idx] = true;
-                }
-                if (both || buffer->detail_only) {
-                    int detail_pulse_index = buffer->detail_pulse_index[index];
-
-                    Color channel_color = objects.detail_non_pulse_color[obj_idx];
-                    if (detail_pulse_index > 0) channel_color = objects.detail_color[obj_idx];
-
-                    float r = (buffer->color.r - (buffer->color.r - channel_color.r) * (1.f - fade_time));
-                    float g = (buffer->color.g - (buffer->color.g - channel_color.g) * (1.f - fade_time));
-                    float b = (buffer->color.b - (buffer->color.b - channel_color.b) * (1.f - fade_time));
-                    objects.detail_color[obj_idx].r = (unsigned char)r;
-                    objects.detail_color[obj_idx].g = (unsigned char)g;
-                    objects.detail_color[obj_idx].b = (unsigned char)b;
-                    objects.detail_being_pulsed[obj_idx] = true;
-                }
-            } else if (buffer->time_run >= buffer->fade_in + buffer->hold) {
-                float fade_time = 1.f;
-                if (buffer->fade_out > 0) fade_time = (buffer->time_run - buffer->hold - buffer->fade_in) / buffer->fade_out;
-
-                if (both || buffer->main_only) {
-                    int main_pulse_index = buffer->main_pulse_index[index];
-
-                    Color channel_color = objects.main_non_pulse_color[obj_idx];
-                    if (main_pulse_index > 0) channel_color = objects.main_color[obj_idx];
-
-                    float r = (buffer->color.r - (buffer->color.r - channel_color.r) * fade_time);
-                    float g = (buffer->color.g - (buffer->color.g - channel_color.g) * fade_time);
-                    float b = (buffer->color.b - (buffer->color.b - channel_color.b) * fade_time);
-                    objects.main_color[obj_idx].r = (unsigned char)r;
-                    objects.main_color[obj_idx].g = (unsigned char)g;
-                    objects.main_color[obj_idx].b = (unsigned char)b;
-                    objects.main_being_pulsed[obj_idx] = true;
-                }
-                if (both || buffer->detail_only) {
-                    int detail_pulse_index = buffer->detail_pulse_index[index];
-                    
-                    Color channel_color = objects.detail_non_pulse_color[obj_idx];
-                    if (detail_pulse_index > 0) channel_color = objects.detail_color[obj_idx];
-
-                    float r = (buffer->color.r - (buffer->color.r - channel_color.r) * fade_time);
-                    float g = (buffer->color.g - (buffer->color.g - channel_color.g) * fade_time);
-                    float b = (buffer->color.b - (buffer->color.b - channel_color.b) * fade_time);
-                    objects.detail_color[obj_idx].r = (unsigned char)r;
-                    objects.detail_color[obj_idx].g = (unsigned char)g;
-                    objects.detail_color[obj_idx].b = (unsigned char)b;
-                    objects.detail_being_pulsed[obj_idx] = true;
-                }
-            } else {
-                if (both || buffer->main_only) {
-                    objects.main_color[obj_idx] = buffer->color;
-                    objects.main_being_pulsed[obj_idx] = true;
-                }
-                if (both || buffer->detail_only) {
-                    objects.detail_color[obj_idx] = buffer->color;
-                    objects.detail_being_pulsed[obj_idx] = true;
-                }
+            if (obj_idx < 0 || obj_idx >= objects.count) continue;
+            if (both || buffer->main_only) {
+                objects.main_color[obj_idx] = objects.main_non_pulse_color[obj_idx];
+                objects.main_being_pulsed[obj_idx] = true;
             }
-            index++;
+            if (both || buffer->detail_only) {
+                objects.detail_color[obj_idx] = objects.detail_non_pulse_color[obj_idx];
+                objects.detail_being_pulsed[obj_idx] = true;
+            }
+        }
+    }
+
+    for (int gi = 0; gi < group_order_count; gi++) {
+        PulseTriggerBuffer *buffer = &pulse_trigger_buffer[group_order[gi]];
+        bool both = !buffer->main_only && !buffer->detail_only;
+
+        float alpha;
+        if (buffer->time_run <= buffer->fade_in) {
+            alpha = (buffer->fade_in > 0.f) ? (buffer->time_run / buffer->fade_in) : 1.f;
+        } else if (buffer->time_run >= buffer->fade_in + buffer->hold) {
+            float fade_time = 1.f;
+            if (buffer->fade_out > 0.f) fade_time = (buffer->time_run - buffer->hold - buffer->fade_in) / buffer->fade_out;
+            alpha = 1.f - fade_time;
+        } else {
+            alpha = 1.f;
+        }
+        if (alpha < 0.f) alpha = 0.f;
+        else if (alpha > 1.f) alpha = 1.f;
+
+        for (GroupNode *p = get_group(buffer->target_group); p; p = p->next) {
+            int obj_idx = p->obj;
+            if (obj_idx < 0 || obj_idx >= objects.count) continue;
+            if (both || buffer->main_only) {
+                Color base = objects.main_color[obj_idx];
+                objects.main_color[obj_idx].r = (unsigned char)(base.r + (buffer->color.r - base.r) * alpha);
+                objects.main_color[obj_idx].g = (unsigned char)(base.g + (buffer->color.g - base.g) * alpha);
+                objects.main_color[obj_idx].b = (unsigned char)(base.b + (buffer->color.b - base.b) * alpha);
+                objects.main_being_pulsed[obj_idx] = true;
+            }
+            if (both || buffer->detail_only) {
+                Color base = objects.detail_color[obj_idx];
+                objects.detail_color[obj_idx].r = (unsigned char)(base.r + (buffer->color.r - base.r) * alpha);
+                objects.detail_color[obj_idx].g = (unsigned char)(base.g + (buffer->color.g - base.g) * alpha);
+                objects.detail_color[obj_idx].b = (unsigned char)(base.b + (buffer->color.b - base.b) * alpha);
+                objects.detail_being_pulsed[obj_idx] = true;
+            }
         }
     }
 
@@ -790,11 +777,17 @@ void handle_pulse_triggers(void) {
                     if (obj_idx < 0 || obj_idx >= objects.count) continue;
                     if (both || buffer->main_only) {
                         objects.num_main_pulses[obj_idx]--;
-                        if (!objects.num_main_pulses[obj_idx]) objects.main_being_pulsed[obj_idx] = false;
+                        if (!objects.num_main_pulses[obj_idx]) {
+                            objects.main_being_pulsed[obj_idx] = false;
+                            objects.main_color[obj_idx] = objects.main_non_pulse_color[obj_idx];
+                        }
                     }
                     if (both || buffer->detail_only) {
                         objects.num_detail_pulses[obj_idx]--;
-                        if (!objects.num_detail_pulses[obj_idx]) objects.detail_being_pulsed[obj_idx] = false;
+                        if (!objects.num_detail_pulses[obj_idx]) {
+                            objects.detail_being_pulsed[obj_idx] = false;
+                            objects.detail_color[obj_idx] = objects.detail_non_pulse_color[obj_idx];
+                        }
                     }
                 }
                 
@@ -809,6 +802,7 @@ void handle_pulse_triggers(void) {
                 int removed_idx = buffer->pulse_index;
 
                 chan->num_pulses--;
+                if (!chan->num_pulses) chan->color = chan->non_pulse_color;
 
                 for (int j = 0; j < MAX_PULSE_TRIGGERS; j++) {
                     if (j == i) continue;

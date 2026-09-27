@@ -126,6 +126,7 @@ typedef struct {
     int *detail_pulse_index;
     float seconds;
     float time_run;
+    unsigned int activation_order;
 } PulseTriggerBuffer;
 
 extern ColorChannel channels[COL_CHANNEL_NUM];
