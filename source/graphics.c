@@ -321,7 +321,7 @@ inline int get_color_channel(int col_type, int obj, const GameObject *game_obj) 
     int col_channel = game_obj->base_color;
     if (col_type == COLOR_TYPE_GLOW) {
         col_channel = get_glow_channel(obj);
-        if (col_channel == CHANNEL_OBJ_BLENDING) col_type = CHANNEL_OBJ_BLENDING;
+        if (col_channel == CHANNEL_OBJ_BLENDING) col_type = COLOR_TYPE_BASE;
     } 
     
     if (col_type == COLOR_TYPE_BLACK) col_channel = 0;
