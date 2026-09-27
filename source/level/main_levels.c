@@ -199,6 +199,28 @@ MainLevelDefinition robtop_main_levels[] = {
             .title = "Theory of Everything 2", 
             .artist = "DJ-Nate"
         }
+    },
+    {
+        .level_name = "Geometrical Dominator",
+        .gmd_path = "romfs:/main_levels/GeometricalDominator.gmd",
+        .song_path = "romfs:/songs/GeometricalDominator.mp3",
+        .difficulty = MAIN_DIFF_HARDER,
+        .stars = 10,
+        .song_data = {
+            .title = "Geometrical Dominator",
+            .artist = "Waterflame"
+        }
+    },
+    {
+        .level_name = "Deadlocked",
+        .gmd_path = "romfs:/main_levels/Deadlocked.gmd",
+        .song_path = "romfs:/songs/Deadlocked.mp3",
+        .difficulty = MAIN_DIFF_DEMON,
+        .stars = 15,
+        .song_data = {
+            .title = "Deadlocked",
+            .artist = "F-777"
+        }
     }
 };
 
