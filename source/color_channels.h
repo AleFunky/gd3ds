@@ -100,7 +100,6 @@ typedef struct {
 } SpawnTriggerBuffer;
 
 #define MAX_PULSE_TRIGGERS 50
-#define MAX_OBJECTS_PER_GROUP 200
 
 #define PULSE_TARGET_CHANNEL 0
 #define PULSE_TARGET_GROUP 1

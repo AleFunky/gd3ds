@@ -695,7 +695,6 @@ void handle_pulse_triggers(void) {
         bool both = !buffer->main_only && !buffer->detail_only;
         int index = 0;
         for (GroupNode *p = get_group(buffer->target_group); p; p = p->next) {
-            if (index >= MAX_OBJECTS_PER_GROUP) break;
             int obj_idx = p->obj;
             if (obj_idx < 0 || obj_idx >= objects.count) { index++; continue; }
 
