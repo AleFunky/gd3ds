@@ -353,6 +353,10 @@ void upload_to_alpha_buffer(int obj) {
     if (slot < 0) return;
 
     AlphaTriggerBuffer *buffer = &alpha_trigger_buffer[slot];
+    if (buffer->restored_from_checkpoint) {
+        buffer->restored_from_checkpoint = false;
+        return;
+    }
     buffer->target_group = target_group;
     buffer->new_alpha = trigger->trigger_opacity;
     buffer->old_alpha = objects.alpha_trigger_opacity[p->obj];
@@ -419,6 +423,15 @@ void upload_to_move_buffer(int obj) {
     int target_group = trigger->target_group;
     if (!get_group(target_group)) return;
 
+    for (int i = 0; i < MAX_MOVE_TRIGGERS; i++) {
+        if (move_trigger_buffer[i].active &&
+            move_trigger_buffer[i].source_obj == obj &&
+            move_trigger_buffer[i].restored_from_checkpoint) {
+            move_trigger_buffer[i].restored_from_checkpoint = false;
+            return;
+        }
+    }
+
     int slot = -1;
     for (int i = 0; i < MAX_MOVE_TRIGGERS; i++) {
         if (!move_trigger_buffer[i].active) { slot = i; break; }
@@ -428,6 +441,7 @@ void upload_to_move_buffer(int obj) {
 
     MoveTriggerBuffer *buffer = &move_trigger_buffer[slot];
     buffer->target_group = target_group;
+    buffer->source_obj = obj;
     buffer->offset_x = trigger->move_offset_x;
     buffer->offset_y = trigger->move_offset_y;
     buffer->easing = trigger->move_easing;
@@ -497,6 +511,15 @@ static int obtain_free_spawn_slot(void) {
 }
 
 void upload_to_spawn_buffer(int obj) {
+    for (int i = 0; i < MAX_SPAWN_TRIGGERS; i++) {
+        if (spawn_trigger_buffer[i].active &&
+            spawn_trigger_buffer[i].source_obj == obj &&
+            spawn_trigger_buffer[i].restored_from_checkpoint) {
+            spawn_trigger_buffer[i].restored_from_checkpoint = false;
+            return;
+        }
+    }
+
     int slot = obtain_free_spawn_slot();
     if (slot < 0) return;
 

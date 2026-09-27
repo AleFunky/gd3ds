@@ -1,6 +1,8 @@
 #include "practice.h"
 #include "icons.h"
 #include <stdlib.h>
+#include <string.h>
+#include "groups.h"
 #include "level_loading.h"
 #include "main.h"
 #include "graphics.h"
@@ -55,6 +57,21 @@ typedef struct CheckpointData {
     int *channel_indices;
     ColorChannel *channel_snapshot;
     ColTriggerBuffer *trigger_snapshot;
+
+    MoveTriggerBuffer move_triggers[MAX_MOVE_TRIGGERS];
+    AlphaTriggerBuffer alpha_triggers[MAX_ALPHA_TRIGGERS];
+    SpawnTriggerBuffer spawn_triggers[MAX_SPAWN_TRIGGERS];
+
+    // per-object state for triggers that were active at checkpoint time, so they
+    // can continue from the exact point instead of restarting. bounded by the
+    // number of active move/alpha triggers so it's usually empty
+    int move_obj_count;
+    int *move_obj_index;     // object indices in move groups
+    float *move_obj_x;       // saved objects.x at checkpoint
+    float *move_obj_y;       // saved objects.y at checkpoint
+    int alpha_obj_count;
+    int *alpha_obj_index;    // object indices in alpha groups
+    float *alpha_obj_alpha;  // saved objects.alpha_trigger_opacity at checkpoint
 
     float song_offset;
 
@@ -112,6 +129,14 @@ static void free_checkpoint_snapshot(CheckpointData *check) {
     if (check->channel_snapshot) { free(check->channel_snapshot); check->channel_snapshot = NULL; }
     if (check->trigger_snapshot) { free(check->trigger_snapshot); check->trigger_snapshot = NULL; }
     check->channel_snapshot_count = 0;
+
+    if (check->move_obj_index) { free(check->move_obj_index); check->move_obj_index = NULL; }
+    if (check->move_obj_x)     { free(check->move_obj_x);     check->move_obj_x = NULL; }
+    if (check->move_obj_y)     { free(check->move_obj_y);     check->move_obj_y = NULL; }
+    check->move_obj_count = 0;
+    if (check->alpha_obj_index) { free(check->alpha_obj_index); check->alpha_obj_index = NULL; }
+    if (check->alpha_obj_alpha) { free(check->alpha_obj_alpha); check->alpha_obj_alpha = NULL; }
+    check->alpha_obj_count = 0;
 }
 
 // static const int checkpoint_size = sizeof(checkpoints);
@@ -195,6 +220,67 @@ void new_checkpoint() {
         check->trigger_snapshot[i] = col_trigger_buffer[idx];
     }
 
+    memcpy(check->move_triggers,  move_trigger_buffer,  sizeof(move_trigger_buffer));
+    memcpy(check->alpha_triggers, alpha_trigger_buffer, sizeof(alpha_trigger_buffer));
+    memcpy(check->spawn_triggers, spawn_trigger_buffer, sizeof(spawn_trigger_buffer));
+
+    check->move_obj_count = 0;
+    check->move_obj_index = NULL;
+    check->move_obj_x = NULL;
+    check->move_obj_y = NULL;
+    int move_cap = 0;
+    for (int i = 0; i < MAX_MOVE_TRIGGERS; i++)
+        if (move_trigger_buffer[i].active)
+            for (GroupNode *p = get_group(move_trigger_buffer[i].target_group); p; p = p->next)
+                move_cap++;
+    if (move_cap > 0) {
+        check->move_obj_index = malloc(sizeof(int) * move_cap);
+        check->move_obj_x = malloc(sizeof(float) * move_cap);
+        check->move_obj_y = malloc(sizeof(float) * move_cap);
+        if (check->move_obj_index && check->move_obj_x && check->move_obj_y) {
+            int n = 0;
+            for (int i = 0; i < MAX_MOVE_TRIGGERS; i++) {
+                if (!move_trigger_buffer[i].active) continue;
+                for (GroupNode *p = get_group(move_trigger_buffer[i].target_group); p; p = p->next) {
+                    if (n >= move_cap) break;
+                    int oi = p->obj;
+                    check->move_obj_index[n] = oi;
+                    check->move_obj_x[n] = objects.x[oi];
+                    check->move_obj_y[n] = objects.y[oi];
+                    n++;
+                }
+            }
+            check->move_obj_count = n;
+        }
+    }
+
+    check->alpha_obj_count = 0;
+    check->alpha_obj_index = NULL;
+    check->alpha_obj_alpha = NULL;
+    int alpha_cap = 0;
+    for (int i = 0; i < MAX_ALPHA_TRIGGERS; i++)
+        if (alpha_trigger_buffer[i].active)
+            for (GroupNode *p = get_group(alpha_trigger_buffer[i].target_group); p; p = p->next)
+                alpha_cap++;
+    if (alpha_cap > 0) {
+        check->alpha_obj_index = malloc(sizeof(int) * alpha_cap);
+        check->alpha_obj_alpha = malloc(sizeof(float) * alpha_cap);
+        if (check->alpha_obj_index && check->alpha_obj_alpha) {
+            int n = 0;
+            for (int i = 0; i < MAX_ALPHA_TRIGGERS; i++) {
+                if (!alpha_trigger_buffer[i].active) continue;
+                for (GroupNode *p = get_group(alpha_trigger_buffer[i].target_group); p; p = p->next) {
+                    if (n >= alpha_cap) break;
+                    int oi = p->obj;
+                    check->alpha_obj_index[n] = oi;
+                    check->alpha_obj_alpha[n] = objects.alpha_trigger_opacity[oi];
+                    n++;
+                }
+            }
+            check->alpha_obj_count = n;
+        }
+    }
+
     set_checkpoint_timer(AUTO_CHECKPOINT_TIME);
 }
 
@@ -243,6 +329,27 @@ void restore_checkpoint() {
         int idx = check->channel_indices[i];
         channels[idx] = check->channel_snapshot[i];
         col_trigger_buffer[idx] = check->trigger_snapshot[i];
+    }
+
+    memcpy(move_trigger_buffer,  check->move_triggers,  sizeof(move_trigger_buffer));
+    memcpy(alpha_trigger_buffer, check->alpha_triggers, sizeof(alpha_trigger_buffer));
+    memcpy(spawn_trigger_buffer, check->spawn_triggers, sizeof(spawn_trigger_buffer));
+
+    for (int i = 0; i < MAX_MOVE_TRIGGERS; i++)
+        move_trigger_buffer[i].restored_from_checkpoint = move_trigger_buffer[i].active;
+    for (int i = 0; i < MAX_ALPHA_TRIGGERS; i++)
+        alpha_trigger_buffer[i].restored_from_checkpoint = alpha_trigger_buffer[i].active;
+    for (int i = 0; i < MAX_SPAWN_TRIGGERS; i++)
+        spawn_trigger_buffer[i].restored_from_checkpoint = spawn_trigger_buffer[i].active;
+
+    for (int i = 0; i < check->move_obj_count; i++) {
+        int oi = check->move_obj_index[i];
+        objects.x[oi] = check->move_obj_x[i];
+        objects.y[oi] = check->move_obj_y[i];
+        update_object_section(oi);
+    }
+    for (int i = 0; i < check->alpha_obj_count; i++) {
+        objects.alpha_trigger_opacity[check->alpha_obj_index[i]] = check->alpha_obj_alpha[i];
     }
 
     update_attempt_text_pos();

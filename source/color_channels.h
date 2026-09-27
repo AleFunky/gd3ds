@@ -65,6 +65,7 @@ typedef struct {
 
 typedef struct {
     bool active;
+    bool restored_from_checkpoint;
     int target_group;
     float old_alpha;
     float new_alpha;
@@ -76,7 +77,9 @@ typedef struct {
 
 typedef struct {
     bool active;
+    bool restored_from_checkpoint;
     int target_group;
+    int source_obj;   // runtime identity of the trigger object
     float offset_x;
     float offset_y;
     int easing;
@@ -92,6 +95,7 @@ typedef struct {
 
 typedef struct {
     bool active;
+    bool restored_from_checkpoint;
     int target_group;
     int source_obj;
     float seconds;
