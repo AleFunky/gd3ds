@@ -36,8 +36,6 @@ enum ColorChannelIDs {
     COL_CHANNEL_NUM = 1024,
 };
 
-#define MAX_PULSES_PER_CHANNEL 10
-
 typedef struct {
     Color color;
     Color non_pulse_color;
@@ -45,7 +43,6 @@ typedef struct {
     bool blending;
     HSV hsv;
     int copy_color_id;
-    Color pulses[MAX_PULSES_PER_CHANNEL];
     int num_pulses;
 } ColorChannel;
 
@@ -126,8 +123,8 @@ typedef struct {
     bool detail_only;
     bool started_fade_out;
     int pulse_index;
-    int main_pulse_index[MAX_OBJECTS_PER_GROUP];
-    int detail_pulse_index[MAX_OBJECTS_PER_GROUP];
+    int *main_pulse_index;
+    int *detail_pulse_index;
     float seconds;
     float time_run;
 } PulseTriggerBuffer;

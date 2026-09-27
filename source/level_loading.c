@@ -1634,8 +1634,6 @@ void free_arrays() {
     if (objects.group_count)        { free(objects.group_count);        objects.group_count = NULL; }
     if (objects.original_x)             { free(objects.original_x);             objects.original_x = NULL; }
     if (objects.original_y)             { free(objects.original_y);             objects.original_y = NULL; }
-    if (objects.main_pulses)            { free(objects.main_pulses);            objects.main_pulses = NULL; }
-    if (objects.detail_pulses)          { free(objects.detail_pulses);          objects.detail_pulses = NULL; }
     if (objects.num_main_pulses)        { free(objects.num_main_pulses);        objects.num_main_pulses = NULL; }
     if (objects.num_detail_pulses)      { free(objects.num_detail_pulses);      objects.num_detail_pulses = NULL; }
     if (objects.main_being_pulsed)      { free(objects.main_being_pulsed);      objects.main_being_pulsed = NULL; }
@@ -1669,7 +1667,7 @@ void free_arrays() {
     if (objects.collided)           { free(objects.collided);           objects.collided = NULL; }
 }
 
-bool init_arrays(int count) {
+bool init_arrays(size_t count) {
     objects.random = malloc(sizeof(int) * count);
     if (!objects.random) return false;
 
@@ -1762,12 +1760,6 @@ bool init_arrays(int count) {
 
     objects.original_y = malloc(sizeof(float) * count);
     if (!objects.original_y) return false;
-
-    objects.main_pulses = malloc(sizeof(Color[MAX_PULSES_PER_GROUP]) * count);
-    if (!objects.main_pulses) return false;
-
-    objects.detail_pulses = malloc(sizeof(Color[MAX_PULSES_PER_GROUP]) * count);
-    if (!objects.detail_pulses) return false;
 
     objects.num_main_pulses = malloc(sizeof(u8) * count);
     if (!objects.num_main_pulses) return false;
@@ -1886,8 +1878,6 @@ bool init_arrays(int count) {
         objects.original_scale_y[i] = 1.0f;
     }
 
-    memset(objects.main_pulses,        0, sizeof(Color[MAX_PULSES_PER_GROUP]) * count);
-    memset(objects.detail_pulses,      0, sizeof(Color[MAX_PULSES_PER_GROUP]) * count);
     memset(objects.num_main_pulses,    0, sizeof(u8) * count);
     memset(objects.num_detail_pulses,  0, sizeof(u8) * count);
     memset(objects.main_being_pulsed,  0, sizeof(bool) * count);

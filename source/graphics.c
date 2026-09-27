@@ -1,6 +1,7 @@
 #include "graphics.h"
 #include "c2d/base.h"
 #include "c2d/spritesheet.h"
+#include "level_loading.h"
 #include "objects.h"
 #include "animations.h"
 #include "main.h"
@@ -48,6 +49,33 @@ static const HSV lighter_hsv = {
 
 static bool color_equal(Color a, Color b) {
     return a.r == b.r && a.g == b.g && a.b == b.b;
+}
+
+#define LUT_SIZE 256
+
+uint8_t opacityLUT[LUT_SIZE];
+
+void make_opacity_lut() {
+    for (int i = 0; i < LUT_SIZE; i++) {
+        float x = (float)i / (LUT_SIZE - 1);  // normalize to [0,1]
+
+        float y = 0.175656971639325f * powf(7.06033051530761f, x)
+                - 0.213355914301931f;
+
+        // clamp
+        if (y < 0.0f) y = 0.0f;
+        if (y > 1.0f) y = 1.0f;
+
+        opacityLUT[i] = (uint8_t)(y * 255.0f + 0.5f);
+    }
+}
+
+float get_opacity(float opacity) {
+    int index = (int)(opacity * 255.0f + 0.5f);
+    index = index < 0 ? 0 : (index > 255 ? 255 : index);
+
+    uint8_t result = opacityLUT[index];
+    return result / 255.f;
 }
 
 static Color apply_hsv_to_color(Color src, int game_object, bool is_main, int col_channel) {
@@ -313,10 +341,14 @@ bool object_fades(int obj) {
     return false;
 }
 
+int get_glow_channel(int obj);
+
 inline int get_color_channel(int col_type, int obj, const GameObject *game_obj) {
     int obj_id = objects.id[obj];
     int col_channel = game_obj->base_color;
-    if (col_type == COLOR_TYPE_BLACK) col_channel = 0;
+    if (col_type == COLOR_TYPE_GLOW) {
+        col_channel = get_glow_channel(obj);
+    } else if (col_type == COLOR_TYPE_BLACK) col_channel = 0;
     else if (col_type == COLOR_TYPE_WHITE) col_channel = -1;
     else {
         // Check for the presence of 1.9 color channel
@@ -854,11 +886,16 @@ static inline uint32_t make_sort_key(SpriteObject *s)
     const GameObject *game_obj = &game_objects[id];
 
     int zlayer = objects.zlayer[obj] ? objects.zlayer[obj] : game_obj->z_layer;
-
+    bool blending;
     // Blending makes zlayer one 
-    int col_channel = s->col_channel;
-
-    bool blending = col_channel > 0 && (channels[get_col_channel_index(col_channel)].blending ^ ((zlayer & 1) == 0));
+    if (obj_has_main(game_obj) && obj_has_detail(game_obj)) {
+        bool blending_main = !obj_has_main(game_obj) || (objects.col_channel[obj] > 0 && (channels[get_col_channel_index(objects.col_channel[obj])].blending ^ ((zlayer & 1) == 0)));
+        bool blending_detail = !obj_has_detail(game_obj) || (objects.detail_col_channel[obj] > 0 && (channels[get_col_channel_index(objects.detail_col_channel[obj])].blending ^ ((zlayer & 1) == 0)));
+        blending = blending_main && blending_detail;
+    } else {
+        int col_channel = s->col_channel;
+        blending = col_channel > 0 && (channels[get_col_channel_index(col_channel)].blending ^ ((zlayer & 1) == 0));
+    }
 
     // If layer is a glow layer or it has blending, decrement it
     if (s->layer == 1 || blending) {
@@ -895,7 +932,7 @@ static inline uint32_t make_sort_key(SpriteObject *s)
 
     // Pack all variables into a nice 32 bit variable
     uint32_t zl = (uint32_t)(zlayer + 8);     // fits in 6 bits
-    uint32_t zb = (uint32_t)(blending);       // fits in 1 bit
+    uint32_t zb = (uint32_t)(blending);  // fits in 1 bit
     uint32_t zs = (uint32_t)(sheet);          // fits in 1 bit
     uint32_t zo = (uint32_t)(zorder + 128);   // fits in 8 bits
     uint32_t cz = (uint32_t)(child_z + 128);  // fits in 8 bits
@@ -1561,7 +1598,7 @@ void update_tints() {
                     col.color.b = CLAMP(b, 0, 255);
                     col.blending = true;
                 }
-            } else if (col_channel == CHANNEL_LIGHTER && obj->layer != 1) {
+            } else if (col_channel == CHANNEL_LIGHTER) {
                 // LIGHTER: derive the detail color from the object's main channel + lighter_hsv
                 int main_ch = objects.col_channel[obj->obj];
                 if (main_ch == 0 || main_ch == CHANNEL_LIGHTER)
@@ -1569,6 +1606,9 @@ void update_tints() {
                 main_ch = get_col_channel_index(main_ch);
                 col = channels[main_ch];
                 col.color = HSV_combine(col.color, lighter_hsv);
+                if (objects.main_col_HSV_enabled[obj->obj]) {
+                    col.color = HSV_combine(col.color, objects.main_col_HSV[obj->obj]);
+                }
                 col.blending = false;
                 // TODO: pulse interaction
             } else {
@@ -1577,32 +1617,28 @@ void update_tints() {
             
             int game_object = obj->obj;
 
-            if (obj->layer == 0) {
+            if (obj->col_type == COLOR_TYPE_BASE) {
                 if (objects.main_col_HSV_enabled[game_object]) {
                     col.color = apply_hsv_to_color(col.color, game_object, true, col_channel);
                 }
                 objects.main_non_pulse_color[game_object] = col.color;
-            } else if (obj->layer == 1) {
+            } else if (obj->col_type == COLOR_TYPE_DETAIL) {
                 if (objects.detail_col_HSV_enabled[game_object]) {
                     col.color = apply_hsv_to_color(col.color, game_object, false, col_channel);
                 }
                 objects.detail_non_pulse_color[game_object] = col.color;
             }
 
-            if (objects.num_main_pulses[game_object] | objects.num_detail_pulses[game_object]) {
-                if (obj->layer == 0 && objects.main_being_pulsed[game_object] && col_channel != 0) {
-                    col.color = objects.main_color[game_object];
-                } else if (obj->layer == 1 && objects.detail_being_pulsed[game_object] && col_channel != 0) {
-                    col.color = objects.detail_color[game_object];
-                }
-
-                if (col_channel == CHANNEL_LIGHTER && obj->layer != 1 &&
-                    obj->layer == 0 && objects.main_being_pulsed[game_object]) {
+            if (obj->col_type == COLOR_TYPE_BASE && objects.main_being_pulsed[game_object] && col_channel >= 0) {
+                col.color = objects.main_color[game_object];
+            } else if (obj->col_type == COLOR_TYPE_DETAIL && objects.detail_being_pulsed[game_object] && col_channel >= 0) {
+                col.color = objects.detail_color[game_object];
+                if (col_channel == CHANNEL_LIGHTER && objects.main_being_pulsed[game_object]) {
                     col.color = HSV_combine(col.color, lighter_hsv);
-                    col.blending = false;
                     if (objects.main_col_HSV_enabled[game_object]) {
                         col.color = apply_hsv_to_color(col.color, game_object, true, col_channel);
                     }
+                    col.blending = false;
                 }
             }
 
@@ -1620,7 +1656,7 @@ void update_tints() {
                 else opacity *= fading_opacity;
             }
 
-            int real_opacity = get_obj_opacity(game_object, x) * opacity * col.alpha * objects.alpha_trigger_opacity[game_object];
+            int real_opacity = get_obj_opacity(game_object, x) * opacity * get_opacity(col.alpha * objects.alpha_trigger_opacity[game_object]);
 
             // Set opacity here
             if (obj->layer == 0) objects.opacity[game_object] = real_opacity / 255.f;

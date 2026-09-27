@@ -140,8 +140,6 @@ typedef struct {
     float *original_x;
     float *original_y;
 
-    Color (*main_pulses)[MAX_PULSES_PER_GROUP];
-    Color (*detail_pulses)[MAX_PULSES_PER_GROUP];
     u8 *num_main_pulses;
     u8 *num_detail_pulses;
     bool *main_being_pulsed;

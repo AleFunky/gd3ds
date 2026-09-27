@@ -504,10 +504,11 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
                 MotionTrail_ResumeStroke(trail);
                 player->gravObj_id = obj;
-                update_rotation_direction(player);
 
                 player->upside_down ^= 1;
                 player->vel_y = jump_heights_table[state.speed][JUMP_YELLOW_ORB][player->gamemode][player->mini];
+                
+                update_rotation_direction(player);
 
                 if (player->gamemode == GAMEMODE_SHIP) player->vel_y *= 0.7f;
 
