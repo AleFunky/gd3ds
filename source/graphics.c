@@ -46,6 +46,39 @@ static const HSV lighter_hsv = {
     .vChecked = false
 };
 
+static bool color_equal(Color a, Color b) {
+    return a.r == b.r && a.g == b.g && a.b == b.b;
+}
+
+static Color apply_hsv_to_color(Color src, int game_object, bool is_main, int col_channel) {
+    bool *valid;
+    Color *cached_src, *cached_color;
+    HSV *hsv;
+
+    if (is_main) {
+        hsv = &objects.main_col_HSV[game_object];
+        valid = &objects.cached_main_hsv_valid[game_object];
+        cached_src = &objects.cached_main_hsv_src_color[game_object];
+        cached_color = &objects.cached_main_hsv_color[game_object];
+    } else {
+        hsv = &objects.detail_col_HSV[game_object];
+        valid = &objects.cached_detail_hsv_valid[game_object];
+        cached_src = &objects.cached_detail_hsv_src_color[game_object];
+        cached_color = &objects.cached_detail_hsv_color[game_object];
+    }
+
+    if (*valid && color_equal(*cached_src, src)) {
+        return *cached_color;
+    }
+
+    Color out = HSV_combine(src, *hsv);
+    *cached_src = src;
+    *cached_color = out;
+    *valid = true;
+
+    return out;
+}
+
 int sprite_count = 0;
 
 static bool blending_state = false;
@@ -1570,6 +1603,36 @@ void update_tints() {
             }
             
             int game_object = obj->obj;
+
+            if (obj->layer == 0) {
+                if (objects.main_col_HSV_enabled[game_object]) {
+                    col.color = apply_hsv_to_color(col.color, game_object, true, col_channel);
+                }
+                objects.main_non_pulse_color[game_object] = col.color;
+            } else if (obj->layer == 1) {
+                if (objects.detail_col_HSV_enabled[game_object]) {
+                    col.color = apply_hsv_to_color(col.color, game_object, false, col_channel);
+                }
+                objects.detail_non_pulse_color[game_object] = col.color;
+            }
+
+            if (objects.num_main_pulses[game_object] | objects.num_detail_pulses[game_object]) {
+                if (obj->layer == 0 && objects.main_being_pulsed[game_object] && col_channel != 0) {
+                    col.color = objects.main_color[game_object];
+                } else if (obj->layer == 1 && objects.detail_being_pulsed[game_object] && col_channel != 0) {
+                    col.color = objects.detail_color[game_object];
+                }
+
+                if (col_channel == CHANNEL_LIGHTER && obj->layer != 1 &&
+                    obj->layer == 0 && objects.main_being_pulsed[game_object]) {
+                    col.color = HSV_combine(col.color, lighter_hsv);
+                    col.blending = false;
+                    if (objects.main_col_HSV_enabled[game_object]) {
+                        col.color = apply_hsv_to_color(col.color, game_object, true, col_channel);
+                    }
+                }
+            }
+
             float x = ((objects.x[game_object] - state.camera_x));
             
             float opacity = obj->opacity;

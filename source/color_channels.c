@@ -27,6 +27,7 @@ ColTriggerBuffer col_trigger_buffer[COL_CHANNEL_NUM];
 AlphaTriggerBuffer alpha_trigger_buffer[MAX_ALPHA_TRIGGERS];
 MoveTriggerBuffer move_trigger_buffer[MAX_MOVE_TRIGGERS];
 SpawnTriggerBuffer spawn_trigger_buffer[MAX_SPAWN_TRIGGERS];
+PulseTriggerBuffer pulse_trigger_buffer[MAX_PULSE_TRIGGERS];
 float move_lock_player_x_delta = 0.0f;
 float move_lock_player_y_delta = 0.0f;
 
@@ -533,6 +534,285 @@ void handle_spawn_triggers(void) {
     }
 }
 
+static int obtain_free_pulse_slot(void) {
+    for (int i = 0; i < MAX_PULSE_TRIGGERS; i++) {
+        if (!pulse_trigger_buffer[i].active) return i;
+    }
+    return -1;
+}
+
+void upload_to_pulse_buffer(int obj) {
+    int slot = obtain_free_pulse_slot();
+    if (slot < 0) return;
+
+    PulseTrigger *trigger = get_pulse_trigger(obj);
+    int channel = trigger->target_group;
+    if (channel == 0) return;
+
+    PulseTriggerBuffer *buffer = &pulse_trigger_buffer[slot];
+    buffer->target_group = trigger->target_group;
+
+    buffer->color.r = trigger->trig_colorR;
+    buffer->color.g = trigger->trig_colorG;
+    buffer->color.b = trigger->trig_colorB;
+
+    buffer->copied_color_id = trigger->copied_color_id;
+    buffer->copied_hsv = trigger->copied_hsv;
+
+    buffer->main_only = trigger->pulse_main_only;
+    buffer->detail_only = trigger->pulse_detail_only;
+
+    buffer->fade_in  = trigger->pulse_fade_in;
+    buffer->hold     = trigger->pulse_hold;
+    buffer->fade_out = trigger->pulse_fade_out;
+
+    buffer->pulse_mode = trigger->pulse_mode;
+    buffer->pulse_target_type = trigger->pulse_target_type;
+
+    buffer->started_fade_out = false;
+
+    buffer->target_color_id = channel;
+
+    if (buffer->pulse_target_type == PULSE_TARGET_CHANNEL) {
+        ColorChannel *chan = &channels[get_col_channel_index(buffer->target_color_id)];
+        if (chan->num_pulses >= MAX_PULSES_PER_CHANNEL) {
+            buffer->active = false;
+            return;
+        }
+        buffer->pulse_index = chan->num_pulses;
+        chan->num_pulses++;
+    }
+
+    if (buffer->pulse_target_type == PULSE_TARGET_GROUP) {
+        bool both = !buffer->main_only && !buffer->detail_only;
+        int index = 0;
+        for (GroupNode *p = get_group(buffer->target_group); p; p = p->next) {
+            if (index >= MAX_OBJECTS_PER_GROUP) break;
+            int obj_idx = p->obj;
+            if (obj_idx < 0 || obj_idx >= objects.count) { index++; continue; }
+
+            if (both || buffer->main_only) {
+                if (objects.num_main_pulses[obj_idx] >= MAX_PULSES_PER_GROUP) {
+                    return;
+                }
+                buffer->main_pulse_index[index] = objects.num_main_pulses[obj_idx]++;
+                objects.main_being_pulsed[obj_idx] = true;
+            }
+
+            if (both || buffer->detail_only) {
+                if (objects.num_detail_pulses[obj_idx] >= MAX_PULSES_PER_GROUP) {
+                    return;
+                }
+                buffer->detail_pulse_index[index] = objects.num_detail_pulses[obj_idx]++;
+                objects.detail_being_pulsed[obj_idx] = true;
+            }
+            index++;
+        }
+    } else {
+        buffer->pulse_index = 0;
+    }
+
+    buffer->time_run = 0;
+    buffer->seconds = trigger->pulse_fade_in + trigger->pulse_hold + trigger->pulse_fade_out;
+    buffer->active = true;
+}
+
+void handle_pulse_triggers(void) {
+    // preprocess HSV for all active pulses
+    for (int i = 0; i < MAX_PULSE_TRIGGERS; i++) {
+        PulseTriggerBuffer *buffer = &pulse_trigger_buffer[i];
+        if (!buffer->active) continue;
+        if (buffer->pulse_mode == PULSE_MODE_HSV) {
+            int source_id = buffer->copied_color_id;
+            if (source_id <= 0 || source_id >= COL_CHANNEL_NUM)
+                source_id = buffer->target_color_id;
+            int source_idx = get_col_channel_index(source_id);
+            Color copy_color = channels[source_idx].non_pulse_color;
+            buffer->color = HSV_combine(copy_color, buffer->copied_hsv);
+        }
+    }
+
+    // process channel pulses in pulse_index order
+    for (int pi = 0; pi < MAX_PULSES_PER_CHANNEL; pi++) {
+        for (int i = 0; i < MAX_PULSE_TRIGGERS; i++) {
+            PulseTriggerBuffer *buffer = &pulse_trigger_buffer[i];
+            if (!buffer->active || buffer->pulse_target_type != PULSE_TARGET_CHANNEL) continue;
+            if (buffer->pulse_index != pi) continue;
+
+            ColorChannel *chan = &channels[get_col_channel_index(buffer->target_color_id)];
+            int idx = buffer->pulse_index;
+            if (idx < 0 || idx >= chan->num_pulses) continue;
+
+            Color base_color = (idx == 0) ? chan->non_pulse_color : chan->pulses[idx - 1];
+
+            Color result_color;
+            if (buffer->time_run <= buffer->fade_in) {
+                float fade_time = 1.f;
+                if (buffer->fade_in > 0) fade_time = buffer->time_run / buffer->fade_in;
+                float r = (buffer->color.r - (buffer->color.r - base_color.r) * (1.f - fade_time));
+                float g = (buffer->color.g - (buffer->color.g - base_color.g) * (1.f - fade_time));
+                float b = (buffer->color.b - (buffer->color.b - base_color.b) * (1.f - fade_time));
+                result_color.r = (unsigned char)r;
+                result_color.g = (unsigned char)g;
+                result_color.b = (unsigned char)b;
+            } else if (buffer->time_run >= buffer->fade_in + buffer->hold) {
+                float fade_time = 1.f;
+                if (buffer->fade_out > 0) fade_time = (buffer->time_run - buffer->hold - buffer->fade_in) / buffer->fade_out;
+                float r = (buffer->color.r - (buffer->color.r - base_color.r) * fade_time);
+                float g = (buffer->color.g - (buffer->color.g - base_color.g) * fade_time);
+                float b = (buffer->color.b - (buffer->color.b - base_color.b) * fade_time);
+                result_color.r = (unsigned char)r;
+                result_color.g = (unsigned char)g;
+                result_color.b = (unsigned char)b;
+            } else {
+                result_color = buffer->color;
+            }
+
+            chan->pulses[idx] = result_color;
+            chan->color = chan->pulses[chan->num_pulses - 1];
+        }
+    }
+
+    // process group pulses
+    for (int i = 0; i < MAX_PULSE_TRIGGERS; i++) {
+        PulseTriggerBuffer *buffer = &pulse_trigger_buffer[i];
+        if (!buffer->active || buffer->pulse_target_type != PULSE_TARGET_GROUP) continue;
+
+        bool both = !buffer->main_only && !buffer->detail_only;
+        int index = 0;
+        for (GroupNode *p = get_group(buffer->target_group); p; p = p->next) {
+            if (index >= MAX_OBJECTS_PER_GROUP) break;
+            int obj_idx = p->obj;
+            if (obj_idx < 0 || obj_idx >= objects.count) { index++; continue; }
+
+            if (buffer->time_run <= buffer->fade_in) {
+                float fade_time = 1.f;
+                if (buffer->fade_in > 0) fade_time = buffer->time_run / buffer->fade_in;
+
+                if (both || buffer->main_only) {
+                    int main_pulse_index = buffer->main_pulse_index[index];
+                    Color channel_color = objects.main_non_pulse_color[obj_idx];
+                    if (main_pulse_index > 0) channel_color = objects.main_pulses[obj_idx][main_pulse_index - 1];
+                    float r = (buffer->color.r - (buffer->color.r - channel_color.r) * (1.f - fade_time));
+                    float g = (buffer->color.g - (buffer->color.g - channel_color.g) * (1.f - fade_time));
+                    float b = (buffer->color.b - (buffer->color.b - channel_color.b) * (1.f - fade_time));
+                    objects.main_pulses[obj_idx][main_pulse_index].r = (unsigned char)r;
+                    objects.main_pulses[obj_idx][main_pulse_index].g = (unsigned char)g;
+                    objects.main_pulses[obj_idx][main_pulse_index].b = (unsigned char)b;
+                    objects.main_color[obj_idx] = objects.main_pulses[obj_idx][main_pulse_index];
+                    objects.main_being_pulsed[obj_idx] = true;
+                }
+                if (both || buffer->detail_only) {
+                    int detail_pulse_index = buffer->detail_pulse_index[index];
+                    Color channel_color = objects.detail_non_pulse_color[obj_idx];
+                    if (detail_pulse_index > 0) channel_color = objects.detail_pulses[obj_idx][detail_pulse_index - 1];
+                    float r = (buffer->color.r - (buffer->color.r - channel_color.r) * (1.f - fade_time));
+                    float g = (buffer->color.g - (buffer->color.g - channel_color.g) * (1.f - fade_time));
+                    float b = (buffer->color.b - (buffer->color.b - channel_color.b) * (1.f - fade_time));
+                    objects.detail_pulses[obj_idx][detail_pulse_index].r = (unsigned char)r;
+                    objects.detail_pulses[obj_idx][detail_pulse_index].g = (unsigned char)g;
+                    objects.detail_pulses[obj_idx][detail_pulse_index].b = (unsigned char)b;
+                    objects.detail_color[obj_idx] = objects.detail_pulses[obj_idx][detail_pulse_index];
+                    objects.detail_being_pulsed[obj_idx] = true;
+                }
+            } else if (buffer->time_run >= buffer->fade_in + buffer->hold) {
+                float fade_time = 1.f;
+                if (buffer->fade_out > 0) fade_time = (buffer->time_run - buffer->hold - buffer->fade_in) / buffer->fade_out;
+
+                if (both || buffer->main_only) {
+                    int main_pulse_index = buffer->main_pulse_index[index];
+                    Color channel_color = objects.main_non_pulse_color[obj_idx];
+                    if (main_pulse_index > 0) channel_color = objects.main_pulses[obj_idx][main_pulse_index - 1];
+                    float r = (buffer->color.r - (buffer->color.r - channel_color.r) * fade_time);
+                    float g = (buffer->color.g - (buffer->color.g - channel_color.g) * fade_time);
+                    float b = (buffer->color.b - (buffer->color.b - channel_color.b) * fade_time);
+                    objects.main_pulses[obj_idx][main_pulse_index].r = (unsigned char)r;
+                    objects.main_pulses[obj_idx][main_pulse_index].g = (unsigned char)g;
+                    objects.main_pulses[obj_idx][main_pulse_index].b = (unsigned char)b;
+                    objects.main_color[obj_idx] = objects.main_pulses[obj_idx][main_pulse_index];
+                    objects.main_being_pulsed[obj_idx] = true;
+                }
+                if (both || buffer->detail_only) {
+                    int detail_pulse_index = buffer->detail_pulse_index[index];
+                    Color channel_color = objects.detail_non_pulse_color[obj_idx];
+                    if (detail_pulse_index > 0) channel_color = objects.detail_pulses[obj_idx][detail_pulse_index - 1];
+                    float r = (buffer->color.r - (buffer->color.r - channel_color.r) * fade_time);
+                    float g = (buffer->color.g - (buffer->color.g - channel_color.g) * fade_time);
+                    float b = (buffer->color.b - (buffer->color.b - channel_color.b) * fade_time);
+                    objects.detail_pulses[obj_idx][detail_pulse_index].r = (unsigned char)r;
+                    objects.detail_pulses[obj_idx][detail_pulse_index].g = (unsigned char)g;
+                    objects.detail_pulses[obj_idx][detail_pulse_index].b = (unsigned char)b;
+                    objects.detail_color[obj_idx] = objects.detail_pulses[obj_idx][detail_pulse_index];
+                    objects.detail_being_pulsed[obj_idx] = true;
+                }
+            } else {
+                if (both || buffer->main_only) {
+                    int main_pulse_index = buffer->main_pulse_index[index];
+                    objects.main_pulses[obj_idx][main_pulse_index] = buffer->color;
+                    objects.main_color[obj_idx] = buffer->color;
+                    objects.main_being_pulsed[obj_idx] = true;
+                }
+                if (both || buffer->detail_only) {
+                    int detail_pulse_index = buffer->detail_pulse_index[index];
+                    objects.detail_pulses[obj_idx][detail_pulse_index] = buffer->color;
+                    objects.detail_color[obj_idx] = buffer->color;
+                    objects.detail_being_pulsed[obj_idx] = true;
+                }
+            }
+            index++;
+        }
+    }
+
+    // time update and cleanup for all pulses
+    for (int i = 0; i < MAX_PULSE_TRIGGERS; i++) {
+        PulseTriggerBuffer *buffer = &pulse_trigger_buffer[i];
+        if (!buffer->active) continue;
+
+        buffer->time_run += g_trigger_dt;
+        if (buffer->time_run > buffer->seconds) {
+            if (buffer->pulse_target_type == PULSE_TARGET_GROUP) {
+                bool both = !buffer->main_only && !buffer->detail_only;
+                for (GroupNode *p = get_group(buffer->target_group); p; p = p->next) {
+                    int obj_idx = p->obj;
+                    if (obj_idx < 0 || obj_idx >= objects.count) continue;
+                    if (both || buffer->main_only) {
+                        objects.num_main_pulses[obj_idx]--;
+                        if (!objects.num_main_pulses[obj_idx]) objects.main_being_pulsed[obj_idx] = false;
+                    }
+                    if (both || buffer->detail_only) {
+                        objects.num_detail_pulses[obj_idx]--;
+                        if (!objects.num_detail_pulses[obj_idx]) objects.detail_being_pulsed[obj_idx] = false;
+                    }
+                }
+            } else if (buffer->pulse_target_type == PULSE_TARGET_CHANNEL) {
+                int chan_idx = get_col_channel_index(buffer->target_color_id);
+                ColorChannel *chan = &channels[chan_idx];
+                int removed_idx = buffer->pulse_index;
+
+                for (int ci = removed_idx; ci < chan->num_pulses - 1; ci++) {
+                    chan->pulses[ci] = chan->pulses[ci + 1];
+                }
+                chan->num_pulses--;
+
+                for (int j = 0; j < MAX_PULSE_TRIGGERS; j++) {
+                    if (j == i) continue;
+                    PulseTriggerBuffer *other = &pulse_trigger_buffer[j];
+                    if (!other->active) continue;
+                    if (other->pulse_target_type != PULSE_TARGET_CHANNEL) continue;
+                    if (other->target_color_id != buffer->target_color_id) continue;
+                    if (other->pulse_index > removed_idx) other->pulse_index--;
+                }
+
+                if (chan->num_pulses > 0)
+                    chan->color = chan->pulses[chan->num_pulses - 1];
+                else
+                    chan->color = chan->non_pulse_color;
+            }
+            buffer->active = false;
+        }
+    }
+}
+
 void upload_to_buffer(int obj, int channel) {
     if (channel == 0) channel = 1;
     int buffer_channel = get_col_channel_index(channel);
@@ -714,6 +994,9 @@ void run_trigger(int obj) {
             break;
         case SPAWN_TRIGGER:
             upload_to_spawn_buffer(obj);
+            break;
+        case PULSE_TRIGGER:
+            upload_to_pulse_buffer(obj);
             break;
         case TOGGLE_TRIGGER:
         {

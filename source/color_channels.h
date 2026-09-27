@@ -98,11 +98,42 @@ typedef struct {
     float time_run;
 } SpawnTriggerBuffer;
 
+#define MAX_PULSE_TRIGGERS 50
+#define MAX_OBJECTS_PER_GROUP 200
+
+#define PULSE_TARGET_CHANNEL 0
+#define PULSE_TARGET_GROUP 1
+#define PULSE_MODE_COLOR 0
+#define PULSE_MODE_HSV 1
+
+typedef struct {
+    bool active;
+    Color color;
+    int target_color_id;
+    float fade_in;
+    float hold;
+    float fade_out;
+    int pulse_mode;
+    int copied_color_id;
+    HSV copied_hsv;
+    int target_group;
+    int pulse_target_type;
+    bool main_only;
+    bool detail_only;
+    bool started_fade_out;
+    int pulse_index;
+    int main_pulse_index[MAX_OBJECTS_PER_GROUP];
+    int detail_pulse_index[MAX_OBJECTS_PER_GROUP];
+    float seconds;
+    float time_run;
+} PulseTriggerBuffer;
+
 extern ColorChannel channels[COL_CHANNEL_NUM];
 extern ColTriggerBuffer col_trigger_buffer[COL_CHANNEL_NUM];
 extern AlphaTriggerBuffer alpha_trigger_buffer[MAX_ALPHA_TRIGGERS];
 extern MoveTriggerBuffer move_trigger_buffer[MAX_MOVE_TRIGGERS];
 extern SpawnTriggerBuffer spawn_trigger_buffer[MAX_SPAWN_TRIGGERS];
+extern PulseTriggerBuffer pulse_trigger_buffer[MAX_PULSE_TRIGGERS];
 extern float move_lock_player_x_delta;
 extern float move_lock_player_y_delta;
 
@@ -167,6 +198,8 @@ void upload_to_move_buffer(int obj);
 void handle_move_triggers(void);
 void upload_to_spawn_buffer(int obj);
 void handle_spawn_triggers(void);
+void upload_to_pulse_buffer(int obj);
+void handle_pulse_triggers(void);
 void run_trigger(int obj);
 void upload_color_to_buffer(int channel, u32 color, float seconds);
 void upload_to_buffer(int obj, int channel);
