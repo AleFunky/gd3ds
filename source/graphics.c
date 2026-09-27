@@ -149,13 +149,6 @@ static C2D_SpriteSheet *get_sprite_sheet(int index, int *rel_index) {
     return &animatedSheet;
 }
 
-const SlotFrames* find_slot_frames(const GameObject* obj, int slot) {
-    for (int i = 0; i < obj->slot_count; i++) {
-        if (obj->slot_frames[i].slot == slot) return &obj->slot_frames[i];
-    }
-    return NULL;
-}
-
 int get_child_group(const GameObject* obj, int child_index) {
     for (int g = 0; g < obj->group_count; g++) {
         int end = obj->groups[g].start + obj->groups[g].count;
@@ -822,29 +815,8 @@ void spawn_object_at(
                 }
             }
 
-            // handle frame swap anims
-            if (obj->animation_type == ANIMATION_FRAME_SWAP && obj->frame_count > 0) {
-                const SlotFrames* slot_frames = find_slot_frames(obj, i + 1);
-                if (slot_frames) {
-                    float time = frame_timer * slot_frames->fps;
-                    int index = (int)time % slot_frames->count;
-                    const SwapFrame* swap_frame = &obj->swap_frames[slot_frames->start + index];
-
-                    int rel_index;
-                    C2D_SpriteSheet *sheet = get_sprite_sheet(swap_frame->texture, &rel_index);
-                    C2D_SpriteFromSheet(&vo->spr, *sheet, rel_index);
-                    C2D_SpriteSetCenter(&vo->spr, 0.5f, 0.5f);
-
-                    c_sx *= (swap_frame->flip_x ? -1 : 1);
-                    c_sy *= (swap_frame->flip_y ? -1 : 1);
-                } else {
-                    if (!sprite_templates[id].child_templates) continue;
-                    vo->spr = sprite_templates[id].child_templates[i];
-                }
-            } else {
-                if (!sprite_templates[id].child_templates) continue;
-                vo->spr = sprite_templates[id].child_templates[i];
-            }
+            if (!sprite_templates[id].child_templates) continue;
+            vo->spr = sprite_templates[id].child_templates[i];
 
             float pulse_scale = get_object_pulse(amplitude, id, i + 2);
 

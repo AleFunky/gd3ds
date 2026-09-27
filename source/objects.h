@@ -16,8 +16,7 @@ typedef enum {
 
 typedef enum {
    ANIMATION_NONE = 0,
-   ANIMATION_MOVEMENT,
-   ANIMATION_FRAME_SWAP
+   ANIMATION_MOVEMENT
 } AnimationType;
 
 typedef enum {
@@ -52,18 +51,6 @@ typedef struct {
 } ChildGroup;
 
 typedef struct {
-    int texture;
-    int flip_x, flip_y;
-} SwapFrame;
-
-typedef struct {
-    int slot;
-    float fps;
-    int start;
-    int count;
-} SlotFrames;
-
-typedef struct {
    int collision_type;
    float x, y;
    float width, height;
@@ -87,10 +74,6 @@ typedef struct {
     int animation_type;
     int group_count;
     const ChildGroup* groups;
-    int frame_count;
-    const SwapFrame* swap_frames;
-    int slot_count;
-    const SlotFrames* slot_frames;
 } GameObject;
 
 #define TEXTURE_COUNT 1574
