@@ -97,6 +97,7 @@ C2D_SpriteSheet shipSheet;
 C2D_SpriteSheet ballSheet;
 C2D_SpriteSheet ufoSheet;
 C2D_SpriteSheet waveSheet;
+C2D_SpriteSheet robotSheet;
 C2D_SpriteSheet trailSheet;
 C2D_SpriteSheet particleSheet;
 
@@ -2071,6 +2072,8 @@ C2D_SpriteSheet *get_icon_sheet(const IconPart *part, int gamemode) {
             return &ufoSheet;
         case GAMEMODE_WAVE:
             return &waveSheet;
+        case GAMEMODE_ROBOT:
+            return &robotSheet;
     }
     return NULL;
 }
@@ -2109,6 +2112,8 @@ void spawn_icon_at(
     C2D_Sprite spr = { 0 };
 
     int count = icon.part_count - 1;
+
+    if (icon.part_count < 2) return;
 
     C2D_ImageTint tints[count];
 

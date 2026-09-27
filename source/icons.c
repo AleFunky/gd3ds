@@ -8021,10 +8021,22 @@ const Icon icons_dart[97] = {
     { 4, dart_96 },
 };
 
-const Icon* icons[GAMEMODE_COUNT] = {
+static const IconPart robot_0[] = {
+ { 0, 0, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0.00, 0, 1.00 },
+ { 0, 1, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0.00, 0, 1.00 },
+ { 0, 2, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0.00, 0, 1.00 },
+};
+
+const Icon icons_robot[ICON_COUNT_ROBOT] = {
+    { 3, robot_0 },
+    { 3, robot_0 },
+};
+
+const Icon* icons[ICON_GAMEMODE_COUNT] = {
     icons_player,
     icons_ship,
     icons_player_ball,
     icons_bird,
     icons_dart,
+    icons_robot,
 };

@@ -1455,6 +1455,9 @@ void game_assets_init() {
     waveSheet = C2D_SpriteSheetLoad("romfs:/gfx/dart.t3x");
     if (!waveSheet) svcBreak(USERBREAK_PANIC);
 
+    robotSheet = C2D_SpriteSheetLoad("romfs:/gfx/robot.t3x");
+    if (!robotSheet) svcBreak(USERBREAK_PANIC);
+
     trailSheet = C2D_SpriteSheetLoad("romfs:/gfx/trails.t3x");
     if (!trailSheet) svcBreak(USERBREAK_PANIC);
 
@@ -1640,6 +1643,7 @@ int main(int argc, char* argv[]) {
     C2D_SpriteSheetFree(ballSheet);
     C2D_SpriteSheetFree(ufoSheet);
     C2D_SpriteSheetFree(waveSheet);
+    C2D_SpriteSheetFree(robotSheet);
     C2D_SpriteSheetFree(trailSheet);
     C2D_SpriteSheetFree(particleSheet);
     C2D_SpriteSheetFree(ui_sheet);

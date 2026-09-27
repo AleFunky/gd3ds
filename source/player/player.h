@@ -69,6 +69,7 @@ typedef struct {
     int ball;
     int ufo;
     int wave;
+    int robot;
 
     Color p1_color;
     Color p2_color;

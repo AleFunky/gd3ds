@@ -119,6 +119,7 @@ extern C2D_SpriteSheet shipSheet;
 extern C2D_SpriteSheet ballSheet;
 extern C2D_SpriteSheet ufoSheet;
 extern C2D_SpriteSheet waveSheet;
+extern C2D_SpriteSheet robotSheet;
 extern C2D_SpriteSheet trailSheet;
 extern C2D_SpriteSheet particleSheet;
 

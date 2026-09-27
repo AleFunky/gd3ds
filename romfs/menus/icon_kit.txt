@@ -8,7 +8,8 @@ button x=104 y=65 id=351 tag="icon_buttons,ship" actions=action_page[page=1]
 button x=141 y=65 id=325 tag="icon_buttons,ball" actions=action_page[page=2]
 button x=178 y=65 id=327 tag="icon_buttons,ufo" actions=action_page[page=3]
 button x=215 y=65 id=329 tag="icon_buttons,dart" actions=action_page[page=4]
-button x=252 y=65 id=355 tag="icon_buttons,trail" action=action_trail
+button x=252 y=65 id=349 tag="icon_buttons,robot" actions=action_page[page=5]
+button x=289 y=65 id=355 tag="icon_buttons,trail" action=action_trail
 
 button x=30 y=145 id=6 action="icons_left" keyBinds="LEFT"
 button x=290 y=145 id=6 sx=-1 action="icons_right" keyBinds="RIGHT"

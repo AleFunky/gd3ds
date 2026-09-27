@@ -189,6 +189,7 @@ void init_player(Player *player) {
     player->player_icons.ball = selected_ball;
     player->player_icons.ufo  = selected_ufo;
     player->player_icons.wave = selected_wave;
+    player->player_icons.robot = selected_robot;
     player->player_icons.glow = player_glow_enabled;
 
     player->player_icons.p1_color = p1_color;
