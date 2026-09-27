@@ -48,6 +48,9 @@ static float get_object_particle_depth(int id) {
         case FASTER_SPEED_PORTAL:
         case DUAL_PORTAL:
         case DIVORCE_PORTAL:
+        case ROBOT_PORTAL:
+        case BLUE_TP_PORTAL:
+        case ORANGE_TP_PORTAL:
             return 0.5f;
         // Orbs and coins hang in mid air, so theirs carry a bit further
         case YELLOW_ORB:
@@ -317,6 +320,45 @@ void spawn_object_particles(int obj) {
                 index = load_object_particles(obj, &portal_effect_01, false);
                 if (index >= 0) {
                     set_particle_color(&object_particle[index].ps.cfg, 1, 0.75f, 0);
+
+                    object_particle[index].ps.cfg.angle = -(adjust_angle_y(objects.rotation[obj], objects.flippedH[obj]));
+
+                    object_particle[index].ps.emitterX = objects.x[obj];
+                    object_particle[index].ps.emitterY = objects.y[obj];
+                }
+            }
+            break;
+        case ROBOT_PORTAL:
+            if (!is_ps_already_loaded(obj)) {
+                index = load_object_particles(obj, &portal_effect_01, false);
+                if (index >= 0) {
+                    set_particle_color(&object_particle[index].ps.cfg, 1, 1, 1);
+
+                    object_particle[index].ps.cfg.angle = -(adjust_angle_y(objects.rotation[obj], objects.flippedH[obj]));
+
+                    object_particle[index].ps.emitterX = objects.x[obj];
+                    object_particle[index].ps.emitterY = objects.y[obj];
+                }
+            }
+            break;
+        case BLUE_TP_PORTAL:
+            if (!is_ps_already_loaded(obj)) {
+                index = load_object_particles(obj, &portal_effect_01, false);
+                if (index >= 0) {
+                    set_particle_color(&object_particle[index].ps.cfg, 0.22f, 0.78f, 1.0f);
+
+                    object_particle[index].ps.cfg.angle = -(adjust_angle_y(objects.rotation[obj], objects.flippedH[obj]));
+
+                    object_particle[index].ps.emitterX = objects.x[obj];
+                    object_particle[index].ps.emitterY = objects.y[obj];
+                }
+            }
+            break;
+        case ORANGE_TP_PORTAL:
+            if (!is_ps_already_loaded(obj)) {
+                index = load_object_particles(obj, &portal_effect_01, false);
+                if (index >= 0) {
+                    set_particle_color(&object_particle[index].ps.cfg, 1.0f, 91.0f/255.0f, 0.0f);
 
                     object_particle[index].ps.cfg.angle = -(adjust_angle_y(objects.rotation[obj], objects.flippedH[obj]));
 
