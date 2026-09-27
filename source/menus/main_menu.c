@@ -190,14 +190,17 @@ static void main_menu_init(UIScreen *s){
 
     int chan_bg = get_col_channel_index(CHANNEL_BG);
     int chan_ground = get_col_channel_index(CHANNEL_GROUND);
+    int chan_ground_2 = get_col_channel_index(CHANNEL_GROUND_2);
     int chan_line = get_col_channel_index(CHANNEL_LINE);
 
     channels[chan_bg].color = col;
     channels[chan_ground].color = col;
+    channels[chan_ground_2].color = col;
     channels[chan_line].color = white;
 
     get_buffer(CHANNEL_BG)->active = false;
     get_buffer(CHANNEL_GROUND)->active = false;
+    get_buffer(CHANNEL_GROUND_2)->active = false;
     get_buffer(CHANNEL_LINE)->active = false;
 
     allocate_particles();
@@ -315,11 +318,13 @@ static void main_menu_update(UIScreen *s, UIInput *input){
 
     handle_col_channel(CHANNEL_BG);
     handle_col_channel(CHANNEL_GROUND);
+    handle_col_channel(CHANNEL_GROUND_2);
 
     ColTriggerBuffer *trig = get_buffer(CHANNEL_BG);
     if (!trig->active) {
         upload_color_to_buffer(CHANNEL_BG, default_lvl_colors[main_menu_color_index % NUM_MENU_COLORS], 4.f);
         upload_color_to_buffer(CHANNEL_GROUND, default_lvl_colors[main_menu_color_index % NUM_MENU_COLORS], 4.f);
+        upload_color_to_buffer(CHANNEL_GROUND_2, default_lvl_colors[main_menu_color_index % NUM_MENU_COLORS], 4.f);
         main_menu_color_index++;
     }
     
