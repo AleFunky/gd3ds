@@ -2187,6 +2187,8 @@ static void generate_orange_portals(int orange_start) {
         objects.tp_y_offset[oi]  = 0.0f;
         objects.original_x[oi]   = objects.x[oi];
         objects.original_y[oi]   = objects.y[oi];
+        objects.zlayer[oi]       = objects.zlayer[i];
+        objects.zorder[oi]       = objects.zorder[i];
         objects.child_object[i]  = oi;
 
         // Copy groups from blue portal to orange portal
