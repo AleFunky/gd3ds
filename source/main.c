@@ -1551,8 +1551,6 @@ int main(int argc, char* argv[]) {
 
     cache_all_sprites();
 
-    make_opacity_lut();
-
     loading_screen_update(55);
     
     init_default_use_effect_pools();

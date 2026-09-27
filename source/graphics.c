@@ -51,33 +51,6 @@ static bool color_equal(Color a, Color b) {
     return a.r == b.r && a.g == b.g && a.b == b.b;
 }
 
-#define LUT_SIZE 256
-
-uint8_t opacityLUT[LUT_SIZE];
-
-void make_opacity_lut() {
-    for (int i = 0; i < LUT_SIZE; i++) {
-        float x = (float)i / (LUT_SIZE - 1);  // normalize to [0,1]
-
-        float y = 0.175656971639325f * powf(7.06033051530761f, x)
-                - 0.213355914301931f;
-
-        // clamp
-        if (y < 0.0f) y = 0.0f;
-        if (y > 1.0f) y = 1.0f;
-
-        opacityLUT[i] = (uint8_t)(y * 255.0f + 0.5f);
-    }
-}
-
-float get_opacity(float opacity) {
-    int index = (int)(opacity * 255.0f + 0.5f);
-    index = index < 0 ? 0 : (index > 255 ? 255 : index);
-
-    uint8_t result = opacityLUT[index];
-    return result / 255.f;
-}
-
 static Color apply_hsv_to_color(Color src, int game_object, bool is_main, int col_channel) {
     bool *valid;
     Color *cached_src, *cached_color;
@@ -1656,7 +1629,7 @@ void update_tints() {
                 else opacity *= fading_opacity;
             }
 
-            int real_opacity = get_obj_opacity(game_object, x) * opacity * get_opacity(col.alpha * objects.alpha_trigger_opacity[game_object]);
+            int real_opacity = get_obj_opacity(game_object, x) * opacity * col.alpha * objects.alpha_trigger_opacity[game_object];
 
             // Set opacity here
             if (obj->layer == 0) objects.opacity[game_object] = real_opacity / 255.f;

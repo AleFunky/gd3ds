@@ -99,8 +99,6 @@ void free_cached_sprites();
 void get_fade_vars(int obj, float x, float *fade_x, float *fade_y, float *fade_scale);
 float obj_edge_fade(float x, int right_edge);
 float get_special_fading_vars(int obj, float fade_val);
-void make_opacity_lut();
-float get_opacity(float opacity);
 
 extern bool p1_trail;
 extern float p1_trail_timer;
