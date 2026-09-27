@@ -1,6 +1,7 @@
 #include "collision.h"
 #include "icons.h"
 #include "player.h"
+#include "robot_anim_data.h"
 #include <math.h>
 #include "practice.h"
 #include "profiling.h"
@@ -773,6 +774,43 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     pseudo_checkpoint_exists = false;
                     flip_other_player(state.current_player ^ 1);
                     update_rotation_direction(player);
+                }
+
+                if (state.dual) {
+                    set_dual_bounds();
+                } 
+
+                SET_ACTIVATED(obj, true);
+            }
+            break;
+        case ROBOT_PORTAL:
+            if (!GET_ACTIVATED(obj)) {
+                state.ground_y = 0;
+                state.ceiling_y = 999999;
+                if (player->gamemode != GAMEMODE_ROBOT) {
+                    if (player->gamemode == GAMEMODE_WAVE) player->vel_y *= 0.9f;
+                    player->vel_y /= 2;
+
+                    player->ceiling_inv_time = GAMEMODE_INVUL_TIME;
+                    player->snap_rotation = true;
+                    player->inverse_rotation = false;
+                    set_gamemode(player, GAMEMODE_ROBOT);
+                    set_checkpoint_timer(0);
+                    pseudo_checkpoint_exists = false;
+                    flip_other_player(state.current_player ^ 1);
+                    update_rotation_direction(player);
+
+                    player->robot_anim_id = ROBOT_ANIM_JUMP_START;
+                    player->robot_anim_frame = 0;
+                    player->robot_anim_timer = 0;
+                    player->robot_air_time = 0;
+
+                    UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                    if (effect) {
+                        effect->def.colorR = 255 / 255.f;
+                        effect->def.colorG = 100 / 255.f;
+                        effect->def.colorB = 0 / 255.f;
+                    }
                 }
 
                 if (state.dual) {

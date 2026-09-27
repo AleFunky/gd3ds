@@ -50,6 +50,7 @@ enum JumpType {
 #define BALL_PORTAL 47
 #define UFO_PORTAL 111
 #define WAVE_PORTAL 660
+#define ROBOT_PORTAL 745
 
 #define BLUE_TP_PORTAL 747
 #define ORANGE_TP_PORTAL 749
