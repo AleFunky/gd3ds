@@ -41,7 +41,7 @@ void run_camera() {
     float playable_height = state.ceiling_y - state.ground_y;
     float calc_height = 0;
 
-    if (player->gamemode != GAMEMODE_PLAYER || state.dual) {
+    if ((player->gamemode != GAMEMODE_PLAYER && player->gamemode != GAMEMODE_ROBOT) || state.dual) {
         calc_height = (SCREEN_HEIGHT_AREA - playable_height) / 2;
     }
     state.ground_y_gfx = ease_out(state.ground_y_gfx, calc_height, 0.02f);
@@ -80,7 +80,7 @@ void run_camera() {
 
         float target_y = cam_y;
 
-        if (player->gamemode == GAMEMODE_PLAYER && !state.dual) {
+        if ((player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_ROBOT) && !state.dual) {
             float player_y = player->y;
 
             float upside_down_offset = (player->upside_down ? -30.f : 0);
@@ -275,6 +275,7 @@ void init_level_bounds() {
             set_intended_ceiling();
             break;
         case GAMEMODE_PLAYER:
+        case GAMEMODE_ROBOT:
             state.camera_intended_y = 0;
     }
     
@@ -293,7 +294,7 @@ void init_level_bounds() {
     float playable_height = state.ceiling_y - state.ground_y;
     float calc_height = 0;
 
-    if (state.player.gamemode != GAMEMODE_PLAYER || state.dual) {
+    if ((state.player.gamemode != GAMEMODE_PLAYER && state.player.gamemode != GAMEMODE_ROBOT) || state.dual) {
         calc_height = (SCREEN_HEIGHT_AREA - playable_height) / 2;
     }
     

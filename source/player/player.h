@@ -152,6 +152,11 @@ typedef struct {
 
     bool buffer_ufo;
 
+    float robot_air_time;
+    int robot_anim_id;
+    int robot_anim_frame;
+    float robot_anim_timer;
+
     float coyote_frames;
 
     IconsDrawing player_icons;

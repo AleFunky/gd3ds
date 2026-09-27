@@ -28,7 +28,7 @@ typedef enum {
  GAMEMODE_ROBOT = 5,
 } IconGamemode;
 
-#define GAMEMODE_COUNT 5
+#define GAMEMODE_COUNT 6
 #define ICON_GAMEMODE_COUNT 6
 
 #define TRAIL 6

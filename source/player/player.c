@@ -10,6 +10,7 @@
 
 #include "menus/icon_kit.h"
 #include "collision.h"
+#include "robot_anim_data.h"
 #include "math_helpers.h"
 
 #include "main.h"
@@ -562,12 +563,84 @@ void wave_gamemode(Player *player) {
     player->vel_y = (input * 2 - 1) * player_speeds[state.speed] * (player->mini ? 2 : 1);
 }
 
+void robot_gamemode(Player *player) {
+    trail->positionR = (Vec2D){player->x, player->y};
+    trail->startingPositionInitialized = true;
+
+    if (player->vel_y < -810) player->vel_y = -810;
+
+    if (player->y > 2794.f) kill_player(DEATH_FELL_OFF_LEVEL);
+
+    if (player->on_ground) {
+        player->robot_anim_id = ROBOT_ANIM_RUN;
+        MotionTrail_StopStroke(trail);
+        if (player->slope_data.slope_id < 0) player->rotation = roundf(player->rotation / 90.0f) * 90.0f;
+    }
+
+    SlopeData slope_data = player->slope_data;
+
+    if (player->slope_data.slope_id < 0 && player->slope_slide_coyote_time) {
+        slope_data = player->coyote_slope;
+    }
+
+    if (slope_data.slope_id < 0) {
+        player->rotation = 0;
+    }
+
+    if ((slope_data.slope_id >= 0 || player->on_ground) && (curr_input.holdJump && player->buffering_state == BUFFER_READY)) {
+        set_p_velocity(player, cube_jump_heights[state.speed] / 2, false);
+        player->inverse_rotation = false;
+        player->on_ground = false;
+        player->robot_anim_timer = 0;
+        player->robot_anim_id = ROBOT_ANIM_JUMP_START;
+        player->robot_anim_frame = 0;
+        player->buffering_state = BUFFER_END;
+        player->robot_air_time = 0.f;
+        player->gravity = 0;
+    }
+
+    if (player->robot_air_time >= 1.5f || (!curr_input.holdJump)) {
+        player->gravity = -2794.1082f * 0.9f;
+        if (player->robot_anim_id == ROBOT_ANIM_JUMP) {
+            player->robot_anim_timer = 0;
+            player->robot_anim_frame = 0;
+            player->robot_anim_id = ROBOT_ANIM_FALL_START;
+        }
+    } else if (player->buffering_state == BUFFER_END) {
+        player->robot_air_time += 5.4f * STEPS_DT;
+    }
+
+    if (!player->on_ground && player->vel_y < 0
+        && player->robot_anim_id != ROBOT_ANIM_FALL_START
+        && player->robot_anim_id != ROBOT_ANIM_FALL) {
+        player->robot_anim_id = ROBOT_ANIM_FALL_START;
+        player->robot_anim_frame = 0;
+        player->robot_anim_timer = 0;
+    }
+
+    const RobotAnimation *anim = &robot_animations[player->robot_anim_id];
+    player->robot_anim_timer += STEPS_DT;
+    if (player->robot_anim_timer >= anim->frames[player->robot_anim_frame].delay) {
+        player->robot_anim_timer = 0;
+        int next = player->robot_anim_frame + 1;
+        if (next >= anim->frame_count) {
+            if (player->robot_anim_id == ROBOT_ANIM_JUMP_START) {
+                player->robot_anim_id = ROBOT_ANIM_JUMP;
+            } else if (player->robot_anim_id == ROBOT_ANIM_FALL_START) {
+                player->robot_anim_id = ROBOT_ANIM_FALL;
+            }
+            next = 0;
+        }
+        player->robot_anim_frame = next;
+    }
+}
+
 void clamp_player_ground(Player *player) {
     bool slopeCheck = player->slope_data.slope_id >= 0 && (grav_slope_orient(player->slope_data.slope_id, player) == ORIENT_NORMAL_DOWN || grav_slope_orient(player->slope_data.slope_id, player) == ORIENT_UD_DOWN);
 
     // Check for ground collision
     if (getGroundBottom(player) < state.ground_y) {
-        if (player->ceiling_inv_time <= 0 && player->gamemode == GAMEMODE_PLAYER && player->upside_down) {
+        if (player->ceiling_inv_time <= 0 && (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_ROBOT) && player->upside_down) {
             kill_player(DEATH_CEILING);
         }
 
@@ -582,7 +655,7 @@ void clamp_player_ground(Player *player) {
 
     // Check for ceiling collision
     if (getGroundTop(player) > state.ceiling_y) {
-        if (player->ceiling_inv_time <= 0 && player->gamemode == GAMEMODE_PLAYER && !player->upside_down) {
+        if (player->ceiling_inv_time <= 0 && (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_ROBOT) && !player->upside_down) {
             kill_player(DEATH_CEILING);
         }
 
@@ -678,6 +751,9 @@ void run_player(Player *player) {
                 }
             }
             wave_gamemode(player);
+            break;
+        case GAMEMODE_ROBOT:
+            robot_gamemode(player);
             break;
     } 
     
@@ -916,6 +992,9 @@ void spawn_p1_trail(Player *player, int player_id) {
             trail_data->gamemode = GAMEMODE_PLAYER;
             trail_data->scale = scale * 0.5f;
             trail_data->upside_down = player->upside_down;
+            break;
+        case GAMEMODE_ROBOT:
+            return;
     }
 
     float end_scale = trail_data->scale * P1_TRAIL_END_SCALE;
@@ -1098,6 +1177,53 @@ void draw_player(Player *player) {
                 C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
             );
             break;
+        case GAMEMODE_ROBOT: {
+            const RobotAnimation *anim = &robot_animations[player->robot_anim_id];
+            if (player->robot_anim_frame >= anim->frame_count)
+                player->robot_anim_frame = 0;
+            const RobotFrame *frame = &anim->frames[player->robot_anim_frame];
+
+            static const int robot_l1_atlas[] = {4,2,6,0,4,2,6};
+            static const int robot_l2_atlas[] = {5,3,7,1,5,3,7};
+
+            #define ROBOT_SCALE 2.0f
+            float cos_rot = cosf(C3D_AngleFromDegrees(-player->rotation));
+            float sin_rot = sinf(C3D_AngleFromDegrees(-player->rotation));
+
+            for (int i = 0; i < frame->part_count; i++) {
+                const RobotSpritePart *part = &frame->parts[i];
+
+                float part_x = part->px;
+                float part_y = part->py * flip_y_mult;
+
+                float rotated_x = (part_x * cos_rot - part_y * sin_rot) * scale * ROBOT_SCALE;
+                float rotated_y = (part_x * sin_rot + part_y * cos_rot) * scale * ROBOT_SCALE;
+
+                float pos_x = calc_x_mirror + rotated_x * state.mirror_mult;
+                float pos_y = calc_y - rotated_y;
+
+                float final_rot = C3D_AngleFromDegrees((part->rotation + player->rotation) * state.mirror_mult);
+                float sx = scale * part->scale_x * (flip_x ? -1 : 1);
+                float sy = scale * part->scale_y * flip_y_mult;
+
+                for (int layer = 0; layer < 2; layer++) {
+                    int atlas_idx = (layer == 0) ? robot_l2_atlas[i] : robot_l1_atlas[i];
+                    u32 tint_color = (layer == 0) ? secondary_color : primary_color;
+
+                    C2D_Sprite spr;
+                    C2D_SpriteFromSheet(&spr, robotSheet, atlas_idx);
+                    C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
+                    C2D_SpriteSetPos(&spr, pos_x, pos_y);
+                    C2D_SpriteSetRotation(&spr, final_rot);
+                    C2D_SpriteSetScale(&spr, sx, sy);
+
+                    C2D_ImageTint tint;
+                    C2D_PlainImageTint(&tint, tint_color, 1.0f);
+                    C2D_DrawSpriteTinted(&spr, &tint);
+                }
+            }
+            break;
+        }
     }
 }
 

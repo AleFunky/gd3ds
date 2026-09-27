@@ -94,7 +94,7 @@ void reset_players() {
     title_screen_player.upside_down = false;
     state.speed = random_int(0, SPEED_COUNT - 1);
     title_screen_player.rotation = 0;
-    set_gamemode(&title_screen_player, random_int(0, GAMEMODE_COUNT - 1));
+    set_gamemode(&title_screen_player, random_int(0, GAMEMODE_COUNT - 2));
     set_mini(&title_screen_player, random_int(0,1));
 
     title_screen_player.player_icons.cube = random_int(1, ICON_COUNT_PLAYER - 1);
