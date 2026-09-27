@@ -456,6 +456,9 @@ int get_glow_channel(int obj) {
         case 186:
         case 187:
         case 188:
+        case 918:
+        case 1327:
+        case 1328:
             return CHANNEL_LBG_NOLERP;
         case 144:
         case 145:
