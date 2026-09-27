@@ -525,8 +525,8 @@ int get_obj_random_layer(int obj, int id) {
 }
 
 // Deco saws rotate slower than normal saws. If not a saw, rotation speed is just 0
-float get_rotation_speed(int id) {
-    switch (id) {
+float get_rotation_speed(int obj) {
+    switch (objects.id[obj]) {
         case 88: 
         case 89:
         case 98:
@@ -573,7 +573,25 @@ float get_rotation_speed(int id) {
         case 394:
         case 395:
         case 396:
+        case 997:
+        case 998:
+        case 999:
+        case 1000:
+        case 1055:
+        case 1056:
+        case 1057:
             return 180.f;
+        case 1019:
+            return 180.f + map_range(objects.random[obj] & 0xff, 0, 255, -10, 10);
+        case 1020:
+            return 100.f + map_range(objects.random[obj] & 0xff, 0, 255, -10, 10);
+        case 1021:
+            return 80.f + map_range(objects.random[obj] & 0xff, 0, 255, -10, 10);
+        case 1058:
+        case 1059:
+        case 1060:
+        case 1061:
+            return 300.f;
     }
     return 0.f;
 }
@@ -1699,7 +1717,7 @@ void create_objects() {
         }
         
         // The rotating objects need to be recalculated
-        float rotation_speed = get_rotation_speed(id);
+        float rotation_speed = get_rotation_speed(obj);
         if (rotation_speed != 0) {
             objects.rotation[obj] += ((objects.random[obj] & 1) ? -rotation_speed : rotation_speed) * delta;
             objects.dirty[obj] = true;
