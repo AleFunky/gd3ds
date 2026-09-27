@@ -820,6 +820,41 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 SET_ACTIVATED(obj, true);
             }
             break;
+        case BLUE_TP_PORTAL: {
+            if (player->has_teleported_timer > 0.0f) break;
+            if (GET_ACTIVATED(obj)) break;
+            int oi = objects.child_object[obj];
+            if (oi >= 0) {
+                player->y = objects.y[oi];
+                state.old_player.y = player->y;
+
+                float half_view = SCREEN_HEIGHT_AREA / 2.0f;
+                float cam_y = state.camera_y;
+                float player_y = player->y;
+                if (fabsf(cam_y + half_view - player_y) >= half_view + 60.0f) {
+                    set_camera_y(player_y - half_view);
+                }
+
+                UseEffect *eff1 = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                if (eff1) {
+                    eff1->def.colorR = 56 / 255.f;
+                    eff1->def.colorG = 200 / 255.f;
+                    eff1->def.colorB = 255 / 255.f;
+                }
+
+                UseEffect *eff2 = add_use_effect(objects.x[oi], objects.y[oi], oi, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                if (eff2) {
+                    eff2->def.colorR = 255 / 255.f;
+                    eff2->def.colorG = 255 / 255.f;
+                    eff2->def.colorB = 0 / 255.f;
+                }
+            }
+            SET_ACTIVATED(obj, true);
+            player->has_teleported_timer = 0.5f;
+            player->just_teleported      = true;
+            MotionTrail_Clear(trail);
+            break;
+        }
         case SHIP_PORTAL: 
             if (!GET_ACTIVATED(obj)) {
                 state.ground_y = fmaxf(0, ip1_ceilf((objects.y[obj] - ((gamemode_heights[GAMEMODE_SHIP] + 60.f) / 2.f)) / 30.f)) * 30;

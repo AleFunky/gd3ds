@@ -2412,6 +2412,18 @@ void reload_level() {
         update_object_section(i);
     }
 
+    int next_orange = 0;
+    for (int i = 0; i < objects.count; i++) {
+        if (objects.id[i] == BLUE_TP_PORTAL) {
+            while (next_orange < objects.count && objects.id[next_orange] != ORANGE_TP_PORTAL)
+                next_orange++;
+            if (next_orange < objects.count) {
+                objects.child_object[i] = next_orange;
+                next_orange++;
+            }
+        }
+    }
+
     accumulator = 0.f;
     fixed_dt = true;
 

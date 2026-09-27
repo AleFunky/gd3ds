@@ -639,7 +639,7 @@ void clamp_player_ground(Player *player) {
     bool slopeCheck = player->slope_data.slope_id >= 0 && (grav_slope_orient(player->slope_data.slope_id, player) == ORIENT_NORMAL_DOWN || grav_slope_orient(player->slope_data.slope_id, player) == ORIENT_UD_DOWN);
 
     // Check for ground collision
-    if (getGroundBottom(player) < state.ground_y) {
+    if (getGroundBottom(player) < state.ground_y && !player->just_teleported) {
         if (player->ceiling_inv_time <= 0 && (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_ROBOT) && player->upside_down) {
             kill_player(DEATH_CEILING);
         }
@@ -654,7 +654,7 @@ void clamp_player_ground(Player *player) {
     }
 
     // Check for ceiling collision
-    if (getGroundTop(player) > state.ceiling_y) {
+    if (getGroundTop(player) > state.ceiling_y && !player->just_teleported) {
         if (player->ceiling_inv_time <= 0 && (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_ROBOT) && !player->upside_down) {
             kill_player(DEATH_CEILING);
         }
@@ -869,7 +869,11 @@ void handle_player(Player *player) {
     player->x += player->vel_x * STEPS_DT;
     player->y += player_get_vel(player, player->vel_y) * STEPS_DT;
 
+    if (player->has_teleported_timer > 0.0f)
+        player->has_teleported_timer -= STEPS_DT;
+
     clamp_player_ground(player);
+    player->just_teleported = false;
 
     player->frame++;
 
