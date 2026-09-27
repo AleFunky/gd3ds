@@ -321,7 +321,10 @@ inline int get_color_channel(int col_type, int obj, const GameObject *game_obj) 
     int col_channel = game_obj->base_color;
     if (col_type == COLOR_TYPE_GLOW) {
         col_channel = get_glow_channel(obj);
-    } else if (col_type == COLOR_TYPE_BLACK) col_channel = 0;
+        if (col_channel == CHANNEL_OBJ_BLENDING) col_type = CHANNEL_OBJ_BLENDING;
+    } 
+    
+    if (col_type == COLOR_TYPE_BLACK) col_channel = 0;
     else if (col_type == COLOR_TYPE_WHITE) col_channel = -1;
     else {
         // Check for the presence of 1.9 color channel
@@ -649,6 +652,20 @@ static bool object_has_pulse(int id) {
     }
 }
 
+int get_color_type(const GameObject *game_obj, int obj, int col_type) {
+    // Check for the presence of 1.9 color channel
+    if (objects.v1p9_col_channel[obj]) {
+        col_type = COLOR_TYPE_BASE;
+    } else {
+        if (col_type == COLOR_TYPE_DETAIL) {
+            if (!obj_has_main(game_obj)) {
+                col_type = COLOR_TYPE_BASE;
+            }
+        }
+    }
+    return col_type;
+}
+
 void spawn_object_at(
     int obj_game,
     int id,
@@ -726,7 +743,7 @@ void spawn_object_at(
 
         vo->obj = obj_game;
         vo->layer = 0;
-        vo->col_type = obj->color_type;
+        vo->col_type = get_color_type(obj, obj_game, obj->color_type);
         vo->opacity = obj->opacity;
         vo->col_channel = get_color_channel(obj->color_type, obj_game, obj);
         calc_quad_params(vo);
@@ -754,7 +771,7 @@ void spawn_object_at(
         vo->layer = 1;
         vo->col_type = COLOR_TYPE_BASE;
         vo->opacity = obj->opacity;
-        vo->col_channel = get_glow_channel(obj_game);
+        vo->col_channel = get_color_channel(COLOR_TYPE_GLOW, obj_game, obj);
         calc_quad_params(vo);
         sprite_count++;
     }
@@ -837,7 +854,7 @@ void spawn_object_at(
 
             vo->obj = obj_game;
             vo->layer = i + 2;
-            vo->col_type = c->color_type;
+            vo->col_type = get_color_type(obj, obj_game, c->color_type);
             vo->opacity = c->opacity;
             vo->col_channel = get_color_channel(c->color_type, obj_game, obj);
             calc_quad_params(vo);
@@ -858,12 +875,14 @@ static inline uint32_t make_sort_key(SpriteObject *s)
     const int id = objects.id[obj];
     const GameObject *game_obj = &game_objects[id];
 
-    int zlayer = objects.zlayer[obj] ? objects.zlayer[obj] : game_obj->z_layer;
+    int zlayer = objects.zlayer[obj];
+    int zorder = objects.zorder[obj];
+
     bool blending;
     // Blending makes zlayer one 
     if (obj_has_main(game_obj) && obj_has_detail(game_obj)) {
-        bool blending_main = !obj_has_main(game_obj) || (objects.col_channel[obj] > 0 && (channels[get_col_channel_index(objects.col_channel[obj])].blending ^ ((zlayer & 1) == 0)));
-        bool blending_detail = !obj_has_detail(game_obj) || (objects.detail_col_channel[obj] > 0 && (channels[get_col_channel_index(objects.detail_col_channel[obj])].blending ^ ((zlayer & 1) == 0)));
+        bool blending_main = (objects.col_channel[obj] > 0 && (channels[get_col_channel_index(objects.col_channel[obj])].blending ^ ((zlayer & 1) == 0)));
+        bool blending_detail = (objects.detail_col_channel[obj] > 0 && (channels[get_col_channel_index(objects.detail_col_channel[obj])].blending ^ ((zlayer & 1) == 0)));
         blending = blending_main && blending_detail;
     } else {
         int col_channel = s->col_channel;
@@ -891,10 +910,8 @@ static inline uint32_t make_sort_key(SpriteObject *s)
     if (s->layer == 1) {
         sheet = 2;
     } else {
-        sheet = tex < SPRITESHEET2_START ? 1 : 0;
+        sheet = tex < SPRITESHEET2_START || tex >= SPRITESHEET3_START ? 1 : 0;
     }
-    
-    int zorder = objects.zorder[obj] ? objects.zorder[obj] : game_obj->z_order;
 
     // Move the pulserod ball
     if (id >= 15 && id <= 17 && s->layer == 2) {
@@ -905,7 +922,7 @@ static inline uint32_t make_sort_key(SpriteObject *s)
 
     // Pack all variables into a nice 32 bit variable
     uint32_t zl = (uint32_t)(zlayer + 8);     // fits in 6 bits
-    uint32_t zb = (uint32_t)(blending);  // fits in 1 bit
+    uint32_t zb = (uint32_t)(blending);       // fits in 1 bit
     uint32_t zs = (uint32_t)(sheet);          // fits in 1 bit
     uint32_t zo = (uint32_t)(zorder + 128);   // fits in 8 bits
     uint32_t cz = (uint32_t)(child_z + 128);  // fits in 8 bits
@@ -1595,11 +1612,17 @@ void update_tints() {
                     col.color = apply_hsv_to_color(col.color, game_object, true, col_channel);
                 }
                 objects.main_non_pulse_color[game_object] = col.color;
+                if (objects.num_main_pulses[game_object] == 0) {
+                    objects.main_color[game_object] = col.color;
+                }
             } else if (obj->col_type == COLOR_TYPE_DETAIL) {
                 if (objects.detail_col_HSV_enabled[game_object]) {
                     col.color = apply_hsv_to_color(col.color, game_object, false, col_channel);
                 }
                 objects.detail_non_pulse_color[game_object] = col.color;
+                if (objects.num_detail_pulses[game_object] == 0) {
+                    objects.detail_color[game_object] = col.color;
+                }
             }
 
             if (obj->col_type == COLOR_TYPE_BASE && objects.main_being_pulsed[game_object] && col_channel >= 0) {
@@ -1632,7 +1655,7 @@ void update_tints() {
             int real_opacity = get_obj_opacity(game_object, x) * opacity * col.alpha * objects.alpha_trigger_opacity[game_object];
 
             // Set opacity here
-            if (obj->layer == 0) objects.opacity[game_object] = real_opacity / 255.f;
+            objects.opacity[game_object] = real_opacity / 255.f;
 
             obj->blending = col.blending;
             obj->hidden = (real_opacity == 0) || (col.blending && (col.color.r | col.color.g | col.color.b) == 0);

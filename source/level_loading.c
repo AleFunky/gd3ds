@@ -1029,7 +1029,15 @@ int allocate_trigger_component(int obj) {
     return index;
 }
 
+void init_default_variables(int object) {
+    const GameObject *game_obj = &game_objects[objects.id[object]];
+
+    objects.zlayer[object] = game_obj->z_layer;
+    objects.zorder[object] = game_obj->z_order;
+}
+
 bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
+    
     // Default members
     int trigger_index = objects.trigger_index[object];
     switch (key) {
@@ -1037,6 +1045,7 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
             if (type == GD_VAL_INT) {
                 objects.id[object] = convert_object(val.i);
 
+                init_default_variables(object);
                 if (is_trigger_object(val.i)) {
                     // Allocate its data
                     trigger_index = allocate_trigger_component(object);

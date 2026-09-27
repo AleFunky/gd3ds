@@ -705,8 +705,10 @@ void handle_pulse_triggers(void) {
 
                 if (both || buffer->main_only) {
                     int main_pulse_index = buffer->main_pulse_index[index];
+
                     Color channel_color = objects.main_non_pulse_color[obj_idx];
                     if (main_pulse_index > 0) channel_color = objects.main_color[obj_idx];
+
                     float r = (buffer->color.r - (buffer->color.r - channel_color.r) * (1.f - fade_time));
                     float g = (buffer->color.g - (buffer->color.g - channel_color.g) * (1.f - fade_time));
                     float b = (buffer->color.b - (buffer->color.b - channel_color.b) * (1.f - fade_time));
@@ -717,8 +719,10 @@ void handle_pulse_triggers(void) {
                 }
                 if (both || buffer->detail_only) {
                     int detail_pulse_index = buffer->detail_pulse_index[index];
+
                     Color channel_color = objects.detail_non_pulse_color[obj_idx];
                     if (detail_pulse_index > 0) channel_color = objects.detail_color[obj_idx];
+
                     float r = (buffer->color.r - (buffer->color.r - channel_color.r) * (1.f - fade_time));
                     float g = (buffer->color.g - (buffer->color.g - channel_color.g) * (1.f - fade_time));
                     float b = (buffer->color.b - (buffer->color.b - channel_color.b) * (1.f - fade_time));
@@ -733,8 +737,10 @@ void handle_pulse_triggers(void) {
 
                 if (both || buffer->main_only) {
                     int main_pulse_index = buffer->main_pulse_index[index];
+
                     Color channel_color = objects.main_non_pulse_color[obj_idx];
                     if (main_pulse_index > 0) channel_color = objects.main_color[obj_idx];
+
                     float r = (buffer->color.r - (buffer->color.r - channel_color.r) * fade_time);
                     float g = (buffer->color.g - (buffer->color.g - channel_color.g) * fade_time);
                     float b = (buffer->color.b - (buffer->color.b - channel_color.b) * fade_time);
@@ -745,8 +751,10 @@ void handle_pulse_triggers(void) {
                 }
                 if (both || buffer->detail_only) {
                     int detail_pulse_index = buffer->detail_pulse_index[index];
+                    
                     Color channel_color = objects.detail_non_pulse_color[obj_idx];
                     if (detail_pulse_index > 0) channel_color = objects.detail_color[obj_idx];
+
                     float r = (buffer->color.r - (buffer->color.r - channel_color.r) * fade_time);
                     float g = (buffer->color.g - (buffer->color.g - channel_color.g) * fade_time);
                     float b = (buffer->color.b - (buffer->color.b - channel_color.b) * fade_time);
@@ -904,6 +912,8 @@ void upload_color_to_buffer(int channel, u32 color, float seconds) {
 }
 
 void run_trigger(int obj) {
+    if (objects.toggled[obj]) return;
+
     switch (objects.id[obj]) {
         case TRIGGER_FADE_SIMPLE:
             current_fading_effect = FADE_SIMPLE;
