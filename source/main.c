@@ -11,7 +11,7 @@
 #include "level_loading.h"
 #include "main.h"
 #include "graphics.h"
-#include "color_channels.h"
+#include "triggers.h"
 #include "menus/core/ui_element.h"
 #include "mp3_player.h"
 #include "fonts/bigFont.h"
@@ -983,6 +983,10 @@ void game_loop() {
                         handle_player(&state.player2);
 
                         if (state.dead) break;
+
+                        //revert state back to first player
+                        state.current_player = 0;
+                        state.old_player = state.player;
                     }
                     
                     acc_delta_y += state.player.delta_y;

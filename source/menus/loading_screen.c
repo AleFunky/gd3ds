@@ -7,7 +7,7 @@
 #include "menus/components/ui_label.h"
 #include "menus/components/ui_progress_bar.h"
 #include "main.h"
-#include "color_channels.h"
+#include "triggers.h"
 #include "graphics.h"
 
 static UIProgressBar *progressbar;

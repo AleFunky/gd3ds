@@ -1,6 +1,6 @@
 #include <math.h>
 #include "math_helpers.h"
-#include "color_channels.h"
+#include "triggers.h"
 
 #include <stdlib.h>
 #include <float.h>

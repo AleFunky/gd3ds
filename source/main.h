@@ -4,7 +4,7 @@
 #include "sounds.h"
 
 #include "particles/particles.h"
-#include "color_channels.h"
+#include "triggers.h"
 
 #include "save/saving.h"
 

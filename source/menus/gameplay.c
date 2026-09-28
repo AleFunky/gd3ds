@@ -5,7 +5,7 @@
 #include "main.h"
 #include "graphics.h"
 #include "state.h"
-#include "color_channels.h"
+#include "triggers.h"
 #include "easing.h"
 #include "mp3_player.h"
 #include "particles/circles.h"

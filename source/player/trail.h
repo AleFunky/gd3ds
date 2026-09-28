@@ -5,7 +5,7 @@
 
 #include <citro2d.h>
 #include "objects.h"
-#include "color_channels.h"
+#include "triggers.h"
 #include "main.h"
 
 #include "icons.h"

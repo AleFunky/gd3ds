@@ -896,7 +896,7 @@ void handle_player(Player *player) {
     u64 ticks = end - start;
     snapshot.collision_ms += ticks / CPU_TICKS_PER_MSEC;
     
-    if (state.noclip) state.dead = false;
+    if (state.noclip || state.end_wall_anim_playing) state.dead = false;
     
     if (state.dead) return;
 
