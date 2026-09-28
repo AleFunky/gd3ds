@@ -58,9 +58,9 @@ typedef struct CheckpointData {
     ColorChannel *channel_snapshot;
     ColTriggerBuffer *trigger_snapshot;
 
-    MoveTriggerBuffer move_triggers[MAX_MOVE_TRIGGERS];
-    AlphaTriggerBuffer alpha_triggers[MAX_ALPHA_TRIGGERS];
-    SpawnTriggerBuffer spawn_triggers[MAX_SPAWN_TRIGGERS];
+    MoveTriggerBuffer *move_triggers;
+    AlphaTriggerBuffer *alpha_triggers;
+    SpawnTriggerBuffer *spawn_triggers;
 
     // per-object state for triggers that were active at checkpoint time, so they
     // can continue from the exact point instead of restarting. bounded by the
@@ -220,16 +220,16 @@ void new_checkpoint() {
         check->trigger_snapshot[i] = col_trigger_buffer[idx];
     }
 
-    memcpy(check->move_triggers,  move_trigger_buffer,  sizeof(move_trigger_buffer));
-    memcpy(check->alpha_triggers, alpha_trigger_buffer, sizeof(alpha_trigger_buffer));
-    memcpy(check->spawn_triggers, spawn_trigger_buffer, sizeof(spawn_trigger_buffer));
+    memcpy(check->move_triggers,  move_trigger_buffer,  sizeof(MoveTriggerBuffer) * move_trigger_count);
+    memcpy(check->alpha_triggers, alpha_trigger_buffer, sizeof(AlphaTriggerBuffer) * alpha_trigger_count);
+    memcpy(check->spawn_triggers, spawn_trigger_buffer, sizeof(SpawnTriggerBuffer) * spawn_trigger_count);
 
     check->move_obj_count = 0;
     check->move_obj_index = NULL;
     check->move_obj_x = NULL;
     check->move_obj_y = NULL;
     int move_cap = 0;
-    for (int i = 0; i < MAX_MOVE_TRIGGERS; i++)
+    for (int i = 0; i < move_trigger_count; i++)
         if (move_trigger_buffer[i].active)
             for (GroupNode *p = get_group(move_trigger_buffer[i].target_group); p; p = p->next)
                 move_cap++;
@@ -239,7 +239,7 @@ void new_checkpoint() {
         check->move_obj_y = malloc(sizeof(float) * move_cap);
         if (check->move_obj_index && check->move_obj_x && check->move_obj_y) {
             int n = 0;
-            for (int i = 0; i < MAX_MOVE_TRIGGERS; i++) {
+            for (int i = 0; i <move_trigger_count ; i++) {
                 if (!move_trigger_buffer[i].active) continue;
                 for (GroupNode *p = get_group(move_trigger_buffer[i].target_group); p; p = p->next) {
                     if (n >= move_cap) break;
@@ -258,7 +258,7 @@ void new_checkpoint() {
     check->alpha_obj_index = NULL;
     check->alpha_obj_alpha = NULL;
     int alpha_cap = 0;
-    for (int i = 0; i < MAX_ALPHA_TRIGGERS; i++)
+    for (int i = 0; i < alpha_trigger_count; i++)
         if (alpha_trigger_buffer[i].active)
             for (GroupNode *p = get_group(alpha_trigger_buffer[i].target_group); p; p = p->next)
                 alpha_cap++;
@@ -267,7 +267,7 @@ void new_checkpoint() {
         check->alpha_obj_alpha = malloc(sizeof(float) * alpha_cap);
         if (check->alpha_obj_index && check->alpha_obj_alpha) {
             int n = 0;
-            for (int i = 0; i < MAX_ALPHA_TRIGGERS; i++) {
+            for (int i = 0; i < alpha_trigger_count; i++) {
                 if (!alpha_trigger_buffer[i].active) continue;
                 for (GroupNode *p = get_group(alpha_trigger_buffer[i].target_group); p; p = p->next) {
                     if (n >= alpha_cap) break;
@@ -331,15 +331,15 @@ void restore_checkpoint() {
         col_trigger_buffer[idx] = check->trigger_snapshot[i];
     }
 
-    memcpy(move_trigger_buffer,  check->move_triggers,  sizeof(move_trigger_buffer));
-    memcpy(alpha_trigger_buffer, check->alpha_triggers, sizeof(alpha_trigger_buffer));
-    memcpy(spawn_trigger_buffer, check->spawn_triggers, sizeof(spawn_trigger_buffer));
+    memcpy(move_trigger_buffer,  check->move_triggers,  sizeof(MoveTriggerBuffer) * move_trigger_count);
+    memcpy(alpha_trigger_buffer, check->alpha_triggers, sizeof(AlphaTriggerBuffer) * alpha_trigger_count);
+    memcpy(spawn_trigger_buffer, check->spawn_triggers, sizeof(SpawnTriggerBuffer) * spawn_trigger_count);
 
-    for (int i = 0; i < MAX_MOVE_TRIGGERS; i++)
+    for (int i = 0; i < move_trigger_count; i++)
         move_trigger_buffer[i].restored_from_checkpoint = move_trigger_buffer[i].active;
-    for (int i = 0; i < MAX_ALPHA_TRIGGERS; i++)
+    for (int i = 0; i < alpha_trigger_count; i++)
         alpha_trigger_buffer[i].restored_from_checkpoint = alpha_trigger_buffer[i].active;
-    for (int i = 0; i < MAX_SPAWN_TRIGGERS; i++)
+    for (int i = 0; i < spawn_trigger_count; i++)
         spawn_trigger_buffer[i].restored_from_checkpoint = spawn_trigger_buffer[i].active;
 
     for (int i = 0; i < check->move_obj_count; i++) {

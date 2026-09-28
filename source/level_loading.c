@@ -2393,10 +2393,7 @@ int load_level(char *path) {
 void reload_level() {
     clear_groups();
 
-    memset(alpha_trigger_buffer, 0, sizeof(alpha_trigger_buffer));
-    memset(move_trigger_buffer, 0, sizeof(move_trigger_buffer));
-    memset(spawn_trigger_buffer, 0, sizeof(spawn_trigger_buffer));
-    memset(pulse_trigger_buffer, 0, sizeof(pulse_trigger_buffer));
+    free_trigger_buffers();
 
     for (int i = 0; i < objects.count; i++) {
         objects.activated[i] = false;
@@ -2458,11 +2455,7 @@ void unload_level() {
     clear_groups();
     reset_render_cache();
     free_arrays();
-
-    memset(alpha_trigger_buffer, 0, sizeof(alpha_trigger_buffer));
-    memset(move_trigger_buffer, 0, sizeof(move_trigger_buffer));
-    memset(spawn_trigger_buffer, 0, sizeof(spawn_trigger_buffer));
-    memset(pulse_trigger_buffer, 0, sizeof(pulse_trigger_buffer));
+    free_trigger_buffers();
     free_sections();
     free_object_particles();
     
