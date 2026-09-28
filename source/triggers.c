@@ -662,7 +662,7 @@ void handle_pulse_triggers(void) {
         int idx = buffer->pulse_index;
         if (idx < 0 || idx >= chan->num_pulses) continue;
 
-        Color base_color = chan->non_pulse_color;
+        Color base_color = (idx == 0) ? chan->non_pulse_color : chan->color;
 
         Color result_color;
         if (buffer->time_run <= buffer->fade_in) {
