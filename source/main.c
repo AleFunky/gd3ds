@@ -11,7 +11,7 @@
 #include "level_loading.h"
 #include "main.h"
 #include "graphics.h"
-#include "color_channels.h"
+#include "triggers.h"
 #include "menus/core/ui_element.h"
 #include "mp3_player.h"
 #include "fonts/bigFont.h"
@@ -982,6 +982,10 @@ void game_loop() {
                         curr_old_input = state.old_input_p2;
                         handle_player(&state.player2);
 
+                        //revert state back to first player
+                        state.current_player = 0;
+                        state.old_player = state.player;
+
                         if (state.dead) break;
                     }
                     
@@ -1485,8 +1489,6 @@ void game_assets_init() {
 
     initParticleSystem(&faster_speed_particles_bottom, &speed_effect_vfast);
     faster_speed_particles_bottom.relativeStationary = true;
-
-    
 }
 
 int main(int argc, char* argv[]) {

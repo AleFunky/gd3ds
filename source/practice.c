@@ -10,7 +10,7 @@
 #include "state.h"
 #include "mp3_player.h"
 #include "math_helpers.h"
-#include "color_channels.h"
+#include "triggers.h"
 #include "utils/gfx.h"
 #include "menus/settings_hub/settings.h"
 

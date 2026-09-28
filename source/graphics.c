@@ -6,7 +6,7 @@
 #include "animations.h"
 #include "main.h"
 #include "math_helpers.h"
-#include "color_channels.h"
+#include "triggers.h"
 #include <stdlib.h>
 #include <string.h>
 #include "mp3_player.h"

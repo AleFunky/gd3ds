@@ -1,5 +1,5 @@
 #include <citro2d.h>
-#include "color_channels.h"
+#include "triggers.h"
 #include "color.h"
 #include "math_helpers.h"
 #include <float.h>
@@ -463,6 +463,11 @@ void handle_move_triggers(void) {
         MoveTriggerBuffer *buffer = &move_trigger_buffer[slot];
         if (!buffer->active) continue;
 
+        buffer->time_run += g_trigger_dt;
+        if (buffer->time_run >= buffer->seconds) {
+            buffer->active = false;
+        }
+
         float t = easeTime(convert_ease(buffer->easing),
                            buffer->time_run, buffer->seconds, 2.0f);
         float delta_x, delta_y;
@@ -498,11 +503,6 @@ void handle_move_triggers(void) {
                     update_object_section(group_obj);
                 }
             }
-        }
-
-        buffer->time_run += g_trigger_dt;
-        if (buffer->time_run >= buffer->seconds) {
-            buffer->active = false;
         }
     }
 }

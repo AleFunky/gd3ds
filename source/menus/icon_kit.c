@@ -13,7 +13,7 @@
 #include "fonts/bigFont.h"
 #include "main.h"
 #include "easing.h"
-#include "color_channels.h"
+#include "triggers.h"
 #include "mp3_player.h"
 #include "graphics.h"
 #include "icon_kit.h"

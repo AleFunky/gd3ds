@@ -1,7 +1,7 @@
 #pragma once
 #include <citro2d.h>
 #include "level_loading.h"
-#include "color_channels.h"
+#include "triggers.h"
 #include "utils/c2d_internal.h"
 #include "animations.h"
 

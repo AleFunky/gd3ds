@@ -6,7 +6,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdio.h>
-#include "color_channels.h"
+#include "triggers.h"
 #include "main.h"
 #include "menus/creator_menu/online/online_menu.h"
 #include "objects.h"
@@ -148,6 +148,7 @@ void update_object_section(int obj) {
     if (new_sx == old_sx && new_sy == old_sy) return;
 
     Section *old_sec = get_section(old_sx, old_sy);
+
     if (old_sec) {
         for (int i = 0; i < old_sec->object_count; i++) {
             if (old_sec->objects[i] == obj) {

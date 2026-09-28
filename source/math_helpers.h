@@ -1,6 +1,6 @@
 #pragma once
 #include <citro2d.h>
-#include "color_channels.h"
+#include "triggers.h"
 #include "player/collision.h"
 
 #define RGB8(r, g, b) (r | (g << (u32)8) | (b << (u32)16))
