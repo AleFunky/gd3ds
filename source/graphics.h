@@ -33,13 +33,6 @@ typedef enum {
     FADE_STATUS_IN
 } FadeStatus;
 
-// Simple sprite struct
-typedef struct
-{
-    C2D_Sprite spr;
-    float dx, dy; // velocity
-} Sprite;
-
 typedef struct {
     C2Di_Quad quadr;
     float tcTopLeft[2], tcTopRight[2], tcBotLeft[2], tcBotRight[2];
@@ -50,15 +43,16 @@ typedef struct
     C2D_Sprite spr;
     C2D_ImageTint tint;
     QuadParams params;
-    int obj;
-    int layer;
-    int col_type;
     float opacity;
-    int col_channel;
-    int zlayer;
+    int obj;
+    short col_channel;
+    unsigned char col_type;
+    signed char zlayer;
+    unsigned char layer;
     bool blending;
     bool hidden;
 } SpriteObject;
+
 
 typedef struct {
     SpriteObject *obj;

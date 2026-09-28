@@ -458,6 +458,24 @@ void upload_to_move_buffer(int obj) {
     buffer->active = true;
 }
 
+bool object_can_be_x_moved(int obj) {
+    int obj_id = objects.id[obj];
+    if (is_trigger_object(obj_id) && !objects.touch_triggered) {
+        return false;
+    }
+
+    switch (obj_id) {
+        // Speed portals
+        case 200:
+        case 201:
+        case 202:
+        case 203:
+            return false;
+    }
+
+    return true;
+}
+
 void handle_move_triggers(void) {
     for (int slot = 0; slot < MAX_MOVE_TRIGGERS; slot++) {
         MoveTriggerBuffer *buffer = &move_trigger_buffer[slot];
@@ -494,7 +512,7 @@ void handle_move_triggers(void) {
                 int group_obj = cur->obj;
                 int old_sx = objects.section_x[group_obj];
                 int old_sy = objects.section_y[group_obj];
-                objects.x[group_obj] += delta_x;
+                if (objects.flags[group_obj] & FLAG_CAN_BE_X_MOVED) objects.x[group_obj] += delta_x;
                 objects.y[group_obj] += delta_y;
                 objects.flags[group_obj] |= FLAG_DIRTY;
                 int new_sx = (int)(objects.x[group_obj] / SECTION_SIZE);

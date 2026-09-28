@@ -1617,6 +1617,10 @@ int parse_gd_object(const char *objStr, int obj) {
         objects.height[obj] = 30 * fabsf(objects.scale_y[obj]);
     }
 
+    if (object_can_be_x_moved(obj)) {
+        objects.flags[obj] |= FLAG_CAN_BE_X_MOVED;
+    }
+
     free_string_array(tokens, count);
     return 1;
 }

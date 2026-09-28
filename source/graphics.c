@@ -108,7 +108,7 @@ static SortItem buf_b[MAX_SPRITES];
 static SpriteObject *object_sprite_cache;
 static SpriteObject *viewable_objects;
 static SpriteObject *viewable_objects_ptr[MAX_SPRITES];
-static int *current_objects;
+static int current_objects[MAX_SPRITES];
 static int *object_sprite_start;
 static unsigned char *object_sprite_count;
 static int current_object_count;
@@ -321,39 +321,36 @@ inline int get_color_channel(int col_type, int obj, const GameObject *game_obj) 
     int col_channel = game_obj->base_color;
     if (col_type == COLOR_TYPE_GLOW) {
         col_channel = get_glow_channel(obj);
-        if (col_channel == CHANNEL_OBJ_BLENDING) col_type = COLOR_TYPE_BASE;
+        if (col_channel != CHANNEL_OBJ_BLENDING) return col_channel;
     } 
     
-    if (col_type == COLOR_TYPE_BLACK) col_channel = 0;
-    else if (col_type == COLOR_TYPE_WHITE) col_channel = -1;
-    else {
-        // Check for the presence of 1.9 color channel
-        if (objects.v1p9_col_channel[obj]) {
-            // If pulserods, use base instead of detail
-            if (obj_id >= 15 && obj_id <= 17) {
-                if (col_type == COLOR_TYPE_BASE) col_channel = objects.v1p9_col_channel[obj];
-            } else {
-                if (col_type == COLOR_TYPE_DETAIL) col_channel = objects.v1p9_col_channel[obj];
-            }
+    // Check for the presence of 1.9 color channel
+    if (objects.v1p9_col_channel[obj]) {
+        // If pulserods, use base instead of detail
+        if (obj_id >= 15 && obj_id <= 17) {
+            if (col_type != COLOR_TYPE_DETAIL) col_channel = objects.v1p9_col_channel[obj];
         } else {
-            // 2.0 color channels, here for 1.9 levels that got updated in 2.0 (and for making 1.9 levels in 2.2)
-            if (objects.col_channel[obj]) {
-                if (col_type == COLOR_TYPE_BASE) {
-                    col_channel = objects.col_channel[obj];
-                } else if (!obj_has_main(game_obj)) {
-                    col_channel = objects.col_channel[obj];
-                }
+            if (col_type == COLOR_TYPE_DETAIL) col_channel = objects.v1p9_col_channel[obj];
+        }
+    } else {
+        // 2.0 color channels, here for 1.9 levels that got updated in 2.0 (and for making 1.9 levels in 2.2)
+        if (objects.col_channel[obj]) {
+            if (col_type != COLOR_TYPE_DETAIL) {
+                col_channel = objects.col_channel[obj];
+            } else if (!obj_has_main(game_obj)) {
+                col_channel = objects.col_channel[obj];
             }
+        }
 
-            if (objects.detail_col_channel[obj]) {
-                if (col_type == COLOR_TYPE_DETAIL) {
-                    if (obj_has_main(game_obj)) {
-                        col_channel = objects.detail_col_channel[obj];
-                    }
+        if (objects.detail_col_channel[obj]) {
+            if (col_type == COLOR_TYPE_DETAIL) {
+                if (obj_has_main(game_obj)) {
+                    col_channel = objects.detail_col_channel[obj];
                 }
             }
         }
     }
+
     return col_channel;
 }
 
@@ -790,8 +787,9 @@ void spawn_object_at(
 
         vo->obj = obj_game;
         vo->layer = 1;
-        vo->col_type = COLOR_TYPE_BASE;
+        vo->col_type = COLOR_TYPE_GLOW;
         vo->opacity = obj->opacity;
+        vo->blending = true;
         vo->col_channel = get_color_channel(COLOR_TYPE_GLOW, obj_game, obj);
         calc_quad_params(vo);
         sprite_count++;
@@ -1411,20 +1409,16 @@ static bool ensure_render_cache(void) {
 
     // New objects! Reallocate stuff and maintain pointer integrity
 
-    free(current_objects);
     free(object_sprite_start);
     free(object_sprite_count);
     free(object_sprite_cache);
 
-    current_objects = malloc(sizeof(int) * objects.count);
     object_sprite_start = malloc(sizeof(int) * objects.count);
     object_sprite_count = malloc(sizeof(unsigned char) * objects.count);
     
-    if (!current_objects || !object_sprite_start || !object_sprite_count) {
-        free(current_objects);
+    if (!object_sprite_start || !object_sprite_count) {
         free(object_sprite_start);
         free(object_sprite_count);
-        current_objects = NULL;
         object_sprite_start = NULL;
         object_sprite_count = NULL;
         object_sprite_cache = NULL;
@@ -1446,11 +1440,9 @@ static bool ensure_render_cache(void) {
     object_sprite_cache = malloc(sizeof(SpriteObject) * cache_capacity);
     if (!object_sprite_cache) {
         // Today i discovered free ignores NULL
-        free(current_objects);
         free(object_sprite_start);
         free(object_sprite_count);
         free(object_sprite_cache);
-        current_objects = NULL;
         object_sprite_start = NULL;
         object_sprite_count = NULL;
         object_sprite_cache = NULL;
@@ -1473,12 +1465,10 @@ static bool ensure_render_cache(void) {
 }
 
 void reset_render_cache(void) {
-    free(current_objects);
     free(object_sprite_start);
     free(object_sprite_count);
     free(object_sprite_cache);
 
-    current_objects = NULL;
     object_sprite_start = NULL;
     object_sprite_count = NULL;
     object_sprite_cache = NULL;
@@ -1489,6 +1479,8 @@ void reset_render_cache(void) {
 }
 
 static int insert_sorted_object(int obj) {
+    if (current_object_count >= MAX_SPRITES) return -1;
+
     int idx = current_object_count;
 
     while (idx > 0) {
@@ -1587,13 +1579,7 @@ void update_tints() {
 
             ColorChannel col;
 
-            if (col_channel < 0) {
-                col.color.r = 255;
-                col.color.g = 255;
-                col.color.b = 255;
-                col.alpha = 1.0f;
-                col.blending = false;
-            } else if (col_channel == CHANNEL_INVISIBLE_GLOW) { // Handle invisible blocks color lerping
+            if (col_channel == CHANNEL_INVISIBLE_GLOW) { // Handle invisible blocks color lerping
                 int chan = get_col_channel_index(CHANNEL_LBG_NOLERP);
                 col.alpha = channels[chan].alpha;
 
@@ -1635,7 +1621,7 @@ void update_tints() {
             
             int game_object = obj->obj;
 
-            if (obj->col_type == COLOR_TYPE_BASE) {
+            if (obj->col_type != COLOR_TYPE_DETAIL) {
                 if (objects.main_col_HSV_enabled[game_object]) {
                     col.color = apply_hsv_to_color(col.color, game_object, true, col_channel);
                 }
@@ -1643,7 +1629,7 @@ void update_tints() {
                 if (objects.num_main_pulses[game_object] == 0) {
                     objects.main_color[game_object] = col.color;
                 }
-            } else if (obj->col_type == COLOR_TYPE_DETAIL) {
+            } else {
                 if (objects.detail_col_HSV_enabled[game_object]) {
                     col.color = apply_hsv_to_color(col.color, game_object, false, col_channel);
                 }
@@ -1653,7 +1639,7 @@ void update_tints() {
                 }
             }
 
-            if (obj->col_type == COLOR_TYPE_BASE && objects.main_being_pulsed[game_object] && col_channel >= 0) {
+            if (obj->col_type != COLOR_TYPE_DETAIL && objects.main_being_pulsed[game_object] && col_channel >= 0) {
                 col.color = objects.main_color[game_object];
             } else if (obj->col_type == COLOR_TYPE_DETAIL && objects.detail_being_pulsed[game_object] && col_channel >= 0) {
                 col.color = objects.detail_color[game_object];
@@ -1686,6 +1672,19 @@ void update_tints() {
             objects.opacity[game_object] = real_opacity / 255.f;
 
             obj->blending = col.blending;
+
+            switch (obj->col_type) {
+                case COLOR_TYPE_GLOW:
+                    col.blending = true;
+                    break;
+                case COLOR_TYPE_BLACK:
+                    col.color = (Color) {0,0,0};
+                    break;
+                case COLOR_TYPE_WHITE:
+                    col.color = (Color) {255,255,255};
+                    break;
+            }
+
             obj->hidden = (real_opacity == 0) || (col.blending && (col.color.r | col.color.g | col.color.b) == 0);
             
             C2D_PlainImageTint(&obj->tint, C2D_Color32(col.color.r, col.color.g, col.color.b, real_opacity), 1.f);

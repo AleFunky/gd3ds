@@ -185,6 +185,8 @@ Color HSV_combine(Color base, HSV hsv);
 
 int trigger_pool_add(TriggerPool *pool, size_t element_size);
 
+bool object_can_be_x_moved(int obj);
+
 void calculate_lbg();
 int get_col_channel_index(int channel);
 int get_col_channel_from_index(int index);

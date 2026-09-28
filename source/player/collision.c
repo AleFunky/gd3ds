@@ -859,7 +859,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         }
         case SHIP_PORTAL: 
             if (!GET_ACTIVATED(obj)) {
-                state.ground_y = fmaxf(0, ip1_ceilf((objects.y[obj] - ((gamemode_heights[GAMEMODE_SHIP] + 60.f) / 2.f)) / 30.f)) * 30;
+                state.ground_y = fmaxf(0, ip1_ceilf((objects.original_y[obj] - ((gamemode_heights[GAMEMODE_SHIP] + 60.f) / 2.f)) / 30.f)) * 30;
                 state.ceiling_y = state.ground_y + gamemode_heights[GAMEMODE_SHIP];
                 set_intended_ceiling();
 
@@ -903,7 +903,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case BALL_PORTAL: 
             if (!GET_ACTIVATED(obj)) {
-                state.ground_y = fmaxf(0, ip1_ceilf((objects.y[obj] - ((gamemode_heights[GAMEMODE_BALL] + 60.f) / 2.f)) / 30.f)) * 30;
+                state.ground_y = fmaxf(0, ip1_ceilf((objects.original_y[obj] - ((gamemode_heights[GAMEMODE_BALL] + 60.f) / 2.f)) / 30.f)) * 30;
                 state.ceiling_y = state.ground_y + gamemode_heights[GAMEMODE_BALL];
                 set_intended_ceiling();
 
@@ -947,7 +947,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case UFO_PORTAL:
             if (!GET_ACTIVATED(obj)) {
-                state.ground_y = fmaxf(0, ip1_ceilf((objects.y[obj] - ((gamemode_heights[GAMEMODE_UFO] + 60.f) / 2.f)) / 30.f)) * 30;
+                state.ground_y = fmaxf(0, ip1_ceilf((objects.original_y[obj] - ((gamemode_heights[GAMEMODE_UFO] + 60.f) / 2.f)) / 30.f)) * 30;
                 state.ceiling_y = state.ground_y + gamemode_heights[GAMEMODE_UFO];
                 set_intended_ceiling();
                 
@@ -986,7 +986,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case WAVE_PORTAL:
             if (!GET_ACTIVATED(obj)) {
-                state.ground_y = fmaxf(0, ip1_ceilf((objects.y[obj] - ((gamemode_heights[GAMEMODE_WAVE] + 60.f) / 2.f)) / 30.f)) * 30;
+                state.ground_y = fmaxf(0, ip1_ceilf((objects.original_y[obj] - ((gamemode_heights[GAMEMODE_WAVE] + 60.f) / 2.f)) / 30.f)) * 30;
                 state.ceiling_y = state.ground_y + gamemode_heights[GAMEMODE_WAVE];
                 set_intended_ceiling();
 
@@ -1031,7 +1031,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 if (!state.dual){
                     player->ceiling_inv_time = CEILING_INVUL_TIME;
                     state.dual = true;
-                    state.dual_portal_y = objects.y[obj];
+                    state.dual_portal_y = objects.original_y[obj];
                     setup_dual();
                     if (state.current_player == 0) state.player2.x = state.old_player.x; // Sync them
                 }
