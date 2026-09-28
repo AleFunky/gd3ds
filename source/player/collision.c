@@ -823,7 +823,6 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             }
             break;
         case BLUE_TP_PORTAL: {
-            if (player->has_teleported_timer > 0.0f) break;
             if (GET_ACTIVATED(obj)) break;
             int oi = objects.child_object[obj];
             if (oi >= 0) {
@@ -852,8 +851,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 }
             }
             SET_ACTIVATED(obj, true);
-            player->has_teleported_timer = 0.5f;
-            player->just_teleported      = true;
+            player->just_teleported = true;
             MotionTrail_Clear(trail);
             break;
         }

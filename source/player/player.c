@@ -869,9 +869,6 @@ void handle_player(Player *player) {
     player->x += player->vel_x * STEPS_DT;
     player->y += player_get_vel(player, player->vel_y) * STEPS_DT;
 
-    if (player->has_teleported_timer > 0.0f)
-        player->has_teleported_timer -= STEPS_DT;
-
     clamp_player_ground(player);
     player->just_teleported = false;
 

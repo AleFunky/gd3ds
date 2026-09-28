@@ -152,7 +152,6 @@ typedef struct {
 
     bool buffer_ufo;
 
-    float has_teleported_timer;
     bool just_teleported;
 
     float robot_air_time;
