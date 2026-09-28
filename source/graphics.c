@@ -932,6 +932,8 @@ static inline uint32_t make_sort_key(SpriteObject *s)
         sheet = 2;
     } else {
         sheet = tex < SPRITESHEET2_START || tex >= SPRITESHEET3_START ? 1 : 0;
+        if (id == BLUE_TP_PORTAL || id == ORANGE_TP_PORTAL)
+            sheet = 0;
     }
 
     // Move the pulserod ball
