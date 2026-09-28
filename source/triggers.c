@@ -748,17 +748,21 @@ void handle_pulse_triggers(void) {
             int obj_idx = p->obj;
             if (obj_idx < 0 || obj_idx >= objects.count) continue;
             if (both || buffer->main_only) {
+                Color target = buffer->color;
+                if (objects.main_col_HSV_enabled[obj_idx]) target = HSV_combine(target, objects.main_col_HSV[obj_idx]);
                 Color base = objects.main_color[obj_idx];
-                objects.main_color[obj_idx].r = (unsigned char)(base.r + (buffer->color.r - base.r) * alpha);
-                objects.main_color[obj_idx].g = (unsigned char)(base.g + (buffer->color.g - base.g) * alpha);
-                objects.main_color[obj_idx].b = (unsigned char)(base.b + (buffer->color.b - base.b) * alpha);
+                objects.main_color[obj_idx].r = (unsigned char)(base.r + (target.r - base.r) * alpha);
+                objects.main_color[obj_idx].g = (unsigned char)(base.g + (target.g - base.g) * alpha);
+                objects.main_color[obj_idx].b = (unsigned char)(base.b + (target.b - base.b) * alpha);
                 objects.main_being_pulsed[obj_idx] = true;
             }
             if (both || buffer->detail_only) {
+                Color target = buffer->color;
+                if (objects.detail_col_HSV_enabled[obj_idx]) target = HSV_combine(target, objects.detail_col_HSV[obj_idx]);
                 Color base = objects.detail_color[obj_idx];
-                objects.detail_color[obj_idx].r = (unsigned char)(base.r + (buffer->color.r - base.r) * alpha);
-                objects.detail_color[obj_idx].g = (unsigned char)(base.g + (buffer->color.g - base.g) * alpha);
-                objects.detail_color[obj_idx].b = (unsigned char)(base.b + (buffer->color.b - base.b) * alpha);
+                objects.detail_color[obj_idx].r = (unsigned char)(base.r + (target.r - base.r) * alpha);
+                objects.detail_color[obj_idx].g = (unsigned char)(base.g + (target.g - base.g) * alpha);
+                objects.detail_color[obj_idx].b = (unsigned char)(base.b + (target.b - base.b) * alpha);
                 objects.detail_being_pulsed[obj_idx] = true;
             }
         }
