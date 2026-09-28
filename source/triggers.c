@@ -460,7 +460,7 @@ void upload_to_move_buffer(int obj) {
 
 bool object_can_be_x_moved(int obj) {
     int obj_id = objects.id[obj];
-    if (is_trigger_object(obj_id) && !objects.touch_triggered) {
+    if (is_trigger_object(obj_id) && !objects.touch_triggered[obj]) {
         return false;
     }
 
