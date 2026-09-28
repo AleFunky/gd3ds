@@ -1489,8 +1489,6 @@ void game_assets_init() {
 
     initParticleSystem(&faster_speed_particles_bottom, &speed_effect_vfast);
     faster_speed_particles_bottom.relativeStationary = true;
-
-    
 }
 
 int main(int argc, char* argv[]) {
