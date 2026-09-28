@@ -4,8 +4,8 @@
 #include <stdint.h>
 
 #define SPRITESHEET2_START 767
-#define SPRITESHEET3_START (SPRITESHEET2_START + 64)
-#define ANIMATEDSHEET_START (SPRITESHEET3_START + 607)
+#define SPRITESHEET3_START (SPRITESHEET2_START + 70)
+#define ANIMATEDSHEET_START (SPRITESHEET3_START + 599)
 
 typedef enum {
    COLLISION_NONE = 0,
@@ -13,11 +13,6 @@ typedef enum {
    COLLISION_CIRCLE,
    COLLISION_SLOPE
 } CollisionShape;
-
-typedef enum {
-   ANIMATION_NONE = 0,
-   ANIMATION_MOVEMENT
-} AnimationType;
 
 typedef enum {
    COLOR_TYPE_BASE = 0,
@@ -32,6 +27,12 @@ typedef enum {
    HITBOX_SOLID,
    HITBOX_HAZARD
 } HitboxType;
+
+typedef enum {
+   ANIMATION_NONE = 0,
+   ANIMATION_MOVEMENT,
+   ANIMATION_FRAME_SWAP
+} AnimationType;
 
 typedef struct {
     int texture;
@@ -51,6 +52,18 @@ typedef struct {
 } ChildGroup;
 
 typedef struct {
+    int texture;
+    int flip_x, flip_y;
+} SwapFrame;
+
+typedef struct {
+    int slot;
+    float fps;
+    int start;
+    int count;
+} SlotFrames;
+
+typedef struct {
    int collision_type;
    float x, y;
    float width, height;
@@ -67,16 +80,20 @@ typedef struct {
     int detail_color;
     int color_type;
     int swap_base_detail;
+    int animation_type;
     float opacity;
     int child_count;
     const ChildSprite* children;
-    const ObjectHitbox* hitbox;
-    int animation_type;
     int group_count;
     const ChildGroup* groups;
+    int frame_count;
+    const SwapFrame*  swap_frames;
+    int slot_count;
+    const SlotFrames* slot_frames;
+    const ObjectHitbox* hitbox;
 } GameObject;
 
-#define TEXTURE_COUNT 1574
+#define TEXTURE_COUNT 1568
 #define GAME_OBJECT_COUNT 1330
 
 extern const GameObject game_objects[GAME_OBJECT_COUNT];

@@ -150,6 +150,13 @@ static C2D_SpriteSheet *get_sprite_sheet(int index, int *rel_index) {
     return &animatedSheet;
 }
 
+const SlotFrames* find_slot_frames(const GameObject* obj, int slot) {
+    for (int i = 0; i < obj->slot_count; i++) {
+        if (obj->slot_frames[i].slot == slot) return &obj->slot_frames[i];
+    }
+    return NULL;
+}
+
 int get_child_group(const GameObject* obj, int child_index) {
     for (int g = 0; g < obj->group_count; g++) {
         int end = obj->groups[g].start + obj->groups[g].count;
@@ -740,17 +747,36 @@ void spawn_object_at(
 
         float p_x = x + rot_x * scale * obj_scale_x;
         float p_y = y + rot_y * scale * obj_scale_y;
+        
+        if (obj->animation_type == ANIMATION_FRAME_SWAP && obj->frame_count > 0) {
+            const SlotFrames* slot_frames = find_slot_frames(obj, 0);
+            if (slot_frames) {
+                float time = frame_timer * slot_frames->fps;
+                int index = (int)time % slot_frames->count;
+                const SwapFrame* swap_frame = &obj->swap_frames[slot_frames->start + index];
 
-        int random_layer = get_obj_random_layer(obj_game, id);
-        if (random_layer < 0) {
-            vo->spr = sprite_templates[id].parent_template;
+                int rel_index;
+                C2D_SpriteSheet *sheet = get_sprite_sheet(swap_frame->texture, &rel_index);
+                C2D_SpriteFromSheet(&vo->spr, *sheet, rel_index);
+                C2D_SpriteSetCenter(&vo->spr, 0.5f, 0.5f);
+                
+                sx *= (swap_frame->flip_x ? -1 : 1);
+                sy *= (swap_frame->flip_y ? -1 : 1);
+            } else {
+                vo->spr = sprite_templates[id].parent_template;
+            }
         } else {
-            int rel_index;
-            C2D_SpriteSheet *sheet = get_sprite_sheet(random_layer, &rel_index);
-            C2D_Sprite rnd = { 0 };
-            vo->spr = rnd;
-            C2D_SpriteFromSheet(&vo->spr, *sheet, rel_index);
-            C2D_SpriteSetCenter(&vo->spr, 0.5f, 0.5f);
+            int random_layer = get_obj_random_layer(obj_game, id);
+            if (random_layer < 0) {
+                vo->spr = sprite_templates[id].parent_template;
+            } else {
+                int rel_index;
+                C2D_SpriteSheet *sheet = get_sprite_sheet(random_layer, &rel_index);
+                C2D_Sprite rnd = { 0 };
+                vo->spr = rnd;
+                C2D_SpriteFromSheet(&vo->spr, *sheet, rel_index);
+                C2D_SpriteSetCenter(&vo->spr, 0.5f, 0.5f);
+            }
         }
 
         float pulse_scale = get_object_pulse(amplitude, id, 0);
@@ -855,9 +881,29 @@ void spawn_object_at(
                     }
                 }
             }
+            // handle frame swap anims
+            if (obj->animation_type == ANIMATION_FRAME_SWAP && obj->frame_count > 0) {
+                const SlotFrames* slot_frames = find_slot_frames(obj, i + 1);
+                if (slot_frames) {
+                    float time = frame_timer * slot_frames->fps;
+                    int index = (int)time % slot_frames->count;
+                    const SwapFrame* swap_frame = &obj->swap_frames[slot_frames->start + index];
 
-            if (!sprite_templates[id].child_templates) continue;
-            vo->spr = sprite_templates[id].child_templates[i];
+                    int rel_index;
+                    C2D_SpriteSheet *sheet = get_sprite_sheet(swap_frame->texture, &rel_index);
+                    C2D_SpriteFromSheet(&vo->spr, *sheet, rel_index);
+                    C2D_SpriteSetCenter(&vo->spr, 0.5f, 0.5f);
+
+                    c_sx *= (swap_frame->flip_x ? -1 : 1);
+                    c_sy *= (swap_frame->flip_y ? -1 : 1);
+                } else {
+                    if (!sprite_templates[id].child_templates) continue;
+                    vo->spr = sprite_templates[id].child_templates[i];
+                }
+            } else {
+                if (!sprite_templates[id].child_templates) continue;
+                vo->spr = sprite_templates[id].child_templates[i];
+            }
 
             float pulse_scale = get_object_pulse(amplitude, id, i + 2);
 
@@ -930,8 +976,6 @@ static inline uint32_t make_sort_key(SpriteObject *s)
         sheet = 2;
     } else {
         sheet = tex < SPRITESHEET2_START || tex >= SPRITESHEET3_START ? 1 : 0;
-        if (id == BLUE_TP_PORTAL || id == ORANGE_TP_PORTAL)
-            sheet = 0;
     }
 
     // Move the pulserod ball
@@ -1732,7 +1776,7 @@ void create_objects() {
         if (object_has_pulse(id)) objects.flags[obj] |= FLAG_DIRTY;
 
         // animated objs need to be respawned every frame
-        if (game_objects[id].animation_type == ANIMATION_MOVEMENT)
+        if (game_objects[id].animation_type)
             objects.flags[obj] |= FLAG_DIRTY;
 
         // Secret coin is animated

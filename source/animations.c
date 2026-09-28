@@ -561,14 +561,14 @@ static const AnimFrame GJBeast03_idle02_frames[] = {
 };
 
 const Animation animations[ANIMATION_COUNT] = {
-    { BlackSludge_loop_frames, 11, 18 },
-    { GJBeast01_attack01_frames, 3, 18 },
-    { GJBeast01_attack01_end_frames, 6, 18 },
-    { GJBeast01_attack01_loop_frames, 7, 18 },
-    { GJBeast01_bite_frames, 16, 38 },
-    { GJBeast01_idle01_frames, 8, 18 },
-    { GJBeast02_idle01_frames, 9, 18 },
-    { GJBeast02_idle02_frames, 9, 18 },
-    { GJBeast03_idle01_frames, 9, 18 },
-    { GJBeast03_idle02_frames, 9, 18 },
+    { BlackSludge_loop_frames, 11, 18 },  /* ANIM_BLACKSLUDGE_LOOP */
+    { GJBeast01_attack01_frames, 3, 18 },  /* ANIM_GJBEAST01_ATTACK01 */
+    { GJBeast01_attack01_end_frames, 6, 18 },  /* ANIM_GJBEAST01_ATTACK01_END */
+    { GJBeast01_attack01_loop_frames, 7, 18 },  /* ANIM_GJBEAST01_ATTACK01_LOOP */
+    { GJBeast01_bite_frames, 16, 38 },  /* ANIM_GJBEAST01_BITE */
+    { GJBeast01_idle01_frames, 8, 18 },  /* ANIM_GJBEAST01_IDLE01 */
+    { GJBeast02_idle01_frames, 9, 18 },  /* ANIM_GJBEAST02_IDLE01 */
+    { GJBeast02_idle02_frames, 9, 18 },  /* ANIM_GJBEAST02_IDLE02 */
+    { GJBeast03_idle01_frames, 9, 18 },  /* ANIM_GJBEAST03_IDLE01 */
+    { GJBeast03_idle02_frames, 9, 18 },  /* ANIM_GJBEAST03_IDLE02 */
 };

@@ -20,8 +20,7 @@ typedef struct {
 typedef struct {
     const AnimFrame* frames;
     int frame_count;
-    float fps;
-} Animation;
+    float fps;} Animation;
 
 typedef enum {
     ANIM_BLACKSLUDGE_LOOP = 0,
