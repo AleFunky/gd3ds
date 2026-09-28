@@ -982,11 +982,11 @@ void game_loop() {
                         curr_old_input = state.old_input_p2;
                         handle_player(&state.player2);
 
-                        if (state.dead) break;
-
                         //revert state back to first player
                         state.current_player = 0;
                         state.old_player = state.player;
+
+                        if (state.dead) break;
                     }
                     
                     acc_delta_y += state.player.delta_y;
