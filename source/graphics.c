@@ -1671,8 +1671,6 @@ void update_tints() {
             // Set opacity here
             objects.opacity[game_object] = real_opacity / 255.f;
 
-            obj->blending = col.blending;
-
             switch (obj->col_type) {
                 case COLOR_TYPE_GLOW:
                     col.blending = true;
@@ -1685,6 +1683,7 @@ void update_tints() {
                     break;
             }
 
+            obj->blending = col.blending;
             obj->hidden = (real_opacity == 0) || (col.blending && (col.color.r | col.color.g | col.color.b) == 0);
             
             C2D_PlainImageTint(&obj->tint, C2D_Color32(col.color.r, col.color.g, col.color.b, real_opacity), 1.f);
