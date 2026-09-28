@@ -840,6 +840,8 @@ void run_player(Player *player) {
     if (player->gamemode == GAMEMODE_UFO) rotate_fly(player, 0.07f);
 
     player->snap_rotation = false;
+    
+    player->just_teleported = false;
 
     player->buffer_ufo = false;
 }
@@ -870,7 +872,6 @@ void handle_player(Player *player) {
     player->y += player_get_vel(player, player->vel_y) * STEPS_DT;
 
     clamp_player_ground(player);
-    player->just_teleported = false;
 
     player->frame++;
 

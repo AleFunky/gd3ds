@@ -2,6 +2,7 @@
 #include "icons.h"
 #include "level_loading.h"
 #include "player.h"
+#include "player/trail.h"
 #include "robot_anim_data.h"
 #include <math.h>
 #include "practice.h"
@@ -853,6 +854,12 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             SET_ACTIVATED(obj, true);
             player->just_teleported = true;
             MotionTrail_Clear(trail);
+            MotionTrail_Clear(wave_trail);
+            if (player->gamemode == GAMEMODE_WAVE) {
+                wave_trail->positionR = (Vec2D){player->x, player->y};  
+                wave_trail->startingPositionInitialized = true;
+                MotionTrail_AddWavePoint(wave_trail);
+            }
             break;
         }
         case SHIP_PORTAL: 
@@ -1034,9 +1041,12 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     if (state.current_player == 0) state.player2.x = state.old_player.x; // Sync them
                 }
                 set_dual_bounds();
+
+                MotionTrail_Clear(&trail_p2);
                 if (state.player2.gamemode == GAMEMODE_WAVE) {
                     wave_trail_p2.positionR = (Vec2D){state.player2.x, state.player2.y};  
                     wave_trail_p2.startingPositionInitialized = true;
+                    MotionTrail_Clear(&wave_trail_p2);
                     MotionTrail_AddWavePoint(&wave_trail_p2);
                 }
                 SET_ACTIVATED(obj, true);                
@@ -1069,7 +1079,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     
                     MotionTrail_StopStroke(&trail_p2);
                     MotionTrail_StopStroke(&wave_trail_p2);
-
+                    
                     UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
                     if (effect) {
                         effect->def.colorR = 145 / 255.f;
