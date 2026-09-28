@@ -31,6 +31,7 @@
 #include "menus/core/ui_screen.h"
 
 #include "fonts/bigFont.h"
+#include "fonts/level_fonts.h"
 #include "particles/rays.h"
 #include "practice.h"
 
@@ -733,6 +734,48 @@ void spawn_object_at(
 
     if (sprite_count >= MAX_SPRITES - 1) return;
 
+    if (id == TEXT_OBJECT) {
+        TextObject *text_obj = get_text_object(obj_game);
+        if (text_obj->len > 0) {
+            if (!text_obj->layout_done) {
+                text_obj->glyph_count = text_object_layout(level_font, text_obj->text, text_obj->glyphs, MAX_TEXT_LEN);
+                text_obj->layout_done = 1;
+            }
+
+            for (int i = 0; i < text_obj->glyph_count; i++) {
+                if (sprite_count >= MAX_SPRITES - 1) break;
+
+                const TextGlyphPlacement *place = &text_obj->glyphs[i];
+                SpriteObject *vo = &viewable_objects[sprite_count];
+
+                vo->hidden = false;
+
+                float local_x = place->x * flip_x_mult;
+                float local_y = place->y * flip_y_mult;
+
+                float rot_x = local_x * cos_r - local_y * sin_r;
+                float rot_y = local_x * sin_r + local_y * cos_r;
+
+                C2D_SpriteFromSheet(&vo->spr, level_font_sheet ? level_font_sheet : bigFont_sheet, place->sprite);
+                C3D_TexSetFilter(vo->spr.image.tex, GPU_LINEAR, GPU_LINEAR);
+                C2D_SpriteSetCenter(&vo->spr, 0.5f, 0.5f);
+                C2D_SpriteSetPos(&vo->spr, x + rot_x * scale * obj_scale_x, y + rot_y * scale * obj_scale_y);
+                C2D_SpriteSetScale(&vo->spr, TEXT_OBJECT_SCALE * sx, TEXT_OBJECT_SCALE * sy);
+                C2D_SpriteSetRotation(&vo->spr, rad);
+
+                vo->obj = obj_game;
+                vo->layer = 0;
+                vo->col_type = get_color_type(obj, obj_game, obj->color_type);
+                vo->opacity = obj->opacity;
+                vo->col_channel = get_color_channel(obj->color_type, obj_game, obj);
+                calc_quad_params(vo);
+
+                sprite_count++;
+            }
+        }
+        return;
+    }
+
     // Spawn parent, skip if no texture
     if (obj->texture >= 0) {
         SpriteObject *vo = &viewable_objects[sprite_count];
@@ -1046,6 +1089,25 @@ int get_object_layers(int id) {
     for (size_t c = 0; c < obj->child_count; c++) {
         if (obj->children[c].texture >= 0) count++;
     }
+    return count;
+}
+
+static int get_object_sprite_total(int obj) {
+    const GameObject *game_object = &game_objects[objects.id[obj]];
+    int count = get_object_layers(objects.id[obj]);
+    if (game_object->glow_frame >= 0) count++;
+
+    if (objects.id[obj] == TEXT_OBJECT) {
+        TextObject *text_obj = get_text_object(obj);
+        if (text_obj->len > 0) {
+            if (!text_obj->layout_done) {
+                text_obj->glyph_count = text_object_layout(level_font, text_obj->text, text_obj->glyphs, MAX_TEXT_LEN);
+                text_obj->layout_done = 1;
+            }
+            count += text_obj->glyph_count;
+        }
+    }
+
     return count;
 }
 
@@ -1444,7 +1506,8 @@ void draw_attempt_text() {
     float calc_y = SCREEN_HEIGHT - ((state.attempt_text_pos.y - state.camera_y));  
 
     if (calc_x > -200) {
-        draw_text(&bigFont_fontCharset, &bigFont_sheet, get_mirror_x(calc_x, state.mirror_factor), calc_y, 1, (settingsState.doNot ? -1 : 1), 0.5f, true, "Attempt %d", attempts);
+        C2D_SpriteSheet *font_sheet = level_font_sheet ? &level_font_sheet : &bigFont_sheet;
+        draw_text(level_font, font_sheet, get_mirror_x(calc_x, state.mirror_factor), calc_y, 1, (settingsState.doNot ? -1 : 1), 0.5f, true, "Attempt %d", attempts);
     }
 }
 
@@ -1473,10 +1536,7 @@ static bool ensure_render_cache(void) {
     // Count all layers
     int cache_capacity = 0;
     for (int obj = 0; obj < objects.count; obj++) {
-        const GameObject *game_object = &game_objects[objects.id[obj]];
-        int count = 0;
-        count += get_object_layers(objects.id[obj]);
-        if (game_object->glow_frame >= 0) count++;
+        int count = get_object_sprite_total(obj);
         cache_capacity += count;
         object_sprite_count[obj] = count;
     }
@@ -1498,8 +1558,7 @@ static bool ensure_render_cache(void) {
     int sprite_offset = 0;
     for (int obj = 0; obj < objects.count; obj++) {
         object_sprite_start[obj] = sprite_offset;
-        sprite_offset += get_object_layers(objects.id[obj]);
-        if (game_objects[objects.id[obj]].glow_frame >= 0) sprite_offset++;
+        sprite_offset += get_object_sprite_total(obj);
     }
 
     current_object_count = 0;

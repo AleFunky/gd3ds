@@ -1,5 +1,6 @@
 #pragma once
 #include "objects.h"
+#include "text.h"
 #include "utils/server_utils.h"
 #include <3ds.h>
 
@@ -10,6 +11,9 @@
 #define SECTION_SIZE 128
 
 #define MAX_PULSES_PER_GROUP 5
+
+#define MAX_TEXT_LEN 64
+#define MAX_TEXT_OBJECTS 64
 
 typedef struct {
     unsigned char r,g,b;
@@ -29,6 +33,7 @@ typedef enum {
     GD_VAL_BOOL,
     GD_VAL_HSV,
     GD_VAL_INT_ARRAY,
+    GD_VAL_STRING,
     GD_VAL_UNKNOWN
 } GDValueType;
 
@@ -38,6 +43,7 @@ typedef union {
     bool b;
     HSV hsv;
     short int_array[MAX_GROUPS_PER_OBJECT];
+    char *str;
 } GDValue;
 
 typedef struct {
@@ -110,6 +116,14 @@ typedef struct {
     float spawn_delay;
     float trig_duration;
 } SpawnTrigger;
+
+typedef struct {
+    char text[MAX_TEXT_LEN + 1];
+    unsigned char len;
+    unsigned char layout_done;
+    unsigned char glyph_count;
+    TextGlyphPlacement glyphs[MAX_TEXT_LEN];
+} TextObject;
 
 typedef struct {
     void *data;
@@ -275,6 +289,7 @@ AlphaTrigger *get_alpha_trigger(int obj);
 MoveTrigger *get_move_trigger(int obj);
 ToggleTrigger *get_toggle_trigger(int obj);
 SpawnTrigger *get_spawn_trigger(int obj);
+TextObject *get_text_object(int obj);
 
 bool trigger_is_spawn_triggered(int id, int obj);
 bool trigger_is_multi_triggered(int id, int obj);

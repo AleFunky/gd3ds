@@ -574,3 +574,36 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
         }
     }
 }
+
+unsigned char text_object_layout(const Charset *font, const char *text, TextGlyphPlacement *out, unsigned char max_out) {
+    if (!font || !text || !out || max_out == 0) return 0;
+
+    float width = 0.f;
+    for (int i = 0; text[i]; i++) {
+        const Glyph *g = get_glyph(font, text[i]);
+        if (g) width += g->xAdvance;
+    }
+    width *= TEXT_OBJECT_SCALE;
+
+    const Glyph *reference = get_glyph(font, 'A');
+    float line_height = reference ? (float)reference->height : 29.f;
+
+    float cursor = -width * 0.5f;
+    unsigned char count = 0;
+
+    for (int i = 0; text[i]; i++) {
+        const Glyph *g = get_glyph(font, text[i]);
+        if (!g) continue;
+
+        if (g->spriteIndex >= 0 && count < max_out) {
+            out[count].x = cursor + (g->xOffset + g->width * 0.5f) * TEXT_OBJECT_SCALE;
+            out[count].y = (g->yOffset + g->height * 0.5f) * TEXT_OBJECT_SCALE - line_height * TEXT_OBJECT_SCALE * 0.5f;
+            out[count].sprite = g->spriteIndex;
+            count++;
+        }
+
+        cursor += g->xAdvance * TEXT_OBJECT_SCALE;
+    }
+
+    return count;
+}

@@ -13,6 +13,8 @@
 #include "groups.h"
 #include "mp3_player.h"
 #include "graphics.h"
+#include "fonts/level_fonts.h"
+#include "fonts/bigFont.h"
 #include "math_helpers.h"
 #include "particles/object_particles.h"
 #include "utils/json_config.h"
@@ -48,6 +50,8 @@ TriggerPool alpha_pool;
 TriggerPool pulse_pool;
 TriggerPool toggle_pool;
 TriggerPool spawn_pool;
+static TriggerPool text_pool;
+static TextObject empty_text_object;
 
 ColorTrigger *get_color_trigger(int obj) {
     return TRIGGER_AT(col_pool, ColorTrigger, objects.trigger_index[obj]);
@@ -71,6 +75,14 @@ ToggleTrigger *get_toggle_trigger(int obj) {
 
 SpawnTrigger *get_spawn_trigger(int obj) {
     return TRIGGER_AT(spawn_pool, SpawnTrigger, objects.trigger_index[obj]);
+}
+
+TextObject *get_text_object(int obj) {
+    int index = objects.trigger_index[obj];
+    if (index < 0 || !text_pool.data || (size_t)index >= text_pool.count) {
+        return &empty_text_object;
+    }
+    return TRIGGER_AT(text_pool, TextObject, index);
 }
 
 const char *level_lengths[] = {
@@ -814,6 +826,7 @@ GDValueType get_value_type_for_key(int key) {
         case 28: return GD_VAL_FLOAT;  // move offset X
         case 29: return GD_VAL_FLOAT;  // move offset Y
         case 30: return GD_VAL_INT;    // move easing
+        case 31: return GD_VAL_STRING; // (Text object) Text
         case 32: return GD_VAL_FLOAT;  // scale (uniform)
         case 35: return GD_VAL_FLOAT;  // opacity (alpha trigger)
         case 41: return GD_VAL_BOOL;   // main_col_HSV_enabled
@@ -1056,6 +1069,15 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                         return false;
                     }
                 }
+
+                if (objects.id[object] == TEXT_OBJECT) {
+                    if (text_pool.count < MAX_TEXT_OBJECTS) {
+                        int text_index = trigger_pool_add(&text_pool, sizeof(TextObject));
+                        objects.trigger_index[object] = (text_index < 0) ? -1 : text_index;
+                    } else {
+                        objects.trigger_index[object] = -1;
+                    }
+                }
             }
             break;
         case 2:  // X
@@ -1188,6 +1210,26 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
         case 30: // Move easing
             if (type == GD_VAL_INT && objects.id[object] == MOVE_TRIGGER) {
                 get_move_trigger(object)->move_easing = val.i;
+            }
+            break;
+        case 31: // Text
+            if (type == GD_VAL_STRING && objects.id[object] == TEXT_OBJECT && val.str) {
+                fix_base64_url(val.str);
+
+                char *decoded = malloc(strlen(val.str) + 1);
+                if (decoded) {
+                    int decoded_len = base64_decode(val.str, (unsigned char *)decoded);
+
+                    if (decoded_len > 0 && is_ascii((unsigned char *)decoded, decoded_len)) {
+                        int len = decoded_len > MAX_TEXT_LEN ? MAX_TEXT_LEN : decoded_len;
+                        TextObject *text_obj = get_text_object(object);
+                        memcpy(text_obj->text, decoded, len);
+                        text_obj->text[len] = '\0';
+                        text_obj->len = (unsigned char)len;
+                    }
+
+                    free(decoded);
+                }
             }
             break;
         case 32: // Scale (uniform)
@@ -1521,6 +1563,10 @@ int parse_gd_object(const char *objStr, int obj) {
                 parse_ints(val.int_array, valStr);
                 fill_object_data(obj, key, GD_VAL_INT_ARRAY, val);
                 break;
+            case GD_VAL_STRING:
+                val.str = (char *) valStr;
+                fill_object_data(obj, key, GD_VAL_STRING, val);
+                break;
             default:
                 break;
         }
@@ -1632,12 +1678,14 @@ void free_arrays() {
     free(pulse_pool.data);
     free(toggle_pool.data);
     free(spawn_pool.data);
+    free(text_pool.data);
     col_pool = (TriggerPool){0};
     move_pool = (TriggerPool){0};
     alpha_pool = (TriggerPool){0};
     pulse_pool = (TriggerPool){0};
     toggle_pool = (TriggerPool){0};
     spawn_pool = (TriggerPool){0};
+    text_pool = (TriggerPool){0};
 
     if (objects.random)             { free(objects.random);             objects.random = NULL; }
     if (objects.id)                 { free(objects.id);                 objects.id = NULL; }
@@ -2074,6 +2122,26 @@ const char *bg_sheet_paths[] = {
     "romfs:/gfx/bg_sheet_04.t3x"
 };
 
+const char *level_font_paths[LEVEL_FONT_COUNT] = {
+    NULL,
+    "romfs:/gfx/gjFont01.t3x",
+    "romfs:/gfx/gjFont02.t3x",
+    "romfs:/gfx/gjFont03.t3x",
+    "romfs:/gfx/gjFont04.t3x",
+    "romfs:/gfx/gjFont05.t3x",
+    "romfs:/gfx/gjFont06.t3x",
+    "romfs:/gfx/gjFont07.t3x",
+    "romfs:/gfx/gjFont08.t3x",
+    "romfs:/gfx/gjFont09.t3x",
+    "romfs:/gfx/gjFont10.t3x",
+    "romfs:/gfx/gjFont11.t3x",
+    "romfs:/gfx/gjFont12.t3x"
+};
+
+int loaded_level_font = 0;
+C2D_SpriteSheet level_font_sheet = NULL;
+const Charset *level_font = &bigFont_fontCharset;
+
 void load_level_string_info(char *level_string) {
     char *gmd_song_offset = get_metadata_value(level_string, "kA13");
     if (gmd_song_offset) {
@@ -2156,6 +2224,27 @@ void load_level_string_info(char *level_string) {
     } else {
         level_info.initial_upsidedown = 0; 
     }
+
+    // load the level font on demand (0 = bigFont)
+    char *font_data = get_metadata_value(level_string, "kA18");
+    int font_index = 0;
+    if (font_data) {
+        font_index = CLAMP(atoi(font_data), 0, LEVEL_FONT_COUNT - 1);
+        free(font_data);
+    }
+
+    if (loaded_level_font != font_index) {
+        if (level_font_sheet) {
+            C2D_SpriteSheetFree(level_font_sheet);
+            level_font_sheet = NULL;
+        }
+        if (font_index > 0) {
+            level_font_sheet = C2D_SpriteSheetLoad(level_font_paths[font_index]);
+            if (!level_font_sheet) font_index = 0;
+        }
+        loaded_level_font = font_index;
+    }
+    level_font = level_font_charsets[font_index];
     
 }
 
@@ -2471,6 +2560,13 @@ void unload_level() {
         free(colorChannels);
         colorChannels = NULL;
     }
+
+    if (level_font_sheet) {
+        C2D_SpriteSheetFree(level_font_sheet);
+        level_font_sheet = NULL;
+    }
+    loaded_level_font = 0;
+    level_font = &bigFont_fontCharset;
 
     stop_mp3();
 }

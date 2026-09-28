@@ -55,6 +55,8 @@ enum JumpType {
 #define BLUE_TP_PORTAL 747
 #define ORANGE_TP_PORTAL 749
 
+#define TEXT_OBJECT 914
+
 #define BLUE_GRAVITY_PORTAL 10
 #define YELLOW_GRAVITY_PORTAL 11
 
