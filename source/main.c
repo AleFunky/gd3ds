@@ -656,6 +656,7 @@ void ui_loop(){
         } else {
             delta = (now - lastTime) / (CPU_TICKS_PER_MSEC * 1000);
         }
+        g_trigger_dt = delta;
         lastTime = now;
         hidScanInput();
 

@@ -463,6 +463,8 @@ void level_select_init(UIScreen *s){
     channels[0].color.g = GET_G(color);
     channels[0].color.b = GET_B(color);
 
+    channels[0].copy_color_id = 0;
+
     dragging = false;
     dragDistance = 0;
     dragDir = 0;
