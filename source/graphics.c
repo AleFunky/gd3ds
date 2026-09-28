@@ -1686,7 +1686,7 @@ void update_tints() {
             obj->blending = col.blending;
             obj->hidden = (real_opacity == 0) || (col.blending && (col.color.r | col.color.g | col.color.b) == 0);
             
-            C2D_PlainImageTint(&obj->tint, C2D_Color32(col.color.r, col.color.g, col.color.b, real_opacity), 1.f);
+            obj->tint = C2D_Color32(col.color.r, col.color.g, col.color.b, real_opacity);
         }
     }
     
@@ -1954,7 +1954,7 @@ void draw_objects() {
 
             change_blending(obj->blending);
             
-            C2D_DrawImageFast(obj->spr.image, obj->params, &obj->spr.params, &obj->tint);
+            C2D_DrawImageFast(obj->spr.image, obj->params, &obj->spr.params, obj->tint);
         } else {   
             C2D_ViewRestore(&object_view);
             draw_player_graphics();

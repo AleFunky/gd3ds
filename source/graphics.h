@@ -38,10 +38,9 @@ typedef struct {
     float tcTopLeft[2], tcTopRight[2], tcBotLeft[2], tcBotRight[2];
 } QuadParams;
 
-typedef struct
-{
+typedef struct {
     C2D_Sprite spr;
-    C2D_ImageTint tint;
+    u32 tint;
     QuadParams params;
     float opacity;
     int obj;
@@ -52,7 +51,6 @@ typedef struct
     bool blending;
     bool hidden;
 } SpriteObject;
-
 
 typedef struct {
     SpriteObject *obj;
