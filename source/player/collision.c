@@ -1410,7 +1410,9 @@ void collide_with_obj(Player *player, int obj) {
     float rot_rad = C3D_AngleFromDegrees(objects.rotation[obj]);
     float cos_r = cosf(rot_rad), sin_r = sinf(rot_rad);
     float off_x = hitbox->x * cos_r - hitbox->y * sin_r;
-    float off_y = hitbox->x * sin_r + hitbox->y * cos_r;
+    float off_y = (hitbox->collision_type == HITBOX_SPECIAL)
+                ? -(hitbox->x * sin_r + hitbox->y * cos_r)
+                :  (hitbox->x * sin_r + hitbox->y * cos_r);
     float x = objects.x[obj] + off_x;
     float y = objects.y[obj] + off_y;
     float width = objects.width[obj];
