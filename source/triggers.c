@@ -45,6 +45,19 @@ float get_group_opacities(int object) {
     return group_opacity;
 }
 
+bool get_group_toggles(int object) {
+    bool toggled = false;
+    for (int i = 0; i < MAX_GROUPS_PER_OBJECT; i++) {
+        int group = objects.groups[object][i];
+        if (!group) break;
+
+        GroupNode *p = get_group(group);
+        if (p) toggled = toggled || p->toggled;
+        if (toggled) break;
+    }
+    return toggled;
+}
+
 // Convert channel id to buffer index
 int get_col_channel_index(int channel) {
     if (channel < 0 || channel >= COL_CHANNEL_NUM) {
@@ -1060,9 +1073,14 @@ void run_trigger(int obj) {
         case TOGGLE_TRIGGER:
         {
             ToggleTrigger *trigger = get_toggle_trigger(obj);
-            for (GroupNode *p = get_group(trigger->target_group); p; p = p->next) {
-                objects.flags[p->obj] &= ~FLAG_TOGGLED;
-                objects.flags[p->obj] |= !trigger->activate_group ? FLAG_TOGGLED : 0;
+            GroupNode *p = get_group(trigger->target_group);
+            if (p) {
+                p->toggled = !trigger->activate_group;
+
+                for (; p; p = p->next) {
+                    objects.flags[p->obj] &= ~FLAG_TOGGLED;
+                    objects.flags[p->obj] |= get_group_toggles(p->obj) ? FLAG_TOGGLED : 0;
+                }
             }
             break;
         }

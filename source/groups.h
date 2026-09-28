@@ -2,9 +2,12 @@
 
 #define MAX_GROUPS 1000
 
+#include <stdbool.h>
+
 typedef struct GroupNode {
     int obj;
     float alpha;
+    bool toggled;
     struct GroupNode *next;
 } GroupNode;
 

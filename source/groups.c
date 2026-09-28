@@ -8,6 +8,7 @@ void add_to_group(int obj, int g) {
     GroupNode *n = malloc(sizeof(GroupNode));
     n->obj = obj;
     n->alpha = 1.f;
+    n->toggled = false;
     n->next = group_buckets[g];
     group_buckets[g] = n;
 }
