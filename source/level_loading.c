@@ -834,8 +834,10 @@ GDValueType get_value_type_for_key(int key) {
         case 59: return GD_VAL_BOOL;   // lock to player Y (move trigger)
         case 62: return GD_VAL_BOOL;   // spawn_triggered
         case 63: return GD_VAL_FLOAT;  // spawn_delay
+        case 64: return GD_VAL_BOOL;   // dont fade
         case 65: return GD_VAL_BOOL;   // pulse main_only
         case 66: return GD_VAL_BOOL;   // pulse detail_only
+        case 67: return GD_VAL_BOOL;   // dont enter
         case 87: return GD_VAL_BOOL;   // multi_triggered
         case 128: return GD_VAL_FLOAT; // scale X
         case 129: return GD_VAL_FLOAT; // scale Y
@@ -1333,6 +1335,11 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                 get_spawn_trigger(object)->spawn_delay = val.f;
             }
             break;
+        case 64: // dont fade
+            if (type == GD_VAL_BOOL) {
+                objects.flags[object] |= val.b ? FLAG_DONT_FADE : 0;
+            }
+            break;
         case 65: // pulse main_only
             if (type == GD_VAL_BOOL && objects.id[object] == PULSE_TRIGGER) {
                 get_pulse_trigger(object)->pulse_main_only = val.b;
@@ -1341,6 +1348,11 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
         case 66: // pulse detail_only
             if (type == GD_VAL_BOOL && objects.id[object] == PULSE_TRIGGER) {
                 get_pulse_trigger(object)->pulse_detail_only = val.b;
+            }
+            break;
+        case 67: // dont enter
+            if (type == GD_VAL_BOOL) {
+                objects.flags[object] |= val.b ? FLAG_DONT_ENTER : 0;
             }
             break;
         case 87: // multi_triggered
@@ -1644,7 +1656,7 @@ void free_arrays() {
     if (objects.touch_triggered)    { free(objects.touch_triggered);    objects.touch_triggered = NULL; }
     if (objects.flippedH)           { free(objects.flippedH);           objects.flippedH = NULL; }
     if (objects.flippedV)           { free(objects.flippedV);           objects.flippedV = NULL; }
-    if (objects.toggled)            { free(objects.toggled);            objects.toggled = NULL; }
+    if (objects.flags)            { free(objects.flags);            objects.flags = NULL; }
     if (objects.groups)             { free(objects.groups);             objects.groups = NULL; }
     if (objects.group_count)        { free(objects.group_count);        objects.group_count = NULL; }
     if (objects.original_x)             { free(objects.original_x);             objects.original_x = NULL; }
@@ -1675,9 +1687,6 @@ void free_arrays() {
     if (objects.tp_y_offset)            { free(objects.tp_y_offset);            objects.tp_y_offset = NULL; }
     if (objects.section_x)              { free(objects.section_x);              objects.section_x = NULL; }
     if (objects.section_y)              { free(objects.section_y);              objects.section_y = NULL; }
-    if (objects.dirty)              { free(objects.dirty);              objects.dirty = NULL; }
-    if (objects.render_visible)     { free(objects.render_visible);     objects.render_visible = NULL; }
-    if (objects.render_seen)        { free(objects.render_seen);        objects.render_seen = NULL; }
     if (objects.activated)          { free(objects.activated);          objects.activated = NULL; }
     if (objects.collided)           { free(objects.collided);           objects.collided = NULL; }
 }
@@ -1745,9 +1754,6 @@ bool init_arrays(size_t count) {
     
     objects.flippedV = malloc(sizeof(bool) * count);
     if (!objects.flippedV) return false;
-    
-    objects.toggled = malloc(sizeof(bool) * count);
-    if (!objects.toggled) return false;
 
     objects.groups = malloc(sizeof(short[MAX_GROUPS_PER_OBJECT]) * count);
     if (!objects.groups) return false;
@@ -1755,14 +1761,8 @@ bool init_arrays(size_t count) {
     objects.group_count = malloc(sizeof(u8) * count);
     if (!objects.group_count) return false;
 
-    objects.dirty = malloc(sizeof(bool) * count);
-    if (!objects.dirty) return false;
-
-    objects.render_visible = malloc(sizeof(bool) * count);
-    if (!objects.render_visible) return false;
-
-    objects.render_seen = malloc(sizeof(bool) * count);
-    if (!objects.render_seen) return false;
+    objects.flags = malloc(sizeof(u8) * count);
+    if (!objects.flags) return false;
     
     objects.activated = malloc(sizeof(u8) * count);
     if (!objects.activated) return false;
@@ -1876,12 +1876,9 @@ bool init_arrays(size_t count) {
     memset(objects.touch_triggered,    0, sizeof(bool) * count);
     memset(objects.flippedH,           0, sizeof(bool) * count);
     memset(objects.flippedV,           0, sizeof(bool) * count);
-    memset(objects.toggled,            0, sizeof(bool) * count);
     memset(objects.groups,             0, sizeof(short[MAX_GROUPS_PER_OBJECT]) * count);
     memset(objects.group_count,        0, sizeof(u8) * count);
-    memset(objects.dirty,              1, sizeof(bool) * count); // Dirty by default (needs to be created lol)
-    memset(objects.render_visible,     0, sizeof(bool) * count);
-    memset(objects.render_seen,        0, sizeof(u8) * count);
+    memset(objects.flags,              FLAG_DIRTY, sizeof(bool) * count); // Dirty by default (needs to be created lol)
     memset(objects.activated,          0, sizeof(u8) * count);
     memset(objects.collided,           0, sizeof(u8) * count);
 
@@ -2181,7 +2178,7 @@ static void generate_orange_portals(int orange_start) {
         objects.flippedH[oi]     = false;
         objects.flippedV[oi]     = false;
         objects.opacity[oi]      = 1.0f;
-        objects.toggled[oi]      = false;
+        objects.flags[oi]        &= ~FLAG_TOGGLED;
         objects.activated[oi]    = 0;
         objects.collided[oi]     = 0;
         objects.child_object[oi] = -1;
@@ -2398,7 +2395,7 @@ void reload_level() {
         objects.collided[i] = false;
         objects.hitbox_counter[i] = 0;
         objects.transition_applied[i] = FADE_NONE;
-        objects.toggled[i] = false;
+        objects.flags[i] &= ~FLAG_TOGGLED;
         objects.opacity[i] = 1.f;
         objects.x[i] = objects.original_x[i];
         objects.y[i] = objects.original_y[i];

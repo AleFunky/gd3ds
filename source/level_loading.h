@@ -117,6 +117,15 @@ typedef struct {
     size_t capacity;
 } TriggerPool;
 
+typedef enum {
+    FLAG_DIRTY      = (1 << 0),
+    FLAG_SEEN       = (1 << 1),
+    FLAG_VISIBLE    = (1 << 2),
+    FLAG_TOGGLED    = (1 << 3),
+    FLAG_DONT_FADE  = (1 << 4),
+    FLAG_DONT_ENTER = (1 << 5),
+} ObjectFlags;
+
 typedef struct {
     int count;
 
@@ -177,13 +186,10 @@ typedef struct {
         u8 *coin_id;
     };
     bool *flippedH, *flippedV;
-    bool *toggled;
 
     short (*groups)[MAX_GROUPS_PER_OBJECT];
     u8 *group_count;
-    bool *dirty;
-    bool *render_visible;
-    bool *render_seen;
+    u8 *flags;
 
     u8 *activated;
     u8 *collided;

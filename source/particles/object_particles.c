@@ -1,4 +1,5 @@
 #include "object_particles.h"
+#include "level_loading.h"
 #include "particles/particles.h"
 #include "state.h"
 #include "main.h"
@@ -117,7 +118,7 @@ void update_object_particles(float dt) {
         if (object_particle[i].occupied) {
             
             int obj = object_particle[i].id;
-            if (objects.toggled[obj]) {
+            if (objects.flags[obj] & FLAG_TOGGLED) {
                 object_particle[i].ps.emitting = false;
             }
 

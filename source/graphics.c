@@ -1035,6 +1035,8 @@ float get_out_scale_fade(float x, int right_edge) {
 
 // Some objects dont change opacity on fade transitions
 int get_obj_opacity(int obj, float x) {
+    if (objects.flags[obj] & FLAG_DONT_FADE) return 255;
+
     float opacity = obj_edge_fade(x, SCREEN_WIDTH / SCALE);
     bool blending;
 
@@ -1128,6 +1130,8 @@ void handle_special_fading(int obj, float calc_x, float calc_y) {
 }
 
 void get_fade_vars(int obj, float x, float *fade_x, float *fade_y, float *fade_scale) {
+    if (objects.flags[obj] & FLAG_DONT_ENTER) return;
+
     switch (objects.transition_applied[obj]) {
         case FADE_SIMPLE:
             break;
@@ -1175,6 +1179,8 @@ void get_fade_vars(int obj, float x, float *fade_x, float *fade_y, float *fade_s
 }
 
 float get_special_fading_vars(int obj, float fade_val) {
+    if (objects.flags[obj] & FLAG_DONT_ENTER) return 0;
+
     if (objects.transition_applied[obj] == FADE_DOWN_STATIONARY || objects.transition_applied[obj] == FADE_UP_STATIONARY) {
         if (fade_val < 255) {
             float calc_x = objects.x[obj] - state.camera_x;
@@ -1510,7 +1516,7 @@ static void remove_object_at(int index) {
 static void update_current_objects(void) {
     // Mark everything as unseen, everything that is actually on screen will mark it as seen again
     for (int i = 0; i < current_object_count; i++) {
-        objects.render_seen[current_objects[i]] = false;
+        objects.flags[current_objects[i]] &= ~FLAG_SEEN;
     }
 
     int width = ceilf(SCREEN_WIDTH_AREA / SECTION_SIZE);
@@ -1534,7 +1540,7 @@ static void update_current_objects(void) {
                 if (calc_x < -60 || calc_x >= SCREEN_WIDTH / SCALE + 60 || calc_y < -60 || calc_y >= SCREEN_HEIGHT / SCALE + 60) 
                     continue;
 
-                if (!is_valid_object(objects.id[obj]) || objects.toggled[obj]) 
+                if (!is_valid_object(objects.id[obj]) || objects.flags[obj] & FLAG_TOGGLED) 
                     continue;
 
                 // 0 scale objects are invisible
@@ -1542,15 +1548,14 @@ static void update_current_objects(void) {
                     continue;
 
                 // This object has just entered the screen
-                if (!objects.render_visible[obj]) {
-                    objects.render_visible[obj] = true;
-                    objects.dirty[obj] = true;
+                if (!(objects.flags[obj] & FLAG_VISIBLE)) {
+                    objects.flags[obj] |= (FLAG_DIRTY | FLAG_VISIBLE);
                     render_list_changed = true;
                     insert_sorted_object(obj);
                 }
 
                 // Mark as seen again
-                objects.render_seen[obj] = true;
+                objects.flags[obj] |= FLAG_SEEN;
             }
         }
     }
@@ -1560,14 +1565,14 @@ static void update_current_objects(void) {
         int obj = current_objects[i];
 
         // Keep visible
-        if (objects.render_seen[obj]) {
+        if (objects.flags[obj] & FLAG_SEEN) {
             i++;
             continue;
         }
 
         // Not visible anymore, bye
-        objects.render_visible[obj] = false;
-        objects.dirty[obj] = true;
+        objects.flags[obj] &= ~FLAG_VISIBLE;
+        objects.flags[obj] |= FLAG_DIRTY;
         render_list_changed = true;
         remove_object_at(i);
     }
@@ -1715,25 +1720,25 @@ void create_objects() {
         }
 
         if (objects.transition_applied[obj] > FADE_SIMPLE && fade_val != 255) {
-            objects.dirty[obj] = true;
+            objects.flags[obj] |= FLAG_DIRTY;
         }
         
         // The rotating objects need to be recalculated
         float rotation_speed = get_rotation_speed(obj);
         if (rotation_speed != 0) {
             objects.rotation[obj] += ((objects.random[obj] & 1) ? -rotation_speed : rotation_speed) * delta;
-            objects.dirty[obj] = true;
+            objects.flags[obj] |= FLAG_DIRTY;
         }
 
         // Check for pulsing objects, they are dirty
-        if (object_has_pulse(id)) objects.dirty[obj] = true;
+        if (object_has_pulse(id)) objects.flags[obj] |= FLAG_DIRTY;
 
         // animated objs need to be respawned every frame
         if (game_objects[id].animation_type == ANIMATION_MOVEMENT)
-            objects.dirty[obj] = true;
+            objects.flags[obj] |= FLAG_DIRTY;
 
         // Secret coin is animated
-        if (id == SECRET_COIN) objects.dirty[obj] = true;
+        if (id == SECRET_COIN) objects.flags[obj] |= FLAG_DIRTY;
 
         spawn_object_particles(obj);
     }
@@ -1747,7 +1752,7 @@ void create_objects() {
         // Check if theres dirty objects
         bool has_dirty_objects = false;
         for (int i = 0; i < current_object_count; i++) {
-            if (objects.dirty[current_objects[i]]) {
+            if (objects.flags[current_objects[i]] & FLAG_DIRTY) {
                 has_dirty_objects = true;
                 break;
             }
@@ -1767,7 +1772,7 @@ void create_objects() {
     // If mirror direction changed, everything is dirty now, jeez
     if (mirror_changed) {
         for (int i = 0; i < current_object_count; i++) {
-            objects.dirty[current_objects[i]] = true;
+            objects.flags[current_objects[i]] |= FLAG_DIRTY;
         }
     }
 
@@ -1793,7 +1798,7 @@ void create_objects() {
 
         if (layer_count <= 0) continue;
 
-        if (!objects.dirty[obj]) {
+        if (!(objects.flags[obj] & FLAG_DIRTY)) {
             // Not dirty, avoid recalculating it
             for (int layer = 0; layer < layer_count; layer++) {
                 viewable_objects_ptr[sprite_count++] = &object_sprite_cache[object_start + layer];
@@ -1854,7 +1859,8 @@ void create_objects() {
         sprite_count = visible_start + layer_count;
     
         // Objects in transition are dirty
-        objects.dirty[obj] = objects.transition_applied[obj] > FADE_SIMPLE && fade_val != 255;
+        objects.flags[obj] &= ~FLAG_DIRTY;
+        objects.flags[obj] |= (objects.transition_applied[obj] > FADE_SIMPLE && fade_val != 255) ? FLAG_DIRTY : 0;
     }
 
     viewable_objects = object_sprite_cache;

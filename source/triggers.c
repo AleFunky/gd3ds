@@ -496,7 +496,7 @@ void handle_move_triggers(void) {
                 int old_sy = objects.section_y[group_obj];
                 objects.x[group_obj] += delta_x;
                 objects.y[group_obj] += delta_y;
-                objects.dirty[group_obj] = true;
+                objects.flags[group_obj] |= FLAG_DIRTY;
                 int new_sx = (int)(objects.x[group_obj] / SECTION_SIZE);
                 int new_sy = (int)(objects.y[group_obj] / SECTION_SIZE);
                 if (new_sx != old_sx || new_sy != old_sy) {
@@ -553,7 +553,7 @@ void handle_spawn_triggers(void) {
                 if (trigger_is_spawn_triggered(objects.id[obj_idx], obj_idx)
                     && is_trigger_object(objects.id[obj_idx])
                     && (trigger_is_multi_triggered(objects.id[obj_idx], obj_idx) || !GET_ACTIVATED(obj_idx))
-                    && !objects.toggled[obj_idx]) {
+                    && !(objects.flags[obj_idx] & FLAG_TOGGLED)) {
                     run_trigger(obj_idx);
                 }
             }
@@ -910,7 +910,7 @@ void upload_color_to_buffer(int channel, u32 color, float seconds) {
 }
 
 void run_trigger(int obj) {
-    if (objects.toggled[obj]) return;
+    if (objects.flags[obj] & FLAG_TOGGLED) return;
 
     switch (objects.id[obj]) {
         case TRIGGER_FADE_SIMPLE:
@@ -1029,7 +1029,8 @@ void run_trigger(int obj) {
         {
             ToggleTrigger *trigger = get_toggle_trigger(obj);
             for (GroupNode *p = get_group(trigger->target_group); p; p = p->next) {
-                objects.toggled[p->obj] = !trigger->activate_group;
+                objects.flags[p->obj] &= ~FLAG_TOGGLED;
+                objects.flags[p->obj] |= !trigger->activate_group ? FLAG_TOGGLED : 0;
             }
             break;
         }

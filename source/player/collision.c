@@ -1,5 +1,6 @@
 #include "collision.h"
 #include "icons.h"
+#include "level_loading.h"
 #include "player.h"
 #include "robot_anim_data.h"
 #include <math.h>
@@ -1124,7 +1125,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                         break;
                 }
 
-                objects.toggled[obj] = true;
+                objects.flags[obj] |= FLAG_TOGGLED;
             }
             break;
 
@@ -1306,7 +1307,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                     brick_destroy_particles.emitterX = objects.x[obj];
                     brick_destroy_particles.emitterY = objects.y[obj];
                     spawnMultipleParticles(&brick_destroy_particles, 25);
-                    objects.toggled[obj] = true;
+                    objects.flags[obj] |= FLAG_TOGGLED;
                 } else {
                     // Not a brick, die
                     kill_player(DEATH_BLOCK);
@@ -1402,7 +1403,7 @@ void collide_with_obj(Player *player, int obj) {
     int obj_id = objects.id[obj];
     const ObjectHitbox *hitbox = game_objects[obj_id].hitbox;
 
-    if (!hitbox || objects.toggled[obj]) return;
+    if (!hitbox || objects.flags[obj] & FLAG_TOGGLED) return;
 
     snapshot.collision_checks++;
 
