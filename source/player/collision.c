@@ -1186,7 +1186,7 @@ static bool sat_overlap(const Vec2D a[4], const Vec2D b[4]) {
                 if (projB > maxB) maxB = projB;
             }
             // If projections do not overlap, there is a separating axis
-            if (maxA <= minB || maxB <= minA) return false;
+            if (maxA < minB || maxB < minA) return false;
         }
     }
     return true;
