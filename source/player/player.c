@@ -1272,13 +1272,24 @@ void draw_hitbox(int obj) {
 
     if (!hitbox) return;
 
-    float angle = objects.rotation[obj];
+    float angle = -objects.rotation[obj];
+    float rot_rad = C3D_AngleFromDegrees(adjust_angle_y(angle, objects.flippedH[obj]));
+    float cos_r = cosf(rot_rad), sin_r = sinf(rot_rad);
 
-    float x = objects.x[obj];
-    float y = objects.y[obj];
+    float raw_off_x = hitbox->x * objects.scale_x[obj];
+    float raw_off_y = hitbox->y * objects.scale_y[obj];
+
+    float off_x = raw_off_x * cos_r - raw_off_y * sin_r;
+    float off_y = raw_off_x * sin_r + raw_off_y * cos_r;
+
+    float x = objects.x[obj] + off_x;
+    float y = objects.y[obj] + off_y;
     float w = objects.width[obj];
     float h = objects.height[obj];
 
+    if (hitbox->collision_type == HITBOX_SOLID) {
+        angle = 0;
+    }
     unsigned int color = C2D_Color32(0x00, 0xff, 0xff, 0xff);
 
     int hitbox_type = hitbox->collision_type;
@@ -1311,7 +1322,7 @@ void draw_player_hitbox(Player *player) {
     InternalHitbox internal = player->internal_hitbox;
     Vec2D rect[4];
     // Rotated hitbox
-    get_corners(player->x, player->y, player->width, player->height, player->rotation, rect);
+    get_corners(player->x, player->y, player->width, player->height, -player->rotation, rect);
 
     draw_square(rect, C2D_Color32(0x7f, 0x00, 0x00, 0xff));
 

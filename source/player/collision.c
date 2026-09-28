@@ -1135,7 +1135,6 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
 
 void get_corners(float cx, float cy, float w, float h, float angle, Vec2D out[4]) {
     float hw = w * 0.5f, hh = h * 0.5f;
-    angle = -angle;
     float rad = C3D_AngleFromDegrees(angle);
     float cos_a = cosf(rad), sin_a = sinf(rad);
     
@@ -1154,10 +1153,6 @@ void get_corners(float cx, float cy, float w, float h, float angle, Vec2D out[4]
     
     out[3].x = cx - hw_cos - hh_sin;
     out[3].y = cy - hw_sin + hh_cos;
-}
-
-static inline float dot_product(float ax, float ay, float bx, float by) {
-    return ax * bx + ay * by;
 }
 
 static bool sat_overlap(const Vec2D a[4], const Vec2D b[4]) {
@@ -1408,12 +1403,16 @@ void collide_with_obj(Player *player, int obj) {
     snapshot.collision_checks++;
 
     // hitbox offset by object rotation
-    float rot_rad = C3D_AngleFromDegrees(objects.rotation[obj]);
+    float angle = -objects.rotation[obj];
+    float rot_rad = C3D_AngleFromDegrees(adjust_angle_y(angle, objects.flippedH[obj]));
     float cos_r = cosf(rot_rad), sin_r = sinf(rot_rad);
-    float off_x = hitbox->x * cos_r - hitbox->y * sin_r;
-    float off_y = (hitbox->collision_type == HITBOX_SPECIAL)
-                ? -(hitbox->x * sin_r + hitbox->y * cos_r)
-                :  (hitbox->x * sin_r + hitbox->y * cos_r);
+
+    float raw_off_x = hitbox->x * objects.scale_x[obj];
+    float raw_off_y = hitbox->y * objects.scale_y[obj];
+
+    float off_x = raw_off_x * cos_r - raw_off_y * sin_r;
+    float off_y = raw_off_x * sin_r + raw_off_y * cos_r;
+    
     float x = objects.x[obj] + off_x;
     float y = objects.y[obj] + off_y;
     float width = objects.width[obj];
@@ -1431,7 +1430,7 @@ void collide_with_obj(Player *player, int obj) {
             SET_COLLIDED(obj, false);
         }
     } else {
-        float obj_rot = normalize_angle(objects.rotation[obj]);
+        float obj_rot = normalize_angle(angle);
 
         // No rotation for solid hitboxes
         if (hitbox->collision_type == HITBOX_SOLID) {
