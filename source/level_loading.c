@@ -2006,6 +2006,10 @@ int parse_string(const char *levelString, int extra_slots, int *out_object_count
 
     free_string_array(sections, sectionCount);
 
+    for (int i = 1; i < MAX_GROUPS; i++) {
+        sort_group(i);
+    }
+
     return LOAD_NO_ERROR;
 }
 
