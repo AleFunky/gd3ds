@@ -4,6 +4,7 @@
 
 typedef struct GroupNode {
     int obj;
+    float alpha;
     struct GroupNode *next;
 } GroupNode;
 

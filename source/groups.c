@@ -7,6 +7,7 @@ void add_to_group(int obj, int g) {
     if (g < 1 || g >= MAX_GROUPS) return;
     GroupNode *n = malloc(sizeof(GroupNode));
     n->obj = obj;
+    n->alpha = 1.f;
     n->next = group_buckets[g];
     group_buckets[g] = n;
 }

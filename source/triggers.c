@@ -33,6 +33,18 @@ static unsigned int pulse_activation_counter = 0;
 float move_lock_player_x_delta = 0.0f;
 float move_lock_player_y_delta = 0.0f;
 
+float get_group_opacities(int object) {
+    float group_opacity = 1.f;
+    for (int i = 0; i < MAX_GROUPS_PER_OBJECT; i++) {
+        int group = objects.groups[object][i];
+        if (!group) break;
+
+        GroupNode *p = get_group(group);
+        if (p) group_opacity *= p->alpha;
+    }
+    return group_opacity;
+}
+
 // Convert channel id to buffer index
 int get_col_channel_index(int channel) {
     if (channel < 0 || channel >= COL_CHANNEL_NUM) {
@@ -333,8 +345,9 @@ void upload_to_alpha_buffer(int obj) {
 
     if (trigger->trig_duration == 0) {
         float alpha = trigger->trigger_opacity;
+        p->alpha = alpha;
         for (GroupNode *cur = p; cur; cur = cur->next) {
-            objects.alpha_trigger_opacity[cur->obj] = alpha;
+            objects.alpha_trigger_opacity[cur->obj] = get_group_opacities(cur->obj);
         }
         return;
     }
@@ -363,7 +376,7 @@ void upload_to_alpha_buffer(int obj) {
     }
     buffer->target_group = target_group;
     buffer->new_alpha = trigger->trigger_opacity;
-    buffer->old_alpha = objects.alpha_trigger_opacity[p->obj];
+    buffer->old_alpha = p->alpha;
     buffer->seconds = trigger->trig_duration;
     buffer->time_run = 0;
     buffer->active = true;
@@ -379,17 +392,18 @@ void handle_alpha_triggers(void) {
 
         GroupNode *p = get_group(buffer->target_group);
         if (p) {
+            p->alpha = lerped;
             for (GroupNode *cur = p; cur; cur = cur->next) {
-                objects.alpha_trigger_opacity[cur->obj] = lerped;
+                objects.alpha_trigger_opacity[cur->obj] = get_group_opacities(cur->obj);
             }
         }
 
         buffer->time_run += g_trigger_dt;
         if (buffer->time_run >= buffer->seconds) {
-            GroupNode *pg = get_group(buffer->target_group);
-            if (pg) {
-                for (GroupNode *cur = pg; cur; cur = cur->next) {
-                    objects.alpha_trigger_opacity[cur->obj] = buffer->new_alpha;
+            if (p) {
+                p->alpha = buffer->new_alpha;
+                for (GroupNode *cur = p; cur; cur = cur->next) {
+                    objects.alpha_trigger_opacity[cur->obj] = get_group_opacities(cur->obj);
                 }
             }
             buffer->active = false;
