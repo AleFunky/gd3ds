@@ -25,10 +25,115 @@ float g_trigger_dt = 0.f;
 ColorChannel channels[COL_CHANNEL_NUM];
 
 ColTriggerBuffer col_trigger_buffer[COL_CHANNEL_NUM];
-AlphaTriggerBuffer alpha_trigger_buffer[MAX_ALPHA_TRIGGERS];
-MoveTriggerBuffer move_trigger_buffer[MAX_MOVE_TRIGGERS];
-SpawnTriggerBuffer spawn_trigger_buffer[MAX_SPAWN_TRIGGERS];
-PulseTriggerBuffer pulse_trigger_buffer[MAX_PULSE_TRIGGERS];
+AlphaTriggerBuffer *alpha_trigger_buffer = NULL;
+int alpha_trigger_count = 0;
+int alpha_trigger_capacity = 0;
+
+MoveTriggerBuffer *move_trigger_buffer = NULL;
+int move_trigger_count = 0;
+int move_trigger_capacity = 0;
+
+SpawnTriggerBuffer *spawn_trigger_buffer = NULL;
+int spawn_trigger_count = 0;
+int spawn_trigger_capacity = 0;
+
+PulseTriggerBuffer *pulse_trigger_buffer = NULL;
+int pulse_trigger_count = 0;
+int pulse_trigger_capacity = 0;
+
+AlphaTriggerBuffer *get_new_alpha_trigger() {
+    if (alpha_trigger_count >= alpha_trigger_capacity) {
+        size_t new_capacity = alpha_trigger_capacity == 0 ? 32 : alpha_trigger_capacity + 32;
+
+        AlphaTriggerBuffer *new_list = realloc(alpha_trigger_buffer, new_capacity * sizeof(AlphaTriggerBuffer));
+        if (!new_list) {
+            return NULL;
+        }
+
+        alpha_trigger_buffer = new_list;
+        alpha_trigger_capacity = new_capacity;
+    }
+
+    AlphaTriggerBuffer *buffer = &alpha_trigger_buffer[alpha_trigger_count++];
+    memset(buffer, 0, sizeof(AlphaTriggerBuffer));
+    return buffer;
+}
+
+MoveTriggerBuffer *get_new_move_trigger() {
+    if (move_trigger_count >= move_trigger_capacity) {
+        size_t new_capacity = move_trigger_capacity == 0 ? 32 : move_trigger_capacity + 32;
+
+        MoveTriggerBuffer *new_list = realloc(move_trigger_buffer, new_capacity * sizeof(MoveTriggerBuffer));
+        if (!new_list) {
+            return NULL;
+        }
+
+        move_trigger_buffer = new_list;
+        move_trigger_capacity = new_capacity;
+    }
+    MoveTriggerBuffer *buffer = &move_trigger_buffer[move_trigger_count++];
+    memset(buffer, 0, sizeof(MoveTriggerBuffer));
+    return buffer;
+}
+
+SpawnTriggerBuffer *get_new_spawn_trigger() {
+    if (spawn_trigger_count >= spawn_trigger_capacity) {
+        size_t new_capacity = spawn_trigger_capacity == 0 ? 32 : spawn_trigger_capacity + 32;
+
+        SpawnTriggerBuffer *new_list = realloc(spawn_trigger_buffer, new_capacity * sizeof(SpawnTriggerBuffer));
+        if (!new_list) {
+            return NULL;
+        }
+
+        spawn_trigger_buffer = new_list;
+        spawn_trigger_capacity = new_capacity;
+    }
+    SpawnTriggerBuffer *buffer = &spawn_trigger_buffer[spawn_trigger_count++];
+    memset(buffer, 0, sizeof(SpawnTriggerBuffer));
+    return buffer;
+}
+
+PulseTriggerBuffer *get_new_pulse_trigger() {
+    if (pulse_trigger_count >= pulse_trigger_capacity) {
+        size_t new_capacity = pulse_trigger_capacity == 0 ? 32 : pulse_trigger_capacity + 32;
+
+        PulseTriggerBuffer *new_list = realloc(pulse_trigger_buffer, new_capacity * sizeof(PulseTriggerBuffer));
+        if (!new_list) {
+            return NULL;
+        }
+
+        pulse_trigger_buffer = new_list;
+        pulse_trigger_capacity = new_capacity;
+    }
+    PulseTriggerBuffer *buffer = &pulse_trigger_buffer[pulse_trigger_count++];
+    memset(buffer, 0, sizeof(PulseTriggerBuffer));
+    return buffer;
+}
+
+void free_trigger_buffers() {
+    free(alpha_trigger_buffer);
+    free(move_trigger_buffer);
+    free(spawn_trigger_buffer);
+    free(pulse_trigger_buffer);
+
+    alpha_trigger_buffer = NULL;
+    move_trigger_buffer = NULL;
+    spawn_trigger_buffer = NULL;
+    pulse_trigger_buffer = NULL;
+
+    alpha_trigger_count = 0;
+    alpha_trigger_capacity = 0;
+
+    move_trigger_count = 0;
+    move_trigger_capacity = 0;
+
+    spawn_trigger_count = 0;
+    spawn_trigger_capacity = 0;
+
+    pulse_trigger_count = 0;
+    pulse_trigger_capacity = 0;
+}
+
 static unsigned int pulse_activation_counter = 0;
 float move_lock_player_x_delta = 0.0f;
 float move_lock_player_y_delta = 0.0f;
@@ -366,27 +471,26 @@ void upload_to_alpha_buffer(int obj) {
     }
 
     int slot = -1;
-    for (int i = 0; i < MAX_ALPHA_TRIGGERS; i++) {
-        if (!alpha_trigger_buffer[i].active) {
-            slot = i;
-            break;
-        }
-    }
-
-    for (int i = 0; i < MAX_ALPHA_TRIGGERS; i++) {
+    for (int i = 0; i < alpha_trigger_count; i++) {
         if (alpha_trigger_buffer[i].active && alpha_trigger_buffer[i].target_group == target_group) {
             slot = i;
             break;
         }
     }
 
-    if (slot < 0) return;
+    AlphaTriggerBuffer *buffer;
 
-    AlphaTriggerBuffer *buffer = &alpha_trigger_buffer[slot];
-    if (buffer->restored_from_checkpoint) {
-        buffer->restored_from_checkpoint = false;
-        return;
+    if (slot >= 0) {
+        buffer = &alpha_trigger_buffer[slot];
+    } else {
+        buffer = get_new_alpha_trigger();
     }
+    if (!buffer) return;
+
+    //if (buffer->restored_from_checkpoint) {
+    //    buffer->restored_from_checkpoint = false;
+    //    return;
+    //}
     buffer->target_group = target_group;
     buffer->new_alpha = trigger->trigger_opacity;
     buffer->old_alpha = p->alpha;
@@ -396,7 +500,7 @@ void upload_to_alpha_buffer(int obj) {
 }
 
 void handle_alpha_triggers(void) {
-    for (int slot = 0; slot < MAX_ALPHA_TRIGGERS; slot++) {
+    for (int slot = 0; slot < alpha_trigger_count; slot++) {
         AlphaTriggerBuffer *buffer = &alpha_trigger_buffer[slot];
         if (!buffer->active) continue;
 
@@ -420,6 +524,15 @@ void handle_alpha_triggers(void) {
                 }
             }
             buffer->active = false;
+            
+            for (int j = slot; j < alpha_trigger_count - 1; j++) {
+                // Shift buffer array
+                alpha_trigger_buffer[j] = alpha_trigger_buffer[j + 1];
+            }
+            
+            // Make the game run the pulse moved into the current slot
+            slot--;
+            alpha_trigger_count--;
         }
     }
 }
@@ -454,7 +567,7 @@ void upload_to_move_buffer(int obj) {
     int target_group = trigger->target_group;
     if (!get_group(target_group)) return;
 
-    for (int i = 0; i < MAX_MOVE_TRIGGERS; i++) {
+    for (int i = 0; i < move_trigger_count; i++) {
         if (move_trigger_buffer[i].active &&
             move_trigger_buffer[i].source_obj == obj &&
             move_trigger_buffer[i].restored_from_checkpoint) {
@@ -463,14 +576,9 @@ void upload_to_move_buffer(int obj) {
         }
     }
 
-    int slot = -1;
-    for (int i = 0; i < MAX_MOVE_TRIGGERS; i++) {
-        if (!move_trigger_buffer[i].active) { slot = i; break; }
-    }
+    MoveTriggerBuffer *buffer = get_new_move_trigger();
+    if (!buffer) return;
 
-    if (slot < 0) return;
-
-    MoveTriggerBuffer *buffer = &move_trigger_buffer[slot];
     buffer->target_group = target_group;
     buffer->source_obj = obj;
     buffer->offset_x = trigger->move_offset_x;
@@ -504,14 +612,11 @@ bool object_can_be_x_moved(int obj) {
 }
 
 void handle_move_triggers(void) {
-    for (int slot = 0; slot < MAX_MOVE_TRIGGERS; slot++) {
+    for (int slot = 0; slot < move_trigger_count; slot++) {
         MoveTriggerBuffer *buffer = &move_trigger_buffer[slot];
         if (!buffer->active) continue;
 
         buffer->time_run += g_trigger_dt;
-        if (buffer->time_run >= buffer->seconds) {
-            buffer->active = false;
-        }
 
         float t = easeTime(convert_ease(buffer->easing),
                            buffer->time_run, buffer->seconds, 2.0f);
@@ -549,18 +654,22 @@ void handle_move_triggers(void) {
                 }
             }
         }
+        if (buffer->time_run >= buffer->seconds) {
+            buffer->active = false;
+            for (int j = slot; j < move_trigger_count - 1; j++) {
+                // Shift buffer array
+                move_trigger_buffer[j] = move_trigger_buffer[j + 1];
+            }
+            
+            // Make the game run the pulse moved into the current slot
+            slot--;
+            move_trigger_count--;
+        }
     }
 }
 
-static int obtain_free_spawn_slot(void) {
-    for (int i = 0; i < MAX_SPAWN_TRIGGERS; i++) {
-        if (!spawn_trigger_buffer[i].active) return i;
-    }
-    return -1;
-}
-
-void upload_to_spawn_buffer(int obj) {
-    for (int i = 0; i < MAX_SPAWN_TRIGGERS; i++) {
+void upload_to_spawn_buffer(int obj, bool from_spawn) {
+    for (int i = 0; i < spawn_trigger_count; i++) {
         if (spawn_trigger_buffer[i].active &&
             spawn_trigger_buffer[i].source_obj == obj &&
             spawn_trigger_buffer[i].restored_from_checkpoint) {
@@ -569,11 +678,11 @@ void upload_to_spawn_buffer(int obj) {
         }
     }
 
-    int slot = obtain_free_spawn_slot();
-    if (slot < 0) return;
-
+    SpawnTriggerBuffer *buffer = get_new_spawn_trigger();
+    if (!buffer) return;
+    
     SpawnTrigger *trigger = get_spawn_trigger(obj);
-    SpawnTriggerBuffer *buffer = &spawn_trigger_buffer[slot];
+    buffer->queued = from_spawn;
     buffer->target_group = trigger->target_group;
     buffer->source_obj = obj;
     buffer->seconds = trigger->spawn_delay ? trigger->spawn_delay : trigger->trig_duration;
@@ -582,15 +691,15 @@ void upload_to_spawn_buffer(int obj) {
 }
 
 void handle_spawn_triggers(void) {
-    for (int slot = 0; slot < MAX_SPAWN_TRIGGERS; slot++) {
+    for (int slot = 0; slot < spawn_trigger_count; slot++) {
+        spawn_trigger_buffer[slot].queued = false;
+    }
+    for (int slot = 0; slot < spawn_trigger_count; slot++) {
         SpawnTriggerBuffer *buffer = &spawn_trigger_buffer[slot];
-        if (!buffer->active) continue;
+        if (!buffer->active || buffer->queued) continue;
 
         buffer->time_run += g_trigger_dt;
         if (buffer->time_run > buffer->seconds) {
-            // deactivate before running the group: a spawned spawn trigger enqueues
-            // via obtain_free_spawn_slot() (first free slot) which is always <= slot
-            // so it can't be reprocessed in this same pass
             buffer->active = false;
 
             for (GroupNode *p = get_group(buffer->target_group); p; p = p->next) {
@@ -599,29 +708,31 @@ void handle_spawn_triggers(void) {
                     && is_trigger_object(objects.id[obj_idx])
                     && (trigger_is_multi_triggered(objects.id[obj_idx], obj_idx) || !GET_ACTIVATED(obj_idx))
                     && !(objects.flags[obj_idx] & FLAG_TOGGLED)) {
-                    run_trigger(obj_idx);
+                    run_trigger(obj_idx, true);
                 }
             }
+
+            for (int j = slot; j < spawn_trigger_count - 1; j++) {
+                // Shift buffer array
+                spawn_trigger_buffer[j] = spawn_trigger_buffer[j + 1];
+            }
+            
+            // Make the game run the pulse moved into the current slot
+            slot--;
+            spawn_trigger_count--;
         }
     }
 }
 
-static int obtain_free_pulse_slot(void) {
-    for (int i = 0; i < MAX_PULSE_TRIGGERS; i++) {
-        if (!pulse_trigger_buffer[i].active) return i;
-    }
-    return -1;
-}
 
 void upload_to_pulse_buffer(int obj) {
-    int slot = obtain_free_pulse_slot();
-    if (slot < 0) return;
-
     PulseTrigger *trigger = get_pulse_trigger(obj);
     int channel = trigger->target_group;
     if (channel == 0) return;
 
-    PulseTriggerBuffer *buffer = &pulse_trigger_buffer[slot];
+    PulseTriggerBuffer *buffer = get_new_pulse_trigger();
+    if (!buffer) return;
+
     buffer->target_group = trigger->target_group;
 
     buffer->color.r = trigger->trig_colorR;
@@ -685,7 +796,7 @@ void upload_to_pulse_buffer(int obj) {
 
 void handle_pulse_triggers(void) {
     // preprocess HSV for all active pulses
-    for (int i = 0; i < MAX_PULSE_TRIGGERS; i++) {
+    for (int i = 0; i < pulse_trigger_count; i++) {
         PulseTriggerBuffer *buffer = &pulse_trigger_buffer[i];
         if (!buffer->active) continue;
         if (buffer->pulse_mode == PULSE_MODE_HSV) {
@@ -699,7 +810,7 @@ void handle_pulse_triggers(void) {
     }
 
     // process channel pulses in pulse_index order
-    for (int i = 0; i < MAX_PULSE_TRIGGERS; i++) {
+    for (int i = 0; i < pulse_trigger_count; i++) {
         PulseTriggerBuffer *buffer = &pulse_trigger_buffer[i];
         if (!buffer->active || buffer->pulse_target_type != PULSE_TARGET_CHANNEL) continue;
 
@@ -736,9 +847,9 @@ void handle_pulse_triggers(void) {
     }
 
     // process group pulses in ascending activation_order
-    int group_order[MAX_PULSE_TRIGGERS];
+    int group_order[pulse_trigger_count];
     int group_order_count = 0;
-    for (int i = 0; i < MAX_PULSE_TRIGGERS; i++) {
+    for (int i = 0; i < pulse_trigger_count; i++) {
         PulseTriggerBuffer *b = &pulse_trigger_buffer[i];
         if (!b->active || b->pulse_target_type != PULSE_TARGET_GROUP) continue;
         group_order[group_order_count++] = i;
@@ -814,7 +925,7 @@ void handle_pulse_triggers(void) {
     }
 
     // time update and cleanup for all pulses
-    for (int i = 0; i < MAX_PULSE_TRIGGERS; i++) {
+    for (int i = 0; i < pulse_trigger_count; i++) {
         PulseTriggerBuffer *buffer = &pulse_trigger_buffer[i];
         if (!buffer->active) continue;
 
@@ -854,7 +965,7 @@ void handle_pulse_triggers(void) {
                 chan->num_pulses--;
                 if (!chan->num_pulses) chan->color = chan->non_pulse_color;
 
-                for (int j = 0; j < MAX_PULSE_TRIGGERS; j++) {
+                for (int j = 0; j < pulse_trigger_count; j++) {
                     if (j == i) continue;
                     PulseTriggerBuffer *other = &pulse_trigger_buffer[j];
                     if (!other->active) continue;
@@ -864,16 +975,12 @@ void handle_pulse_triggers(void) {
                 }
             }
 
-            for (int j = i; j < MAX_PULSE_TRIGGERS - 1; j++) {
+            for (int j = i; j < pulse_trigger_count - 1; j++) {
                 // Shift buffer array
-                if (pulse_trigger_buffer[j].active) {
-                    pulse_trigger_buffer[j] = pulse_trigger_buffer[j + 1];
-                }
+                pulse_trigger_buffer[j] = pulse_trigger_buffer[j + 1];
             }
 
-            // If last slot, nothing is gonna move into the slot so just disable it
-            pulse_trigger_buffer[MAX_PULSE_TRIGGERS - 1].active = false;
-            
+            pulse_trigger_count--;
             // Make the game run the pulse moved into the current slot
             i--;
         }
@@ -954,7 +1061,7 @@ void upload_color_to_buffer(int channel, u32 color, float seconds) {
     buffer->active = true;
 }
 
-void run_trigger(int obj) {
+void run_trigger(int obj, bool from_spawn) {
     if (objects.flags[obj] & FLAG_TOGGLED) return;
 
     switch (objects.id[obj]) {
@@ -1063,7 +1170,7 @@ void run_trigger(int obj) {
             upload_to_move_buffer(obj);
             break;
         case SPAWN_TRIGGER:
-            upload_to_spawn_buffer(obj);
+            upload_to_spawn_buffer(obj, from_spawn);
             break;
         case PULSE_TRIGGER:
             if (get_pulse_trigger(obj)->pulse_target_type == PULSE_TARGET_CHANNEL &&
@@ -1133,14 +1240,14 @@ void handle_triggers() {
                             state.player.x, state.player.y, state.player.width, state.player.height, 0, 
                             objects.x[obj], objects.y[obj], objects.width[obj] + TOUCH_TRIGGER_EPSILON, objects.height[obj] + TOUCH_TRIGGER_EPSILON, objects.rotation[obj]
                         )) {
-                            run_trigger(obj);
+                            run_trigger(obj, false);
                         } else
                         // Try now p2
                         if (intersect(
                             state.player2.x, state.player2.y, state.player2.width, state.player2.height, 0, 
                             objects.x[obj], objects.y[obj], objects.width[obj] + TOUCH_TRIGGER_EPSILON, objects.height[obj] + TOUCH_TRIGGER_EPSILON, objects.rotation[obj]
                         )) {
-                            run_trigger(obj);
+                            run_trigger(obj, false);
                         }
                     } else if (!trigger_is_spawn_triggered(objects.id[obj], obj) && objects.x[obj] < state.player.x) {
                         if (trigger_count < TRIGGER_BUFFER_SIZE) {
@@ -1155,7 +1262,7 @@ void handle_triggers() {
     qsort(triggers_buffer, trigger_count, sizeof(int), compare_triggers);
 
     for (size_t i = 0; i < trigger_count; i++) {
-        run_trigger(triggers_buffer[i]);
+        run_trigger(triggers_buffer[i], false);
     }
 }
 

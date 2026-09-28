@@ -36,6 +36,11 @@ enum ColorChannelIDs {
     COL_CHANNEL_NUM = 1024,
 };
 
+extern int alpha_trigger_count;
+extern int move_trigger_count;
+extern int spawn_trigger_count;
+extern int pulse_trigger_count;
+
 typedef struct {
     Color color;
     Color non_pulse_color;
@@ -58,8 +63,6 @@ typedef struct {
     HSV copied_hsv;
 } ColTriggerBuffer;
 
-#define MAX_ALPHA_TRIGGERS 50
-
 typedef struct {
     bool active;
     bool restored_from_checkpoint;
@@ -69,8 +72,6 @@ typedef struct {
     float seconds;
     float time_run;
 } AlphaTriggerBuffer;
-
-#define MAX_MOVE_TRIGGERS 50
 
 typedef struct {
     bool active;
@@ -88,18 +89,15 @@ typedef struct {
     float time_run;
 } MoveTriggerBuffer;
 
-#define MAX_SPAWN_TRIGGERS 100
-
 typedef struct {
     bool active;
+    bool queued;
     bool restored_from_checkpoint;
     int target_group;
     int source_obj;
     float seconds;
     float time_run;
 } SpawnTriggerBuffer;
-
-#define MAX_PULSE_TRIGGERS 50
 
 #define PULSE_TARGET_CHANNEL 0
 #define PULSE_TARGET_GROUP 1
@@ -129,12 +127,14 @@ typedef struct {
     unsigned int activation_order;
 } PulseTriggerBuffer;
 
+void free_trigger_buffers();
+
 extern ColorChannel channels[COL_CHANNEL_NUM];
 extern ColTriggerBuffer col_trigger_buffer[COL_CHANNEL_NUM];
-extern AlphaTriggerBuffer alpha_trigger_buffer[MAX_ALPHA_TRIGGERS];
-extern MoveTriggerBuffer move_trigger_buffer[MAX_MOVE_TRIGGERS];
-extern SpawnTriggerBuffer spawn_trigger_buffer[MAX_SPAWN_TRIGGERS];
-extern PulseTriggerBuffer pulse_trigger_buffer[MAX_PULSE_TRIGGERS];
+extern AlphaTriggerBuffer *alpha_trigger_buffer;
+extern MoveTriggerBuffer *move_trigger_buffer;
+extern SpawnTriggerBuffer *spawn_trigger_buffer;
+extern PulseTriggerBuffer *pulse_trigger_buffer;
 extern float move_lock_player_x_delta;
 extern float move_lock_player_y_delta;
 
@@ -200,11 +200,11 @@ void upload_to_alpha_buffer(int obj);
 void handle_alpha_triggers(void);
 void upload_to_move_buffer(int obj);
 void handle_move_triggers(void);
-void upload_to_spawn_buffer(int obj);
+void upload_to_spawn_buffer(int obj, bool from_spawn);
 void handle_spawn_triggers(void);
 void upload_to_pulse_buffer(int obj);
 void handle_pulse_triggers(void);
-void run_trigger(int obj);
+void run_trigger(int obj, bool from_spawn);
 void upload_color_to_buffer(int channel, u32 color, float seconds);
 void upload_to_buffer(int obj, int channel);
 int convert_one_point_nine_channel(int channel);
