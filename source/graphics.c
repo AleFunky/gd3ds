@@ -479,14 +479,14 @@ int get_glow_channel(int obj) {
         case 741:
         case 742:
             return CHANNEL_LBG;
-        case 35:
-        case 36:
+        case YELLOW_PAD:
+        case YELLOW_ORB:
             return CHANNEL_YELLOW_GLOW_INTERNAL;
-        case 67:
-        case 84:
+        case BLUE_PAD:
+        case BLUE_ORB:
             return CHANNEL_BLUE_GLOW;
-        case 140:
-        case 141:
+        case PINK_PAD:
+        case PINK_ORB:
             return CHANNEL_PINK_GLOW;
         case 200:
         case 201:
@@ -608,10 +608,10 @@ float get_object_pulse(float amplitude, int id, int layer) {
     amplitude *= music_volume > 0 && global_volume > 0;
     amplitude = MAX(0.1f, amplitude); // Cap at 0.1
     switch (id) {
-        case 36:
-        case 84:
-        case 141:
-        case 1022:
+        case YELLOW_ORB:
+        case BLUE_ORB:
+        case PINK_ORB:
+        case GREEN_ORB:
             return map_range(amplitude, 0.f, 1.f, 0.3f, 1.2f);
         case 15:
         case 16:
@@ -650,19 +650,18 @@ static bool object_has_pulse(int id) {
         case 15:
         case 16:
         case 17:
-        case 36:
+        case YELLOW_ORB:
         case 50:
         case 51:
         case 52:
         case 53:
         case 54:
         case 60:
-        case 84:
+        case BLUE_ORB:
         case 132:
         case 133:
         case 136:
-        case 141:
-        case 1022:
+        case PINK_ORB:
         case 148:
         case 149:
         case 150:
@@ -673,6 +672,7 @@ static bool object_has_pulse(int id) {
         case 495:
         case 496:
         case 497:
+        case GREEN_ORB:
             return true;
         default:
             return false;
