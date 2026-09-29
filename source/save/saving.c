@@ -32,6 +32,7 @@ static SavingTask tasks[SAVE_TYPE_COUNT] = { 0 };
 
 int total_stars = 0;
 int total_coins = 0;
+int total_user_coins = 0;
 int total_attempts = 0;
 int total_jumps = 0;
 int total_demons = 0;
@@ -146,9 +147,27 @@ static void calculate_stats_level_list(LevelDataList *list, bool is_main_level, 
     }
 }
 
+bool level_has_rate(const LevelData *data) {
+    return data->stars > 0;
+}
+
+static int count_list_user_coins(LevelDataList *list) {
+    int count = 0;
+    for (int i = 0; i < list->count; i++) {
+        LevelData *data = &list->list[i].data;
+        if (data->normal_progress == 100 && level_has_rate(data)) {
+            count += data->coin1;
+            count += data->coin2;
+            count += data->coin3;
+        }
+    }
+    return count;
+}
+
 void calculate_stats() {
     total_stars = 0;
     total_coins = 0;
+    total_user_coins = 0;
     total_attempts = 0;
     total_jumps = 0;
     total_demons = 0;
@@ -163,6 +182,9 @@ void calculate_stats() {
     calculate_stats_level_list(&gdps_file.online_levels, false, NULL);
 
     calculate_stats_level_list(&external_file.external_levels, false, NULL);
+
+    total_user_coins += count_list_user_coins(&gd_server_file.online_levels);
+    total_user_coins += count_list_user_coins(&gdps_file.online_levels);
 }
 
 // New save file format

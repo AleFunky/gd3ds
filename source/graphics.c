@@ -524,7 +524,7 @@ int get_obj_random_layer(int obj, int id) {
             return tex + (objects.random[obj] & 0b11);
         
         case SECRET_COIN:
-            return get_coin_texture(tex + (is_coin_collected(obj) ? 12 : 0), 26);
+            return get_coin_texture(tex + (state.custom_level ? (is_coin_collected(obj) ? 8 : 4) : (is_coin_collected(obj) ? 12 : 0)), 26);
     }
     return -1;
 }
@@ -1782,7 +1782,11 @@ void update_tints() {
                     col.color = (Color) {0,0,0};
                     break;
                 case COLOR_TYPE_WHITE:
-                    col.color = (Color) {255,255,255};
+                    if (level_is_unrated_online() && objects.id[game_object] == SECRET_COIN) {
+                        col.color = (Color) {USER_COIN_UNRATED_R, USER_COIN_UNRATED_G, USER_COIN_UNRATED_B};
+                    } else {
+                        col.color = (Color) {255,255,255};
+                    }
                     break;
             }
 

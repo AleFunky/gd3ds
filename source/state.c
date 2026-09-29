@@ -23,6 +23,23 @@
 
 GameState state;
 
+bool level_unrated_online = false;
+
+bool level_is_unrated_online(void) {
+    return level_unrated_online;
+}
+
+void level_unrated_online_refresh(void) {
+    level_unrated_online = state.online_level
+        && current_level_entry
+        && !level_has_rate(&current_level_entry->data);
+}
+
+u32 user_coin_icon_tint(bool collected, bool has_rate) {
+    if (collected) return has_rate ? C2D_Color32(255, 255, 255, 255) : USER_COIN_UNRATED_TINT;
+    return has_rate ? C2D_Color32(165, 165, 165, 255) : USER_COIN_UNRATED_EMPTY_TINT;
+}
+
 void set_camera_x(float x) {
     state.camera_x = x;
     state.unmod_cam_x = x;
@@ -304,6 +321,7 @@ void init_level_bounds() {
 }
 
 void first_load_init_variables() {
+    level_unrated_online_refresh();
     memset(&state.current_data, 0, sizeof(StateLevelData));
     
     level_info.wall_x = roundf(level_info.last_obj_x / 30) * 30;
@@ -589,7 +607,7 @@ void clear_respawn_effect() {
 }
 
 bool is_coin_collected(int obj) {
-    if (state.custom_level) return false;
+    if (!current_level_entry) return false;
 
     if (objects.id[obj] != SECRET_COIN) return false;
 

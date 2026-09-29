@@ -887,8 +887,7 @@ int convert_object(int id) {
 
         // User coin
         case 1329:
-            if (state.custom_level) return 0;
-            else return SECRET_COIN;
+            return SECRET_COIN;
 
         // Slopes
         case 1743:
@@ -1468,6 +1467,10 @@ bool obj_has_detail(const GameObject *obj) {
 
 bool is_valid_object(int id) {
     return id >= 1 && id < GAME_OBJECT_COUNT;
+}
+
+int get_level_coin_count(void) {
+    return coin_count;
 }
 
 bool is_color_trigger(int id) {

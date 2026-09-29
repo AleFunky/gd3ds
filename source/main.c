@@ -507,8 +507,8 @@ void init_particles(Color p1_color, Color p2_color) {
     faster_speed_particles.cfg.startColorBlue  = 255 / 255.f;
 
     coin_pickup_particles.cfg.startColorRed   = 255 / 255.f;
-    coin_pickup_particles.cfg.startColorGreen = 190 / 255.f;
-    coin_pickup_particles.cfg.startColorBlue  = 0 / 255.f;
+    coin_pickup_particles.cfg.startColorGreen = state.custom_level ? 1.f : 190 / 255.f;
+    coin_pickup_particles.cfg.startColorBlue  = state.custom_level ? 1.f : 0.f;
     
     end_wall_particles.cfg.startColorRed   = p1_not_white.r / 255.f;
     end_wall_particles.cfg.startColorGreen = p1_not_white.g / 255.f;

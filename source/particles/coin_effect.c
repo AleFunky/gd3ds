@@ -80,9 +80,12 @@ void draw_collect_effect() {
             C2D_Sprite spr = { 0 };
             C2D_ImageTint tint = { 0 };
 
-            C2D_PlainImageTint(&tint, C2D_Color32f(1, 1, 1, data->opacity), 1.f);
+            u32 tint_color = level_is_unrated_online()
+                ? C2D_Color32(USER_COIN_UNRATED_R, USER_COIN_UNRATED_G, USER_COIN_UNRATED_B, (u8)(data->opacity * 255.f))
+                : C2D_Color32f(1, 1, 1, data->opacity);
+            C2D_PlainImageTint(&tint, tint_color, 1.f);
 
-            int index = get_coin_texture(game_objects[SECRET_COIN].texture + (data->already_collected ? 12 : 0), 12) - SPRITESHEET2_START;
+            int index = get_coin_texture(game_objects[SECRET_COIN].texture + (state.custom_level ? (data->already_collected ? 8 : 4) : (data->already_collected ? 12 : 0)), 12) - SPRITESHEET2_START;
             
             float calc_x = (data->x - state.camera_x);
             float calc_y = SCREEN_HEIGHT - ((data->y - state.camera_y));  

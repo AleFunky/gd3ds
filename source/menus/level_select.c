@@ -407,6 +407,7 @@ void level_select_init(UIScreen *s){
     curr_level_id = 0;
     start_level = false;
     state.custom_level = false;
+    state.online_level = false;
     dragDistance = 0;
 
     // Set window color

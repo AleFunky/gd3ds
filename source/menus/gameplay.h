@@ -7,6 +7,9 @@
 #define PAUSE_COIN_FILLED_ID 418
 #define PAUSE_COIN_UNFILLED_ID 419
 
+#define COIN_BIG_USER_ID 417
+#define COIN_BIG_USER_SCALE 0.325f
+
 void reset_coins();
 void unpause_game();
 void pause_game();

@@ -67,6 +67,7 @@ static char *gmd = NULL;
 
 static void open_level(UIElement *e, const UIPropertyList *args) {
     state.custom_level = true;
+    state.online_level = false;
 
     stop_mp3();
     playing_menu_loop = false;

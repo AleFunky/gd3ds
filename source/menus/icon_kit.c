@@ -23,6 +23,7 @@
 
 #include "save/config.h"
 #include "state.h"
+#include "menus/creator_menu/search_menu.h"
 
 static int gamemode_page = 0;
 
@@ -217,8 +218,17 @@ static void icon_kit_init_top(UIScreen *s){
     char coins[32];
     snprintf(coins, sizeof(coins), "%d", total_coins);
 
+    char user_coins[32];
+    snprintf(user_coins, sizeof(user_coins), "%d", total_user_coins);
+
     ui_label_set_text((UILabel *) ui_get_element_by_tag(s, "star_text"), stars);
     ui_label_set_text((UILabel *) ui_get_element_by_tag(s, "secretcoins_text"), coins);
+    ui_label_set_text((UILabel *) ui_get_element_by_tag(s, "usercoins_text"), user_coins);
+
+    if (!user_coins_counter_visible()) {
+        ui_run_func_on_tag(s, "usercoins_icon", ui_disable_element);
+        ui_run_func_on_tag(s, "usercoins_text", ui_disable_element);
+    }
 
 }
 

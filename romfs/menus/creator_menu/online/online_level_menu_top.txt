@@ -28,7 +28,10 @@ label x=217 y=118 text="N/A" font=0 scale=0.5 align=LEFT tag="length"
 
 # Description 
 
-window x=200 y=170 w=300 h=75 style=8
-label x=200 y=170 font=1 text="No description found." scale=0.8 align=CENTER tag="description"
+window x=200 y=175 w=300 h=75 style=8
+label x=200 y=175 font=1 text="No description found." scale=0.8 align=CENTER tag="description"
 
 label x=345 y=197 font=1 text="<#78aaf0>ID: N/A</>" scale=0.8 align=RIGHT tag="levelid"
+image x=100 y=87 id=32 scale=0.5 tag="usercoin_slot_1"
+image x=118 y=87 id=32 scale=0.5 tag="usercoin_slot_2"
+image x=136 y=87 id=32 scale=0.5 tag="usercoin_slot_3"

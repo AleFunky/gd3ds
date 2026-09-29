@@ -1102,16 +1102,16 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
 
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &coin_use_effect, get_use_effect_array_ptr(GFX_TOP));
                 if (effect) {
-                    effect->def.colorR = 255 / 255.f;
-                    effect->def.colorG = 190 / 255.f;
-                    effect->def.colorB = 0 / 255.f;
+                    effect->def.colorR = 1.f;
+                    effect->def.colorG = state.custom_level ? 1.f : 190 / 255.f;
+                    effect->def.colorB = state.custom_level ? 1.f : 0 / 255.f;
                 }
 
                 UseEffect *effect2 = add_use_effect(objects.x[obj], objects.y[obj], obj, &coin_radius_effect, get_use_effect_array_ptr(GFX_TOP));
                 if (effect2) {
-                    effect2->def.colorR = 255 / 255.f;
-                    effect2->def.colorG = 190 / 255.f;
-                    effect2->def.colorB = 0 / 255.f;
+                    effect2->def.colorR = 1.f;
+                    effect2->def.colorG = state.custom_level ? 1.f : 190 / 255.f;
+                    effect2->def.colorB = state.custom_level ? 1.f : 0 / 255.f;
                 }
                 coin_pickup_particles.emitterX = objects.x[obj];
                 coin_pickup_particles.emitterY = objects.y[obj];

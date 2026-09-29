@@ -5,6 +5,7 @@
 #include "main.h"
 #include "graphics.h"
 #include "state.h"
+#include "level_loading.h"
 #include "triggers.h"
 #include "easing.h"
 #include "mp3_player.h"
@@ -105,6 +106,21 @@ void reset_coins(){
     }
 }
 
+static void apply_coin_slot_count(){
+    int count = get_level_coin_count();
+    if (count > 3) count = 3;
+
+    UIImage *slots[3] = { coin_1, coin_2, coin_3 };
+    for(int i = 0; i < 3; i++){
+        if (slots[i]) slots[i]->base.enabled = (i < count);
+        if (i >= count && coins_full[i]) coins_full[i]->base.enabled = false;
+    }
+
+    if (count == 0) {
+        ui_run_func_on_tag(screen, "coin_circle", ui_disable_element);
+    }
+}
+
 void pause_game() {
     if (state.end_wall_anim_playing) return;
 
@@ -147,6 +163,7 @@ void unpause_game() {
             reset_coin(&current_level_entry->data, i);
         }
         ui_run_func_on_tag(screen, "coin_circle", ui_enable_element);
+        apply_coin_slot_count();
     }
     ui_run_func_on_tag(screen_top, "pause_menu", ui_disable_element);
     ui_run_func_on_tag(screen, "paused", ui_disable_element);
@@ -265,17 +282,12 @@ void gameplay_init_top(UIScreen *s){
 void gameplay_init(UIScreen *s) {
     screen = s;
 
+    level_unrated_online_refresh();
+
     bg_gradient = (UIImage *) ui_get_element_by_tag(s, "gradient");
 
     ui_window_set_tint((UIWindow *) ui_get_element_by_tag(s, "bgwindow"), C2D_Color32(0, 0, 0, 150));
 
-    // hide coins if level is a custom level
-    if(state.custom_level == true){
-        ui_run_func_on_tag(s, "coin_1", ui_disable_element);
-        ui_run_func_on_tag(s, "coin_2", ui_disable_element);
-        ui_run_func_on_tag(s, "coin_3", ui_disable_element);
-    }
-    
     ui_run_func_on_tag(s, "paused", ui_disable_element);
     ui_run_func_on_tag(s, "practice_buttons", ui_disable_element);
 
@@ -287,7 +299,22 @@ void gameplay_init(UIScreen *s) {
     coins_full[1] = (UIImage *) ui_get_element_by_tag(s, "coin_2_full");
     coins_full[2] = (UIImage *) ui_get_element_by_tag(s, "coin_3_full");
     
+    if (state.custom_level) {
+        bool unrated = level_is_unrated_online();
+        UIImage *coin_slots[3] = { coin_1, coin_2, coin_3 };
+        for (int i = 0; i < 3; i++) {
+            ui_image_set_image(coin_slots[i], COIN_BIG_USER_ID, 0);
+            ui_element_set_scale((UIElement *) coin_slots[i], COIN_BIG_USER_SCALE);
+            ui_image_set_tint(coin_slots[i], unrated ? USER_COIN_UNRATED_EMPTY_TINT : C2D_Color32(165, 165, 165, 255));
+            ui_image_set_image(coins_full[i], COIN_BIG_USER_ID, 0);
+            ui_element_set_scale((UIElement *) coins_full[i], COIN_BIG_USER_SCALE);
+            if (unrated) ui_image_set_tint(coins_full[i], USER_COIN_UNRATED_TINT);
+        }
+    }
+    
     reset_coins();
+
+    apply_coin_slot_count();
 
     music_slider_bar = (UISlider*) ui_get_element_by_tag(s, "music_slider");
     sound_slider_bar = (UISlider*) ui_get_element_by_tag(s, "sound_slider");
@@ -329,12 +356,14 @@ void gameplay_update(UIScreen *s, UIInput *touch) {
 
     for(int i = 0; i < 3; i++){
         if(coins_got[i] && !game_paused){
-            float scale = easeValue(BOUNCE_OUT, 2.f, 0.65f, coin_anims[i], 0.35f, 1.f);
+            float scale = easeValue(BOUNCE_OUT, 2.f, state.custom_level ? COIN_BIG_USER_SCALE : 0.65f, coin_anims[i], 0.35f, 1.f);
             float opacity = easeValue(EASE_LINEAR, 0.f, 1.f, coin_anims[i], 0.1f, 1.f);
 
             coins_full[i]->base.enabled = true;
             ui_element_set_scale((UIElement *) coins_full[i], scale);
-            ui_image_set_tint(coins_full[i], C2D_Color32f(1, 1, 1, opacity));
+            ui_image_set_tint(coins_full[i], level_is_unrated_online()
+                ? C2D_Color32(USER_COIN_UNRATED_R, USER_COIN_UNRATED_G, USER_COIN_UNRATED_B, (u8)(opacity * 255.f))
+                : C2D_Color32f(1, 1, 1, opacity));
 
             if(coin_anims[i] >= 0.05f){
                 if(!coins_circles_spawned[i]){
@@ -342,7 +371,9 @@ void gameplay_update(UIScreen *s, UIInput *touch) {
                         ui_add_use_effect(
                             (UIUseEffect *) ui_get_element_by_tag(s, "coin_circle"), 
                         coins_full[i]->base.x, coins_full[i]->base.y, &end_wall_firework_circle),
-                    1.f, 0.75f, 0.f);
+                    1.f,
+                    level_is_unrated_online() ? USER_COIN_UNRATED_G / 255.f : (state.custom_level ? 1.f : 0.75f),
+                    level_is_unrated_online() ? USER_COIN_UNRATED_B / 255.f : (state.custom_level ? 1.f : 0.f));
                     
                     coins_circles_spawned[i] = true;
                 }

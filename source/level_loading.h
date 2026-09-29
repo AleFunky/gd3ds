@@ -333,6 +333,7 @@ bool obj_has_detail(const GameObject *obj);
 bool is_valid_object(int id);
 bool is_trigger_object(int id);
 bool is_color_trigger(int id);
+int get_level_coin_count(void);
 
 char *get_level_name(char *data_ptr);
 char *load_user_song(int id, size_t *out_size); 

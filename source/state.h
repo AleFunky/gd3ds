@@ -9,6 +9,22 @@
 
 #define MIRROR_DURATION 0.4f
 
+#define USER_COIN_UNRATED_R 255
+#define USER_COIN_UNRATED_G 175
+#define USER_COIN_UNRATED_B 75
+#define USER_COIN_UNRATED_TINT C2D_Color32(USER_COIN_UNRATED_R, USER_COIN_UNRATED_G, USER_COIN_UNRATED_B, 255)
+
+#define USER_COIN_UNRATED_EMPTY_R 165
+#define USER_COIN_UNRATED_EMPTY_G 113
+#define USER_COIN_UNRATED_EMPTY_B 48
+#define USER_COIN_UNRATED_EMPTY_TINT C2D_Color32(USER_COIN_UNRATED_EMPTY_R, USER_COIN_UNRATED_EMPTY_G, USER_COIN_UNRATED_EMPTY_B, 255)
+
+extern bool level_unrated_online;
+bool level_is_unrated_online(void);
+void level_unrated_online_refresh(void);
+
+u32 user_coin_icon_tint(bool collected, bool has_rate);
+
 typedef struct {
     float x;
     float y;
