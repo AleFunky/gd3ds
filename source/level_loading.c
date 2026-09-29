@@ -1070,12 +1070,8 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                 }
 
                 if (objects.id[object] == TEXT_OBJECT) {
-                    if (text_pool.count < MAX_TEXT_OBJECTS) {
-                        int text_index = trigger_pool_add(&text_pool, sizeof(TextObject));
-                        objects.trigger_index[object] = (text_index < 0) ? -1 : text_index;
-                    } else {
-                        objects.trigger_index[object] = -1;
-                    }
+                    int text_index = trigger_pool_add(&text_pool, sizeof(TextObject));
+                    objects.trigger_index[object] = (text_index < 0) ? -1 : text_index;
                 }
             }
             break;

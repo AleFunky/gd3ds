@@ -13,7 +13,6 @@
 #define MAX_PULSES_PER_GROUP 5
 
 #define MAX_TEXT_LEN 64
-#define MAX_TEXT_OBJECTS 64
 
 typedef struct {
     unsigned char r,g,b;
