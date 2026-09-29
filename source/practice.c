@@ -14,6 +14,12 @@
 #include "utils/gfx.h"
 #include "menus/settings_hub/settings.h"
 
+// needed to re-create the runtime trigger buffers
+// after reload_level() frees them
+extern int alpha_trigger_capacity;
+extern int move_trigger_capacity;
+extern int spawn_trigger_capacity;
+
 #define MAX_CHECKPOINTS 100
 #define MAX_CHECKPOINT_CHANNELS (COL_CHANNEL_LAST + 256)
 #define CHECKPOINT_GFX_ID 6
@@ -61,6 +67,9 @@ typedef struct CheckpointData {
     MoveTriggerBuffer *move_triggers;
     AlphaTriggerBuffer *alpha_triggers;
     SpawnTriggerBuffer *spawn_triggers;
+    int move_triggers_count;
+    int alpha_triggers_count;
+    int spawn_triggers_count;
 
     // per-object state for triggers that were active at checkpoint time, so they
     // can continue from the exact point instead of restarting. bounded by the
@@ -137,6 +146,13 @@ static void free_checkpoint_snapshot(CheckpointData *check) {
     if (check->alpha_obj_index) { free(check->alpha_obj_index); check->alpha_obj_index = NULL; }
     if (check->alpha_obj_alpha) { free(check->alpha_obj_alpha); check->alpha_obj_alpha = NULL; }
     check->alpha_obj_count = 0;
+
+    if (check->move_triggers)  { free(check->move_triggers);  check->move_triggers = NULL; }
+    if (check->alpha_triggers) { free(check->alpha_triggers); check->alpha_triggers = NULL; }
+    if (check->spawn_triggers) { free(check->spawn_triggers); check->spawn_triggers = NULL; }
+    check->move_triggers_count = 0;
+    check->alpha_triggers_count = 0;
+    check->spawn_triggers_count = 0;
 }
 
 // static const int checkpoint_size = sizeof(checkpoints);
@@ -156,16 +172,32 @@ void set_checkpoint_timer(float timer) {
 void new_checkpoint() {
     if (state.dead) return;
 
-    // Wrap around
-    if (++checkpoint_pointer >= MAX_CHECKPOINTS) checkpoint_pointer = 0;
+    int next_checkpoint = checkpoint_pointer + 1;
+    if (next_checkpoint >= MAX_CHECKPOINTS) next_checkpoint = 0;
 
-    // Cap checkpoint count
-    if (++checkpoint_count > MAX_CHECKPOINTS) checkpoint_count = MAX_CHECKPOINTS;
-
-    CheckpointData *check = &checkpoints[checkpoint_pointer];
+    CheckpointData *check = &checkpoints[next_checkpoint];
 
     // release the snapshot of the checkpoint we are about to overwrite
     free_checkpoint_snapshot(check);
+
+    // reserve the runtime trigger buffers
+    check->move_triggers  = (move_trigger_count  > 0) ? malloc(sizeof(MoveTriggerBuffer)  * move_trigger_count)  : NULL;
+    check->alpha_triggers = (alpha_trigger_count > 0) ? malloc(sizeof(AlphaTriggerBuffer) * alpha_trigger_count) : NULL;
+    check->spawn_triggers = (spawn_trigger_count > 0) ? malloc(sizeof(SpawnTriggerBuffer) * spawn_trigger_count) : NULL;
+    check->move_triggers_count  = move_trigger_count;
+    check->alpha_triggers_count = alpha_trigger_count;
+    check->spawn_triggers_count = spawn_trigger_count;
+
+    if ((move_trigger_count  > 0 && !check->move_triggers) ||
+        (alpha_trigger_count > 0 && !check->alpha_triggers) ||
+        (spawn_trigger_count > 0 && !check->spawn_triggers)) {
+        // if out of memory leave the slot empty and skip this checkpoint so it doesn't crashes
+        free_checkpoint_snapshot(check);
+        return;
+    }
+
+    checkpoint_pointer = next_checkpoint;
+    if (++checkpoint_count > MAX_CHECKPOINTS) checkpoint_count = MAX_CHECKPOINTS;
 
     check->camera_x = state.camera_x;
     check->camera_y = state.camera_y;
@@ -220,9 +252,9 @@ void new_checkpoint() {
         check->trigger_snapshot[i] = col_trigger_buffer[idx];
     }
 
-    memcpy(check->move_triggers,  move_trigger_buffer,  sizeof(MoveTriggerBuffer) * move_trigger_count);
-    memcpy(check->alpha_triggers, alpha_trigger_buffer, sizeof(AlphaTriggerBuffer) * alpha_trigger_count);
-    memcpy(check->spawn_triggers, spawn_trigger_buffer, sizeof(SpawnTriggerBuffer) * spawn_trigger_count);
+    if (check->move_triggers)  memcpy(check->move_triggers,  move_trigger_buffer,  sizeof(MoveTriggerBuffer)  * move_trigger_count);
+    if (check->alpha_triggers) memcpy(check->alpha_triggers, alpha_trigger_buffer, sizeof(AlphaTriggerBuffer) * alpha_trigger_count);
+    if (check->spawn_triggers) memcpy(check->spawn_triggers, spawn_trigger_buffer, sizeof(SpawnTriggerBuffer) * spawn_trigger_count);
 
     check->move_obj_count = 0;
     check->move_obj_index = NULL;
@@ -331,9 +363,33 @@ void restore_checkpoint() {
         col_trigger_buffer[idx] = check->trigger_snapshot[i];
     }
 
-    memcpy(move_trigger_buffer,  check->move_triggers,  sizeof(MoveTriggerBuffer) * move_trigger_count);
-    memcpy(alpha_trigger_buffer, check->alpha_triggers, sizeof(AlphaTriggerBuffer) * alpha_trigger_count);
-    memcpy(spawn_trigger_buffer, check->spawn_triggers, sizeof(SpawnTriggerBuffer) * spawn_trigger_count);
+    if (check->move_triggers && check->move_triggers_count > 0) {
+        MoveTriggerBuffer *buf = realloc(move_trigger_buffer, sizeof(MoveTriggerBuffer) * check->move_triggers_count);
+        if (buf) {
+            move_trigger_buffer = buf;
+            move_trigger_capacity = check->move_triggers_count;
+            move_trigger_count = check->move_triggers_count;
+            memcpy(move_trigger_buffer, check->move_triggers, sizeof(MoveTriggerBuffer) * check->move_triggers_count);
+        }
+    }
+    if (check->alpha_triggers && check->alpha_triggers_count > 0) {
+        AlphaTriggerBuffer *buf = realloc(alpha_trigger_buffer, sizeof(AlphaTriggerBuffer) * check->alpha_triggers_count);
+        if (buf) {
+            alpha_trigger_buffer = buf;
+            alpha_trigger_capacity = check->alpha_triggers_count;
+            alpha_trigger_count = check->alpha_triggers_count;
+            memcpy(alpha_trigger_buffer, check->alpha_triggers, sizeof(AlphaTriggerBuffer) * check->alpha_triggers_count);
+        }
+    }
+    if (check->spawn_triggers && check->spawn_triggers_count > 0) {
+        SpawnTriggerBuffer *buf = realloc(spawn_trigger_buffer, sizeof(SpawnTriggerBuffer) * check->spawn_triggers_count);
+        if (buf) {
+            spawn_trigger_buffer = buf;
+            spawn_trigger_capacity = check->spawn_triggers_count;
+            spawn_trigger_count = check->spawn_triggers_count;
+            memcpy(spawn_trigger_buffer, check->spawn_triggers, sizeof(SpawnTriggerBuffer) * check->spawn_triggers_count);
+        }
+    }
 
     for (int i = 0; i < move_trigger_count; i++)
         move_trigger_buffer[i].restored_from_checkpoint = move_trigger_buffer[i].active;
