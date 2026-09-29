@@ -100,6 +100,7 @@ static const ProfilerRow overview_rows[] = {
     {},
     { "Rendering", PROFILER_STAT_RENDERING, PROFILER_VALUE_MS_PERCENTAGE },
     { "Physics",   PROFILER_STAT_PHYSICS,   PROFILER_VALUE_MS_PERCENTAGE },
+    { "Triggers",  PROFILER_STAT_TRIGGERS,  PROFILER_VALUE_MS_PERCENTAGE },
 };
 
 static const ProfilerRow render_rows[] = {
@@ -127,7 +128,9 @@ static const ProfilerRow gameplay_rows[] = {
     { "Physics",     PROFILER_STAT_PHYSICS,          PROFILER_VALUE_MS_PERCENTAGE },
     { "- Player",    PROFILER_STAT_PLAYER,           PROFILER_VALUE_MS_PERCENTAGE },
     { "- Collision", PROFILER_STAT_PLAYER_COLLISION, PROFILER_VALUE_MS_PERCENTAGE },
-    { "- Handler",   PROFILER_STAT_PLAYER_HANDLER,   PROFILER_VALUE_MS_PERCENTAGE }
+    { "- Handler",   PROFILER_STAT_PLAYER_HANDLER,   PROFILER_VALUE_MS_PERCENTAGE },
+    {},
+    { "Triggers",  PROFILER_STAT_TRIGGERS,  PROFILER_VALUE_MS_PERCENTAGE },
 };
 
 static const ProfilerRow player_camera_rows[] = {
