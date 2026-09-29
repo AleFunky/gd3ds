@@ -169,7 +169,7 @@ void update_level_progress(int level, int card) {
     if (level < 0) level = current_main_level_pack->count-1;
     if (level >= current_main_level_pack->count) level = 0;
 
-    update_current_level(level);
+    update_current_level(current_main_level_pack->levels[level].level_id);
 
     LevelData data = { 0 }; 
     if (current_level_entry) {
@@ -234,7 +234,7 @@ void update_level_face(int level) {
     ui_image_set_image(level_card_face, 239 + current_main_level_pack->levels[level].difficulty, 0);
 }
 void update_level_top(int level){
-    update_current_level(level);
+    update_current_level(current_main_level_pack->levels[level].level_id);
 
     LevelData *data = &current_level_entry->data;
 
@@ -441,7 +441,7 @@ void level_select_init(UIScreen *s){
     level_card_2_coin_2 = (UIImage *) ui_get_element_by_tag(s, "coin_2_2");
     level_card_2_coin_3 = (UIImage *) ui_get_element_by_tag(s, "coin_3_2");
 
-    update_current_level(curr_level_id);
+    update_current_level(current_main_level_pack->levels[curr_level_id].level_id);
 
     ui_progress_bar_set_tint(level_card_normal_progress, C2D_Color32(0, 255, 0, 255));
     ui_progress_bar_set_tint(level_card_2_normal_progress, C2D_Color32(0, 255, 0, 255));
