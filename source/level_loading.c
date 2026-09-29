@@ -2546,6 +2546,10 @@ void reload_level() {
             }
         }
     }
+    
+    for (int i = 1; i < MAX_GROUPS; i++) {
+        sort_group(i);
+    }
 }
 
 void unload_level() {
