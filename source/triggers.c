@@ -16,6 +16,8 @@
 
 #include "state.h"
 
+#define LAUNCH_CAP 1080.f
+
 Color p1_color;
 Color p2_color;
 Color glow_color;
@@ -638,6 +640,12 @@ void handle_move_triggers(void) {
 
         bool zero_delta = (delta_x == 0.f && delta_y == 0.f);
 
+        float rise_vel = (buffer->seconds > 0.f && g_trigger_dt != 0.f) ? delta_y / g_trigger_dt : 0.f;
+        bool rise1 = buffer->seconds > 0.f && grav(&state.player, rise_vel) > MINIMUM_OBJECT_SPEED;
+        bool rise2 = buffer->seconds > 0.f && state.dual && grav(&state.player2, rise_vel) > MINIMUM_OBJECT_SPEED;
+        float carry1 = 0.f, carry2 = 0.f;
+        bool sup1 = false, sup2 = false;
+
         GroupNode *p = get_group(buffer->target_group);
         if (p && !zero_delta) {
             for (GroupNode *cur = p; cur; cur = cur->next) {
@@ -651,6 +659,63 @@ void handle_move_triggers(void) {
 
                 objects.last_y[group_obj] = objects.y[group_obj];
                 objects.y[group_obj] += delta_y;
+                if (buffer->seconds <= 0.f) {
+                    float launch_vel = (g_trigger_dt != 0.f) ? fminf(fabsf(delta_y) / STEPS_DT_UNMOD, LAUNCH_CAP) : 0.f;
+                    if (grav(&state.player, delta_y) > 0.f && state.player.collided_block == group_obj) {
+                        state.player.y += delta_y;
+                        state.player.vel_y = launch_vel;
+                    }
+                    if (state.dual && grav(&state.player2, delta_y) > 0.f && state.player2.collided_block == group_obj) {
+                        state.player2.y += delta_y;
+                        state.player2.vel_y = launch_vel;
+                    }
+                }
+                if (buffer->seconds > 0.f &&
+                    (grav(&state.player, delta_y) < 0.f || (state.dual && grav(&state.player2, delta_y) < 0.f))) {
+                    objects.last_x[group_obj] = objects.x[group_obj];
+                    objects.last_y[group_obj] = objects.y[group_obj];
+                    float cont_vel = (g_trigger_dt != 0.f) ? delta_y / g_trigger_dt : 0.f;
+                    if (state.player.collided_block == group_obj &&
+                        grav(&state.player, delta_y) < 0.f &&
+                        grav(&state.player, cont_vel) >= -MINIMUM_OBJECT_SPEED) {
+                        state.player.y += delta_y;
+                    }
+                    if (state.dual && state.player2.collided_block == group_obj &&
+                        grav(&state.player2, delta_y) < 0.f &&
+                        grav(&state.player2, cont_vel) >= -MINIMUM_OBJECT_SPEED) {
+                        state.player2.y += delta_y;
+                    }
+                }
+                if (rise1 || rise2) {
+                    objects.last_x[group_obj] = objects.x[group_obj];
+                    objects.last_y[group_obj] = objects.y[group_obj];
+                }
+                if (group_obj == state.player.collided_block) sup1 = true;
+                if (state.dual && group_obj == state.player2.collided_block) sup2 = true;
+                if (rise1 && carry1 == 0.f) {
+                    bool rise_dir1 = buffer->seconds > 0.f && grav(&state.player, buffer->offset_y) > 0.f;
+                    float pb = gravBottom(&state.player);
+                    float old_top = grav(&state.player, objects.y[group_obj] - delta_y);
+                    float new_top = grav(&state.player, objects.y[group_obj]);
+                    float tol1 = 10.f + fabsf(state.player.vel_y) * STEPS_DT;
+                    if (rise_dir1 &&
+                        fabsf(state.player.x - objects.x[group_obj]) <= (state.player.width + objects.width[group_obj]) / 2.f &&
+                        pb >= old_top - tol1 && pb <= new_top + tol1) {
+                        carry1 = delta_y;
+                    }
+                }
+                if (state.dual && rise2 && carry2 == 0.f) {
+                    bool rise_dir2 = buffer->seconds > 0.f && grav(&state.player2, buffer->offset_y) > 0.f;
+                    float pb = gravBottom(&state.player2);
+                    float old_top = grav(&state.player2, objects.y[group_obj] - delta_y);
+                    float new_top = grav(&state.player2, objects.y[group_obj]);
+                    float tol2 = 10.f + fabsf(state.player2.vel_y) * STEPS_DT;
+                    if (rise_dir2 &&
+                        fabsf(state.player2.x - objects.x[group_obj]) <= (state.player2.width + objects.width[group_obj]) / 2.f &&
+                        pb >= old_top - tol2 && pb <= new_top + tol2) {
+                        carry2 = delta_y;
+                    }
+                }
                 objects.flags[group_obj] |= FLAG_DIRTY;
                 int new_sx = (int)(objects.x[group_obj] / SECTION_SIZE);
                 int new_sy = (int)(objects.y[group_obj] / SECTION_SIZE);
@@ -658,8 +723,40 @@ void handle_move_triggers(void) {
                     update_object_section(group_obj);
                 }
             }
+            state.player.y += carry1;
+            if (state.dual) state.player2.y += carry2;
         }
         if (buffer->time_run >= buffer->seconds) {
+            if (p) {
+                for (GroupNode *cur = p; cur; cur = cur->next) {
+                    objects.last_x[cur->obj] = objects.x[cur->obj];
+                    objects.last_y[cur->obj] = objects.y[cur->obj];
+                }
+            }
+            if (buffer->seconds > 0.f && g_trigger_dt != 0.f && p && (sup1 || sup2)) {
+                float launch;
+                if (buffer->time_run - 2.f * g_trigger_dt < 0.f) {
+                    launch = fabsf(delta_y) / g_trigger_dt;
+                } else {
+                    float e1 = easeTime(convert_ease(buffer->easing), buffer->time_run - g_trigger_dt, buffer->seconds, 2.0f);
+                    float e2 = easeTime(convert_ease(buffer->easing), buffer->time_run - 2.f * g_trigger_dt, buffer->seconds, 2.0f);
+                    launch = fabsf(buffer->offset_y * (e1 - e2)) / g_trigger_dt;
+                }
+                bool launch1 = sup1 && grav(&state.player, launch) > MINIMUM_OBJECT_SPEED;
+                bool launch2 = state.dual && sup2 && grav(&state.player2, launch) > MINIMUM_OBJECT_SPEED;
+                if (launch1 || launch2) {
+                    bool other = false;
+                    for (int k = 0; k < move_trigger_count; k++) {
+                        if (&move_trigger_buffer[k] != buffer && move_trigger_buffer[k].active &&
+                            move_trigger_buffer[k].target_group == buffer->target_group &&
+                            move_trigger_buffer[k].offset_y != 0.f) { other = true; break; }
+                    }
+                    if (!other) {
+                        if (launch1) state.player.vel_y = grav(&state.player, launch);
+                        if (launch2) state.player2.vel_y = grav(&state.player2, launch);
+                    }
+                }
+            }
             buffer->active = false;
             for (int j = slot; j < move_trigger_count - 1; j++) {
                 // Shift buffer array
