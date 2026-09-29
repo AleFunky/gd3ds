@@ -1078,12 +1078,14 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
         case 2:  // X
             if (type == GD_VAL_FLOAT) {
                 objects.x[object] = val.f;
+                objects.last_x[object] = val.f;
                 objects.original_x[object] = val.f;
             }
             break;
         case 3:  // Y
             if (type == GD_VAL_FLOAT) {
                 objects.y[object] = val.f;
+                objects.last_y[object] = val.f;
                 objects.original_y[object] = val.f;
             }
             break;
@@ -1693,6 +1695,8 @@ void free_arrays() {
     if (objects.id)                 { free(objects.id);                 objects.id = NULL; }
     if (objects.x)                  { free(objects.x);                  objects.x = NULL; }
     if (objects.y)                  { free(objects.y);                  objects.y = NULL; }
+    if (objects.last_x)             { free(objects.last_x);             objects.last_x = NULL; }
+    if (objects.last_y)             { free(objects.last_y);             objects.last_y = NULL; }
     if (objects.rotation)           { free(objects.rotation);           objects.rotation = NULL; }
     if (objects.visual_rotation)    { free(objects.visual_rotation);    objects.visual_rotation = NULL; }
     if (objects.zlayer)             { free(objects.zlayer);             objects.zlayer = NULL; }
@@ -1758,6 +1762,12 @@ bool init_arrays(size_t count) {
     
     objects.y = malloc(sizeof(float) * count);
     if (!objects.y) return false;
+    
+    objects.last_x = malloc(sizeof(float) * count);
+    if (!objects.last_x) return false;
+    
+    objects.last_y = malloc(sizeof(float) * count);
+    if (!objects.last_y) return false;
 
     objects.rotation = malloc(sizeof(float) * count);
     if (!objects.rotation) return false;
@@ -2277,7 +2287,9 @@ static void generate_orange_portals(int orange_start) {
         int oi = next_orange++;
         objects.id[oi]           = ORANGE_TP_PORTAL;
         objects.x[oi]            = objects.x[i] - x_off;
+        objects.last_x[oi]       = objects.x[oi];
         objects.y[oi]            = objects.y[i] + objects.tp_y_offset[i];
+        objects.last_y[oi]       = objects.y[oi];
         objects.rotation[oi]     = adjust_angle_y(objects.rotation[i], objects.flippedH[i]) + 180.0f;
         objects.visual_rotation[oi] = objects.rotation[oi];
         objects.flippedH[oi]     = false;
@@ -2501,6 +2513,8 @@ void reload_level() {
         objects.opacity[i] = 1.f;
         objects.x[i] = objects.original_x[i];
         objects.y[i] = objects.original_y[i];
+        objects.last_x[i] = objects.original_x[i];
+        objects.last_y[i] = objects.original_y[i];
         objects.alpha_trigger_opacity[i] = 1.0f;
         objects.scale_x[i] = objects.original_scale_x[i];
         objects.scale_y[i] = objects.original_scale_y[i];

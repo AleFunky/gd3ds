@@ -42,6 +42,8 @@ extern float delta;
 extern float frame_timer;
 extern unsigned int frame_counter;
 
+extern int steps;
+extern int last_steps;
 extern unsigned int level_frame;
 
 extern bool exiting_level;

@@ -198,14 +198,14 @@ void trySnap(int block, Player *player) {
     int snap_block = player->snap_data.object_id;
 
     if (snap_block >= 0) {
-        diff.x = objects.x[block] - objects.x[snap_block];
-        diff.y = objects.y[block] - objects.y[snap_block];
+        diff.x = get_lerped_x(block) - get_lerped_x(snap_block);
+        diff.y = get_lerped_y(block) - get_lerped_y(snap_block);
         diff.y = grav(player, diff.y);
         float threshold = snap_player(diff, player);
         if (threshold > 0) {
             // Snap the player up to threshold
             player->x = clampf(
-                objects.x[block] + player->snap_data.player_snap_diff,
+                get_lerped_x(block) + player->snap_data.player_snap_diff,
                 player->x - threshold,
                 player->x + threshold
             );
@@ -1283,6 +1283,9 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
         case HITBOX_SOLID: 
             bool gravSnap = false;
 
+            float x = get_lerped_x(obj);
+            float y = get_lerped_y(obj);
+
             // This is equal to using the old player y position (a frame of snap leeway)
             clip += fabsf(player->vel_y) * STEPS_DT;
             
@@ -1290,7 +1293,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                 // Only do the funny grav snap if player is touching a gravity object and internal hitbox is touching block
                 bool internalCollidingBlock = intersect(
                     player->x, player->y, internal.width, internal.height, 0, 
-                    objects.x[obj], objects.y[obj], objects.width[obj], objects.height[obj], objects.rotation[obj]
+                    x, y, objects.width[obj], objects.height[obj], objects.rotation[obj]
                 );
 
                 float diff = obj_gravBottom(player, obj) - gravInternalBottom(player);
@@ -1303,12 +1306,12 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
             // Check collision with internal hitbox
             if ((player->gamemode == GAMEMODE_WAVE || (!gravSnap && !safeZone)) && intersect(
                 player->x, player->y, internal.width, internal.height, 0, 
-                objects.x[obj], objects.y[obj], objects.width[obj], objects.height[obj], objects.rotation[obj]
+                x, y, objects.width[obj], objects.height[obj], objects.rotation[obj]
             )) {
                 if (objects.id[obj] == BREAKABLE_BLOCK) {
                     // Spawn breakable brick particles
-                    brick_destroy_particles.emitterX = objects.x[obj];
-                    brick_destroy_particles.emitterY = objects.y[obj];
+                    brick_destroy_particles.emitterX = x;
+                    brick_destroy_particles.emitterY = y;
                     spawnMultipleParticles(&brick_destroy_particles, 25);
                     objects.flags[obj] |= FLAG_TOGGLED;
                 } else {
@@ -1353,14 +1356,21 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                 }
             }
 
+            float y_pos = objects.y[obj];
+            float last_y = objects.last_y[obj];
+
+            float object_raw_vel = (y_pos - last_y) / delta;
+
             // Check snap for player bottom
-            if (obj_gravTop(player, obj) - bottom <= clip && player->vel_y <= 0 && player->gamemode != GAMEMODE_WAVE) {
+            if (obj_gravTop(player, obj) - bottom <= clip && player->vel_y <= fmaxf(object_raw_vel, 0) && player->gamemode != GAMEMODE_WAVE) {
                 player->y = grav(player, obj_gravTop(player, obj)) + grav(player, player->height / 2);
                 if (player->vel_y <= 0) player->vel_y = 0;
                 player->on_ground = true;
                 player->inverse_rotation = false;
                 player->time_since_ground = 0;
                 player_non_flying_landing(player);
+
+                player->collided_block = obj;
 
                 if (player->gamemode == GAMEMODE_PLAYER) {
                     // Check for x snap
@@ -1372,7 +1382,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
 
                     player->snap_data.player_frame = level_frame;
                     player->snap_data.object_id = obj;
-                    player->snap_data.player_snap_diff = player->x - objects.x[obj];
+                    player->snap_data.player_snap_diff = player->x - x;
                 }
             // Check snap for player top
             } else if (player->gamemode != GAMEMODE_WAVE) {
@@ -1402,6 +1412,41 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
     }
 }
 
+void handle_moving_block(Player *player, int obj) {
+    float y_pos = objects.y[obj];
+    float last_y = objects.last_y[obj];
+
+    bool launch = false;
+    bool drop = false;
+
+    float object_raw_vel = (y_pos - last_y) / delta;
+    float object_velocity = fabsf(object_raw_vel);
+    if (player->upside_down) {
+        if (last_y < y_pos) {
+            // Falling
+            drop = true;
+        } else {
+            // Rising
+            launch = true;
+        }
+    } else {
+        if (last_y > y_pos) {
+            // Falling
+            drop = true;
+        } else {
+            // Rising
+            launch = true;
+        }
+    }
+
+    if (launch && object_velocity > MINIMUM_OBJECT_SPEED) {
+        player->vel_y = object_velocity;
+        player->on_ground = false;
+    } else if (drop && object_velocity <= MINIMUM_OBJECT_SPEED) {
+        if (player->vel_y < -player->gravity * STEPS_DT) player->vel_y -= object_velocity;
+    }
+}
+
 void collide_with_obj(Player *player, int obj) {
     int obj_id = objects.id[obj];
     const ObjectHitbox *hitbox = game_objects[obj_id].hitbox;
@@ -1422,7 +1467,7 @@ void collide_with_obj(Player *player, int obj) {
     float off_y = raw_off_x * sin_r + raw_off_y * cos_r;
     
     float x = objects.x[obj] + off_x;
-    float y = objects.y[obj] + off_y;
+    float y = get_lerped_y(obj) + off_y;
     float width = objects.width[obj];
     float height = objects.height[obj];
 
@@ -1480,7 +1525,7 @@ void collide_with_slope(Player *player, int obj, bool has_slope) {
 
     if (intersect(
         player->x, player->y, player->width, player->height, 0, 
-        objects.x[obj], objects.y[obj], width, height, objects.rotation[obj]
+        get_lerped_x(obj), get_lerped_y(obj), width, height, objects.rotation[obj]
     )) {
         slope_collide(obj, player);
     }
@@ -1499,6 +1544,13 @@ int potential_slopes_buffer[2][MAX_COLLIDED_OBJECTS];
 int potential_slopes[2];
 
 void collide_with_objects(Player *player) {
+    player->last_collided_block = player->collided_block;
+    player->collided_block = -1;
+
+    if (player->last_collided_block >= 0) {
+        handle_moving_block(player, player->last_collided_block);
+    }
+    
     int sx = (int)(player->x / SECTION_SIZE);
     int sy = (int)(player->y / SECTION_SIZE);
     

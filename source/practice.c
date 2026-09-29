@@ -402,6 +402,8 @@ void restore_checkpoint() {
         int oi = check->move_obj_index[i];
         objects.x[oi] = check->move_obj_x[i];
         objects.y[oi] = check->move_obj_y[i];
+        objects.last_x[oi] = check->move_obj_x[i];
+        objects.last_y[oi] = check->move_obj_y[i];
         update_object_section(oi);
     }
     for (int i = 0; i < check->alpha_obj_count; i++) {

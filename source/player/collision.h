@@ -12,6 +12,8 @@ enum JumpType {
     JUMP_TYPES_COUNT
 };
 
+#define MINIMUM_OBJECT_SPEED 315
+
 #define GET_ACTIVATED(obj) \
     ((objects.activated[(obj)] >> state.current_player) & 1)
 

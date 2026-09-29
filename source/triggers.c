@@ -644,7 +644,12 @@ void handle_move_triggers(void) {
                 int group_obj = cur->obj;
                 int old_sx = objects.section_x[group_obj];
                 int old_sy = objects.section_y[group_obj];
-                if (objects.flags[group_obj] & FLAG_CAN_BE_X_MOVED) objects.x[group_obj] += delta_x;
+                if (objects.flags[group_obj] & FLAG_CAN_BE_X_MOVED) {
+                    objects.last_x[group_obj] = objects.x[group_obj];
+                    objects.x[group_obj] += delta_x;   
+                }
+
+                objects.last_y[group_obj] = objects.y[group_obj];
                 objects.y[group_obj] += delta_y;
                 objects.flags[group_obj] |= FLAG_DIRTY;
                 int new_sx = (int)(objects.x[group_obj] / SECTION_SIZE);

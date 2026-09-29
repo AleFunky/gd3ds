@@ -91,6 +91,9 @@ float global_volume;
 float music_volume;
 float sound_volume;
 
+int steps = 0;
+int last_steps = 0;
+
 bool cheats_used[CHEAT_COUNT];
 
 const char *cheat_names[CHEAT_COUNT] = {
@@ -860,8 +863,6 @@ void game_loop() {
             cheats_used[CHEAT_HITBOX_DISPLAY] = true;
         }
         
-        int steps = 0;
-        
         kHeldPaused &= ~touch.up;
         if(!game_paused){
             touch.held &= ~kHeldPaused;
@@ -914,6 +915,9 @@ void game_loop() {
                     if (!being_faded) fixed_dt = false;
                 }
                 accumulator += physics_delta;
+                
+                last_steps = steps;
+                steps = 0;
 
                 // in case of merge conflicts: this needs to stay after the accumulator deposit above.
                 // planned is how many substeps this frame is about to run, so if we calculate it

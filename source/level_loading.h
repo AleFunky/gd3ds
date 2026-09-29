@@ -147,6 +147,7 @@ typedef struct {
 
     int *id;
     float *x, *y;
+    float *last_x, *last_y;
     float *rotation;
     float *visual_rotation;
     int *zlayer, *zorder;

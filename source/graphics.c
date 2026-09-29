@@ -2076,7 +2076,7 @@ void draw_objects() {
 
             change_blending(obj->blending);
             
-            C2D_DrawImageFast(obj->spr.image, obj->params, &obj->spr.params, obj->tint);
+            C2D_DrawImageFast(&obj->spr.image, &obj->params, &obj->spr.params, obj->tint);
         } else {   
             C2D_ViewRestore(&object_view);
             draw_player_graphics();
