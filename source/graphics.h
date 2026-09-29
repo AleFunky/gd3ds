@@ -43,6 +43,7 @@ typedef struct {
     u32 tint;
     QuadParams params;
     float opacity;
+    float rotation;
     int obj;
     short col_channel;
     unsigned char col_type;

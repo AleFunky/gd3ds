@@ -585,6 +585,7 @@ float get_rotation_speed(int obj) {
         case 1055:
         case 1056:
         case 1057:
+        case GREEN_ORB:
             return 180.f;
         case 1019:
             return 180.f + map_range(objects.random[obj] & 0xff, 0, 255, -10, 10);
@@ -1016,9 +1017,21 @@ static inline uint32_t make_sort_key(SpriteObject *s)
     // Glow layers always use spritesheet 2 (only for sorting purposes)
     int sheet;
     if (s->layer == 1) {
-        sheet = 2;
+        sheet = 0;
     } else {
-        sheet = tex < SPRITESHEET2_START || tex >= SPRITESHEET3_START ? 1 : 0;
+        sheet = tex < SPRITESHEET2_START || tex >= SPRITESHEET3_START ? 1 : 2;
+        // Some animated object are in sheet 3
+        switch (id) {
+            case 918:
+            case 1327:
+            case 1328:
+            case 920:
+            case 921:
+            case 923:
+            case 924:
+                sheet = 3;
+                break;
+        }
     }
 
     // Move the pulserod ball
@@ -1030,12 +1043,11 @@ static inline uint32_t make_sort_key(SpriteObject *s)
 
     // Pack all variables into a nice 32 bit variable
     uint32_t zl = (uint32_t)(zlayer + 8);     // fits in 6 bits
-    uint32_t zb = (uint32_t)(blending);       // fits in 1 bit
-    uint32_t zs = (uint32_t)(sheet);          // fits in 1 bit
+    uint32_t zs = (uint32_t)(3 - sheet);          // fits in 2 bit
     uint32_t zo = (uint32_t)(zorder + 128);   // fits in 8 bits
     uint32_t cz = (uint32_t)(child_z + 128);  // fits in 8 bits
 
-    return (zl << 18) | (zb << 17) | (zs << 16) | (zo << 8) | cz;
+    return (zl << 18) | (zs << 16) | (zo << 8) | cz;
 }
 
 void sort_viewable_objects(SpriteObject **objects, int count) {
@@ -1093,7 +1105,10 @@ int get_object_layers(int id) {
 }
 
 static int get_object_sprite_total(int obj) {
-    const GameObject *game_object = &game_objects[objects.id[obj]];
+    int id = objects.id[obj];
+    if (id < 0 || id >= GAME_OBJECT_COUNT) return 0;
+    
+    const GameObject *game_object = &game_objects[id];
     int count = get_object_layers(objects.id[obj]);
     if (game_object->glow_frame >= 0) count++;
 
@@ -1831,7 +1846,7 @@ void create_objects() {
         // The rotating objects need to be recalculated
         float rotation_speed = get_rotation_speed(obj);
         if (rotation_speed != 0) {
-            objects.rotation[obj] += ((objects.random[obj] & 1) ? -rotation_speed : rotation_speed) * delta;
+            objects.visual_rotation[obj] += ((objects.random[obj] & 1) ? -rotation_speed : rotation_speed) * delta;
             objects.flags[obj] |= FLAG_DIRTY;
         }
 
@@ -1948,7 +1963,7 @@ void create_objects() {
             objects.id[obj],        
             world_x + fade_x_world,
             world_y + fade_y, 
-            objects.rotation[obj],
+            objects.visual_rotation[obj],
             objects.flippedH[obj] ^ (state.mirror_mult < 0),
             objects.flippedV[obj], 
             fade_scale

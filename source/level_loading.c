@@ -1094,7 +1094,10 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
             if (type == GD_VAL_BOOL) objects.flippedV[object] = val.b;
             break;
         case 6:  // Rotation
-            if (type == GD_VAL_FLOAT) objects.rotation[object] = val.f;
+            if (type == GD_VAL_FLOAT) {
+                objects.rotation[object] = val.f;
+                objects.visual_rotation[object] = val.f;
+            }
             break;
         case 7:  // Color R
             if (type == GD_VAL_INT) {
@@ -1691,6 +1694,7 @@ void free_arrays() {
     if (objects.x)                  { free(objects.x);                  objects.x = NULL; }
     if (objects.y)                  { free(objects.y);                  objects.y = NULL; }
     if (objects.rotation)           { free(objects.rotation);           objects.rotation = NULL; }
+    if (objects.visual_rotation)    { free(objects.visual_rotation);    objects.visual_rotation = NULL; }
     if (objects.zlayer)             { free(objects.zlayer);             objects.zlayer = NULL; }
     if (objects.zorder)             { free(objects.zorder);             objects.zorder = NULL; }
     if (objects.opacity)            { free(objects.opacity);            objects.opacity = NULL; }
@@ -1757,6 +1761,9 @@ bool init_arrays(size_t count) {
 
     objects.rotation = malloc(sizeof(float) * count);
     if (!objects.rotation) return false;
+
+    objects.visual_rotation = malloc(sizeof(float) * count);
+    if (!objects.visual_rotation) return false;
 
     objects.zlayer = malloc(sizeof(int) * count);
     if (!objects.zlayer) return false;
@@ -1911,6 +1918,7 @@ bool init_arrays(size_t count) {
     memset(objects.x,                  0, sizeof(float) * count);
     memset(objects.y,                  0, sizeof(float) * count);
     memset(objects.rotation,           0, sizeof(float) * count);
+    memset(objects.visual_rotation,    0, sizeof(float) * count);
     memset(objects.zlayer,             0, sizeof(int) * count);
     memset(objects.zorder,             0, sizeof(int) * count);
     memset(objects.opacity,            0, sizeof(float) * count);
@@ -2270,7 +2278,7 @@ static void generate_orange_portals(int orange_start) {
         objects.id[oi]           = ORANGE_TP_PORTAL;
         objects.x[oi]            = objects.x[i] - x_off;
         objects.y[oi]            = objects.y[i] + objects.tp_y_offset[i];
-        objects.rotation[oi]     = objects.rotation[i] + 180.0f;
+        objects.rotation[oi]     = adjust_angle_y(objects.rotation[i], objects.flippedH[i]) + 180.0f;
         objects.flippedH[oi]     = false;
         objects.flippedV[oi]     = false;
         objects.opacity[oi]      = 1.0f;

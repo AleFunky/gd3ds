@@ -148,6 +148,7 @@ typedef struct {
     int *id;
     float *x, *y;
     float *rotation;
+    float *visual_rotation;
     int *zlayer, *zorder;
     float *opacity;
     float *alpha_trigger_opacity;
