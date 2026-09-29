@@ -1737,6 +1737,7 @@ void update_tints() {
                 col = channels[get_col_channel_index(col_channel)];
             }
             
+            
             int game_object = obj->obj;
 
             if (obj->col_type != COLOR_TYPE_DETAIL) {
@@ -1755,6 +1756,22 @@ void update_tints() {
                 if (objects.num_detail_pulses[game_object] == 0) {
                     objects.detail_color[game_object] = col.color;
                 }
+            }
+
+            switch (obj->col_type) {
+                case COLOR_TYPE_GLOW:
+                    col.blending = true;
+                    break;
+                case COLOR_TYPE_BLACK:
+                    col.color = (Color) {0,0,0};
+                    break;
+                case COLOR_TYPE_WHITE:
+                    if (level_is_unrated_online() && objects.id[game_object] == SECRET_COIN) {
+                        col.color = (Color) {USER_COIN_UNRATED_R, USER_COIN_UNRATED_G, USER_COIN_UNRATED_B};
+                    } else {
+                        col.color = (Color) {255,255,255};
+                    }
+                    break;
             }
 
             if (obj->col_type != COLOR_TYPE_DETAIL && objects.main_being_pulsed[game_object] && col_channel >= 0) {
@@ -1788,22 +1805,6 @@ void update_tints() {
 
             // Set opacity here
             objects.opacity[game_object] = real_opacity / 255.f;
-
-            switch (obj->col_type) {
-                case COLOR_TYPE_GLOW:
-                    col.blending = true;
-                    break;
-                case COLOR_TYPE_BLACK:
-                    col.color = (Color) {0,0,0};
-                    break;
-                case COLOR_TYPE_WHITE:
-                    if (level_is_unrated_online() && objects.id[game_object] == SECRET_COIN) {
-                        col.color = (Color) {USER_COIN_UNRATED_R, USER_COIN_UNRATED_G, USER_COIN_UNRATED_B};
-                    } else {
-                        col.color = (Color) {255,255,255};
-                    }
-                    break;
-            }
 
             obj->blending = col.blending;
             obj->hidden = (real_opacity == 0) || (col.blending && (col.color.r | col.color.g | col.color.b) == 0);
