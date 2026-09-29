@@ -2511,6 +2511,8 @@ void reload_level() {
         objects.transition_applied[i] = FADE_NONE;
         objects.flags[i] &= ~FLAG_TOGGLED;
         objects.opacity[i] = 1.f;
+        if (objects.x[i] != objects.original_x[i] || objects.y[i] != objects.original_y[i])
+            objects.flags[i] |= FLAG_DIRTY;
         objects.x[i] = objects.original_x[i];
         objects.y[i] = objects.original_y[i];
         objects.last_x[i] = objects.original_x[i];
