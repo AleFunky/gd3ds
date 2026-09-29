@@ -2279,6 +2279,7 @@ static void generate_orange_portals(int orange_start) {
         objects.x[oi]            = objects.x[i] - x_off;
         objects.y[oi]            = objects.y[i] + objects.tp_y_offset[i];
         objects.rotation[oi]     = adjust_angle_y(objects.rotation[i], objects.flippedH[i]) + 180.0f;
+        objects.visual_rotation[oi] = objects.rotation[oi];
         objects.flippedH[oi]     = false;
         objects.flippedV[oi]     = false;
         objects.opacity[oi]      = 1.0f;

@@ -978,7 +978,7 @@ static inline uint32_t make_sort_key(SpriteObject *s)
 
     // Player sprite is -1 so handle it there
     if (obj == -1) {
-        return ((4 + 8) << 18) | (0 << 16) | (255 << 8) | 128;
+        return ((4 + 8) << 18) | (2 << 16) | (255 << 8) | 128;
     }
 
     const int id = objects.id[obj];
@@ -1107,7 +1107,7 @@ int get_object_layers(int id) {
 static int get_object_sprite_total(int obj) {
     int id = objects.id[obj];
     if (id < 0 || id >= GAME_OBJECT_COUNT) return 0;
-    
+
     const GameObject *game_object = &game_objects[id];
     int count = get_object_layers(objects.id[obj]);
     if (game_object->glow_frame >= 0) count++;
