@@ -2038,7 +2038,7 @@ void draw_player_graphics() {
     if (level_info.wall_y > 0) {
         drawParticleSystem(&end_wall_particles, 0, 0, 1);
         // Render rays
-        draw_rays(delta);
+        draw_rays();
     }
     draw_object_particles();
     draw_player_effects();

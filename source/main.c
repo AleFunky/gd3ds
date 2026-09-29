@@ -11,6 +11,7 @@
 #include "level_loading.h"
 #include "main.h"
 #include "graphics.h"
+#include "particles/rays.h"
 #include "triggers.h"
 #include "menus/core/ui_element.h"
 #include "mp3_player.h"
@@ -1145,6 +1146,7 @@ void game_loop() {
 
             u64 start_part = svcGetSystemTick();
             update_player_effects(delta);
+            update_rays(delta);
 
             // End wall particles
             if (level_info.wall_y > 0) {
