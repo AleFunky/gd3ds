@@ -46,7 +46,7 @@ static void ui_icon_draw(UIElement* e, UITransform *transform) {
             icon->glow_color,
             (IconParameters) { 
                 .robot_anim_frame = 0,
-                .robot_anim_id = ROBOT_ANIM_FALL
+                .robot_anim_id = ROBOT_ANIM_IDLE
             }
         );
     }
