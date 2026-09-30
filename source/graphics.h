@@ -140,6 +140,12 @@ void draw_background(float x, float y);
 void draw_ground(float cam_x, float cam_y, float y, bool is_ceiling, int screen_width);
 void update_player_colors();
 void set_player_colors(Color p1, Color p2, Color glow);
+
+typedef struct {
+    int robot_anim_id;
+    int robot_anim_frame;
+} IconParameters;
+
 void spawn_icon_at(
     int gamemode,
     int id,
@@ -152,7 +158,8 @@ void spawn_icon_at(
     float scale,
     u32 p1_color,
     u32 p2_color,
-    u32 glow_color
+    u32 glow_color,
+    IconParameters params
 );
 void spawn_p1_layer_at(
     int gamemode,
@@ -163,7 +170,8 @@ void spawn_p1_layer_at(
     unsigned char flip_x,
     unsigned char flip_y,
     float scale,
-    u32 p1_color
+    u32 p1_color,
+    IconParameters params
 );
 
 void spawn_glow_layer_at(
@@ -175,7 +183,8 @@ void spawn_glow_layer_at(
     unsigned char flip_x,
     unsigned char flip_y,
     float scale,
-    u32 glow_color
+    u32 glow_color,
+    IconParameters params
 );
 
 Color get_color_abgr8(u32 color);

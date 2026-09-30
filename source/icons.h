@@ -2,6 +2,13 @@
 
 #include <stddef.h>
 
+typedef enum {
+ ICON_COLOR_WHITE = 0,
+ ICON_COLOR_P1,
+ ICON_COLOR_P2,
+ ICON_COLOR_GLOW
+} IconColorType;
+
 typedef struct {
  int atlas;
  int texture;
@@ -10,8 +17,9 @@ typedef struct {
  int flip_x, flip_y;
  int z;
  float rot;
- int color_type;
+ IconColorType color_type;
  float opacity;
+ int animation_part;
 } IconPart;
 
 typedef struct {
@@ -25,7 +33,8 @@ typedef enum {
  GAMEMODE_BALL,
  GAMEMODE_UFO,
  GAMEMODE_WAVE,
- GAMEMODE_ROBOT = 5,
+ GAMEMODE_ROBOT,
+ GAMEMODE_COUNT
 } IconGamemode;
 
 #define GAMEMODE_COUNT 6
@@ -38,8 +47,7 @@ typedef enum {
 #define ICON_COUNT_PLAYER_BALL 119
 #define ICON_COUNT_BIRD 150
 #define ICON_COUNT_DART 97
-#define ICON_COUNT_ROBOT 2
-#define TRAIL_COUNT 17
+#define ICON_COUNT_ROBOT 69
 
 #define ATLAS_COUNT_PLAYER 2
 #define ATLAS_COUNT_SHIP 1
@@ -47,5 +55,6 @@ typedef enum {
 #define ATLAS_COUNT_BIRD 1
 #define ATLAS_COUNT_DART 1
 #define ATLAS_COUNT_ROBOT 1
+#define TRAIL_COUNT 17
 
 extern const Icon* icons[ICON_GAMEMODE_COUNT];

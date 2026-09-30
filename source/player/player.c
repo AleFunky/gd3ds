@@ -601,7 +601,7 @@ void robot_gamemode(Player *player) {
         slope_data = player->coyote_slope;
     }
 
-    if (slope_data.slope_id < 0) {
+    if (player->snap_rotation) {
         player->rotation = 0;
     }
 
@@ -842,20 +842,35 @@ void run_player(Player *player) {
         }
     }
 
-    // Handle rotation for ship and wave
-    if (player->gamemode == GAMEMODE_PLAYER) {
-        float lerp_speed = player_speed_mults[state.speed] * 0.175f;
+    float lerp_speed = player_speed_mults[state.speed] * 0.175f;
 
-        if (player->on_ground || player->slope_data.slope_id >= 0) {
-            lerp_speed *= 3.0f;
-            player->rotation = RadToDeg(slerp_fancy(DegToRad(player->rotation), DegToRad(player->cube_target_rotation), MIN(STEPS_DT, STEPS_DT * lerp_speed) * 60));
-        } else {
-            player->rotation = player->cube_target_rotation;
-        }
+    // Handle rotation for ship and wave
+    switch (player->gamemode) {
+        case GAMEMODE_PLAYER:
+            if (player->on_ground || player->slope_data.slope_id >= 0) {
+                lerp_speed *= 3.0f;
+                player->rotation = RadToDeg(slerp_fancy(DegToRad(player->rotation), DegToRad(player->cube_target_rotation), MIN(STEPS_DT, STEPS_DT * lerp_speed) * 60));
+            } else {
+                player->rotation = player->cube_target_rotation;
+            }
+            break;
+        case GAMEMODE_SHIP:
+            rotate_fly(player, 0.15f);
+            break;
+        case GAMEMODE_UFO:
+            rotate_fly(player, 0.07f);
+            break;
+        case GAMEMODE_WAVE:
+            rotate_fly(player, player->mini ? 0.4f : 0.25f);
+            break;
+        case GAMEMODE_ROBOT:
+            float angle_rad = 0;
+            if (player->slope_data.slope_id >= 0) {
+                angle_rad = slope_snap_angle(player->slope_data.slope_id, player);
+            }
+            player->rotation = RadToDeg(slerp_fancy(DegToRad(player->rotation), angle_rad, MIN(STEPS_DT, STEPS_DT * lerp_speed) * 60));
+            break;       
     }
-    if (player->gamemode == GAMEMODE_SHIP) rotate_fly(player, 0.15f);
-    if (player->gamemode == GAMEMODE_WAVE) rotate_fly(player, player->mini ? 0.4f : 0.25f);
-    if (player->gamemode == GAMEMODE_UFO) rotate_fly(player, 0.07f);
 
     player->snap_rotation = false;
 
@@ -1082,7 +1097,11 @@ void draw_p1_trail(Player *player, int player_id) {
                 trail_data->rot,  
                 flip_x, trail_data->upside_down,
                 trail_data->scale,
-                color
+                color,
+                (IconParameters) { 
+                    .robot_anim_frame = player->robot_anim_frame,
+                    .robot_anim_id = player->robot_anim_id
+                 }
             );
         }
     }
@@ -1144,8 +1163,7 @@ void draw_player(Player *player) {
     int selected_ball = player->player_icons.ball;
     int selected_ufo =  player->player_icons.ufo;
     int selected_wave = player->player_icons.wave;
-
-
+    int selected_robot = player->player_icons.robot;
 
     bool glow_enabled = (player->player_icons.glow || ((p1_color.r | p1_color.g | p1_color.b) == 0));
 
@@ -1154,94 +1172,76 @@ void draw_player(Player *player) {
             spawn_icon_at(GAMEMODE_PLAYER, (settingsState.defaultMiniIcon && player->mini) ? 0 : selected_cube, glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, false, scale, 
                 primary_color,
                 secondary_color,
-                C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
+                C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255),
+                (IconParameters) { 0 }
             );
             break;
         case GAMEMODE_SHIP:
-            if (glow_enabled) spawn_glow_layer_at(GAMEMODE_SHIP, selected_ship, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale, C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255));
+            if (glow_enabled) {
+                spawn_glow_layer_at(GAMEMODE_SHIP, selected_ship, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale, 
+                    C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255), 
+                    (IconParameters) { 0 }
+                );
+            }
             spawn_icon_at(GAMEMODE_PLAYER, (settingsState.defaultMiniIcon && player->mini) ? 0 : selected_cube, glow_enabled, p_x, p_y, p_rot, flip_x, player->upside_down, scale * 0.5f, 
                 primary_color,
                 secondary_color,
-                C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
+                C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255),
+                (IconParameters) { 0 }
             );
             spawn_icon_at(GAMEMODE_SHIP, selected_ship, glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale, 
                 primary_color,
                 secondary_color,
-                0
+                0,
+                (IconParameters) { 0 }
             );
             break;
         case GAMEMODE_BALL:
             spawn_icon_at(GAMEMODE_BALL, (settingsState.defaultMiniIcon && player->mini) ? 0 : selected_ball, glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, false, scale, 
                 primary_color,
                 secondary_color,
-                C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
+                C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255),
+                (IconParameters) { 0 }
             );
             break;
         case GAMEMODE_UFO:
-            if (glow_enabled) spawn_glow_layer_at(GAMEMODE_UFO, selected_ufo, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale, C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255));
+            if (glow_enabled) {
+                spawn_glow_layer_at(GAMEMODE_UFO, selected_ufo, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale,
+                    C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255),
+                    (IconParameters) { 0 }
+            );
+            }
             spawn_icon_at(GAMEMODE_PLAYER, (settingsState.defaultMiniIcon && player->mini) ? 0 : selected_cube, glow_enabled, p_x, p_y, p_rot, flip_x, player->upside_down, scale * 0.5f, 
                 primary_color,
                 secondary_color,
-                C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
+                C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255),
+                (IconParameters) { 0 }
             );
             spawn_icon_at(GAMEMODE_UFO, selected_ufo, glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale, 
                 primary_color,
                 secondary_color,
-                0
+                0,
+                (IconParameters) { 0 }
             );
             break;    
         case GAMEMODE_WAVE:
             spawn_icon_at(GAMEMODE_WAVE, selected_wave, glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale, 
                 primary_color,
                 secondary_color,
-                C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
+                C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255),
+                (IconParameters) { 0 }
             );
             break;
         case GAMEMODE_ROBOT: {
-            const RobotAnimation *anim = &robot_animations[player->robot_anim_id];
-            if (player->robot_anim_frame >= anim->frame_count)
-                player->robot_anim_frame = 0;
-            const RobotFrame *frame = &anim->frames[player->robot_anim_frame];
-
-            static const int robot_l1_atlas[] = {4,2,6,0,4,2,6};
-            static const int robot_l2_atlas[] = {5,3,7,1,5,3,7};
-
-            #define ROBOT_SCALE 2.0f
-            float cos_rot = cosf(C3D_AngleFromDegrees(-player->rotation));
-            float sin_rot = sinf(C3D_AngleFromDegrees(-player->rotation));
-
-            for (int i = 0; i < frame->part_count; i++) {
-                const RobotSpritePart *part = &frame->parts[i];
-
-                float part_x = part->px;
-                float part_y = part->py * flip_y_mult;
-
-                float rotated_x = (part_x * cos_rot - part_y * sin_rot) * scale * ROBOT_SCALE;
-                float rotated_y = (part_x * sin_rot + part_y * cos_rot) * scale * ROBOT_SCALE;
-
-                float pos_x = calc_x_mirror + rotated_x * state.mirror_mult;
-                float pos_y = calc_y - rotated_y;
-
-                float final_rot = C3D_AngleFromDegrees((part->rotation + player->rotation) * state.mirror_mult);
-                float sx = scale * part->scale_x * (flip_x ? -1 : 1);
-                float sy = scale * part->scale_y * flip_y_mult;
-
-                for (int layer = 0; layer < 2; layer++) {
-                    int atlas_idx = (layer == 0) ? robot_l2_atlas[i] : robot_l1_atlas[i];
-                    u32 tint_color = (layer == 0) ? secondary_color : primary_color;
-
-                    C2D_Sprite spr;
-                    C2D_SpriteFromSheet(&spr, robotSheet, atlas_idx);
-                    C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
-                    C2D_SpriteSetPos(&spr, pos_x, pos_y);
-                    C2D_SpriteSetRotation(&spr, final_rot);
-                    C2D_SpriteSetScale(&spr, sx, sy);
-
-                    C2D_ImageTint tint;
-                    C2D_PlainImageTint(&tint, tint_color, 1.0f);
-                    C2D_DrawSpriteTinted(&spr, &tint);
-                }
-            }
+            spawn_icon_at(GAMEMODE_ROBOT, selected_robot, glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale,
+                primary_color,
+                secondary_color,
+                C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255),
+                (IconParameters) { 
+                    .robot_anim_frame = player->robot_anim_frame,
+                    .robot_anim_id = player->robot_anim_id
+                 }
+            );
             break;
         }
     }

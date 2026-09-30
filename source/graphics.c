@@ -1,11 +1,13 @@
 #include "graphics.h"
 #include "c2d/base.h"
 #include "c2d/spritesheet.h"
+#include "c3d/maths.h"
 #include "level_loading.h"
 #include "objects.h"
 #include "animations.h"
 #include "main.h"
 #include "math_helpers.h"
+#include "player/robot_anim_data.h"
 #include "triggers.h"
 #include <stdlib.h>
 #include <string.h>
@@ -2231,6 +2233,219 @@ C2D_SpriteSheet *get_icon_sheet(const IconPart *part, int gamemode) {
     }
     return NULL;
 }
+/*
+static void robot_icon(
+    float x,
+    float y,
+    float deg,
+    unsigned char flip_x,
+    unsigned char flip_y,
+    int robot_anim_id,
+    int robot_anim_frame,
+    float flip_y_mult, float scale, C2D_ImageTint *tints
+) {
+
+    float cos_rot = cosf(C3D_AngleFromDegrees(deg));
+    float sin_rot = sinf(C3D_AngleFromDegrees(deg));
+
+    for (int i = 0; i < frame->part_count; i++) {
+        const RobotSpritePart *part = &frame->parts[i];
+
+        float part_x = part->px;
+        float part_y = part->py * flip_y_mult;
+
+        float rotated_x = (part_x * cos_rot - part_y * sin_rot) * scale;
+        float rotated_y = (part_x * sin_rot + part_y * cos_rot) * scale;
+
+        float pos_x = calc_x_mirror + rotated_x * state.mirror_mult;
+        float pos_y = calc_y - rotated_y;
+
+        float final_rot = C3D_AngleFromDegrees((part->rotation + player->rotation) * state.mirror_mult);
+        float sx = scale * part->scale_x * (flip_x ? -1 : 1);
+        float sy = scale * part->scale_y * flip_y_mult;
+
+        for (int layer = 0; layer < 2; layer++) {
+            int atlas_idx = (layer == 0) ? robot_l2_atlas[i] : robot_l1_atlas[i];
+            u32 tint_color = (layer == 0) ? secondary_color : primary_color;
+
+            C2D_Sprite spr;
+            C2D_SpriteFromSheet(&spr, robotSheet, atlas_idx);
+            C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
+            C2D_SpriteSetPos(&spr, pos_x, pos_y);
+            C2D_SpriteSetRotation(&spr, final_rot);
+            C2D_SpriteSetScale(&spr, sx, sy);
+
+            C2D_ImageTint tint;
+            C2D_PlainImageTint(&tint, tint_color, 1.0f);
+            C2D_DrawSpriteTinted(&spr, &tint);
+        }
+    }
+    break;
+}*/
+
+static void spawn_icon_at_internal(
+    int gamemode,
+    int id,
+    bool glow,
+    float x,
+    float y,
+    float deg,
+    unsigned char flip_x,
+    unsigned char flip_y,
+    float scale,
+    u32 p1_color,
+    u32 p2_color,
+    u32 glow_color,
+    IconParameters params
+) {
+    const Icon icon = icons[gamemode][id];
+    const IconPart *parts = icon.parts;
+
+    float rad = C3D_AngleFromDegrees(deg);
+    float cos_r = cosf(rad);
+    float sin_r = sinf(rad);
+
+    int flip_x_mult = (flip_x ? -1 : 1);
+    int flip_y_mult = (flip_y ? -1 : 1);
+
+    float sx = scale * flip_x_mult;
+    float sy = scale * flip_y_mult;
+
+    C2D_Sprite spr = { 0 };
+
+    int count = icon.part_count;
+
+    if (icon.part_count < 2) return;
+
+    C2D_ImageTint tints[4];
+
+    C2D_PlainImageTint(&tints[ICON_COLOR_WHITE], C2D_Color32(255, 255, 255, 255), 1.0f);
+    C2D_PlainImageTint(&tints[ICON_COLOR_P1], p1_color, 1.0f);
+    C2D_PlainImageTint(&tints[ICON_COLOR_P2], p2_color, 1.0f);
+
+    if (glow) {
+        C2D_PlainImageTint(&tints[ICON_COLOR_GLOW], glow_color, 1.0f);
+    } else {
+        C2D_PlainImageTint(&tints[ICON_COLOR_GLOW], 0, 1.0f);
+    }
+
+    if (gamemode == GAMEMODE_ROBOT) {
+        const RobotAnimation *anim = &robot_animations[params.robot_anim_id];
+        if (params.robot_anim_frame >= anim->frame_count)
+            params.robot_anim_frame = 0;
+        const RobotFrame *frame = &anim->frames[params.robot_anim_frame];
+        
+        for (int i = 0; i < frame->part_count; i++) {
+            const RobotSpritePart *animation_part = &frame->parts[i];
+
+            int texture_part = animation_part->texture_idx / 2;
+        
+            size_t index;
+            for (index = 0; index < count; index++) {
+                const IconPart *part = &parts[index];
+                if (part->animation_part - 1 == texture_part) {
+                    break;
+                }
+            }
+            
+            if (index == count) continue;
+
+            // Find layer count
+            size_t layer_count = 0;
+            while (index + layer_count < count) {
+                const IconPart *test_part = &parts[index + layer_count];
+
+                if (test_part->animation_part - 1 != texture_part)
+                    break;
+
+                layer_count++;
+            }
+
+            for (size_t j = 0; j < layer_count; j++) {
+                int real_index = j;
+
+                // Swap p1 and p2
+                if (j==0) real_index = 1;
+                else if (j==1) real_index = 0;
+
+                const IconPart *part = &parts[index + real_index];
+
+                C2D_SpriteSheet *sheet = get_icon_sheet(part, gamemode);
+                if (!sheet) return;
+
+                if (part->texture >= 0) {
+                    float part_rad = rad + C3D_AngleFromDegrees(animation_part->rotation);
+                    float part_cos_r = cosf(part_rad);
+                    float part_sin_r = sinf(part_rad);
+
+                    float anim_x = animation_part->px * 2.0f;
+                    float anim_y = animation_part->py * 2.0f;
+
+                    float part_x = part->x;
+                    float part_y = part->y;
+
+                    float rot_anim_x = anim_x * cos_r + anim_y * sin_r;
+                    float rot_anim_y = anim_x * sin_r - anim_y * cos_r;
+
+                    float rot_part_x = part_x * part_cos_r + part_y * part_sin_r;
+                    float rot_part_y = part_x * part_sin_r - part_y * part_cos_r;
+
+                    float p_x = x + (rot_anim_x + rot_part_x) * scale * flip_x_mult;
+                    float p_y = y + (rot_anim_y + rot_part_y) * scale * flip_y_mult;
+
+                    C2D_SpriteFromSheet(&spr, *sheet, part->texture);
+                    C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
+                    C3D_TexSetFilter(spr.image.tex, GPU_LINEAR, GPU_LINEAR);
+
+                    C2D_SpriteSetPos(&spr, p_x, p_y);
+                    C2D_SpriteSetScale(&spr, sx, sy);
+                    C2D_SpriteSetRotation(&spr, rad + C3D_AngleFromDegrees(animation_part->rotation));
+
+                    C2D_DrawSpriteTinted(&spr, &tints[part->color_type]);
+                }
+            }
+        }
+    } else {
+        for (size_t i = 0; i < count; i++) {
+            size_t real_index = i;
+            // Swap p1 and p2 layers
+            if (i==0) real_index = 1;
+            else if (i==1) real_index = 0;
+
+            if (gamemode == GAMEMODE_UFO) {
+                if (i==2) real_index = 0;
+                else if (i < 2) real_index++;
+            }
+            
+            const IconPart *part = &parts[real_index];
+            C2D_SpriteSheet *sheet = get_icon_sheet(part, gamemode);
+            if (!sheet) return;
+
+            if (part->texture >= 0) {
+
+                float local_x = part->x * flip_x_mult;
+                float local_y = part->y * flip_y_mult;
+
+                float rot_x = local_x * cos_r + local_y * sin_r;
+                float rot_y = local_x * sin_r - local_y * cos_r;
+
+                float p_x = x + rot_x * scale;
+                float p_y = y + rot_y * scale;
+
+                C2D_SpriteFromSheet(&spr, *sheet, part->texture);
+                C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
+                C3D_TexSetFilter(spr.image.tex, GPU_LINEAR, GPU_LINEAR);
+
+                C2D_SpriteSetPos(&spr, p_x, p_y);
+                C2D_SpriteSetScale(&spr, sx, sy);
+                C2D_SpriteSetRotation(&spr, rad);
+
+                C2D_DrawSpriteTinted(&spr, &tints[part->color_type]);
+            }
+        }
+    }
+}
+
 void spawn_icon_at(
     int gamemode,
     int id,
@@ -2243,82 +2458,40 @@ void spawn_icon_at(
     float scale,
     u32 p1_color,
     u32 p2_color,
-    u32 glow_color
+    u32 glow_color,
+    IconParameters params
 ) {
-    const Icon icon = icons[gamemode][id];
-    const IconPart *parts = icon.parts;
-
-    float rad = C3D_AngleFromDegrees(deg);
-    float cos_r = cosf(rad);
-    float sin_r = sinf(rad);
-
-    int flip_x_mult = (flip_x ? -1 : 1);
-    int flip_y_mult = (flip_y ? -1 : 1);
-
-    float m00 = cos_r;
-    float m01 = sin_r;
-    float m10 = sin_r;
-    float m11 = -cos_r;
-
-    float sx = scale * flip_x_mult;
-    float sy = scale * flip_y_mult;
-
-    C2D_Sprite spr = { 0 };
-
-    int count = icon.part_count - 1;
-
-    if (icon.part_count < 2) return;
-
-    C2D_ImageTint tints[count];
-
-    for (size_t i = 0; i < count; i++) {
-        C2D_PlainImageTint(&tints[i], C2D_Color32(255, 255, 255, 255), 1.0f);
-    }
 
     if (glow) {
-        spawn_glow_layer_at(gamemode, id, x, y, deg, flip_x, flip_y, scale, glow_color);
+        spawn_glow_layer_at(
+            gamemode,
+            id,
+            x,
+            y,
+            deg,
+            flip_x,
+            flip_y,
+            scale,
+            glow_color,
+            params
+        );
     }
 
-    C2D_PlainImageTint(&tints[0], p1_color, 1.0f);
-    C2D_PlainImageTint(&tints[1], p2_color, 1.0f);
-
-    for (size_t i = 0; i < count; i++) {
-        size_t real_index = i;
-        // Swap p1 and p2 layers
-        if (i==0) real_index = 1;
-        else if (i==1) real_index = 0;
-
-        if (gamemode == GAMEMODE_UFO) {
-            if (i==2) real_index = 0;
-            else if (i < 2) real_index++;
-        }
-        
-        const IconPart *part = &parts[real_index];
-        C2D_SpriteSheet *sheet = get_icon_sheet(part, gamemode);
-        if (!sheet) return;
-
-        if (part->texture >= 0) {
-
-            float local_x = part->x * flip_x_mult;
-            float local_y = part->y * flip_y_mult;
-
-            float rot_x = local_x * m00 + local_y * m01;
-            float rot_y = local_x * m10 + local_y * m11;
-
-            float p_x = x + rot_x * scale;
-            float p_y = y + rot_y * scale;
-
-            C2D_SpriteFromSheet(&spr, *sheet, part->texture);
-            C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
-            C3D_TexSetFilter(spr.image.tex, GPU_LINEAR, GPU_LINEAR);
-
-            C2D_SpriteSetPos(&spr, p_x, p_y);
-            C2D_SpriteSetScale(&spr, sx, sy);
-            C2D_SpriteSetRotation(&spr, rad);
-
-            C2D_DrawSpriteTinted(&spr, &tints[real_index]);
-        }
-    }
+    spawn_icon_at_internal(
+        gamemode,
+        id,
+        false,
+        x,
+        y,
+        deg,
+        flip_x,
+        flip_y,
+        scale,
+        p1_color,
+        p2_color,
+        0,
+        params
+    );
 }
 
 void spawn_p1_layer_at(
@@ -2330,57 +2503,24 @@ void spawn_p1_layer_at(
     unsigned char flip_x,
     unsigned char flip_y,
     float scale,
-    u32 p1_color
+    u32 p1_color,
+    IconParameters params
 ) {
-    const Icon icon = icons[gamemode][id];
-    const IconPart *parts = icon.parts;
-
-    float rad = C3D_AngleFromDegrees(deg);
-    float cos_r = cosf(rad);
-    float sin_r = sinf(rad);
-
-    int flip_x_mult = (flip_x ? -1 : 1);
-    int flip_y_mult = (flip_y ? -1 : 1);
-
-    float m00 = cos_r;
-    float m01 = sin_r;
-    float m10 = sin_r;
-    float m11 = -cos_r;
-
-    float sx = scale * flip_x_mult;
-    float sy = scale * flip_y_mult;
-
-    C2D_Sprite spr = { 0 };
-
-    C2D_ImageTint tint;
-
-    C2D_PlainImageTint(&tint, p1_color, 1.0f);
-        
-    const IconPart *part = &parts[0];
-
-    if (part->texture >= 0) {
-        float local_x = part->x * flip_x_mult;
-        float local_y = part->y * flip_y_mult;
-
-        float rot_x = local_x * m00 + local_y * m01;
-        float rot_y = local_x * m10 + local_y * m11;
-
-        float p_x = x + rot_x * scale;
-        float p_y = y + rot_y * scale;
-        
-        C2D_SpriteSheet *sheet = get_icon_sheet(part, gamemode);
-        if (!sheet) return;
-
-        C2D_SpriteFromSheet(&spr, *sheet, part->texture);
-        C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
-        C3D_TexSetFilter(spr.image.tex, GPU_LINEAR, GPU_LINEAR);
-
-        C2D_SpriteSetPos(&spr, p_x, p_y);
-        C2D_SpriteSetScale(&spr, sx, sy);
-        C2D_SpriteSetRotation(&spr, rad);
-
-        C2D_DrawSpriteTinted(&spr, &tint);
-    }
+    spawn_icon_at_internal(
+        gamemode,
+        id,
+        false,
+        x,
+        y,
+        deg,
+        flip_x,
+        flip_y,
+        scale,
+        p1_color,
+        0,
+        0,
+        params
+    );
 }
 
 void spawn_glow_layer_at(
@@ -2392,57 +2532,24 @@ void spawn_glow_layer_at(
     unsigned char flip_x,
     unsigned char flip_y,
     float scale,
-    u32 glow_color
+    u32 glow_color,
+    IconParameters params
 ) {
-    const Icon icon = icons[gamemode][id];
-    const IconPart *parts = icon.parts;
-
-    float rad = C3D_AngleFromDegrees(deg);
-    float cos_r = cosf(rad);
-    float sin_r = sinf(rad);
-
-    int flip_x_mult = (flip_x ? -1 : 1);
-    int flip_y_mult = (flip_y ? -1 : 1);
-
-    float m00 = cos_r;
-    float m01 = sin_r;
-    float m10 = sin_r;
-    float m11 = -cos_r;
-
-    float sx = scale * flip_x_mult;
-    float sy = scale * flip_y_mult;
-
-    C2D_Sprite spr = { 0 };
-
-    C2D_ImageTint tint;
-
-    C2D_PlainImageTint(&tint, glow_color, 1.0f);
-        
-    const IconPart *part = &parts[icon.part_count - 1];
-
-    if (part->texture >= 0) {
-        float local_x = part->x * flip_x_mult;
-        float local_y = part->y * flip_y_mult;
-
-        float rot_x = local_x * m00 + local_y * m01;
-        float rot_y = local_x * m10 + local_y * m11;
-
-        float p_x = x + rot_x * scale;
-        float p_y = y + rot_y * scale;
-        
-        C2D_SpriteSheet *sheet = get_icon_sheet(part, gamemode);
-        if (!sheet) return;
-
-        C2D_SpriteFromSheet(&spr, *sheet, part->texture);
-        C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
-        C3D_TexSetFilter(spr.image.tex, GPU_LINEAR, GPU_LINEAR);
-
-        C2D_SpriteSetPos(&spr, p_x, p_y);
-        C2D_SpriteSetScale(&spr, sx, sy);
-        C2D_SpriteSetRotation(&spr, rad);
-
-        C2D_DrawSpriteTinted(&spr, &tint);
-    }
+    spawn_icon_at_internal(
+        gamemode,
+        id,
+        true,
+        x,
+        y,
+        deg,
+        flip_x,
+        flip_y,
+        scale,
+        0,
+        0,
+        glow_color,
+        params
+    );
 }
 
 float approachf(float current, float target, float speed, float smoothing) {

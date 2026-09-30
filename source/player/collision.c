@@ -1416,7 +1416,6 @@ void handle_moving_block(Player *player, int obj) {
     float y_pos = objects.y[obj];
     float last_y = objects.last_y[obj];
 
-    bool launch = false;
     bool drop = false;
 
     float object_raw_vel = (y_pos - last_y) / delta;
@@ -1425,24 +1424,15 @@ void handle_moving_block(Player *player, int obj) {
         if (last_y < y_pos) {
             // Falling
             drop = true;
-        } else {
-            // Rising
-            launch = true;
         }
     } else {
         if (last_y > y_pos) {
             // Falling
             drop = true;
-        } else {
-            // Rising
-            launch = true;
         }
     }
 
-    if (launch && object_velocity > MINIMUM_OBJECT_SPEED) {
-        player->vel_y = object_velocity;
-        player->on_ground = false;
-    } else if (drop && object_velocity <= MINIMUM_OBJECT_SPEED) {
+    if (drop && object_velocity <= MINIMUM_OBJECT_SPEED) {
         if (player->vel_y < -player->gravity * STEPS_DT) player->vel_y -= object_velocity;
     }
 }
