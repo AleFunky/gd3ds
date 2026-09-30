@@ -857,8 +857,6 @@ void run_player(Player *player) {
     if (player->gamemode == GAMEMODE_UFO) rotate_fly(player, 0.07f);
 
     player->snap_rotation = false;
-    
-    player->just_teleported = false;
 
     player->buffer_ufo = false;
 }
@@ -889,6 +887,8 @@ void handle_player(Player *player) {
     player->y += player_get_vel(player, player->vel_y) * STEPS_DT;
 
     clamp_player_ground(player);
+
+    player->just_teleported = false;
 
     player->frame++;
 
@@ -1334,22 +1334,29 @@ void draw_hitbox(int obj) {
 }
 
 void draw_player_hitbox(Player *player) {
-    InternalHitbox internal = player->internal_hitbox;
     Vec2D rect[4];
-    // Rotated hitbox
-    get_corners(player->x, player->y, player->width, player->height, -player->rotation, rect);
-
-    draw_square(rect, C2D_Color32(0x7f, 0x00, 0x00, 0xff));
-
-    // Internal hitbox
-    get_corners(player->x, player->y, internal.width, internal.height, 0, rect);
-
-    draw_square(rect, C2D_Color32(0x00, 0x00, 0xff, 0xff));
 
     // Unrotated hitbox
     get_corners(player->x, player->y, player->width, player->height, 0, rect);
 
     draw_square(rect, C2D_Color32(0xff, 0x00, 0x00, 0xff));
+}
+
+void draw_internal_hitbox(Player *player) {
+    InternalHitbox internal = player->internal_hitbox;
+    Vec2D rect[4];
+    // Internal hitbox
+    get_corners(player->x, player->y, internal.width, internal.height, 0, rect);
+
+    draw_square(rect, C2D_Color32(0x00, 0x00, 0xff, 0xff));
+}
+
+void draw_rotated_hitbox(Player *player) {
+    Vec2D rect[4];
+    // Rotated hitbox
+    get_corners(player->x, player->y, player->width, player->height, -player->rotation, rect);
+
+    draw_square(rect, C2D_Color32(0x7f, 0x00, 0x00, 0xff));
 }
 
 
@@ -1373,6 +1380,20 @@ void add_new_hitbox(Player *player) {
 }
 
 void draw_hitbox_trail(int player) {
+    // Draw normal hitbox
+    for (int i = state.last_hitbox_trail - 1; i >= 0; i--) {
+        PlayerHitboxTrail hitbox = state.hitbox_trail_players[player][i];
+
+        Player player;
+        player.x = hitbox.x;
+        player.y = hitbox.y;
+        player.width = hitbox.width;
+        player.height = hitbox.height;
+        player.rotation = hitbox.rotation;
+
+        draw_player_hitbox(&player);
+    }
+    // Draw internal
     for (int i = state.last_hitbox_trail - 1; i >= 0; i--) {
         PlayerHitboxTrail hitbox = state.hitbox_trail_players[player][i];
 
@@ -1384,7 +1405,7 @@ void draw_hitbox_trail(int player) {
         player.internal_hitbox = hitbox.internal_hitbox;
         player.rotation = hitbox.rotation;
 
-        draw_player_hitbox(&player);
+        draw_internal_hitbox(&player);
     }
 }
 
