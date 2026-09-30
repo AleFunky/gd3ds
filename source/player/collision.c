@@ -1392,7 +1392,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                 }
                 // Behave normally
                 if ((player->gamemode != GAMEMODE_PLAYER && player->gamemode != GAMEMODE_ROBOT) || gravSnap) {
-                    if (((gravTop(player) - obj_gravBottom(player, obj) <= clip && player->vel_y >= 0) || gravSnap)) {
+                    if (((gravTop(player) - obj_gravBottom(player, obj) <= clip && player->vel_y >= object_raw_vel) || gravSnap)) {
                         if (!gravSnap) player->on_ceiling = true;
                         else player->vel_y = 0;
                         player->inverse_rotation = false;

@@ -1,6 +1,7 @@
 #include <citro2d.h>
 #include "triggers.h"
 #include "color.h"
+#include "icons.h"
 #include "math_helpers.h"
 #include <float.h>
 #include <math.h>
@@ -15,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "player/player.h"
 #include "state.h"
 
 #define LAUNCH_CAP 1080.f
@@ -615,31 +617,44 @@ bool object_can_be_x_moved(int obj) {
 }
 
 static bool check_rising_platform(Player *player, int object, float delta_y, float offset_y) {
-    if (grav(player, offset_y) <= 0.f) return false;
+    if (grav(player, delta_y) <= 0.f) return false;
     
-    int object_id = objects.id[object];
-
-    if (!is_valid_object(object_id)) return false;
-
-    const GameObject *game_object = &game_objects[object_id];
-    
-    // Ignore no solid hitbox
-    if (!game_object->hitbox || game_object->hitbox->type != HITBOX_SOLID) return false;
-
     float player_bottom = gravBottom(player);
 
     float object_x = objects.x[object];
     float object_y = objects.y[object];
     float object_width = objects.width[object];
+    float object_height = objects.height[object];
 
-    float old_top = grav(player, object_y - delta_y);
-    float new_top = grav(player, object_y);
+    float old_top = grav(player, object_y - delta_y + object_height / 2.f);
+    float new_top = grav(player, object_y + object_height / 2.f);
 
     float tolerance = 10.f + fabsf(player->vel_y) * STEPS_DT;
 
     bool horizontal_overlap = fabsf(player->x - object_x) <= (player->width + object_width) / 2.f;
 
     bool vertical_overlap = player_bottom >= old_top - tolerance && player_bottom <= new_top + tolerance;
+
+    return horizontal_overlap && vertical_overlap;
+}
+
+static bool check_moving_ceiling(Player *player, int object, float delta_y, float offset_y) {
+    if (grav(player, delta_y) >= 0.f) return false;
+    if (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_ROBOT) return false;
+
+    float player_top = gravTop(player);
+
+    float object_x = objects.x[object];
+    float object_y = objects.y[object];
+    float object_width = objects.width[object];
+    float object_height = objects.height[object];
+
+    float old_bottom = grav(player, object_y - delta_y - object_height / 2.f);
+    float new_bottom = grav(player, object_y - object_height / 2.f);
+
+    bool horizontal_overlap = fabsf(player->x - object_x) <= (player->width + object_width) / 2.f;
+    
+    bool vertical_overlap = player_top >= new_bottom && player_top <= old_bottom;
 
     return horizontal_overlap && vertical_overlap;
 }
@@ -655,6 +670,14 @@ static bool has_other_vertical_trigger(MoveTriggerBuffer *buffer) {
     }
 
     return false;
+}
+/*
+static void set_player_to_obj_bottom(Player *player, int obj) {
+    player->y = grav(player, grav(player, objects.y[obj] + objects.height[obj] / 2.f)) + grav(player, player->height / 2);
+}
+*/
+static void set_player_to_obj_top(Player *player, int obj) {
+    player->y = grav(player, grav(player, objects.y[obj] - objects.height[obj] / 2.f)) - grav(player, player->height / 2);
 }
 
 void handle_move_triggers(void) {
@@ -711,7 +734,25 @@ void handle_move_triggers(void) {
 
                 objects.last_y[group_obj] = objects.y[group_obj];
                 objects.y[group_obj] += delta_y;
+
+                // Dirty part
+                objects.flags[group_obj] |= FLAG_DIRTY;
+
+                int new_sx = (int)(objects.x[group_obj] / SECTION_SIZE);
+                int new_sy = (int)(objects.y[group_obj] / SECTION_SIZE);
+
+                if (new_sx != old_sx || new_sy != old_sy)
+                    update_object_section(group_obj);
+
+                int object_id = objects.id[group_obj];
+
+                if (!is_valid_object(object_id)) continue;
+
+                const GameObject *game_object = &game_objects[object_id];
                 
+                // Ignore no solid hitbox
+                if (!game_object->hitbox || game_object->hitbox->type != HITBOX_SOLID) continue;
+
                 if (buffer->seconds <= 0.f) {
                     float launch_vel = 0.f;
 
@@ -758,19 +799,18 @@ void handle_move_triggers(void) {
                 ) {
                     player2_carry = delta_y;
                 }
+
+                if (check_moving_ceiling(&state.player, group_obj, delta_y, buffer->offset_y)) {
+                    set_player_to_obj_top(&state.player, group_obj);
+                }
+                
+                if (state.dual && check_moving_ceiling(&state.player2, group_obj, delta_y, buffer->offset_y)) {
+                    set_player_to_obj_top(&state.player2, group_obj);
+                }
                 
                 // Support state
                 if (group_obj == state.player.collided_block) player1_support = true;
                 if (state.dual && group_obj == state.player2.collided_block) player2_support = true;
-
-                // Dirty part
-                objects.flags[group_obj] |= FLAG_DIRTY;
-
-                int new_sx = (int)(objects.x[group_obj] / SECTION_SIZE);
-                int new_sy = (int)(objects.y[group_obj] / SECTION_SIZE);
-
-                if (new_sx != old_sx || new_sy != old_sy)
-                    update_object_section(group_obj);
             }
             state.player.y += player1_carry;
             if (state.dual) state.player2.y += player2_carry;

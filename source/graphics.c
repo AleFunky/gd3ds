@@ -1764,9 +1764,6 @@ void update_tints() {
                 case COLOR_TYPE_GLOW:
                     col.blending = true;
                     break;
-                case COLOR_TYPE_BLACK:
-                    col.color = (Color) {0,0,0};
-                    break;
                 case COLOR_TYPE_WHITE:
                     if (level_is_unrated_online() && objects.id[game_object] == SECRET_COIN) {
                         col.color = (Color) {USER_COIN_UNRATED_R, USER_COIN_UNRATED_G, USER_COIN_UNRATED_B};
@@ -1787,6 +1784,11 @@ void update_tints() {
                     }
                     col.blending = false;
                 }
+            }
+
+            
+            if (obj->col_type == COLOR_TYPE_BLACK) {
+                col.color = (Color) {0,0,0};
             }
 
             float x = ((objects.x[game_object] - state.camera_x));
