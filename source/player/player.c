@@ -1,4 +1,5 @@
 #include "player.h"
+#include "level_loading.h"
 #include "profiling.h"
 #include "state.h"
 #include "icons.h"
@@ -1283,6 +1284,13 @@ void draw_square(Vec2D rect[4], uint32_t color) {
 void draw_hitbox(int obj) {
     if (!is_valid_object(objects.id[obj])) return;
 
+    Vec2D rect[4];
+    if (is_trigger_object(objects.id[obj]) && objects.touch_triggered[obj]) {
+        get_corners(objects.x[obj], objects.y[obj], objects.width[obj], objects.height[obj], objects.rotation[obj], rect);
+        draw_square(rect, C2D_Color32(0x00, 0xff, 0xff, 0xff));
+        return;
+    }
+
     const ObjectHitbox *hitbox = game_objects[objects.id[obj]].hitbox;
 
     if (!hitbox) return;
@@ -1316,7 +1324,6 @@ void draw_hitbox(int obj) {
     if (obj == state.player.slope_data.slope_id || obj == state.player2.slope_data.slope_id) color = C2D_Color32(0x00, 0xff, 0x00, 0xff);
     if (obj == state.player.snap_data.snapped_obj || obj == state.player2.snap_data.snapped_obj) color = C2D_Color32(0xff, 0xff, 0x00, 0xff);
 
-    Vec2D rect[4];
     if (hitbox->type == COLLISION_SLOPE) {
         w = objects.width[obj];
         h = objects.height[obj];

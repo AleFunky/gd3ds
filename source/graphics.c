@@ -2096,25 +2096,21 @@ void draw_objects() {
     change_blending(false);
 
     if (state.hitbox_display) {
-        for (size_t s = 0; s < sprite_count; s++) {
-            SpriteObject *obj = viewable_objects_ptr[s];
-            if (obj->obj != -1) {
-                // Only one per object please
-                if (obj->layer != 0) continue;
-                draw_hitbox(obj->obj);
-            } else {
-                draw_rotated_hitbox(&state.player);
-                draw_player_hitbox(&state.player);
-                draw_internal_hitbox(&state.player);
-                if (state.hitbox_display == 2) draw_hitbox_trail(0);
-                
-                if (state.dual) {
-                    draw_rotated_hitbox(&state.player2);
-                    draw_player_hitbox(&state.player2);
-                    draw_internal_hitbox(&state.player2);
-                    if (state.hitbox_display == 2) draw_hitbox_trail(1);
-                }
-            }
+        draw_rotated_hitbox(&state.player);
+        draw_player_hitbox(&state.player);
+        draw_internal_hitbox(&state.player);
+        if (state.hitbox_display == 2) draw_hitbox_trail(0);
+
+        if (state.dual) {
+            draw_rotated_hitbox(&state.player2);
+            draw_player_hitbox(&state.player2);
+            draw_internal_hitbox(&state.player2);
+            if (state.hitbox_display == 2) draw_hitbox_trail(1);
+        }
+
+        for (int i = 0; i < current_object_count; i++) {
+            int obj = current_objects[i];
+            draw_hitbox(obj);
         }
     }
 
