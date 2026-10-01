@@ -165,6 +165,8 @@ typedef struct {
 
     int collided_block;
     int last_collided_block;
+
+    bool gravity_changed_move;
 } Player;
 
 typedef struct {

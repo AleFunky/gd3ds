@@ -626,31 +626,27 @@ inline float objBot(float y, int object)  {
 inline float objgravBot(Player *player, float y, int object) { return player->upside_down ? -objTop(y, object) : objBot(y, object); }
 inline float objgravTop(Player *player, float y, int object) { return player->upside_down ? -objBot(y, object) : objTop(y, object); }
 
-
-static bool check_rising_platform(Player *player, int object, float delta_y, float offset_y) {
-    if (grav(player, delta_y) <= 0.f) return false;
+static bool check_rising_platform(Player *player, int object, float delta_y, float offset_y, bool gravity_changed) {
+    if (gravity_changed || grav(player, delta_y) <= 0.f) return false;
     
     float player_bottom = gravBottom(player);
 
     float object_x = objects.x[object];
     float object_y = objects.y[object];
     float object_width = objects.width[object];
-    float object_height = objects.height[object];
 
-    float old_top = grav(player, object_y - delta_y + object_height / 2.f);
-    float new_top = grav(player, object_y + object_height / 2.f);
-
-    float tolerance = 10.f + fabsf(player->vel_y) * STEPS_DT;
+    float old_top = objgravTop(player, object_y - delta_y, object);
+    float new_top = objgravTop(player, object_y, object);
 
     bool horizontal_overlap = fabsf(player->x - object_x) <= (player->width + object_width) / 2.f;
 
-    bool vertical_overlap = player_bottom >= old_top - tolerance && player_bottom <= new_top + tolerance;
+    bool vertical_overlap = player_bottom >= old_top && player_bottom <= new_top;
 
     return horizontal_overlap && vertical_overlap;
 }
 
-static bool check_moving_ceiling(Player *player, int object, float delta_y, float offset_y) {
-    if (grav(player, delta_y) >= 0.f) return false;
+static bool check_moving_ceiling(Player *player, int object, float delta_y, float offset_y, bool gravity_changed) {
+    if (gravity_changed || grav(player, delta_y) >= 0.f) return false;
     if (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_ROBOT) return false;
 
     float player_top = gravTop(player);
@@ -717,15 +713,17 @@ void handle_move_triggers(void) {
         bool zero_delta = (delta_x == 0.f && delta_y == 0.f);
 
         float rise_vel = (buffer->seconds > 0.f && g_trigger_dt != 0.f) ? delta_y / g_trigger_dt : 0.f;
-        
-        bool player1_can_be_carried = buffer->seconds > 0.f && grav(&state.player, rise_vel) > MINIMUM_OBJECT_SPEED;
-        bool player2_can_be_carried = buffer->seconds > 0.f && state.dual && grav(&state.player2, rise_vel) > MINIMUM_OBJECT_SPEED;
+        bool player1_gravity_changed = state.player.gravity_changed_move;
+        bool player2_gravity_changed = state.player2.gravity_changed_move;
+
+        bool player1_can_be_carried = buffer->seconds > 0.f && !player1_gravity_changed && grav(&state.player, rise_vel) > MINIMUM_OBJECT_SPEED;
+        bool player2_can_be_carried = buffer->seconds > 0.f && state.dual && !player2_gravity_changed && grav(&state.player2, rise_vel) > MINIMUM_OBJECT_SPEED;
         
         float player1_carry = 0.f, player2_carry = 0.f;
         bool player1_support = false, player2_support = false;
         
-        bool player1_moving_with_gravity = grav(&state.player, delta_y) < 0.f;
-        bool player2_moving_with_gravity = state.dual && grav(&state.player2, delta_y) < 0.f;
+        bool player1_moving_with_gravity = !player1_gravity_changed && grav(&state.player, delta_y) < 0.f;
+        bool player2_moving_with_gravity = state.dual && !player2_gravity_changed && grav(&state.player2, delta_y) < 0.f;
 
         float player1_grav_delta = grav(&state.player, delta_y);
         float player2_grav_delta = grav(&state.player2, delta_y);
@@ -769,12 +767,12 @@ void handle_move_triggers(void) {
                         launch_vel = fminf(fabsf(delta_y) / STEPS_DT_UNMOD, LAUNCH_CAP);
                     }
 
-                    if (state.player.collided_block == group_obj && player1_grav_delta > 0.f) {
+                    if (!player1_gravity_changed && state.player.collided_block == group_obj && player1_grav_delta > 0.f) {
                         state.player.y += delta_y;
                         state.player.vel_y = launch_vel;
                     }
 
-                    if (state.dual && state.player2.collided_block == group_obj && player2_grav_delta > 0.f) {
+                    if (state.dual && !player2_gravity_changed && state.player2.collided_block == group_obj && player2_grav_delta > 0.f) {
                         state.player2.y += delta_y;
                         state.player2.vel_y = launch_vel;
                     }
@@ -797,23 +795,23 @@ void handle_move_triggers(void) {
                 // Players riding object
                 if (
                     player1_can_be_carried && player1_carry == 0.f &&
-                    check_rising_platform(&state.player, group_obj, delta_y, buffer->offset_y)
+                    check_rising_platform(&state.player, group_obj, delta_y, buffer->offset_y, player1_gravity_changed)
                 ) {
-                    player1_carry = delta_y;
+                    set_player_to_obj_bottom(&state.player, group_obj);
                 }
 
                 if (
                     state.dual && player2_can_be_carried && player2_carry == 0.f &&
-                    check_rising_platform(&state.player2, group_obj, delta_y, buffer->offset_y)
+                    check_rising_platform(&state.player2, group_obj, delta_y, buffer->offset_y, player2_gravity_changed)
                 ) {
-                    player2_carry = delta_y;
+                    set_player_to_obj_bottom(&state.player2, group_obj);
                 }
 
-                if (check_moving_ceiling(&state.player, group_obj, delta_y, buffer->offset_y)) {
+                if (check_moving_ceiling(&state.player, group_obj, delta_y, buffer->offset_y, player1_gravity_changed)) {
                     set_player_to_obj_top(&state.player, group_obj);
                 }
                 
-                if (state.dual && check_moving_ceiling(&state.player2, group_obj, delta_y, buffer->offset_y)) {
+                if (state.dual && check_moving_ceiling(&state.player2, group_obj, delta_y, buffer->offset_y, player2_gravity_changed)) {
                     set_player_to_obj_top(&state.player2, group_obj);
                 }
                 

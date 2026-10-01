@@ -930,9 +930,14 @@ void game_loop() {
                 float player_x_before_physics = state.player.x;
                 float acc_delta_y = 0.0f;
 
+                state.player.gravity_changed_move = false;
+                state.player2.gravity_changed_move = false;
+
                 // Run simulation in fixed steps
                 while (accumulator >= STEPS_DT_UNMOD) {
                     u64 start_physics = svcGetSystemTick();
+                    bool player1_upside_down_before = state.player.upside_down;
+                    bool player2_upside_down_before = state.player2.upside_down;
 
                     if (pi_enabled) {
                         pi_apply_substep((u32)steps);
@@ -964,6 +969,7 @@ void game_loop() {
                     trail = &trail_p1;
                     wave_trail = &wave_trail_p1;
                     handle_player(&state.player);
+                    state.player.gravity_changed_move |= state.player.upside_down != player1_upside_down_before;
                     handle_mirror_transition();
 
                     state.level_progress = (state.player.x / level_info.last_obj_x) * 100;
@@ -987,6 +993,7 @@ void game_loop() {
                         curr_input = state.input_p2;
                         curr_old_input = state.old_input_p2;
                         handle_player(&state.player2);
+                        state.player2.gravity_changed_move |= state.player2.upside_down != player2_upside_down_before;
 
                         //revert state back to first player
                         state.current_player = 0;

@@ -1433,7 +1433,7 @@ void handle_moving_block(Player *player, int obj) {
     }
 
     if (drop && object_velocity <= MINIMUM_OBJECT_SPEED) {
-        player->y = grav(player, obj_gravTop(player, obj)) + grav(player, player->height / 2);
+        player->y += object_raw_vel * STEPS_DT_UNMOD;
     }
 }
 
