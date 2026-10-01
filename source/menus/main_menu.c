@@ -2,6 +2,7 @@
 #include <citro2d.h>
 #include <stdlib.h>
 
+#include "icons.h"
 #include "math_helpers.h"
 #include "main.h"
 #include "graphics.h"
@@ -94,7 +95,7 @@ void reset_players() {
     title_screen_player.upside_down = false;
     state.speed = random_int(0, SPEED_COUNT - 1);
     title_screen_player.rotation = 0;
-    set_gamemode(&title_screen_player, random_int(0, GAMEMODE_COUNT - 2));
+    set_gamemode(&title_screen_player, random_int(0, GAMEMODE_COUNT - 1));
     set_mini(&title_screen_player, random_int(0,1));
 
     title_screen_player.player_icons.cube = random_int(1, ICON_COUNT_PLAYER - 1);
@@ -102,6 +103,7 @@ void reset_players() {
     title_screen_player.player_icons.ball = random_int(1, ICON_COUNT_PLAYER_BALL - 1);
     title_screen_player.player_icons.ufo  = random_int(1, ICON_COUNT_BIRD - 1);
     title_screen_player.player_icons.wave = random_int(1, ICON_COUNT_DART - 1);
+    title_screen_player.player_icons.robot = random_int(1, ICON_COUNT_ROBOT - 1);
     title_screen_player.player_icons.glow = false;
 
     title_screen_player_hold = random_int(0,1);
@@ -151,6 +153,15 @@ static void handle_input() {
                 pressing = true;
             }
             break;
+        case GAMEMODE_ROBOT:
+            if (title_screen_player_hold) {
+                // If holding, 1/8 change to stop holding
+                if (!(rand() & 0b111)) title_screen_player_hold = 0;
+                pressing = true;
+            } else {
+                // Else 1/16 change to start holding
+                if (!(rand() & 0b1111)) title_screen_player_hold = 0;
+            }
     }
 
     started = !old_pressing && pressing;

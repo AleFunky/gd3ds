@@ -43,6 +43,7 @@ ParticleSystem ship_fire_particles[2];
 ParticleSystem ship_secondary_particles[2];
 ParticleSystem secondary_particles[2];
 ParticleSystem burst_particles[2];
+ParticleSystem robot_fire_particles[2];
 ParticleSystem land_particles[2];
 ParticleSystem explosion_particles[2];
 ParticleSystem glitter_particles;
@@ -594,6 +595,15 @@ void robot_gamemode(Player *player) {
         MotionTrail_StopStroke(trail);
         if (player->slope_data.slope_id < 0) player->rotation = roundf(player->rotation / 90.0f) * 90.0f;
     }
+    
+    drag_particles[state.current_player].emitterX = player->x;
+    drag_particles[state.current_player].emitterY = fabsf(gravBottom(player)) + (player->upside_down ? -2 : 2);
+    drag_particles[state.current_player].emitting = player->on_ground || player->on_ceiling;
+
+    drag_particles[state.current_player].gravityFlipped = player->upside_down;
+    drag_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
+
+    drag_particles[state.current_player].cfg.sourcePositionVariancey = (player->mini ? 4.f : 2.f);
 
     SlopeData slope_data = player->slope_data;
 
@@ -627,6 +637,12 @@ void robot_gamemode(Player *player) {
     } else if (player->buffering_state == BUFFER_END) {
         player->robot_air_time += 5.4f * STEPS_DT;
     }
+    
+    robot_fire_particles[state.current_player].emitterX = player->x - 4;
+    robot_fire_particles[state.current_player].emitterY = fabsf(gravBottom(player));
+    robot_fire_particles[state.current_player].emitting = player->gravity == 0;
+
+    robot_fire_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
 
     if (!player->on_ground && player->vel_y < 0
         && player->robot_anim_id != ROBOT_ANIM_FALL_START

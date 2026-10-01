@@ -204,6 +204,7 @@ extern ParticleSystem ship_fire_particles[2];
 extern ParticleSystem ship_secondary_particles[2];
 extern ParticleSystem secondary_particles[2];
 extern ParticleSystem burst_particles[2];
+extern ParticleSystem robot_fire_particles[2];
 extern ParticleSystem land_particles[2];
 extern ParticleSystem explosion_particles[2];
 extern ParticleSystem glitter_particles;

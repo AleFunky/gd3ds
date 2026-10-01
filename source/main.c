@@ -284,6 +284,7 @@ void update_player_effects(float delta) {
         updateParticleSystem(&ship_secondary_particles[i], delta);
         updateParticleSystem(&secondary_particles[i], delta);
         updateParticleSystem(&burst_particles[i], delta);
+        updateParticleSystem(&robot_fire_particles[i], delta);
         updateParticleSystem(&land_particles[i], delta);
         updateParticleSystem(&explosion_particles[i], delta);
     }
@@ -315,6 +316,9 @@ void allocate_particles() {
     initParticleSystem(&burst_particles[0], &burst_effect);
     initParticleSystem(&burst_particles[1], &burst_effect);
 
+    initParticleSystem(&robot_fire_particles[0], &burst_effect2);
+    initParticleSystem(&robot_fire_particles[1], &burst_effect2);
+
     initParticleSystem(&land_particles[0], &land_effect);
     initParticleSystem(&land_particles[1], &land_effect);
     
@@ -343,6 +347,7 @@ void free_particles() {
         freeParticleData(&secondary_particles[i].data);
         freeParticleData(&ship_secondary_particles[i].data);
         freeParticleData(&burst_particles[i].data);
+        freeParticleData(&robot_fire_particles[i].data);
         freeParticleData(&land_particles[i].data);
         freeParticleData(&explosion_particles[i].data);
     }
@@ -383,6 +388,9 @@ void init_particles(Color p1_color, Color p2_color) {
 
     burst_particles[0].depth = 0.5f;
     burst_particles[1].depth = 0.5f;
+    
+    robot_fire_particles[0].depth = 0.5f;
+    robot_fire_particles[1].depth = 0.5f;
 
     land_particles[0].depth = 0.35f;
     land_particles[1].depth = 0.35f;
@@ -882,6 +890,7 @@ void game_loop() {
             secondary_particles[i].emitting = false;
             ship_secondary_particles[i].emitting = false;
             burst_particles[i].emitting = false;
+            robot_fire_particles[i].emitting = false;
             land_particles[i].emitting = false;
         }
 

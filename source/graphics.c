@@ -2020,6 +2020,8 @@ void draw_player_effects() {
         drawParticleSystem(&ship_secondary_particles[i], 0, 0, 1.f);
         drawParticleSystem(&secondary_particles[i], 0, 0, 1.f);
         drawParticleSystem(&burst_particles[i], 0, 0, 1.f);
+        drawParticleSystem(&robot_fire_particles[i], 0, 0, 1.f);
+        drawParticleSystem(&robot_fire_particles[i], 0, 0, 1.f);
         drawParticleSystem(&land_particles[i], 0, 0, 1.f);
         drawParticleSystem(&explosion_particles[i], 0, 0, 1.f);
     }
