@@ -51,6 +51,8 @@ void reset_search_filters() {
     filters.mainSong = 0;
     filters.lengthFilters = 0;
     filters.difficultyFilters = 0;
+    filters.isAuto = false;
+    filters.isNA = false;
     filters.customSongQuery[0] = '\0';
     update_difficulty_tints(
         ui_stack_get_screen("search_menu", SCREEN_BTM)
