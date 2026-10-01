@@ -1789,6 +1789,12 @@ void update_tints() {
             
             if (obj->col_type == COLOR_TYPE_BLACK) {
                 col.color = (Color) {0,0,0};
+                
+                // Rod base ignore blending
+                int obj_id = objects.id[obj->obj];
+                if (obj_id >= 15 && obj_id <= 17) {
+                    col.blending = false;
+                }
             }
 
             float x = ((objects.x[game_object] - state.camera_x));
@@ -2289,6 +2295,7 @@ static void spawn_icon_at_internal(
     int gamemode,
     int id,
     bool glow,
+    bool draw_white,
     float x,
     float y,
     float deg,
@@ -2321,7 +2328,11 @@ static void spawn_icon_at_internal(
 
     C2D_ImageTint tints[4];
 
-    C2D_PlainImageTint(&tints[ICON_COLOR_WHITE], C2D_Color32(255, 255, 255, 255), 1.0f);
+    if (draw_white) {
+        C2D_PlainImageTint(&tints[ICON_COLOR_WHITE], C2D_Color32(255, 255, 255, 255), 1.0f);
+    } else {
+        C2D_PlainImageTint(&tints[ICON_COLOR_WHITE], 0, 1.0f);
+    }
     C2D_PlainImageTint(&tints[ICON_COLOR_P1], p1_color, 1.0f);
     C2D_PlainImageTint(&tints[ICON_COLOR_P2], p2_color, 1.0f);
 
@@ -2483,6 +2494,7 @@ void spawn_icon_at(
         gamemode,
         id,
         false,
+        true,
         x,
         y,
         deg,
@@ -2511,6 +2523,7 @@ void spawn_p1_layer_at(
     spawn_icon_at_internal(
         gamemode,
         id,
+        false,
         false,
         x,
         y,
@@ -2541,6 +2554,7 @@ void spawn_glow_layer_at(
         gamemode,
         id,
         true,
+        false,
         x,
         y,
         deg,
