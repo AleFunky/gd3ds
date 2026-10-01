@@ -206,3 +206,5 @@ void draw_touch_effect();
 
 void update_bottom_particles(float delta);
 void draw_bottom_particles();
+
+bool ensure_render_cache(void);

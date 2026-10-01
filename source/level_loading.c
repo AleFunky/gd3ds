@@ -2389,6 +2389,11 @@ int load_online_level(char *level_string) {
     C2D_SpriteFromSheet(&sprite_templates[17].child_templates[0], spriteSheet, current_pulserod_ball_image);
     C2D_SpriteSetCenter(&sprite_templates[17].child_templates[0], 0.5f, 0.5f);
 
+    if (!ensure_render_cache()) {
+        unload_level();
+        return LOAD_OUT_OF_MEMORY;
+    }
+
     return LOAD_NO_ERROR;
 }
 
@@ -2495,6 +2500,11 @@ int load_level(char *path) {
 
     C2D_SpriteFromSheet(&sprite_templates[17].child_templates[0], spriteSheet, current_pulserod_ball_image);
     C2D_SpriteSetCenter(&sprite_templates[17].child_templates[0], 0.5f, 0.5f);
+
+    if (!ensure_render_cache()) {
+        unload_level();
+        return LOAD_OUT_OF_MEMORY;
+    }
 
     return LOAD_NO_ERROR;
 }

@@ -1542,7 +1542,7 @@ void draw_attempt_text() {
     }
 }
 
-static bool ensure_render_cache(void) {
+bool ensure_render_cache(void) {
     if (render_object_capacity == objects.count) return true;
 
     // New objects! Reallocate stuff and maintain pointer integrity
