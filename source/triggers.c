@@ -616,6 +616,17 @@ bool object_can_be_x_moved(int obj) {
     return true;
 }
 
+
+inline float objTop(float y, int object)  { 
+    return y + objects.height[object] / 2; 
+}
+inline float objBot(float y, int object)  { 
+    return y - objects.height[object] / 2; 
+}
+inline float objgravBot(Player *player, float y, int object) { return player->upside_down ? -objTop(y, object) : objBot(y, object); }
+inline float objgravTop(Player *player, float y, int object) { return player->upside_down ? -objBot(y, object) : objTop(y, object); }
+
+
 static bool check_rising_platform(Player *player, int object, float delta_y, float offset_y) {
     if (grav(player, delta_y) <= 0.f) return false;
     
@@ -647,10 +658,9 @@ static bool check_moving_ceiling(Player *player, int object, float delta_y, floa
     float object_x = objects.x[object];
     float object_y = objects.y[object];
     float object_width = objects.width[object];
-    float object_height = objects.height[object];
 
-    float old_bottom = grav(player, object_y - delta_y - object_height / 2.f);
-    float new_bottom = grav(player, object_y - object_height / 2.f);
+    float old_bottom = objgravBot(player, object_y - delta_y, object);
+    float new_bottom = objgravBot(player, object_y, object);
 
     bool horizontal_overlap = fabsf(player->x - object_x) <= (player->width + object_width) / 2.f;
     
@@ -671,15 +681,14 @@ static bool has_other_vertical_trigger(MoveTriggerBuffer *buffer) {
 
     return false;
 }
-/*
+
 static void set_player_to_obj_bottom(Player *player, int obj) {
-    player->y = grav(player, grav(player, objects.y[obj] + objects.height[obj] / 2.f)) + grav(player, player->height / 2);
-}
-*/
-static void set_player_to_obj_top(Player *player, int obj) {
-    player->y = grav(player, grav(player, objects.y[obj] - objects.height[obj] / 2.f)) - grav(player, player->height / 2);
+    player->y = grav(player, objgravTop(player, objects.y[obj], obj)) + grav(player, player->height / 2);
 }
 
+static void set_player_to_obj_top(Player *player, int obj) {
+    player->y = grav(player, objgravBot(player, objects.y[obj], obj)) - grav(player, player->height / 2);
+}
 void handle_move_triggers(void) {
     for (int slot = 0; slot < move_trigger_count; slot++) {
         MoveTriggerBuffer *buffer = &move_trigger_buffer[slot];
@@ -776,11 +785,11 @@ void handle_move_triggers(void) {
                         float cont_vel = (g_trigger_dt != 0.f) ? delta_y / g_trigger_dt : 0.f;
 
                         if (state.player.collided_block == group_obj && player1_moving_with_gravity && grav(&state.player, cont_vel) >= -MINIMUM_OBJECT_SPEED) {
-                            state.player.y += delta_y;
+                            set_player_to_obj_bottom(&state.player, group_obj);
                         }
 
                         if (state.dual && state.player2.collided_block == group_obj && player2_moving_with_gravity && grav(&state.player2, cont_vel) >= -MINIMUM_OBJECT_SPEED) {
-                            state.player2.y += delta_y;
+                            set_player_to_obj_bottom(&state.player2, group_obj);
                         }
                     }
                 }

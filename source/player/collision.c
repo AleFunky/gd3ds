@@ -1359,7 +1359,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
             float y_pos = objects.y[obj];
             float last_y = objects.last_y[obj];
 
-            float object_raw_vel = (y_pos - last_y) / delta;
+            float object_raw_vel = grav(player, (y_pos - last_y)) / delta;
 
             // Check snap for player bottom
             if (obj_gravTop(player, obj) - bottom <= clip && player->vel_y <= fmaxf(object_raw_vel, 0) && player->gamemode != GAMEMODE_WAVE) {
@@ -1433,7 +1433,7 @@ void handle_moving_block(Player *player, int obj) {
     }
 
     if (drop && object_velocity <= MINIMUM_OBJECT_SPEED) {
-        if (player->vel_y < -player->gravity * STEPS_DT) player->vel_y -= object_velocity;
+        player->y = grav(player, obj_gravTop(player, obj)) + grav(player, player->height / 2);
     }
 }
 
