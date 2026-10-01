@@ -26,6 +26,7 @@
 #include "particles/object_particles.h"
 #include "particles/circles.h"
 #include "particles/coin_effect.h"
+#include "particles/key_effect.h"
 
 #include "menus/settings_hub/settings.h"
 #include "menus/gameplay.h"
@@ -41,6 +42,15 @@
 #include "menus/level_select.h"
 
 const Color white = { 255, 255, 255 };
+
+#define KEY_FLOAT_AMP 1.5f
+#define KEY_FLOAT_PERIOD 0.8f
+#define KEY_FLOAT_BASE 0.0f
+
+static inline float key_float_offset(int obj) {
+    float phase = objects.x[obj] * 0.05f;
+    return KEY_FLOAT_BASE + KEY_FLOAT_AMP * lut_sin(6.2831853f * (frame_timer / KEY_FLOAT_PERIOD) + phase);
+}
 
 static const HSV lighter_hsv = {
     .h = 0.0f,
@@ -151,6 +161,10 @@ static C2D_SpriteSheet *get_sprite_sheet(int index, int *rel_index) {
     // Return spritesheet 4 (animated objects)
     *rel_index = index - ANIMATEDSHEET_START;
     return &animatedSheet;
+}
+
+C2D_SpriteSheet *get_sprite_sheet_ex(int index, int *rel_index) {
+    return get_sprite_sheet(index, rel_index);
 }
 
 const SlotFrames* find_slot_frames(const GameObject* obj, int slot) {
@@ -2045,6 +2059,7 @@ void draw_player_graphics() {
     change_blending(false);
     
     draw_collect_effect();
+    draw_key_effect();
 
     change_blending(true);
     draw_use_effects(get_use_effect_array_ptr(GFX_TOP));
@@ -2088,8 +2103,18 @@ void draw_objects() {
             if (obj->hidden) continue;
 
             change_blending(obj->blending);
-            
-            C2D_DrawImageFast(&obj->spr.image, &obj->params, &obj->spr.params, obj->tint);
+
+            if (objects.id[obj->obj] == KEY_OBJ) {
+                QuadParams key_params = obj->params;
+                float off = key_float_offset(obj->obj);
+                key_params.quadr.topLeft[1]  += off;
+                key_params.quadr.topRight[1] += off;
+                key_params.quadr.botLeft[1]  += off;
+                key_params.quadr.botRight[1] += off;
+                C2D_DrawImageFast(&obj->spr.image, &key_params, &obj->spr.params, obj->tint);
+            } else {
+                C2D_DrawImageFast(&obj->spr.image, &obj->params, &obj->spr.params, obj->tint);
+            }
         } else {   
             C2D_ViewRestore(&object_view);
             draw_player_graphics();

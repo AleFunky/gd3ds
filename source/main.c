@@ -29,6 +29,7 @@
 #include "particles/particles.h"
 #include "particles/object_particles.h"
 #include "particles/coin_effect.h"
+#include "particles/key_effect.h"
 
 #include <stdarg.h>
 
@@ -1181,6 +1182,7 @@ void game_loop() {
             handle_new_best_popup(delta);
 
             update_collect_effect(delta);
+            update_key_effect(delta);
 
             float calc_x_speed_particles = SCREEN_WIDTH_AREA;
             float calc_y_speed_particles = (SCREEN_HEIGHT_AREA / 2);

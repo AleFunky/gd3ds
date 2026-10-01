@@ -20,6 +20,7 @@
 #include "particles/object_particles.h"
 #include "particles/circles.h"
 #include "particles/coin_effect.h"
+#include "particles/key_effect.h"
 #include "save/saving.h"
 #include "menus/level_select.h"
 
@@ -1132,6 +1133,24 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                         state.current_data.coin3 = true;
                         break;
                 }
+
+                objects.flags[obj] |= FLAG_TOGGLED;
+            }
+            break;
+
+        case KEY_OBJ:
+            if (!GET_ACTIVATED(obj)) {
+                SET_ACTIVATED(obj, true);
+
+                if (state.practice_mode) break;
+
+                key_effect_spawn(objects.x[obj], objects.y[obj],
+                                 game_objects[KEY_OBJ].texture,
+                                 game_objects[KEY_OBJ].children[0].texture,
+                                 objects.col_channel[obj],
+                                 objects.detail_col_channel[obj],
+                                 objects.scale_x[obj], objects.scale_y[obj],
+                                 objects.flippedH[obj], objects.flippedV[obj]);
 
                 objects.flags[obj] |= FLAG_TOGGLED;
             }

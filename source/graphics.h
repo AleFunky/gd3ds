@@ -199,6 +199,7 @@ void draw_player_effects();
 void draw_post_player_effects();
 void draw_player_graphics();
 int get_coin_texture(int tex, int ticks);
+C2D_SpriteSheet *get_sprite_sheet_ex(int index, int *rel_index);
 
 void update_touch_effect(float delta);
 void draw_touch_effect();
