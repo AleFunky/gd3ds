@@ -742,9 +742,6 @@ void handle_move_triggers(void) {
                 objects.last_y[group_obj] = objects.y[group_obj];
                 objects.y[group_obj] += delta_y;
 
-                // Dirty part
-                objects.flags[group_obj] |= FLAG_DIRTY;
-
                 int new_sx = (int)(objects.x[group_obj] / SECTION_SIZE);
                 int new_sy = (int)(objects.y[group_obj] / SECTION_SIZE);
 

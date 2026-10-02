@@ -131,13 +131,10 @@ typedef struct {
 } TriggerPool;
 
 typedef enum {
-    FLAG_DIRTY      = (1 << 0),
-    FLAG_SEEN       = (1 << 1),
-    FLAG_VISIBLE    = (1 << 2),
-    FLAG_TOGGLED    = (1 << 3),
-    FLAG_DONT_FADE  = (1 << 4),
-    FLAG_DONT_ENTER = (1 << 5),
-    FLAG_CAN_BE_X_MOVED = (1 << 6)
+    FLAG_TOGGLED    = (1 << 0),
+    FLAG_DONT_FADE  = (1 << 1),
+    FLAG_DONT_ENTER = (1 << 2),
+    FLAG_CAN_BE_X_MOVED = (1 << 3)
 } ObjectFlags;
 
 typedef struct {

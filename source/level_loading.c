@@ -1947,7 +1947,7 @@ bool init_arrays(size_t count) {
     memset(objects.flippedV,           0, sizeof(bool) * count);
     memset(objects.groups,             0, sizeof(short[MAX_GROUPS_PER_OBJECT]) * count);
     memset(objects.group_count,        0, sizeof(u8) * count);
-    memset(objects.flags,              FLAG_DIRTY, sizeof(bool) * count); // Dirty by default (needs to be created lol)
+    memset(objects.flags,              0, sizeof(u8) * count);
     memset(objects.activated,          0, sizeof(u8) * count);
     memset(objects.collided,           0, sizeof(u8) * count);
 
@@ -2389,10 +2389,6 @@ int load_online_level(char *level_string) {
     C2D_SpriteFromSheet(&sprite_templates[17].child_templates[0], spriteSheet, current_pulserod_ball_image);
     C2D_SpriteSetCenter(&sprite_templates[17].child_templates[0], 0.5f, 0.5f);
 
-    if (!ensure_render_cache()) {
-        unload_level();
-        return LOAD_OUT_OF_MEMORY;
-    }
 
     return LOAD_NO_ERROR;
 }
@@ -2501,11 +2497,6 @@ int load_level(char *path) {
     C2D_SpriteFromSheet(&sprite_templates[17].child_templates[0], spriteSheet, current_pulserod_ball_image);
     C2D_SpriteSetCenter(&sprite_templates[17].child_templates[0], 0.5f, 0.5f);
 
-    if (!ensure_render_cache()) {
-        unload_level();
-        return LOAD_OUT_OF_MEMORY;
-    }
-
     return LOAD_NO_ERROR;
 }
 
@@ -2521,8 +2512,6 @@ void reload_level() {
         objects.transition_applied[i] = FADE_NONE;
         objects.flags[i] &= ~FLAG_TOGGLED;
         objects.opacity[i] = 1.f;
-        if (objects.x[i] != objects.original_x[i] || objects.y[i] != objects.original_y[i])
-            objects.flags[i] |= FLAG_DIRTY;
         objects.x[i] = objects.original_x[i];
         objects.y[i] = objects.original_y[i];
         objects.last_x[i] = objects.original_x[i];
@@ -2580,7 +2569,6 @@ void reload_level() {
 
 void unload_level() {
     clear_groups();
-    reset_render_cache();
     free_arrays();
     free_trigger_buffers();
     free_sections();

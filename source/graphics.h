@@ -128,7 +128,6 @@ inline float normalize_angle(float a)
 }
 
 void create_objects();
-void reset_render_cache();
 void change_blending(bool blending);
 Color get_white_if_black(Color color);
 Color get_p1_if_black(Color color);
@@ -206,5 +205,3 @@ void draw_touch_effect();
 
 void update_bottom_particles(float delta);
 void draw_bottom_particles();
-
-bool ensure_render_cache(void);

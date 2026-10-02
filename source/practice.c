@@ -440,8 +440,6 @@ void restore_checkpoint() {
 
     for (int i = 0; i < check->move_obj_count; i++) {
         int oi = check->move_obj_index[i];
-        if (objects.x[oi] != check->move_obj_x[i] || objects.y[oi] != check->move_obj_y[i])
-            objects.flags[oi] |= FLAG_DIRTY;
         objects.x[oi] = check->move_obj_x[i];
         objects.y[oi] = check->move_obj_y[i];
         objects.last_x[oi] = check->move_obj_x[i];
