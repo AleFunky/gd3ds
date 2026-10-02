@@ -1650,11 +1650,10 @@ static void update_current_objects(void) {
     int cam_sx = (int)(state.camera_x / SECTION_SIZE);
     int cam_sy = (int)((state.camera_y - LEVEL_Y_OFFSET) / SECTION_SIZE);
 
-    for (int x = -1; x <= width; x++) {
-        for (int y = -1; y <= height; y++) {
+    for (int x = -2; x <= width + 1; x++) {
+        for (int y = -2; y <= height + 1; y++) {
             int sx = cam_sx + x;
             int sy = cam_sy + y;
-            if (sx < 0 || sy < 0) continue;
 
             Section *sec = get_section(sx, sy);
             for (int i = 0; i < sec->object_count; i++) {
@@ -1662,8 +1661,11 @@ static void update_current_objects(void) {
 
                 float calc_x = objects.x[obj] - state.camera_x;
                 float calc_y = SCREEN_HEIGHT - (objects.y[obj] - state.camera_y);
+                
+                float x_margin = 60 * objects.scale_x[obj];
+                float y_margin = 60 * objects.scale_y[obj];
 
-                if (calc_x < -60 || calc_x >= SCREEN_WIDTH / SCALE + 60 || calc_y < -60 || calc_y >= SCREEN_HEIGHT / SCALE + 60) 
+                if (calc_x < -x_margin || calc_x >= SCREEN_WIDTH / SCALE + x_margin || calc_y < -y_margin || calc_y >= SCREEN_HEIGHT / SCALE + y_margin) 
                     continue;
 
                 if (!is_valid_object(objects.id[obj]) || objects.flags[obj] & FLAG_TOGGLED) 
