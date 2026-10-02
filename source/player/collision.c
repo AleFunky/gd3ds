@@ -1527,7 +1527,7 @@ void collide_with_obj(Player *player, int obj) {
 void collide_with_slope(Player *player, int obj, bool has_slope) {
     const ObjectHitbox *hitbox = game_objects[objects.id[obj]].hitbox;
     
-    if (!hitbox) return;
+    if (!hitbox || objects.flags[obj] & FLAG_TOGGLED) return;
     
     float width = objects.width[obj];
     float height = objects.height[obj];
