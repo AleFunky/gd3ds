@@ -34,9 +34,6 @@ typedef struct {
     float sorting_ms;
     float tint_ms;
     float drawing_ms;
-
-    // Dirty system
-    int draw_dirty;
     int draw_count;
 
     // Touch

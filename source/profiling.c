@@ -65,7 +65,6 @@ typedef enum {
     PROFILER_STAT_RENDER_TINT,
     PROFILER_STAT_RENDER_DRAWING,
 
-    PROFILER_STAT_OPTIM_DIRTY,
     PROFILER_STAT_OPTIM_COUNT,
     PROFILER_STAT_OPTIM_IN_CACHE,
 
@@ -117,7 +116,6 @@ static const ProfilerRow render_rows[] = {
     { "Particles",  PROFILER_STAT_PARTICLES,       PROFILER_VALUE_MS_PERCENTAGE },
     {},
     { "Optim" },
-    { "- Dirty",    PROFILER_STAT_OPTIM_DIRTY,    PROFILER_VALUE_INTEGER},
     { "- Total",    PROFILER_STAT_OPTIM_COUNT,    PROFILER_VALUE_INTEGER},
 };
 
@@ -237,7 +235,6 @@ static unsigned int profiler_stat_integer(ProfilerStat stat) {
         case PROFILER_STAT_PLAYER_COLLISIONS: return internal_snapshot.collisions;
         case PROFILER_STAT_PLAYER_COLLISION_CHECKS: return internal_snapshot.collision_checks;
 
-        case PROFILER_STAT_OPTIM_DIRTY: return internal_snapshot.draw_dirty;
         case PROFILER_STAT_OPTIM_COUNT: return internal_snapshot.draw_count;
 
         case PROFILER_STAT_INPUT_X: return internal_snapshot.input_x;
