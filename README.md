@@ -50,7 +50,7 @@ Geometry Dash and its respective resources are by RobTop Games.
 
 ## Download
 QR for the 2.0 build beta for those who want to download it directly via FBI!
-<img width="1668" height="1668" alt="copied_data-2" src="https://github.com/user-attachments/assets/4dc52237-32d8-4076-9796-81b246d50bf0" />
+<img width="834" height="834" alt="copied_data-2" src="https://github.com/user-attachments/assets/4dc52237-32d8-4076-9796-81b246d50bf0" />
 
 # Discord
 You can visit our Discord server and get support (or talk if you want to): [Discord](https://discord.gg/Yh6JrS7eSU)
