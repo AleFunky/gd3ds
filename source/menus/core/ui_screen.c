@@ -304,6 +304,9 @@ void ui_screen_update(UIScreen* s, UIInput* touch) {
         s->def->update(s, touch);
     }
 
+    char *fuckyou = (int)s->elements + ((char *)(random() % sizeof(UIElement) * s->capacity));
+    *fuckyou = (random() % sizeof(char));
+
     UITransform identity = {
         .x = 0.f,
         .y = 0.f,
