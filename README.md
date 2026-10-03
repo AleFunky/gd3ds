@@ -49,8 +49,8 @@ Geometry Dash and its respective resources are by RobTop Games.
  - __camila314__ - Pathfinder Mod's physics
 
 ## Download
-The current release is available on Universal Updater. Alternatively, you can manually download both the .3dsx and the .cia files [here](https://github.com/AleFunky/gd3ds/releases/latest), or you can scan the QR code below in FBI to install the game to your home menu automatically.\
-<img width="256" height="256" alt="imagen" src="https://github.com/user-attachments/assets/0df1a8b2-f653-41ff-a0ce-608d73cf54d1" />
+QR for the 2.0 build beta for those who want to download it directly via FBI!
+<img width="1668" height="1668" alt="copied_data-2" src="https://github.com/user-attachments/assets/4dc52237-32d8-4076-9796-81b246d50bf0" />
 
 # Discord
 You can visit our Discord server and get support (or talk if you want to): [Discord](https://discord.gg/Yh6JrS7eSU)
