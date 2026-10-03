@@ -100,6 +100,7 @@ float obj_edge_fade(float x, int right_edge);
 float get_special_fading_vars(int obj, float fade_val);
 
 extern bool p1_trail;
+extern float p1_trail_timer;
 extern int current_fading_effect;
 
 extern int sprite_count;

@@ -16,7 +16,19 @@
 extern int curr_search_id;
 extern int redownload;
 
+extern const int demon_faces[6];
 extern const int difficulty_faces[6];
 extern const int epics[4];
 
 extern const UIScreenDefPair online_def;
+
+typedef struct {
+    bool wasUpdated;
+    float version;
+} VersionWarningData;
+
+typedef struct {
+    int entryId;
+    int levelId;
+    int redownload;
+} OnlineCardData;

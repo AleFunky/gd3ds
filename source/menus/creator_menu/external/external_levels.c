@@ -95,7 +95,7 @@ void load_level_folder(char *folder, UIScreen *s) {
     ui_run_func_on_tag(s, "spinner", ui_disable_element);
     ui_run_func_on_tag(s, "no_levels", ui_disable_element);
 
-    char level_name[256];
+    char level_name[525];
 
     ui_list_reset(list);
     

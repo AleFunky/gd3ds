@@ -45,7 +45,7 @@ static void populate_online_info() {
     snprintf(buffer, sizeof(buffer), "By: <#ffff00>%s</>", creator_entry->creatorName);
     ui_label_set_text(level_creator, buffer);
     
-    if (lvl_entry) {
+    if (lvl_entry && lvl_entry->updateDate[0] != '\0') {
         snprintf(
             buffer, sizeof(buffer), 
             gdps ? "Uploaded: <#ffff00>%s</>" : "Uploaded: <#ffff00>%s ago</>", 

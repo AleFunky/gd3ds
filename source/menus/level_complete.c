@@ -466,9 +466,9 @@ void level_complete_init() {
 int level_complete_loop(UIInput *touch) {
     if (!init) return 0;
 
-    if (animating_down) run_start_animation(1.f / 60.f);
-    if (animating_reward && !state.practice_mode && !cheated) run_rewards_animation(1.f / 60.f);
-    if (animating_up) run_end_animation(1.f / 60.f);
+    if (animating_down) run_start_animation(delta);
+    if (animating_reward && !state.practice_mode && !cheated) run_rewards_animation(delta);
+    if (animating_up) run_end_animation(delta);
 
     if (yes_exit) {
         return 1;

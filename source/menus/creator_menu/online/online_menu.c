@@ -58,7 +58,7 @@ static GenericTask search_task = {
 
 int search_result = -2;
 
-const int demon_faces[] = {
+const int demon_faces[6] = {
     NA_FACE,
     EASY_DEMON_FACE,
     MEDIUM_DEMON_FACE,
@@ -82,17 +82,6 @@ const int epics[4] = {
     EPIC_GLOW,
     LEGENDARY_GLOW,
 };
-
-typedef struct {
-    int entryId;
-    int levelId;
-    int redownload;
-} OnlineCardData;
-
-typedef struct {
-    bool wasUpdated;
-    float version;
-} VersionWarningData;
 
 static void action_clear_data(UIElement* e, const UIPropertyList *args) {
     if (search_entries) {
@@ -580,8 +569,6 @@ static void online_menu_exit() {
         search_task.cancelled = true;
         threadJoin(thread, U64_MAX);
     }
-    
-    save_current_save_file(LEVEL_LIST_ONLINE);
 }
 
 

@@ -57,9 +57,10 @@ typedef struct {
     bool skipHighObjWarning;
     bool skipVersionWarning;
     bool skipSongWarning;
+    bool vsync;
 } SettingState;
 
-extern Setting settings[29];
+extern Setting settings[30];
 extern SettingState settingsState;
 
 extern const UIScreenDefPair settings_def;
