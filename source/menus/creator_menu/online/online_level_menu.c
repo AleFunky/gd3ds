@@ -677,7 +677,7 @@ static void online_level_init (UIScreen *s) {
             output_log("Oops, couldn't save da level!\n");
         }
     }
-    
+
     play_menu_song();
     
     if (!already_played_online_level) {
@@ -690,6 +690,7 @@ static void online_level_init (UIScreen *s) {
     populate_level_info(online_menu_level_id);
 
     if (!already_played_online_level) {
+        level_entry = NULL;
         if (saved_level_exists(online_menu_level_id, gdps) && !redownload) {
             has_saved_level = true;
             saved_level_thread = create_generic_thread(&saved_level_task);
