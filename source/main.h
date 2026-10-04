@@ -31,8 +31,22 @@
 #define GD_VERSION 1.9
 #define LAST_GD_VERSION_ID 11020426 // Last 1.9 id
 
+#define GAME_TITLE_ID 0x000400000BB41C00
+
+#define REPO_AUTHOR "alefunky"
+#define REPO_NAME "gd3ds"
+#define REPO_BRANCH "main"
+
+#define CURRENT_GIT_HASH "9f24cb92f4214c55e0a12fd63c5d678a8ed30da3"
+
 // When making a release, uncomment this please thanks
 // #define IS_RELEASE
+
+// you'll have to curl the current release id from the github api sorry
+// this is the command btw
+// curl -L \ -H "Accept: application/vnd.github+json" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/alefunky/gd3ds/releases
+
+#define CURRENT_RELEASE_ID 345222206
 
 typedef struct {
     float x, y;
@@ -49,6 +63,9 @@ extern bool song_loaded;
 
 extern bool alt_title_screen;
 extern bool is_N3DS;
+extern bool is_3DSX;
+
+extern char *_3dsx_path;
 
 extern float global_volume;
 extern float music_volume;

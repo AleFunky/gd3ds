@@ -31,6 +31,9 @@
 #include "menus/creator_menu/search/song_filter.h"
 #include "menus/settings_hub/songs.h"
 #include "menus/statistics.h"
+#include "menus/updater.h"
+#include "menus/updater_settings.h"
+#include "menus/updater_pop_up.h"
 
 const UIScreenDefPair *defs[] = {
     &main_menu_def,
@@ -64,6 +67,9 @@ const UIScreenDefPair *defs[] = {
     &online_level_comments_def,
     &external_popup_def,
     &external_infobox_def,
+    &updater_def,
+    &updater_settings_def,
+    &updater_pop_up_def,
 };
 
 const UIScreenDefPair *ui_get_screen_def(const char* name){

@@ -91,7 +91,8 @@ static GenericTask song_data_task = {
 static Thread song_data_thread;
 
 static DownloadTask song_task = {
-    .path = USER_SONGS_DIR
+    .path = USER_SONGS_DIR,
+    .extension = "mp3"
 };
 
 static Thread saved_level_thread;
@@ -717,9 +718,9 @@ static void online_level_menu_update(UIScreen *s, UIInput *i) {
         // Handle result
         if (song_data_result == 0) {
             song_data_task.finished = false;
-            snprintf(song_task.song_id, sizeof(song_task.song_id), "%d", current_search_entry->songId);
+            snprintf(song_task.file_name, sizeof(song_task.file_name), "%d", current_search_entry->songId);
             song_task.url = current_song_entry->songLink;
-            song_thread = create_download_song_thread(&song_task);
+            song_thread = create_file_download_thread(&song_task);
         } else { handle_song_data_errors(song_data_result); }
         
     }

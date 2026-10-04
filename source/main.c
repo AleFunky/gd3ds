@@ -132,6 +132,9 @@ float faster_speed_particles_timer = 0.f;
 bool alt_title_screen;
 
 bool is_N3DS;
+bool is_3DSX;
+
+char *_3dsx_path;
 
 UIStack menu_stack = { 0 };
 UIStack gameplay_stack = { 0 };
@@ -251,6 +254,12 @@ void set_channel_volume(int channel, float volume) {
     mix[1] = gain;
 
     ndspChnSetMix(channel, mix);
+}
+
+static void check_rom_type() {
+    u64 id;
+    APT_GetProgramID(&id);
+    is_3DSX = (id != GAME_TITLE_ID);
 }
 
 void apply_volume_settings() {
@@ -1460,8 +1469,6 @@ void game_assets_init() {
 
     initParticleSystem(&faster_speed_particles_bottom, &speed_effect_vfast);
     faster_speed_particles_bottom.relativeStationary = true;
-
-    
 }
 
 int main(int argc, char* argv[]) {
@@ -1476,6 +1483,10 @@ int main(int argc, char* argv[]) {
     osSetSpeedupEnable(1);
     soc_init();
     check_system_model();
+    check_rom_type();
+    if (argc > 0) { output_log("3dsx path: %s\n", argv[0]);
+        _3dsx_path = argv[0];}
+    
 #ifndef IS_RELEASE
     consoleDebugInit(debugDevice_SVC);
 #endif

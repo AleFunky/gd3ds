@@ -56,10 +56,11 @@ typedef struct {
 
     char *path;
     char *url;
-    char song_id[16];
+    char file_name[16];
+    char extension[8];
 } DownloadTask;
 
-Thread create_download_song_thread(DownloadTask *task);
+Thread create_file_download_thread(DownloadTask *task);
 
 int soc_init();
 
@@ -70,5 +71,9 @@ int get_search_results(GenericTask *task, char **out_data, int gameVer, SearchFi
 int get_comments_from_id(GenericTask *task, char **out_data, int id, int page, int mode, bool useGdps);
 
 int get_song_info_from_id(GenericTask *task, char **out_data, int songId, bool useGdps);
+
+int get_current_commit(GenericTask *task, char **out_data, char *repoOwner, char *repoName, char *branch);
+
+int get_releases(GenericTask *task, char **out_data, char *repoOwner, char *repoName);
 
 void soc_exit();

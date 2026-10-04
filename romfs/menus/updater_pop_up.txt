@@ -1,0 +1,14 @@
+darken opacity=0.4
+
+window x=160 y=120 w=240 h=140 style=1
+{
+    label x=0 y=-40 text="Updating..." font=2 scale=0.9 align=CENTER
+    
+    button x=-114 y=-64 id=31 actions=soft_exit keyBinds="B" scale=0.9 tag="exitbutton"
+
+    spinner x=0 y=3 id=53 sheet=1 scale=0.8 speed=240 tag="spinner"
+    label x=-77 y=20 text="0B/s" scale=0.7 tag="speedlabel" align=LEFT font=1
+    label x=77 y=20 text="" scale=0.7 tag="timelabel" align=RIGHT font=1
+    progressbar x=0 y=5 max_value=100 style=1 scale=0.75 tag="progressbar"
+    label x=0 y=-10 text="Downloading..." font=1 scale=0.8 tag="statuslabel" align=CENTER
+}

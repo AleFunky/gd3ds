@@ -1,12 +1,5 @@
-#include <3ds.h>
-#include <citro2d.h>
-
 #include "menus/core/ui_screen.h"
-#include "menus/components/ui_list.h"
-#include "main.h"
 #include "mp3_player.h"
-#include "graphics.h"
-
 #include "save/config.h"
 
 bool gotSogged = false;
