@@ -118,10 +118,17 @@ C2D_SpriteSheet particleSheet;
 static SortItem buf_a[MAX_SPRITES];
 static SortItem buf_b[MAX_SPRITES];
 
-static SpriteObject viewable_objects[MAX_SPRITES];
+static SpriteObject *object_sprite_cache;
+static SpriteObject *viewable_objects;
 static SpriteObject *viewable_objects_ptr[MAX_SPRITES];
 static int current_objects[MAX_SPRITES];
+static int *object_sprite_start;
+static unsigned char *object_sprite_count;
 static int current_object_count;
+static int render_object_capacity;
+static float render_mirror_factor;
+static bool render_list_changed;
+static SpriteObject player_sprite_cache;
 
 bool p1_trail = false;
 float p1_trail_timer = 0;
@@ -654,6 +661,40 @@ float get_object_pulse(float amplitude, int id, int layer) {
     return 1.0f;
 }
 
+static bool object_has_pulse(int id) {
+    switch (id) {
+        case 15:
+        case 16:
+        case 17:
+        case YELLOW_ORB:
+        case 50:
+        case 51:
+        case 52:
+        case 53:
+        case 54:
+        case 60:
+        case BLUE_ORB:
+        case 132:
+        case 133:
+        case 136:
+        case PINK_ORB:
+        case 148:
+        case 149:
+        case 150:
+        case 236:
+        case 405:
+        case 460:
+        case 494:
+        case 495:
+        case 496:
+        case 497:
+        case GREEN_ORB:
+            return true;
+        default:
+            return false;
+    }
+}
+
 int get_color_type(const GameObject *game_obj, int obj, int col_type) {
     // Check for the presence of 1.9 color channel
     if (objects.v1p9_col_channel[obj]) {
@@ -745,7 +786,6 @@ void spawn_object_at(
                 vo->opacity = obj->opacity;
                 vo->col_channel = get_color_channel(obj->color_type, obj_game, obj);
                 calc_quad_params(vo);
-                viewable_objects_ptr[sprite_count] = vo;
 
                 sprite_count++;
             }
@@ -811,7 +851,6 @@ void spawn_object_at(
         vo->opacity = obj->opacity;
         vo->col_channel = get_color_channel(obj->color_type, obj_game, obj);
         calc_quad_params(vo);
-        viewable_objects_ptr[sprite_count] = vo;
 
         sprite_count++;
     }
@@ -839,7 +878,6 @@ void spawn_object_at(
         vo->blending = true;
         vo->col_channel = get_color_channel(COLOR_TYPE_GLOW, obj_game, obj);
         calc_quad_params(vo);
-        viewable_objects_ptr[sprite_count] = vo;
         sprite_count++;
     }
 
@@ -945,7 +983,6 @@ void spawn_object_at(
             vo->opacity = c->opacity;
             vo->col_channel = get_color_channel(c->color_type, obj_game, obj);
             calc_quad_params(vo);
-            viewable_objects_ptr[sprite_count] = vo;
             sprite_count++;
         }
     }
@@ -1080,6 +1117,28 @@ int get_object_layers(int id) {
     for (size_t c = 0; c < obj->child_count; c++) {
         if (obj->children[c].texture >= 0) count++;
     }
+    return count;
+}
+
+static int get_object_sprite_total(int obj) {
+    int id = objects.id[obj];
+    if (id < 0 || id >= GAME_OBJECT_COUNT) return 0;
+
+    const GameObject *game_object = &game_objects[id];
+    int count = get_object_layers(objects.id[obj]);
+    if (game_object->glow_frame >= 0) count++;
+
+    if (objects.id[obj] == TEXT_OBJECT) {
+        TextObject *text_obj = get_text_object(obj);
+        if (text_obj->len > 0) {
+            if (!text_obj->layout_done) {
+                text_obj->glyph_count = text_object_layout(level_font, text_obj->text, text_obj->glyphs, MAX_TEXT_LEN);
+                text_obj->layout_done = 1;
+            }
+            count += text_obj->glyph_count;
+        }
+    }
+
     return count;
 }
 
@@ -1483,8 +1542,108 @@ void draw_attempt_text() {
     }
 }
 
-static void update_current_objects(void) {
+bool ensure_render_cache(void) {
+    if (render_object_capacity == objects.count) return true;
+
+    // New objects! Reallocate stuff and maintain pointer integrity
+
+    free(object_sprite_start);
+    free(object_sprite_count);
+    free(object_sprite_cache);
+
+    object_sprite_start = malloc(sizeof(int) * objects.count);
+    object_sprite_count = malloc(sizeof(unsigned char) * objects.count);
+    
+    if (!object_sprite_start || !object_sprite_count) {
+        free(object_sprite_start);
+        free(object_sprite_count);
+        object_sprite_start = NULL;
+        object_sprite_count = NULL;
+        object_sprite_cache = NULL;
+        render_object_capacity = 0;
+        return false;
+    }
+
+    // Count all layers
+    int cache_capacity = 0;
+    for (int obj = 0; obj < objects.count; obj++) {
+        int count = get_object_sprite_total(obj);
+        cache_capacity += count;
+        object_sprite_count[obj] = count;
+    }
+
+    object_sprite_cache = malloc(sizeof(SpriteObject) * cache_capacity);
+    if (!object_sprite_cache) {
+        // Today i discovered free ignores NULL
+        free(object_sprite_start);
+        free(object_sprite_count);
+        free(object_sprite_cache);
+        object_sprite_start = NULL;
+        object_sprite_count = NULL;
+        object_sprite_cache = NULL;
+        render_object_capacity = 0;
+        return false;
+    }
+
+    // Get offsets of each object
+    int sprite_offset = 0;
+    for (int obj = 0; obj < objects.count; obj++) {
+        object_sprite_start[obj] = sprite_offset;
+        sprite_offset += get_object_sprite_total(obj);
+    }
+
     current_object_count = 0;
+    render_object_capacity = objects.count;
+    render_mirror_factor = state.mirror_factor;
+    return true;
+}
+
+void reset_render_cache(void) {
+    free(object_sprite_start);
+    free(object_sprite_count);
+    free(object_sprite_cache);
+
+    object_sprite_start = NULL;
+    object_sprite_count = NULL;
+    object_sprite_cache = NULL;
+    render_object_capacity = 0;
+    current_object_count = 0;
+    sprite_count = 0;
+    viewable_objects = NULL;
+}
+
+static int insert_sorted_object(int obj) {
+    if (current_object_count >= MAX_SPRITES) return -1;
+
+    int idx = current_object_count;
+
+    while (idx > 0) {
+        int prev = current_objects[idx - 1];
+
+        // keep the list sorted by object index
+        if (prev < obj) break;
+
+        current_objects[idx] = prev;
+        idx--;
+    }
+
+    current_objects[idx] = obj;
+    current_object_count++;
+    return idx;
+}
+
+static void remove_object_at(int index) {
+    for (int i = index; i + 1 < current_object_count; i++) {
+        current_objects[i] = current_objects[i + 1];
+    }
+    current_object_count--;
+}
+
+static void update_current_objects(void) {
+    // Mark everything as unseen, everything that is actually on screen will mark it as seen again
+    for (int i = 0; i < current_object_count; i++) {
+        objects.flags[current_objects[i]] &= ~FLAG_SEEN;
+    }
 
     int width = ceilf(SCREEN_WIDTH_AREA / SECTION_SIZE);
     int height = ceilf(SCREEN_HEIGHT_AREA / SECTION_SIZE);
@@ -1502,11 +1661,8 @@ static void update_current_objects(void) {
 
                 float calc_x = objects.x[obj] - state.camera_x;
                 float calc_y = SCREEN_HEIGHT - (objects.y[obj] - state.camera_y);
-                
-                float x_margin = 60 * objects.scale_x[obj];
-                float y_margin = 60 * objects.scale_y[obj];
 
-                if (calc_x < -x_margin || calc_x >= SCREEN_WIDTH / SCALE + x_margin || calc_y < -y_margin || calc_y >= SCREEN_HEIGHT / SCALE + y_margin) 
+                if (calc_x < -60 || calc_x >= SCREEN_WIDTH / SCALE + 60 || calc_y < -60 || calc_y >= SCREEN_HEIGHT / SCALE + 60) 
                     continue;
 
                 if (!is_valid_object(objects.id[obj]) || objects.flags[obj] & FLAG_TOGGLED) 
@@ -1515,54 +1671,35 @@ static void update_current_objects(void) {
                 // 0 scale objects are invisible
                 if (objects.scale_x[obj] == 0.f || objects.scale_y[obj] == 0.f)
                     continue;
-            
-                float fade_val = obj_edge_fade(calc_x, SCREEN_WIDTH / SCALE);
-                if (fade_val == 255) {
-                    objects.transition_applied[obj] = FADE_NONE;
-                } else if (objects.transition_applied[obj] == FADE_NONE) {
-                    float calc_y = SCREEN_HEIGHT - (objects.y[obj] - state.camera_y);
-                    handle_special_fading(obj, calc_x, calc_y);
-                }
-                // The rotating objects need to be recalculated
-                float rotation_speed = get_rotation_speed(obj);
-                if (rotation_speed != 0) {
-                    objects.visual_rotation[obj] += ((objects.random[obj] & 1) ? -rotation_speed : rotation_speed) * delta;
+
+                // This object has just entered the screen
+                if (!(objects.flags[obj] & FLAG_VISIBLE)) {
+                    objects.flags[obj] |= (FLAG_DIRTY | FLAG_VISIBLE);
+                    render_list_changed = true;
+                    insert_sorted_object(obj);
                 }
 
-                spawn_object_particles(obj);
-                
-                if (fade_val == 255) {
-                    objects.transition_applied[obj] = FADE_NONE;
-                }
-
-                // Fade when it reaches an edge
-                if (fade_val != 255 && objects.transition_applied[obj] == FADE_NONE) {
-                    handle_special_fading(obj, calc_x, calc_y);
-                }
-                
-                float fade_x = 0;
-                float fade_y = 0;
-                float fade_scale = 1.f;
-                get_fade_vars(obj, calc_x, &fade_x, &fade_y, &fade_scale);
-
-                // Handle special fade types
-                fade_x += get_special_fading_vars(obj, fade_val);
-
-                spawn_object_at(
-                    obj,
-                    objects.id[obj],
-                    get_mirror_x(calc_x + fade_x, state.mirror_factor),
-                    calc_y + fade_y,
-                    objects.visual_rotation[obj],
-                    objects.flippedH[obj] ^ (state.mirror_mult < 0),
-                    objects.flippedV[obj],
-                    fade_scale
-                );
-
-                spawn_object_particles(obj);
-                if (current_object_count < MAX_SPRITES) current_objects[current_object_count++] = obj;
+                // Mark as seen again
+                objects.flags[obj] |= FLAG_SEEN;
             }
         }
+    }
+
+    // Remove objects that aren't visible anymore
+    for (int i = 0; i < current_object_count;) {
+        int obj = current_objects[i];
+
+        // Keep visible
+        if (objects.flags[obj] & FLAG_SEEN) {
+            i++;
+            continue;
+        }
+
+        // Not visible anymore, bye
+        objects.flags[obj] &= ~FLAG_VISIBLE;
+        objects.flags[obj] |= FLAG_DIRTY;
+        render_list_changed = true;
+        remove_object_at(i);
     }
 }
 
@@ -1706,28 +1843,174 @@ void update_tints() {
 
 
 void create_objects() {
+    if (!ensure_render_cache()) return;
+
     u64 start = svcGetSystemTick();
+    render_list_changed = false;
+
+    bool mirror_changed = render_mirror_factor != state.mirror_factor;
+
+    for (int i = 0; i < current_object_count; i++) {
+        int obj = current_objects[i];
+        int id = objects.id[obj];
+        float calc_x = objects.x[obj] - state.camera_x;
+
+        float fade_val = obj_edge_fade(calc_x, SCREEN_WIDTH / SCALE);
+        if (fade_val == 255) {
+            objects.transition_applied[obj] = FADE_NONE;
+        } else if (objects.transition_applied[obj] == FADE_NONE) {
+            float calc_y = SCREEN_HEIGHT - (objects.y[obj] - state.camera_y);
+            handle_special_fading(obj, calc_x, calc_y);
+        }
+
+        if (objects.transition_applied[obj] > FADE_SIMPLE && fade_val != 255) {
+            objects.flags[obj] |= FLAG_DIRTY;
+        }
+        
+        // The rotating objects need to be recalculated
+        float rotation_speed = get_rotation_speed(obj);
+        if (rotation_speed != 0) {
+            objects.visual_rotation[obj] += ((objects.random[obj] & 1) ? -rotation_speed : rotation_speed) * delta;
+            objects.flags[obj] |= FLAG_DIRTY;
+        }
+
+        // Check for pulsing objects, they are dirty
+        if (object_has_pulse(id)) objects.flags[obj] |= FLAG_DIRTY;
+
+        // animated objs need to be respawned every frame
+        if (game_objects[id].animation_type)
+            objects.flags[obj] |= FLAG_DIRTY;
+
+        // Secret coin is animated
+        if (id == SECRET_COIN) objects.flags[obj] |= FLAG_DIRTY;
+
+        spawn_object_particles(obj);
+    }
+
+    update_current_objects();
+
+    snapshot.draw_count = current_object_count;
+    snapshot.draw_dirty = 0;
+
+    if (!mirror_changed && !render_list_changed) {
+        // Check if theres dirty objects
+        bool has_dirty_objects = false;
+        for (int i = 0; i < current_object_count; i++) {
+            if (objects.flags[current_objects[i]] & FLAG_DIRTY) {
+                has_dirty_objects = true;
+                break;
+            }
+        }
+
+        // No dirty objects, do nothing
+        if (!has_dirty_objects && current_object_count > 0) {
+            u64 start = svcGetSystemTick();
+            render_mirror_factor = state.mirror_factor;
+            snapshot.creating_ms = (svcGetSystemTick() - start) / CPU_TICKS_PER_MSEC;
+            snapshot.sorting_ms = 0;
+            update_tints();
+            return;
+        }
+    }
+
+    // If mirror direction changed, everything is dirty now, jeez
+    if (mirror_changed) {
+        for (int i = 0; i < current_object_count; i++) {
+            objects.flags[current_objects[i]] |= FLAG_DIRTY;
+        }
+    }
 
     sprite_count = 0;
 
     // Player sprite
     // Only needs one as its only for sorting purposes
-    SpriteObject *vo = &viewable_objects[sprite_count];
-
-    C2D_Sprite spr = { 0 };
-    vo->spr = spr;
+    memset(&player_sprite_cache, 0, sizeof(player_sprite_cache));
+    SpriteObject *vo = &player_sprite_cache;
     vo->obj = -1;
     vo->layer = 0;
     vo->col_type = 0;
     vo->opacity = 1.f;
     vo->col_channel = 0;
-    viewable_objects_ptr[sprite_count] = vo;
-    sprite_count++;
+    vo->blending = false;
+    vo->hidden = false;
+    viewable_objects_ptr[sprite_count++] = vo;
 
-    update_current_objects();
+    for (int i = 0; i < current_object_count; i++) {
+        int obj = current_objects[i];
+        int object_start = object_sprite_start[obj];
+        unsigned char layer_count = object_sprite_count[obj];
+
+        if (layer_count <= 0) continue;
+
+        if (!(objects.flags[obj] & FLAG_DIRTY)) {
+            // Not dirty, avoid recalculating it
+            for (int layer = 0; layer < layer_count; layer++) {
+                viewable_objects_ptr[sprite_count++] = &object_sprite_cache[object_start + layer];
+            }
+            continue;
+        }
+
+        snapshot.draw_dirty++;
+
+        int visible_start = sprite_count;
+        viewable_objects = object_sprite_cache + object_start;
+        sprite_count = 0;
+
+        float calc_x = objects.x[obj] - state.camera_x;
+        float calc_y = SCREEN_HEIGHT - (objects.y[obj] - state.camera_y);
+
+        float fade_val = obj_edge_fade(calc_x, SCREEN_WIDTH / SCALE);
+        
+        if (fade_val == 255) {
+            objects.transition_applied[obj] = FADE_NONE;
+        }
+
+        // Fade when it reaches an edge
+        if (fade_val != 255 && objects.transition_applied[obj] == FADE_NONE) {
+            handle_special_fading(obj, calc_x, calc_y);
+        }
+        
+        float fade_x = 0;
+        float fade_y = 0;
+        float fade_scale = 1.f;
+        get_fade_vars(obj, calc_x, &fade_x, &fade_y, &fade_scale);
+
+        // Handle special fade types
+        fade_x += get_special_fading_vars(obj, fade_val);
+
+        float world_x = get_mirror_x(objects.x[obj], state.mirror_factor);
+        float world_y = SCREEN_HEIGHT - objects.y[obj];
+        float fade_x_world = (1.f - 2.f * state.mirror_factor) * fade_x;
+
+        spawn_object_at(
+            obj, 
+            objects.id[obj],        
+            world_x + fade_x_world,
+            world_y + fade_y, 
+            objects.visual_rotation[obj],
+            objects.flippedH[obj] ^ (state.mirror_mult < 0),
+            objects.flippedV[obj], 
+            fade_scale
+        );
+
+        layer_count = sprite_count;
+        object_sprite_count[obj] = layer_count;
+
+        // Add layers to the list
+        for (int layer = 0; layer < layer_count; layer++) {
+            viewable_objects_ptr[visible_start + layer] = &object_sprite_cache[object_start + layer];
+        }
+        sprite_count = visible_start + layer_count;
     
+        // Objects in transition are dirty
+        objects.flags[obj] &= ~FLAG_DIRTY;
+        objects.flags[obj] |= (objects.transition_applied[obj] > FADE_SIMPLE && fade_val != 255) ? FLAG_DIRTY : 0;
+    }
 
-    snapshot.draw_count = current_object_count;
+    viewable_objects = object_sprite_cache;
+    viewable_objects_ptr[0] = &player_sprite_cache;
+
+    render_mirror_factor = state.mirror_factor;
     
     u64 end = svcGetSystemTick();
     u64 ticks = end - start;
@@ -1807,6 +2090,10 @@ void draw_player_graphics() {
 void draw_objects() {
     u64 start = svcGetSystemTick();
 
+    C3D_Mtx object_view;
+    C2D_ViewSave(&object_view);
+    C2D_ViewTranslate((2.f * state.mirror_factor - 1.f) * state.camera_x, state.camera_y);
+
     // Draw
     for (size_t s = 0; s < sprite_count; s++) {
         SpriteObject *obj = viewable_objects_ptr[s];
@@ -1828,9 +2115,14 @@ void draw_objects() {
                 C2D_DrawImageFast(&obj->spr.image, &obj->params, &obj->spr.params, obj->tint);
             }
         } else {   
+            C2D_ViewRestore(&object_view);
             draw_player_graphics();
+            C2D_ViewSave(&object_view);
+            C2D_ViewTranslate((2.f * state.mirror_factor - 1.f) * state.camera_x, state.camera_y);
         }
     }
+
+    C2D_ViewRestore(&object_view);
 
     change_blending(true);
     drawParticleSystem(&slow_speed_particles, 0, 0, 1.f);

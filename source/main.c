@@ -144,11 +144,18 @@ UIStack gameplay_stack = { 0 };
 ExternalLevelFile external_file;
 ServerFile gd_server_file;
 ServerFile gdps_file;
+ServerFile geometrix_file;
 ServerFile *current_server_file;
 
 void load_gdps_info() {
-    current_server_file = (gdps ? &gdps_file : &gd_server_file);
-    current_main_level_pack = (gdps ? &gdps_levels : &robtop_levels);
+    if (geometrix) {
+        current_server_file = &geometrix_file;
+    } else if (gdps) {
+        current_server_file = &gdps_file;
+    } else {
+        current_server_file = &gd_server_file;
+    }
+    current_main_level_pack = ((gdps) ? &gdps_levels : &robtop_levels);
 }
 
 // Checks if the game is being emulated by citra/azahar
@@ -1564,6 +1571,10 @@ int main(int argc, char* argv[]) {
 
     load_save_file(SAVE_1P9_SERVER_FILE, &gdps_file);
 
+    loading_screen_update(25);
+
+    load_save_file(SAVE_GEOMETRIX_SERVER_FILE, &geometrix_file);
+
     loading_screen_update(30);
 
     load_external_file(SAVE_EXTERNAL_LEVELS_FILE, &external_file);
@@ -1681,6 +1692,7 @@ int main(int argc, char* argv[]) {
     C2D_SpriteSheetFree(goldFont_sheet);
     C2D_SpriteSheetFree(window_sheet);
     C2D_SpriteSheetFree(bar_sheet);
+    C2D_SpriteSheetFree(ui_3_sheet);
 
     cfg_fini();
 

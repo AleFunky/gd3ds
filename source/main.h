@@ -141,3 +141,4 @@ extern ServerFile *current_server_file;
 extern ExternalLevelFile external_file;
 extern ServerFile gd_server_file;
 extern ServerFile gdps_file;
+extern ServerFile geometrix_file;
