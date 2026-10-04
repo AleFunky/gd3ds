@@ -34,6 +34,8 @@ typedef struct LevelData {
     bool coin3;
 } LevelData;
 
+bool level_has_rate(const LevelData *data);
+
 typedef struct SavedLevelDataEntry {
     char *key;
     SearchEntry search_entry;
@@ -111,6 +113,7 @@ bool is_saving();
 
 extern int total_stars;
 extern int total_coins;
+extern int total_user_coins;
 extern int total_attempts;
 extern int total_jumps;
 extern int total_demons;

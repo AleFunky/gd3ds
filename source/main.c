@@ -11,7 +11,8 @@
 #include "level_loading.h"
 #include "main.h"
 #include "graphics.h"
-#include "color_channels.h"
+#include "particles/rays.h"
+#include "triggers.h"
 #include "menus/core/ui_element.h"
 #include "mp3_player.h"
 #include "fonts/bigFont.h"
@@ -28,6 +29,7 @@
 #include "particles/particles.h"
 #include "particles/object_particles.h"
 #include "particles/coin_effect.h"
+#include "particles/key_effect.h"
 
 #include <stdarg.h>
 
@@ -72,7 +74,7 @@
 #define CITRA_TYPE 0x20000
 #define CITRA_VERSION 11
 
-u32 __ctru_linear_heap_size = 36 << 20;
+u32 __ctru_linear_heap_size = 44 << 20;
 
 int game_state = STATE_MENU;
 bool escape_state;
@@ -89,6 +91,9 @@ bool cheated = false;
 float global_volume;
 float music_volume;
 float sound_volume;
+
+int steps = 0;
+int last_steps = 0;
 
 bool cheats_used[CHEAT_COUNT];
 
@@ -139,11 +144,18 @@ UIStack gameplay_stack = { 0 };
 ExternalLevelFile external_file;
 ServerFile gd_server_file;
 ServerFile gdps_file;
+ServerFile geometrix_file;
 ServerFile *current_server_file;
 
 void load_gdps_info() {
-    current_server_file = (gdps ? &gdps_file : &gd_server_file);
-    current_main_level_pack = (gdps ? &gdps_levels : &robtop_levels);
+    if (geometrix) {
+        current_server_file = &geometrix_file;
+    } else if (gdps) {
+        current_server_file = &gdps_file;
+    } else {
+        current_server_file = &gd_server_file;
+    }
+    current_main_level_pack = ((gdps) ? &gdps_levels : &robtop_levels);
 }
 
 // Checks if the game is being emulated by citra/azahar
@@ -267,9 +279,9 @@ void check_system_model() {
 }
 
 float delta = 0;
+float frame_timer = 0;
 unsigned int level_frame = 0;
 unsigned int frame_counter = 0;
-
 bool song_loaded;
 
 void update_player_effects(float delta) {
@@ -280,6 +292,7 @@ void update_player_effects(float delta) {
         updateParticleSystem(&ship_secondary_particles[i], delta);
         updateParticleSystem(&secondary_particles[i], delta);
         updateParticleSystem(&burst_particles[i], delta);
+        updateParticleSystem(&robot_fire_particles[i], delta);
         updateParticleSystem(&land_particles[i], delta);
         updateParticleSystem(&explosion_particles[i], delta);
     }
@@ -311,6 +324,9 @@ void allocate_particles() {
     initParticleSystem(&burst_particles[0], &burst_effect);
     initParticleSystem(&burst_particles[1], &burst_effect);
 
+    initParticleSystem(&robot_fire_particles[0], &burst_effect2);
+    initParticleSystem(&robot_fire_particles[1], &burst_effect2);
+
     initParticleSystem(&land_particles[0], &land_effect);
     initParticleSystem(&land_particles[1], &land_effect);
     
@@ -339,6 +355,7 @@ void free_particles() {
         freeParticleData(&secondary_particles[i].data);
         freeParticleData(&ship_secondary_particles[i].data);
         freeParticleData(&burst_particles[i].data);
+        freeParticleData(&robot_fire_particles[i].data);
         freeParticleData(&land_particles[i].data);
         freeParticleData(&explosion_particles[i].data);
     }
@@ -379,6 +396,9 @@ void init_particles(Color p1_color, Color p2_color) {
 
     burst_particles[0].depth = 0.5f;
     burst_particles[1].depth = 0.5f;
+    
+    robot_fire_particles[0].depth = 0.5f;
+    robot_fire_particles[1].depth = 0.5f;
 
     land_particles[0].depth = 0.35f;
     land_particles[1].depth = 0.35f;
@@ -507,8 +527,8 @@ void init_particles(Color p1_color, Color p2_color) {
     faster_speed_particles.cfg.startColorBlue  = 255 / 255.f;
 
     coin_pickup_particles.cfg.startColorRed   = 255 / 255.f;
-    coin_pickup_particles.cfg.startColorGreen = 190 / 255.f;
-    coin_pickup_particles.cfg.startColorBlue  = 0 / 255.f;
+    coin_pickup_particles.cfg.startColorGreen = state.custom_level ? 1.f : 190 / 255.f;
+    coin_pickup_particles.cfg.startColorBlue  = state.custom_level ? 1.f : 0.f;
     
     end_wall_particles.cfg.startColorRed   = p1_not_white.r / 255.f;
     end_wall_particles.cfg.startColorGreen = p1_not_white.g / 255.f;
@@ -656,6 +676,7 @@ void ui_loop(){
         } else {
             delta = (now - lastTime) / (CPU_TICKS_PER_MSEC * 1000);
         }
+        g_trigger_dt = delta;
         lastTime = now;
         hidScanInput();
 
@@ -777,6 +798,7 @@ void game_loop() {
 
     play_level_song(level_info.song_offset);
 
+    frame_timer = 0;
     if (song_loaded) {
         pause_playback_mp3();
     }
@@ -857,8 +879,6 @@ void game_loop() {
             cheats_used[CHEAT_HITBOX_DISPLAY] = true;
         }
         
-        int steps = 0;
-        
         kHeldPaused &= ~touch.up;
         if(!game_paused){
             touch.held &= ~kHeldPaused;
@@ -878,6 +898,7 @@ void game_loop() {
             secondary_particles[i].emitting = false;
             ship_secondary_particles[i].emitting = false;
             burst_particles[i].emitting = false;
+            robot_fire_particles[i].emitting = false;
             land_particles[i].emitting = false;
         }
 
@@ -911,6 +932,9 @@ void game_loop() {
                     if (!being_faded) fixed_dt = false;
                 }
                 accumulator += physics_delta;
+                
+                last_steps = steps;
+                steps = 0;
 
                 // in case of merge conflicts: this needs to stay after the accumulator deposit above.
                 // planned is how many substeps this frame is about to run, so if we calculate it
@@ -920,9 +944,17 @@ void game_loop() {
                 u32 planned = (u32)(accumulator / STEPS_DT_UNMOD);
                 pi_begin_frame((u32)frame_window_start, (u32)now, planned ? planned : 1);
 
+                float player_x_before_physics = state.player.x;
+                float acc_delta_y = 0.0f;
+
+                state.player.gravity_changed_move = false;
+                state.player2.gravity_changed_move = false;
+
                 // Run simulation in fixed steps
                 while (accumulator >= STEPS_DT_UNMOD) {
                     u64 start_physics = svcGetSystemTick();
+                    bool player1_upside_down_before = state.player.upside_down;
+                    bool player2_upside_down_before = state.player2.upside_down;
 
                     if (pi_enabled) {
                         pi_apply_substep((u32)steps);
@@ -954,6 +986,7 @@ void game_loop() {
                     trail = &trail_p1;
                     wave_trail = &wave_trail_p1;
                     handle_player(&state.player);
+                    state.player.gravity_changed_move |= state.player.upside_down != player1_upside_down_before;
                     handle_mirror_transition();
 
                     state.level_progress = (state.player.x / level_info.last_obj_x) * 100;
@@ -977,10 +1010,17 @@ void game_loop() {
                         curr_input = state.input_p2;
                         curr_old_input = state.old_input_p2;
                         handle_player(&state.player2);
+                        state.player2.gravity_changed_move |= state.player2.upside_down != player2_upside_down_before;
+
+                        //revert state back to first player
+                        state.current_player = 0;
+                        state.old_player = state.player;
 
                         if (state.dead) break;
                     }
                     
+                    acc_delta_y += state.player.delta_y;
+
                     run_camera();
                     handle_bg_flash();
                     handle_respawn_effect();
@@ -1000,11 +1040,16 @@ void game_loop() {
                     steps++;
                     level_frame++;
                 }
+
+                move_lock_player_x_delta = state.player.x - player_x_before_physics;
+                move_lock_player_y_delta = acc_delta_y;
             }
         }
 
         if (!game_paused) {
             frame_counter++;
+            frame_timer += delta;
+            g_trigger_dt = delta;
 
             if (state.dead && state.death_timer <= 0.f) {
                 state.death_timer = (settingsState.quickRetry ? 0.5f : 1.f);
@@ -1110,7 +1155,12 @@ void game_loop() {
 
             u64 start_trig = svcGetSystemTick();
             handle_triggers();
+            handle_spawn_triggers();
             handle_col_triggers();
+            handle_copy_channels();
+            handle_alpha_triggers();
+            handle_move_triggers();
+            handle_pulse_triggers();
             calculate_lbg();
             u64 end_trig = svcGetSystemTick();
             u64 ticks_trig = end_trig - start_trig;
@@ -1124,6 +1174,7 @@ void game_loop() {
 
             u64 start_part = svcGetSystemTick();
             update_player_effects(delta);
+            update_rays(delta);
 
             // End wall particles
             if (level_info.wall_y > 0) {
@@ -1138,6 +1189,7 @@ void game_loop() {
             handle_new_best_popup(delta);
 
             update_collect_effect(delta);
+            update_key_effect(delta);
 
             float calc_x_speed_particles = SCREEN_WIDTH_AREA;
             float calc_y_speed_particles = (SCREEN_HEIGHT_AREA / 2);
@@ -1411,6 +1463,12 @@ void game_assets_init() {
     
     spriteSheet2 = C2D_SpriteSheetLoad("romfs:/gfx/portals.t3x");
     if (!spriteSheet2) svcBreak(USERBREAK_PANIC);
+
+    spriteSheet3 = C2D_SpriteSheetLoad("romfs:/gfx/sprites_2p0.t3x");
+    if (!spriteSheet3) svcBreak(USERBREAK_PANIC);
+
+    animatedSheet = C2D_SpriteSheetLoad("romfs:/gfx/animated.t3x");
+    if (!animatedSheet) svcBreak(USERBREAK_PANIC);
     
     glowSheet = C2D_SpriteSheetLoad("romfs:/gfx/glow.t3x");
     if (!glowSheet) svcBreak(USERBREAK_PANIC);
@@ -1432,6 +1490,9 @@ void game_assets_init() {
     
     waveSheet = C2D_SpriteSheetLoad("romfs:/gfx/dart.t3x");
     if (!waveSheet) svcBreak(USERBREAK_PANIC);
+
+    robotSheet = C2D_SpriteSheetLoad("romfs:/gfx/robot.t3x");
+    if (!robotSheet) svcBreak(USERBREAK_PANIC);
 
     trailSheet = C2D_SpriteSheetLoad("romfs:/gfx/trails.t3x");
     if (!trailSheet) svcBreak(USERBREAK_PANIC);
@@ -1460,8 +1521,6 @@ void game_assets_init() {
 
     initParticleSystem(&faster_speed_particles_bottom, &speed_effect_vfast);
     faster_speed_particles_bottom.relativeStationary = true;
-
-    
 }
 
 int main(int argc, char* argv[]) {
@@ -1511,6 +1570,10 @@ int main(int argc, char* argv[]) {
     loading_screen_update(20);
 
     load_save_file(SAVE_1P9_SERVER_FILE, &gdps_file);
+
+    loading_screen_update(25);
+
+    load_save_file(SAVE_GEOMETRIX_SERVER_FILE, &geometrix_file);
 
     loading_screen_update(30);
 
@@ -1608,15 +1671,17 @@ int main(int argc, char* argv[]) {
     // Delete graphics
     C2D_SpriteSheetFree(spriteSheet);
     C2D_SpriteSheetFree(spriteSheet2);
+    C2D_SpriteSheetFree(spriteSheet3);
+    C2D_SpriteSheetFree(animatedSheet);
     C2D_SpriteSheetFree(glowSheet);
     C2D_SpriteSheetFree(bgSheet);
-    C2D_SpriteSheetFree(bg2Sheet);
     C2D_SpriteSheetFree(cube0Sheet);
     C2D_SpriteSheetFree(cube1Sheet);
     C2D_SpriteSheetFree(shipSheet);
     C2D_SpriteSheetFree(ballSheet);
     C2D_SpriteSheetFree(ufoSheet);
     C2D_SpriteSheetFree(waveSheet);
+    C2D_SpriteSheetFree(robotSheet);
     C2D_SpriteSheetFree(trailSheet);
     C2D_SpriteSheetFree(particleSheet);
     C2D_SpriteSheetFree(ui_sheet);
@@ -1627,6 +1692,7 @@ int main(int argc, char* argv[]) {
     C2D_SpriteSheetFree(goldFont_sheet);
     C2D_SpriteSheetFree(window_sheet);
     C2D_SpriteSheetFree(bar_sheet);
+    C2D_SpriteSheetFree(ui_3_sheet);
 
     cfg_fini();
 

@@ -17,6 +17,8 @@ typedef struct SongEntries {
 } SongEntries;
 
 typedef struct {
+    int level_id;
+    
     char *level_name;
     char *gmd_path;
     char *song_path;

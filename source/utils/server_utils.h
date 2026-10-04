@@ -14,6 +14,7 @@ typedef struct SearchEntry {
     int downloads;
     int likes;
     int stars;
+    int coins;
     int reqStars;
     int difficulty;
     int objCount;

@@ -5,7 +5,7 @@
 #include "math_helpers.h"
 #include "main.h"
 #include "easing.h"
-#include "color_channels.h"
+#include "triggers.h"
 #include "menus/core/ui_element.h"
 #include "mp3_player.h"
 #include "graphics.h"

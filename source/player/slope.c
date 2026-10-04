@@ -519,6 +519,7 @@ void slope_collide(int obj, Player *player) {
     ) {
         if (player->gamemode != GAMEMODE_WAVE && ((player->gamemode != GAMEMODE_PLAYER && (player->vel_y >= 0)) || gravSnap)) {
             player->vel_y = 0;
+            player->collided_block = obj;
             if (!gravSnap) player->on_ceiling = true;
             player->time_since_ground = 0;
             player->y = grav(player, obj_gravBottom(player, obj)) - grav(player, player->height / 2);
@@ -652,6 +653,7 @@ void slope_collide(int obj, Player *player) {
 
             if (orient >= ORIENT_UD_DOWN) player->on_ceiling = true;
             else {
+                player->collided_block = obj;
                 player->on_ground = true;
                 player_non_flying_landing(player);
             }

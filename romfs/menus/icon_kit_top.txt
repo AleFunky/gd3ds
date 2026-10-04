@@ -6,6 +6,8 @@ image x=385 y=15 id=184 scale=0.7
 label x=370 y=16 text="0" align=RIGHT scale=0.5 tag="star_text"
 image x=385 y=35 id=33 scale=0.7
 label x=370 y=36 text="0" align=RIGHT scale=0.5 tag="secretcoins_text"
+image x=385 y=55 id=32 scale=0.7 tag="usercoins_icon"
+label x=370 y=56 text="0" align=RIGHT scale=0.5 tag="usercoins_text"
 
 image x=36 y=35 id=178 sy=-1.0
 image x=36 y=205 id=178

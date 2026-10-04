@@ -116,6 +116,7 @@ static void fill_song_entry(char *songString, SongEntry *targetEntry) {
 
 static void fill_level_entries(char **levelsStrings, int songStringCount, int creatorStringCount, int levelStringCount) {
     for (int i = 0; i < levelStringCount; i++) {
+        search_entries[i].coins = 0;
         int levelKeyCount = 0;
         char **levelKeys = split_string(levelsStrings[i], ':', &levelKeyCount, true);
         if (!levelKeys) return;
@@ -206,11 +207,20 @@ static void fill_level_entries(char **levelsStrings, int songStringCount, int cr
                     // two player status
                     search_entries[i].isTwoPlayer = parse_bool(valStr);
                     break;
-                case 35: 
+                case 35:
                     // newgrounds song id
                     search_entries[i].songId = atoi(valStr);
                     break;
-                case 39: 
+                case 37:
+                    // coins
+                    {
+                        int coins = atoi(valStr);
+                        if (coins < 0) coins = 0;
+                        if (coins > 3) coins = 3;
+                        search_entries[i].coins = coins;
+                    }
+                    break;
+                case 39:
                     // stars requested
                     search_entries[i].reqStars = atoi(valStr);
                     break;
@@ -363,6 +373,15 @@ static void fill_level_entry(char **levelStrings, int levelStringsCount, bool fi
             // newgrounds song id
             if (fillSearchEntry)
                 current_search_entry->songId = atoi(valStr);
+            break;
+        case 37:
+            // coins
+            if (fillSearchEntry) {
+                int coins = atoi(valStr);
+                if (coins < 0) coins = 0;
+                if (coins > 3) coins = 3;
+                current_search_entry->coins = coins;
+            }
             break;
         case 39:
             // stars requested

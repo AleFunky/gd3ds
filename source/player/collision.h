@@ -12,6 +12,8 @@ enum JumpType {
     JUMP_TYPES_COUNT
 };
 
+#define MINIMUM_OBJECT_SPEED 315
+
 #define GET_ACTIVATED(obj) \
     ((objects.activated[(obj)] >> state.current_player) & 1)
 
@@ -43,12 +45,19 @@ enum JumpType {
 #define YELLOW_ORB 36
 #define PINK_ORB 141
 #define BLUE_ORB 84
+#define GREEN_ORB 1022
 
 #define CUBE_PORTAL 12
 #define SHIP_PORTAL 13
 #define BALL_PORTAL 47
 #define UFO_PORTAL 111
 #define WAVE_PORTAL 660
+#define ROBOT_PORTAL 745
+
+#define BLUE_TP_PORTAL 747
+#define ORANGE_TP_PORTAL 749
+
+#define TEXT_OBJECT 914
 
 #define BLUE_GRAVITY_PORTAL 10
 #define YELLOW_GRAVITY_PORTAL 11
@@ -60,6 +69,7 @@ enum JumpType {
 #define MINI_PORTAL 101
 
 #define SECRET_COIN 142
+#define KEY_OBJ 1275
 
 #define SLOW_SPEED_PORTAL 200
 #define NORMAL_SPEED_PORTAL 201

@@ -6,12 +6,15 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdio.h>
-#include "color_channels.h"
+#include "triggers.h"
 #include "main.h"
 #include "menus/creator_menu/online/online_menu.h"
 #include "objects.h"
+#include "groups.h"
 #include "mp3_player.h"
 #include "graphics.h"
+#include "fonts/level_fonts.h"
+#include "fonts/bigFont.h"
 #include "math_helpers.h"
 #include "particles/object_particles.h"
 #include "utils/json_config.h"
@@ -40,6 +43,47 @@ GDColorChannel *colorChannels = NULL;
 LoadedLevelInfo level_info;
 
 char *curr_level_string = NULL;
+
+TriggerPool col_pool;
+TriggerPool move_pool;
+TriggerPool alpha_pool;
+TriggerPool pulse_pool;
+TriggerPool toggle_pool;
+TriggerPool spawn_pool;
+static TriggerPool text_pool;
+static TextObject empty_text_object;
+
+ColorTrigger *get_color_trigger(int obj) {
+    return TRIGGER_AT(col_pool, ColorTrigger, objects.trigger_index[obj]);
+}
+
+PulseTrigger *get_pulse_trigger(int obj) {
+    return TRIGGER_AT(pulse_pool, PulseTrigger, objects.trigger_index[obj]);
+}
+
+AlphaTrigger *get_alpha_trigger(int obj) {
+    return TRIGGER_AT(alpha_pool, AlphaTrigger, objects.trigger_index[obj]);
+}
+
+MoveTrigger *get_move_trigger(int obj) {
+    return TRIGGER_AT(move_pool, MoveTrigger, objects.trigger_index[obj]);
+}
+
+ToggleTrigger *get_toggle_trigger(int obj) {
+    return TRIGGER_AT(toggle_pool, ToggleTrigger, objects.trigger_index[obj]);
+}
+
+SpawnTrigger *get_spawn_trigger(int obj) {
+    return TRIGGER_AT(spawn_pool, SpawnTrigger, objects.trigger_index[obj]);
+}
+
+TextObject *get_text_object(int obj) {
+    int index = objects.trigger_index[obj];
+    if (index < 0 || !text_pool.data || (size_t)index >= text_pool.count) {
+        return &empty_text_object;
+    }
+    return TRIGGER_AT(text_pool, TextObject, index);
+}
 
 const char *level_lengths[] = {
     "Tiny",
@@ -103,6 +147,30 @@ void assign_object_to_section(int obj) {
         sec->objects = realloc(sec->objects, sizeof(int) * sec->object_capacity);
     }
     sec->objects[sec->object_count++] = obj;
+    objects.section_x[obj] = sx;
+    objects.section_y[obj] = sy;
+}
+
+void update_object_section(int obj) {
+    int new_sx = (int)(objects.x[obj] / SECTION_SIZE);
+    int new_sy = (int)(objects.y[obj] / SECTION_SIZE);
+    int old_sx = objects.section_x[obj];
+    int old_sy = objects.section_y[obj];
+
+    if (new_sx == old_sx && new_sy == old_sy) return;
+
+    Section *old_sec = get_section(old_sx, old_sy);
+
+    if (old_sec) {
+        for (int i = 0; i < old_sec->object_count; i++) {
+            if (old_sec->objects[i] == obj) {
+                old_sec->objects[i] = old_sec->objects[--old_sec->object_count];
+                break;
+            }
+        }
+    }
+
+    assign_object_to_section(obj);
 }
 
 char *read_file(const char *filepath, size_t *out_size) {
@@ -425,8 +493,38 @@ void free_string_array(char **arr, int count) {
     free(arr);
 }
 
+void parse_ints(short *int_array, const char *string) {
+    int count = 0;
+    char **ints = split_string(string, '.', &count, false);
+
+    for (int j = 0; j < MAX_GROUPS_PER_OBJECT; j++) {
+        if (j < count) int_array[j] = (short) atoi(ints[j]);
+        else int_array[j] = 0;
+    }
+
+    free_string_array(ints, count);
+}
+
+HSV parse_hsv_string(const char *string) {
+    int count = 0;
+    char **hsv_string = split_string(string, 'a', &count, false);
+    HSV obtained = { 0 };
+
+    if (count >= 5) {
+        obtained.h = atoi(hsv_string[0]);
+        obtained.s = atof(hsv_string[1]);
+        obtained.v = atof(hsv_string[2]);
+        obtained.sChecked = parse_bool(hsv_string[3]);
+        obtained.vChecked = parse_bool(hsv_string[4]);
+    }
+
+    free_string_array(hsv_string, count);
+    return obtained;
+}
+
 void parse_color_channel(GDColorChannel *channels, int i, char *channel_string) {
     GDColorChannel channel = {0};  // Zero-initialize
+    channel.fromOpacity = 1.0f;
     int kvCount = 0;
     char **kvs = split_string(channel_string, '_', &kvCount, false);
 
@@ -441,9 +539,17 @@ void parse_color_channel(GDColorChannel *channels, int i, char *channel_string) 
             case 4:  channel.playerColor = atoi(valStr); break;
             case 5:  channel.blending = atoi(valStr) != 0; break;
             case 6:  channel.channelID = atoi(valStr); break;
+            case 7:  channel.fromOpacity = atof(valStr); break;
+            case 8:  channel.toggleOpacity = atoi(valStr) != 0; break;
+            case 9:  channel.inheritedChannelID = atoi(valStr); break;
+            case 10: channel.hsv = parse_hsv_string(valStr); break;
             case 11: channel.toRed = atoi(valStr); break;
             case 12: channel.toGreen = atoi(valStr); break;
             case 13: channel.toBlue = atoi(valStr); break;
+            case 14: channel.deltaTime = atof(valStr); break;
+            case 15: channel.toOpacity = atof(valStr); break;
+            case 16: channel.duration = atof(valStr); break;
+            case 17: channel.copyOpacity = atoi(valStr) != 0; break;
         }
     }
 
@@ -550,6 +656,7 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
     int bg_b = atoi(get_metadata_value(level_string, "kS3"));
 
     GDColorChannel bg_channel = {0};
+    bg_channel.fromOpacity = 1.0f;
     bg_channel.channelID = CHANNEL_BG;
     bg_channel.fromRed = bg_r;
     bg_channel.fromGreen = bg_g;
@@ -570,6 +677,7 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
     int g_b = atoi(get_metadata_value(level_string, "kS6"));
 
     GDColorChannel g_channel = {0};
+    g_channel.fromOpacity = 1.0f;
     g_channel.channelID = CHANNEL_GROUND;
     g_channel.fromRed = g_r;
     g_channel.fromGreen = g_g;
@@ -590,6 +698,7 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
 
     if (line_r && line_g && line_b) {
         GDColorChannel line_channel = {0};
+        line_channel.fromOpacity = 1.0f;
         line_channel.channelID = CHANNEL_LINE;
         line_channel.fromRed = atoi(line_r);
         line_channel.fromGreen = atoi(line_g);
@@ -612,6 +721,7 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
 
     if (obj_r && obj_g && obj_b) {
         GDColorChannel obj_channel = {0};
+        obj_channel.fromOpacity = 1.0f;
         obj_channel.channelID = CHANNEL_OBJ;
         obj_channel.fromRed = atoi(obj_r);
         obj_channel.fromGreen = atoi(obj_g);
@@ -634,6 +744,7 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
 
     if (obj_2_r && obj_2_g && obj_2_b) {
         GDColorChannel obj_2_channel = {0};
+        obj_2_channel.fromOpacity = 1.0f;
         obj_2_channel.channelID = 1;
         obj_2_channel.fromRed = atoi(obj_2_r);
         obj_2_channel.fromGreen = atoi(obj_2_g);
@@ -712,6 +823,38 @@ GDValueType get_value_type_for_key(int key) {
         case 23: return GD_VAL_INT;    // (Color trigger) Target color ID
         case 24: return GD_VAL_INT;    // Zlayer
         case 25: return GD_VAL_INT;    // Zorder
+        case 28: return GD_VAL_FLOAT;  // move offset X
+        case 29: return GD_VAL_FLOAT;  // move offset Y
+        case 30: return GD_VAL_INT;    // move easing
+        case 31: return GD_VAL_STRING; // (Text object) Text
+        case 32: return GD_VAL_FLOAT;  // scale (uniform)
+        case 35: return GD_VAL_FLOAT;  // opacity (alpha trigger)
+        case 41: return GD_VAL_BOOL;   // main_col_HSV_enabled
+        case 42: return GD_VAL_BOOL;   // detail_col_HSV_enabled
+        case 43: return GD_VAL_HSV;    // main_col_HSV
+        case 44: return GD_VAL_HSV;    // detail_col_HSV
+        case 45: return GD_VAL_FLOAT;  // pulse fade_in
+        case 46: return GD_VAL_FLOAT;  // pulse hold
+        case 47: return GD_VAL_FLOAT;  // pulse fade_out
+        case 48: return GD_VAL_INT;    // pulse_mode
+        case 49: return GD_VAL_HSV;    // copied_hsv
+        case 50: return GD_VAL_INT;    // copied_color_id
+        case 51: return GD_VAL_INT;    // target group (triggers)
+        case 52: return GD_VAL_INT;    // pulse_target_type
+        case 54: return GD_VAL_FLOAT;  // teleport portal Y offset
+        case 56: return GD_VAL_BOOL;   // activate group (toggle trigger)
+        case 58: return GD_VAL_BOOL;   // lock to player X (move trigger)
+        case 59: return GD_VAL_BOOL;   // lock to player Y (move trigger)
+        case 62: return GD_VAL_BOOL;   // spawn_triggered
+        case 63: return GD_VAL_FLOAT;  // spawn_delay
+        case 64: return GD_VAL_BOOL;   // dont fade
+        case 65: return GD_VAL_BOOL;   // pulse main_only
+        case 66: return GD_VAL_BOOL;   // pulse detail_only
+        case 67: return GD_VAL_BOOL;   // dont enter
+        case 87: return GD_VAL_BOOL;   // multi_triggered
+        case 128: return GD_VAL_FLOAT; // scale X
+        case 129: return GD_VAL_FLOAT; // scale Y
+        case 57: return GD_VAL_INT_ARRAY; // groups
         default:
             return GD_VAL_INT; // Default fallback
     }
@@ -744,8 +887,7 @@ int convert_object(int id) {
 
         // User coin
         case 1329:
-            if (state.custom_level) return 0;
-            else return SECRET_COIN;
+            return SECRET_COIN;
 
         // Slopes
         case 1743:
@@ -845,17 +987,107 @@ int convert_object(int id) {
     return id;
 }
 
-void fill_object_data(int object, int key, GDValueType type, GDValue val) {
+int allocate_trigger_component(int obj) {
+    int index = -1;
+    switch (objects.id[obj]) {
+        case COL_TRIGGER:
+        case BG_TRIGGER:
+        case GROUND_TRIGGER:
+        case LINE_TRIGGER:
+        case V2_0_LINE_TRIGGER:
+        case OBJ_TRIGGER:
+        case OBJ_2_TRIGGER:
+        case COL2_TRIGGER:
+        case COL3_TRIGGER:
+        case COL4_TRIGGER:
+        case THREEDL_TRIGGER:
+        case GROUND_2_TRIGGER:
+            index = trigger_pool_add(&col_pool, sizeof(ColorTrigger));
+            if (index >= 0) {
+                objects.trigger_index[obj] = index;
+                get_color_trigger(obj)->opacity = 1.0f;
+            }
+            break;
+        case MOVE_TRIGGER:
+            index = trigger_pool_add(&move_pool, sizeof(MoveTrigger));
+            if (index >= 0) {
+                objects.trigger_index[obj] = index;
+            }
+            break;
+        case ALPHA_TRIGGER:
+            index = trigger_pool_add(&alpha_pool, sizeof(AlphaTrigger));
+            if (index >= 0) {
+                objects.trigger_index[obj] = index;
+                get_alpha_trigger(obj)->trigger_opacity = 1.0f;
+            }
+            break;
+        case PULSE_TRIGGER:
+            index = trigger_pool_add(&pulse_pool, sizeof(PulseTrigger));
+            if (index >= 0) {
+                objects.trigger_index[obj] = index;
+                get_pulse_trigger(obj)->opacity = 1.0f;
+            }
+            break;
+        case TOGGLE_TRIGGER:
+            index = trigger_pool_add(&toggle_pool, sizeof(ToggleTrigger));
+            if (index >= 0) {
+                objects.trigger_index[obj] = index;
+            }
+            break;
+        case SPAWN_TRIGGER:
+            index = trigger_pool_add(&spawn_pool, sizeof(SpawnTrigger));
+            if (index >= 0) {
+                objects.trigger_index[obj] = index;
+            }
+            break;
+    }
+    return index;
+}
+
+void init_default_variables(int object) {
+    const GameObject *game_obj = &game_objects[objects.id[object]];
+
+    objects.zlayer[object] = game_obj->z_layer;
+    objects.zorder[object] = game_obj->z_order;
+}
+
+bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
+    
     // Default members
+    int trigger_index = objects.trigger_index[object];
     switch (key) {
         case 1:  // ID
-            if (type == GD_VAL_INT) objects.id[object] = convert_object(val.i);
+            if (type == GD_VAL_INT) {
+                objects.id[object] = convert_object(val.i);
+
+                init_default_variables(object);
+                if (is_trigger_object(val.i)) {
+                    // Allocate its data
+                    trigger_index = allocate_trigger_component(object);
+                    if (trigger_index < 0) {
+                        return false;
+                    }
+                }
+
+                if (objects.id[object] == TEXT_OBJECT) {
+                    int text_index = trigger_pool_add(&text_pool, sizeof(TextObject));
+                    objects.trigger_index[object] = (text_index < 0) ? -1 : text_index;
+                }
+            }
             break;
         case 2:  // X
-            if (type == GD_VAL_FLOAT) objects.x[object] = val.f;
+            if (type == GD_VAL_FLOAT) {
+                objects.x[object] = val.f;
+                objects.last_x[object] = val.f;
+                objects.original_x[object] = val.f;
+            }
             break;
         case 3:  // Y
-            if (type == GD_VAL_FLOAT) objects.y[object] = val.f;
+            if (type == GD_VAL_FLOAT) {
+                objects.y[object] = val.f;
+                objects.last_y[object] = val.f;
+                objects.original_y[object] = val.f;
+            }
             break;
         case 4:  // FlippedH
             if (type == GD_VAL_BOOL) objects.flippedH[object] = val.b;
@@ -864,34 +1096,82 @@ void fill_object_data(int object, int key, GDValueType type, GDValue val) {
             if (type == GD_VAL_BOOL) objects.flippedV[object] = val.b;
             break;
         case 6:  // Rotation
-            if (type == GD_VAL_FLOAT) objects.rotation[object] = val.f;
+            if (type == GD_VAL_FLOAT) {
+                objects.rotation[object] = val.f;
+                objects.visual_rotation[object] = val.f;
+            }
             break;
         case 7:  // Color R
-            if (type == GD_VAL_INT) objects.trig_colorR[object] = val.i;
+            if (type == GD_VAL_INT) {
+                if (is_color_trigger(objects.id[object])) {
+                    get_color_trigger(object)->trig_colorR = val.i;
+                } else if (objects.id[object] == PULSE_TRIGGER) {
+                    get_pulse_trigger(object)->trig_colorR = val.i;
+                }
+            }
             break;
         case 8:  // Color G
-            if (type == GD_VAL_INT) objects.trig_colorG[object] = val.i;
+            if (type == GD_VAL_INT) {
+                if (is_color_trigger(objects.id[object])) {
+                    get_color_trigger(object)->trig_colorG = val.i;
+                } else if (objects.id[object] == PULSE_TRIGGER) {
+                    get_pulse_trigger(object)->trig_colorG = val.i;
+                }
+            }
             break;
         case 9:  // Color B
-            if (type == GD_VAL_INT) objects.trig_colorB[object] = val.i;
+            if (type == GD_VAL_INT) {
+                if (is_color_trigger(objects.id[object])) {
+                    get_color_trigger(object)->trig_colorB = val.i;
+                } else if (objects.id[object] == PULSE_TRIGGER) {
+                    get_pulse_trigger(object)->trig_colorB = val.i;
+                }
+            }
             break;
         case 10: // Duration
-            if (type == GD_VAL_FLOAT) objects.trig_duration[object] = val.f;
+            if (type == GD_VAL_FLOAT) {
+                if (is_color_trigger(objects.id[object])) {
+                    get_color_trigger(object)->trig_duration = val.f;
+                } else {
+                    switch (objects.id[object]) {
+                        case MOVE_TRIGGER:
+                            get_move_trigger(object)->trig_duration = val.f;
+                            break;
+                        case ALPHA_TRIGGER:
+                            get_alpha_trigger(object)->trig_duration = val.f;
+                            break;
+                        case PULSE_TRIGGER:
+                            get_pulse_trigger(object)->trig_duration = val.f;
+                            break;
+                        case SPAWN_TRIGGER:
+                            get_spawn_trigger(object)->trig_duration = val.f;
+                            break;
+                    }
+                }
+            }
             break;
         case 11: // Touch triggered
             if (type == GD_VAL_BOOL) objects.touch_triggered[object] = val.b;
             break;
         case 14: // Tint Ground
-            if (type == GD_VAL_BOOL) objects.tintGround[object] = val.b;
+            if (type == GD_VAL_BOOL && is_color_trigger(objects.id[object])) {
+                get_color_trigger(object)->tintGround = val.b;
+            }
             break;
         case 15: // Player 1 color
-            if (type == GD_VAL_BOOL) objects.p1_color[object] = val.b;
+            if (type == GD_VAL_BOOL && is_color_trigger(objects.id[object])) {
+                get_color_trigger(object)->p1_color = val.b;
+            }
             break;
         case 16: // Player 2 color
-            if (type == GD_VAL_BOOL) objects.p2_color[object] = val.b;
+            if (type == GD_VAL_BOOL && is_color_trigger(objects.id[object])) {
+                get_color_trigger(object)->p2_color = val.b;
+            }
             break;
         case 17: // Blending
-            if (type == GD_VAL_BOOL) objects.blending[object] = val.b;
+            if (type == GD_VAL_BOOL && is_color_trigger(objects.id[object])) {
+                get_color_trigger(object)->blending = val.b;
+            }
             break;
         case 19: // 1.9 channel id
             if (type == GD_VAL_INT) objects.v1p9_col_channel[object] = convert_one_point_nine_channel(val.i);
@@ -903,7 +1183,13 @@ void fill_object_data(int object, int key, GDValueType type, GDValue val) {
             if (type == GD_VAL_INT) objects.detail_col_channel[object] = val.i;
             break;
         case 23: // Target color ID
-            if (type == GD_VAL_INT) objects.target_color_id[object] = val.i;
+            if (type == GD_VAL_INT) {
+                if (is_color_trigger(objects.id[object])) {
+                    get_color_trigger(object)->target_color_id = val.i;
+                } else if (objects.id[object] == PULSE_TRIGGER) {
+                    get_pulse_trigger(object)->target_color_id = val.i;
+                }
+            }
             break;
         case 24: // Z layer
             if (type == GD_VAL_INT) objects.zlayer[object] = val.i;
@@ -911,14 +1197,262 @@ void fill_object_data(int object, int key, GDValueType type, GDValue val) {
         case 25: // Z order
             if (type == GD_VAL_INT) objects.zorder[object] = val.i;
             break;
+        case 28: // Move offset X
+            if (type == GD_VAL_FLOAT && objects.id[object] == MOVE_TRIGGER) {
+                get_move_trigger(object)->move_offset_x = val.f;
+            }
+            break;
+        case 29: // Move offset Y
+            if (type == GD_VAL_FLOAT && objects.id[object] == MOVE_TRIGGER) {
+                get_move_trigger(object)->move_offset_y = val.f;
+            }
+            break;
+        case 30: // Move easing
+            if (type == GD_VAL_INT && objects.id[object] == MOVE_TRIGGER) {
+                get_move_trigger(object)->move_easing = val.i;
+            }
+            break;
+        case 31: // Text
+            if (type == GD_VAL_STRING && objects.id[object] == TEXT_OBJECT && val.str) {
+                fix_base64_url(val.str);
+
+                char *decoded = malloc(strlen(val.str) + 1);
+                if (decoded) {
+                    int decoded_len = base64_decode(val.str, (unsigned char *)decoded);
+
+                    if (decoded_len > 0 && is_ascii((unsigned char *)decoded, decoded_len)) {
+                        int len = decoded_len > MAX_TEXT_LEN ? MAX_TEXT_LEN : decoded_len;
+                        TextObject *text_obj = get_text_object(object);
+                        memcpy(text_obj->text, decoded, len);
+                        text_obj->text[len] = '\0';
+                        text_obj->len = (unsigned char)len;
+                    }
+
+                    free(decoded);
+                }
+            }
+            break;
+        case 32: // Scale (uniform)
+            if (type == GD_VAL_FLOAT) {
+                objects.scale_x[object] = objects.scale_y[object] = val.f;
+                objects.original_scale_x[object] = objects.original_scale_y[object] = val.f;
+            }
+            break;
+        case 35: // Opacity (alpha trigger)
+            if (type == GD_VAL_FLOAT) {
+                if (is_color_trigger(objects.id[object])) {
+                    get_color_trigger(object)->opacity = val.f;
+                } else if (objects.id[object] == ALPHA_TRIGGER) {
+                    get_alpha_trigger(object)->trigger_opacity = val.f;
+                } else if (objects.id[object] == PULSE_TRIGGER) {
+                    get_pulse_trigger(object)->opacity = val.f;
+                }
+            }
+            break;
+        case 41: // main_col_HSV_enabled
+            if (type == GD_VAL_BOOL) objects.main_col_HSV_enabled[object] = val.b;
+            break;
+        case 42: // detail_col_HSV_enabled
+            if (type == GD_VAL_BOOL) objects.detail_col_HSV_enabled[object] = val.b;
+            break;
+        case 43: // main_col_HSV
+            if (type == GD_VAL_HSV) objects.main_col_HSV[object] = val.hsv;
+            break;
+        case 44: // detail_col_HSV
+            if (type == GD_VAL_HSV) objects.detail_col_HSV[object] = val.hsv;
+            break;
+        case 45: // pulse fade_in
+            if (type == GD_VAL_FLOAT && objects.id[object] == PULSE_TRIGGER) {
+                get_pulse_trigger(object)->pulse_fade_in = val.f;
+            }
+            break;
+        case 46: // pulse hold
+            if (type == GD_VAL_FLOAT && objects.id[object] == PULSE_TRIGGER) {
+                get_pulse_trigger(object)->pulse_hold = val.f;
+            }
+            break;
+        case 47: // pulse fade_out
+            if (type == GD_VAL_FLOAT && objects.id[object] == PULSE_TRIGGER) {
+                get_pulse_trigger(object)->pulse_fade_out = val.f;
+            }
+            break;
+        case 48: // pulse_mode
+            if (type == GD_VAL_INT && objects.id[object] == PULSE_TRIGGER) {
+                get_pulse_trigger(object)->pulse_mode = val.i;
+            }
+            break;
+        case 49: // copied_hsv
+            if (type == GD_VAL_HSV) {
+                if (is_color_trigger(objects.id[object])) {
+                    get_color_trigger(object)->copied_hsv = val.hsv;
+                } else if (objects.id[object] == PULSE_TRIGGER) {
+                    get_pulse_trigger(object)->copied_hsv = val.hsv;
+                }
+            }
+            break;
+        case 50: // copied_color_id
+            if (type == GD_VAL_INT) {
+                if (is_color_trigger(objects.id[object])) {
+                    get_color_trigger(object)->copied_color_id = val.i;
+                } else if (objects.id[object] == PULSE_TRIGGER) {
+                    get_pulse_trigger(object)->copied_color_id = val.i;
+                }
+            }
+            break;
+        case 51: // Target group
+            if (type == GD_VAL_INT) {
+                if (is_color_trigger(objects.id[object])) {
+                    get_color_trigger(object)->target_group = val.i;
+                } else {
+                    switch (objects.id[object]) {
+                        case MOVE_TRIGGER:
+                            get_move_trigger(object)->target_group = val.i;
+                            break;
+                        case ALPHA_TRIGGER:
+                            get_alpha_trigger(object)->target_group = val.i;
+                            break;
+                        case PULSE_TRIGGER:
+                            get_pulse_trigger(object)->target_group = val.i;
+                            break;
+                        case TOGGLE_TRIGGER:
+                            get_toggle_trigger(object)->target_group = val.i;
+                            break;
+                        case SPAWN_TRIGGER:
+                            get_spawn_trigger(object)->target_group = val.i;
+                            break;
+                    }
+                }
+            }
+            break;
+        case 52: // pulse_target_type
+            if (type == GD_VAL_INT && objects.id[object] == PULSE_TRIGGER) {
+                get_pulse_trigger(object)->pulse_target_type = val.i;
+            }
+            break;
+        case 54: // teleport portal Y offset
+            if (type == GD_VAL_FLOAT) objects.tp_y_offset[object] = val.f;
+            break;
+        case 56: // Activate group
+            if (type == GD_VAL_BOOL && objects.id[object] == TOGGLE_TRIGGER) {
+                get_toggle_trigger(object)->activate_group = val.b;
+            }
+            break;
+        case 58: // Lock to player X
+            if (type == GD_VAL_BOOL && objects.id[object] == MOVE_TRIGGER) {
+                get_move_trigger(object)->lock_to_player_x = val.b;
+            }
+            break;
+        case 59: // Lock to player Y
+            if (type == GD_VAL_BOOL && objects.id[object] == MOVE_TRIGGER) {
+                get_move_trigger(object)->lock_to_player_y = val.b;
+            }
+            break;
+        case 62: // spawn_triggered
+            if (type == GD_VAL_BOOL) {
+                if (is_color_trigger(objects.id[object])) {
+                    get_color_trigger(object)->spawn_triggered = val.b;
+                } else {
+                    switch (objects.id[object]) {
+                        case MOVE_TRIGGER:
+                            get_move_trigger(object)->spawn_triggered = val.b;
+                            break;
+                        case ALPHA_TRIGGER:
+                            get_alpha_trigger(object)->spawn_triggered = val.b;
+                            break;
+                        case PULSE_TRIGGER:
+                            get_pulse_trigger(object)->spawn_triggered = val.b;
+                            break;
+                        case TOGGLE_TRIGGER:
+                            get_toggle_trigger(object)->spawn_triggered = val.b;
+                            break;
+                        case SPAWN_TRIGGER:
+                            get_spawn_trigger(object)->spawn_triggered = val.b;
+                            break;
+                    }
+                }
+            }
+            break;
+        case 63: // spawn_delay
+            if (type == GD_VAL_FLOAT && objects.id[object] == SPAWN_TRIGGER) {
+                get_spawn_trigger(object)->spawn_delay = val.f;
+            }
+            break;
+        case 64: // dont fade
+            if (type == GD_VAL_BOOL) {
+                objects.flags[object] |= val.b ? FLAG_DONT_FADE : 0;
+            }
+            break;
+        case 65: // pulse main_only
+            if (type == GD_VAL_BOOL && objects.id[object] == PULSE_TRIGGER) {
+                get_pulse_trigger(object)->pulse_main_only = val.b;
+            }
+            break;
+        case 66: // pulse detail_only
+            if (type == GD_VAL_BOOL && objects.id[object] == PULSE_TRIGGER) {
+                get_pulse_trigger(object)->pulse_detail_only = val.b;
+            }
+            break;
+        case 67: // dont enter
+            if (type == GD_VAL_BOOL) {
+                objects.flags[object] |= val.b ? FLAG_DONT_ENTER : 0;
+            }
+            break;
+        case 87: // multi_triggered
+            if (type == GD_VAL_BOOL) {
+                if (is_color_trigger(objects.id[object])) {
+                    get_color_trigger(object)->multi_triggered = val.b;
+                } else {
+                    switch (objects.id[object]) {
+                        case MOVE_TRIGGER:
+                            get_move_trigger(object)->multi_triggered = val.b;
+                            break;
+                        case ALPHA_TRIGGER:
+                            get_alpha_trigger(object)->multi_triggered = val.b;
+                            break;
+                        case PULSE_TRIGGER:
+                            get_pulse_trigger(object)->multi_triggered = val.b;
+                            break;
+                        case TOGGLE_TRIGGER:
+                            get_toggle_trigger(object)->multi_triggered = val.b;
+                            break;
+                        case SPAWN_TRIGGER:
+                            get_spawn_trigger(object)->multi_triggered = val.b;
+                            break;
+                    }
+                }
+            }
+            break;
+        case 128: // Scale X
+            if (type == GD_VAL_FLOAT) {
+                objects.scale_x[object] = val.f;
+                objects.original_scale_x[object] = val.f;
+            }
+            break;
+        case 129: // Scale Y
+            if (type == GD_VAL_FLOAT) {
+                objects.scale_y[object] = val.f;
+                objects.original_scale_y[object] = val.f;
+            }
+            break;
+        case 57: // Groups
+            if (type == GD_VAL_INT_ARRAY) {
+                int gcount = 0;
+                for (int i = 0; i < MAX_GROUPS_PER_OBJECT; i++) {
+                    objects.groups[object][i] = val.int_array[i];
+                    if (val.int_array[i] != 0) gcount++;
+                }
+                objects.group_count[object] = gcount;
+            }
+            break;
     }
+    return true;
 }
 
 bool obj_has_main(const GameObject *obj) {
-    if (obj->color_type == COLOR_TYPE_BASE) return true;
+    if (obj->color_type != COLOR_TYPE_DETAIL) return true;
     
     for (int i = 0; i < obj->child_count; i++) {
-        if (obj->children[i].color_type == COLOR_TYPE_BASE) return true;
+        if (obj->children[i].color_type != COLOR_TYPE_DETAIL) return true;
     }
     return false;
 }
@@ -934,6 +1468,58 @@ bool obj_has_detail(const GameObject *obj) {
 
 bool is_valid_object(int id) {
     return id >= 1 && id < GAME_OBJECT_COUNT;
+}
+
+int get_level_coin_count(void) {
+    return coin_count;
+}
+
+bool is_color_trigger(int id) {
+    return id == COL_TRIGGER
+        || id == BG_TRIGGER
+        || id == GROUND_TRIGGER
+        || id == LINE_TRIGGER
+        || id == V2_0_LINE_TRIGGER
+        || id == OBJ_TRIGGER
+        || id == OBJ_2_TRIGGER
+        || id == COL2_TRIGGER
+        || id == COL3_TRIGGER
+        || id == COL4_TRIGGER
+        || id == THREEDL_TRIGGER
+        || id == GROUND_2_TRIGGER;
+}
+
+bool is_trigger_object(int id) {
+    return is_color_trigger(id)
+        || id == MOVE_TRIGGER
+        || id == ALPHA_TRIGGER
+        || id == TOGGLE_TRIGGER
+        || id == PULSE_TRIGGER
+        || id == SPAWN_TRIGGER;
+}
+
+bool trigger_is_spawn_triggered(int id, int obj) {
+    if (is_color_trigger(id)) return get_color_trigger(obj)->spawn_triggered;
+    switch (id) {
+        case MOVE_TRIGGER:   return get_move_trigger(obj)->spawn_triggered;
+        case ALPHA_TRIGGER:  return get_alpha_trigger(obj)->spawn_triggered;
+        case PULSE_TRIGGER:  return get_pulse_trigger(obj)->spawn_triggered;
+        case TOGGLE_TRIGGER: return get_toggle_trigger(obj)->spawn_triggered;
+        case SPAWN_TRIGGER:  return get_spawn_trigger(obj)->spawn_triggered;
+    }
+    return false;
+}
+
+bool trigger_is_multi_triggered(int id, int obj) {
+    if (is_color_trigger(id)) return get_color_trigger(obj)->multi_triggered;
+    switch (id) {
+        case MOVE_TRIGGER:   return get_move_trigger(obj)->multi_triggered;
+        case ALPHA_TRIGGER:  return get_alpha_trigger(obj)->multi_triggered;
+        case PULSE_TRIGGER:  return get_pulse_trigger(obj)->multi_triggered;
+        case TOGGLE_TRIGGER: return get_toggle_trigger(obj)->multi_triggered;
+        case SPAWN_TRIGGER:  return get_spawn_trigger(obj)->multi_triggered;
+    }
+    return false;
 }
 
 int parse_gd_object(const char *objStr, int obj) {
@@ -955,15 +1541,35 @@ int parse_gd_object(const char *objStr, int obj) {
         switch (type) {
             case GD_VAL_INT:
                 val.i = atoi(valStr);
-                fill_object_data(obj, key, GD_VAL_INT, val);
+                if (!fill_object_data(obj, key, GD_VAL_INT, val)) {
+                    return 0;
+                }
                 break;
             case GD_VAL_FLOAT:
                 val.f = atof(valStr);
-                fill_object_data(obj, key, GD_VAL_FLOAT, val);
+                if (!fill_object_data(obj, key, GD_VAL_FLOAT, val)) {
+                    return 0;
+                }
                 break;
             case GD_VAL_BOOL:
                 val.b = parse_bool(valStr);
-                fill_object_data(obj, key, GD_VAL_BOOL, val);
+                if (!fill_object_data(obj, key, GD_VAL_BOOL, val)) {
+                    return 0;
+                }
+                break;
+            case GD_VAL_HSV:
+                val.hsv = parse_hsv_string(valStr);
+                if (!fill_object_data(obj, key, GD_VAL_HSV, val)) {
+                    return 0;
+                }
+                break;
+            case GD_VAL_INT_ARRAY:
+                parse_ints(val.int_array, valStr);
+                fill_object_data(obj, key, GD_VAL_INT_ARRAY, val);
+                break;
+            case GD_VAL_STRING:
+                val.str = (char *) valStr;
+                fill_object_data(obj, key, GD_VAL_STRING, val);
                 break;
             default:
                 break;
@@ -991,7 +1597,7 @@ int parse_gd_object(const char *objStr, int obj) {
             }
         } else {
             if (!objects.col_channel[obj]) objects.col_channel[obj] = game_object->base_color;
-            if (!objects.detail_col_channel[obj]) objects.detail_col_channel[obj] = 1;
+            if (!objects.detail_col_channel[obj]) objects.detail_col_channel[obj] = game_object->detail_color ? game_object->detail_color : 1;
         }
 
         // Give each object its own random value
@@ -1025,15 +1631,44 @@ int parse_gd_object(const char *objStr, int obj) {
                     objects.height[obj] = hitbox->height;
                 }
             }
+
+            // precompute scaled hitbox dimensions (scale_x/scale_y)
+            if (hitbox->type == COLLISION_CIRCLE) {
+                float s = fmaxf(fabsf(objects.scale_x[obj]), fabsf(objects.scale_y[obj]));
+                objects.width[obj] *= s;
+            } else if (hitbox->type == COLLISION_SLOPE) {
+                objects.width[obj] *= fabsf(objects.scale_x[obj]);
+                objects.height[obj] *= fabsf(objects.scale_y[obj]);
+            } else if (hitbox->collision_type == HITBOX_SOLID) {
+                if ((int) fabsf(objects.rotation[obj]) % 180 != 0) {
+                    objects.width[obj] *= fabsf(objects.scale_y[obj]);
+                    objects.height[obj] *= fabsf(objects.scale_x[obj]);
+                } else {
+                    objects.width[obj] *= fabsf(objects.scale_x[obj]);
+                    objects.height[obj] *= fabsf(objects.scale_y[obj]);
+                }
+            } else {
+                objects.width[obj] *= fabsf(objects.scale_x[obj]);
+                objects.height[obj] *= fabsf(objects.scale_y[obj]);
+            }
         }
 
         // Modify level ending pos
         if (objects.x[obj] > level_info.last_obj_x) {
             level_info.last_obj_x = objects.x[obj];
         }
-    } else if (obj_id != COL_TRIGGER) { // Do not replace 2.0 col trigger
+    } else if (!is_trigger_object(obj_id)) { // Keep trigger objects even if outside the table
         // Invalid object
         objects.id[obj] = 0;
+    }
+
+    if (is_trigger_object(obj_id)) {
+        objects.width[obj] = 30 * fabsf(objects.scale_x[obj]);
+        objects.height[obj] = 30 * fabsf(objects.scale_y[obj]);
+    }
+
+    if (object_can_be_x_moved(obj)) {
+        objects.flags[obj] |= FLAG_CAN_BE_X_MOVED;
     }
 
     free_string_array(tokens, count);
@@ -1041,43 +1676,81 @@ int parse_gd_object(const char *objStr, int obj) {
 }
 
 void free_arrays() {
+    free(col_pool.data);
+    free(move_pool.data);
+    free(alpha_pool.data);
+    free(pulse_pool.data);
+    free(toggle_pool.data);
+    free(spawn_pool.data);
+    free(text_pool.data);
+    col_pool = (TriggerPool){0};
+    move_pool = (TriggerPool){0};
+    alpha_pool = (TriggerPool){0};
+    pulse_pool = (TriggerPool){0};
+    toggle_pool = (TriggerPool){0};
+    spawn_pool = (TriggerPool){0};
+    text_pool = (TriggerPool){0};
+
     if (objects.random)             { free(objects.random);             objects.random = NULL; }
     if (objects.id)                 { free(objects.id);                 objects.id = NULL; }
     if (objects.x)                  { free(objects.x);                  objects.x = NULL; }
     if (objects.y)                  { free(objects.y);                  objects.y = NULL; }
+    if (objects.last_x)             { free(objects.last_x);             objects.last_x = NULL; }
+    if (objects.last_y)             { free(objects.last_y);             objects.last_y = NULL; }
     if (objects.rotation)           { free(objects.rotation);           objects.rotation = NULL; }
+    if (objects.visual_rotation)    { free(objects.visual_rotation);    objects.visual_rotation = NULL; }
     if (objects.zlayer)             { free(objects.zlayer);             objects.zlayer = NULL; }
     if (objects.zorder)             { free(objects.zorder);             objects.zorder = NULL; }
-    if (objects.trig_duration)      { free(objects.trig_duration);      objects.trig_duration = NULL; }
     if (objects.opacity)            { free(objects.opacity);            objects.opacity = NULL; }
+    if (objects.alpha_trigger_opacity) { free(objects.alpha_trigger_opacity); objects.alpha_trigger_opacity = NULL; }
     if (objects.width)              { free(objects.width);              objects.width = NULL; }
     if (objects.height)             { free(objects.height);             objects.height = NULL; }
     if (objects.v1p9_col_channel)   { free(objects.v1p9_col_channel);   objects.v1p9_col_channel = NULL; }
     if (objects.col_channel)        { free(objects.col_channel);        objects.col_channel = NULL; }
     if (objects.detail_col_channel) { free(objects.detail_col_channel); objects.detail_col_channel = NULL; }
-    if (objects.target_color_id)    { free(objects.target_color_id);    objects.target_color_id = NULL; }
+    if (objects.trigger_index)      { free(objects.trigger_index);      objects.trigger_index = NULL; }
     if (objects.hitbox_counter)     { free(objects.hitbox_counter);     objects.hitbox_counter = NULL; }
     if (objects.transition_applied) { free(objects.transition_applied); objects.transition_applied = NULL; }
-    if (objects.trig_colorR)        { free(objects.trig_colorR);        objects.trig_colorR = NULL; }
-    if (objects.trig_colorG)        { free(objects.trig_colorG);        objects.trig_colorG = NULL; }
-    if (objects.trig_colorB)        { free(objects.trig_colorB);        objects.trig_colorB = NULL; }
     if (objects.orientation)        { free(objects.orientation);        objects.orientation = NULL; }
-    if (objects.tintGround)         { free(objects.tintGround);         objects.tintGround = NULL; }
-    if (objects.p1_color)           { free(objects.p1_color);           objects.p1_color = NULL; }
-    if (objects.p2_color)           { free(objects.p2_color);           objects.p2_color = NULL; }
-    if (objects.blending)           { free(objects.blending);           objects.blending = NULL; }
     if (objects.touch_triggered)    { free(objects.touch_triggered);    objects.touch_triggered = NULL; }
     if (objects.flippedH)           { free(objects.flippedH);           objects.flippedH = NULL; }
     if (objects.flippedV)           { free(objects.flippedV);           objects.flippedV = NULL; }
-    if (objects.toggled)            { free(objects.toggled);            objects.toggled = NULL; }
-    if (objects.dirty)              { free(objects.dirty);              objects.dirty = NULL; }
-    if (objects.render_visible)     { free(objects.render_visible);     objects.render_visible = NULL; }
-    if (objects.render_seen)        { free(objects.render_seen);        objects.render_seen = NULL; }
+    if (objects.flags)            { free(objects.flags);            objects.flags = NULL; }
+    if (objects.groups)             { free(objects.groups);             objects.groups = NULL; }
+    if (objects.group_count)        { free(objects.group_count);        objects.group_count = NULL; }
+    if (objects.original_x)             { free(objects.original_x);             objects.original_x = NULL; }
+    if (objects.original_y)             { free(objects.original_y);             objects.original_y = NULL; }
+    if (objects.num_main_pulses)        { free(objects.num_main_pulses);        objects.num_main_pulses = NULL; }
+    if (objects.num_detail_pulses)      { free(objects.num_detail_pulses);      objects.num_detail_pulses = NULL; }
+    if (objects.main_being_pulsed)      { free(objects.main_being_pulsed);      objects.main_being_pulsed = NULL; }
+    if (objects.detail_being_pulsed)    { free(objects.detail_being_pulsed);    objects.detail_being_pulsed = NULL; }
+    if (objects.main_non_pulse_color)   { free(objects.main_non_pulse_color);   objects.main_non_pulse_color = NULL; }
+    if (objects.detail_non_pulse_color) { free(objects.detail_non_pulse_color); objects.detail_non_pulse_color = NULL; }
+    if (objects.main_color)             { free(objects.main_color);             objects.main_color = NULL; }
+    if (objects.detail_color)           { free(objects.detail_color);           objects.detail_color = NULL; }
+    if (objects.main_col_HSV_enabled)   { free(objects.main_col_HSV_enabled);   objects.main_col_HSV_enabled = NULL; }
+    if (objects.detail_col_HSV_enabled) { free(objects.detail_col_HSV_enabled); objects.detail_col_HSV_enabled = NULL; }
+    if (objects.main_col_HSV)           { free(objects.main_col_HSV);           objects.main_col_HSV = NULL; }
+    if (objects.detail_col_HSV)         { free(objects.detail_col_HSV);         objects.detail_col_HSV = NULL; }
+    if (objects.cached_main_hsv_src_color)   { free(objects.cached_main_hsv_src_color);   objects.cached_main_hsv_src_color = NULL; }
+    if (objects.cached_detail_hsv_src_color) { free(objects.cached_detail_hsv_src_color); objects.cached_detail_hsv_src_color = NULL; }
+    if (objects.cached_main_hsv_color)       { free(objects.cached_main_hsv_color);       objects.cached_main_hsv_color = NULL; }
+    if (objects.cached_detail_hsv_color)     { free(objects.cached_detail_hsv_color);     objects.cached_detail_hsv_color = NULL; }
+    if (objects.cached_main_hsv_valid)       { free(objects.cached_main_hsv_valid);       objects.cached_main_hsv_valid = NULL; }
+    if (objects.cached_detail_hsv_valid)     { free(objects.cached_detail_hsv_valid);     objects.cached_detail_hsv_valid = NULL; }
+    if (objects.scale_x)                { free(objects.scale_x);                objects.scale_x = NULL; }
+    if (objects.scale_y)                { free(objects.scale_y);                objects.scale_y = NULL; }
+    if (objects.original_scale_x)       { free(objects.original_scale_x);       objects.original_scale_x = NULL; }
+    if (objects.original_scale_y)       { free(objects.original_scale_y);       objects.original_scale_y = NULL; }
+    if (objects.child_object)           { free(objects.child_object);           objects.child_object = NULL; }
+    if (objects.tp_y_offset)            { free(objects.tp_y_offset);            objects.tp_y_offset = NULL; }
+    if (objects.section_x)              { free(objects.section_x);              objects.section_x = NULL; }
+    if (objects.section_y)              { free(objects.section_y);              objects.section_y = NULL; }
     if (objects.activated)          { free(objects.activated);          objects.activated = NULL; }
     if (objects.collided)           { free(objects.collided);           objects.collided = NULL; }
 }
 
-bool init_arrays(int count) {
+bool init_arrays(size_t count) {
     objects.random = malloc(sizeof(int) * count);
     if (!objects.random) return false;
 
@@ -1089,9 +1762,18 @@ bool init_arrays(int count) {
     
     objects.y = malloc(sizeof(float) * count);
     if (!objects.y) return false;
+    
+    objects.last_x = malloc(sizeof(float) * count);
+    if (!objects.last_x) return false;
+    
+    objects.last_y = malloc(sizeof(float) * count);
+    if (!objects.last_y) return false;
 
     objects.rotation = malloc(sizeof(float) * count);
     if (!objects.rotation) return false;
+
+    objects.visual_rotation = malloc(sizeof(float) * count);
+    if (!objects.visual_rotation) return false;
 
     objects.zlayer = malloc(sizeof(int) * count);
     if (!objects.zlayer) return false;
@@ -1099,11 +1781,11 @@ bool init_arrays(int count) {
     objects.zorder = malloc(sizeof(int) * count);
     if (!objects.zorder) return false;
     
-    objects.trig_duration = malloc(sizeof(float) * count);
-    if (!objects.trig_duration) return false;
-    
     objects.opacity = malloc(sizeof(float) * count);
     if (!objects.opacity) return false;
+
+    objects.alpha_trigger_opacity = malloc(sizeof(float) * count);
+    if (!objects.alpha_trigger_opacity) return false;
     
     objects.width = malloc(sizeof(float) * count);
     if (!objects.width) return false;
@@ -1120,8 +1802,8 @@ bool init_arrays(int count) {
     objects.detail_col_channel = malloc(sizeof(unsigned short) * count);
     if (!objects.detail_col_channel) return false;
     
-    objects.target_color_id = malloc(sizeof(unsigned short) * count);
-    if (!objects.target_color_id) return false;
+    objects.trigger_index = malloc(sizeof(int) * count);
+    if (!objects.trigger_index) return false;
     
     objects.hitbox_counter = malloc(sizeof(unsigned short) * count);
     if (!objects.hitbox_counter) return false;
@@ -1129,29 +1811,8 @@ bool init_arrays(int count) {
     objects.transition_applied = malloc(sizeof(unsigned char) * count);
     if (!objects.transition_applied) return false;
     
-    objects.trig_colorR = malloc(sizeof(unsigned char) * count);
-    if (!objects.trig_colorR) return false;
-    
-    objects.trig_colorG = malloc(sizeof(unsigned char) * count);
-    if (!objects.trig_colorG) return false;
-    
-    objects.trig_colorB = malloc(sizeof(unsigned char) * count);
-    if (!objects.trig_colorB) return false;
-    
     objects.orientation = malloc(sizeof(unsigned char) * count);
     if (!objects.orientation) return false;
-    
-    objects.tintGround = malloc(sizeof(bool) * count);
-    if (!objects.tintGround) return false;
-    
-    objects.p1_color = malloc(sizeof(bool) * count);
-    if (!objects.p1_color) return false;
-    
-    objects.p2_color = malloc(sizeof(bool) * count);
-    if (!objects.p2_color) return false;
-    
-    objects.blending = malloc(sizeof(bool) * count);
-    if (!objects.blending) return false;
     
     objects.touch_triggered = malloc(sizeof(bool) * count);
     if (!objects.touch_triggered) return false;
@@ -1161,18 +1822,15 @@ bool init_arrays(int count) {
     
     objects.flippedV = malloc(sizeof(bool) * count);
     if (!objects.flippedV) return false;
-    
-    objects.toggled = malloc(sizeof(bool) * count);
-    if (!objects.toggled) return false;
 
-    objects.dirty = malloc(sizeof(bool) * count);
-    if (!objects.dirty) return false;
+    objects.groups = malloc(sizeof(short[MAX_GROUPS_PER_OBJECT]) * count);
+    if (!objects.groups) return false;
 
-    objects.render_visible = malloc(sizeof(bool) * count);
-    if (!objects.render_visible) return false;
+    objects.group_count = malloc(sizeof(u8) * count);
+    if (!objects.group_count) return false;
 
-    objects.render_seen = malloc(sizeof(bool) * count);
-    if (!objects.render_seen) return false;
+    objects.flags = malloc(sizeof(u8) * count);
+    if (!objects.flags) return false;
     
     objects.activated = malloc(sizeof(u8) * count);
     if (!objects.activated) return false;
@@ -1180,41 +1838,165 @@ bool init_arrays(int count) {
     objects.collided = malloc(sizeof(u8) * count);
     if (!objects.collided) return false;
 
+    objects.original_x = malloc(sizeof(float) * count);
+    if (!objects.original_x) return false;
+
+    objects.original_y = malloc(sizeof(float) * count);
+    if (!objects.original_y) return false;
+
+    objects.num_main_pulses = malloc(sizeof(u8) * count);
+    if (!objects.num_main_pulses) return false;
+
+    objects.num_detail_pulses = malloc(sizeof(u8) * count);
+    if (!objects.num_detail_pulses) return false;
+
+    objects.main_being_pulsed = malloc(sizeof(bool) * count);
+    if (!objects.main_being_pulsed) return false;
+
+    objects.detail_being_pulsed = malloc(sizeof(bool) * count);
+    if (!objects.detail_being_pulsed) return false;
+
+    objects.main_non_pulse_color = malloc(sizeof(Color) * count);
+    if (!objects.main_non_pulse_color) return false;
+
+    objects.detail_non_pulse_color = malloc(sizeof(Color) * count);
+    if (!objects.detail_non_pulse_color) return false;
+
+    objects.main_color = malloc(sizeof(Color) * count);
+    if (!objects.main_color) return false;
+
+    objects.detail_color = malloc(sizeof(Color) * count);
+    if (!objects.detail_color) return false;
+
+    objects.main_col_HSV_enabled = malloc(sizeof(bool) * count);
+    if (!objects.main_col_HSV_enabled) return false;
+
+    objects.detail_col_HSV_enabled = malloc(sizeof(bool) * count);
+    if (!objects.detail_col_HSV_enabled) return false;
+
+    objects.main_col_HSV = malloc(sizeof(HSV) * count);
+    if (!objects.main_col_HSV) return false;
+
+    objects.detail_col_HSV = malloc(sizeof(HSV) * count);
+    if (!objects.detail_col_HSV) return false;
+
+    objects.cached_main_hsv_src_color = malloc(sizeof(Color) * count);
+    if (!objects.cached_main_hsv_src_color) return false;
+
+    objects.cached_detail_hsv_src_color = malloc(sizeof(Color) * count);
+    if (!objects.cached_detail_hsv_src_color) return false;
+
+    objects.cached_main_hsv_color = malloc(sizeof(Color) * count);
+    if (!objects.cached_main_hsv_color) return false;
+
+    objects.cached_detail_hsv_color = malloc(sizeof(Color) * count);
+    if (!objects.cached_detail_hsv_color) return false;
+
+    objects.cached_main_hsv_valid = malloc(sizeof(bool) * count);
+    if (!objects.cached_main_hsv_valid) return false;
+
+    objects.cached_detail_hsv_valid = malloc(sizeof(bool) * count);
+    if (!objects.cached_detail_hsv_valid) return false;
+
+    objects.scale_x = malloc(sizeof(float) * count);
+    if (!objects.scale_x) return false;
+
+    objects.scale_y = malloc(sizeof(float) * count);
+    if (!objects.scale_y) return false;
+
+    objects.original_scale_x = malloc(sizeof(float) * count);
+    if (!objects.original_scale_x) return false;
+
+    objects.original_scale_y = malloc(sizeof(float) * count);
+    if (!objects.original_scale_y) return false;
+
+    objects.child_object = malloc(sizeof(int) * count);
+    if (!objects.child_object) return false;
+
+    objects.tp_y_offset = malloc(sizeof(float) * count);
+    if (!objects.tp_y_offset) return false;
+
+    objects.section_x = malloc(sizeof(int) * count);
+    if (!objects.section_x) return false;
+
+    objects.section_y = malloc(sizeof(int) * count);
+    if (!objects.section_y) return false;
+
     // Initialize the values
     memset(objects.random,             0, sizeof(int) * count);
     memset(objects.id,                 0, sizeof(int) * count);
     memset(objects.x,                  0, sizeof(float) * count);
     memset(objects.y,                  0, sizeof(float) * count);
     memset(objects.rotation,           0, sizeof(float) * count);
+    memset(objects.visual_rotation,    0, sizeof(float) * count);
     memset(objects.zlayer,             0, sizeof(int) * count);
     memset(objects.zorder,             0, sizeof(int) * count);
-    memset(objects.trig_duration,      0, sizeof(float) * count);
     memset(objects.opacity,            0, sizeof(float) * count);
+    memset(objects.alpha_trigger_opacity, 0, sizeof(float) * count);
     memset(objects.width,              0, sizeof(float) * count);
     memset(objects.height,             0, sizeof(float) * count);
     memset(objects.v1p9_col_channel,   0, sizeof(unsigned short) * count);
     memset(objects.col_channel,        0, sizeof(unsigned short) * count);
     memset(objects.detail_col_channel, 0, sizeof(unsigned short) * count);
-    memset(objects.target_color_id,    0, sizeof(unsigned short) * count);
+    memset(objects.trigger_index,      0, sizeof(int) * count);
     memset(objects.hitbox_counter,     0, sizeof(unsigned short) * count);
     memset(objects.transition_applied, 0, sizeof(unsigned char) * count);
-    memset(objects.trig_colorR,        0, sizeof(unsigned char) * count);
-    memset(objects.trig_colorG,        0, sizeof(unsigned char) * count);
-    memset(objects.trig_colorB,        0, sizeof(unsigned char) * count);
     memset(objects.orientation,        0, sizeof(unsigned char) * count);
-    memset(objects.tintGround,         0, sizeof(bool) * count);
-    memset(objects.p1_color,           0, sizeof(bool) * count);
-    memset(objects.p2_color,           0, sizeof(bool) * count);
-    memset(objects.blending,           0, sizeof(bool) * count);
     memset(objects.touch_triggered,    0, sizeof(bool) * count);
     memset(objects.flippedH,           0, sizeof(bool) * count);
     memset(objects.flippedV,           0, sizeof(bool) * count);
-    memset(objects.toggled,            0, sizeof(bool) * count);
-    memset(objects.dirty,              1, sizeof(bool) * count); // Dirty by default (needs to be created lol)
-    memset(objects.render_visible,     0, sizeof(bool) * count);
-    memset(objects.render_seen,        0, sizeof(u8) * count);
+    memset(objects.groups,             0, sizeof(short[MAX_GROUPS_PER_OBJECT]) * count);
+    memset(objects.group_count,        0, sizeof(u8) * count);
+    memset(objects.flags,              0, sizeof(u8) * count);
     memset(objects.activated,          0, sizeof(u8) * count);
     memset(objects.collided,           0, sizeof(u8) * count);
+
+    for (int i = 0; i < count; i++) {
+        objects.alpha_trigger_opacity[i] = 1.0f;
+        objects.scale_x[i] = 1.0f;
+        objects.scale_y[i] = 1.0f;
+        objects.original_scale_x[i] = 1.0f;
+        objects.original_scale_y[i] = 1.0f;
+    }
+
+    memset(objects.num_main_pulses,    0, sizeof(u8) * count);
+    memset(objects.num_detail_pulses,  0, sizeof(u8) * count);
+    memset(objects.main_being_pulsed,  0, sizeof(bool) * count);
+    memset(objects.detail_being_pulsed,0, sizeof(bool) * count);
+
+    for (int i = 0; i < count; i++) {
+        objects.main_non_pulse_color[i].r = 255;
+        objects.main_non_pulse_color[i].g = 255;
+        objects.main_non_pulse_color[i].b = 255;
+        objects.detail_non_pulse_color[i].r = 255;
+        objects.detail_non_pulse_color[i].g = 255;
+        objects.detail_non_pulse_color[i].b = 255;
+        objects.main_color[i].r = 255;
+        objects.main_color[i].g = 255;
+        objects.main_color[i].b = 255;
+        objects.detail_color[i].r = 255;
+        objects.detail_color[i].g = 255;
+        objects.detail_color[i].b = 255;
+    }
+
+    memset(objects.main_col_HSV_enabled,   0, sizeof(bool) * count);
+    memset(objects.detail_col_HSV_enabled, 0, sizeof(bool) * count);
+    memset(objects.main_col_HSV,           0, sizeof(HSV) * count);
+    memset(objects.detail_col_HSV,         0, sizeof(HSV) * count);
+    memset(objects.cached_main_hsv_src_color,  0, sizeof(Color) * count);
+    memset(objects.cached_detail_hsv_src_color, 0, sizeof(Color) * count);
+    memset(objects.cached_main_hsv_color,       0, sizeof(Color) * count);
+    memset(objects.cached_detail_hsv_color,     0, sizeof(Color) * count);
+    memset(objects.cached_main_hsv_valid,       0, sizeof(bool) * count);
+    memset(objects.cached_detail_hsv_valid,     0, sizeof(bool) * count);
+
+    for (int i = 0; i < count; i++) {
+        objects.child_object[i] = -1;
+        objects.tp_y_offset[i] = 0.0f;
+    }
+
+    memset(objects.section_x,           0, sizeof(int) * count);
+    memset(objects.section_y,           0, sizeof(int) * count);
 
     return true;
 }
@@ -1226,7 +2008,7 @@ int compare_coins(const void *a, const void *b) {
     return objects.x[*c1] - objects.x[*c2];
 }
 
-int parse_string(const char *levelString) {
+int parse_string(const char *levelString, int extra_slots, int *out_object_count) {
     int sectionCount = 0;
 
     // Split the string in object sections
@@ -1242,13 +2024,15 @@ int parse_string(const char *levelString) {
 
     printf("%d\n", objectCount);
     
-    if (!init_arrays(objectCount)) {
+    if (!init_arrays(objectCount + extra_slots)) {
         free_arrays();
         output_log("Failed to allocate object array\n");
         return LOAD_OUT_OF_MEMORY;
     }
 
-    objects.count = objectCount;
+    objects.count = objectCount + extra_slots;
+
+    if (out_object_count) *out_object_count = objectCount;
 
     printf("Parsing string and converting objects...\n");
     printf("Aproximately %d bytes of pure objects\n", sizeof(ObjectsArray) * objectCount);
@@ -1266,6 +2050,15 @@ int parse_string(const char *levelString) {
         assign_object_to_section(i);
     }
 
+    for (int i = 0; i < objectCount; i++) {
+        for (int g = 0; g < objects.group_count[i]; g++) {
+            int group_id = objects.groups[i][g];
+            if (group_id > 0) {
+                add_to_group(i, group_id);
+            }
+        }
+    }
+
     qsort(coin_ids, coin_count, sizeof(int), compare_coins);
 
     // Set IDs here
@@ -1278,6 +2071,10 @@ int parse_string(const char *levelString) {
 
     free_string_array(sections, sectionCount);
 
+    for (int i = 1; i < MAX_GROUPS; i++) {
+        sort_group(i);
+    }
+
     return LOAD_NO_ERROR;
 }
 
@@ -1286,35 +2083,81 @@ void set_color_channels() {
         GDColorChannel colorChannel = colorChannels[i];
         int id = colorChannel.channelID;
 
+        if (id == CHANNEL_BLACK) continue;
+
         switch (id) {
             case CHANNEL_P1:
             case CHANNEL_P2:
                 break;
 
             default:
-                if (!(id > COL_4 && id < CHANNEL_BG) && id < CHANNEL_P1) {
+                if (id >= 0 && id < COL_CHANNEL_NUM) {
                     int chan = get_col_channel_index(id);
 
-                    memset(&channels[chan], 0, sizeof(ColorChannel));
                     Color color;
                     color.r = colorChannel.fromRed;
                     color.g = colorChannel.fromGreen;
                     color.b = colorChannel.fromBlue;
 
                     channels[chan].blending = colorChannel.blending;
-
                     channels[chan].color = color;
+                    channels[chan].non_pulse_color = color;
+                    channels[chan].alpha = colorChannel.fromOpacity < 0.0f ? 0.0f : (colorChannel.fromOpacity > 1.0f ? 1.0f : colorChannel.fromOpacity);
 
-                    if (colorChannel.playerColor == 1) channels[chan].color = get_p2_if_black(p1_color);
-                    if (colorChannel.playerColor == 2) channels[chan].color = get_p1_if_black(p2_color); 
+                    if (colorChannel.inheritedChannelID > 0) {
+                        channels[chan].copy_color_id = colorChannel.inheritedChannelID;
+                        channels[chan].hsv = colorChannel.hsv;
+                    } else {
+                        channels[chan].copy_color_id = 0;
+                    }
+
+                    if (colorChannel.playerColor == 1) {
+                        channels[chan].color = get_p2_if_black(p1_color);
+                        channels[chan].non_pulse_color = channels[chan].color;
+                    }
+                    if (colorChannel.playerColor == 2) {
+                        channels[chan].color = get_p1_if_black(p2_color);
+                        channels[chan].non_pulse_color = channels[chan].color;
+                    }
 
                     if (id == CHANNEL_OBJ) {
                         channels[get_col_channel_index(CHANNEL_OBJ_BLENDING)].color = color;
+                        channels[get_col_channel_index(CHANNEL_OBJ_BLENDING)].non_pulse_color = color;
                     }
                 }
         }
     }
+
+    for (int i = 0; i < COL_CHANNEL_NUM; i++)
+        channels[i].non_pulse_color = channels[i].color;
 }
+
+const char *bg_sheet_paths[] = {
+    "romfs:/gfx/bg_sheet_01.t3x",
+    "romfs:/gfx/bg_sheet_02.t3x",
+    "romfs:/gfx/bg_sheet_03.t3x",
+    "romfs:/gfx/bg_sheet_04.t3x"
+};
+
+const char *level_font_paths[LEVEL_FONT_COUNT] = {
+    NULL,
+    "romfs:/gfx/gjFont01.t3x",
+    "romfs:/gfx/gjFont02.t3x",
+    "romfs:/gfx/gjFont03.t3x",
+    "romfs:/gfx/gjFont04.t3x",
+    "romfs:/gfx/gjFont05.t3x",
+    "romfs:/gfx/gjFont06.t3x",
+    "romfs:/gfx/gjFont07.t3x",
+    "romfs:/gfx/gjFont08.t3x",
+    "romfs:/gfx/gjFont09.t3x",
+    "romfs:/gfx/gjFont10.t3x",
+    "romfs:/gfx/gjFont11.t3x",
+    "romfs:/gfx/gjFont12.t3x"
+};
+
+int loaded_level_font = 0;
+C2D_SpriteSheet level_font_sheet = NULL;
+const Charset *level_font = &bigFont_fontCharset;
 
 void load_level_string_info(char *level_string) {
     char *gmd_song_offset = get_metadata_value(level_string, "kA13");
@@ -1331,6 +2174,14 @@ void load_level_string_info(char *level_string) {
         free(background_data);
     } else {
         level_info.background_id = 0;
+    }
+
+    // load the background sheet on demand
+    int new_sheet = level_info.background_id / 4;
+    if (loaded_bg_sheet != new_sheet) {
+        C2D_SpriteSheetFree(bgSheet);
+        bgSheet = C2D_SpriteSheetLoad(bg_sheet_paths[new_sheet]);
+        loaded_bg_sheet = new_sheet;
     }
 
     char *ground_data = get_metadata_value(level_string, "kA7");
@@ -1390,6 +2241,27 @@ void load_level_string_info(char *level_string) {
     } else {
         level_info.initial_upsidedown = 0; 
     }
+
+    // load the level font on demand (0 = bigFont)
+    char *font_data = get_metadata_value(level_string, "kA18");
+    int font_index = 0;
+    if (font_data) {
+        font_index = CLAMP(atoi(font_data), 0, LEVEL_FONT_COUNT - 1);
+        free(font_data);
+    }
+
+    if (loaded_level_font != font_index) {
+        if (level_font_sheet) {
+            C2D_SpriteSheetFree(level_font_sheet);
+            level_font_sheet = NULL;
+        }
+        if (font_index > 0) {
+            level_font_sheet = C2D_SpriteSheetLoad(level_font_paths[font_index]);
+            if (!level_font_sheet) font_index = 0;
+        }
+        loaded_level_font = font_index;
+    }
+    level_font = level_font_charsets[font_index];
     
 }
 
@@ -1402,6 +2274,50 @@ void load_online_level_info(char *level_string) {
     level_info.custom_song_id = current_search_entry->songId;
     snprintf(level_info.level_name, sizeof(level_info.level_name), "%s", current_search_entry->name);
     snprintf(level_info.creator_name, sizeof(level_info.level_name), "%s",current_creator_entry->creatorName);
+}
+
+static void generate_orange_portals(int orange_start) {
+    int next_orange = orange_start;
+    for (int i = 0; i < orange_start; i++) {
+        if (objects.id[i] != BLUE_TP_PORTAL) continue;
+
+        float angle_rad = objects.rotation[i] * (M_PI / 180.0f);
+        float x_off = 10.0f * fabsf(cosf(angle_rad));
+
+        int oi = next_orange++;
+        objects.id[oi]           = ORANGE_TP_PORTAL;
+        objects.x[oi]            = objects.x[i] - x_off;
+        objects.last_x[oi]       = objects.x[oi];
+        objects.y[oi]            = objects.y[i] + objects.tp_y_offset[i];
+        objects.last_y[oi]       = objects.y[oi];
+        objects.rotation[oi]     = adjust_angle_y(objects.rotation[i], objects.flippedH[i]) + 180.0f;
+        objects.visual_rotation[oi] = objects.rotation[oi];
+        objects.flippedH[oi]     = false;
+        objects.flippedV[oi]     = false;
+        objects.opacity[oi]      = 1.0f;
+        objects.flags[oi]        &= ~FLAG_TOGGLED;
+        objects.activated[oi]    = 0;
+        objects.collided[oi]     = 0;
+        objects.child_object[oi] = -1;
+        objects.tp_y_offset[oi]  = 0.0f;
+        objects.original_x[oi]   = objects.x[oi];
+        objects.original_y[oi]   = objects.y[oi];
+        objects.zlayer[oi]       = objects.zlayer[i];
+        objects.zorder[oi]       = objects.zorder[i];
+        objects.child_object[i]  = oi;
+
+        // Copy groups from blue portal to orange portal
+        objects.group_count[oi] = objects.group_count[i];
+        for (int g = 0; g < objects.group_count[i] && g < MAX_GROUPS_PER_OBJECT; g++) {
+            objects.groups[oi][g] = objects.groups[i][g];
+            if (objects.groups[i][g] > 0) {
+                add_to_group(oi, objects.groups[i][g]);
+            }
+        }
+
+        assign_object_to_section(oi);
+    }
+    objects.count = next_orange;
 }
 
 int load_online_level(char *level_string) {
@@ -1440,12 +2356,23 @@ int load_online_level(char *level_string) {
     // Minimum size
     level_info.last_obj_x = 570.f;
 
-    int returned = parse_string(data);
+    // Count blue teleport portals to reserve extra object slots
+    int extra_slots = 0;
+    const char *scan = data;
+    while ((scan = strstr(scan, "1,747,")) != NULL) {
+        extra_slots++;
+        scan++;
+    }
+    int orange_start = 0;
+
+    int returned = parse_string(data, extra_slots, &orange_start);
 
     free(data);
     free(metaStr);
 
     if (returned) return returned;
+
+    generate_orange_portals(orange_start);
 
     init_col_channels();
     set_color_channels();
@@ -1461,6 +2388,7 @@ int load_online_level(char *level_string) {
 
     C2D_SpriteFromSheet(&sprite_templates[17].child_templates[0], spriteSheet, current_pulserod_ball_image);
     C2D_SpriteSetCenter(&sprite_templates[17].child_templates[0], 0.5f, 0.5f);
+
 
     return LOAD_NO_ERROR;
 }
@@ -1535,14 +2463,25 @@ int load_level(char *path) {
     // Minimum size
     level_info.last_obj_x = 570.f;
 
-    int returned = parse_string(data);
+    // Count blue teleport portals to reserve extra object slots
+    int extra_slots = 0;
+    const char *scan = data;
+    while ((scan = strstr(scan, "1,747,")) != NULL) {
+        extra_slots++;
+        scan++;
+    }
+    int orange_start = 0;
+
+    int returned = parse_string(data, extra_slots, &orange_start);
 
     free(data);
     free(metaStr);
     free(level);
 
     if (returned) return returned;
-    
+
+    generate_orange_portals(orange_start);
+
     init_col_channels();
     set_color_channels();
 
@@ -1562,13 +2501,50 @@ int load_level(char *path) {
 }
 
 void reload_level() {
+    clear_groups();
+
+    free_trigger_buffers();
+
     for (int i = 0; i < objects.count; i++) {
         objects.activated[i] = false;
         objects.collided[i] = false;
         objects.hitbox_counter[i] = 0;
         objects.transition_applied[i] = FADE_NONE;
-        objects.toggled[i] = false;
+        objects.flags[i] &= ~FLAG_TOGGLED;
         objects.opacity[i] = 1.f;
+        objects.x[i] = objects.original_x[i];
+        objects.y[i] = objects.original_y[i];
+        objects.last_x[i] = objects.original_x[i];
+        objects.last_y[i] = objects.original_y[i];
+        objects.alpha_trigger_opacity[i] = 1.0f;
+        objects.scale_x[i] = objects.original_scale_x[i];
+        objects.scale_y[i] = objects.original_scale_y[i];
+        objects.num_main_pulses[i] = 0;
+        objects.num_detail_pulses[i] = 0;
+        objects.main_being_pulsed[i] = false;
+        objects.detail_being_pulsed[i] = false;
+        objects.main_color[i] = (Color){255, 255, 255};
+        objects.detail_color[i] = (Color){255, 255, 255};
+        objects.child_object[i] = -1;
+        objects.tp_y_offset[i] = 0.0f;
+        objects.cached_main_hsv_valid[i] = false;
+        objects.cached_detail_hsv_valid[i] = false;
+    }
+
+    for (int i = 0; i < objects.count; i++) {
+        update_object_section(i);
+    }
+
+    int next_orange = 0;
+    for (int i = 0; i < objects.count; i++) {
+        if (objects.id[i] == BLUE_TP_PORTAL) {
+            while (next_orange < objects.count && objects.id[next_orange] != ORANGE_TP_PORTAL)
+                next_orange++;
+            if (next_orange < objects.count) {
+                objects.child_object[i] = next_orange;
+                next_orange++;
+            }
+        }
     }
 
     accumulator = 0.f;
@@ -1576,11 +2552,25 @@ void reload_level() {
 
     init_col_channels();
     set_color_channels();
+
+    for (int i = 0; i < objects.count; i++) {
+        for (int g = 0; g < objects.group_count[i]; g++) {
+            int group_id = objects.groups[i][g];
+            if (group_id > 0) {
+                add_to_group(i, group_id);
+            }
+        }
+    }
+    
+    for (int i = 1; i < MAX_GROUPS; i++) {
+        sort_group(i);
+    }
 }
 
 void unload_level() {
-    reset_render_cache();
+    clear_groups();
     free_arrays();
+    free_trigger_buffers();
     free_sections();
     free_object_particles();
     
@@ -1589,6 +2579,13 @@ void unload_level() {
         free(colorChannels);
         colorChannels = NULL;
     }
+
+    if (level_font_sheet) {
+        C2D_SpriteSheetFree(level_font_sheet);
+        level_font_sheet = NULL;
+    }
+    loaded_level_font = 0;
+    level_font = &bigFont_fontCharset;
 
     stop_mp3();
 }

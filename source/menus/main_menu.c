@@ -2,11 +2,12 @@
 #include <citro2d.h>
 #include <stdlib.h>
 
+#include "icons.h"
 #include "math_helpers.h"
 #include "main.h"
 #include "graphics.h"
 #include "state.h"
-#include "color_channels.h"
+#include "triggers.h"
 #include "mp3_player.h"
 
 #include "menus/components/ui_list.h"
@@ -102,6 +103,7 @@ void reset_players() {
     title_screen_player.player_icons.ball = random_int(1, ICON_COUNT_PLAYER_BALL - 1);
     title_screen_player.player_icons.ufo  = random_int(1, ICON_COUNT_BIRD - 1);
     title_screen_player.player_icons.wave = random_int(1, ICON_COUNT_DART - 1);
+    title_screen_player.player_icons.robot = random_int(1, ICON_COUNT_ROBOT - 1);
     title_screen_player.player_icons.glow = false;
 
     title_screen_player_hold = random_int(0,1);
@@ -151,6 +153,15 @@ static void handle_input() {
                 pressing = true;
             }
             break;
+        case GAMEMODE_ROBOT:
+            if (title_screen_player_hold) {
+                // If holding, 1/8 change to stop holding
+                if (!(rand() & 0b111)) title_screen_player_hold = 0;
+                pressing = true;
+            } else {
+                // Else 1/16 change to start holding
+                if (!(rand() & 0b1111)) title_screen_player_hold = 0;
+            }
     }
 
     started = !old_pressing && pressing;
@@ -190,14 +201,17 @@ static void main_menu_init(UIScreen *s){
 
     int chan_bg = get_col_channel_index(CHANNEL_BG);
     int chan_ground = get_col_channel_index(CHANNEL_GROUND);
+    int chan_ground_2 = get_col_channel_index(CHANNEL_GROUND_2);
     int chan_line = get_col_channel_index(CHANNEL_LINE);
 
     channels[chan_bg].color = col;
     channels[chan_ground].color = col;
+    channels[chan_ground_2].color = col;
     channels[chan_line].color = white;
 
     get_buffer(CHANNEL_BG)->active = false;
     get_buffer(CHANNEL_GROUND)->active = false;
+    get_buffer(CHANNEL_GROUND_2)->active = false;
     get_buffer(CHANNEL_LINE)->active = false;
 
     allocate_particles();
@@ -315,11 +329,13 @@ static void main_menu_update(UIScreen *s, UIInput *input){
 
     handle_col_channel(CHANNEL_BG);
     handle_col_channel(CHANNEL_GROUND);
+    handle_col_channel(CHANNEL_GROUND_2);
 
     ColTriggerBuffer *trig = get_buffer(CHANNEL_BG);
     if (!trig->active) {
         upload_color_to_buffer(CHANNEL_BG, default_lvl_colors[main_menu_color_index % NUM_MENU_COLORS], 4.f);
         upload_color_to_buffer(CHANNEL_GROUND, default_lvl_colors[main_menu_color_index % NUM_MENU_COLORS], 4.f);
+        upload_color_to_buffer(CHANNEL_GROUND_2, default_lvl_colors[main_menu_color_index % NUM_MENU_COLORS], 4.f);
         main_menu_color_index++;
     }
     

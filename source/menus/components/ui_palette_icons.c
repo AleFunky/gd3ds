@@ -13,17 +13,18 @@ static void ui_palette_icons_draw(UIElement* e, UITransform *transform) {
 
     bool glow_enabled = (player_glow_enabled || ((p1_color.r | p1_color.g | p1_color.b) == 0));
     
-    float length = ((GAMEMODE_COUNT - 1) * (ICON_WIDTH + palette_icons->spacing)) * transform->scaleX;
+    float length = ((ICON_GAMEMODE_COUNT - 1) * (ICON_WIDTH + palette_icons->spacing)) * transform->scaleX;
 
     float x = transform->x - length * 0.5f;
     
-    for (size_t g = 0; g < GAMEMODE_COUNT; g++) {
+    for (size_t g = 0; g < ICON_GAMEMODE_COUNT; g++) {
         float icon_x = x + (ICON_WIDTH + palette_icons->spacing) * transform->scaleX * g;
         spawn_icon_at(
             g, *current_icons[g], glow_enabled, icon_x, transform->y, 0, 0, 0, transform->scaleX,
             C2D_Color32(p1_color.r, p1_color.g, p1_color.b, 255),
             C2D_Color32(p2_color.r, p2_color.g, p2_color.b, 255),
-            C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
+            C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255),
+            (IconParameters) { 0 }
         );
     }
 }

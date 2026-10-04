@@ -130,6 +130,8 @@ void cfg_init() {
     selected_ball = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ball", 1);
     selected_ufo  = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ufo",  1);
     selected_wave = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "wave", 1);
+    selected_robot = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "robot", 1);
+    if (selected_robot < 1 || selected_robot >= ICON_COUNT_ROBOT) selected_robot = 1;
     selected_trail = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "trail", 0);
     selected_p1   = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "p1",   DEFAULT_P1);
     selected_p2   = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "p2",   DEFAULT_P2);
@@ -169,6 +171,7 @@ void cfg_save() {
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ball", selected_ball);
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ufo",  selected_ufo );
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "wave", selected_wave);
+    config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "robot", selected_robot);
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "trail", selected_trail);
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "p1",   selected_p1  );
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "p2",   selected_p2  );

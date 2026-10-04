@@ -9,6 +9,7 @@
 #include "graphics.h"
 
 #include "menus/icon_kit.h"
+#include "player/robot_anim_data.h"
 
 #define FIRST_TRAIL_ID 27
 
@@ -42,7 +43,11 @@ static void ui_icon_draw(UIElement* e, UITransform *transform) {
             transform->scaleX,
             icon->p1_color,
             icon->p2_color,
-            icon->glow_color
+            icon->glow_color,
+            (IconParameters) { 
+                .robot_anim_frame = 0,
+                .robot_anim_id = ROBOT_ANIM_IDLE
+            }
         );
     }
 

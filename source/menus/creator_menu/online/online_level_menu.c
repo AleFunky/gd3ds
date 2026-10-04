@@ -47,6 +47,11 @@
 #define INSANE_DEMON_FACE_1 263
 #define EXTREME_DEMON_FACE_1 265
 
+#define USER_COIN_CENTER_X      165.f
+#define USER_COIN_STEP_X        9.f
+#define USER_COIN_ROW_Y_RATED   131.f
+#define USER_COIN_ROW_Y_UNRATED 123.f
+
 const int demon_faces_1[] = {
     NA_FACE,
     EASY_DEMON_FACE_1,
@@ -129,6 +134,7 @@ static UILabel *description_label;
 static UILabel *level_id_label;
 static UIImage *difficulty_face_image;
 static UIImage *featured_glow_image;
+static UIImage *usercoin_slots[3];
 
 static UIProgressBar *normal_percent_prog;
 static UIProgressBar *practice_percent_prog;
@@ -480,6 +486,29 @@ static void populate_level_info(int level_id) {
     current_level_entry->data.level_id = entry_srch->levelId;
     current_level_entry->data.stars = entry_srch->stars;
 
+    int coin_count = entry_srch->coins;
+    if (coin_count < 0) coin_count = 0;
+    if (coin_count > 3) coin_count = 3;
+    bool coins_visible = user_coins_counter_visible();
+    bool has_rate = entry_srch->stars > 0;
+    float coin_row_y = has_rate ? USER_COIN_ROW_Y_RATED : USER_COIN_ROW_Y_UNRATED;
+    for (int i = 0; i < 3; i++) {
+        UIImage *slot = usercoin_slots[i];
+        if (!slot) continue;
+        if (coins_visible && i < coin_count) {
+            float coin_x = USER_COIN_CENTER_X + (i - (coin_count - 1) / 2.f) * USER_COIN_STEP_X;
+            bool collected = current_level_entry &&
+                (i == 0 ? current_level_entry->data.coin1 :
+                 i == 1 ? current_level_entry->data.coin2 :
+                          current_level_entry->data.coin3);
+            ui_element_set_position((UIElement *) slot, coin_x, coin_row_y);
+            ui_image_set_tint(slot, user_coin_icon_tint(collected, has_rate));
+            slot->base.enabled = true;
+        } else {
+            slot->base.enabled = false;
+        }
+    }
+
     update_progress_bars();
 }
 
@@ -620,6 +649,10 @@ static void online_level_init_top (UIScreen *s) {
 
     difficulty_face_image = (UIImage *) ui_get_element_by_tag(screen_top, "difficultyface");
     featured_glow_image = (UIImage *) ui_get_element_by_tag(screen_top, "glow");
+
+    usercoin_slots[0] = (UIImage *) ui_get_element_by_tag(screen_top, "usercoin_slot_1");
+    usercoin_slots[1] = (UIImage *) ui_get_element_by_tag(screen_top, "usercoin_slot_2");
+    usercoin_slots[2] = (UIImage *) ui_get_element_by_tag(screen_top, "usercoin_slot_3");
 
     likes_image = (UIImage *) ui_get_element_by_tag(screen_top, "thumbsup");
 

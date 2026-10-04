@@ -72,4 +72,4 @@ void custom_circle (const float x, const float y, const float radius,
                      const u32 color);
 
 void calc_quad_params(SpriteObject *vo);
-bool C2D_DrawImageFast(C2D_Image img, const QuadParams quad_params, const C2D_DrawParams* params, const C2D_ImageTint* tint);
+bool C2D_DrawImageFast(C2D_Image *img, const QuadParams *quad_params, const C2D_DrawParams *params, const u32 color);

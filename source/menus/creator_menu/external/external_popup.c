@@ -67,6 +67,7 @@ static char *gmd = NULL;
 
 static void open_level(UIElement *e, const UIPropertyList *args) {
     state.custom_level = true;
+    state.online_level = false;
 
     stop_mp3();
     playing_menu_loop = false;
@@ -310,20 +311,16 @@ static void external_popup_init_top(UIScreen *s) {
 
 void show_level_load_error_message() {
     // Level gave error
-    char tmp[512];
-
     int message_id = level_result - 1;
     char *message = "Ultra unknown error.";
     if (IN_BOUNDS(message_id, error_strings)) {
         message = (char *) error_strings[message_id]; 
     }
 
-    snprintf(tmp, sizeof(tmp), "%s", message);
-
     InfoCardData *ext_error_data = malloc(sizeof(InfoCardData));
     if(!ext_error_data) return;
 
-    ext_error_data->text = strdup(tmp);
+    ext_error_data->text = strdup(message);
     ext_error_data->copied = true;
     ext_error_data->title = strdup("Error");
     ext_error_data->customTitle = true;

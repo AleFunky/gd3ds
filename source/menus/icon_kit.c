@@ -13,7 +13,7 @@
 #include "fonts/bigFont.h"
 #include "main.h"
 #include "easing.h"
-#include "color_channels.h"
+#include "triggers.h"
 #include "mp3_player.h"
 #include "graphics.h"
 #include "icon_kit.h"
@@ -23,6 +23,7 @@
 
 #include "save/config.h"
 #include "state.h"
+#include "menus/creator_menu/search_menu.h"
 
 static int gamemode_page = 0;
 
@@ -33,6 +34,7 @@ static int current_ship_page = 0;
 static int current_ball_page = 0;
 static int current_ufo_page  = 0;
 static int current_wave_page = 0;
+static int current_robot_page = 0;
 static int current_trail_page = 0;
 
 static int last_displayed_gamemode = 0;
@@ -42,6 +44,7 @@ int selected_ship = 1;
 int selected_ball = 1;
 int selected_ufo  = 1;
 int selected_wave = 1;
+int selected_robot = 1;
 int selected_trail = 1;
 
 int selected_p1 = 0;
@@ -51,32 +54,35 @@ int selected_glow = 0;
 bool player_glow_enabled = false;
 bool show_glow = false;
 
-const int gamemode_icon_count[GAMEMODE_COUNT + 1] = {
+const int gamemode_icon_count[ICON_GAMEMODE_COUNT + 1] = {
     ICON_COUNT_PLAYER,
     ICON_COUNT_SHIP,
     ICON_COUNT_PLAYER_BALL,
     ICON_COUNT_BIRD,
     ICON_COUNT_DART,
+    ICON_COUNT_ROBOT,
     TRAIL_COUNT
 };
 
-static int *current_pages[GAMEMODE_COUNT + 1] = {
+static int *current_pages[ICON_GAMEMODE_COUNT + 1] = {
     &current_cube_page,
     &current_ship_page,
     &current_ball_page,
     &current_ufo_page,
     &current_wave_page,
+    &current_robot_page,
     &current_trail_page
 };
 
-static UIButton *gamemode_btns[GAMEMODE_COUNT + 1];
+static UIButton *gamemode_btns[ICON_GAMEMODE_COUNT + 1];
 
-int *current_icons[GAMEMODE_COUNT + 1] = {
+int *current_icons[ICON_GAMEMODE_COUNT + 1] = {
     &selected_cube,
     &selected_ship,
     &selected_ball,
     &selected_ufo,
     &selected_wave,
+    &selected_robot,
     &selected_trail
 };
 
@@ -86,12 +92,13 @@ int *current_colors[3] = {
     &selected_glow
 };
 
-static const int button_images[6] = {
+static const int button_images[7] = {
     341,
     351,
     325,
     327,
     329,
+    349,
     355
 };
 static int icon_counter = 1;
@@ -134,7 +141,8 @@ static void disable_all_icon_buttons(UIScreen *s) {
     ui_button_set_image((UIButton *) ui_get_element_by_tag(s, "ball"), button_images[2], 0);
     ui_button_set_image((UIButton *) ui_get_element_by_tag(s, "ufo"),  button_images[3], 0);
     ui_button_set_image((UIButton *) ui_get_element_by_tag(s, "dart"), button_images[4], 0);
-    ui_button_set_image((UIButton *) ui_get_element_by_tag(s, "trail"), button_images[5], 0);
+    ui_button_set_image((UIButton *) ui_get_element_by_tag(s, "robot"), button_images[5], 0);
+    ui_button_set_image((UIButton *) ui_get_element_by_tag(s, "trail"), button_images[6], 0);
 }
 
 static void action_set_page(UIElement *e, const UIPropertyList *args) {
@@ -144,7 +152,7 @@ static void action_set_page(UIElement *e, const UIPropertyList *args) {
     ui_button_set_image((UIButton *) e, button_images[gamemode_page] + 1, 0);
     ui_run_func_on_tag(e->screen, "icon", set_icon_index); 
 
-    for(int i = 0; i < GAMEMODE_COUNT + 1; i++){
+    for(int i = 0; i < ICON_GAMEMODE_COUNT + 1; i++){
         gamemode_btns[i]->keyBinds = 0;
         if(i == gamemode_page - 1){
             gamemode_btns[i]->keyBinds |= KEY_L | KEY_ZL;
@@ -155,9 +163,9 @@ static void action_set_page(UIElement *e, const UIPropertyList *args) {
 }
 
 static void set_trail_page(UIElement *e, const UIPropertyList *args) {
-    gamemode_page = 5;
+    gamemode_page = 6;
     disable_all_icon_buttons(e->screen);
-    ui_button_set_image((UIButton *) e, button_images[5] + 1, 0);
+    ui_button_set_image((UIButton *) e, button_images[6] + 1, 0);
     ui_run_func_on_tag(e->screen, "icon", set_trail_index); 
 }
 
@@ -192,7 +200,8 @@ static void icon_kit_init(UIScreen *s){
     gamemode_btns[2] = (UIButton *) ui_get_element_by_tag(s, "ball");
     gamemode_btns[3] = (UIButton *) ui_get_element_by_tag(s, "ufo");
     gamemode_btns[4] = (UIButton *) ui_get_element_by_tag(s, "dart");
-    gamemode_btns[5] = (UIButton *) ui_get_element_by_tag(s, "trail");
+    gamemode_btns[5] = (UIButton *) ui_get_element_by_tag(s, "robot");
+    gamemode_btns[6] = (UIButton *) ui_get_element_by_tag(s, "trail");
 
     action_set_page(ui_get_element_by_tag(s, "cube"), NULL);
 
@@ -209,8 +218,17 @@ static void icon_kit_init_top(UIScreen *s){
     char coins[32];
     snprintf(coins, sizeof(coins), "%d", total_coins);
 
+    char user_coins[32];
+    snprintf(user_coins, sizeof(user_coins), "%d", total_user_coins);
+
     ui_label_set_text((UILabel *) ui_get_element_by_tag(s, "star_text"), stars);
     ui_label_set_text((UILabel *) ui_get_element_by_tag(s, "secretcoins_text"), coins);
+    ui_label_set_text((UILabel *) ui_get_element_by_tag(s, "usercoins_text"), user_coins);
+
+    if (!user_coins_counter_visible()) {
+        ui_run_func_on_tag(s, "usercoins_icon", ui_disable_element);
+        ui_run_func_on_tag(s, "usercoins_text", ui_disable_element);
+    }
 
 }
 

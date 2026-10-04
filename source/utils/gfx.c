@@ -460,7 +460,7 @@ void calc_quad_params(SpriteObject *vo) {
     }
 }
 
-bool C2D_DrawImageFast(C2D_Image img, const QuadParams quad_params, const C2D_DrawParams* params, const C2D_ImageTint* tint) {
+bool C2D_DrawImageFast(C2D_Image *img, const QuadParams *quad_params, const C2D_DrawParams *params, const u32 color) {
 	C2Di_Context* ctx = C2Di_GetContext();
 	if (!(ctx->flags & C2DiF_Active))
 		return false;
@@ -468,22 +468,18 @@ bool C2D_DrawImageFast(C2D_Image img, const QuadParams quad_params, const C2D_Dr
 		return false;
 
 	C2Di_SetMode((ctx->flags & C2DiF_TintMode_Mask) >> (C2DiF_TintMode_Shift - C2DiF_Mode_Shift));
-	C2Di_SetTex(img.tex);
+	C2Di_SetTex(img->tex);
 	C2Di_Update();
 
 	// Calculate colors
-	const C2D_Tint* tintTopLeft  = &tint->corners[C2D_TopLeft];
-	const C2D_Tint* tintTopRight = &tint->corners[C2D_TopRight];
-	const C2D_Tint* tintBotLeft  = &tint->corners[C2D_BotLeft];
-	const C2D_Tint* tintBotRight = &tint->corners[C2D_BotRight];
 
-    const C2Di_Quad quadr = quad_params.quadr;
+    const C2Di_Quad quadr = quad_params->quadr;
 
 	C2Di_AppendQuad();
-	C2Di_AppendVtx(quadr.topLeft[0],  quadr.topLeft[1],  params->depth, quad_params.tcTopLeft[0],  quad_params.tcTopLeft[1],  0, tintTopLeft->blend,  tintTopLeft->color);
-	C2Di_AppendVtx(quadr.topRight[0], quadr.topRight[1], params->depth, quad_params.tcTopRight[0], quad_params.tcTopRight[1], 0, tintTopRight->blend, tintTopRight->color);
-	C2Di_AppendVtx(quadr.botLeft[0],  quadr.botLeft[1],  params->depth, quad_params.tcBotLeft[0],  quad_params.tcBotLeft[1],  0, tintBotLeft->blend,  tintBotLeft->color);
-	C2Di_AppendVtx(quadr.botRight[0], quadr.botRight[1], params->depth, quad_params.tcBotRight[0], quad_params.tcBotRight[1], 0, tintBotRight->blend, tintBotRight->color);
+	C2Di_AppendVtx(quadr.topLeft[0],  quadr.topLeft[1],  params->depth, quad_params->tcTopLeft[0],  quad_params->tcTopLeft[1],  0, 1, color);
+	C2Di_AppendVtx(quadr.topRight[0], quadr.topRight[1], params->depth, quad_params->tcTopRight[0], quad_params->tcTopRight[1], 0, 1, color);
+	C2Di_AppendVtx(quadr.botLeft[0],  quadr.botLeft[1],  params->depth, quad_params->tcBotLeft[0],  quad_params->tcBotLeft[1],  0, 1, color);
+	C2Di_AppendVtx(quadr.botRight[0], quadr.botRight[1], params->depth, quad_params->tcBotRight[0], quad_params->tcBotRight[1], 0, 1, color);
 	return true;
 }
 

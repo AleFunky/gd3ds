@@ -1,8 +1,9 @@
 #pragma once
 #include <citro2d.h>
 #include "level_loading.h"
-#include "color_channels.h"
+#include "triggers.h"
 #include "utils/c2d_internal.h"
+#include "animations.h"
 
 #define FADING_OBJ_PADDING 45
 #define FADING_OBJ_WIDTH 180
@@ -32,29 +33,22 @@ typedef enum {
     FADE_STATUS_IN
 } FadeStatus;
 
-// Simple sprite struct
-typedef struct
-{
-    C2D_Sprite spr;
-    float dx, dy; // velocity
-} Sprite;
-
 typedef struct {
     C2Di_Quad quadr;
     float tcTopLeft[2], tcTopRight[2], tcBotLeft[2], tcBotRight[2];
 } QuadParams;
 
-typedef struct
-{
+typedef struct {
     C2D_Sprite spr;
-    C2D_ImageTint tint;
+    u32 tint;
     QuadParams params;
-    int obj;
-    int layer;
-    int col_type;
     float opacity;
-    int col_channel;
-    int zlayer;
+    float rotation;
+    int obj;
+    short col_channel;
+    unsigned char col_type;
+    signed char zlayer;
+    unsigned char layer;
     bool blending;
     bool hidden;
 } SpriteObject;
@@ -106,9 +100,11 @@ extern int current_fading_effect;
 extern int sprite_count;
 extern C2D_SpriteSheet spriteSheet;
 extern C2D_SpriteSheet spriteSheet2;
+extern C2D_SpriteSheet spriteSheet3;
+extern C2D_SpriteSheet animatedSheet;
 extern C2D_SpriteSheet glowSheet;
 extern C2D_SpriteSheet bgSheet;
-extern C2D_SpriteSheet bg2Sheet;
+extern int loaded_bg_sheet;
 extern C2D_SpriteSheet groundSheet;
 extern C2D_SpriteSheet cube0Sheet;
 extern C2D_SpriteSheet cube1Sheet;
@@ -116,6 +112,7 @@ extern C2D_SpriteSheet shipSheet;
 extern C2D_SpriteSheet ballSheet;
 extern C2D_SpriteSheet ufoSheet;
 extern C2D_SpriteSheet waveSheet;
+extern C2D_SpriteSheet robotSheet;
 extern C2D_SpriteSheet trailSheet;
 extern C2D_SpriteSheet particleSheet;
 
@@ -131,7 +128,6 @@ inline float normalize_angle(float a)
 }
 
 void create_objects();
-void reset_render_cache();
 void change_blending(bool blending);
 Color get_white_if_black(Color color);
 Color get_p1_if_black(Color color);
@@ -143,6 +139,12 @@ void draw_background(float x, float y);
 void draw_ground(float cam_x, float cam_y, float y, bool is_ceiling, int screen_width);
 void update_player_colors();
 void set_player_colors(Color p1, Color p2, Color glow);
+
+typedef struct {
+    int robot_anim_id;
+    int robot_anim_frame;
+} IconParameters;
+
 void spawn_icon_at(
     int gamemode,
     int id,
@@ -155,7 +157,8 @@ void spawn_icon_at(
     float scale,
     u32 p1_color,
     u32 p2_color,
-    u32 glow_color
+    u32 glow_color,
+    IconParameters params
 );
 void spawn_p1_layer_at(
     int gamemode,
@@ -166,7 +169,8 @@ void spawn_p1_layer_at(
     unsigned char flip_x,
     unsigned char flip_y,
     float scale,
-    u32 p1_color
+    u32 p1_color,
+    IconParameters params
 );
 
 void spawn_glow_layer_at(
@@ -178,10 +182,15 @@ void spawn_glow_layer_at(
     unsigned char flip_x,
     unsigned char flip_y,
     float scale,
-    u32 glow_color
+    u32 glow_color,
+    IconParameters params
 );
 
 Color get_color_abgr8(u32 color);
+
+const SlotFrames* find_slot_frames(const GameObject* obj, int slot);
+int get_child_group(const GameObject* obj, int child_index);
+const Animation* get_animation_for_object(int id);
 
 void handle_mirror_transition();
 
@@ -189,6 +198,7 @@ void draw_player_effects();
 void draw_post_player_effects();
 void draw_player_graphics();
 int get_coin_texture(int tex, int ticks);
+C2D_SpriteSheet *get_sprite_sheet_ex(int index, int *rel_index);
 
 void update_touch_effect(float delta);
 void draw_touch_effect();

@@ -1,4 +1,4 @@
---atlas --border edge -f rgba8888 -z auto
+--atlas -f rgba8888 -z auto
 blockPiece_001_001.png
 boost_01_001.png
 boost_02_001.png
@@ -46,6 +46,12 @@ portal_13_back_001.png
 portal_13_extra_001.png
 portal_13_extra_2_001.png
 portal_13_front_001.png
+portal_14_back_001.png
+portal_14_front_001.png
+portal_15_back_001.png
+portal_15_front_001.png
+portal_16_back_001.png
+portal_16_front_001.png
 portal_extra_shine_001.png
 secretCoin_01_001.png
 secretCoin_01_002.png

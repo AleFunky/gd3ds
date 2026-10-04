@@ -122,7 +122,7 @@ void populate_comments() {
                 int iconIndex = comment_entries[i].playerIcon;
 
                 // check if provided player icon is in bounds
-                if (iconType >= GAMEMODE_COUNT) {
+                if (iconType >= ICON_GAMEMODE_COUNT) {
                     iconType = 0;
                     iconIndex = 1;
                 } else if (iconIndex >= gamemode_icon_count[iconType]) iconIndex = 1;

@@ -10,6 +10,7 @@
 #include "menus/components/ui_label.h"
 
 #include "save/saving.h"
+#include "menus/creator_menu/search_menu.h"
 
 static UIList *list;
 
@@ -26,6 +27,7 @@ static const StatisticEntries stats[] = {
     { "Completed Ext. Levels", &completed_external_levels },
     { "Completed Demon Levels", &total_demons },
     { "Collected Secret Coins", &total_coins },
+    { "Collected User Coins", &total_user_coins },
     { "Players Destroyed", &players_destroyed }
 };
 
@@ -36,6 +38,8 @@ void statistics_init(UIScreen *s) {
         float list_width = list->base.w * 0.5f;
 
         for (int i = 0; i < ARRAY_LEN(stats); i++) {
+            if (stats[i].value == &total_user_coins && !user_coins_counter_visible()) continue;
+
             char *name = stats[i].name;
             int value = *stats[i].value;
 

@@ -69,6 +69,7 @@ typedef struct {
     int ball;
     int ufo;
     int wave;
+    int robot;
 
     Color p1_color;
     Color p2_color;
@@ -151,9 +152,21 @@ typedef struct {
 
     bool buffer_ufo;
 
+    bool just_teleported;
+
+    float robot_air_time;
+    int robot_anim_id;
+    int robot_anim_frame;
+    float robot_anim_timer;
+
     float coyote_frames;
 
     IconsDrawing player_icons;
+
+    int collided_block;
+    int last_collided_block;
+
+    bool gravity_changed_move;
 } Player;
 
 typedef struct {
@@ -191,6 +204,7 @@ extern ParticleSystem ship_fire_particles[2];
 extern ParticleSystem ship_secondary_particles[2];
 extern ParticleSystem secondary_particles[2];
 extern ParticleSystem burst_particles[2];
+extern ParticleSystem robot_fire_particles[2];
 extern ParticleSystem land_particles[2];
 extern ParticleSystem explosion_particles[2];
 extern ParticleSystem glitter_particles;
@@ -229,17 +243,20 @@ inline float gravInternalTop(Player *player) { return player->upside_down ? -get
 
 inline float grav(Player *player, float val) { return player->upside_down ? -val : val; }
 
+float get_lerped_x(int object);
+float get_lerped_y(int object);
+
 inline float obj_getTop(int object)  { 
-    return objects.y[object] + objects.height[object] / 2; 
+    return get_lerped_y(object) + objects.height[object] / 2; 
 }
 inline float obj_getBottom(int object)  { 
-    return objects.y[object] - objects.height[object] / 2; 
+    return get_lerped_y(object) - objects.height[object] / 2; 
 }
 inline float obj_getRight(int object)  {  
-    return objects.x[object] + objects.width[object] / 2; 
+    return get_lerped_x(object) + objects.width[object] / 2; 
 }
 inline float obj_getLeft(int object)  { 
-    return objects.x[object] - objects.width[object] / 2; 
+    return get_lerped_x(object) - objects.width[object] / 2; 
 }
 inline float obj_gravBottom(Player *player, int object) { return player->upside_down ? -obj_getTop(object) : obj_getBottom(object); }
 inline float obj_gravTop(Player *player, int object) { return player->upside_down ? -obj_getBottom(object) : obj_getTop(object); }
@@ -250,6 +267,8 @@ void run_player(Player *player);
 
 void draw_hitbox(int obj);
 void draw_player_hitbox(Player *player);
+void draw_internal_hitbox(Player *player);
+void draw_rotated_hitbox(Player *player);
 void draw_hitbox_trail(int player);
 void add_new_hitbox(Player *player);
 

@@ -25,6 +25,10 @@
 bool search_needs_refresh = true;
 bool gdps = false;
 
+bool user_coins_counter_visible(void) {
+    return !gdps;
+}
+
 static UIScreen *btm_screen = NULL;
 
 static void update_difficulty_tint(UIElement *e){
