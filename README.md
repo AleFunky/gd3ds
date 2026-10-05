@@ -49,8 +49,10 @@ Geometry Dash and its respective resources are by RobTop Games.
  - __camila314__ - Pathfinder Mod's physics
 
 ## Download
-QR for the 2.0 build beta for those who want to download it directly via FBI!
-<img width="600" height="600" alt="qr" src="https://github.com/user-attachments/assets/084e0688-ea6b-4cc8-9fcc-08a33bb54edc" />
+QR for the 2.0 build beta for those who want to download it directly via FBI! 
+This includes an autoupdater!
+<img width="256" height="256" alt="autoupdat" src="https://github.com/user-attachments/assets/c6f6a56e-6671-4a19-8fdc-c71560e8668a" />
+
 
 
 # Discord
