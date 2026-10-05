@@ -18,9 +18,16 @@ jobs:
         with:
           submodules: recursive
       - name: Make application
+        env:
+          COMMIT_HASH: ${{ github.sha }}
+          REPO_NAME: ${{ github.event.repository.name }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_BRANCH: ${{ github.ref_name }}
         run: |
           chmod -R 755 buildtools/
-          make 3dsx cia
+          make 3dsx cia CFLAGS='-DCURRENT_COMMIT_HASH=\"$(COMMIT_HASH)\" \
+                                -DREPO_NAME=\"$(REPO_NAME)\" \
+                                -DREPO_AUTHOR=\"$(REPO_OWNER)\"'
       - name: Prepare for build publishing
         run: |
           mkdir -p out/3dsx/rom
