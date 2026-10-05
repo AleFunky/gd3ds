@@ -98,7 +98,7 @@ int get_level_from_id(GenericTask *task, char **out_data, int id, bool useGdps) 
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
-        curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 
         char data[64];
         snprintf(data, 63, "levelID=%d&secret=Wmfd2893gb7", id);
@@ -164,7 +164,7 @@ int get_search_results(GenericTask *task, char **out_data, int gameVer, SearchFi
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
-        curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 
         char data[512];
 
@@ -266,7 +266,7 @@ int get_comments_from_id(GenericTask *task, char **out_data, int id, int page, i
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
-        curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 
         char data[64];
         snprintf(data, 63, "levelID=%d&page=%d&mode=%d&secret=Wmfd2893gb7", id, page, mode);
@@ -316,7 +316,7 @@ int get_song_info_from_id(GenericTask *task, char **out_data, int songId, bool u
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
-        curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 
         char data[64];
         snprintf(data, sizeof(data), "songID=%d&secret=Wmfd2893gb7", songId);
@@ -398,7 +398,6 @@ static int download_file(DownloadTask *task) {
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, progressCallback);
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
-        // curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem"); // Certificate slop
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
 
@@ -478,7 +477,6 @@ int get_current_commit(GenericTask *task, char **out_data, char *repoOwner, char
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
-        // curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/github.pem");
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 
         char url[128];
@@ -529,7 +527,6 @@ int get_releases(GenericTask *task, char **out_data, char *repoOwner, char *repo
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
-        // curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/github.pem");
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
         
         char url[128];
