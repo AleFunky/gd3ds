@@ -17,6 +17,15 @@ jobs:
         uses: actions/checkout@v7
         with:
           submodules: recursive
+      - name: Generate github_info header file
+        run: |
+          cat > source/github_info.h <<EOF
+          #pragma once
+          
+          #define CURRENT_COMMIT_HASH "${{ github.sha }}"
+          #define REPO_AUTHOR "${{ github.repository_owner }}"
+          #define REPO_NAME "${{ github.event.repository.name }}"
+          EOF
       - name: Make application
         run: |
           chmod -R 755 buildtools/
