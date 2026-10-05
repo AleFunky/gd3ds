@@ -24,6 +24,7 @@
 #include "menus/settings_hub/songs.h"
 #include "menus/settings_hub/how_to_play.h"
 #include "menus/settings_hub/info_card.h"
+#include "menus/creator_menu/online/two_option_pop_up.h"
 
 #include "particles/object_particles.h"
 #include "particles/circles.h"
@@ -33,6 +34,8 @@
 
 #define DEATH_WAITING_TIME 0.5f
 #define OFFSCREEN_BUFFER 240
+
+static UIButton *quit_game_button;
 
 static Player title_screen_player;
 static bool title_screen_player_hold = false;
@@ -52,8 +55,17 @@ static float bg_scroll = 0;
 bool old_wide;
 bool old_stereo;
 
-void action_open_info_card_text(const char *text) {
-    // ui_stack_push()
+static void action_open_quit_game_pop_up(){
+    TwoOptionPopupData *quit_data = malloc(sizeof(TwoOptionPopupData));
+    if(!quit_data) return;
+
+    quit_data->text = strdup("Are you sure you want to quit?");
+    quit_data->title = strdup("Quit Game");
+    quit_data->proceed_text = strdup("Quit");
+    quit_data->cancel_text = strdup("Cancel");
+
+    ui_stack_push(&quit_pop_up_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+    ui_stack_push_data(quit_data);
 }
 
 void handle_title_screen_player(Player *player) {
@@ -190,6 +202,9 @@ static void handle_players() {
 static void main_menu_init(UIScreen *s){
     play_menu_song();
 
+    quit_game_button = (UIButton *)ui_get_element_by_tag(s, "quitbutton");
+    if (!is_3DSX) ui_disable_element((UIElement *)quit_game_button);
+
     main_menu_color_index = 0;
     u32 color = default_lvl_colors[main_menu_color_index % NUM_MENU_COLORS];
     main_menu_color_index++;
@@ -235,11 +250,6 @@ static void main_menu_init_top(UIScreen *s){
 }
 
 static void main_menu_update(UIScreen *s, UIInput *input){
-    if (input->down & KEY_SELECT) {
-        ui_stack_push_game_state(STATE_EXIT);
-        stop_mp3();
-        return;
-    }
 
     if (settingsState.wideEnabled != old_wide || settingsState.stereoEnabled != old_stereo) {
         gspWaitForVBlank();
@@ -391,6 +401,11 @@ static void main_menu_exit(UIScreen *s) {
     free_particles();
 }
 
+const UIActionDef main_menu_actions[] = {
+    { "quit_game", action_open_quit_game_pop_up }
+};
+
+
 const UIScreenDefPair main_menu_def = {
     .name = "main_menu",
     .top = {
@@ -403,6 +418,10 @@ const UIScreenDefPair main_menu_def = {
         .init = main_menu_init,
         .update = main_menu_update,
         .draw = main_menu_draw,
-        .exit = main_menu_exit
+        .exit = main_menu_exit,
+        .action_list = {
+            .action_count = ARRAY_LEN(main_menu_actions),
+            .actions = main_menu_actions
+        }
     }
 };

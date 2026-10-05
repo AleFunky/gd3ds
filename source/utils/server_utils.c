@@ -3,6 +3,13 @@
 #include <ctype.h>
 #include <citro2d.h>
 #include <string.h>
+
+#include "json-c/json_object.h"
+#include "json-c/json_object_iterator.h"
+#include "json-c/json_tokener.h"
+#include "json-c/json_types.h"
+#include "json-c/json_util.h"
+
 #include "level_loading.h"
 #include "main.h"
 #include "mp3_player.h"
@@ -20,6 +27,8 @@
 #include "menus/components/ui_button.h"
 #include "menus/components/ui_rectangle.h"
 #include "menus/components/ui_window_button.h"
+#include "menus/updater_pop_up.h"
+#include "menus/updater_settings.h"
 #include "menus/creator_menu/search_menu.h"
 #include "menus/creator_menu/online/online_menu.h"
 #include "menus/creator_menu/online/online_level_menu.h"
@@ -35,6 +44,8 @@ LevelEntry *level_entry = NULL;
 CommentEntry *comment_entries = NULL;
 
 SearchFilters filters = { 0 };
+
+UpdateData *update_data = NULL;
 
 int searchEntriesLength = 0;
 int creatorEntriesLength = 0;
@@ -643,6 +654,125 @@ void fill_gdps_comment_author_entries(char **authorStrings, int authorStringCoun
     }
 }
 
+char *parse_commit_data(char *jsonString) {
+    // parse response from github as json object 
+    json_object *jsonObject = json_tokener_parse(jsonString);
+    json_object *commitObject = NULL;
+    json_object *hashObject = NULL;
+
+    // check if we didnt get served garbage data
+    if (!jsonObject) return NULL;
+
+    // first array entry is always the latest commit, especially since we only request one in the first place 
+    commitObject = json_object_array_get_idx(jsonObject, 0); 
+
+    // attempt to populate latest commit hash, ofc gotta check if it actually exists first cuz who knows 
+    if (json_object_object_get_ex(commitObject, "sha", &hashObject)) {
+        // take ownership of hashobject so i can free everything else
+        json_object *hashObjectTemp = json_object_get(hashObject);
+        
+        json_object_put(jsonObject);
+        return (char *)json_object_get_string(hashObjectTemp);
+    } else {
+        json_object_put(jsonObject);
+        return NULL;
+    }
+}
+
+int parse_releases_data(char *jsonString, bool useNightly) {
+    // parse response as json string string
+    json_object *jsonObject = json_tokener_parse(jsonString);
+    json_object *targetRelease = NULL; 
+    json_object *url = NULL;
+    json_object *size = NULL;
+
+    // check for garbage data
+    if (!jsonObject) return -1;
+
+    size_t count = json_object_object_length(jsonObject);
+
+    // if getting nightly build, iterate array looking for a prerelease tag instead of release tags
+    if (useNightly) {
+        for (int i = 0; i < count; i++) {
+            json_object *curr_object;
+            json_object *prerelease = NULL;
+
+            curr_object = json_object_array_get_idx(jsonObject, i);
+
+            bool isPrerelease = (json_object_object_get_ex(curr_object, "prerelease", &prerelease) && json_object_get_boolean(prerelease));
+
+            if (isPrerelease) {
+                targetRelease = curr_object;
+                break;
+            }
+        }
+    } else {
+        for (int i = 0; i < count; i++) {
+            json_object *curr_object;
+            json_object *prerelease = NULL;
+            json_object *id = NULL;
+
+            curr_object = json_object_array_get_idx(jsonObject, i);
+
+            bool isPrerelease = json_object_object_get_ex(curr_object, "prerelease", &prerelease) && json_object_get_boolean(prerelease);
+            bool idGreaterThanCurrent = (json_object_object_get_ex(curr_object, "id", &id) && json_object_get_int(id) > CURRENT_RELEASE_ID);
+
+            if (!isPrerelease && idGreaterThanCurrent) {
+                targetRelease = curr_object;
+                update_data->isAvailable = true;
+                break;
+            }
+        }
+    }
+
+    // if a release is found:
+    if (targetRelease) {
+        json_object *name = NULL;
+        json_object *body = NULL;
+        json_object *assets = NULL;
+
+        // get release name
+        if (json_object_object_get_ex(targetRelease, "name", &name)) snprintf(update_data->releaseTitle, sizeof(update_data->releaseTitle), json_object_get_string(name));
+
+        // get release body
+        if (json_object_object_get_ex(targetRelease, "body", &body)) {
+            const char *tmp = json_object_get_string(body);
+            update_data->releaseBody = malloc(strlen(tmp) + 1);
+            strcpy(update_data->releaseBody, tmp);
+        }
+
+        // get assets object and iterate it looking for either the .3dsx build or .cia bundle depending on what the user is running
+        if (json_object_object_get_ex(targetRelease, "assets", &assets)) {
+            size_t assetCount = json_object_object_length(assets);
+            for (size_t j = 0; j < assetCount; j++) {
+                const json_object *currAssetObject = json_object_array_get_idx(assets, j);
+                json_object *assetNameObject = NULL;
+
+                if (json_object_object_get_ex(currAssetObject, "name", &assetNameObject)) {
+                    const char *currAssetName = json_object_get_string(assetNameObject);
+                    if (strstr(currAssetName, is_3DSX ? ".3dsx" : ".cia")) {
+                        if (json_object_object_get_ex(currAssetObject, "browser_download_url", &url)) {
+                            // we found the freaking download link lets go
+                            const char *tempUrl = json_object_get_string(url);
+                            snprintf(update_data->releaseDownloadUrl, sizeof(update_data->releaseDownloadUrl), tempUrl);
+                        }
+                        if (json_object_object_get_ex(currAssetObject, "size", &size)) {
+                            // also get the file size
+                            update_data->releaseFileSize = json_object_get_int(size);
+                        }
+                        json_object_put(jsonObject);
+                        return 0;
+                    }
+                }
+            }
+            json_object_put(jsonObject);
+            return -2;
+        }
+    } 
+    json_object_put(jsonObject);
+    return -3;
+}
+
 int search_levels_internal(GenericTask *task, bool useGdps) {
     char *outdata;
     int result = get_search_results(task, &outdata, 22, filters, useGdps);
@@ -862,6 +992,152 @@ int get_song_data_internal(GenericTask *task, int songId, SongEntry *targetSongE
     return 0;
 }
 
+int get_latest_commit_internal(GenericTask *task, char *repoAuthor, char *repoName, char *repoBranch, char *destination, int destSize) {
+    char *outdata;
+    int result = get_current_commit(task, &outdata, repoAuthor, repoName, repoBranch);
+    if (result != 0) return result;
+
+    output_log("commit data: %s\n", outdata);
+
+    char *parserResult = parse_commit_data(outdata);
+    if (!parserResult) return -1;
+
+    free(outdata);
+
+    snprintf(destination, destSize, parserResult);
+    return 0;
+}
+
+int get_latest_build_internal(GenericTask *task, char *repoAuthor, char *repoName, bool useNightly) {
+    char *outdata;
+    int result = get_releases(task, &outdata, repoAuthor, repoName);
+    if (result != 0) return result;
+
+    int parserResult = parse_releases_data(outdata, useNightly);
+    if (parserResult != 0) return parserResult;
+
+    free(outdata);
+    return 0;
+}
+
+int check_for_updates_internal(GenericTask *task, char *repoAuthor, char *repoName, char *repoBranch, bool useNightly) {
+    update_data = malloc(sizeof(UpdateData));
+    if (!update_data) return -1;
+
+    // Initialize
+    memset(update_data, 0, sizeof(UpdateData));
+
+    // if checking for nightly updates, get latest commit hash and compare it against the embedded one to see if an update is available
+    if (useNightly) {
+        char latestCommitHash[64];
+        int result = get_latest_commit_internal(task, repoAuthor, repoName, repoBranch, latestCommitHash, sizeof(latestCommitHash));
+        if (result != 0) return result;
+        
+        update_data->isAvailable = (strcmp(CURRENT_COMMIT_HASH, latestCommitHash) != 0); 
+
+        if (!update_data->isAvailable) return -3;
+    }
+
+    // get and parse releases 
+    int result = get_latest_build_internal(task, repoAuthor, repoName, useNightly);
+
+    if (result != 0) return result; 
+
+    return 0;
+}
+
+int install_update_internal(char *target_path) {
+    // 3dsx and cia rom installs are handled very differently 
+    
+    if (is_3DSX) {
+        // ensure 3dsx path is present
+        output_log("3dsx path: %s\n", _3dsx_path);
+        if (!_3dsx_path) return -1;
+        
+        Result res = 0;
+
+        // unmount romfs so we can modify current .3dsx
+        res = romfsExit();
+        if(R_FAILED(res)) {
+            output_log("failed to exit romfs - code: %d\n", res);
+            return -1;
+        }
+
+        // filesystem operations
+        if (remove(_3dsx_path) != 0) {
+            output_log("failed to remove current .3dsx\n");
+            return -1;
+        }
+        if (rename(target_path, _3dsx_path) != 0) {
+            output_log("failed to remove current .3dsx.\n");
+            return -1;
+        }
+        // success
+        return 0;
+    }
+
+    output_log("cia path: %s", target_path);
+    
+    Result res = 0;
+    FILE *cia = NULL;
+    Handle ciaHandle = 0;
+    
+    // initialise application manager 
+    res = amInit();
+    if (R_FAILED(res)) {
+        output_log("failed to init application manager - code: %d\n", res);
+        return 2;
+    }
+    
+    // open target .cia
+    cia = fopen(target_path, "rb");
+    if (!cia) {
+        amExit();
+        output_log("failed to open target .cia\n");
+        return 1;
+    }
+    
+    // begin .cia install and get write handle
+    res = AM_StartCiaInstall(MEDIATYPE_SD, &ciaHandle);
+    if (R_FAILED(res)) {
+        fclose(cia);
+        amExit();
+        output_log("failed to start cia install: %d\n", res);
+        return 3;
+    }
+    
+    // write the .cia to handle in 64kb segments
+    size_t bufferSize = 1024 * 64;
+    u8* buffer = malloc(bufferSize);
+    u32 bytesWritten = 0;
+    u32 offset = 0;
+    size_t bytesRead = 0;
+    
+    while ((bytesRead = fread(buffer, 1, bufferSize, cia)) > 0)
+    {
+        res = FSFILE_Write(ciaHandle, &bytesWritten, offset, buffer, bytesRead, FS_WRITE_FLUSH);
+        
+        if (R_FAILED(res)) {
+            AM_CancelCIAInstall(ciaHandle);
+            free(buffer);
+            fclose(cia);
+            amExit();
+            output_log("failed during cia install - code: %d\n", res);
+            return 4;
+        }
+        
+        offset += bytesWritten;
+    }
+    
+    // no way we did it
+    res = AM_FinishCiaInstall(ciaHandle);
+    free(buffer);
+    fclose(cia);
+    amExit();
+    output_log("cia installation successful\n");
+    return 0;
+}
+
 //intermediate functions
 
 int search_levels(GenericTask *task) {
@@ -881,5 +1157,15 @@ int get_comments(GenericTask *task) {
 
 int get_song_data(GenericTask *task) {
     int result = get_song_data_internal(task, current_search_entry->songId, current_song_entry, gdps);
+    return result;
+}
+
+int check_for_updates(GenericTask *task) {
+    int result = check_for_updates_internal(task, REPO_AUTHOR, REPO_NAME, REPO_BRANCH, useNightlyBranch);
+    return result;
+}
+
+int install_update(){
+    int result = install_update_internal(downloadedUpdateFilePath);
     return result;
 }

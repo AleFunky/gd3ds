@@ -98,7 +98,7 @@ int get_level_from_id(GenericTask *task, char **out_data, int id, bool useGdps) 
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
-        curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 
         char data[64];
         snprintf(data, 63, "levelID=%d&secret=Wmfd2893gb7", id);
@@ -164,7 +164,7 @@ int get_search_results(GenericTask *task, char **out_data, int gameVer, SearchFi
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
-        curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 
         char data[512];
 
@@ -266,7 +266,7 @@ int get_comments_from_id(GenericTask *task, char **out_data, int id, int page, i
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
-        curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 
         char data[64];
         snprintf(data, 63, "levelID=%d&page=%d&mode=%d&secret=Wmfd2893gb7", id, page, mode);
@@ -316,7 +316,7 @@ int get_song_info_from_id(GenericTask *task, char **out_data, int songId, bool u
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
-        curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem");
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 
         char data[64];
         snprintf(data, sizeof(data), "songID=%d&secret=Wmfd2893gb7", songId);
@@ -379,10 +379,11 @@ static int progressCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow,
     return 0;
 }
 
-static int download_song(DownloadTask *task) {
+static int download_file(DownloadTask *task) {
     char *path = task->path;
     char *url = task->url;
-    char *song_id = task->song_id;
+    char *file_name = task->file_name;
+    char *extension = task->extension;
     
     // Init
     CURL *curl = curl_easy_init();
@@ -391,16 +392,17 @@ static int download_song(DownloadTask *task) {
         char *decoded_url = url_decode(url);
         // url_convert_to_http(decoded_url);
 
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, "curl/8.4.0");
         curl_easy_setopt(curl, CURLOPT_URL, decoded_url);
-        
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, progressCallback);
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
-        curl_easy_setopt(curl, CURLOPT_CAINFO, "romfs:/certs.pem"); // Certificate slop
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
 
         char tmp_file[273];
-        snprintf(tmp_file, sizeof(tmp_file), "%s/%s.tmp", path, song_id);
+        snprintf(tmp_file, sizeof(tmp_file), "%s%s.%s.tmp", path, file_name, extension);
         FILE* f = fopen(tmp_file, "wb");
         if (!f) {
             free(decoded_url);
@@ -436,7 +438,7 @@ static int download_song(DownloadTask *task) {
         curl_easy_cleanup(curl);
         
         char actual_file[273];
-        snprintf(actual_file, sizeof(actual_file), "%s/%s.mp3", path, song_id);
+        snprintf(actual_file, sizeof(actual_file), "%s%s.%s", path, file_name, extension);
         rename(tmp_file, actual_file);
 
         return 0;
@@ -444,22 +446,121 @@ static int download_song(DownloadTask *task) {
     return -2;
 }
 
-
 static void download_thread(void *arg) {
     DownloadTask *task = arg;
 
-    task->result = download_song(task);
+    task->result = download_file(task);
 
     task->running = false;
     task->finished = true;
 }
 
-Thread create_download_song_thread(DownloadTask *task) {
+int get_current_commit(GenericTask *task, char **out_data, char *repoOwner, char *repoName, char *repoBranch) {
+    // Init
+    CURL *curl = curl_easy_init();
+    struct curl_slist *headers = NULL;
+
+    if (curl) {
+        struct MemoryStruct chunk;
+        chunk.memory = malloc(1);
+        chunk.size = 0;
+        headers = curl_slist_append(headers, "Accept: application/vnd.github+json");
+        headers = curl_slist_append(headers, "X-GitHub-Api_Version: 2026-03-10");
+
+        // github actually requires a useragent Whoops
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, "curl/8.4.0");
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
+        curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
+        curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
+        curl_easy_setopt(curl, CURLOPT_PROXY, "");
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+
+        char url[128];
+        snprintf(url, sizeof(url) - 1, "https://api.github.com/repos/%s/%s/commits?per_page=1&sha=%s", repoOwner, repoName, repoBranch);
+        curl_easy_setopt(curl, CURLOPT_URL, url);
+        
+        CURLcode code = curl_easy_perform(curl);
+        
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+
+        if (code) {
+            return code;
+        }
+
+        printf("(code %d) Response (%d): %s\n", code, chunk.size, chunk.memory);
+
+        if (chunk.memory[0] == '-') {
+            return atoi(chunk.memory);
+        }
+        
+        *out_data = chunk.memory;
+
+        return 0;
+    }
+    return 2;
+}
+
+int get_releases(GenericTask *task, char **out_data, char *repoOwner, char *repoName) {
+    // Init
+    CURL *curl = curl_easy_init();
+    struct curl_slist *headers = NULL;
+
+    if (curl) {
+        struct MemoryStruct chunk;
+        chunk.memory = malloc(1);
+        chunk.size = 0;
+        headers = curl_slist_append(headers, "Accept: application/vnd.github+json");
+        headers = curl_slist_append(headers, "X-GitHub-Api_Version: 2026-03-10");
+
+        // github requires a useragent 
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, "curl/8.4.0");
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
+        curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
+        curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
+        curl_easy_setopt(curl, CURLOPT_PROXY, "");
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+        
+        char url[128];
+        snprintf(url, sizeof(url) - 1, "https://api.github.com/repos/%s/%s/releases", repoOwner, repoName);
+        curl_easy_setopt(curl, CURLOPT_URL, url);
+        
+        CURLcode code = curl_easy_perform(curl);
+        
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+
+        if (code) {
+            return code;
+        }
+
+        printf("(code %d) Response (%d): %s\n", code, chunk.size, chunk.memory);
+
+        if (chunk.memory[0] == '-') {
+            return atoi(chunk.memory);
+        }
+        
+        *out_data = chunk.memory;
+
+        return 0;
+    }
+    return 2;
+}
+
+Thread create_file_download_thread(DownloadTask *task) {
     int32_t priority = 0x30;
     svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
     priority += 1;
     priority = priority < 0x18 ? 0x18 : priority;
-    priority = priority > 0x3F ? 0x3F : priority;
+    priority = priority > 0x3F ? 0x3F : priority; 
     
     task->progress = 0;
     task->speed = 0;

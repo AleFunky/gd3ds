@@ -12,6 +12,7 @@
 #include "menus/settings_hub/settings.h"
 #include "menus/creator_menu/soggy.h"
 #include "menus/creator_menu/search_menu.h"
+#include "menus/updater_settings.h"
 
 #include "save/saving.h"
 #include "utils/json_config.h"
@@ -70,6 +71,8 @@ void save_user_config(Config *cfg) {
 void init_values() {
     config_init_bool(&cfg, CONFIG_FLAGS "sogged", false);
     config_init_bool(&cfg, CONFIG_FLAGS "gdps", false);
+    config_init_bool(&cfg, CONFIG_FLAGS "nightlyUpdates", is_nightly);
+    config_init_bool(&cfg, CONFIG_FLAGS "autoUpdate", false);
     
     config_init_int(&cfg, CONFIG_VALUES "playersDestroyed", 0);
     config_init_float(&cfg, CONFIG_VALUES "music_volume", 1);
@@ -115,6 +118,9 @@ void cfg_init() {
 
     init_values();
 
+    doAutoUpdates = config_get_bool(&cfg, CONFIG_FLAGS "autoUpdate", false);
+    useNightlyBranch = config_get_bool(&cfg, CONFIG_FLAGS "nightlyUpdates", false);
+
     gotSogged = config_get_bool(&cfg, CONFIG_FLAGS "sogged", false);
     gdps = config_get_bool(&cfg, CONFIG_FLAGS "gdps", false);
     strcpy(menu_loop_path, gdps ? "romfs:/songs/menuLoopGDPS.mp3" : "romfs:/songs/menuLoop.mp3");
@@ -159,6 +165,8 @@ void cfg_init() {
 }
 
 void cfg_save() {
+    config_set_bool(&cfg, CONFIG_FLAGS "autoUpdate", doAutoUpdates);
+    config_set_bool(&cfg, CONFIG_FLAGS "nightlyUpdates", useNightlyBranch);
     config_set_bool(&cfg, CONFIG_FLAGS "sogged", gotSogged);
     config_set_bool(&cfg, CONFIG_FLAGS "gdps", gdps);
 

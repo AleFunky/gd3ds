@@ -137,6 +137,12 @@ float faster_speed_particles_timer = 0.f;
 bool alt_title_screen;
 
 bool is_N3DS;
+bool is_3DSX;
+bool is_nightly;
+
+bool queued_restart;
+
+char *_3dsx_path;
 
 UIStack menu_stack = { 0 };
 UIStack gameplay_stack = { 0 };
@@ -258,6 +264,12 @@ void set_channel_volume(int channel, float volume) {
     ndspChnSetMix(channel, mix);
 }
 
+static void check_rom_type() {
+    u64 id;
+    APT_GetProgramID(&id);
+    is_3DSX = (id != GAME_TITLE_ID);
+}
+
 void apply_volume_settings() {
     set_channel_volume(0, music_volume);
 
@@ -276,6 +288,23 @@ float frame_timer = 0;
 unsigned int level_frame = 0;
 unsigned int frame_counter = 0;
 bool song_loaded;
+
+static int restart_game() {
+    aptInit();
+    Result result = 0;
+	u8 param[0x300] = {};
+	u8 hmac[0x20] = {};
+
+	if (R_FAILED(result = APT_PrepareToDoApplicationJump(0, GAME_TITLE_ID, MEDIATYPE_SD))) {
+		return result;
+	}
+
+	if (R_FAILED(result = APT_DoApplicationJump(param, sizeof(param), hmac))) {
+		return result;
+	}
+
+	return 0;
+}
 
 void update_player_effects(float delta) {
     for (int i = 0; i < 2; i++) {
@@ -1528,7 +1557,15 @@ int main(int argc, char* argv[]) {
     osSetSpeedupEnable(1);
     soc_init();
     check_system_model();
+    check_rom_type();
+    output_log("argc: %d", argc);
+    if (argc > 0) { 
+        _3dsx_path = argv[0];
+        output_log("3dsx path: %s\n", _3dsx_path);
+    }
+    
 #ifndef IS_RELEASE
+    is_nightly = true;
     consoleDebugInit(debugDevice_SVC);
 #endif
 
@@ -1541,6 +1578,7 @@ int main(int argc, char* argv[]) {
 
     srand(time(NULL));
     alt_title_screen = random_float(0, 1) < (1.f / 256);
+    queued_restart = false;
     
     C2D_SetTintMode(C2D_TintMult);
     
@@ -1602,6 +1640,7 @@ int main(int argc, char* argv[]) {
     ui_stack_push_root_instant(&main_menu_def);
 
     bool exit = false;
+    
     while (aptMainLoop() && !exit) {
         // Update color if changed menus
         Color p1_not_white = get_white_if_black(p1_color);
@@ -1690,5 +1729,11 @@ int main(int argc, char* argv[]) {
     gfxExit();
     romfsExit();
     ndspExit();
+
+    // restart game if a restart was queued
+    if (queued_restart) {
+        restart_game();
+    }
+
     return 0;
 }
