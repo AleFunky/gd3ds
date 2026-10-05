@@ -4,6 +4,7 @@ window x=160 y=120 w=280 h=200 style=0
 
 button x=24 y=25 id=31 actions=close_menu keyBinds="B"
 button x=296 y=25 id=127 actions=open_menu[screen="updater_settings" btm_anim="zoom"] scale=0.9
+button x=296 y=215 id=202 actions=refresh id=202 scale=0.9 
 
 list w=216 h=150 x=160 y=130 tag="list" bgColor="#bf723e"
 label x=160 y=130 scale=0.5 tag="errorlabel" font=0 text="" align=CENTER w=300
@@ -17,4 +18,4 @@ image x=270 y=130 id=37 sx=-1.0 sy=4.0
 
 label x=160 y=40 text="Updater" font=2 scale=0.9 align=CENTER
 
-windowbutton x=160 y=210 text="Check for Updates" w=200 h=30 textScale=0.55 tag="updatebutton" actions="update" style=5 keyBinds="A"
+windowbutton x=160 y=210 text="Install Update" w=164 h=30 textScale=0.55 tag="updatebutton" actions="update" style=5 keyBinds="A"

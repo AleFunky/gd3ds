@@ -1,8 +1,10 @@
+button x=25 y=25 id=31 scale=0.9 actions=quit_game tag="quitbutton" keyBinds="B"
+
 button x=160 y=100 id=1 sheet=1 keyBinds="A,START" actions=open_menu[screen="level_select" type="root"]
 button x=60 y=120 id=79 keyBinds="X" actions=open_menu[screen="icon_kit" type="root"]
 button x=260 y=120 id=2 keyBinds="Y" sheet=1 actions=open_menu[screen="creator_menu" type="root"]
 
-button x=160 y=208  id=12 sheet=1 actions=open_menu[screen="statistics" top_anim="slide_down" btm_anim="slide_down"]
-button x=100 y=208  id=11 sheet=1 actions=open_menu[screen="settings_hub" btm_anim="slide_down"]
-button x=220 y=208 id=57 sheet=1 scale=1 actions=open_menu[screen="server_switcher" btm_anim="slide_right"]
-button x=280 y=208 id=57 sheet=1 scale=1 actions=open_menu[screen="updater" btm_anim="zoom"]
+button x=79 y=208  id=12 sheet=1 actions=open_menu[screen="statistics" top_anim="slide_down" btm_anim="slide_down"]
+button x=133 y=208  id=11 sheet=1 actions=open_menu[screen="settings_hub" btm_anim="slide_down"]
+button x=187 y=208 id=57 sheet=1 scale=1 actions=open_menu[screen="server_switcher" btm_anim="slide_right"]
+button x=241 y=208 id=57 sheet=1 scale=1 actions=open_menu[screen="updater" btm_anim="zoom"]

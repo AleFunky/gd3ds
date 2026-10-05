@@ -26,19 +26,53 @@ static GenericTask updater_task = {
 };
 
 static Thread updater_thread;
-bool checkedForUpdate;
+bool checkedForUpdate = false;
 
 static void action_update(UIElement *e, const UIPropertyList *p) {
-    if (!checkedForUpdate) {
-        ui_enable_element((UIElement *) spinner);
-        updater_thread = create_generic_thread(&updater_task);
-        return;
+    if (update_data->isAvailable && checkedForUpdate) ui_stack_push(&updater_pop_up_def, ANIM_NONE, ANIM_ZOOM, PUSH_NEXT); 
+}
+
+static void action_refresh_updates(UIElement *e, const UIPropertyList *p) {
+    ui_label_set_text(error_label, "");
+    ui_enable_element((UIElement *) spinner);
+    ui_disable_element((UIElement *) updater_button);
+    checkedForUpdate = false;
+    updater_thread = create_generic_thread(&updater_task);
+}
+
+char *handle_updater_error_codes(int code) {
+    switch (code) {
+        case -3:
+            return "No updates found.";
+            break;
+        case -2:
+            return "Failed to find\nrelease!";
+            break;
+        case -1:
+            return "Failed to parse\nresponse!";
+            break;
+        case 6:
+        case 7:
+            return "No internet\nconnection!";
+            break;
+        case 28:
+            return "Connection timed\nout.";
+            break;
+        case 56: 
+            return "Connection reset by\npeer.";
+            break;
+        case 42:
+            break;
+        default:
+            return "Unknown error.";
+            break;
     }
-    if (update_data->isAvailable) ui_stack_push(&updater_pop_up_def, ANIM_NONE, ANIM_ZOOM, PUSH_NEXT); 
+    return "";
 }
 
 static UIActionDef updater_actions[] = {
-    {"update", action_update }
+    {"update", action_update },
+    {"refresh", action_refresh_updates }
 };
 
 static void updater_init(UIScreen *s) {
@@ -46,7 +80,14 @@ static void updater_init(UIScreen *s) {
     updater_button = (UIWindowButton *)ui_get_element_by_tag(s, "updatebutton");
     spinner = (UISpinner *)ui_get_element_by_tag(s, "spinner");
     error_label = (UILabel *)ui_get_element_by_tag(s, "errorlabel");
-    ui_disable_element((UIElement *) spinner);
+    if (checkedForUpdate && update_data->isAvailable) {
+        ui_disable_element((UIElement *) spinner);
+        ui_label_set_text(error_label, update_data->releaseTitle);
+    } else {
+        ui_disable_element((UIElement *) updater_button);
+        ui_enable_element((UIElement *) spinner);
+        updater_thread = create_generic_thread(&updater_task);
+    }
 }
 
 static void updater_update(UIScreen *s, UIInput *i) {
@@ -56,12 +97,14 @@ static void updater_update(UIScreen *s, UIInput *i) {
         // Handle result
         if (updater_task.result == 0) {
             if (update_data->isAvailable) {
-                ui_button_set_text((UIButton *) updater_button, "Install Update");
+                ui_enable_element((UIElement *) updater_button);
                 ui_label_set_text(error_label, update_data->releaseTitle);
-                updater_button->base.base.w = 164;
                 checkedForUpdate = true;
             } else output_log("no updates found");
-        } else output_log("failure, code: %d", updater_task.result);
+        } else {
+            output_log(handle_updater_error_codes(updater_task.result));
+            ui_label_set_text(error_label, handle_updater_error_codes(updater_task.result));
+        }
         updater_task.finished = false;
     }
 }

@@ -100,3 +100,28 @@ const UIScreenDefPair delete_pop_up_def = {
     },
     .free_data = two_option_pop_up_free_data,
 };
+
+//EXIT POPUP
+
+static void action_quit_game(UIElement *e, const UIPropertyList *args){
+    ui_stack_push_game_state(STATE_EXIT);
+    stop_mp3();
+    return;
+}
+
+const UIActionDef quit_pop_up_actions[] = {
+    { "on_confirm", action_quit_game }
+};
+
+const UIScreenDefPair quit_pop_up_def = {
+    .name = "quit_pop_up",
+    .btm = {
+        .path = "romfs:/menus/creator_menu/online/two_option_pop_up.txt",
+        .init = two_option_pop_up_init,
+        .action_list = {
+            .action_count = ARRAY_LEN(quit_pop_up_actions),
+            .actions = quit_pop_up_actions
+        }
+    },
+    .free_data = two_option_pop_up_free_data,
+};

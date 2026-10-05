@@ -8,6 +8,8 @@
 
 #include "save/saving.h"
 
+#include "github_info.h"
+
 #define CAM_SPEED 5.19300155f
 
 #define DT (delta)
@@ -33,11 +35,8 @@
 
 #define GAME_TITLE_ID 0x000400000BB41C00
 
-#define REPO_AUTHOR "alefunky"
-#define REPO_NAME "gd3ds"
-#define REPO_BRANCH "main"
-
-#define CURRENT_GIT_HASH "9f24cb92f4214c55e0a12fd63c5d678a8ed30da3"
+// leave empty for main
+#define REPO_BRANCH ""
 
 // When making a release, uncomment this please thanks
 // #define IS_RELEASE
@@ -46,7 +45,7 @@
 // this is the command btw
 // curl -L \ -H "Accept: application/vnd.github+json" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/alefunky/gd3ds/releases
 
-#define CURRENT_RELEASE_ID 345222206
+#define CURRENT_RELEASE_ID 371103258
 
 typedef struct {
     float x, y;
@@ -64,6 +63,9 @@ extern bool song_loaded;
 extern bool alt_title_screen;
 extern bool is_N3DS;
 extern bool is_3DSX;
+extern bool is_nightly;
+
+extern bool queued_restart;
 
 extern char *_3dsx_path;
 

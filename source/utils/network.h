@@ -72,7 +72,7 @@ int get_comments_from_id(GenericTask *task, char **out_data, int id, int page, i
 
 int get_song_info_from_id(GenericTask *task, char **out_data, int songId, bool useGdps);
 
-int get_current_commit(GenericTask *task, char **out_data, char *repoOwner, char *repoName, char *branch);
+int get_current_commit(GenericTask *task, char **out_data, char *repoOwner, char *repoName, char *repoBranch);
 
 int get_releases(GenericTask *task, char **out_data, char *repoOwner, char *repoName);
 

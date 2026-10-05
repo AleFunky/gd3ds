@@ -2,6 +2,9 @@
 #include "menus/components/ui_progress_bar.h"
 #include "menus/components/ui_label.h"
 #include "menus/components/ui_spinner.h"
+#include "menus/components/ui_window_button.h"
+
+#include "menus/updater.h"
 
 #include "utils/server_utils.h"
 #include "utils/utils.h"
@@ -14,6 +17,7 @@ static UILabel *speed_label;
 static UILabel *time_label;
 static UIProgressBar *download_progress_bar;
 static UIButton *exit_button;
+static UIWindowButton *finish_update_button;
 static UISpinner *install_spinner;
 
 static Thread download_thread;
@@ -23,7 +27,15 @@ static DownloadTask download_task = {
     .file_name = "rom"
 };
 
+static Thread install_thread;
+
+static GenericTask install_task = {
+    .func = install_update
+};
+
 char downloadSpeed[16];
+char downloadedUpdateFilePath[256];
+int updateResult = 0;
 bool canExit;
 
 static void action_exit(UIElement *e, const UIPropertyList *p) {
@@ -32,72 +44,54 @@ static void action_exit(UIElement *e, const UIPropertyList *p) {
     }
 }
 
-static void update_game() {
-    if (is_3DSX) {
-        output_log("3dsx path: %s\nrom path: %s%s.%s", _3dsx_path, download_task.path, download_task.file_name, download_task.extension);
-        char target_path[280];
-        // char target_path[280] = "/3ds/gd3ds/rom.3dsx";
-        // char tmp_path2[280] = "/3ds/gd3ds/rom_renamed2.3dsx";
-        snprintf(target_path, sizeof(target_path), "%s%s.%s", download_task.path, download_task.file_name, download_task.extension);
-        remove(_3dsx_path);
-        rename(target_path, _3dsx_path);
-        ui_label_set_text(status_label, "Success!");
-    } else {
-        Result res = 0;
-        FILE *cia = NULL;
-        Handle ciaHandle = 0;
-        char target_path[280];
-        snprintf(target_path, sizeof(target_path), "%s%s.%s", download_task.path, download_task.file_name, download_task.extension);
-        // char target_path[280] = "/3ds/gd3ds/rom.cia";
-        res = amInit();
-        if (R_FAILED(res)) {
-            output_log("failed to init application manager: %d", res);
-            return;
-        }
-        cia = fopen(target_path, "rb");
-        if (!cia) {
-            amExit();
-            output_log("file not found");
-            ui_label_set_text(status_label, "cia not found");
-            return;
-        }
-        res = AM_StartCiaInstall(MEDIATYPE_SD, &ciaHandle);
-        if (R_FAILED(res)) {
-            fclose(cia);
-            amExit();
-            ui_label_set_text(status_label, "failed to start cia install");
-            output_log("failed to start cia install: %d", res);
-            return;
-        }
-        size_t bufferSize = 1024 * 64;
-        u8* buffer = malloc(bufferSize);
-        u32 bytesWritten = 0;
-        size_t bytesRead = 0;
-
-        while ((bytesRead = fread(buffer, 1, bufferSize, cia)) > 0)
-        {
-            res = FSFILE_Write(ciaHandle, &bytesWritten, 0, buffer, bytesRead, FS_WRITE_FLUSH);
-
-            if (R_FAILED(res))
-            {
-                AM_CancelCIAInstall(ciaHandle);
-                free(buffer);
-                fclose(cia);
-                amExit();
-                output_log("failed during cia install: %d", res);
-                ui_label_set_text(status_label, "failed during cia install");
-                return;
-            }
-        }
-
-    res = AM_FinishCiaInstall(ciaHandle);
-    
-    free(buffer);
-    fclose(cia);
-    amExit();
-    output_log("SUCCESS!!!!!!!");
-    ui_label_set_text(status_label, "Success!");
+static void action_finish_update(UIElement *e, const UIPropertyList *p) {
+    if (updateResult == 0) {
+        ui_stack_push_game_state(STATE_EXIT);
+        stop_mp3();
+        return;
     }
+}
+
+char *handle_download_error_codes(int code) {
+    switch (code) {
+        case 6:
+        case 7:
+            return "Download failed:\nNo internet connection!";
+            break;
+        case 28:
+            return "Download failed:\nConnection timed out.";
+            break;
+        case 56: 
+            return "Download failed:\nConnection reset by peer.";
+            break;
+        case 42:
+            break;
+        default:
+            return "Download failed:\nUnknown error.";
+            break;
+    }
+    return "";
+}
+
+char *handle_install_error_codes(int code) {
+    switch (code) {
+        case -1:
+            return "Install failed:\nFilesystem error.";
+            break;
+        case 1:
+            return "Install failed:\nROM file not found.";
+            break;
+        case 2: 
+            return "Install failed:\nAM init failure.";
+            break;
+        case 3:
+            return "Install failed:\nFailed to open write handle.";
+            break;
+        case 4:
+            return "Install failed:\nError during file streaming.";
+            break;
+    }
+    return "";
 }
 
 static void updater_pop_up_init(UIScreen *s) {
@@ -107,8 +101,10 @@ static void updater_pop_up_init(UIScreen *s) {
     download_progress_bar = (UIProgressBar *)ui_get_element_by_tag(s, "progressbar");
     exit_button = (UIButton *)ui_get_element_by_tag(s, "exitbutton");
     install_spinner = (UISpinner *)ui_get_element_by_tag(s, "spinner");
+    finish_update_button = (UIWindowButton *)ui_get_element_by_tag(s, "finishbutton");
 
     ui_disable_element((UIElement *) install_spinner);
+    ui_disable_element((UIElement *) finish_update_button);
     download_task.url = update_data->releaseDownloadUrl;
     snprintf(download_task.extension, sizeof(download_task.extension), is_3DSX ? "3dsx" : "cia");
     download_progress_bar->value = 0;
@@ -116,8 +112,6 @@ static void updater_pop_up_init(UIScreen *s) {
     canExit = true;
 
     download_thread = create_file_download_thread(&download_task);
-    // download_task.finished = true;
-    // download_task.result = 0;
 }
 
 static void updater_pop_up_update(UIScreen *s, UIInput *i) {
@@ -134,14 +128,18 @@ static void updater_pop_up_update(UIScreen *s, UIInput *i) {
     if (download_task.finished) {
         // Handle result
         if (download_task.result != 0) {
-            char buf[64];
-            snprintf(buf, sizeof(buf), "download failure. code: %d\nfile path: %s%s.%s", download_task.result, download_task.path, download_task.file_name, download_task.extension);
-            output_log(buf);
-            ui_label_set_text(status_label, buf);
+            status_label->base.y = 10;
+            output_log(handle_download_error_codes(download_task.result));
+            ui_disable_element((UIElement *) install_spinner);
+            ui_label_set_text(status_label, handle_download_error_codes(download_task.result));
             return;
         }
 
         canExit = false;
+
+        // disable home button for the duration of the install
+        aptSetHomeAllowed(false);
+
         ui_enable_element((UIElement *) install_spinner);
         ui_disable_element((UIElement *) download_progress_bar);
         ui_disable_element((UIElement *) speed_label);
@@ -149,7 +147,28 @@ static void updater_pop_up_update(UIScreen *s, UIInput *i) {
         ui_label_set_text(status_label, "Installing...");
         status_label->base.y = 45;
         download_task.finished = false;
-        update_game();
+        snprintf(downloadedUpdateFilePath, sizeof(downloadedUpdateFilePath), "%s%s.%s", download_task.path, download_task.file_name, download_task.extension);
+        install_thread = create_generic_thread(&install_task);
+    }
+
+    if (install_task.finished) {
+        ui_disable_element((UIElement *) install_spinner);
+        // reenable home button
+        aptSetHomeAllowed(true);
+        // Handle result
+        if (install_task.result != 0) {
+            output_log(handle_install_error_codes(install_task.result));
+            status_label->base.y = 10;
+            ui_label_set_text(status_label, handle_install_error_codes(install_task.result));
+            canExit = true;
+            ui_enable_element((UIElement *) exit_button);
+            return;
+        }
+        queued_restart = !is_3DSX;
+        status_label->base.y = -5;
+        install_task.finished = false;
+        ui_label_set_text(status_label, is_3DSX ? "Update successful!\nPress OK to quit." : "Update successful!\nPress OK to restart.");
+        ui_enable_element((UIElement *) finish_update_button);
     }
 }
 
@@ -161,7 +180,8 @@ static void updater_pop_up_exit(UIScreen *s) {
 }
 
 static UIActionDef updater_pop_up_actions[] = {
-    {"soft_exit", action_exit }
+    {"soft_exit", action_exit },
+    {"finish_update", action_finish_update }
 };
 
 const UIScreenDefPair updater_pop_up_def = {

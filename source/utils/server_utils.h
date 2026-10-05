@@ -94,6 +94,7 @@ int get_level(GenericTask *task);
 int get_comments(GenericTask *task);
 int get_song_data(GenericTask *task);
 int check_for_updates(GenericTask *task);
+int install_update();
 
 float derive_gj_version(int version);
 

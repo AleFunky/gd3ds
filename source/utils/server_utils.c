@@ -27,6 +27,8 @@
 #include "menus/components/ui_button.h"
 #include "menus/components/ui_rectangle.h"
 #include "menus/components/ui_window_button.h"
+#include "menus/updater_pop_up.h"
+#include "menus/updater_settings.h"
 #include "menus/creator_menu/search_menu.h"
 #include "menus/creator_menu/online/online_menu.h"
 #include "menus/creator_menu/online/online_level_menu.h"
@@ -647,8 +649,13 @@ char *parse_commit_data(char *jsonString) {
 
     // attempt to populate latest commit hash, ofc gotta check if it actually exists first cuz who knows 
     if (json_object_object_get_ex(commitObject, "sha", &hashObject)) {
-        return (char *)json_object_get_string(hashObject);
+        // take ownership of hashobject so i can free everything else
+        json_object *hashObjectTemp = json_object_get(hashObject);
+        
+        json_object_put(jsonObject);
+        return (char *)json_object_get_string(hashObjectTemp);
     } else {
+        json_object_put(jsonObject);
         return NULL;
     }
 }
@@ -724,7 +731,7 @@ int parse_releases_data(char *jsonString, bool useNightly) {
 
                 if (json_object_object_get_ex(currAssetObject, "name", &assetNameObject)) {
                     const char *currAssetName = json_object_get_string(assetNameObject);
-                    if (strstr(currAssetName, !is_3DSX ? ".3dsx" : ".cia")) {
+                    if (strstr(currAssetName, is_3DSX ? ".3dsx" : ".cia")) {
                         if (json_object_object_get_ex(currAssetObject, "browser_download_url", &url)) {
                             // we found the freaking download link lets go
                             const char *tempUrl = json_object_get_string(url);
@@ -734,14 +741,17 @@ int parse_releases_data(char *jsonString, bool useNightly) {
                             // also get the file size
                             update_data->releaseFileSize = json_object_get_int(size);
                         }
+                        json_object_put(jsonObject);
                         return 0;
                     }
                 }
             }
-            return 1;
+            json_object_put(jsonObject);
+            return -2;
         }
     } 
-    return 3;
+    json_object_put(jsonObject);
+    return -3;
 }
 
 int search_levels_internal(GenericTask *task, bool useGdps) {
@@ -963,16 +973,20 @@ int get_song_data_internal(GenericTask *task, int songId, SongEntry *targetSongE
     return 0;
 }
 
-char *get_latest_commit_internal(GenericTask *task, char *repoAuthor, char *repoName, char *repoBranch) {
+int get_latest_commit_internal(GenericTask *task, char *repoAuthor, char *repoName, char *repoBranch, char *destination, int destSize) {
     char *outdata;
     int result = get_current_commit(task, &outdata, repoAuthor, repoName, repoBranch);
-    if (result != 0) return NULL;
+    if (result != 0) return result;
+
+    output_log("commit data: %s\n", outdata);
 
     char *parserResult = parse_commit_data(outdata);
-    if (!parserResult) return NULL;
+    if (!parserResult) return -1;
 
     free(outdata);
-    return parserResult;
+
+    snprintf(destination, destSize, parserResult);
+    return 0;
 }
 
 int get_latest_build_internal(GenericTask *task, char *repoAuthor, char *repoName, bool useNightly) {
@@ -996,12 +1010,13 @@ int check_for_updates_internal(GenericTask *task, char *repoAuthor, char *repoNa
 
     // if checking for nightly updates, get latest commit hash and compare it against the embedded one to see if an update is available
     if (useNightly) {
-        char *latestCommitHash = get_latest_commit_internal(task, repoAuthor, repoName, repoBranch);
+        char latestCommitHash[64];
+        int result = get_latest_commit_internal(task, repoAuthor, repoName, repoBranch, latestCommitHash, sizeof(latestCommitHash));
+        if (result != 0) return result;
+        
+        update_data->isAvailable = (strcmp(CURRENT_COMMIT_HASH, latestCommitHash) != 0); 
 
-        if (latestCommitHash) update_data->isAvailable = (strcmp(CURRENT_GIT_HASH, latestCommitHash) != 0); 
-        else 
-        return 2;
-        if (!update_data->isAvailable) return 1;
+        if (!update_data->isAvailable) return -3;
     }
 
     // get and parse releases 
@@ -1009,6 +1024,98 @@ int check_for_updates_internal(GenericTask *task, char *repoAuthor, char *repoNa
 
     if (result != 0) return result; 
 
+    return 0;
+}
+
+int install_update_internal(char *target_path) {
+    // 3dsx and cia rom installs are handled very differently 
+    
+    if (is_3DSX) {
+        // ensure 3dsx path is present
+        output_log("3dsx path: %s\n", _3dsx_path);
+        if (!_3dsx_path) return -1;
+        
+        Result res = 0;
+
+        // unmount romfs so we can modify current .3dsx
+        res = romfsExit();
+        if(R_FAILED(res)) {
+            output_log("failed to exit romfs - code: %d\n", res);
+            return -1;
+        }
+
+        // filesystem operations
+        if (remove(_3dsx_path) != 0) {
+            output_log("failed to remove current .3dsx\n");
+            return -1;
+        }
+        if (rename(target_path, _3dsx_path) != 0) {
+            output_log("failed to remove current .3dsx.\n");
+            return -1;
+        }
+        // success
+        return 0;
+    }
+
+    output_log("cia path: %s", target_path);
+    
+    Result res = 0;
+    FILE *cia = NULL;
+    Handle ciaHandle = 0;
+    
+    // initialise application manager 
+    res = amInit();
+    if (R_FAILED(res)) {
+        output_log("failed to init application manager - code: %d\n", res);
+        return 2;
+    }
+    
+    // open target .cia
+    cia = fopen(target_path, "rb");
+    if (!cia) {
+        amExit();
+        output_log("failed to open target .cia\n");
+        return 1;
+    }
+    
+    // begin .cia install and get write handle
+    res = AM_StartCiaInstall(MEDIATYPE_SD, &ciaHandle);
+    if (R_FAILED(res)) {
+        fclose(cia);
+        amExit();
+        output_log("failed to start cia install: %d\n", res);
+        return 3;
+    }
+    
+    // write the .cia to handle in 64kb segments
+    size_t bufferSize = 1024 * 64;
+    u8* buffer = malloc(bufferSize);
+    u32 bytesWritten = 0;
+    u32 offset = 0;
+    size_t bytesRead = 0;
+    
+    while ((bytesRead = fread(buffer, 1, bufferSize, cia)) > 0)
+    {
+        res = FSFILE_Write(ciaHandle, &bytesWritten, offset, buffer, bytesRead, FS_WRITE_FLUSH);
+        
+        if (R_FAILED(res)) {
+            AM_CancelCIAInstall(ciaHandle);
+            free(buffer);
+            fclose(cia);
+            amExit();
+            output_log("failed during cia install - code: %d\n", res);
+            return 4;
+        }
+        
+        offset += bytesWritten;
+    }
+    
+    // no way we did it
+    res = AM_FinishCiaInstall(ciaHandle);
+    free(buffer);
+    fclose(cia);
+    amExit();
+    output_log("cia installation successful\n");
     return 0;
 }
 
@@ -1035,6 +1142,11 @@ int get_song_data(GenericTask *task) {
 }
 
 int check_for_updates(GenericTask *task) {
-    int result = check_for_updates_internal(task, REPO_AUTHOR, REPO_NAME, REPO_BRANCH, true);
+    int result = check_for_updates_internal(task, REPO_AUTHOR, REPO_NAME, REPO_BRANCH, useNightlyBranch);
+    return result;
+}
+
+int install_update(){
+    int result = install_update_internal(downloadedUpdateFilePath);
     return result;
 }

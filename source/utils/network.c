@@ -403,7 +403,7 @@ static int download_file(DownloadTask *task) {
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
 
         char tmp_file[273];
-        snprintf(tmp_file, sizeof(tmp_file), "%s%s.tmp", path, file_name);
+        snprintf(tmp_file, sizeof(tmp_file), "%s%s.%s.tmp", path, file_name, extension);
         FILE* f = fopen(tmp_file, "wb");
         if (!f) {
             free(decoded_url);
@@ -439,7 +439,7 @@ static int download_file(DownloadTask *task) {
         curl_easy_cleanup(curl);
         
         char actual_file[273];
-        snprintf(actual_file, sizeof(actual_file), "%s/%s.%s", path, file_name, extension);
+        snprintf(actual_file, sizeof(actual_file), "%s%s.%s", path, file_name, extension);
         rename(tmp_file, actual_file);
 
         return 0;
@@ -456,7 +456,7 @@ static void download_thread(void *arg) {
     task->finished = true;
 }
 
-int get_current_commit(GenericTask *task, char **out_data, char *repoOwner, char *repoName, char *branch) {
+int get_current_commit(GenericTask *task, char **out_data, char *repoOwner, char *repoName, char *repoBranch) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -482,7 +482,7 @@ int get_current_commit(GenericTask *task, char **out_data, char *repoOwner, char
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 
         char url[128];
-        snprintf(url, sizeof(url) - 1, "https://api.github.com/repos/%s/%s/commits?per_page=1", repoOwner, repoName);
+        snprintf(url, sizeof(url) - 1, "https://api.github.com/repos/%s/%s/commits?per_page=1&sha=%s", repoOwner, repoName, repoBranch);
         curl_easy_setopt(curl, CURLOPT_URL, url);
         
         CURLcode code = curl_easy_perform(curl);

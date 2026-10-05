@@ -7,8 +7,8 @@ window x=160 y=120 w=240 h=140 style=0
     button x=-118 y=-66 id=31 actions=close_menu keyBinds="B" scale=0.9
 
     label x=-100 y=-5 scale=0.5 font=0 text="Auto-update" align=LEFT
-    checkbox x=90 y=-5 scale=0.8 tag="check_autoupdate" actions="autoupdate"
+    checkbox x=90 y=-5 scale=0.8 tag="chk_auto_update" actions="autoupdate"
 
     label x=-100 y=30 scale=0.5 font=0 text="Use beta branch" align=LEFT
-    checkbox x=90 y=30 scale=0.8 tag="check_nightly" actions="nightly"
+    checkbox x=90 y=30 scale=0.8 tag="chk_nightly" actions="nightly"
 }
