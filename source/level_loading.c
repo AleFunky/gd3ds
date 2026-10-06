@@ -2596,12 +2596,12 @@ char *get_level_name(char *data_ptr) {
 
 char *load_user_song(int id, size_t *out_size) {
     char full_path[273];
-    snprintf(full_path, sizeof(full_path), "%s/%d.mp3", USER_SONGS_DIR, id);
+    snprintf(full_path, sizeof(full_path), "%s%d.mp3", USER_SONGS_DIR, id);
     return read_file(full_path, out_size);
 }
 
 bool check_song(int id) {
     char full_path[273];
-    snprintf(full_path, sizeof(full_path), "%s/%d.mp3", USER_SONGS_DIR, id);
+    snprintf(full_path, sizeof(full_path), "%s%d.mp3", USER_SONGS_DIR, id);
     return access(full_path, F_OK) == 0;
 }
