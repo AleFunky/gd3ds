@@ -23,7 +23,7 @@
 
 #define USER_LEVELS_NAME "external_levels"
 #define USER_LEVELS_DIR CONFIG_ROOT USER_LEVELS_NAME
-#define USER_SONGS_NAME "saved_songs"
+#define USER_SONGS_NAME "saved_songs/"
 #define USER_SONGS_DIR CONFIG_ROOT USER_SONGS_NAME
 #define SAVED_LEVELS_NAME "saved_levels"
 #define SAVED_LEVELS_DIR CONFIG_ROOT SAVED_LEVELS_NAME
