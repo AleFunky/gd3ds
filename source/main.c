@@ -1500,19 +1500,29 @@ int main(int argc, char* argv[]) {
 
     loading_screen_init();
 
-    loading_screen_update(0);
+    //short fade in to loading screen
+    int fade = 255;
+    while(aptMainLoop()){
+        loading_screen_update(0, fade);
+
+        fade -= FADE_SPEED * (1 / 60.f);
+
+        if(fade < 0){
+            break;
+        }
+    }
 
     ui_assets_init();
     game_assets_init();
-    loading_screen_update(10);
+    loading_screen_update(10, 0);
 
     load_save_file(SAVE_ROBTOP_SERVER_FILE, &gd_server_file);
     
-    loading_screen_update(20);
+    loading_screen_update(20, 0);
 
     load_save_file(SAVE_1P9_SERVER_FILE, &gdps_file);
 
-    loading_screen_update(30);
+    loading_screen_update(30, 0);
 
     load_external_file(SAVE_EXTERNAL_LEVELS_FILE, &external_file);
 
@@ -1520,24 +1530,24 @@ int main(int argc, char* argv[]) {
 
     migrate_old_data();
     
-    loading_screen_update(40);
+    loading_screen_update(40, 0);
 
     calculate_stats();
 
     cache_all_sprites();
 
-    loading_screen_update(55);
+    loading_screen_update(55, 0);
     
     init_default_use_effect_pools();
     update_player_colors();
 
-    loading_screen_update(75);
+    loading_screen_update(75, 0);
 
     load_sfx();
 
     memset(&level_info, 0, sizeof(LoadedLevelInfo));
 
-    loading_screen_update(100);
+    loading_screen_update(100, 0);
 
     // Unload loading screen
     ui_unload_screen(&default_screen);
