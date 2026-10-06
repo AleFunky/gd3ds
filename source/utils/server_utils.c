@@ -1129,11 +1129,12 @@ int install_update_internal(char *target_path) {
         offset += bytesWritten;
     }
     
-    // no way we did it
+    // install success, do cleanup
     res = AM_FinishCiaInstall(ciaHandle);
     free(buffer);
     fclose(cia);
     amExit();
+    remove(target_path);
     output_log("cia installation successful\n");
     return 0;
 }
