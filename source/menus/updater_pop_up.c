@@ -110,6 +110,10 @@ static void updater_pop_up_init(UIScreen *s) {
     download_progress_bar->value = 0;
     ui_progress_bar_set_tint(download_progress_bar, C2D_Color32(50, 190, 240, 255));
     canExit = true;
+    // attempt to remove leftover rom
+    char oldPath[256];
+    snprintf(oldPath, sizeof(oldPath), "%s%s.%s", CONFIG_ROOT, download_task.file_name, download_task.extension);
+    remove(oldPath);
 
     download_thread = create_file_download_thread(&download_task);
 }
