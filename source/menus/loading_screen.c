@@ -118,7 +118,7 @@ void loading_screen_init() {
     ui_label_set_text(splashtext, text);
 }
 
-void loading_screen_update(float progress) {    
+void loading_screen_update(float progress, int fade) {    
     progressbar->value = progress;
     UIInput touch;
     touchPosition touchPos;
@@ -138,6 +138,8 @@ void loading_screen_update(float progress) {
         begin_eye_layer(DEPTH_UI);
         ui_screen_draw(&default_screen_top);
         end_eye_layer();
+    
+        C2D_DrawRectSolid(0.f, 0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT, C2D_Color32(0, 0, 0, fade));
     }
 
     // Bottom Screen
@@ -149,6 +151,9 @@ void loading_screen_update(float progress) {
 
     C2D_ViewScale(1/SCALE, 1/SCALE);
     ui_screen_draw(&default_screen);
+
+    C2D_DrawRectSolid(0.f, 0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT, C2D_Color32(0, 0, 0, fade));
+
     C2D_ViewReset();
     C3D_FrameEnd(0);
 }
