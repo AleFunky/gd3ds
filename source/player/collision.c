@@ -1293,6 +1293,24 @@ bool circle_rect_collision(float cx, float cy, float radius,
     return distSq <= radius * radius;
 }
 
+static bool noclip_death_latched[2];
+static bool noclip_hazard_contact[2];
+
+static void count_noclip_death_for_object(int obj) {
+    (void)obj;
+    if (!state.noclip || noclip_death_latched[state.current_player]) return;
+
+    noclip_death_latched[state.current_player] = true;
+    state.current_data.noclip_deaths++;
+}
+
+static void mark_noclip_hazard_contact(int obj, const ObjectHitbox *hitbox) {
+    if (hitbox->collision_type == HITBOX_HAZARD
+        || (hitbox->collision_type == HITBOX_SOLID && objects.id[obj] != BREAKABLE_BLOCK)) {
+        noclip_hazard_contact[state.current_player] = true;
+    }
+}
+
 void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
     InternalHitbox internal = player->internal_hitbox;
 
@@ -1335,6 +1353,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                     objects.flags[obj] |= FLAG_TOGGLED;
                 } else {
                     // Not a brick, die
+                    count_noclip_death_for_object(obj);
                     kill_player(DEATH_BLOCK);
                 }
 
@@ -1423,6 +1442,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
             }
             break;
         case HITBOX_HAZARD:
+            count_noclip_death_for_object(obj);
             kill_player(hitbox->type == COLLISION_CIRCLE ? DEATH_SAW : DEATH_SPIKE);
             break;
         case HITBOX_SPECIAL:
@@ -1485,6 +1505,7 @@ void collide_with_obj(Player *player, int obj) {
             player->x, player->y, player->width, player->height, 0, 
             x, y, objects.width[obj]
         )) {
+            mark_noclip_hazard_contact(obj, hitbox);
             handle_collision(player, obj, hitbox);
             SET_COLLIDED(obj, true);
             snapshot.collisions++;
@@ -1515,6 +1536,7 @@ void collide_with_obj(Player *player, int obj) {
         }
 
         if (checkColl) {
+            mark_noclip_hazard_contact(obj, hitbox);
             handle_collision(player, obj, hitbox);
             SET_COLLIDED(obj, true);
             snapshot.collisions++;
@@ -1553,6 +1575,7 @@ int potential_slopes_buffer[2][MAX_COLLIDED_OBJECTS];
 int potential_slopes[2];
 
 void collide_with_objects(Player *player) {
+    noclip_hazard_contact[state.current_player] = false;
     player->last_collided_block = player->collided_block;
     player->collided_block = -1;
 
@@ -1620,6 +1643,12 @@ void collide_with_objects(Player *player) {
     for (int i = 0; i < hazard_count; i++) {
         int obj = hazard_buffer[i];
         collide_with_obj(player, obj);
+    }
+
+    // Stay latched across adjacent hitboxes. Re-arm only once this player is
+    // outside every block and hazard hitbox.
+    if (!noclip_hazard_contact[state.current_player]) {
+        noclip_death_latched[state.current_player] = false;
     }
 
     player->touching_slope = false;
