@@ -1425,7 +1425,7 @@ void game_loop() {
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 234, 0.5f, 0.5f, 0, true, "Noclip Activated");
                 char deaths_text[32];
                 snprintf(deaths_text, sizeof(deaths_text), "Deaths: %d", state.current_data.noclip_deaths);
-                float deaths_x = SCREEN_WIDTH_AREA_BOT - get_text_length(&goldFont_fontCharset, 0.5f, false, deaths_text) - 2.f;
+                float deaths_x = 170.f;
                 draw_text(&goldFont_fontCharset, &goldFont_sheet, deaths_x, 234, 0.5f, 0.5f, 0, true, "%s", deaths_text);
             }
             C2D_ViewReset();
