@@ -14,6 +14,7 @@ image x=200 y=65 id=147 scale=0.68 sheet=0 tag="window,practicecomplete"
 label x=200 y=93 font=2 text="Attempts:" scale=0.67 align=CENTER tag="window,attempts"
 label x=200 y=112 font=2 text="Jumps:" scale=0.67 align=CENTER tag="window,jumps"
 label x=200 y=129 font=2 text="Time:" scale=0.67 align=CENTER tag="window,time"
+label x=200 y=148 font=2 text="Deaths:" scale=0.62 align=CENTER tag="window,deaths"
 
 particle x=150 y=170 tag="coinParticle1,window" particleDef="star_effect"
 particle x=200 y=170 tag="coinParticle2,window" particleDef="star_effect"
