@@ -61,6 +61,7 @@ static UIScreen screen = {
 };
 
 static UILabel *attempt_text;
+static UILabel *deaths_text;
 static UILabel *jumps_text;
 static UILabel *time_text;
 
@@ -330,10 +331,12 @@ void level_complete_init() {
     state.current_data.time_end = svcGetSystemTick() / (CPU_TICKS_PER_MSEC * 1000);
 
     char attempts[64];
+    char deaths[64];
     char jumps[64];
     char time[64];
 
     snprintf(attempts, sizeof(attempts), "Attempts: %d", state.current_data.attempts);
+    snprintf(deaths, sizeof(deaths), "Deaths: %d", state.current_data.deaths + state.current_data.noclip_deaths);
     snprintf(jumps, sizeof(jumps), "Jumps: %d", state.current_data.jumps);
 
     float timer = state.current_data.time_end - state.current_data.time_start;
@@ -350,6 +353,13 @@ void level_complete_init() {
 
     attempt_text = (UILabel *) ui_get_element_by_tag(&screen_top, "attempts");
     if (attempt_text) ui_label_set_text(attempt_text, attempts);
+
+    deaths_text = (UILabel *) ui_get_element_by_tag(&screen_top, "deaths");
+    if (deaths_text) {
+        ui_label_set_text(deaths_text, deaths);
+        if (cheats_used[CHEAT_NOCLIP]) ui_enable_element((UIElement *) deaths_text);
+        else ui_disable_element((UIElement *) deaths_text);
+    }
 
     jumps_text = (UILabel *) ui_get_element_by_tag(&screen_top, "jumps");
     if (jumps_text) ui_label_set_text(jumps_text, jumps);
