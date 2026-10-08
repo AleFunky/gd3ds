@@ -16,6 +16,7 @@
 #include "menus/core/ui_element.h"
 #include "mp3_player.h"
 #include "fonts/bigFont.h"
+#include "fonts/goldFont.h"
 
 #include "save/config.h"
 
@@ -1422,6 +1423,10 @@ void game_loop() {
 
             if (state.noclip) {
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 234, 0.5f, 0.5f, 0, true, "Noclip Activated");
+                char deaths_text[32];
+                snprintf(deaths_text, sizeof(deaths_text), "Deaths: %d", state.current_data.noclip_deaths);
+                float deaths_x = SCREEN_WIDTH_AREA_BOT - get_text_length(&goldFont_fontCharset, 0.5f, false, deaths_text) - 2.f;
+                draw_text(&goldFont_fontCharset, &goldFont_sheet, deaths_x, 234, 0.5f, 0.5f, 0, true, "%s", deaths_text);
             }
             C2D_ViewReset();
 
@@ -1590,29 +1595,19 @@ int main(int argc, char* argv[]) {
 
     loading_screen_init();
 
-    //short fade in to loading screen
-    int fade = 255;
-    while(aptMainLoop()){
-        loading_screen_update(0, fade);
-
-        fade -= FADE_SPEED * (1 / 60.f);
-
-        if(fade < 0){
-            break;
-        }
-    }
+    loading_screen_update(0);
 
     ui_assets_init();
     game_assets_init();
-    loading_screen_update(10, 0);
+    loading_screen_update(10);
 
     load_save_file(SAVE_ROBTOP_SERVER_FILE, &gd_server_file);
     
-    loading_screen_update(20, 0);
+    loading_screen_update(20);
 
     load_save_file(SAVE_1P9_SERVER_FILE, &gdps_file);
 
-    loading_screen_update(30, 0);
+    loading_screen_update(30);
 
     load_external_file(SAVE_EXTERNAL_LEVELS_FILE, &external_file);
 
@@ -1620,24 +1615,24 @@ int main(int argc, char* argv[]) {
 
     migrate_old_data();
     
-    loading_screen_update(40, 0);
+    loading_screen_update(40);
 
     calculate_stats();
 
     cache_all_sprites();
 
-    loading_screen_update(55, 0);
+    loading_screen_update(55);
     
     init_default_use_effect_pools();
     update_player_colors();
 
-    loading_screen_update(75, 0);
+    loading_screen_update(75);
 
     load_sfx();
 
     memset(&level_info, 0, sizeof(LoadedLevelInfo));
 
-    loading_screen_update(100, 0);
+    loading_screen_update(100);
 
     // Unload loading screen
     ui_unload_screen(&default_screen);

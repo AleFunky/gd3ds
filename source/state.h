@@ -88,6 +88,8 @@ typedef struct {
 
 typedef struct {
     int attempts;
+    int deaths;
+    int noclip_deaths;
     int jumps;
     float time_start;
     float time_end;

@@ -380,6 +380,7 @@ void init_trails(int trail) {
 
 void init_variables() {
     level_frame = 0;
+    state.current_data.noclip_deaths = 0;
    
     init_trails(selected_trail);
     init_wave_trails();
@@ -632,6 +633,7 @@ bool is_coin_collected(int obj) {
 }
 
 void kill_player(DeathReason reason) {
+    if (!state.noclip && !state.dead) state.current_data.deaths++;
     state.dead = true;
     state.death_reason = reason;
 }
