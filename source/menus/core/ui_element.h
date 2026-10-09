@@ -224,7 +224,7 @@ typedef struct {
 typedef struct {
     UIElement base;
     
-    char text[512];
+    char text[1024];
     float alignment;
 
     int font;

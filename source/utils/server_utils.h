@@ -119,3 +119,6 @@ extern int searchEntriesLength;
 extern int levelEntryLength;
 
 extern int commentEntriesLength;
+
+extern char **latestCommits;
+extern int latestCommitCount;

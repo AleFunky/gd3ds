@@ -45,7 +45,7 @@
 // this is the command btw
 // curl -L \ -H "Accept: application/vnd.github+json" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/alefunky/gd3ds/releases
 
-#define CURRENT_RELEASE_ID 402230204
+#define CURRENT_RELEASE_ID 371103258
 
 typedef struct {
     float x, y;

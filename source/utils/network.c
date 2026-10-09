@@ -455,7 +455,7 @@ static void download_thread(void *arg) {
     task->finished = true;
 }
 
-int get_current_commit(GenericTask *task, char **out_data, char *repoOwner, char *repoName, char *repoBranch) {
+int get_commits(GenericTask *task, char **out_data, char *repoOwner, char *repoName, char *repoBranch) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -480,7 +480,7 @@ int get_current_commit(GenericTask *task, char **out_data, char *repoOwner, char
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 
         char url[128];
-        snprintf(url, sizeof(url) - 1, "https://api.github.com/repos/%s/%s/commits?per_page=1&sha=%s", repoOwner, repoName, repoBranch);
+        snprintf(url, sizeof(url) - 1, "https://api.github.com/repos/%s/%s/commits?sha=%s", repoOwner, repoName, repoBranch);
         curl_easy_setopt(curl, CURLOPT_URL, url);
         
         CURLcode code = curl_easy_perform(curl);

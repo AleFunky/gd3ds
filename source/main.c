@@ -1558,7 +1558,7 @@ int main(int argc, char* argv[]) {
     soc_init();
     check_system_model();
     check_rom_type();
-    output_log("argc: %d", argc);
+    output_log("argc: %d\n", argc);
     if (argc > 0) { 
         _3dsx_path = argv[0];
         output_log("3dsx path: %s\n", _3dsx_path);

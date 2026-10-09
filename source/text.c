@@ -136,7 +136,7 @@ static bool parse_image_tag(const char *tag, int *image, int *sheet) {
 }
 
 // Count da lines
-static int count_lines(const char *text, bool parse_tags) {
+int count_lines(const char *text, bool parse_tags) {
     if (!parse_tags) return 1;
     
     int lines = 1;

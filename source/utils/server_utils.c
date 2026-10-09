@@ -55,6 +55,9 @@ int levelEntryLength = 0;
 
 int commentEntriesLength = 0;
 
+char **latestCommits;
+int latestCommitCount = 0;
+
 static void fill_creator_entries(char **creatorStrings, int creatorStringCount) {
     for (int i = 0; i < creatorStringCount; i++) {
         int stringCount;
@@ -654,29 +657,83 @@ void fill_gdps_comment_author_entries(char **authorStrings, int authorStringCoun
     }
 }
 
-char *parse_commit_data(char *jsonString) {
+int parse_latest_commit(char *jsonString) {
     // parse response from github as json object 
     json_object *jsonObject = json_tokener_parse(jsonString);
     json_object *commitObject = NULL;
     json_object *hashObject = NULL;
 
     // check if we didnt get served garbage data
-    if (!jsonObject) return NULL;
-
-    // first array entry is always the latest commit, especially since we only request one in the first place 
+    if (!jsonObject) {
+        output_log("failure parsing commit data: response - %s", jsonString);
+        return -1;
+    }
+    // first array entry is always the latest commit
     commitObject = json_object_array_get_idx(jsonObject, 0); 
 
     // attempt to populate latest commit hash, ofc gotta check if it actually exists first cuz who knows 
     if (json_object_object_get_ex(commitObject, "sha", &hashObject)) {
-        // take ownership of hashobject so i can free everything else
-        json_object *hashObjectTemp = json_object_get(hashObject);
-        
+        update_data->isAvailable = (strcmp(CURRENT_COMMIT_HASH, json_object_get_string(hashObject)) != 0); 
+
         json_object_put(jsonObject);
-        return (char *)json_object_get_string(hashObjectTemp);
+
+        if (!update_data->isAvailable) return -3;
     } else {
         json_object_put(jsonObject);
-        return NULL;
+        return -1;
     }
+    return 0;
+}
+
+int parse_commits_data(char *jsonString) {
+    // parse response from github as json object 
+    json_object *jsonObject = json_tokener_parse(jsonString);
+
+    // check if we didnt get served garbage data
+    if (!jsonObject) {
+        output_log("failure parsing commit data: response - %s", jsonString);
+        return -1;
+    }
+
+    // iterate every commit in the response
+    int count = json_object_array_length(jsonObject);
+    latestCommits = malloc(count * sizeof(char *));
+    for (int i = 0; i < count; i++) {
+        const json_object *currentCommitObject = json_object_array_get_idx(jsonObject, i);
+        json_object *currenthHashObject;
+        json_object *commitDataObject;
+        json_object *currentTitleObject;
+
+        if(!currentCommitObject) return -2;
+
+        // get commit hash, if equal to current we've hit the currently installed commit so we end parsing here
+        if (json_object_object_get_ex(currentCommitObject, "sha", &currenthHashObject)) {
+            const char *commitHash = json_object_get_string(currenthHashObject);
+
+            if (commitHash && strcmp(commitHash, CURRENT_COMMIT_HASH) == 0) break;
+        }
+
+        // append commit title to the array
+        if (json_object_object_get_ex(currentCommitObject, "commit", &commitDataObject) && json_object_object_get_ex(commitDataObject, "message", &currentTitleObject)) {
+
+            const char *commitTitle = json_object_get_string(currentTitleObject);
+
+            if (!commitTitle) return -1;
+
+            // length of dash + space + title
+            int len = 1 + 1 + strlen(commitTitle) + 1;
+
+            latestCommits[i] = malloc(len);
+
+            if (!latestCommits[i]) return -1;
+
+            snprintf(latestCommits[i], len, "- %s", commitTitle);
+
+            latestCommitCount++;
+        }
+    }
+    json_object_put(jsonObject);
+    return 0;
 }
 
 int parse_releases_data(char *jsonString, bool useNightly) {
@@ -992,19 +1049,26 @@ int get_song_data_internal(GenericTask *task, int songId, SongEntry *targetSongE
     return 0;
 }
 
-int get_latest_commit_internal(GenericTask *task, char *repoAuthor, char *repoName, char *repoBranch, char *destination, int destSize) {
+int get_commits_internal(GenericTask *task, char *repoAuthor, char *repoName, char *repoBranch) {
     char *outdata;
-    int result = get_current_commit(task, &outdata, repoAuthor, repoName, repoBranch);
+    latestCommitCount = 0;
+    int result = get_commits(task, &outdata, repoAuthor, repoName, repoBranch);
     if (result != 0) return result;
 
-    output_log("commit data: %s\n", outdata);
-
-    char *parserResult = parse_commit_data(outdata);
-    if (!parserResult) return -1;
+    // check for updates
+    int parserResult = parse_latest_commit(outdata);
+    if (parserResult != 0) {
+        free(outdata);
+        return parserResult;
+    }
+    // populate commits since current
+    parserResult = parse_commits_data(outdata);
+    if (parserResult != 0) {
+        free(outdata);
+        return parserResult;
+    }
 
     free(outdata);
-
-    snprintf(destination, destSize, parserResult);
     return 0;
 }
 
@@ -1029,13 +1093,8 @@ int check_for_updates_internal(GenericTask *task, char *repoAuthor, char *repoNa
 
     // if checking for nightly updates, get latest commit hash and compare it against the embedded one to see if an update is available
     if (useNightly) {
-        char latestCommitHash[64];
-        int result = get_latest_commit_internal(task, repoAuthor, repoName, repoBranch, latestCommitHash, sizeof(latestCommitHash));
+        int result = get_commits_internal(task, repoAuthor, repoName, repoBranch);
         if (result != 0) return result;
-        
-        update_data->isAvailable = (strcmp(CURRENT_COMMIT_HASH, latestCommitHash) != 0); 
-
-        if (!update_data->isAvailable) return -3;
     }
 
     // get and parse releases 
@@ -1069,7 +1128,7 @@ int install_update_internal(char *target_path) {
             return -1;
         }
         if (rename(target_path, _3dsx_path) != 0) {
-            output_log("failed to remove current .3dsx.\n");
+            output_log("failed to move target .3dsx.\n");
             return -1;
         }
         // success

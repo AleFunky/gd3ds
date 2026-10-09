@@ -37,3 +37,4 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
 float get_text_length(const Charset *font, const float zoom_x, bool parse_tags, const char *text);
 float get_longest_line_length(const Charset *font, const float zoom_x, const char *text);
 char *wrap_text(const Charset *font, float zoom_x, const char *text, float max_width);
+int count_lines(const char *text, bool parse_tags);
