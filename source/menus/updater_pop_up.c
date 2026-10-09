@@ -3,6 +3,7 @@
 #include "menus/components/ui_label.h"
 #include "menus/components/ui_spinner.h"
 #include "menus/components/ui_window_button.h"
+#include "menus/components/ui_image.h"
 
 #include "menus/updater.h"
 
@@ -19,6 +20,7 @@ static UIProgressBar *download_progress_bar;
 static UIButton *exit_button;
 static UIWindowButton *finish_update_button;
 static UISpinner *install_spinner;
+static UIImage *home_image;
 
 static Thread download_thread;
 
@@ -37,6 +39,9 @@ char downloadSpeed[16];
 char downloadedUpdateFilePath[256];
 int updateResult = 0;
 bool canExit;
+bool showHomeIcon = false; 
+int homeIconOpacity = 255;
+int homeIconDelay = 255;
 
 static void action_exit(UIElement *e, const UIPropertyList *p) {
     if (canExit) {
@@ -102,9 +107,11 @@ static void updater_pop_up_init(UIScreen *s) {
     exit_button = (UIButton *)ui_get_element_by_tag(s, "exitbutton");
     install_spinner = (UISpinner *)ui_get_element_by_tag(s, "spinner");
     finish_update_button = (UIWindowButton *)ui_get_element_by_tag(s, "finishbutton");
+    home_image = (UIImage *)ui_get_element_by_tag(s, "homeicon");
 
     ui_disable_element((UIElement *) install_spinner);
     ui_disable_element((UIElement *) finish_update_button);
+    ui_disable_element((UIElement*) home_image);
     download_task.url = update_data->releaseDownloadUrl;
     snprintf(download_task.extension, sizeof(download_task.extension), is_3DSX ? "3dsx" : "cia");
     download_progress_bar->value = 0;
@@ -184,6 +191,27 @@ static void updater_pop_up_update(UIScreen *s, UIInput *i) {
         install_task.finished = false;
         ui_label_set_text(status_label, is_3DSX ? "Update successful!\nPress OK to quit." : "Update successful!\nPress OK to restart.");
         ui_enable_element((UIElement *) finish_update_button);
+    }
+    
+
+    if (aptCheckHomePressRejected()) {
+        showHomeIcon = true;
+        ui_enable_element((UIElement *)home_image); 
+        homeIconOpacity = 255;
+        homeIconDelay = 120;
+    }
+
+    if (showHomeIcon) {
+        ui_image_set_tint(home_image, C2D_Color32(255, 255, 255, homeIconOpacity));
+        if (homeIconDelay > 0) {
+            homeIconDelay -= 10;
+        } else {
+        homeIconOpacity -= 10;
+        }
+        if (homeIconOpacity <= 0) {
+            ui_disable_element((UIElement*) home_image);
+            showHomeIcon = false;
+        }
     }
 }
 
