@@ -753,14 +753,16 @@ static void online_level_menu_update(UIScreen *s, UIInput *i) {
             song_data_task.finished = false;
             snprintf(song_task.file_name, sizeof(song_task.file_name), "%d", current_search_entry->songId);
             song_task.url = current_song_entry->songLink;
+
+            // enter exclusive mode, disable sleep mode and begin download 
+            aptSetSleepAllowed(false);
+            enterExclusiveState();
             song_thread = create_file_download_thread(&song_task);
         } else { handle_song_data_errors(song_data_result); }
-        
     }
 
     if (song_task.running) {
         song_progress_bar->value = song_task.progress;
-
         
         char *speed = truncate_speed(song_task.speed);
         if (speed) {
@@ -774,6 +776,8 @@ static void online_level_menu_update(UIScreen *s, UIInput *i) {
     if (song_task.finished) {
         // Handle result
         handle_song_codes(song_task.result);
+        exitExclusiveState(false);
+        aptSetSleepAllowed(true);
         song_task.finished = false;
     }
 
@@ -822,6 +826,18 @@ static void online_level_menu_exit() {
     if (level_task.running) {
         level_task.cancelled = true;
         threadJoin(level_thread, U64_MAX);
+    }
+
+    if (song_data_task.running) {
+        song_data_task.cancelled = true;
+        threadJoin(song_data_thread, U64_MAX);
+    }
+
+    if (song_task.running) {
+        song_task.cancelled = true;
+        exitExclusiveState(false);
+        aptSetSleepAllowed(true);
+        threadJoin(song_thread, U64_MAX);
     }
 
     already_played_online_level = false;

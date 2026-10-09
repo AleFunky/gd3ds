@@ -151,6 +151,9 @@ u32 jump_key_mask_p2(void);
 u32 jump_key_mask(void);
 void sync_precise_input(bool suppress_held);
 
+void enterExclusiveState();
+void exitExclusiveState(bool force);
+
 bool is_citra();
 
 void load_gdps_info();

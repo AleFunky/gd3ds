@@ -116,6 +116,10 @@ static void updater_pop_up_init(UIScreen *s) {
     remove(oldPath);
 
     download_thread = create_file_download_thread(&download_task);
+
+    // temporarily disable sleep mode, enter exclusive mode so network won't get interrupted
+    enterExclusiveState();
+    aptSetSleepAllowed(false);
 }
 
 static void updater_pop_up_update(UIScreen *s, UIInput *i) {
@@ -130,11 +134,17 @@ static void updater_pop_up_update(UIScreen *s, UIInput *i) {
     }
     // Run when finished
     if (download_task.finished) {
+        ui_disable_element((UIElement *) download_progress_bar);
+        ui_disable_element((UIElement *) speed_label);
+
+        // networking is no longer needed, exit exclusive mode
+        exitExclusiveState(false);
+
         // Handle result
         if (download_task.result != 0) {
             status_label->base.y = 10;
+            aptSetSleepAllowed(true);
             output_log(handle_download_error_codes(download_task.result));
-            ui_disable_element((UIElement *) install_spinner);
             ui_label_set_text(status_label, handle_download_error_codes(download_task.result));
             return;
         }
@@ -144,9 +154,8 @@ static void updater_pop_up_update(UIScreen *s, UIInput *i) {
         // disable home button for the duration of the install
         aptSetHomeAllowed(false);
 
+
         ui_enable_element((UIElement *) install_spinner);
-        ui_disable_element((UIElement *) download_progress_bar);
-        ui_disable_element((UIElement *) speed_label);
         ui_disable_element((UIElement *) exit_button);
         ui_label_set_text(status_label, "Installing...");
         status_label->base.y = 45;
@@ -157,8 +166,10 @@ static void updater_pop_up_update(UIScreen *s, UIInput *i) {
 
     if (install_task.finished) {
         ui_disable_element((UIElement *) install_spinner);
-        // reenable home button
+        // reenable home button and sleep, exit exclusive mode
         aptSetHomeAllowed(true);
+        aptSetSleepAllowed(true);
+
         // Handle result
         if (install_task.result != 0) {
             output_log(handle_install_error_codes(install_task.result));
@@ -178,9 +189,11 @@ static void updater_pop_up_update(UIScreen *s, UIInput *i) {
 
 static void updater_pop_up_exit(UIScreen *s) {
     if (download_task.running) {
-            download_task.cancelled = true;
-            threadJoin(download_thread, U64_MAX);
-        }
+        download_task.cancelled = true;
+        exitExclusiveState(false);
+        aptSetSleepAllowed(true);
+        threadJoin(download_thread, U64_MAX);
+    }
 }
 
 static UIActionDef updater_pop_up_actions[] = {

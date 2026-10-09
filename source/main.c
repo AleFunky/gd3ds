@@ -76,6 +76,8 @@
 
 u32 __ctru_linear_heap_size = 44 << 20;
 
+bool inExclusiveState = false;
+
 int game_state = STATE_MENU;
 bool escape_state;
 
@@ -305,6 +307,37 @@ static int restart_game() {
 
 	return 0;
 }
+
+// adapted from Luma3DS - sysmodules/rosalina/source/minisoc.c
+void enterExclusiveState() {
+    Result res = 0;
+    __dmb();
+
+    if (!inExclusiveState) {
+        ndmuInit();
+        res = NDMU_EnterExclusiveState(NDM_EXCLUSIVE_STATE_INFRASTRUCTURE);
+        if (R_SUCCEEDED(res)) res = NDMU_LockState(); // prevents ndm from switching to StreetPass when the lid is closed
+        inExclusiveState = R_SUCCEEDED(res);
+        __dmb();
+    }
+}
+
+void exitExclusiveState(bool force) {
+    Result res = 0;
+    __dmb();
+
+    if (inExclusiveState)
+    {
+        if (!force) {
+            res = NDMU_UnlockState();
+            if (R_SUCCEEDED(res)) res = NDMU_LeaveExclusiveState();
+        }
+        ndmuExit();
+        inExclusiveState = R_FAILED(res);
+        __dmb();
+    }
+}
+
 
 void update_player_effects(float delta) {
     for (int i = 0; i < 2; i++) {
@@ -1558,10 +1591,10 @@ int main(int argc, char* argv[]) {
     soc_init();
     check_system_model();
     check_rom_type();
-    output_log("argc: %d\n", argc);
+    // output_log("argc: %d\n", argc);
     if (argc > 0) { 
         _3dsx_path = argv[0];
-        output_log("3dsx path: %s\n", _3dsx_path);
+        // output_log("3dsx path: %s\n", _3dsx_path);
     }
     
 #ifndef IS_RELEASE
