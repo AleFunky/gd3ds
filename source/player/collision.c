@@ -1167,6 +1167,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
 
 void get_corners(float cx, float cy, float w, float h, float angle, Vec2D out[4]) {
     float hw = w * 0.5f, hh = h * 0.5f;
+    angle = -angle;
     float rad = C3D_AngleFromDegrees(angle);
     float cos_a = cosf(rad), sin_a = sinf(rad);
     
@@ -1543,7 +1544,7 @@ void collide_with_obj(Player *player, int obj) {
             SET_COLLIDED(obj, false);
         }
     } else {
-        float obj_rot = normalize_angle(angle);
+        float obj_rot = normalize_angle(objects.rotation[obj]);
 
         // No rotation for solid hitboxes
         if (hitbox->collision_type == HITBOX_SOLID) {

@@ -1327,8 +1327,10 @@ void draw_hitbox(int obj) {
     float w = objects.width[obj];
     float h = objects.height[obj];
 
+    float rot = objects.rotation[obj];
+
     if (hitbox->collision_type == HITBOX_SOLID) {
-        angle = 0;
+        rot = 0;
     }
     unsigned int color = C2D_Color32(0x00, 0xff, 0xff, 0xff);
 
@@ -1352,7 +1354,7 @@ void draw_hitbox(int obj) {
 
         custom_circunference(mirror_x_on_screen(x), calc_y_on_screen(y), calc_radius, color, 2.f);
     } else if (w != 0 && h != 0) {
-        get_corners(x, y, w, h, angle, rect);
+        get_corners(x, y, w, h, rot, rect);
         draw_square(rect, color);
     }
 }
