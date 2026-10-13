@@ -114,7 +114,7 @@ bool player_gamemode_is_flying(Player *player) {
 
 void player_non_flying_landing(Player *player) {
     if (!player_gamemode_is_flying(player)) {
-        player->landed_from_jump = player->jumped;
+        player->landed_from_jump |= player->jumped;
         player->jumped = false;
     }
 }
