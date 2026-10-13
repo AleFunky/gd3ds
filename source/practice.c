@@ -803,7 +803,6 @@ void handle_practice_mode() {
     u32 kHeld = hidKeysHeld();
 
     if (((kDown & KEY_L) && !((kHeld & KEY_B) && settingsState.enableDebugBindings)) || (kDown & KEY_ZL)) {
-        
         if (settingsState.autoCheckpoints  && player_gamemode_is_flying(&state.player) && pseudo_checkpoint_exists) {
             pseudo_checkpoint_exists = false;
             delete_last_checkpoint();

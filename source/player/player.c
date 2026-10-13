@@ -625,6 +625,7 @@ void robot_gamemode(Player *player) {
         player->buffering_state = BUFFER_END;
         player->robot_air_time = 0.f;
         player->gravity = 0;
+        player->jumped = true;
     }
 
     if (player->robot_air_time >= 1.5f || (!curr_input.holdJump)) {

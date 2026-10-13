@@ -761,6 +761,8 @@ void handle_move_triggers(void) {
 
                 if (new_sx != old_sx || new_sy != old_sy)
                     update_object_section(group_obj);
+    
+                if (state.dead) continue;
 
                 int object_id = objects.id[group_obj];
 
