@@ -3,6 +3,7 @@
 #include "utils/gfx.h"
 #include "state.h"
 #include "main.h"
+#include "level_loading.h"
 #include <stdlib.h>
 
 const UseEffectDefinition pad_use_effect = {
@@ -364,6 +365,10 @@ void update_use_effects(float delta, UseEffectPool *pool) {
     for (size_t i = 0; i < pool->capacity; i++) {
         UseEffect *effect = &ptr[i];
         if (effect->active) {
+            if (effect->obj >= 0) {
+                effect->x = objects.x[effect->obj];
+                effect->y = objects.y[effect->obj];
+            }
             float progress = (effect->elapsed / effect->def.duration);
             float duration_halved = effect->def.duration / 2;
 
