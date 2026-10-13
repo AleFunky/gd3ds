@@ -778,8 +778,8 @@ void handle_move_triggers(void) {
                     float launch_vel_p2 = 0.f;
 
                     if (g_trigger_dt != 0.f) {
-                        launch_vel_p1 = fminf(fabsf(delta_y) / STEPS_DT_UNMOD, state.player.max_vel);
-                        launch_vel_p2 = fminf(fabsf(delta_y) / STEPS_DT_UNMOD, state.player2.max_vel);
+                        launch_vel_p1 = fminf(fabsf(delta_y) / STEPS_DT, state.player.max_vel);
+                        launch_vel_p2 = fminf(fabsf(delta_y) / STEPS_DT, state.player2.max_vel);
                     }
 
                     if (!player1_gravity_changed && state.player.collided_block == group_obj && player1_grav_delta > 0.f) {

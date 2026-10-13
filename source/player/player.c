@@ -56,9 +56,6 @@ ParticleSystem coin_pickup_particles;
 PlayerAction player_actions[2][MAX_ACTIONS];
 int num_actions[2] = {0};
 
-int frame_skipped = 0;
-
-
 const float velocity_thresholds[SPEED_COUNT] = {
 	101.541492,
 	103.485494592,

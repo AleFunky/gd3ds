@@ -979,11 +979,11 @@ void game_loop() {
             fast_speed_particles_bottom.emitting = false;
             faster_speed_particles_bottom.emitting = false;
             
-            if (physics_delta > 0.5f) physics_delta = STEPS_DT_UNMOD; // Avoid spiral of death
+            if (physics_delta > 0.5f) physics_delta = STEPS_DT; // Avoid spiral of death
 
             if (!game_paused) {
                 if (fixed_dt) {
-                    physics_delta = STEPS_DT_UNMOD;
+                    physics_delta = STEPS_DT;
                     if (!being_faded) fixed_dt = false;
                 }
                 accumulator += physics_delta;
@@ -996,7 +996,7 @@ void game_loop() {
                 // before the deposit, the accumulator only has the leftover from last frame and
                 // planned will always be 1, making every input land on a single substep like normal
                 // frame latching (no error, it will just silently get less precise)
-                u32 planned = (u32)(accumulator / STEPS_DT_UNMOD);
+                u32 planned = (u32)(accumulator / STEPS_DT);
                 pi_begin_frame((u32)frame_window_start, (u32)now, planned ? planned : 1);
 
                 float player_x_before_physics = state.player.x;
@@ -1006,7 +1006,7 @@ void game_loop() {
                 state.player2.gravity_changed_move = false;
 
                 // Run simulation in fixed steps
-                while (accumulator >= STEPS_DT_UNMOD) {
+                while (accumulator >= STEPS_DT) {
                     u64 start_physics = svcGetSystemTick();
                     bool player1_upside_down_before = state.player.upside_down;
                     bool player2_upside_down_before = state.player2.upside_down;
@@ -1083,12 +1083,6 @@ void game_loop() {
 
                     u64 end_physics = svcGetSystemTick();
                     float physics_time = (end_physics - start_physics) / (CPU_TICKS_PER_MSEC);
-
-                    if (physics_time / 1000 >= STEPS_DT_UNMOD) {
-                        frame_skipped = (int) ((physics_time / 1000) * STEPS_HZ);
-                    }
-                    else frame_skipped = 0;
-
                     snapshot.physics_ms += physics_time;
 
                     accumulator -= STEPS_DT;
@@ -1101,10 +1095,16 @@ void game_loop() {
             }
         }
 
+        // Death stops the lock triggers
+        if (state.dead) {
+            move_lock_player_x_delta = 0; 
+            move_lock_player_y_delta = 0;
+        }
+
         if (!game_paused) {
             frame_counter++;
             frame_timer += delta;
-            g_trigger_dt = (steps > 0) ? (float)steps * STEPS_DT_UNMOD : delta;
+            g_trigger_dt = (steps > 0) ? (float)steps * STEPS_DT : delta;
 
             if (state.dead && state.death_timer <= 0.f) {
                 state.death_timer = (settingsState.quickRetry ? 0.5f : 1.f);

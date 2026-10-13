@@ -7,11 +7,8 @@
 
 #include "trail.h"
 
-extern int frame_skipped;
-
 #define STEPS_HZ 240
-#define STEPS_DT ((1.f + frame_skipped) / STEPS_HZ) // 1/240 seconds per physics step
-#define STEPS_DT_UNMOD (1.f / STEPS_HZ) // 1/240 seconds per physics step
+#define STEPS_DT (1.f / STEPS_HZ) // 1/240 seconds per physics step
 
 #define P1_TRAIL_LENGTH 10
 #define P1_TRAIL_DURATION 0.45f
