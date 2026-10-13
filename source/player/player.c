@@ -100,20 +100,12 @@ const float cube_rotation_speed[2] = {
 };
 
 float get_lerped_x(int object) {
-    if (last_steps <= 0) return objects.x[object];
-    float alpha = (float)(steps + 1) / last_steps;
-    float delta_x = objects.x[object] - objects.last_x[object];
-
-    return objects.x[object] + delta_x * alpha;
+    return objects.x[object];// + delta_x * alpha;
 }
 
 float get_lerped_y(int object) {
-    if (last_steps <= 0) return objects.y[object];
-    float alpha = (float)(steps + 1) / last_steps;
-    float delta_y = objects.y[object] - objects.last_y[object];
-
     //output_log("y %.2f old_y %.2f lerped %.2f alpha %.2f steps %d last steps %d\n", objects.y[object], objects.last_y[object], objects.y[object] + delta_y * alpha, alpha, steps + 1, last_steps);
-    return objects.y[object] + delta_y * alpha;
+    return objects.y[object];// + delta_y * alpha;
 }
 
 bool player_gamemode_is_flying(Player *player) {

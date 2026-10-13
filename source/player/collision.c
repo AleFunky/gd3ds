@@ -1182,6 +1182,52 @@ void get_corners(float cx, float cy, float w, float h, float angle, Vec2D out[4]
     out[3].y = cy - hw_sin + hh_cos;
 }
 
+static bool sat_overlap_exclusive(const Vec2D a[4], const Vec2D b[4]) {
+    // Test all axes (normals of edges)
+    for (int shape = 0; shape < 2; ++shape) {
+        const Vec2D *verts = (shape == 0) ? a : b;
+        for (int i = 0; i < 4; ++i) {
+            // Edge from verts[i] to verts[(i+1)%4]
+            float dx = verts[(i+1)%4].x - verts[i].x;
+            float dy = verts[(i+1)%4].y - verts[i].y;
+            // Normal axis
+            float ax = -dy, ay = dx;
+
+            // Project both shapes onto axis
+            float minA = INFINITY, maxA = -INFINITY;
+            float minB = INFINITY, maxB = -INFINITY;
+            for (int j = 0; j < 4; ++j) {
+                float projA = a[j].x * ax + a[j].y * ay;
+                float projB = b[j].x * ax + b[j].y * ay;
+                if (projA < minA) minA = projA;
+                if (projA > maxA) maxA = projA;
+                if (projB < minB) minB = projB;
+                if (projB > maxB) maxB = projB;
+            }
+            // If projections do not overlap, there is a separating axis
+            if (maxA <= minB || maxB <= minA) return false;
+        }
+    }
+    return true;
+}
+
+bool intersect_exclusive(float x1, float y1, float w1, float h1, float angle1,
+                    float x2, float y2, float w2, float h2, float angle2) {
+    // Tighter AABB check
+    float max_extent = fmaxf(w1, h1) + fmaxf(w2, h2);
+    float dx = fabsf(x1 - x2);
+    float dy = fabsf(y1 - y2);
+    
+    if (dx > max_extent || dy > max_extent) {
+        return false;
+    }
+    
+    Vec2D rect1[4], rect2[4];
+    get_corners(x1, y1, w1, h1, angle1, rect1);
+    get_corners(x2, y2, w2, h2, angle2, rect2);
+    return sat_overlap_exclusive(rect1, rect2);
+}
+
 static bool sat_overlap(const Vec2D a[4], const Vec2D b[4]) {
     // Test all axes (normals of edges)
     for (int shape = 0; shape < 2; ++shape) {
@@ -1532,7 +1578,7 @@ void collide_with_slope(Player *player, int obj, bool has_slope) {
     float width = objects.width[obj];
     float height = objects.height[obj];
 
-    if (intersect(
+    if (intersect_exclusive(
         player->x, player->y, player->width, player->height, 0, 
         get_lerped_x(obj), get_lerped_y(obj), width, height, objects.rotation[obj]
     )) {
