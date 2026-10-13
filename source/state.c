@@ -270,6 +270,7 @@ void init_state() {
     state.current_data.coin1 = false;
     state.current_data.coin2 = false;
     state.current_data.coin3 = false;
+    state.last_hitbox_trail = 0;
 
     in_level_complete = false;
 
