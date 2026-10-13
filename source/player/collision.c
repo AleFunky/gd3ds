@@ -398,6 +398,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->inverse_rotation = false;
                 player->ceiling_inv_time = CEILING_INVUL_TIME;
                 player->jumped = true;
+                player->robot_air_time = 999.f;
 
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &pad_use_effect, get_use_effect_array_ptr(GFX_TOP));
                 if (effect) {
@@ -551,6 +552,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     player->vel_y /= -2;
                     player->upside_down = false;
                     player->inverse_rotation = false;
+                    player->robot_air_time = 999.f;
 
                     if (player->gamemode == GAMEMODE_UFO) 
                         player->rotation = 0;
@@ -580,6 +582,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     player->vel_y /= -2;
                     player->upside_down = true;
                     player->inverse_rotation = false;
+                    player->robot_air_time = 999.f;
 
                     if (player->gamemode == GAMEMODE_UFO) 
                         player->rotation = 0;
@@ -792,8 +795,10 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 state.ground_y = 0;
                 state.ceiling_y = 999999;
                 if (player->gamemode != GAMEMODE_ROBOT) {
+                    if (player->gamemode != GAMEMODE_BALL && player->gamemode != GAMEMODE_PLAYER) {
+                        player->vel_y /= 2;
+                    }
                     if (player->gamemode == GAMEMODE_WAVE) player->vel_y *= 0.9f;
-                    player->vel_y /= 2;
 
                     player->ceiling_inv_time = GAMEMODE_INVUL_TIME;
                     player->snap_rotation = true;

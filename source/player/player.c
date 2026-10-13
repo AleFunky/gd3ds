@@ -626,7 +626,7 @@ void robot_gamemode(Player *player) {
             player->robot_anim_frame = 0;
             player->robot_anim_id = ROBOT_ANIM_FALL_START;
         }
-    } else if (player->buffering_state == BUFFER_END) {
+    } else {
         player->robot_air_time += 5.4f * STEPS_DT;
     }
     
