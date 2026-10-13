@@ -21,8 +21,14 @@ extern int move_trigger_capacity;
 extern int spawn_trigger_capacity;
 
 #define MAX_CHECKPOINTS 100
-#define MAX_CHECKPOINT_CHANNELS (COL_CHANNEL_LAST + 256)
 #define CHECKPOINT_GFX_ID 6
+
+typedef struct {
+    int source_obj;
+    float time_run;
+    unsigned int activation_order;
+    bool started_fade_out;
+} PulseSnapshot;
 
 typedef struct CheckpointData {
     Player p1;
@@ -60,7 +66,6 @@ typedef struct CheckpointData {
     // snapshot only of the color channels actually used by the level to avoid a 1024 entry copy per checkpoint
     // allocated dynamically in new_checkpoint() (tis is great)
     int channel_snapshot_count;
-    int *channel_indices;
     ColorChannel *channel_snapshot;
     ColTriggerBuffer *trigger_snapshot;
 
@@ -75,18 +80,35 @@ typedef struct CheckpointData {
     // can continue from the exact point instead of restarting. bounded by the
     // number of active move/alpha triggers so it's usually empty
     int move_obj_count;
-    int *move_obj_index;     // object indices in move groups
-    float *move_obj_x;       // saved objects.x at checkpoint
-    float *move_obj_y;       // saved objects.y at checkpoint
-    int alpha_obj_count;
-    int *alpha_obj_index;    // object indices in alpha groups
-    float *alpha_obj_alpha;  // saved objects.alpha_trigger_opacity at checkpoint
+    uint8_t *move_idx_stream;
+    int move_idx_bytes;
+    uint8_t *move_obj_x;
+    int move_x_bytes;
+    int move_x_fmt;
+    int move_x_u;
+    int move_cx;
+    uint8_t *move_obj_y;
+    int move_y_bytes;
+    int move_y_fmt;
+    int move_y_u;
+    int move_cy;
 
     int fired_move_count;
     int *fired_move_index;
 
+    int toggle_group_count;
+    int *toggle_group_id;
+
+    int alpha_group_count;
+    int *alpha_group_id;
+    float *alpha_group_alpha;
+
+    int pulse_snap_count;
+    PulseSnapshot *pulse_snap;
+
     float song_offset;
 
+    void *alloc_base;
 } CheckpointData;
 
 CheckpointData checkpoints[MAX_CHECKPOINTS];
@@ -94,6 +116,12 @@ int checkpoint_count = 0;
 int checkpoint_pointer = 0;
 float checkpoint_timer = 0;
 bool pseudo_checkpoint_exists = false;
+
+static unsigned int ck_float_bits(float f);
+static int ck_varint_len(unsigned int v);
+static uint8_t *ck_varint_put(uint8_t *p, unsigned int v);
+static unsigned int ck_varint_get(const uint8_t **pp);
+static float ck_axis_get(const uint8_t *blob, int fmt, int u, int k);
 
 // max number of distinct channel indices a level can use: built-in special
 // channels + a generous cap for the level's own channels
@@ -136,32 +164,96 @@ static int collect_used_channels(int *out) {
 }
 
 // frees the dynamic snapshot buffers of a checkpoint
-static void free_checkpoint_snapshot(CheckpointData *check) {
-    if (check->channel_indices) { free(check->channel_indices); check->channel_indices = NULL; }
-    if (check->channel_snapshot) { free(check->channel_snapshot); check->channel_snapshot = NULL; }
-    if (check->trigger_snapshot) { free(check->trigger_snapshot); check->trigger_snapshot = NULL; }
-    check->channel_snapshot_count = 0;
+#define CK_ALIGN8(x) (((x) + 7u) & ~(size_t)7u)
 
-    if (check->move_obj_index) { free(check->move_obj_index); check->move_obj_index = NULL; }
-    if (check->move_obj_x)     { free(check->move_obj_x);     check->move_obj_x = NULL; }
-    if (check->move_obj_y)     { free(check->move_obj_y);     check->move_obj_y = NULL; }
-    check->move_obj_count = 0;
-    if (check->alpha_obj_index) { free(check->alpha_obj_index); check->alpha_obj_index = NULL; }
-    if (check->alpha_obj_alpha) { free(check->alpha_obj_alpha); check->alpha_obj_alpha = NULL; }
-    check->alpha_obj_count = 0;
-
-    if (check->fired_move_index) { free(check->fired_move_index); check->fired_move_index = NULL; }
-    check->fired_move_count = 0;
-
-    if (check->move_triggers)  { free(check->move_triggers);  check->move_triggers = NULL; }
-    if (check->alpha_triggers) { free(check->alpha_triggers); check->alpha_triggers = NULL; }
-    if (check->spawn_triggers) { free(check->spawn_triggers); check->spawn_triggers = NULL; }
-    check->move_triggers_count = 0;
-    check->alpha_triggers_count = 0;
-    check->spawn_triggers_count = 0;
+static unsigned int ck_float_bits(float f) {
+    unsigned int u;
+    memcpy(&u, &f, sizeof u);
+    return u;
 }
 
-// static const int checkpoint_size = sizeof(checkpoints);
+static int ck_varint_len(unsigned int v) {
+    int n = 1;
+    while (v >= 128u) { v >>= 7; n++; }
+    return n;
+}
+static uint8_t *ck_varint_put(uint8_t *p, unsigned int v) {
+    while (v >= 128u) { *p++ = (uint8_t)(v | 0x80u); v >>= 7; }
+    *p++ = (uint8_t)v;
+    return p;
+}
+static unsigned int ck_varint_get(const uint8_t **pp) {
+    unsigned int v = 0;
+    int shift = 0;
+    const uint8_t *p = *pp;
+    for (;;) {
+        uint8_t b = *p++;
+        v |= (unsigned int)(b & 0x7Fu) << shift;
+        if (!(b & 0x80u)) break;
+        shift += 7;
+    }
+    *pp = p;
+    return v;
+}
+
+static uint32_t ck_next_pow2(uint32_t x) {
+    uint32_t p = 1;
+    while (p < x) p <<= 1;
+    return p;
+}
+
+static int ck_dedup_put_h(int *h, uint32_t mask, float *tbl, int *n, float v) {
+    if (*n > 65536) return 0;
+    uint32_t bits = ck_float_bits(v);
+    uint32_t i = (bits * 2654435761u) & mask;
+    for (;;) {
+        int val = h[i];
+        if (val == 0) {
+            h[i] = *n + 1;
+            tbl[*n] = v;
+            return (*n)++;
+        }
+        if (ck_float_bits(tbl[val - 1]) == bits) return val - 1;
+        i = (i + 1) & mask;
+    }
+}
+
+static void ck_axis_choose(int c, int u, int *fmt, int *bytes) {
+    int best = (int)(sizeof(float) * (size_t)c);
+    int best_fmt = 0;
+    if (u > 0 && u <= 256) {
+        int b = (int)(sizeof(float) * (size_t)u) + c;
+        if (b < best) { best = b; best_fmt = 1; }
+    }
+    if (u > 0 && u <= 65536) {
+        int b = (int)(sizeof(float) * (size_t)u) + 2 * c;
+        if (b < best) { best = b; best_fmt = 2; }
+    }
+    *fmt = best_fmt;
+    *bytes = best;
+}
+
+static float ck_axis_get(const uint8_t *blob, int fmt, int u, int k) {
+    if (fmt == 0) {
+        float v;
+        memcpy(&v, blob + (size_t)k * sizeof(float), sizeof v);
+        return v;
+    }
+    const float *tbl = (const float *)blob;
+    unsigned int idx;
+    if (fmt == 1) idx = ((const uint8_t *)(blob + (size_t)u * sizeof(float)))[k];
+    else          idx = ((const uint16_t *)(blob + (size_t)u * sizeof(float)))[k];
+    if (idx >= (unsigned int)u) idx = 0;
+    return tbl[idx];
+}
+
+static void free_checkpoint_snapshot(CheckpointData *check) {
+    if (check->alloc_base) { free(check->alloc_base); check->alloc_base = NULL; }
+
+    memset(&check->channel_snapshot_count, 0,
+           (size_t)((char *)&check->pulse_snap + sizeof(check->pulse_snap)
+                    - (char *)&check->channel_snapshot_count));
+}
 
 void set_checkpoint_timer(float timer) {
     if (state.practice_mode && settingsState.autoCheckpoints) {
@@ -186,24 +278,137 @@ void new_checkpoint() {
     // release the snapshot of the checkpoint we are about to overwrite
     free_checkpoint_snapshot(check);
 
-    // reserve the runtime trigger buffers
-    check->move_triggers  = (move_trigger_count  > 0) ? malloc(sizeof(MoveTriggerBuffer)  * move_trigger_count)  : NULL;
-    check->alpha_triggers = (alpha_trigger_count > 0) ? malloc(sizeof(AlphaTriggerBuffer) * alpha_trigger_count) : NULL;
-    check->spawn_triggers = (spawn_trigger_count > 0) ? malloc(sizeof(SpawnTriggerBuffer) * spawn_trigger_count) : NULL;
-    check->move_triggers_count  = move_trigger_count;
-    check->alpha_triggers_count = alpha_trigger_count;
-    check->spawn_triggers_count = spawn_trigger_count;
+    int used[MAX_CHECKPOINT_CHANNELS];
+    int used_count = collect_used_channels(used);
 
-    if ((move_trigger_count  > 0 && !check->move_triggers) ||
-        (alpha_trigger_count > 0 && !check->alpha_triggers) ||
-        (spawn_trigger_count > 0 && !check->spawn_triggers)) {
-        // if out of memory leave the slot empty and skip this checkpoint so it doesn't crashes
-        free_checkpoint_snapshot(check);
-        return;
+    int move_cap = 0;
+    int move_cx = 0;
+    int move_cy = 0;
+    int move_idx_bytes = 0;
+    int prev_index = 0;
+    int *mv_list = NULL;
+    if (objects.count > 0) mv_list = malloc(sizeof(int) * (size_t)objects.count);
+    for (int i = 0; i < objects.count; i++) {
+        unsigned int bx = ck_float_bits(objects.x[i]) ^ ck_float_bits(objects.original_x[i]);
+        unsigned int by = ck_float_bits(objects.y[i]) ^ ck_float_bits(objects.original_y[i]);
+        if (!bx && !by) continue;
+        unsigned int gap = (unsigned int)(move_cap ? (i - prev_index) : i);
+        unsigned int flags = (bx ? 2u : 0u) | (by ? 1u : 0u);
+        move_idx_bytes += ck_varint_len((gap << 2) | flags);
+        prev_index = i;
+        if (mv_list) mv_list[move_cap] = i;
+        move_cap++;
+        if (bx) move_cx++;
+        if (by) move_cy++;
     }
+
+    int move_x_fmt = 0, move_y_fmt = 0, move_x_u = 0, move_y_u = 0;
+    int move_x_bytes = 0, move_y_bytes = 0;
+    int *ck_hx = NULL, *ck_hy = NULL;
+    uint32_t ck_hx_slots = 0, ck_hy_slots = 0;
+    if (mv_list && (move_cx > 0 || move_cy > 0)) {
+        float *tbl = malloc(sizeof(float) * (size_t)(move_cx + move_cy));
+        if (tbl) {
+            uint32_t xb = move_cx > 65537 ? 65537u : (uint32_t)move_cx;
+            uint32_t yb = move_cy > 65537 ? 65537u : (uint32_t)move_cy;
+            ck_hx_slots = xb ? ck_next_pow2(xb * 2u) : 0;
+            ck_hy_slots = yb ? ck_next_pow2(yb * 2u) : 0;
+            if (ck_hx_slots) { ck_hx = malloc(sizeof(int) * ck_hx_slots); if (ck_hx) memset(ck_hx, 0, sizeof(int) * ck_hx_slots); }
+            if (ck_hy_slots) { ck_hy = malloc(sizeof(int) * ck_hy_slots); if (ck_hy) memset(ck_hy, 0, sizeof(int) * ck_hy_slots); }
+            float *tx = tbl;
+            float *ty = tbl + move_cx;
+            for (int e = 0; e < move_cap; e++) {
+                int i = mv_list[e];
+                if (ck_hx && (ck_float_bits(objects.x[i]) ^ ck_float_bits(objects.original_x[i])))
+                    ck_dedup_put_h(ck_hx, ck_hx_slots - 1u, tx, &move_x_u, objects.x[i]);
+                if (ck_hy && (ck_float_bits(objects.y[i]) ^ ck_float_bits(objects.original_y[i])))
+                    ck_dedup_put_h(ck_hy, ck_hy_slots - 1u, ty, &move_y_u, objects.y[i]);
+            }
+            ck_axis_choose(move_cx, move_x_u, &move_x_fmt, &move_x_bytes);
+            ck_axis_choose(move_cy, move_y_u, &move_y_fmt, &move_y_bytes);
+            free(tbl);
+        }
+    }
+    if (move_x_fmt == 0) move_x_bytes = (int)(sizeof(float) * (size_t)move_cx);
+    if (move_y_fmt == 0) move_y_bytes = (int)(sizeof(float) * (size_t)move_cy);
+
+    int fired_cap = 0;
+    for (int i = 0; i < objects.count; i++)
+        if (objects.id[i] == MOVE_TRIGGER && GET_ACTIVATED(i))
+            fired_cap++;
+
+    int toggle_cap = 0;
+    for (int g = 1; g < MAX_GROUPS; g++) {
+        GroupNode *p = get_group(g);
+        if (p && p->toggled) toggle_cap++;
+    }
+
+    int alpha_group_cap = 0;
+    for (int g = 1; g < MAX_GROUPS; g++) {
+        GroupNode *p = get_group(g);
+        if (p && p->alpha != 1.0f) alpha_group_cap++;
+    }
+
+    int pulse_cap = 0;
+    for (int i = 0; i < pulse_trigger_count; i++)
+        if (pulse_trigger_buffer[i].active) pulse_cap++;
+
+    void *ck_ptr[16];
+    size_t ck_size[16];
+    int ck_n = 0;
+    size_t total = 0;
+    void *base = NULL;
+#define CK_ADD(pp, type, count) do { \
+        if ((count) > 0) { \
+            (pp) = NULL; \
+            ck_ptr[ck_n] = (void *)&(pp); \
+            ck_size[ck_n] = CK_ALIGN8(sizeof(type) * (size_t)(count)); \
+            total += ck_size[ck_n]; \
+            ck_n++; \
+        } else { \
+            (pp) = NULL; \
+        } \
+    } while (0)
+
+    CK_ADD(check->move_triggers,     MoveTriggerBuffer,  move_trigger_count);
+    CK_ADD(check->alpha_triggers,    AlphaTriggerBuffer, alpha_trigger_count);
+    CK_ADD(check->spawn_triggers,    SpawnTriggerBuffer, spawn_trigger_count);
+    CK_ADD(check->channel_snapshot,  ColorChannel,       used_count);
+    CK_ADD(check->trigger_snapshot,  ColTriggerBuffer,   used_count);
+    CK_ADD(check->move_idx_stream,   uint8_t,            move_idx_bytes);
+    CK_ADD(check->move_obj_x,        uint8_t,            move_x_bytes);
+    CK_ADD(check->move_obj_y,        uint8_t,            move_y_bytes);
+    CK_ADD(check->fired_move_index,  int,                fired_cap);
+    CK_ADD(check->toggle_group_id,   int,                toggle_cap);
+    CK_ADD(check->alpha_group_id,    int,                alpha_group_cap);
+    CK_ADD(check->alpha_group_alpha, float,              alpha_group_cap);
+    CK_ADD(check->pulse_snap,        PulseSnapshot,      pulse_cap);
+#undef CK_ADD
+
+    if (total > 0) {
+        base = malloc(total);
+        if (!base) {
+            free(mv_list);
+            free(ck_hx);
+            free(ck_hy);
+            free_checkpoint_snapshot(check);
+            return;
+        }
+        size_t off = 0;
+        for (int k = 0; k < ck_n; k++) {
+            *(void **)ck_ptr[k] = (char *)base + off;
+            off += ck_size[k];
+        }
+    }
+    check->alloc_base = base;
 
     checkpoint_pointer = next_checkpoint;
     if (++checkpoint_count > MAX_CHECKPOINTS) checkpoint_count = MAX_CHECKPOINTS;
+
+    check->move_triggers_count  = move_trigger_count;
+    check->alpha_triggers_count = alpha_trigger_count;
+    check->spawn_triggers_count = spawn_trigger_count;
+    check->channel_snapshot_count = used_count;
 
     check->camera_x = state.camera_x;
     check->camera_y = state.camera_y;
@@ -238,22 +443,8 @@ void new_checkpoint() {
     check->song_offset = level_info.song_offset + state.player.timeElapsed;
 
     // snapshot only the channels used by this level
-    int used[MAX_CHECKPOINT_CHANNELS];
-    int used_count = collect_used_channels(used);
-
-    check->channel_indices = malloc(sizeof(int) * used_count);
-    check->channel_snapshot = malloc(sizeof(ColorChannel) * used_count);
-    check->trigger_snapshot = malloc(sizeof(ColTriggerBuffer) * used_count);
-    check->channel_snapshot_count = used_count;
-
-    if (!check->channel_indices || !check->channel_snapshot || !check->trigger_snapshot) {
-        free_checkpoint_snapshot(check);
-        return;
-    }
-
     for (int i = 0; i < used_count; i++) {
         int idx = used[i];
-        check->channel_indices[i] = idx;
         check->channel_snapshot[i] = channels[idx];
         check->trigger_snapshot[i] = col_trigger_buffer[idx];
     }
@@ -263,94 +454,123 @@ void new_checkpoint() {
     if (check->spawn_triggers) memcpy(check->spawn_triggers, spawn_trigger_buffer, sizeof(SpawnTriggerBuffer) * spawn_trigger_count);
 
     check->move_obj_count = 0;
-    check->move_obj_index = NULL;
-    check->move_obj_x = NULL;
-    check->move_obj_y = NULL;
-    int move_cap = 0;
-    for (int i = 0; i < move_trigger_count; i++)
-        if (move_trigger_buffer[i].active)
-            for (GroupNode *p = get_group(move_trigger_buffer[i].target_group); p; p = p->next)
-                move_cap++;
-    for (int i = 0; i < objects.count; i++)
-        if (objects.x[i] != objects.original_x[i] || objects.y[i] != objects.original_y[i])
-            move_cap++;
+    check->move_idx_bytes = 0;
+    check->move_cx = 0;
+    check->move_cy = 0;
+    check->move_x_fmt = move_x_fmt;
+    check->move_x_u = move_x_u;
+    check->move_x_bytes = move_x_bytes;
+    check->move_y_fmt = move_y_fmt;
+    check->move_y_u = move_y_u;
+    check->move_y_bytes = move_y_bytes;
     if (move_cap > 0) {
-        check->move_obj_index = malloc(sizeof(int) * move_cap);
-        check->move_obj_x = malloc(sizeof(float) * move_cap);
-        check->move_obj_y = malloc(sizeof(float) * move_cap);
-        if (check->move_obj_index && check->move_obj_x && check->move_obj_y) {
-            int n = 0;
-            for (int i = 0; i <move_trigger_count ; i++) {
-                if (!move_trigger_buffer[i].active) continue;
-                for (GroupNode *p = get_group(move_trigger_buffer[i].target_group); p; p = p->next) {
-                    if (n >= move_cap) break;
-                    int oi = p->obj;
-                    check->move_obj_index[n] = oi;
-                    check->move_obj_x[n] = objects.x[oi];
-                    check->move_obj_y[n] = objects.y[oi];
-                    n++;
+        int n = 0, kx = 0, ky = 0, prev = 0, scan = 0, tux = 0, tuy = 0;
+        if (ck_hx && move_x_fmt != 0) memset(ck_hx, 0, sizeof(int) * ck_hx_slots);
+        if (ck_hy && move_y_fmt != 0) memset(ck_hy, 0, sizeof(int) * ck_hy_slots);
+        uint8_t *sp = check->move_idx_stream;
+        float *tblx = (float *)check->move_obj_x;
+        float *tbly = (float *)check->move_obj_y;
+        uint8_t  *ix8x  = check->move_obj_x ? (uint8_t  *)(check->move_obj_x + sizeof(float) * (size_t)move_x_u) : NULL;
+        uint16_t *ix16x = check->move_obj_x ? (uint16_t *)(check->move_obj_x + sizeof(float) * (size_t)move_x_u) : NULL;
+        uint8_t  *ix8y  = check->move_obj_y ? (uint8_t  *)(check->move_obj_y + sizeof(float) * (size_t)move_y_u) : NULL;
+        uint16_t *ix16y = check->move_obj_y ? (uint16_t *)(check->move_obj_y + sizeof(float) * (size_t)move_y_u) : NULL;
+        for (int e = 0; e < move_cap; e++) {
+            int i;
+            if (mv_list) {
+                i = mv_list[e];
+            } else {
+                do { i = scan++; } while (i < objects.count &&
+                        !(ck_float_bits(objects.x[i]) ^ ck_float_bits(objects.original_x[i])) &&
+                        !(ck_float_bits(objects.y[i]) ^ ck_float_bits(objects.original_y[i])));
+            }
+            unsigned int bx = ck_float_bits(objects.x[i]) ^ ck_float_bits(objects.original_x[i]);
+            unsigned int by = ck_float_bits(objects.y[i]) ^ ck_float_bits(objects.original_y[i]);
+            unsigned int gap = (unsigned int)(n ? (i - prev) : i);
+            unsigned int flags = (bx ? 2u : 0u) | (by ? 1u : 0u);
+            sp = ck_varint_put(sp, (gap << 2) | flags);
+            prev = i;
+            if (bx) {
+                float v = objects.x[i];
+                if (move_x_fmt == 0) {
+                    tblx[kx] = v;
+                } else {
+                    int ix = ck_dedup_put_h(ck_hx, ck_hx_slots - 1u, tblx, &tux, v);
+                    if (move_x_fmt == 1) ix8x[kx] = (uint8_t)ix; else ix16x[kx] = (uint16_t)ix;
                 }
+                kx++;
             }
-            for (int i = 0; i < objects.count; i++) {
-                if (objects.x[i] == objects.original_x[i] && objects.y[i] == objects.original_y[i]) continue;
-                bool dup = false;
-                for (int k = 0; k < n; k++)
-                    if (check->move_obj_index[k] == i) { dup = true; break; }
-                if (dup) continue;
-                if (n >= move_cap) break;
-                check->move_obj_index[n] = i;
-                check->move_obj_x[n] = objects.x[i];
-                check->move_obj_y[n] = objects.y[i];
-                n++;
-            }
-            check->move_obj_count = n;
-        }
-    }
-
-    check->alpha_obj_count = 0;
-    check->alpha_obj_index = NULL;
-    check->alpha_obj_alpha = NULL;
-    int alpha_cap = 0;
-    for (int i = 0; i < alpha_trigger_count; i++)
-        if (alpha_trigger_buffer[i].active)
-            for (GroupNode *p = get_group(alpha_trigger_buffer[i].target_group); p; p = p->next)
-                alpha_cap++;
-    if (alpha_cap > 0) {
-        check->alpha_obj_index = malloc(sizeof(int) * alpha_cap);
-        check->alpha_obj_alpha = malloc(sizeof(float) * alpha_cap);
-        if (check->alpha_obj_index && check->alpha_obj_alpha) {
-            int n = 0;
-            for (int i = 0; i < alpha_trigger_count; i++) {
-                if (!alpha_trigger_buffer[i].active) continue;
-                for (GroupNode *p = get_group(alpha_trigger_buffer[i].target_group); p; p = p->next) {
-                    if (n >= alpha_cap) break;
-                    int oi = p->obj;
-                    check->alpha_obj_index[n] = oi;
-                    check->alpha_obj_alpha[n] = objects.alpha_trigger_opacity[oi];
-                    n++;
+            if (by) {
+                float v = objects.y[i];
+                if (move_y_fmt == 0) {
+                    tbly[ky] = v;
+                } else {
+                    int iy = ck_dedup_put_h(ck_hy, ck_hy_slots - 1u, tbly, &tuy, v);
+                    if (move_y_fmt == 1) ix8y[ky] = (uint8_t)iy; else ix16y[ky] = (uint16_t)iy;
                 }
+                ky++;
             }
-            check->alpha_obj_count = n;
+            n++;
         }
+        check->move_obj_count = n;
+        check->move_idx_bytes = (int)(sp - check->move_idx_stream);
+        check->move_cx = kx;
+        check->move_cy = ky;
     }
+    free(mv_list);
+    mv_list = NULL;
+    free(ck_hx);
+    ck_hx = NULL;
+    free(ck_hy);
+    ck_hy = NULL;
 
     check->fired_move_count = 0;
-    check->fired_move_index = NULL;
-    int fired_cap = 0;
-    for (int i = 0; i < objects.count; i++)
-        if (objects.id[i] == MOVE_TRIGGER && GET_ACTIVATED(i))
-            fired_cap++;
     if (fired_cap > 0) {
-        check->fired_move_index = malloc(sizeof(int) * fired_cap);
-        if (check->fired_move_index) {
-            int n = 0;
-            for (int i = 0; i < objects.count; i++) {
-                if (n >= fired_cap) break;
-                if (objects.id[i] == MOVE_TRIGGER && GET_ACTIVATED(i))
-                    check->fired_move_index[n++] = i;
-            }
-            check->fired_move_count = n;
+        int n = 0;
+        for (int i = 0; i < objects.count; i++) {
+            if (n >= fired_cap) break;
+            if (objects.id[i] == MOVE_TRIGGER && GET_ACTIVATED(i))
+                check->fired_move_index[n++] = i;
         }
+        check->fired_move_count = n;
+    }
+
+    check->toggle_group_count = 0;
+    if (toggle_cap > 0) {
+        int n = 0;
+        for (int g = 1; g < MAX_GROUPS && n < toggle_cap; g++) {
+            GroupNode *p = get_group(g);
+            if (p && p->toggled) check->toggle_group_id[n++] = g;
+        }
+        check->toggle_group_count = n;
+    }
+
+    check->alpha_group_count = 0;
+    if (alpha_group_cap > 0) {
+        int n = 0;
+        for (int g = 1; g < MAX_GROUPS && n < alpha_group_cap; g++) {
+            GroupNode *p = get_group(g);
+            if (p && p->alpha != 1.0f) {
+                check->alpha_group_id[n] = g;
+                check->alpha_group_alpha[n] = p->alpha;
+                n++;
+            }
+        }
+        check->alpha_group_count = n;
+    }
+
+    check->pulse_snap_count = 0;
+    if (pulse_cap > 0) {
+        int n = 0;
+        for (int i = 0; i < pulse_trigger_count && n < pulse_cap; i++) {
+            PulseTriggerBuffer *pb = &pulse_trigger_buffer[i];
+            if (!pb->active) continue;
+            check->pulse_snap[n].source_obj = pb->source_obj;
+            check->pulse_snap[n].time_run = pb->time_run;
+            check->pulse_snap[n].activation_order = pb->activation_order;
+            check->pulse_snap[n].started_fade_out = pb->started_fade_out;
+            n++;
+        }
+        check->pulse_snap_count = n;
     }
 
     set_checkpoint_timer(AUTO_CHECKPOINT_TIME);
@@ -397,8 +617,10 @@ void restore_checkpoint() {
 
     if (settingsState.practiceMusicSync) seek_mp3(check->song_offset);
     
+    int rec_used[MAX_CHECKPOINT_CHANNELS];
+    collect_used_channels(rec_used);
     for (int i = 0; i < check->channel_snapshot_count; i++) {
-        int idx = check->channel_indices[i];
+        int idx = rec_used[i];
         channels[idx] = check->channel_snapshot[i];
         col_trigger_buffer[idx] = check->trigger_snapshot[i];
     }
@@ -438,20 +660,58 @@ void restore_checkpoint() {
     for (int i = 0; i < spawn_trigger_count; i++)
         spawn_trigger_buffer[i].restored_from_checkpoint = spawn_trigger_buffer[i].active;
 
-    for (int i = 0; i < check->move_obj_count; i++) {
-        int oi = check->move_obj_index[i];
-        objects.x[oi] = check->move_obj_x[i];
-        objects.y[oi] = check->move_obj_y[i];
-        objects.last_x[oi] = check->move_obj_x[i];
-        objects.last_y[oi] = check->move_obj_y[i];
-        update_object_section(oi);
+    {
+        int kx = 0, ky = 0, oi = 0;
+        const uint8_t *sp = check->move_idx_stream;
+        const uint8_t *sp_end = sp + check->move_idx_bytes;
+        for (int i = 0; i < check->move_obj_count; i++) {
+            if (sp >= sp_end) break;
+            unsigned int v = ck_varint_get(&sp);
+            unsigned int gap = v >> 2;
+            unsigned int flags = v & 3u;
+            oi = (i == 0) ? (int)gap : (oi + (int)gap);
+            if (flags & 2u) {
+                float vx = ck_axis_get(check->move_obj_x, check->move_x_fmt, check->move_x_u, kx++);
+                objects.x[oi] = vx; objects.last_x[oi] = vx;
+            }
+            if (flags & 1u) {
+                float vy = ck_axis_get(check->move_obj_y, check->move_y_fmt, check->move_y_u, ky++);
+                objects.y[oi] = vy; objects.last_y[oi] = vy;
+            }
+            update_object_section(oi);
+        }
     }
-    for (int i = 0; i < check->alpha_obj_count; i++) {
-        objects.alpha_trigger_opacity[check->alpha_obj_index[i]] = check->alpha_obj_alpha[i];
+    for (int i = 0; i < check->alpha_group_count; i++) {
+        GroupNode *p = get_group(check->alpha_group_id[i]);
+        if (p) p->alpha = check->alpha_group_alpha[i];
+    }
+    for (int i = 0; i < check->alpha_group_count; i++) {
+        for (GroupNode *p = get_group(check->alpha_group_id[i]); p; p = p->next) {
+            objects.alpha_trigger_opacity[p->obj] = get_group_opacities(p->obj);
+        }
+    }
+
+    for (int i = 0; i < check->toggle_group_count; i++) {
+        GroupNode *p = get_group(check->toggle_group_id[i]);
+        if (!p) continue;
+        p->toggled = true;
+        for (; p; p = p->next) {
+            objects.flags[p->obj] |= FLAG_TOGGLED;
+        }
     }
 
     for (int i = 0; i < check->fired_move_count; i++) {
         SET_ACTIVATED(check->fired_move_index[i], true);
+    }
+
+    for (int i = 0; i < check->pulse_snap_count; i++) {
+        PulseTrigger *pt = get_pulse_trigger(check->pulse_snap[i].source_obj);
+        if (pt->pulse_target_type == PULSE_TARGET_CHANNEL)
+            channels[get_col_channel_index(pt->target_group)].num_pulses = 0;
+    }
+    for (int i = 0; i < check->pulse_snap_count; i++) {
+        PulseSnapshot *ps = &check->pulse_snap[i];
+        restore_pulse_trigger(ps->source_obj, ps->time_run, ps->activation_order, ps->started_fade_out);
     }
 
     update_attempt_text_pos();
@@ -461,14 +721,13 @@ void restore_checkpoint() {
 
 void delete_last_checkpoint() {
     if (checkpoint_count > 0) {
+        free_checkpoint_snapshot(&checkpoints[checkpoint_pointer]);
         checkpoint_count--;
 
         // Wrap around pointer
         if (checkpoint_pointer-- == 0) {
             checkpoint_pointer = MAX_CHECKPOINTS - 1;
         }
-
-        free_checkpoint_snapshot(&checkpoints[checkpoint_pointer]);
     }
 }
 

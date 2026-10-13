@@ -119,6 +119,13 @@ void free_trigger_buffers() {
     free(alpha_trigger_buffer);
     free(move_trigger_buffer);
     free(spawn_trigger_buffer);
+
+    if (pulse_trigger_buffer) {
+        for (int i = 0; i < pulse_trigger_count; i++) {
+            if (pulse_trigger_buffer[i].main_pulse_index) { free(pulse_trigger_buffer[i].main_pulse_index); pulse_trigger_buffer[i].main_pulse_index = NULL; }
+            if (pulse_trigger_buffer[i].detail_pulse_index) { free(pulse_trigger_buffer[i].detail_pulse_index); pulse_trigger_buffer[i].detail_pulse_index = NULL; }
+        }
+    }
     free(pulse_trigger_buffer);
 
     alpha_trigger_buffer = NULL;
@@ -483,6 +490,16 @@ void upload_to_alpha_buffer(int obj) {
         }
     }
 
+    for (int i = 0; i < alpha_trigger_count; i++) {
+        if (alpha_trigger_buffer[i].active &&
+            alpha_trigger_buffer[i].target_group == target_group &&
+            alpha_trigger_buffer[i].source_obj == obj &&
+            alpha_trigger_buffer[i].restored_from_checkpoint) {
+            alpha_trigger_buffer[i].restored_from_checkpoint = false;
+            return;
+        }
+    }
+
     AlphaTriggerBuffer *buffer;
 
     if (slot >= 0) {
@@ -492,11 +509,8 @@ void upload_to_alpha_buffer(int obj) {
     }
     if (!buffer) return;
 
-    //if (buffer->restored_from_checkpoint) {
-    //    buffer->restored_from_checkpoint = false;
-    //    return;
-    //}
     buffer->target_group = target_group;
+    buffer->source_obj = obj;
     buffer->new_alpha = trigger->trigger_opacity;
     buffer->old_alpha = p->alpha;
     buffer->seconds = trigger->trig_duration;
@@ -917,14 +931,8 @@ void handle_spawn_triggers(void) {
     }
 }
 
-
-void upload_to_pulse_buffer(int obj) {
-    PulseTrigger *trigger = get_pulse_trigger(obj);
+static void pulse_register(PulseTriggerBuffer *buffer, PulseTrigger *trigger) {
     int channel = trigger->target_group;
-    if (channel == 0) return;
-
-    PulseTriggerBuffer *buffer = get_new_pulse_trigger();
-    if (!buffer) return;
 
     buffer->target_group = trigger->target_group;
 
@@ -944,8 +952,6 @@ void upload_to_pulse_buffer(int obj) {
 
     buffer->pulse_mode = trigger->pulse_mode;
     buffer->pulse_target_type = trigger->pulse_target_type;
-
-    buffer->started_fade_out = false;
 
     buffer->target_color_id = channel;
 
@@ -981,9 +987,52 @@ void upload_to_pulse_buffer(int obj) {
         }
     }
 
-    buffer->time_run = 0;
     buffer->seconds = trigger->pulse_fade_in + trigger->pulse_hold + trigger->pulse_fade_out;
+}
+
+
+void upload_to_pulse_buffer(int obj) {
+    PulseTrigger *trigger = get_pulse_trigger(obj);
+    int channel = trigger->target_group;
+    if (channel == 0) return;
+
+    for (int i = 0; i < pulse_trigger_count; i++) {
+        if (pulse_trigger_buffer[i].active &&
+            pulse_trigger_buffer[i].source_obj == obj &&
+            pulse_trigger_buffer[i].restored_from_checkpoint) {
+            pulse_trigger_buffer[i].restored_from_checkpoint = false;
+            return;
+        }
+    }
+
+    PulseTriggerBuffer *buffer = get_new_pulse_trigger();
+    if (!buffer) return;
+
+    pulse_register(buffer, trigger);
+
+    buffer->source_obj = obj;
+    buffer->started_fade_out = false;
+    buffer->time_run = 0;
     buffer->activation_order = pulse_activation_counter++;
+    buffer->active = true;
+}
+
+void restore_pulse_trigger(int obj, float time_run, unsigned int activation_order, bool started_fade_out) {
+    PulseTrigger *trigger = get_pulse_trigger(obj);
+    if (trigger->target_group == 0) return;
+
+    PulseTriggerBuffer *buffer = get_new_pulse_trigger();
+    if (!buffer) return;
+
+    pulse_register(buffer, trigger);
+
+    if (activation_order >= pulse_activation_counter) pulse_activation_counter = activation_order + 1;
+
+    buffer->source_obj = obj;
+    buffer->restored_from_checkpoint = true;
+    buffer->started_fade_out = started_fade_out;
+    buffer->time_run = time_run;
+    buffer->activation_order = activation_order;
     buffer->active = true;
 }
 

@@ -1104,7 +1104,7 @@ void game_loop() {
         if (!game_paused) {
             frame_counter++;
             frame_timer += delta;
-            g_trigger_dt = delta;
+            g_trigger_dt = (steps > 0) ? (float)steps * STEPS_DT_UNMOD : delta;
 
             if (state.dead && state.death_timer <= 0.f) {
                 state.death_timer = (settingsState.quickRetry ? 0.5f : 1.f);

@@ -67,6 +67,7 @@ typedef struct {
     bool active;
     bool restored_from_checkpoint;
     int target_group;
+    int source_obj;
     float old_alpha;
     float new_alpha;
     float seconds;
@@ -125,9 +126,13 @@ typedef struct {
     float seconds;
     float time_run;
     unsigned int activation_order;
+
+    int source_obj;
+    bool restored_from_checkpoint;
 } PulseTriggerBuffer;
 
 void free_trigger_buffers();
+void restore_pulse_trigger(int obj, float time_run, unsigned int activation_order, bool started_fade_out);
 
 extern ColorChannel channels[COL_CHANNEL_NUM];
 extern ColTriggerBuffer col_trigger_buffer[COL_CHANNEL_NUM];
