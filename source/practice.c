@@ -775,6 +775,7 @@ void handle_auto_checkpoints(float delta) {
         switch (state.player.gamemode) {
             case GAMEMODE_PLAYER:
             case GAMEMODE_BALL:
+            case GAMEMODE_ROBOT:
                 if (state.player.landed_from_jump) {
                     new_checkpoint();
                 }
