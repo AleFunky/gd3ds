@@ -156,9 +156,12 @@ void cube_gamemode(Player *player) {
 
     player->gravity = cube_accelerations[state.speed];
 
+    player->min_vel = -810;
+    player->max_vel = 1080;
+
     // Limit player speed (there is a upwards cap interestingly)
-    if (player->vel_y < -810) player->vel_y = -810;
-    if (player->vel_y > 1080) player->vel_y = 1080;
+    if (player->vel_y < player->min_vel) player->vel_y = player->min_vel;
+    if (player->vel_y > player->max_vel) player->vel_y = player->max_vel;
 
     // If player fell above the level, die
     if (player->y > 2794.f) kill_player(DEATH_FELL_OFF_LEVEL);
@@ -352,8 +355,6 @@ void ship_gamemode(Player *player) {
     drag_particles_2[state.current_player].gravityFlipped = !player->upside_down;
     drag_particles_2[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
 
-
-
     if (state.dual) {
         // Make both dual players symmetric by using inverted ship gravity
         if (curr_input.holdJump) {
@@ -383,13 +384,13 @@ void ship_gamemode(Player *player) {
         }
     }
     
-    float min = player->mini ? -406.566f : -345.6f;
-    float max = player->mini ? 508.248f : 432.0f;
+    player->min_vel = player->mini ? -406.566f : -345.6f;
+    player->max_vel = player->mini ? 508.248f : 432.0f;
 
-    if (player->gravity < 0 && player->vel_y < min) {
-        player->vel_y = min;
-    } else if (player->gravity > 0 && player->vel_y > max) {
-        player->vel_y = max;
+    if (player->gravity < 0 && player->vel_y < player->min_vel) {
+        player->vel_y = player->min_vel;
+    } else if (player->gravity > 0 && player->vel_y > player->max_vel) {
+        player->vel_y = player->max_vel;
     }
 }
 
@@ -447,10 +448,13 @@ void ball_gamemode(Player *player) {
     
     player->rotation += player->ball_rotation_speed * get_ball_rotation_speed(player) * mult * STEPS_DT;
 
-    if (player->vel_y < -810) {
-        player->vel_y = -810;
-    } else if (player->vel_y > 810) {
-        player->vel_y = 810;
+    player->min_vel = -810;
+    player->max_vel = 810;
+
+    if (player->vel_y < player->min_vel) {
+        player->vel_y = player->min_vel;
+    } else if (player->vel_y > player->max_vel) {
+        player->vel_y = player->max_vel;
     }
 }
 
@@ -531,13 +535,13 @@ void ufo_gamemode(Player *player) {
     burst_particles[state.current_player].gravityFlipped = player->upside_down;
     burst_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
 
-    float min = player->mini ? -406.566f : -345.6f;
-    float max = player->mini ? 508.248f : 432.0f;
+    player->min_vel = player->mini ? -406.566f : -345.6f;
+    player->max_vel = player->mini ? 508.248f : 432.0f;
 
-    if (player->vel_y < min) {
-        player->vel_y = min;
-    } else if (player->vel_y > max) {
-        player->vel_y = max;
+    if (player->vel_y < player->min_vel) {
+        player->vel_y = player->min_vel;
+    } else if (player->vel_y > player->max_vel) {
+        player->vel_y = player->max_vel;
     }
 }
 
@@ -578,7 +582,11 @@ void robot_gamemode(Player *player) {
     trail->positionR = (Vec2D){player->x, player->y};
     trail->startingPositionInitialized = true;
 
-    if (player->vel_y < -810) player->vel_y = -810;
+    player->min_vel = -810;
+    player->max_vel = 1080;
+
+    if (player->vel_y < player->min_vel) player->vel_y = player->min_vel;
+    if (player->vel_y > player->max_vel) player->vel_y = player->max_vel;
 
     if (player->y > 2794.f) kill_player(DEATH_FELL_OFF_LEVEL);
 

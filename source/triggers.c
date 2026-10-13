@@ -772,20 +772,22 @@ void handle_move_triggers(void) {
                 if (!game_object->hitbox || game_object->hitbox->type != HITBOX_SOLID) continue;
 
                 if (buffer->seconds <= 0.f) {
-                    float launch_vel = 0.f;
+                    float launch_vel_p1 = 0.f;
+                    float launch_vel_p2 = 0.f;
 
                     if (g_trigger_dt != 0.f) {
-                        launch_vel = fminf(fabsf(delta_y) / STEPS_DT_UNMOD, LAUNCH_CAP);
+                        launch_vel_p1 = fminf(fabsf(delta_y) / STEPS_DT_UNMOD, state.player.max_vel);
+                        launch_vel_p2 = fminf(fabsf(delta_y) / STEPS_DT_UNMOD, state.player2.max_vel);
                     }
 
                     if (!player1_gravity_changed && state.player.collided_block == group_obj && player1_grav_delta > 0.f) {
                         state.player.y += delta_y;
-                        state.player.vel_y = launch_vel;
+                        state.player.vel_y = launch_vel_p1;
                     }
 
                     if (state.dual && !player2_gravity_changed && state.player2.collided_block == group_obj && player2_grav_delta > 0.f) {
                         state.player2.y += delta_y;
-                        state.player2.vel_y = launch_vel;
+                        state.player2.vel_y = launch_vel_p2;
                     }
                 }
                 // Downwards movement
