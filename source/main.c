@@ -980,6 +980,14 @@ void game_loop() {
         u64 frame_window_start = lastTime;
         lastTime = now;
 
+        if (!game_paused) {
+            u64 start_trig = svcGetSystemTick();
+            handle_triggers();
+            u64 end_trig = svcGetSystemTick();
+            u64 ticks_trig = end_trig - start_trig;
+            snapshot.triggers_ms = ticks_trig / CPU_TICKS_PER_MSEC;
+        }
+
         if (state.death_timer <= 0)  {
             float physics_delta = delta;
             snapshot.physics_ms = 0;
@@ -1201,6 +1209,7 @@ void game_loop() {
                     fixed_dt = true;
                     state.dead = false;
                     state.hitbox_display = 0;
+                    continue;
                 }
             }
 
@@ -1227,7 +1236,6 @@ void game_loop() {
             }
 
             u64 start_trig = svcGetSystemTick();
-            handle_triggers();
             handle_spawn_triggers();
             handle_col_triggers();
             handle_copy_channels();
@@ -1237,7 +1245,7 @@ void game_loop() {
             calculate_lbg();
             u64 end_trig = svcGetSystemTick();
             u64 ticks_trig = end_trig - start_trig;
-            snapshot.triggers_ms = ticks_trig / CPU_TICKS_PER_MSEC;
+            snapshot.triggers_ms += ticks_trig / CPU_TICKS_PER_MSEC;
 
             u64 start_obj = svcGetSystemTick();
             create_objects();
