@@ -357,13 +357,13 @@ static void populate_level_info(int level_id) {
     ui_label_set_text(level_id_label, lvlid);
 
     // Creator
-    char creator[36] = "By -";
+    char creator[36] = "-";
     snprintf(creator, sizeof(creator), "<#%s>By %s</>", (entry_c->userId == 0) ? "5AFFFF" : "FFFFFF", entry_c->creatorName );
     ui_label_set_text(level_creator_label, creator);
 
     // Song and song artist
     char *song_name = "Unknown";
-    char *song_artist_name = "By Unknown";
+    char *song_artist_name = "Unknown";
 
     if (entry_srch->songId != 0) {
         // Custom song

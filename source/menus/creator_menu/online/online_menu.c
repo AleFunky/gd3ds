@@ -189,7 +189,7 @@ static void populate_list() {
         strncpy(tmp_name, entry->name, sizeof(tmp_name) - 1);
         
         // Get creator name
-        char *creator_name = "By -";
+        char *creator_name = "-";
 
         if (entry->creatorIndex < creatorEntriesLength) {
             creator_name = creator_entries[entry->creatorIndex].creatorName;

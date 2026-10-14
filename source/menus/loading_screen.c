@@ -26,7 +26,7 @@ char *splash_texts[] = {
     "Also try Geometry Dash Advance!",
     "I want the fart gamemode",
     "2.1 when",
-    "Look ma! no move triggers! Wait...",
+    "Look ma! no rotate triggers!",
     "99% accuracy!",
     "Six Seven!",
     "AAAAAAAAAAAAAAAAAAA",
