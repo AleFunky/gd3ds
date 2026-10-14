@@ -1731,6 +1731,11 @@ int main(int argc, char* argv[]) {
                 break;
         }
     }
+    
+    // Wait for the game to save
+    while (is_saving()) {
+        gspWaitForVBlank();
+    }
 
     ui_stack_set_stack(&menu_stack);
     ui_stack_clear();
