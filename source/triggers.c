@@ -1140,7 +1140,7 @@ void handle_pulse_triggers(void) {
             if (obj_idx < 0 || obj_idx >= objects.count) continue;
             if (both || buffer->main_only) {
                 Color target = buffer->color;
-                if (buffer->pulse_mode == PULSE_MODE_HSV) {
+                if (buffer->pulse_mode == PULSE_MODE_HSV && buffer->copied_color_id == 0) {
                     target = HSV_combine(objects.main_color[obj_idx], buffer->copied_hsv);
                 }
 
@@ -1153,7 +1153,7 @@ void handle_pulse_triggers(void) {
             }
             if (both || buffer->detail_only) {
                 Color target = buffer->color;
-                if (buffer->pulse_mode == PULSE_MODE_HSV) {
+                if (buffer->pulse_mode == PULSE_MODE_HSV && buffer->copied_color_id == 0) {
                     target = HSV_combine(objects.detail_color[obj_idx], buffer->copied_hsv);
                 }
                 if (objects.detail_col_HSV_enabled[obj_idx]) target = HSV_combine(target, objects.detail_col_HSV[obj_idx]);
