@@ -111,9 +111,11 @@ static void set_icon_index(UIElement *e) {
         ui_icon_set_gamemode_index((UIIcon *) e, gamemode_page, new_index);
 
         if (gamemode_page == GAMEMODE_SHIP || gamemode_page == GAMEMODE_UFO) {
-            ui_element_set_scale(e, 0.6f);
+            ui_element_set_scale(e, .7f);
+        } else if (gamemode_page == GAMEMODE_WAVE) {
+            ui_element_set_scale(e, .95f);
         } else {
-            ui_element_set_scale(e, 0.7f);
+            ui_element_set_scale(e, .8f);
         }
 
         icon_counter++;
