@@ -1100,17 +1100,6 @@ void handle_pulse_triggers(void) {
         if (!b->active || b->pulse_target_type != PULSE_TARGET_GROUP) continue;
         group_order[group_order_count++] = i;
     }
-    // insertion sort by activation_order ascending
-    for (int a = 1; a < group_order_count; a++) {
-        int key = group_order[a];
-        unsigned int key_order = pulse_trigger_buffer[key].activation_order;
-        int b = a - 1;
-        while (b >= 0 && pulse_trigger_buffer[group_order[b]].activation_order > key_order) {
-            group_order[b + 1] = group_order[b];
-            b--;
-        }
-        group_order[b + 1] = key;
-    }
 
     for (int gi = 0; gi < group_order_count; gi++) {
         PulseTriggerBuffer *buffer = &pulse_trigger_buffer[group_order[gi]];
@@ -1151,6 +1140,10 @@ void handle_pulse_triggers(void) {
             if (obj_idx < 0 || obj_idx >= objects.count) continue;
             if (both || buffer->main_only) {
                 Color target = buffer->color;
+                if (buffer->pulse_mode == PULSE_MODE_HSV) {
+                    target = HSV_combine(objects.main_color[obj_idx], buffer->copied_hsv);
+                }
+
                 if (objects.main_col_HSV_enabled[obj_idx]) target = HSV_combine(target, objects.main_col_HSV[obj_idx]);
                 Color base = objects.main_color[obj_idx];
                 objects.main_color[obj_idx].r = (unsigned char)(base.r + (target.r - base.r) * alpha);
@@ -1160,6 +1153,9 @@ void handle_pulse_triggers(void) {
             }
             if (both || buffer->detail_only) {
                 Color target = buffer->color;
+                if (buffer->pulse_mode == PULSE_MODE_HSV) {
+                    target = HSV_combine(objects.detail_color[obj_idx], buffer->copied_hsv);
+                }
                 if (objects.detail_col_HSV_enabled[obj_idx]) target = HSV_combine(target, objects.detail_col_HSV[obj_idx]);
                 Color base = objects.detail_color[obj_idx];
                 objects.detail_color[obj_idx].r = (unsigned char)(base.r + (target.r - base.r) * alpha);
