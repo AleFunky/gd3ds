@@ -1586,7 +1586,7 @@ void collide_with_slope(Player *player, int obj, bool has_slope) {
 
     if (intersect_exclusive(
         player->x, player->y, player->width, player->height, 0, 
-        get_lerped_x(obj), get_lerped_y(obj), width, height, objects.rotation[obj]
+        get_lerped_x(obj), get_lerped_y(obj), width, height, 0
     )) {
         slope_collide(obj, player);
     }
