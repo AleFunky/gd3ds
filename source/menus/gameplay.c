@@ -300,7 +300,7 @@ void gameplay_init(UIScreen *s) {
     coins_full[2] = (UIImage *) ui_get_element_by_tag(s, "coin_3_full");
     
     if (state.custom_level) {
-        bool unrated = level_is_unrated_online();
+        bool unrated = level_has_unverified_coins();
         UIImage *coin_slots[3] = { coin_1, coin_2, coin_3 };
         for (int i = 0; i < 3; i++) {
             ui_image_set_image(coin_slots[i], COIN_BIG_USER_ID, 0);
@@ -361,7 +361,7 @@ void gameplay_update(UIScreen *s, UIInput *touch) {
 
             coins_full[i]->base.enabled = true;
             ui_element_set_scale((UIElement *) coins_full[i], scale);
-            ui_image_set_tint(coins_full[i], level_is_unrated_online()
+            ui_image_set_tint(coins_full[i], level_has_unverified_coins()
                 ? C2D_Color32(USER_COIN_UNRATED_R, USER_COIN_UNRATED_G, USER_COIN_UNRATED_B, (u8)(opacity * 255.f))
                 : C2D_Color32f(1, 1, 1, opacity));
 
@@ -372,8 +372,8 @@ void gameplay_update(UIScreen *s, UIInput *touch) {
                             (UIUseEffect *) ui_get_element_by_tag(s, "coin_circle"), 
                         coins_full[i]->base.x, coins_full[i]->base.y, &end_wall_firework_circle),
                     1.f,
-                    level_is_unrated_online() ? USER_COIN_UNRATED_G / 255.f : (state.custom_level ? 1.f : 0.75f),
-                    level_is_unrated_online() ? USER_COIN_UNRATED_B / 255.f : (state.custom_level ? 1.f : 0.f));
+                    level_has_unverified_coins() ? USER_COIN_UNRATED_G / 255.f : (state.custom_level ? 1.f : 0.75f),
+                    level_has_unverified_coins() ? USER_COIN_UNRATED_B / 255.f : (state.custom_level ? 1.f : 0.f));
                     
                     coins_circles_spawned[i] = true;
                 }

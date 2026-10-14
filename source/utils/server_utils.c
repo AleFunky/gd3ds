@@ -234,6 +234,10 @@ static void fill_level_entries(char **levelsStrings, int songStringCount, int cr
                         search_entries[i].coins = coins;
                     }
                     break;
+                case 38: 
+                    // verified coins
+                    search_entries[i].verifiedCoins = parse_bool(valStr);
+                    break;
                 case 39:
                     // stars requested
                     search_entries[i].reqStars = atoi(valStr);
@@ -396,6 +400,11 @@ static void fill_level_entry(char **levelStrings, int levelStringsCount, bool fi
                 if (coins > 3) coins = 3;
                 current_search_entry->coins = coins;
             }
+            break;
+        case 38:
+            // verified coins
+            if (fillSearchEntry)
+                current_search_entry->verifiedCoins = parse_bool(valStr);
             break;
         case 39:
             // stars requested

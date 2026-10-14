@@ -1641,7 +1641,7 @@ void update_tints() {
                     col.blending = true;
                     break;
                 case COLOR_TYPE_WHITE:
-                    if (level_is_unrated_online() && objects.id[game_object] == SECRET_COIN) {
+                    if (level_has_unverified_coins() && objects.id[game_object] == SECRET_COIN) {
                         col.color = (Color) {USER_COIN_UNRATED_R, USER_COIN_UNRATED_G, USER_COIN_UNRATED_B};
                     } else {
                         col.color = (Color) {255,255,255};

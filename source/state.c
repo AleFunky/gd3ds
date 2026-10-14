@@ -24,9 +24,10 @@
 GameState state;
 
 bool level_unrated_online = false;
+bool level_verified_coins = false;
 
-bool level_is_unrated_online(void) {
-    return level_unrated_online;
+bool level_has_unverified_coins(void) {
+    return level_unrated_online || !level_verified_coins;
 }
 
 void level_unrated_online_refresh(void) {
@@ -34,6 +35,7 @@ void level_unrated_online_refresh(void) {
         && current_level_entry
         && !level_has_rate(&current_level_entry->data);
 }
+
 
 u32 user_coin_icon_tint(bool collected, bool has_rate) {
     if (collected) return has_rate ? C2D_Color32(255, 255, 255, 255) : USER_COIN_UNRATED_TINT;

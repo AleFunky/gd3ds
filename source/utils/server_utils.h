@@ -26,6 +26,7 @@ typedef struct SearchEntry {
     bool isTwoPlayer;
     bool isDemon;
     bool isAuto;
+    bool verifiedCoins;
     int creatorIndex;
     int songIndex;
 } SearchEntry;

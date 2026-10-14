@@ -80,7 +80,7 @@ void draw_collect_effect() {
             C2D_Sprite spr = { 0 };
             C2D_ImageTint tint = { 0 };
 
-            u32 tint_color = level_is_unrated_online()
+            u32 tint_color = level_has_unverified_coins()
                 ? C2D_Color32(USER_COIN_UNRATED_R, USER_COIN_UNRATED_G, USER_COIN_UNRATED_B, (u8)(data->opacity * 255.f))
                 : C2D_Color32f(1, 1, 1, data->opacity);
             C2D_PlainImageTint(&tint, tint_color, 1.f);

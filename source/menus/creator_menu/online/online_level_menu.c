@@ -491,8 +491,9 @@ static void populate_level_info(int level_id) {
     if (coin_count < 0) coin_count = 0;
     if (coin_count > 3) coin_count = 3;
     bool coins_visible = user_coins_counter_visible();
-    bool has_rate = entry_srch->stars > 0;
-    float coin_row_y = has_rate ? USER_COIN_ROW_Y_RATED : USER_COIN_ROW_Y_UNRATED;
+    bool has_verified_coins = entry_srch->stars > 0 && entry_srch->verifiedCoins;
+    level_verified_coins = entry_srch->verifiedCoins;
+    float coin_row_y = entry_srch->stars > 0 ? USER_COIN_ROW_Y_RATED : USER_COIN_ROW_Y_UNRATED;
     for (int i = 0; i < 3; i++) {
         UIImage *slot = usercoin_slots[i];
         if (!slot) continue;
@@ -503,7 +504,7 @@ static void populate_level_info(int level_id) {
                  i == 1 ? current_level_entry->data.coin2 :
                           current_level_entry->data.coin3);
             ui_element_set_position((UIElement *) slot, coin_x, coin_row_y);
-            ui_image_set_tint(slot, user_coin_icon_tint(collected, has_rate));
+            ui_image_set_tint(slot, user_coin_icon_tint(collected, has_verified_coins));
             slot->base.enabled = true;
         } else {
             slot->base.enabled = false;

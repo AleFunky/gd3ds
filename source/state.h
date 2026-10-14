@@ -20,7 +20,8 @@
 #define USER_COIN_UNRATED_EMPTY_TINT C2D_Color32(USER_COIN_UNRATED_EMPTY_R, USER_COIN_UNRATED_EMPTY_G, USER_COIN_UNRATED_EMPTY_B, 255)
 
 extern bool level_unrated_online;
-bool level_is_unrated_online(void);
+extern bool level_verified_coins;
+bool level_has_unverified_coins(void);
 void level_unrated_online_refresh(void);
 
 u32 user_coin_icon_tint(bool collected, bool has_rate);

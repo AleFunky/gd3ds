@@ -183,8 +183,8 @@ static void spawn_reward_firework(UIImage* e){
             (UIUseEffect *) ui_get_element_by_tag(&screen_top, "rewardCircle"),
         x, y, &death_effect),
     1.f,
-    level_is_unrated_online() ? USER_COIN_UNRATED_G / 255.f : (state.custom_level ? 1.f : 0.75f),
-    level_is_unrated_online() ? USER_COIN_UNRATED_B / 255.f : (state.custom_level ? 1.f : 0.f));
+    level_has_unverified_coins() ? USER_COIN_UNRATED_G / 255.f : (state.custom_level ? 1.f : 0.75f),
+    level_has_unverified_coins() ? USER_COIN_UNRATED_B / 255.f : (state.custom_level ? 1.f : 0.f));
 }
 
 // This plays the animation of the coins popping into place and the stars
@@ -223,7 +223,7 @@ static void run_rewards_animation(float delta){
 
         ui_element_set_scale((UIElement *) coin, scale_value * 0.88f);
 
-        ui_image_set_tint(coin, level_is_unrated_online()
+        ui_image_set_tint(coin, level_has_unverified_coins()
             ? C2D_Color32(USER_COIN_UNRATED_R, USER_COIN_UNRATED_G, USER_COIN_UNRATED_B, (u8)(opacity_value * 255.f))
             : C2D_Color32f(1, 1, 1, opacity_value));
     } else{
@@ -383,7 +383,7 @@ void level_complete_init() {
     if (state.custom_level) {
         for (int i = 0; i < 3; i++) {
             ui_image_set_image(coins_full[i], SECRET_COIN_UI2_ID, 0);
-            if (level_is_unrated_online()) ui_image_set_tint(coins_full[i], USER_COIN_UNRATED_TINT);
+            if (level_has_unverified_coins()) ui_image_set_tint(coins_full[i], USER_COIN_UNRATED_TINT);
         }
     }
 
@@ -394,7 +394,7 @@ void level_complete_init() {
     particles[2] = (UIParticle *) ui_get_element_by_tag(&screen_top, "coinParticle3");
     particles[3] = (UIParticle *) ui_get_element_by_tag(&screen_top, "starParticle");
 
-    if (level_is_unrated_online()) {
+    if (level_has_unverified_coins()) {
         for (int i = 0; i < 3; i++) {
             particles[i]->particle.cfg.startColorRed    = USER_COIN_UNRATED_R / 255.f;
             particles[i]->particle.cfg.startColorGreen  = USER_COIN_UNRATED_G / 255.f;
@@ -431,7 +431,7 @@ void level_complete_init() {
                 if (k < coin_display_count && !saved) {
                     ui_image_set_image(coins_base[k], COIN_UNCOLLECTED_CUSTOM_ID, COIN_UNCOLLECTED_CUSTOM_SHEET);
                     ui_element_set_scale((UIElement *) coins_base[k], COIN_UNCOLLECTED_CUSTOM_SCALE);
-                    if (level_is_unrated_online()) ui_image_set_tint(coins_base[k], USER_COIN_UNRATED_TINT);
+                    if (level_has_unverified_coins()) ui_image_set_tint(coins_base[k], USER_COIN_UNRATED_TINT);
                     coins_base[k]->base.enabled = true;
                 } else {
                     coins_base[k]->base.enabled = false;
