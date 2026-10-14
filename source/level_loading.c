@@ -6,6 +6,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdio.h>
+#include "practice.h"
 #include "triggers.h"
 #include "main.h"
 #include "menus/creator_menu/online/online_menu.h"
@@ -2130,6 +2131,8 @@ void set_color_channels() {
 
     for (int i = 0; i < COL_CHANNEL_NUM; i++)
         channels[i].non_pulse_color = channels[i].color;
+
+    load_used_channels();
 }
 
 const char *bg_sheet_paths[] = {

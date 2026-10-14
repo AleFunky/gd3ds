@@ -20,6 +20,9 @@ extern int alpha_trigger_capacity;
 extern int move_trigger_capacity;
 extern int spawn_trigger_capacity;
 
+int used_count = 0;
+int channels_used[COL_CHANNEL_NUM];
+
 #define MAX_CHECKPOINTS 100
 #define CHECKPOINT_GFX_ID 6
 
@@ -123,44 +126,63 @@ static uint8_t *ck_varint_put(uint8_t *p, unsigned int v);
 static unsigned int ck_varint_get(const uint8_t **pp);
 static float ck_axis_get(const uint8_t *blob, int fmt, int u, int k);
 
-// max number of distinct channel indices a level can use: built-in special
-// channels + a generous cap for the level's own channels
-#define MAX_CHECKPOINT_CHANNELS (COL_CHANNEL_LAST + 256)
+static void add_used_channel(int *out, bool *seen, int *count, int channel) {
+    if (channel <= 0 || channel >= COL_CHANNEL_NUM) return;
+
+    int idx = get_col_channel_index(channel);
+    if (seen[idx]) return;
+    seen[idx] = true;
+    out[(*count)++] = idx;
+}
+
 
 // collects the array indices of every color channel that the level can touch
 // and returns how many unique indices were written to 'out'
 static int collect_used_channels(int *out) {
     int n = 0;
+    bool seen[COL_CHANNEL_NUM] = { false };
 
     // normal player channels
-    out[n++] = get_col_channel_index(NONE);
-    out[n++] = get_col_channel_index(COL_1);
-    out[n++] = get_col_channel_index(COL_2);
-    out[n++] = get_col_channel_index(COL_3);
-    out[n++] = get_col_channel_index(COL_4);
+    add_used_channel(out, seen, &n, NONE);
+    add_used_channel(out, seen, &n, COL_1);
+    add_used_channel(out, seen, &n, COL_2);
+    add_used_channel(out, seen, &n, COL_3);
+    add_used_channel(out, seen, &n, COL_4);
 
     // built-in special channels
     for (int id = CHANNEL_BG; id < COL_CHANNEL_LAST; id++) {
-        int idx = get_col_channel_index(id);
-        bool seen = false;
-        for (int i = 0; i < n; i++) {
-            if (out[i] == idx) { seen = true; break; }
-        }
-        if (!seen && idx < COL_CHANNEL_NUM) out[n++] = idx;
+        add_used_channel(out, seen, &n, id);
     }
 
     // channels declared in the level
-    for (int i = 0; i < channelCount && n < MAX_CHECKPOINT_CHANNELS; i++) {
-        int idx = get_col_channel_index(colorChannels[i].channelID);
-        if (idx < 0 || idx >= COL_CHANNEL_NUM) continue;
-        bool seen = false;
-        for (int j = 0; j < n; j++) {
-            if (out[j] == idx) { seen = true; break; }
+    for (int i = 0; i < channelCount && n < COL_CHANNEL_NUM; i++) {
+        add_used_channel(out, seen, &n, colorChannels[i].channelID);
+        add_used_channel(out, seen, &n, colorChannels[i].inheritedChannelID);
+    }
+
+    // check for objects
+    for (int i = 0; i < objects.count && n < COL_CHANNEL_NUM; i++) {
+        add_used_channel(out, seen, &n, objects.col_channel[i]);
+        add_used_channel(out, seen, &n, objects.detail_col_channel[i]);
+        add_used_channel(out, seen, &n, objects.v1p9_col_channel[i]);
+
+        if (is_color_trigger(objects.id[i])) {
+            ColorTrigger *trigger = get_color_trigger(i);
+            add_used_channel(out, seen, &n, trigger->target_color_id);
+            add_used_channel(out, seen, &n, trigger->copied_color_id);
+        } else if (objects.id[i] == PULSE_TRIGGER) {
+            PulseTrigger *trigger = get_pulse_trigger(i);
+            if (trigger->pulse_target_type == PULSE_TARGET_CHANNEL)
+                add_used_channel(out, seen, &n, trigger->target_group);
+            add_used_channel(out, seen, &n, trigger->copied_color_id);
         }
-        if (!seen) out[n++] = idx;
     }
 
     return n;
+}
+
+void load_used_channels() {
+    used_count = collect_used_channels(channels_used);
 }
 
 // frees the dynamic snapshot buffers of a checkpoint
@@ -277,9 +299,6 @@ void new_checkpoint() {
 
     // release the snapshot of the checkpoint we are about to overwrite
     free_checkpoint_snapshot(check);
-
-    int used[MAX_CHECKPOINT_CHANNELS];
-    int used_count = collect_used_channels(used);
 
     int move_cap = 0;
     int move_cx = 0;
@@ -444,7 +463,7 @@ void new_checkpoint() {
 
     // snapshot only the channels used by this level
     for (int i = 0; i < used_count; i++) {
-        int idx = used[i];
+        int idx = channels_used[i];
         check->channel_snapshot[i] = channels[idx];
         check->trigger_snapshot[i] = col_trigger_buffer[idx];
     }
@@ -617,10 +636,8 @@ void restore_checkpoint() {
 
     if (settingsState.practiceMusicSync) seek_mp3(check->song_offset);
     
-    int rec_used[MAX_CHECKPOINT_CHANNELS];
-    collect_used_channels(rec_used);
     for (int i = 0; i < check->channel_snapshot_count; i++) {
-        int idx = rec_used[i];
+        int idx = channels_used[i];
         channels[idx] = check->channel_snapshot[i];
         col_trigger_buffer[idx] = check->trigger_snapshot[i];
     }

@@ -23,3 +23,5 @@ void clear_practice_mode();
 
 void handle_auto_checkpoints(float delta);
 void set_checkpoint_timer(float timer);
+
+void load_used_channels();
