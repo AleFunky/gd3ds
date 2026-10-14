@@ -199,14 +199,14 @@ void trySnap(int block, Player *player) {
     int snap_block = player->snap_data.object_id;
 
     if (snap_block >= 0) {
-        diff.x = get_lerped_x(block) - get_lerped_x(snap_block);
-        diff.y = get_lerped_y(block) - get_lerped_y(snap_block);
+        diff.x = objects.x[block] - objects.x[snap_block];
+        diff.y = objects.y[block] - objects.y[snap_block];
         diff.y = grav(player, diff.y);
         float threshold = snap_player(diff, player);
         if (threshold > 0) {
             // Snap the player up to threshold
             player->x = clampf(
-                get_lerped_x(block) + player->snap_data.player_snap_diff,
+                objects.x[block] + player->snap_data.player_snap_diff,
                 player->x - threshold,
                 player->x + threshold
             );
@@ -1354,8 +1354,8 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
         case HITBOX_SOLID: 
             bool gravSnap = false;
 
-            float x = get_lerped_x(obj);
-            float y = get_lerped_y(obj);
+            float x = objects.x[obj];
+            float y = objects.y[obj];
 
             // This is equal to using the old player y position (a frame of snap leeway)
             clip += fabsf(player->vel_y) * STEPS_DT;
@@ -1528,7 +1528,7 @@ void collide_with_obj(Player *player, int obj) {
     float off_y = raw_off_x * sin_r + raw_off_y * cos_r;
     
     float x = objects.x[obj] + off_x;
-    float y = get_lerped_y(obj) + off_y;
+    float y = objects.y[obj] + off_y;
     float width = objects.width[obj];
     float height = objects.height[obj];
 
@@ -1586,7 +1586,7 @@ void collide_with_slope(Player *player, int obj, bool has_slope) {
 
     if (intersect_exclusive(
         player->x, player->y, player->width, player->height, 0, 
-        get_lerped_x(obj), get_lerped_y(obj), width, height, 0
+        objects.x[obj], objects.y[obj], width, height, 0
     )) {
         slope_collide(obj, player);
     }

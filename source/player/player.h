@@ -243,20 +243,17 @@ inline float gravInternalTop(Player *player) { return player->upside_down ? -get
 
 inline float grav(Player *player, float val) { return player->upside_down ? -val : val; }
 
-float get_lerped_x(int object);
-float get_lerped_y(int object);
-
 inline float obj_getTop(int object)  { 
-    return get_lerped_y(object) + objects.height[object] / 2; 
+    return objects.y[object] + objects.height[object] / 2; 
 }
 inline float obj_getBottom(int object)  { 
-    return get_lerped_y(object) - objects.height[object] / 2; 
+    return objects.y[object] - objects.height[object] / 2; 
 }
 inline float obj_getRight(int object)  {  
-    return get_lerped_x(object) + objects.width[object] / 2; 
+    return objects.x[object] + objects.width[object] / 2; 
 }
 inline float obj_getLeft(int object)  { 
-    return get_lerped_x(object) - objects.width[object] / 2; 
+    return objects.x[object] - objects.width[object] / 2; 
 }
 inline float obj_gravBottom(Player *player, int object) { return player->upside_down ? -obj_getTop(object) : obj_getBottom(object); }
 inline float obj_gravTop(Player *player, int object) { return player->upside_down ? -obj_getBottom(object) : obj_getTop(object); }
