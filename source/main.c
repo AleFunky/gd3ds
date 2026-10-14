@@ -200,6 +200,22 @@ void no_dsp_firmware(void) {
     exit(22);
 }
 
+static aptHookCookie cookie = {0};
+
+static void aptCallback(APT_HookType hook, void *param) {
+    (void)param;
+
+    switch (hook) {
+        case APTHOOK_ONSUSPEND: // Home button
+        case APTHOOK_ONSLEEP: // Lid closed
+            pause_game();
+            break;
+
+        default:
+            break;
+    }
+}
+
 static FILE *log_file = NULL;
 
 static void ensure_log_file(void) {
@@ -878,6 +894,8 @@ void game_loop() {
     u64 start = svcGetSystemTick();
     bool old_wide = settingsState.wideEnabled;
     bool old_stereo = settingsState.stereoEnabled;
+    
+    aptHook(&cookie, aptCallback, NULL);
 
     // Main loop
     while (aptMainLoop()) {
@@ -1473,6 +1491,8 @@ void game_loop() {
             break;
         }
     }
+    
+    aptUnhook(&cookie);
 
     LevelData *level_data_sel = &current_level_entry->data;
 
