@@ -153,7 +153,7 @@ static void populate_list() {
             if (song_entry) {
                 song_name = song_entry->songTitle;
             }
-        } else if (entry->songIndex != -1) {
+        } else {
             if (entry->mainSongId >= 0 && entry->mainSongId < current_main_level_pack->count) {
                 song_name = (char *) current_main_level_pack->levels[entry->mainSongId].song_data.title;
             }
