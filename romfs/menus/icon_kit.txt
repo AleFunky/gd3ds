@@ -11,33 +11,33 @@ button x=215 y=65 id=329 tag="icon_buttons,dart" actions=action_page[page=4]
 button x=252 y=65 id=349 tag="icon_buttons,robot" actions=action_page[page=5]
 button x=289 y=65 id=355 tag="icon_buttons,trail" action=action_trail
 
-button x=30 y=145 id=6 action="icons_left" keyBinds="LEFT"
-button x=290 y=145 id=6 sx=-1 action="icons_right" keyBinds="RIGHT"
-window x=160 y=145 w=220 h=100 style=2 color=#00000040
+button x=20 y=145 id=6 action="icons_left" keyBinds="LEFT"
+button x=300 y=145 id=6 sx=-1 action="icons_right" keyBinds="RIGHT"
+window x=160 y=145 w=240 h=110 style=2 color=#00000040
 
-icon x=79  y=118 scale=0.7 action="icon_selected" tag="icon"
-icon x=106 y=118 scale=0.7 action="icon_selected" tag="icon"
-icon x=133 y=118 scale=0.7 action="icon_selected" tag="icon"
-icon x=160 y=118 scale=0.7 action="icon_selected" tag="icon"
-icon x=187 y=118 scale=0.7 action="icon_selected" tag="icon"
-icon x=214 y=118 scale=0.7 action="icon_selected" tag="icon"
-icon x=241 y=118 scale=0.7 action="icon_selected" tag="icon"
+icon x=67  y=113 scale=1 action="icon_selected" tag="icon"
+icon x=98  y=113 scale=1 action="icon_selected" tag="icon"
+icon x=129 y=113 scale=1 action="icon_selected" tag="icon"
+icon x=160 y=113 scale=1 action="icon_selected" tag="icon"
+icon x=191 y=113 scale=1 action="icon_selected" tag="icon"
+icon x=222 y=113 scale=1 action="icon_selected" tag="icon"
+icon x=253 y=113 scale=1 action="icon_selected" tag="icon"
 
-icon x=79  y=145 scale=0.7 action="icon_selected" tag="icon"
-icon x=106 y=145 scale=0.7 action="icon_selected" tag="icon"
-icon x=133 y=145 scale=0.7 action="icon_selected" tag="icon"
-icon x=160 y=145 scale=0.7 action="icon_selected" tag="icon"
-icon x=187 y=145 scale=0.7 action="icon_selected" tag="icon"
-icon x=214 y=145 scale=0.7 action="icon_selected" tag="icon"
-icon x=241 y=145 scale=0.7 action="icon_selected" tag="icon"
+icon x=67  y=145 scale=1 action="icon_selected" tag="icon"
+icon x=98  y=145 scale=1 action="icon_selected" tag="icon"
+icon x=129 y=145 scale=1 action="icon_selected" tag="icon"
+icon x=160 y=145 scale=1 action="icon_selected" tag="icon"
+icon x=191 y=145 scale=1 action="icon_selected" tag="icon"
+icon x=222 y=145 scale=1 action="icon_selected" tag="icon"
+icon x=253 y=145 scale=1 action="icon_selected" tag="icon"
 
-icon x=79  y=172 scale=0.7 action="icon_selected" tag="icon"
-icon x=106 y=172 scale=0.7 action="icon_selected" tag="icon"
-icon x=133 y=172 scale=0.7 action="icon_selected" tag="icon"
-icon x=160 y=172 scale=0.7 action="icon_selected" tag="icon"
-icon x=187 y=172 scale=0.7 action="icon_selected" tag="icon"
-icon x=214 y=172 scale=0.7 action="icon_selected" tag="icon"
-icon x=241 y=172 scale=0.7 action="icon_selected" tag="icon"
+icon x=67  y=177 scale=1 action="icon_selected" tag="icon"
+icon x=98  y=177 scale=1 action="icon_selected" tag="icon"
+icon x=129 y=177 scale=1 action="icon_selected" tag="icon"
+icon x=160 y=177 scale=1 action="icon_selected" tag="icon"
+icon x=191 y=177 scale=1 action="icon_selected" tag="icon"
+icon x=222 y=177 scale=1 action="icon_selected" tag="icon"
+icon x=253 y=177 scale=1 action="icon_selected" tag="icon"
 
 image x=36 y=205 id=178
 image x=284 y=205 id=178 sx=-1.0
