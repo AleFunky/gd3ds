@@ -434,6 +434,7 @@ void new_checkpoint() {
 
     check->p1 = state.player;
     check->p2 = state.player2;
+    
 
     check->camera_intended_y = state.camera_intended_y;
 

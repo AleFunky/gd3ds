@@ -1,5 +1,6 @@
 #include "player.h"
 #include "level_loading.h"
+#include "practice.h"
 #include "profiling.h"
 #include "state.h"
 #include "icons.h"
@@ -722,6 +723,8 @@ void run_player(Player *player) {
             player->time_since_ground = 0; 
         } 
     }
+    
+    if (state.current_player == 0) handle_auto_checkpoints(STEPS_DT);
     
     // Handle land particles
     if (player->gamemode != GAMEMODE_WAVE && !state.old_player.on_ground && player->on_ground) {

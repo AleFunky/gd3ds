@@ -2579,6 +2579,7 @@ void unload_level() {
     free_trigger_buffers();
     free_sections();
     free_object_particles();
+    init_col_channels();
     
     channelCount = 0;
     if (colorChannels) {

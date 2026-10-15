@@ -489,13 +489,13 @@ void level_select_update(UIScreen *s, UIInput *input){
         dragging = false;
         ui_run_func_on_tag(s, "level_card_2", disable_card_2);
         recenter();
-        upload_color_to_buffer(0, default_lvl_colors[curr_level_id % NUM_MENU_COLORS], 0);
+        upload_color_to_buffer(CHANNEL_BG, default_lvl_colors[curr_level_id % NUM_MENU_COLORS], 0);
         update_level_top(curr_level_id);
     }
     exiting_level = false;
     
     if(!scroll_dir && !dragging){
-        upload_color_to_buffer(0, default_lvl_colors[curr_level_id % NUM_MENU_COLORS], 0);
+        upload_color_to_buffer(CHANNEL_BG, default_lvl_colors[curr_level_id % NUM_MENU_COLORS], 0);
     }
 
     handle_col_channel(CHANNEL_BG);
