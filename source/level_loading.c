@@ -2568,6 +2568,9 @@ void reload_level() {
     for (int i = 1; i < MAX_GROUPS; i++) {
         sort_group(i);
     }
+    
+    // Run triggers behind the start
+    handle_triggers();
 }
 
 void unload_level() {

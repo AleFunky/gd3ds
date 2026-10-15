@@ -345,6 +345,9 @@ void first_load_init_variables() {
     clear_new_best_popup();
     init_variables();
     
+    // Run triggers behind the start
+    handle_triggers();
+    
     LevelData *level_data_sel = &current_level_entry->data;
     state.current_data.time_start = svcGetSystemTick() / (CPU_TICKS_PER_MSEC * 1000);
     state.current_data.max_normal = level_data_sel->normal_progress;

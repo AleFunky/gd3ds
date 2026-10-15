@@ -465,6 +465,11 @@ static void populate_list() {
                         ui_button_set_text((UIButton *)button, "Update");
                         button->base.textScale = 0.30f;
                         data->redownload = true;
+                    } else if (saved_data->version != SAVED_LEVELS_VERSION) {
+                        ui_window_button_set_style(button, 10);
+                        ui_button_set_text((UIButton *)button, "Refresh");
+                        button->base.textScale = 0.30f;
+                        data->redownload = true;
                     } else {
                         ui_window_button_set_style(button, 5);
                         ui_button_set_text((UIButton *)button, "View");

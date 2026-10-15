@@ -699,7 +699,7 @@ static void online_level_init (UIScreen *s) {
     ui_disable_element((UIElement *) speed_label);
 
     SavedLevelDataEntry *data = get_saved_level_data(online_menu_level_id);
-    if (data && !refresh) {
+    if (data && !refresh && !redownload) {
         current_search_entry = &data->search_entry;
         current_creator_entry = &data->creator_entry;
         current_song_entry = &data->song_entry;

@@ -439,6 +439,8 @@ static void fill_level_entry(char **levelStrings, int levelStringsCount, bool fi
             break;
         }
     }
+    
+    entry->version = SAVED_LEVELS_VERSION;
     free_string_array(levelKeys, levelKeyCount);
 }
 

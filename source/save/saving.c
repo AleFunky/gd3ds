@@ -1,4 +1,5 @@
 #include "saving.h"
+#include "3ds/thread.h"
 #include "json-c/json_object.h"
 #include "json-c/json_object_iterator.h"
 #include "json-c/json_tokener.h"
@@ -29,6 +30,7 @@
 LevelDataEntry *current_level_entry;
 
 static SavingTask tasks[SAVE_TYPE_COUNT] = { 0 };
+static Thread saving_threads[SAVE_TYPE_COUNT] = { 0 };
 
 int total_stars = 0;
 int total_coins = 0;
@@ -343,6 +345,14 @@ static struct json_object *search_entry_to_json(const SearchEntry *entry) {
     json_object_object_add(obj, "songIndex",
         json_object_new_int(entry->songIndex)
     );
+    
+    json_object_object_add(obj, "coins",
+        json_object_new_int(entry->coins)
+    );
+    
+    json_object_object_add(obj, "verifiedCoins",
+        json_object_new_boolean(entry->verifiedCoins)
+    );
 
     return obj;
 }
@@ -441,8 +451,8 @@ static struct json_object *make_saved_level_data_list_json(const SavedLevelDataL
             json_object_put(data);
             json_object_put(object);
             return NULL;
-        }
-
+        }  
+        json_object_object_add(data, "version", json_object_new_int(entry->version));
         json_object_object_add(data, "search", search);
         json_object_object_add(data, "creator", creator);
         if (song) json_object_object_add(data, "song", song);
@@ -568,6 +578,7 @@ static bool parse_saved_level_data_list(SavedLevelDataList *level_data, struct j
 
     json_object_object_foreach(object, key, value)
     {
+        struct json_object *version = NULL;
         struct json_object *search = NULL;
         struct json_object *creator = NULL;
         struct json_object *song = NULL;
@@ -585,6 +596,12 @@ static bool parse_saved_level_data_list(SavedLevelDataList *level_data, struct j
         memset(&entry->creator_entry, 0, sizeof(entry->creator_entry));
         memset(&entry->song_entry, 0, sizeof(entry->song_entry));
         memset(&entry->level_entry, 0, sizeof(entry->level_entry));
+
+        if (json_object_object_get_ex(value, "version", &version)) {
+            entry->version = json_object_get_int(version);
+        } else {
+            entry->version = 0;
+        }
 
         // Level entry
         if (json_object_object_get_ex(value, "search", &search)) {
@@ -611,6 +628,8 @@ static bool parse_saved_level_data_list(SavedLevelDataList *level_data, struct j
             struct json_object *is_auto = NULL;
             struct json_object *creator_index = NULL;
             struct json_object *song_index = NULL;
+            struct json_object *coins = NULL;
+            struct json_object *verified_coins = NULL;
 
             if (json_object_object_get_ex(search, "name", &name))
                 snprintf(entry->search_entry.name, sizeof(entry->search_entry.name), "%s", json_object_get_string(name));
@@ -687,6 +706,12 @@ static bool parse_saved_level_data_list(SavedLevelDataList *level_data, struct j
 
             if (json_object_object_get_ex(search, "songIndex", &song_index))
                 entry->search_entry.songIndex = json_object_get_int(song_index);
+
+            if (json_object_object_get_ex(search, "coins", &coins))
+                entry->search_entry.coins = json_object_get_int(coins);
+
+            if (json_object_object_get_ex(search, "verifiedCoins", &verified_coins))
+                entry->search_entry.verifiedCoins = json_object_get_boolean(verified_coins);
         }
 
         // Creator entry
@@ -826,6 +851,7 @@ static bool saved_level_data_list_add(SavedLevelDataList *level_data, const char
         return false;
     }
 
+    entry->version = SAVED_LEVELS_VERSION;
     entry->search_entry = *search;
     entry->creator_entry = *creator;
     if (song) {
@@ -897,6 +923,9 @@ static LevelDataEntry *level_data_list_get_or_add(LevelDataList *level_data, con
 static bool saved_data_list_add(SavedLevelDataList *level_data, const char *key, const SearchEntry *search, const CreatorEntry *creator, const SongEntry *song) {
     SavedLevelDataEntry *entry = saved_level_data_list_find(level_data, key);
     if (entry) {
+        entry->search_entry = *search;
+        entry->creator_entry = *creator;
+        entry->song_entry = *song;
         return true;
     }
     
@@ -1481,6 +1510,14 @@ bool is_saving() {
     return false;
 }
 
+void wait_for_saving() {
+    for (int i = 0; i < SAVE_TYPE_COUNT; i++) {
+        if (!saving_threads[i]) continue;
+
+        threadJoin(saving_threads[i], U64_MAX);
+    }
+}
+
 void begin_saving(SaveType type) {
     if (!tasks[type].running) {   
         int32_t priority = 0x30;
@@ -1492,7 +1529,7 @@ void begin_saving(SaveType type) {
         tasks[type].type = type;
         tasks[type].running = true;
     
-        threadCreate(
+        saving_threads[type] = threadCreate(
             saving_thread,
             &tasks[type],
             32 * 1024,

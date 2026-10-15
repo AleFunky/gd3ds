@@ -47,6 +47,9 @@
 
 #define CURRENT_RELEASE_ID 371103258
 
+// Increment this every time new properties are added to the server entries
+#define SAVED_LEVELS_VERSION 2
+
 typedef struct {
     float x, y;
 } Vec2D;

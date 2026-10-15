@@ -38,6 +38,7 @@ bool level_has_rate(const LevelData *data);
 
 typedef struct SavedLevelDataEntry {
     char *key;
+    int version;
     SearchEntry search_entry;
     CreatorEntry creator_entry;
     SongEntry song_entry;
@@ -110,6 +111,7 @@ typedef enum {
 
 void begin_saving(SaveType type);
 bool is_saving();
+void wait_for_saving();
 
 extern int total_stars;
 extern int total_coins;
