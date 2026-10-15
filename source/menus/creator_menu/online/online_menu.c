@@ -191,20 +191,22 @@ static void populate_list() {
         // Get creator name
         char *creator_name = "-";
 
-        if (entry->creatorIndex < creatorEntriesLength) {
+        bool creator_in_bounds = entry->creatorIndex >= 0 && entry->creatorIndex < creatorEntriesLength;
+        
+        if (creator_in_bounds) {
             creator_name = creator_entries[entry->creatorIndex].creatorName;
         }
 
-        snprintf(tmp_creator, sizeof(tmp_creator), "<#%s>By %s</>", (creator_entries[entry->creatorIndex].userId == 0) ? "5AFFFF" : "FFFFFF", creator_name);
+        snprintf(tmp_creator, sizeof(tmp_creator), "<#%s>By %s</>", (!creator_in_bounds || creator_entries[entry->creatorIndex].userId == 0) ? "5AFFFF" : "FFFFFF", creator_name);
 
         // Get song name
         char *song_name = "Unknown";
 
         if (entry->songId != 0) {
-            if (entry->songIndex < songEntriesLength) {
+            if (entry->songIndex >= 0 && entry->songIndex < songEntriesLength) {
                 song_name = song_entries[entry->songIndex].songTitle;
             }
-        } else if (entry->songIndex != -1) {
+        } else {
             if (entry->mainSongId >= 0 && entry->mainSongId < current_main_level_pack->count) {
                 song_name = (char *) current_main_level_pack->levels[entry->mainSongId].song_data.title;
             }

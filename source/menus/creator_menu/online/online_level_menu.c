@@ -357,8 +357,8 @@ static void populate_level_info(int level_id) {
     ui_label_set_text(level_id_label, lvlid);
 
     // Creator
-    char creator[36] = "-";
-    snprintf(creator, sizeof(creator), "<#%s>By %s</>", (entry_c->userId == 0) ? "5AFFFF" : "FFFFFF", entry_c->creatorName );
+    char creator[36] = "<#5AFFFF>By -</>";
+    if (entry_c) snprintf(creator, sizeof(creator), "<#%s>By %s</>", (entry_c->userId == 0) ? "5AFFFF" : "FFFFFF", entry_c->creatorName);
     ui_label_set_text(level_creator_label, creator);
 
     // Song and song artist
@@ -461,7 +461,7 @@ static void populate_level_info(int level_id) {
     ui_label_set_text(song_id_label, song_id );
 
     // Level icons
-    float half_creator_length = get_text_length(&goldFont_fontCharset, 0.7f, false, entry_c->creatorName) / 2;
+    float half_creator_length = get_text_length(&goldFont_fontCharset, 0.7f, false, (entry_c ? entry_c->creatorName : "-")) / 2;
 
     // Original icon
     bool is_copy = entry_srch->originalId != 0;
@@ -705,8 +705,9 @@ static void online_level_init (UIScreen *s) {
         current_song_entry = &data->song_entry;
     } else {
         current_search_entry = &search_entries[curr_search_id];
-        current_creator_entry = &creator_entries[current_search_entry->creatorIndex];
-        current_song_entry = (current_search_entry->songId != 0) ? &song_entries[current_search_entry->songIndex] : NULL;
+        int creator_index = current_search_entry->creatorIndex;
+        current_creator_entry = (creator_index >= 0 ? &creator_entries[creator_index] : NULL);
+        current_song_entry = (current_search_entry->songId >= 0 ? &song_entries[current_search_entry->songIndex] : NULL);
         bool could_save = save_level_to_server_file(current_server_file, online_menu_level_id, current_search_entry, current_creator_entry, current_song_entry);
         if (!could_save) {
             output_log("Oops, couldn't save da level!\n");

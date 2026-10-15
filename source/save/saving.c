@@ -29,6 +29,11 @@
 
 LevelDataEntry *current_level_entry;
 
+static CreatorEntry empty_creator = (CreatorEntry) {
+    .creatorName = "-",
+    .userId = 0
+};
+
 static SavingTask tasks[SAVE_TYPE_COUNT] = { 0 };
 static Thread saving_threads[SAVE_TYPE_COUNT] = { 0 };
 
@@ -922,14 +927,22 @@ static LevelDataEntry *level_data_list_get_or_add(LevelDataList *level_data, con
 
 static bool saved_data_list_add(SavedLevelDataList *level_data, const char *key, const SearchEntry *search, const CreatorEntry *creator, const SongEntry *song) {
     SavedLevelDataEntry *entry = saved_level_data_list_find(level_data, key);
+
+    const CreatorEntry *c_entry;
+    if (creator) {
+        c_entry = creator;
+    } else {
+        c_entry = &empty_creator;
+    }
+
     if (entry) {
         entry->search_entry = *search;
-        entry->creator_entry = *creator;
+        entry->creator_entry = *c_entry;
         entry->song_entry = *song;
         return true;
     }
     
-    if (!saved_level_data_list_add(level_data, key, search, creator, song)) {
+    if (!saved_level_data_list_add(level_data, key, search, c_entry, song)) {
         return false;
     }
 

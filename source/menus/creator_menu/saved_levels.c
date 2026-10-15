@@ -144,7 +144,7 @@ static void populate_list() {
             creator_name = creator_entry->creatorName;
         }
 
-        snprintf(tmp_creator, sizeof(tmp_creator), "<#%s>By %s</>", (creator_entry->userId == 0) ? "5AFFFF" : "FFFFFF", creator_name);
+        snprintf(tmp_creator, sizeof(tmp_creator), "<#%s>By %s</>", (creator_entry->userId == 0 || !creator_entry) ? "5AFFFF" : "FFFFFF", creator_name);
 
         // Get song name
         char *song_name = "Unknown";

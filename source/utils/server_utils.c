@@ -256,22 +256,26 @@ static void fill_level_entries(char **levelsStrings, int songStringCount, int cr
         int song_index;
         int creator_index;
         
+        bool found = false;
         // Find the song
         for (song_index = 0; song_index < songStringCount; song_index++) {
             if (search_entries[i].songId == song_entries[song_index].ngSongId) {
+                found = true;
                 break;
             }
         }
         
+        search_entries[i].songIndex = (found ? song_index : -1);
+
+        found = false;
         // Find the creator
         for (creator_index = 0; creator_index < creatorStringCount; creator_index++) {
             if (search_entries[i].creatorId == creator_entries[creator_index].accountId) {
+                found = true;
                 break;
             }
         }
-        
-        search_entries[i].songIndex = song_index;
-        search_entries[i].creatorIndex = creator_index;
+        search_entries[i].creatorIndex = (found ? creator_index : -1);
     }
 }
 

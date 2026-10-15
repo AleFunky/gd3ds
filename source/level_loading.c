@@ -2276,7 +2276,7 @@ void load_online_level_info(char *level_string) {
     level_info.song_id = current_search_entry->mainSongId;
     level_info.custom_song_id = current_search_entry->songId;
     snprintf(level_info.level_name, sizeof(level_info.level_name), "%s", current_search_entry->name);
-    snprintf(level_info.creator_name, sizeof(level_info.level_name), "%s",current_creator_entry->creatorName);
+    snprintf(level_info.creator_name, sizeof(level_info.level_name), "%s", (current_creator_entry ? current_creator_entry->creatorName : "-"));
 }
 
 static void generate_orange_portals(int orange_start) {
