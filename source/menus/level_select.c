@@ -296,7 +296,7 @@ void lerp_level_colors(u32 color1, u32 color2){
     float frac = abs(dragDistance) / 320.f;
     frac = clampf(frac, 0.f, 1.f);
     u32 lerpCol = color_lerp_u32(color1, color2, frac);
-    upload_color_to_buffer(0, lerpCol, 0);
+    upload_color_to_buffer(CHANNEL_BG, lerpCol, 0);
 }
 
 void peek_right(){
@@ -330,7 +330,7 @@ void peek_left(){
 }
 
 void tint_ground(UIElement *e) {
-    ColorChannel channel = channels[0];
+    ColorChannel channel = channels[CHANNEL_BG];
     ui_image_set_tint((UIImage *) e, C2D_Color32(channel.color.r, channel.color.g, channel.color.b, 255));
 }
 
@@ -353,7 +353,7 @@ void action_move_right(UIElement* e, const UIPropertyList *args) {
     ui_run_func_on_tag(btm_screen, "level_card_2", enable_card_2);
     ui_run_func_on_tag(btm_screen, "level_card_2", level_card_move_right);
     
-    upload_color_to_buffer(0, default_lvl_colors[curr_level_id % NUM_MENU_COLORS], COLOR_FADE_DURATION);
+    upload_color_to_buffer(CHANNEL_BG, default_lvl_colors[curr_level_id % NUM_MENU_COLORS], COLOR_FADE_DURATION);
 
     update_level_name(curr_level_id - 1, 0);
     update_level_stars(curr_level_id - 1, 0);
@@ -379,7 +379,7 @@ void action_move_left(UIElement* e, const UIPropertyList *args) {
     ui_run_func_on_tag(btm_screen, "level_card_2", enable_card_2);
     ui_run_func_on_tag(btm_screen, "level_card_2", level_card_move_left);
 
-    upload_color_to_buffer(0, default_lvl_colors[curr_level_id % NUM_MENU_COLORS], COLOR_FADE_DURATION);
+    upload_color_to_buffer(CHANNEL_BG, default_lvl_colors[curr_level_id % NUM_MENU_COLORS], COLOR_FADE_DURATION);
 
     update_level_name(curr_level_id + 1, 0);
     update_level_stars(curr_level_id + 1, 0);
@@ -402,6 +402,7 @@ static UIActionDef actions[] = {
 int mode = 0;
 
 void level_select_init(UIScreen *s){
+    init_col_channels();
     btm_screen = s;
     
     curr_level_id = 0;
@@ -458,13 +459,7 @@ void level_select_init(UIScreen *s){
     ui_run_func_on_tag(s, "level_card_2", disable_card_2);
 
     u32 color = default_lvl_colors[curr_level_id % NUM_MENU_COLORS];
-    upload_color_to_buffer(0, color, 0);
-
-    channels[0].color.r = GET_R(color);
-    channels[0].color.g = GET_G(color);
-    channels[0].color.b = GET_B(color);
-
-    channels[0].copy_color_id = 0;
+    upload_color_to_buffer(CHANNEL_BG, color, 0);
 
     dragging = false;
     dragDistance = 0;
@@ -503,9 +498,9 @@ void level_select_update(UIScreen *s, UIInput *input){
         upload_color_to_buffer(0, default_lvl_colors[curr_level_id % NUM_MENU_COLORS], 0);
     }
 
-    handle_col_channel(0);
+    handle_col_channel(CHANNEL_BG);
 
-    ColorChannel channel = channels[0];
+    ColorChannel channel = channels[CHANNEL_BG];
 
     ui_image_set_tint(bg_gradient, C2D_Color32(channel.color.r, channel.color.g, channel.color.b, 255));
     ui_image_set_tint(bg_gradient_top, C2D_Color32(channel.color.r, channel.color.g, channel.color.b, 255));

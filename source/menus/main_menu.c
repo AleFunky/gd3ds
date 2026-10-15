@@ -200,6 +200,7 @@ static void handle_players() {
 }
 
 static void main_menu_init(UIScreen *s){
+    init_col_channels();
     play_menu_song();
 
     quit_game_button = (UIButton *)ui_get_element_by_tag(s, "quitbutton");

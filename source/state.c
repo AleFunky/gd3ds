@@ -27,7 +27,7 @@ bool level_unrated_online = false;
 bool level_verified_coins = false;
 
 bool level_has_unverified_coins(void) {
-    return level_unrated_online || !level_verified_coins;
+    return level_unrated_online || !(level_verified_coins && state.online_level);
 }
 
 void level_unrated_online_refresh(void) {
