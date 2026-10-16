@@ -1,6 +1,7 @@
 #include <3ds.h>
 #include <citro2d.h>
 #include <citro3d.h>
+#include <3ds/util/utf.h>
 
 #include "math_helpers.h"
 
@@ -150,7 +151,21 @@ int count_lines(const char *text, bool parse_tags) {
     return lines;
 }
 
-const Glyph *get_glyph(const Charset *font, char character) {
+static int decode_utf8_codepoint(const char *text, int remaining, uint32_t *codepoint) {
+    uint8_t sequence[4] = { 0 };
+    int available = remaining < sizeof(sequence) ? remaining : sizeof(sequence);
+    memcpy(sequence, text, available);
+
+    ssize_t bytes = decode_utf8(codepoint, sequence);
+    if (bytes <= 0 || bytes > remaining) {
+        *codepoint = '?'; // robert when binaryVersion is not 49
+        return 1;
+    }
+
+    return bytes;
+}
+
+const Glyph *get_glyph(const Charset *font, uint32_t character) {
     // Find matching character
     for (int i = 0; i < font->count; i++) {
         if (character == font->glyphs[i].id) {
@@ -200,12 +215,17 @@ char *wrap_text(const Charset *font, float zoom_x, const char *text, float max_w
         // Extract next word
         char word[256];
         int len = 0;
+        int remaining = strlen(p);
 
-        while (*p && *p != ' ' && *p != '<') {
-            if (len < sizeof(word) - 1) {
-                word[len++] = *p;
+        while (remaining && *p != ' ' && *p != '<') {
+            uint32_t codepoint;
+            int bytes = decode_utf8_codepoint(p, remaining, &codepoint);
+            if (len + bytes < sizeof(word)) {
+                memcpy(word + len, p, bytes);
+                len += bytes;
             }
-            p++;
+            p += bytes;
+            remaining -= bytes;
         }
 
         word[len] = '\0';
@@ -240,11 +260,10 @@ char *wrap_text(const Charset *font, float zoom_x, const char *text, float max_w
 
                 // Find the largest chunk that fits
                 while (end < len) {
-                    char c[2] = { 
-                        word[end], '\0' 
-                    };
-
-                    float char_width = get_text_length(font, zoom_x, true, c);
+                    uint32_t codepoint;
+                    int bytes = decode_utf8_codepoint(word + end, len - end, &codepoint);
+                    const Glyph *glyph = get_glyph(font, codepoint);
+                    float char_width = glyph ? glyph->xAdvance * zoom_x : 0.f;
 
                     // If already outside the max width, break
                     if (end > start && chunk_width + char_width > max_width) {
@@ -252,7 +271,7 @@ char *wrap_text(const Charset *font, float zoom_x, const char *text, float max_w
                     }
 
                     chunk_width += char_width;
-                    end++;
+                    end += bytes;
                 }
 
                 // Append this chunk
@@ -310,20 +329,25 @@ static void get_line_metrics(const Charset *font, float zoom_x, bool parse_tags,
     float first_char = 0.f, last_char = 0.f;
     bool first = true;
 
-    for (int i = start; text[i]; i++) {
-        // Skip tags
+    int text_size = strlen(text);
+    for (int i = start; i < text_size;) {
         if (text[i] == '<' && parse_tags) {
             char tag[64];
-            if (read_tag(text, &i, tag, sizeof(tag))) {
+            int tag_end = i;
+            if (read_tag(text, &tag_end, tag, sizeof(tag))) {
                 length += get_image_tag_length(font, zoom_x, tag);
-                
+                i = tag_end + 1;
                 continue;
             }
-        } else if (text[i] == '\n') {
+        }
+
+        if (text[i] == '\n') {
             break;
         }
 
-        const Glyph *character = get_glyph(font, text[i]);
+        uint32_t codepoint;
+        int bytes = decode_utf8_codepoint(text + i, text_size - i, &codepoint);
+        const Glyph *character = get_glyph(font, codepoint);
         if (character) {
             // First character
             if (first) { 
@@ -335,6 +359,7 @@ static void get_line_metrics(const Charset *font, float zoom_x, bool parse_tags,
             last_char = (character->xAdvance - character->xOffset - character->width) * zoom_x;
             length += character->xAdvance * zoom_x;
         }
+        i += bytes;
     }
 
     *out_length = length;
@@ -342,28 +367,33 @@ static void get_line_metrics(const Charset *font, float zoom_x, bool parse_tags,
     *out_last_char = last_char;
 }
 
-float get_line_length(const Charset *font, const float zoom_x, bool parse_tags, const char *text, int start) {
+float get_line_length(const Charset *font, const float zoom_x, bool parse_tags, const char *text, size_t start) {
     float text_length = 0;
+    int text_size = strlen(text);
 
-    for (int i = start; text[i]; i++) {
-        const Glyph *character = get_glyph(font, text[i]);
-
+    for (int i = start; i < text_size;) {
         // Skip tags
         if (text[i] == '<' && parse_tags) {
             char tag[64];
-
-            if (read_tag(text, &i, tag, sizeof(tag))) {
+            int tag_end = i;
+            if (read_tag(text, &tag_end, tag, sizeof(tag))) {
                 text_length += get_image_tag_length(font, zoom_x, tag);
-
+                i = tag_end + 1;
                 continue;
             }
-        } else if (text[i] == '\n') {
+        }
+
+        if (text[i] == '\n') {
             break;
         }
 
+        uint32_t codepoint;
+        int bytes = decode_utf8_codepoint(text + i, text_size - i, &codepoint);
+        const Glyph *character = get_glyph(font, codepoint);
         if (character) {
             text_length += character->xAdvance * zoom_x;
         }
+        i += bytes;
     }
 
     return text_length;
@@ -373,34 +403,24 @@ float get_longest_line_length(const Charset *font, const float zoom_x, const cha
     float longest = 0.0f;
 
     int start = 0;
-    int i = 0;
-    while (true) {
-        if (text[i] == '<' || text[i] == '\0') {
-            bool newline = false;
-            
-            if (text[i] == '\n') {
-                newline = true;
-            }
-
-            // Measure line
-            if (newline || text[i] == '\0') {
-                float length = get_line_length(font, zoom_x, true, text, start);
-
-                // Set if longer than last saved line
-                if (length > longest) {
-                    longest = length;
-                }
-
-                start = i + 1;
+    int text_size = strlen(text);
+    for (size_t i = 0; i <= text_size; i++) {
+        if (i < text_size && text[i] == '<') {
+            char tag[64];
+            int tag_end = i;
+            if (read_tag(text, &tag_end, tag, sizeof(tag))) {
+                i = tag_end;
+                continue;
             }
         }
 
-        // Break if end of text
-        if (text[i] == '\0') {
-            break;
+        if (i == text_size || text[i] == '\n') {
+            float length = get_line_length(font, zoom_x, true, text, start);
+            if (length > longest) {
+                longest = length;
+            }
+            start = i + 1;
         }
-
-        i++;
     }
 
     return longest;
@@ -409,26 +429,31 @@ float get_longest_line_length(const Charset *font, const float zoom_x, const cha
 float get_text_length(const Charset *font, const float zoom_x, bool parse_tags, const char *text) {
     float text_length = 0;
     int size = strlen(text);
-    for (int i = 0; i < size; i++) {
-        const Glyph *character = get_glyph(font, text[i]);
-        
+    for (int i = 0; i < size;) {
         // Skip tags
         if (text[i] == '<' && parse_tags) {
             char tag[64];
-
-            if (read_tag(text, &i, tag, sizeof(tag))) {
+            int tag_end = i;
+            if (read_tag(text, &tag_end, tag, sizeof(tag))) {
                 text_length += get_image_tag_length(font, zoom_x, tag);
+                i = tag_end + 1;
                 continue;
             }
-        } else if (text[i] == '\n') {
+        }
+
+        if (text[i] == '\n') {
+            i++;
             continue;
         }
 
+        uint32_t codepoint;
+        int bytes = decode_utf8_codepoint(text + i, size - i, &codepoint);
+        const Glyph *character = get_glyph(font, codepoint);
         if (character != NULL) {
             float xadvance = character->xAdvance * zoom_x;
-
             text_length += xadvance;
         }
+        i += bytes;
     }
     return text_length;
 }
@@ -475,40 +500,47 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
     C2D_ImageTint tint = { 0 };
     u32 current_color = white_c;
 
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < size;) {
+        uint32_t codepoint;
+        int bytes = decode_utf8_codepoint(tmp + i, size - i, &codepoint);
         bool is_image = false;
         int image_index = -1;
         int image_sheet = 0;
         
         // Parse tags
-        if (tmp[i] == '<' && parse_tags) {
+        if (codepoint == '<' && parse_tags) {
             char tag[64];
-
-            if (read_tag(tmp, &i, tag, sizeof(tag))) {   
+            int tag_end = i;
+            if (read_tag(tmp, &tag_end, tag, sizeof(tag))) {
+                i = tag_end + 1;
                 if (parse_image_tag(tag, &image_index, &image_sheet)) {
                     is_image = true;
                 } else {
                     parse_color_tag(tag, &current_color);
                     continue;
                 }
+            } else {
+                i += bytes;
             }
-        } else if (tmp[i] == '\n') {
+        } else if (codepoint == '\n') {
+            i += bytes;
             offset_x = 0;
             
             offset_y += line_height;
 
-            get_line_metrics(font, fabsf(mod_scaleX), true, tmp, i + 1, &line_length, &first_char, &last_char);
+            get_line_metrics(font, fabsf(mod_scaleX), parse_tags, tmp, i, &line_length, &first_char, &last_char);
 
             continue;
+        } else {
+            i += bytes;
         }
 
+        const Glyph *character = get_glyph(font, codepoint);
         C2D_PlainImageTint(&tint, current_color, 1.f);
         
         float width_offset = alignment * (line_length - first_char - last_char) + first_char;
 
         if (!is_image) {
-            const Glyph *character = get_glyph(font, tmp[i]);
-            
             if (character != NULL) {
                 C2D_Sprite sprite = { 0 };
 
