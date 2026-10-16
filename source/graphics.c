@@ -243,6 +243,24 @@ void set_player_colors(Color p1, Color p2, Color glow) {
     p1_color = p1;
     p2_color = p2;
     glow_color = glow;
+    
+    // Update particles
+    Color p1_not_white = get_white_if_black(p1_color);
+
+    touch_drag_particles.cfg.startColorRed = p1_not_white.r / 255.f;
+    touch_drag_particles.cfg.startColorGreen = p1_not_white.g / 255.f;
+    touch_drag_particles.cfg.startColorBlue = p1_not_white.b / 255.f;
+
+    touch_explosion_particles.cfg.startColorRed = p1_not_white.r / 255.f;
+    touch_explosion_particles.cfg.startColorGreen = p1_not_white.g / 255.f;
+    touch_explosion_particles.cfg.startColorBlue = p1_not_white.b / 255.f;
+
+    glitter_particles_bottom.cfg.startColorRed = p1_not_white.r / 255.f;
+    glitter_particles_bottom.cfg.startColorGreen = p1_not_white.g / 255.f;
+    glitter_particles_bottom.cfg.startColorBlue = p1_not_white.b / 255.f;
+    glitter_particles_bottom.cfg.finishColorRed = p1_not_white.r / 255.f;
+    glitter_particles_bottom.cfg.finishColorGreen = p1_not_white.g / 255.f;
+    glitter_particles_bottom.cfg.finishColorBlue = p1_not_white.b / 255.f;
 }
 
 // This might make sprite making faster, im not sure thought

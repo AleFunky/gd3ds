@@ -1705,24 +1705,6 @@ int main(int argc, char* argv[]) {
     bool exit = false;
     
     while (aptMainLoop() && !exit) {
-        // Update color if changed menus
-        Color p1_not_white = get_white_if_black(p1_color);
-
-        touch_drag_particles.cfg.startColorRed = p1_not_white.r / 255.f;
-        touch_drag_particles.cfg.startColorGreen = p1_not_white.g / 255.f;
-        touch_drag_particles.cfg.startColorBlue = p1_not_white.b / 255.f;
-
-        touch_explosion_particles.cfg.startColorRed = p1_not_white.r / 255.f;
-        touch_explosion_particles.cfg.startColorGreen = p1_not_white.g / 255.f;
-        touch_explosion_particles.cfg.startColorBlue = p1_not_white.b / 255.f;
-
-        glitter_particles_bottom.cfg.startColorRed = get_white_if_black(p1_color).r / 255.f;
-        glitter_particles_bottom.cfg.startColorGreen = get_white_if_black(p1_color).g / 255.f;
-        glitter_particles_bottom.cfg.startColorBlue = get_white_if_black(p1_color).b / 255.f;
-        glitter_particles_bottom.cfg.finishColorRed = get_white_if_black(p1_color).r / 255.f;
-        glitter_particles_bottom.cfg.finishColorGreen = get_white_if_black(p1_color).g / 255.f;
-        glitter_particles_bottom.cfg.finishColorBlue = get_white_if_black(p1_color).b / 255.f;
-
         slow_speed_particles_bottom.cfg.startColorRed = 255 / 255.f;
         slow_speed_particles_bottom.cfg.startColorGreen = 255 / 255.f;
         slow_speed_particles_bottom.cfg.startColorBlue = 0 / 255.f;
