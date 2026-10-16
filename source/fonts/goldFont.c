@@ -101,5 +101,6 @@ const Glyph goldFont_fontGlyphs[96] = {
 
 const Charset goldFont_fontCharset = {
     goldFont_fontGlyphs,
-    96
+    96,
+    1
 };

@@ -268,8 +268,8 @@ int get_comments_from_id(GenericTask *task, char **out_data, int id, int page, i
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 
-        char data[64];
-        snprintf(data, 63, "levelID=%d&page=%d&mode=%d&secret=Wmfd2893gb7", id, page, mode);
+        char data[128];
+        snprintf(data, sizeof(data), "levelID=%d&page=%d&mode=%d&binaryVersion=49&secret=Wmfd2893gb7", id, page, mode);
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
 
         CURLcode code = curl_easy_perform(curl);

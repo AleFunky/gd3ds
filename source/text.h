@@ -22,6 +22,7 @@ typedef struct {
 typedef struct {
     const Glyph* glyphs;
     unsigned int count;
+    float scale;
 } Charset;
 
 typedef struct {

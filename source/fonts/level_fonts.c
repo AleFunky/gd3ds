@@ -74,7 +74,8 @@ const Glyph gjFont01_fontGlyphs[67] = {
 
 const Charset gjFont01_fontCharset = {
     gjFont01_fontGlyphs,
-    67
+    67,
+    1
 };
 
 const Glyph gjFont02_fontGlyphs[83] = {
@@ -165,7 +166,8 @@ const Glyph gjFont02_fontGlyphs[83] = {
 
 const Charset gjFont02_fontCharset = {
     gjFont02_fontGlyphs,
-    83
+    83,
+    1
 };
 
 const Glyph gjFont03_fontGlyphs[88] = {
@@ -261,7 +263,8 @@ const Glyph gjFont03_fontGlyphs[88] = {
 
 const Charset gjFont03_fontCharset = {
     gjFont03_fontGlyphs,
-    88
+    88,
+    1
 };
 
 const Glyph gjFont04_fontGlyphs[89] = {
@@ -358,7 +361,8 @@ const Glyph gjFont04_fontGlyphs[89] = {
 
 const Charset gjFont04_fontCharset = {
     gjFont04_fontGlyphs,
-    89
+    89,
+    1
 };
 
 const Glyph gjFont05_fontGlyphs[95] = {
@@ -461,7 +465,8 @@ const Glyph gjFont05_fontGlyphs[95] = {
 
 const Charset gjFont05_fontCharset = {
     gjFont05_fontGlyphs,
-    95
+    95,
+    1
 };
 
 const Glyph gjFont06_fontGlyphs[93] = {
@@ -562,7 +567,8 @@ const Glyph gjFont06_fontGlyphs[93] = {
 
 const Charset gjFont06_fontCharset = {
     gjFont06_fontGlyphs,
-    93
+    93,
+    1
 };
 
 const Glyph gjFont07_fontGlyphs[93] = {
@@ -663,7 +669,8 @@ const Glyph gjFont07_fontGlyphs[93] = {
 
 const Charset gjFont07_fontCharset = {
     gjFont07_fontGlyphs,
-    93
+    93,
+    1
 };
 
 const Glyph gjFont08_fontGlyphs[93] = {
@@ -764,7 +771,8 @@ const Glyph gjFont08_fontGlyphs[93] = {
 
 const Charset gjFont08_fontCharset = {
     gjFont08_fontGlyphs,
-    93
+    93,
+    1
 };
 
 const Glyph gjFont09_fontGlyphs[87] = {
@@ -859,7 +867,8 @@ const Glyph gjFont09_fontGlyphs[87] = {
 
 const Charset gjFont09_fontCharset = {
     gjFont09_fontGlyphs,
-    87
+    87,
+    1
 };
 
 const Glyph gjFont10_fontGlyphs[69] = {
@@ -936,7 +945,8 @@ const Glyph gjFont10_fontGlyphs[69] = {
 
 const Charset gjFont10_fontCharset = {
     gjFont10_fontGlyphs,
-    69
+    69,
+    1
 };
 
 const Glyph gjFont11_fontGlyphs[80] = {
@@ -1024,7 +1034,8 @@ const Glyph gjFont11_fontGlyphs[80] = {
 
 const Charset gjFont11_fontCharset = {
     gjFont11_fontGlyphs,
-    80
+    80,
+    1
 };
 
 const Glyph gjFont12_fontGlyphs[96] = {
@@ -1128,7 +1139,8 @@ const Glyph gjFont12_fontGlyphs[96] = {
 
 const Charset gjFont12_fontCharset = {
     gjFont12_fontGlyphs,
-    96
+    96,
+    1
 };
 
 const Charset *level_font_charsets[LEVEL_FONT_COUNT] = {

@@ -176,6 +176,8 @@ const Glyph *get_glyph(const Charset *font, char character) {
 char *wrap_text(const Charset *font, float zoom_x, const char *text, float max_width) {
     wrap_buffer[0] = '\0';
 
+    zoom_x *= font->scale;
+
     float line_width = 0.f;
     const char *p = text;
     while (*p) {
@@ -456,14 +458,18 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
     float first_char;
     float last_char;
 
-    get_line_metrics(font, fabsf(scaleX), parse_tags, tmp, 0, &line_length, &first_char, &last_char);
+    float mod_scaleX = scaleX * font->scale;
+    float mod_scaleY = scaleY * font->scale;
+
+    get_line_metrics(font, fabsf(mod_scaleX), parse_tags, tmp, 0, &line_length, &first_char, &last_char);
 
     float offset_x = 0;
     float offset_y = 0;
 
     // Get total text height
     int line_count = count_lines(tmp, parse_tags) - 1;
-    float line_height = (height * fabsf(scaleY)) + SPACING * fabsf(scaleY);
+    float glyph_height = aCharacter ? aCharacter->height : height;
+    float line_height = glyph_height * 1.3f * fabsf(mod_scaleY);
     float total_height = (line_count * line_height);
 
     C2D_ImageTint tint = { 0 };
@@ -491,7 +497,7 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
             
             offset_y += line_height;
 
-            get_line_metrics(font, fabsf(scaleX), true, tmp, i + 1, &line_length, &first_char, &last_char);
+            get_line_metrics(font, fabsf(mod_scaleX), true, tmp, i + 1, &line_length, &first_char, &last_char);
 
             continue;
         }
@@ -506,19 +512,19 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
             if (character != NULL) {
                 C2D_Sprite sprite = { 0 };
 
-                float xoffset = (character->xOffset) * scaleX;
-                float yoffset = (character->yOffset) * scaleY;
-                float xadvance = character->xAdvance * scaleX;
+                float xoffset = (character->xOffset) * mod_scaleX;
+                float yoffset = (character->yOffset) * mod_scaleY;
+                float xadvance = character->xAdvance * mod_scaleX;
 
                 int index = character->spriteIndex;
                 
                 float base_y = y - total_height / 2.f;
 
                 float final_x = x + offset_x + xoffset - width_offset;
-                float final_y = base_y + offset_y + yoffset - height * scaleY;
+                float final_y = base_y + offset_y + yoffset - height * mod_scaleY;
 
-                final_x += (character->width  * scaleX) * 0.5f;
-                final_y += (character->height * scaleY) * 0.5f;
+                final_x += (character->width  * mod_scaleX) * 0.5f;
+                final_y += (character->height * mod_scaleY) * 0.5f;
 
                 if (index >= 0) { 
                     // Draw glyph so its center is at (final_x, final_y)
@@ -526,7 +532,7 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
                     C3D_TexSetFilter(sprite.image.tex, GPU_LINEAR, GPU_LINEAR);
                     C2D_SpriteSetCenter(&sprite, 0.5f, 0.5f);
                     C2D_SpriteSetPos(&sprite, final_x, final_y);
-                    C2D_SpriteSetScale(&sprite, scaleX, scaleY);
+                    C2D_SpriteSetScale(&sprite, mod_scaleX, mod_scaleY);
                     C2D_DrawSpriteTinted(&sprite, &tint);
                 }
 
@@ -547,8 +553,8 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
 
                     float image_scale = height / tex_h;
                     
-                    float image_scale_x = scaleX * image_scale;
-                    float image_scale_y = scaleY * image_scale;
+                    float image_scale_x = mod_scaleX * image_scale;
+                    float image_scale_y = mod_scaleY * image_scale;
 
                     float image_width = tex_w * image_scale_x;
                     float image_height = tex_h * image_scale_y;
