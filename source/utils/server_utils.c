@@ -674,6 +674,7 @@ void fill_gdps_comment_author_entries(char **authorStrings, int authorStringCoun
 
 int parse_latest_commit(char *jsonString) {
     // parse response from github as json object 
+    output_log(jsonString);
     json_object *jsonObject = json_tokener_parse(jsonString);
     json_object *commitObject = NULL;
     json_object *hashObject = NULL;
@@ -683,6 +684,19 @@ int parse_latest_commit(char *jsonString) {
         output_log("failure parsing commit data: response - %s", jsonString);
         return -1;
     }
+
+    size_t objCount = json_object_object_length(jsonObject);
+    
+    if (objCount == 2) {
+        // uh oh we might have gotten rate limited
+        json_object *message = NULL;
+        if(json_object_object_get_ex(jsonObject, "message", &message)) {
+            // we got ratelimited.
+            json_object_put(jsonObject);
+            return -4;
+        } 
+    }
+        
     // first array entry is always the latest commit
     commitObject = json_object_array_get_idx(jsonObject, 0); 
 
@@ -708,6 +722,18 @@ int parse_commits_data(char *jsonString) {
     if (!jsonObject) {
         output_log("failure parsing commit data: response - %s", jsonString);
         return -1;
+    }
+
+    size_t objCount = json_object_object_length(jsonObject);
+
+    if (objCount == 2) {
+        // uh oh we might have gotten rate limited
+        json_object *message = NULL;
+        if(json_object_object_get_ex(jsonObject, "message", &message)) {
+            // we got ratelimited.
+            json_object_put(jsonObject);
+            return -4;
+        } 
     }
 
     // iterate every commit in the response
@@ -762,6 +788,16 @@ int parse_releases_data(char *jsonString, bool useNightly) {
     if (!jsonObject) return -1;
 
     size_t count = json_object_object_length(jsonObject);
+
+    if (count == 2) {
+        // uh oh we might have gotten rate limited
+        json_object *message = NULL;
+        if(json_object_object_get_ex(jsonObject, "message", &message)) {
+            // we got ratelimited.
+            json_object_put(jsonObject);
+            return -4;
+        } 
+    }
 
     // if getting nightly build, iterate array looking for a prerelease tag instead of release tags
     if (useNightly) {
@@ -1069,6 +1105,8 @@ int get_commits_internal(GenericTask *task, char *repoAuthor, char *repoName, ch
     latestCommitCount = 0;
     int result = get_commits(task, &outdata, repoAuthor, repoName, repoBranch);
     if (result != 0) return result;
+
+
 
     // check for updates
     int parserResult = parse_latest_commit(outdata);

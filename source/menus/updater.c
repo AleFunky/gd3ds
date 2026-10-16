@@ -25,7 +25,7 @@ static UIScreen *screen;
 
 static UIList *list;
 static UILabel *error_label;
-static UIWindowButton *updater_button;
+static UIButton *updater_button;
 static UISpinner *spinner;
 
 static GenericTask updater_task = {
@@ -53,6 +53,7 @@ static void action_update(UIElement *e, const UIPropertyList *p) {
 }
 
 static void action_refresh_updates(UIElement *e, const UIPropertyList *p) {
+    if (updater_task.running) return;
     ui_label_set_text(error_label, "");
     ui_list_reset(list);
     ui_enable_element((UIElement *) spinner);
@@ -63,21 +64,24 @@ static void action_refresh_updates(UIElement *e, const UIPropertyList *p) {
 
 char *handle_updater_error_codes(int code) {
     switch (code) {
+        case -4:
+            return "Too many requests!\nPlease try again later.";
+            break;
         case -3:
             return "No updates found.";
             break;
         case -2:
-            return "Failed to find\nrelease!";
+            return "Failed to find a release!";
             break;
         case -1:
-            return "Failed to parse\nresponse!";
+            return "Failed to parse response!";
             break;
         case 6:
         case 7:
-            return "No internet\nconnection!";
+            return "No internet connection!";
             break;
         case 28:
-            return "Connection timed\nout.";
+            return "Connection timed out.";
             break;
         case 56: 
             return "Connection interrupted.";
@@ -98,27 +102,10 @@ static UIActionDef updater_actions[] = {
 
 static void populate_info() {
     int list_width = list->base.w / 2;
-    int textMarginX = 6;
-    int textMarginY = 6;
-    float textScale = 0.8;
-    int lineHeight = 12;
-
-    // add updates found text
-    UIElement *card = (UIElement *)ui_create_rectangle(screen);
-    if (card) {
-        ui_rectangle_set_color((UIRectangle *)card, C2D_Color32(161, 88, 48, 255));
-        ui_element_set_size(card, list->base.w, 38);
-        // title
-        UILabel *title = ui_create_label(screen);
-        if (title) {
-            ui_label_set_text(title, "Update found!");
-            ui_element_set_scale((UIElement *)title, 0.7);
-            ui_element_set_position((UIElement *)title, 0, 0);
-            title->alignment = 0.5f;
-            ui_element_add_child(card, (UIElement *)title);
-        }
-        ui_list_add(list, card);
-    }
+    int textMarginX = 0;
+    int textMarginY = 3;
+    float textScale = 0.75;
+    int lineHeight = 10;
 
     // list commits for nightly
     if (useNightlyBranch && latestCommits) {
@@ -126,13 +113,13 @@ static void populate_info() {
         // description card
         UIElement *info = (UIElement *)ui_create_rectangle(screen);
         if (info) {
-            ui_rectangle_set_color((UIRectangle *)info, C2D_Color32(194, 114, 62, 255));
-            ui_element_set_size(info, list->base.w, lineHeight * 1.2 + textMarginY * 2);
+            ui_rectangle_set_color((UIRectangle *)info, C2D_Color32(194, 114, 62, 0));
+            ui_element_set_size(info, list->base.w, lineHeight + textMarginY * 2);
             // label
             UILabel *label = ui_create_label(screen);
             if (label) {
                 ui_label_set_text(label, "Changes since last update:");
-                ui_element_set_scale((UIElement *)label, textScale * 1.2);
+                ui_element_set_scale((UIElement *)label, textScale);
                 ui_element_set_position((UIElement *)label, -list_width + textMarginX, 0);
                 label->font = 1;
                 ui_element_add_child(info, (UIElement *)label);
@@ -146,7 +133,7 @@ static void populate_info() {
 
             UIElement *card = (UIElement *)ui_create_rectangle(screen);
             if (card && i < 30 - 1) {
-                ui_rectangle_set_color((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 255) : C2D_Color32(161, 88, 48, 255)));
+                ui_rectangle_set_color((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 0) : C2D_Color32(161, 88, 48, 0)));
                 ui_element_set_size(card, list->base.w, lineCount * lineHeight + textMarginY * 2);
                 
                 // commit title
@@ -165,7 +152,7 @@ static void populate_info() {
 
                 ui_list_add(list, card);
             } else if (card) {
-                ui_rectangle_set_color((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 255) : C2D_Color32(161, 88, 48, 255)));
+                ui_rectangle_set_color((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 0) : C2D_Color32(161, 88, 48, 0)));
                 ui_element_set_size(card, list->base.w, lineHeight + textMarginY * 2);
                 
                 // ... and more
@@ -191,7 +178,7 @@ static void populate_info() {
         // description card
         UIElement *info = (UIElement *)ui_create_rectangle(screen);
         if (info) {
-            ui_rectangle_set_color((UIRectangle *)info, C2D_Color32(194, 114, 62, 255));
+            ui_rectangle_set_color((UIRectangle *)info, C2D_Color32(194, 114, 62, 0));
             ui_element_set_size(info, list->base.w, lineHeight + textMarginY * 2);
             // label
             UILabel *label = ui_create_label(screen);
@@ -211,7 +198,7 @@ static void populate_info() {
 
             UIElement *card = (UIElement *)ui_create_rectangle(screen);
             if (card) {
-                ui_rectangle_set_color((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 255) : C2D_Color32(161, 88, 48, 255)));
+                ui_rectangle_set_color((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 0) : C2D_Color32(161, 88, 48, 0)));
                 ui_element_set_size(card, list->base.w, lineCount * lineHeight + textMarginY * 2);
                 
                 // commit title
@@ -233,24 +220,17 @@ static void populate_info() {
         }
         free_string_array(infoText, baseLineCount);
     }
-    // add footer so the install update button doesnt cover up the last bit of info
-    UIElement *footer = (UIElement *)ui_create_rectangle(screen);
-    if (footer) {
-        ui_rectangle_set_color((UIRectangle *)footer, C2D_Color32(161, 88, 48, 0));
-        ui_element_set_size(footer, list->base.w, 15);
-        ui_list_add(list, footer);
-    }
 }
 
 static void updater_init(UIScreen *s) {
     screen = s;
     list = (UIList *)ui_get_element_by_tag(s, "list");
-    updater_button = (UIWindowButton *)ui_get_element_by_tag(s, "updatebutton");
+    updater_button = (UIButton *)ui_get_element_by_tag(s, "updatebutton");
     spinner = (UISpinner *)ui_get_element_by_tag(s, "spinner");
     error_label = (UILabel *)ui_get_element_by_tag(s, "errorlabel");
     if (checkedForUpdate && update_data->isAvailable) {
         ui_disable_element((UIElement *) spinner);
-        ui_label_set_text(error_label, update_data->releaseTitle);
+        // ui_label_set_text(error_label, update_data->releaseTitle);
         populate_info();
     } else {
         ui_disable_element((UIElement *) updater_button);
