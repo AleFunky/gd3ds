@@ -1528,6 +1528,7 @@ void wait_for_saving() {
         if (!saving_threads[i]) continue;
 
         threadJoin(saving_threads[i], U64_MAX);
+        saving_threads[i] = NULL;
     }
 }
 
@@ -1548,7 +1549,7 @@ void begin_saving(SaveType type) {
             32 * 1024,
             priority,
             (is_N3DS ? 2 : 0),
-            true
+            false
         );
     }
 }

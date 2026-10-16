@@ -1491,6 +1491,8 @@ void game_loop() {
             break;
         }
     }
+
+    if (!aptMainLoop()) return;
     
     aptUnhook(&cookie);
 
