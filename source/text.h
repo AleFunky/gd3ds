@@ -14,9 +14,6 @@ typedef struct {
     short spriteIndex;
 } Glyph;
 
-#define HEIGHT_OFFSET (20.f)
-#define HEIGHT_OFFSET_MULT (HEIGHT_OFFSET / 29)
-
 #define TEXT_OBJECT_SCALE (1.0f)
 
 typedef struct {
@@ -39,3 +36,4 @@ float get_text_length(const Charset *font, const float zoom_x, bool parse_tags, 
 float get_longest_line_length(const Charset *font, const float zoom_x, const char *text);
 char *wrap_text(const Charset *font, float zoom_x, const char *text, float max_width);
 int count_lines(const char *text, bool parse_tags);
+float get_text_height(const Charset *font, C2D_SpriteSheet *sheet, const float scaleY, bool parse_tags, const char *text);

@@ -8,6 +8,7 @@
 #include "text.h"
 #include "fonts/bigFont.h"
 #include <stdarg.h>
+#include <string.h>
 
 #include "menus/core/ui_screen.h"
 
@@ -296,16 +297,16 @@ char *wrap_text(const Charset *font, float zoom_x, const char *text, float max_w
     return wrap_buffer;
 }
 
+static float get_font_line_height(const Charset *font) {
+    const Glyph *reference = get_glyph(font, 'A');
+    return reference ? reference->height : 29.f;
+}
+
 static float get_image_tag_length(const Charset *font, const float zoom_x, char *tag) {
     int image_index = -1;
     int image_sheet = 0;
     if (parse_image_tag(tag, &image_index, &image_sheet)) {
-        float height = HEIGHT_OFFSET;
-
-        const Glyph *aCharacter = get_glyph(font, 'A');
-        if (aCharacter) {
-            height = aCharacter->height * HEIGHT_OFFSET_MULT;
-        }
+        float height = get_font_line_height(font);
 
         C2D_Image image = C2D_SpriteSheetGetImage(*get_sheet(image_sheet), image_index);
         if (!image.subtex) return 0;
@@ -460,6 +461,94 @@ float get_text_length(const Charset *font, const float zoom_x, bool parse_tags, 
 
 #define SPACING 6.f
 
+static void include_vertical_bounds(float top, float bottom, bool *has_bounds, float *min_y, float *max_y) {
+    if (!(*has_bounds)) {
+        *min_y = top;
+        *max_y = bottom;
+        *has_bounds = true;
+        return;
+    }
+
+    if (top < *min_y) *min_y = top;
+    if (bottom > *max_y) *max_y = bottom;
+}
+
+static void get_text_vertical_bounds(const Charset *font, const char *text, int size, bool parse_tags, float scale_y, float line_height, float *min_y, float *max_y) {
+    float offset_y = 0.f;
+    bool has_bounds = false;
+
+    for (int i = 0; i < size;) {
+        uint32_t codepoint;
+        int bytes = decode_utf8_codepoint(text + i, size - i, &codepoint);
+
+        if (codepoint == '\n') {
+            i += bytes;
+            offset_y += line_height;
+            continue;
+        }
+
+        bool is_image = false;
+        int image_index = -1;
+        int image_sheet = 0;
+
+        if (codepoint == '<' && parse_tags) {
+            char tag[64];
+            int tag_end = i;
+            if (read_tag(text, &tag_end, tag, sizeof(tag))) {
+                i = tag_end + 1;
+                if (parse_image_tag(tag, &image_index, &image_sheet)) {
+                    is_image = true;
+                } else {
+                    continue;
+                }
+            } else {
+                i += bytes;
+            }
+        } else {
+            i += bytes;
+        }
+
+        if (is_image) {
+            C2D_SpriteSheet *image_sheet_ptr = get_sheet(image_sheet);
+            if (image_index >= 0 && image_sheet_ptr) {
+                C2D_Image image = C2D_SpriteSheetGetImage(*image_sheet_ptr, image_index);
+                if (image.subtex) {
+                    float image_height = get_font_line_height(font) * fabsf(scale_y);
+                    
+                    include_vertical_bounds(offset_y - image_height * 0.5f, offset_y + image_height * 0.5f, &has_bounds, min_y, max_y);
+                }
+            }
+            continue;
+        }
+
+        const Glyph *character = get_glyph(font, codepoint);
+        if (character) {
+            float glyph_center = offset_y + (character->yOffset + character->height * 0.5f) * scale_y;
+            float glyph_half_height = character->height * fabsf(scale_y) * 0.5f;
+            
+            include_vertical_bounds(glyph_center - glyph_half_height, glyph_center + glyph_half_height, &has_bounds, min_y, max_y);
+        }
+    }
+
+    if (!has_bounds) {
+        *min_y = 0.f;
+        *max_y = 0.f;
+    }
+}
+
+float get_text_height(const Charset *font, C2D_SpriteSheet *sheet, const float scaleY, bool parse_tags, const char *text) {
+    int size = strlen(text);
+    float mod_scaleY = scaleY * font->scale;
+    
+    float height = get_font_line_height(font);
+    float line_height = height * 1.3f * fabsf(mod_scaleY);
+
+    float min_y;
+    float max_y;
+    get_text_vertical_bounds(font, text, size, parse_tags, mod_scaleY, line_height, &min_y, &max_y);
+    return max_y - min_y;
+}
+
 void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const float y, const float scaleX, const float scaleY, float alignment, bool parse_tags, const char *text, ...) {
     if (!text || !sheet) {
         return;
@@ -471,13 +560,6 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
     va_start(argp, text);
     const int size = vsnprintf(tmp, sizeof(tmp), text, argp);
     va_end(argp);
-
-    float height = HEIGHT_OFFSET;
-
-    const Glyph *aCharacter = get_glyph(font, 'A');
-    if (aCharacter) {
-        height = aCharacter->height * HEIGHT_OFFSET_MULT;
-    }
 
     float line_length;
     float first_char;
@@ -491,11 +573,13 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
     float offset_x = 0;
     float offset_y = 0;
 
-    // Get total text height
-    int line_count = count_lines(tmp, parse_tags) - 1;
-    float glyph_height = aCharacter ? aCharacter->height : height;
-    float line_height = glyph_height * 1.3f * fabsf(mod_scaleY);
-    float total_height = (line_count * line_height);
+    float height = get_font_line_height(font);
+    float line_height = height * 1.3f * fabsf(mod_scaleY);
+
+    float min_y;
+    float max_y;
+    get_text_vertical_bounds(font, tmp, size, parse_tags, mod_scaleY, line_height, &min_y, &max_y);
+    float base_y = y - (min_y + max_y) * 0.5f;
 
     C2D_ImageTint tint = { 0 };
     u32 current_color = white_c;
@@ -550,10 +634,8 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
 
                 int index = character->spriteIndex;
                 
-                float base_y = y - total_height / 2.f;
-
                 float final_x = x + offset_x + xoffset - width_offset;
-                float final_y = base_y + offset_y + yoffset - height * mod_scaleY;
+                float final_y = base_y + offset_y + yoffset;
 
                 final_x += (character->width  * mod_scaleX) * 0.5f;
                 final_y += (character->height * mod_scaleY) * 0.5f;
@@ -589,16 +671,13 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
                     float image_scale_y = mod_scaleY * image_scale;
 
                     float image_width = tex_w * image_scale_x;
-                    float image_height = tex_h * image_scale_y;
 
                     float xadvance = image_width;
                     
-                    float base_y = y - total_height / 2.f;
                     float final_x = x + offset_x - width_offset;
-                    float final_y = base_y + offset_y - image_height * 0.5f;
+                    float final_y = base_y + offset_y;
 
                     final_x += image_width * 0.5f;
-                    final_y += image_height * 0.5f;
 
                     // Draw image so its center is at (final_x, final_y)
                     C2D_SpriteSetCenter(&sprite, 0.5f, 0.5f);

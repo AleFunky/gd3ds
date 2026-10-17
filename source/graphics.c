@@ -1527,12 +1527,18 @@ static void update_current_objects(void) {
                 if (calc_x < -x_margin || calc_x >= SCREEN_WIDTH / SCALE + x_margin || calc_y < -y_margin || calc_y >= SCREEN_HEIGHT / SCALE + y_margin) 
                     continue;
 
-                if (!is_valid_object(objects.id[obj]) || objects.flags[obj] & FLAG_TOGGLED || objects.alpha_trigger_opacity[obj] <= 0) 
+                if (!is_valid_object(objects.id[obj]) || objects.flags[obj] & FLAG_TOGGLED) 
                     continue;
 
                 // 0 scale objects are invisible
                 if (objects.scale_x[obj] == 0.f || objects.scale_y[obj] == 0.f)
                     continue;
+                
+                if (current_object_count < MAX_SPRITES) current_objects[current_object_count++] = obj;
+                
+                if (objects.alpha_trigger_opacity[obj] <= 0) {
+                    continue;
+                }
             
                 float fade_val = obj_edge_fade(calc_x, SCREEN_WIDTH / SCALE);
                 if (fade_val == 255) {
@@ -1578,7 +1584,6 @@ static void update_current_objects(void) {
                 );
 
                 spawn_object_particles(obj);
-                if (current_object_count < MAX_SPRITES) current_objects[current_object_count++] = obj;
             }
         }
     }
@@ -1744,7 +1749,6 @@ void create_objects() {
 
     update_current_objects();
     
-
     snapshot.draw_count = current_object_count;
     
     u64 end = svcGetSystemTick();

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "main.h"
+#include "menus/core/ui_screen.h"
 #include "text.h"
 
 #include "menus/components/ui_rectangle.h"
@@ -118,7 +119,7 @@ static void populate_info() {
             // label
             UILabel *label = ui_create_label(screen);
             if (label) {
-                ui_label_set_text(label, "Changes since last update:");
+                ui_label_set_text(label, "<#ffff00>Changes since last update:</>");
                 ui_element_set_scale((UIElement *)label, textScale);
                 ui_element_set_position((UIElement *)label, -list_width + textMarginX, 0);
                 label->font = 1;
@@ -128,22 +129,22 @@ static void populate_info() {
         }
 
         for (int i = 0; i < latestCommitCount; i++) {
-            char *buf = wrap_text(&chatFont_fontCharset, textScale, latestCommits[i], list->base.w - 2 * textMarginX);
-            int lineCount = count_lines(buf, true);
+            float commit_scale = textScale * 0.9f;
+            char *buf = wrap_text(&chatFont_fontCharset, commit_scale, latestCommits[i], list->base.w - 2 * textMarginX);
+            float textHeight = get_text_height(&chatFont_fontCharset, &chatFont_sheet, commit_scale, true, buf);
 
             UIElement *card = (UIElement *)ui_create_rectangle(screen);
             if (card && i < 30 - 1) {
-                ui_rectangle_set_color((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 0) : C2D_Color32(161, 88, 48, 0)));
-                ui_element_set_size(card, list->base.w, lineCount * lineHeight + textMarginY * 2);
+                ui_rectangle_set_color((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 0) : C2D_Color32(194, 114, 62, 63)));
+                ui_element_set_size(card, list->base.w, textHeight + textMarginY * 2);
                 
                 // commit title
                 UILabel *title = ui_create_label(screen);
                 if (title) {
-                    title->base.w = list->base.w - 2 * textMarginX; 
                     ui_label_set_text(title, buf);
 
                     ui_element_set_position((UIElement *)title, -list_width + textMarginX, 0);
-                    ui_element_set_scale((UIElement *)title, textScale);
+                    ui_element_set_scale((UIElement *)title, commit_scale );
 
                     title->font = 1;
 
@@ -152,14 +153,13 @@ static void populate_info() {
 
                 ui_list_add(list, card);
             } else if (card) {
-                ui_rectangle_set_color((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 0) : C2D_Color32(161, 88, 48, 0)));
+                ui_rectangle_set_color((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 0) : C2D_Color32(194, 114, 62, 63)));
                 ui_element_set_size(card, list->base.w, lineHeight + textMarginY * 2);
                 
                 // ... and more
                 UILabel *title = ui_create_label(screen);
                 if (title) {
-                    title->base.w = list->base.w - 2 * textMarginX; 
-                    ui_label_set_text(title, "... and more!");
+                    ui_label_set_text(title, "<#27ff00>... and more!</>");
 
                     ui_element_set_position((UIElement *)title, -list_width + textMarginX, 0);
                     ui_element_set_scale((UIElement *)title, textScale);
@@ -194,12 +194,12 @@ static void populate_info() {
         // body 
         for (int i = 0; i < baseLineCount; i++) {
             char *buf = wrap_text(&chatFont_fontCharset, textScale, infoText[i], list->base.w - 2 * textMarginX);
-            int lineCount = count_lines(buf, true);
+            float textHeight = get_text_height(&chatFont_fontCharset, &chatFont_sheet, textScale, true, buf);
 
             UIElement *card = (UIElement *)ui_create_rectangle(screen);
             if (card) {
                 ui_rectangle_set_color((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 0) : C2D_Color32(161, 88, 48, 0)));
-                ui_element_set_size(card, list->base.w, lineCount * lineHeight + textMarginY * 2);
+                ui_element_set_size(card, list->base.w, textHeight + textMarginY * 2);
                 
                 // commit title
                 UILabel *title = ui_create_label(screen);
