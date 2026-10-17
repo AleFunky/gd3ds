@@ -787,12 +787,13 @@ void exit_practice_mode() {
     }
 }
 
-void update_auto_checkpoint_with_p2() {
+void update_checkpoint_with_p2() {
     // Exit if not in practice mode with autocheckpoints enabled
     if (!(state.practice_mode && settingsState.autoCheckpoints) || state.end_wall_anim_playing) return;
 
     if (placed_checkpoint) {
         placed_checkpoint->p2 = state.player2;
+        placed_checkpoint = NULL;
     }
 }
 
@@ -839,6 +840,7 @@ void handle_practice_mode() {
             delete_last_checkpoint();
         }
         new_checkpoint();
+        update_checkpoint_with_p2();
     }
 
     if (((kDown & KEY_R) && !((kHeld & KEY_B) && settingsState.enableDebugBindings)) || (kDown & KEY_ZR)) {

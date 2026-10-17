@@ -725,7 +725,7 @@ void run_player(Player *player) {
     }
     
     if (state.current_player == 0) handle_auto_checkpoints(STEPS_DT);
-    else if (state.just_placed_auto_checkpoint) update_auto_checkpoint_with_p2();
+    else if (state.just_placed_auto_checkpoint) update_checkpoint_with_p2();
     
     // Handle land particles
     if (player->gamemode != GAMEMODE_WAVE && !state.old_player.on_ground && player->on_ground) {
