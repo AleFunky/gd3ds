@@ -280,6 +280,8 @@ static int load_gmd(GenericTask *task) {
     
     if (gmd == NULL) return 1;
 
+    gmd = convert_if_gdlvl(gmd, state.custom_level_path);
+
     set_name_creator(gmd);
     set_description(gmd);
     set_downloads_likes(gmd);

@@ -2440,6 +2440,8 @@ int load_level(char *path) {
     char *level = read_file(path, &out);
     if (!level) return 1;
 
+    level = convert_if_gdlvl(level, path);
+
     char *data = decompress_level(level, &out_code);
     if (!data) {
         free(level);
@@ -2612,4 +2614,36 @@ bool check_song(int id) {
     char full_path[273];
     snprintf(full_path, sizeof(full_path), "%s%d.mp3", USER_SONGS_DIR, id);
     return access(full_path, F_OK) == 0;
+}
+
+char *convert_if_gdlvl(char *gmd, char *path) {
+    const char *extension = get_filename_ext(path);
+    if (strcmp(extension, "gdlvl") == 0) {
+        unsigned char *decoded = malloc(strlen(gmd));
+        if (!decoded) {
+            return NULL;
+        }
+
+        fix_base64_url(gmd);
+        int decoded_len = base64_decode(gmd, decoded);
+        if (decoded_len <= 0) {
+            output_log("Failed to decode base64\n");
+            free(gmd);
+            free(decoded);
+            return NULL;
+        }
+
+        size_t decompressed_len;
+        int out_code;
+        char *decompressed = decompress_data(decoded, decoded_len, &decompressed_len, &out_code);
+        if (!decompressed) {
+            output_log("Decompression failed (check zlib error above)\n");
+            free(decoded);
+            return NULL;
+        }
+
+        free(decoded);
+        return decompressed;
+    }
+    return gmd;
 }

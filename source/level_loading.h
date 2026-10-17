@@ -341,3 +341,5 @@ char *extract_gmd_key(const char *data, const char *key, const char *type);
 char **split_string(const char *str, char delimiter, int *outCount, bool ignoreZeroLength);
 char **split_string_str_del(const char *str, const char *delimiter, int *outCount, bool ignoreZeroLength);
 void free_string_array(char **arr, int count);
+
+char *convert_if_gdlvl(char *gmd, char *path);
