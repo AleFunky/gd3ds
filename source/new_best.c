@@ -47,7 +47,10 @@ char *new_best_text[] = {
     "Try it in Famidash",
     "Blame it on RobTop",
     "Do you have muscle dementia",
-    "New worst!"
+    "New worst!",
+    "STOP DYING THERE",
+    "!tseB weN",
+    "Dies of death"
 };
 
 char *died_to_text[DEATH_REASON_COUNT] = {

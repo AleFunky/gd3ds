@@ -80,7 +80,15 @@ char *splash_texts[] = {
     "Have you encountered the nightmare men?",
     "who is cloud5474",
     "Can you do um maybe like um... stuff",
-    "Not vibecoded!" // Hopefully reduces people that think this the game is vibecoded lol
+    "Not vibecoded!", // Hopefully reduces people that think this the game is vibecoded lol (okay it turns out this is message number 67, how interesting)
+    "Due to the large count of characters, and the huge amount of content this specific splash has, you really can't see this entire message on your 3DS screen due to the pixelation it's getting. Isn't that weird, right?",
+    "How mfs look at you when your\nfirst extreme is Bloodbath\nand not \"MLG Mountain Dew Lasagna XVII\"",
+    "%sReplacedAdded;=",
+    "\"ok but 2.2 whe-\" get out.",
+    "Did you remember to flush the toilet",
+    "Now with random move trigger deaths!",
+    "Move trigger? More like slopes the second",
+    "Waiter waiter, more revamps please"
 };
 
 void loading_screen_init() {

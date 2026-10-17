@@ -550,7 +550,7 @@ float get_text_height(const Charset *font, C2D_SpriteSheet *sheet, const float s
     float mod_scaleY = scaleY * font->scale;
 
     float height = get_font_line_height(font);
-    float line_height = height * 1.3f * fabsf(mod_scaleY);
+    float line_height = height * 0.9f * fabsf(scaleY);
 
     float min_y;
     float max_y;
@@ -583,7 +583,7 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
     float offset_y = 0;
 
     float height = get_font_line_height(font);
-    float line_height = height * 1.3f * fabsf(mod_scaleY);
+    float line_height = height * 0.9f * fabsf(scaleY);
 
     float min_y;
     float max_y;
