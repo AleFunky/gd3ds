@@ -20,6 +20,8 @@ extern int alpha_trigger_capacity;
 extern int move_trigger_capacity;
 extern int spawn_trigger_capacity;
 
+bool restored_checkpoint = false;
+
 int used_count = 0;
 int channels_used[COL_CHANNEL_NUM];
 
@@ -112,6 +114,9 @@ typedef struct CheckpointData {
     float song_offset;
 
     void *alloc_base;
+
+    float move_lock_player_x_delta;
+    float move_lock_player_y_delta;
 } CheckpointData;
 
 CheckpointData checkpoints[MAX_CHECKPOINTS];
@@ -464,6 +469,9 @@ void new_checkpoint() {
 
     check->song_offset = level_info.song_offset + state.player.timeElapsed;
 
+    check->move_lock_player_x_delta = move_lock_player_x_delta;
+    check->move_lock_player_y_delta = move_lock_player_y_delta;
+
     // snapshot only the channels used by this level
     for (int i = 0; i < used_count; i++) {
         int idx = channels_used[i];
@@ -636,6 +644,9 @@ void restore_checkpoint() {
 
     current_fading_effect = check->current_fading_effect;
     p1_trail = check->p1_trail;
+    
+    tmp_move_lock_player_x_delta = check->move_lock_player_x_delta;
+    tmp_move_lock_player_y_delta = check->move_lock_player_y_delta;
 
     if (settingsState.practiceMusicSync) seek_mp3(check->song_offset);
     
@@ -737,6 +748,7 @@ void restore_checkpoint() {
     update_attempt_text_pos();
 
     set_checkpoint_timer(AUTO_CHECKPOINT_TIME);
+    restored_checkpoint = true;
 }
 
 void delete_last_checkpoint() {
@@ -807,6 +819,8 @@ void handle_auto_checkpoints(float delta) {
             case GAMEMODE_BALL:
             case GAMEMODE_ROBOT:
                 if (state.player.landed_from_jump) {
+                    move_lock_player_x_delta = state.player.x - player_x_before_physics;
+                    move_lock_player_y_delta = acc_delta_y;
                     new_checkpoint();
                     state.just_placed_auto_checkpoint = true;
                 }
@@ -815,6 +829,8 @@ void handle_auto_checkpoints(float delta) {
             case GAMEMODE_SHIP:
             case GAMEMODE_UFO:
             case GAMEMODE_WAVE:
+                move_lock_player_x_delta = state.player.x - player_x_before_physics;
+                move_lock_player_y_delta = acc_delta_y;
                 new_checkpoint();
                 state.just_placed_auto_checkpoint = true;
                 pseudo_checkpoint_exists = true;

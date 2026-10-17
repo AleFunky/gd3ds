@@ -149,6 +149,8 @@ void free_trigger_buffers() {
 static unsigned int pulse_activation_counter = 0;
 float move_lock_player_x_delta = 0.0f;
 float move_lock_player_y_delta = 0.0f;
+float tmp_move_lock_player_x_delta = 0.0f;
+float tmp_move_lock_player_y_delta = 0.0f;
 
 float get_group_opacities(int object) {
     float group_opacity = 1.f;

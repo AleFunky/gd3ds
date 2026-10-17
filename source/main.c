@@ -97,6 +97,9 @@ float sound_volume;
 int steps = 0;
 int last_steps = 0;
 
+float player_x_before_physics = 0;
+float acc_delta_y = 0;
+
 bool cheats_used[CHEAT_COUNT];
 
 const char *cheat_names[CHEAT_COUNT] = {
@@ -1017,8 +1020,8 @@ void game_loop() {
                 u32 planned = (u32)(accumulator / STEPS_DT);
                 pi_begin_frame((u32)frame_window_start, (u32)now, planned ? planned : 1);
 
-                float player_x_before_physics = state.player.x;
-                float acc_delta_y = 0.0f;
+                player_x_before_physics = state.player.x;
+                acc_delta_y = 0.0f;
 
                 state.player.gravity_changed_move = false;
                 state.player2.gravity_changed_move = false;
@@ -1109,8 +1112,11 @@ void game_loop() {
                     level_frame++;
                 }
 
-                move_lock_player_x_delta = state.player.x - player_x_before_physics;
-                move_lock_player_y_delta = acc_delta_y;
+                move_lock_player_x_delta = tmp_move_lock_player_x_delta + state.player.x - player_x_before_physics;
+                move_lock_player_y_delta = tmp_move_lock_player_y_delta + acc_delta_y;
+                
+                tmp_move_lock_player_x_delta = 0;
+                tmp_move_lock_player_y_delta = 0;
             }
         }
 

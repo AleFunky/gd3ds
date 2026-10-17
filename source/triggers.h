@@ -142,6 +142,8 @@ extern SpawnTriggerBuffer *spawn_trigger_buffer;
 extern PulseTriggerBuffer *pulse_trigger_buffer;
 extern float move_lock_player_x_delta;
 extern float move_lock_player_y_delta;
+extern float tmp_move_lock_player_x_delta;
+extern float tmp_move_lock_player_y_delta;
 
 extern Color p1_color;
 extern Color p2_color;

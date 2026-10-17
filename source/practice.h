@@ -7,6 +7,7 @@
 extern int checkpoint_count;
 extern int checkpoint_pointer;
 extern bool pseudo_checkpoint_exists;
+extern bool restored_checkpoint;
 
 void start_practice_mode();
 void exit_practice_mode();

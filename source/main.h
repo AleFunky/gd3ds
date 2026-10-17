@@ -58,6 +58,9 @@ extern float delta;
 extern float frame_timer;
 extern unsigned int frame_counter;
 
+extern float player_x_before_physics;
+extern float acc_delta_y;
+
 extern int steps;
 extern int last_steps;
 extern unsigned int level_frame;
