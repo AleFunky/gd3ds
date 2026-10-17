@@ -158,38 +158,38 @@ void ui_assets_init() {
     if (!groundSheet) svcBreak(USERBREAK_PANIC);
 }
 
-C2D_SpriteSheet *get_sheet(int sheet) {
+C2D_SpriteSheet get_sheet(int sheet) {
     switch (sheet) {
         case 0:
-            return &ui_sheet;
+            return ui_sheet;
         case 1:
-            return &ui_2_sheet;
+            return ui_2_sheet;
         case 2:
-            return &window_sheet;
+            return window_sheet;
         case 3:
-            return &spriteSheet;
+            return spriteSheet;
         case 4:
-            return &spriteSheet2;
+            return spriteSheet2;
         case 5:
-            return &bgSheet;
+            return bgSheet;
         case 6:
-            return &groundSheet;
+            return groundSheet;
         case 7:
-            return &cube0Sheet;
+            return cube0Sheet;
         case 9:
-            return &bar_sheet;
+            return bar_sheet;
         case 10:
-            return &bg_gradient_sheet;
+            return bg_gradient_sheet;
         case 11: 
-            return &cube1Sheet;
+            return cube1Sheet;
         case 12:
-            return &shipSheet;
+            return shipSheet;
         case 13:
-            return &ballSheet;
+            return ballSheet;
         case 14:
-            return &ufoSheet;
+            return ufoSheet;
         case 15:
-            return &waveSheet;
+            return waveSheet;
     }
     return NULL;
 }

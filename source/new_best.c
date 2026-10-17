@@ -54,8 +54,8 @@ char *died_to_text[DEATH_REASON_COUNT] = {
     "Bro died magically",
     "Bro died to a <i646s3>spike",
     "Bro died to a <#000000><i639s3></>saw",
-    "Bro died to a <i650s3>block",
-    "Bro died to a <i758s3>slope",
+    "Bro died to a <i696s3>block",
+    "Bro died to a <i731s3>slope",
     "Bro fell out of the level",
     "Bro died to the ground",
 };

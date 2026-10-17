@@ -86,8 +86,8 @@ static void draw_key_layer(int tex, float px, float py, int channel, float opaci
     C2D_PlainImageTint(&itint, tint, 1.0f);
 
     int rel;
-    C2D_SpriteSheet *sheet = get_sprite_sheet_ex(tex, &rel);
-    C2D_SpriteFromSheet(&spr, *sheet, rel);
+    C2D_SpriteSheet sheet = get_sprite_sheet_ex(tex, &rel);
+    C2D_SpriteFromSheet(&spr, sheet, rel);
     C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
     C2D_SpriteSetPos(&spr, px, py);
     C2D_SpriteSetScale(&spr, scale_x * state.mirror_mult, scale_y);

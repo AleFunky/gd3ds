@@ -132,31 +132,31 @@ SpriteTemplate sprite_templates[GAME_OBJECT_COUNT]; // global cache
 
 float touch_effect_drag_timer = 0.f;
 
-static C2D_SpriteSheet *get_sprite_sheet(int index, int *rel_index) {
+static C2D_SpriteSheet get_sprite_sheet(int index, int *rel_index) {
     // Check if index belongs to spritesheet 1 (most objects)
     if (index < SPRITESHEET2_START) {
         *rel_index = index;
-        return &spriteSheet;
+        return spriteSheet;
     }
 
     if (index < SPRITESHEET3_START) {
         // Return spritesheet 2 (portals)
         *rel_index = index - SPRITESHEET2_START;
-        return &spriteSheet2;
+        return spriteSheet2;
     }
 
     if (index < ANIMATEDSHEET_START) {
         // Return spritesheet 3 (2.0 objects)
         *rel_index = index - SPRITESHEET3_START;
-        return &spriteSheet3;
+        return spriteSheet3;
     }
 
     // Return spritesheet 4 (animated objects)
     *rel_index = index - ANIMATEDSHEET_START;
-    return &animatedSheet;
+    return animatedSheet;
 }
 
-C2D_SpriteSheet *get_sprite_sheet_ex(int index, int *rel_index) {
+C2D_SpriteSheet get_sprite_sheet_ex(int index, int *rel_index) {
     return get_sprite_sheet(index, rel_index);
 }
 
@@ -274,9 +274,9 @@ void cache_all_sprites() {
         // parent template (if object has a parent textur
         if (obj->texture >= 0) {
             int tex;
-            C2D_SpriteSheet *sheet = get_sprite_sheet(obj->texture, &tex);
+            C2D_SpriteSheet sheet = get_sprite_sheet(obj->texture, &tex);
 
-            C2D_SpriteFromSheet(&sprite_templates[id].parent_template, *sheet, tex);
+            C2D_SpriteFromSheet(&sprite_templates[id].parent_template, sheet, tex);
             C3D_TexSetFilter(sprite_templates[id].parent_template.image.tex, GPU_LINEAR, GPU_LINEAR);
             C2D_SpriteSetCenter(&sprite_templates[id].parent_template, 0.5f, 0.5f);
         }
@@ -297,9 +297,9 @@ void cache_all_sprites() {
                 if (c->texture < 0) continue;
 
                 int c_tex;
-                C2D_SpriteSheet *c_sheet = get_sprite_sheet(c->texture, &c_tex);
+                C2D_SpriteSheet c_sheet = get_sprite_sheet(c->texture, &c_tex);
 
-                C2D_SpriteFromSheet(&sprite_templates[id].child_templates[i], *c_sheet, c_tex);
+                C2D_SpriteFromSheet(&sprite_templates[id].child_templates[i], c_sheet, c_tex);
                 C3D_TexSetFilter(sprite_templates[id].child_templates[i].image.tex, GPU_LINEAR, GPU_LINEAR);
                 C2D_SpriteSetCenter(&sprite_templates[id].child_templates[i], 0.5f, 0.5f);
             }
@@ -794,8 +794,8 @@ void spawn_object_at(
                 const SwapFrame* swap_frame = &obj->swap_frames[slot_frames->start + index];
 
                 int rel_index;
-                C2D_SpriteSheet *sheet = get_sprite_sheet(swap_frame->texture, &rel_index);
-                C2D_SpriteFromSheet(&vo->spr, *sheet, rel_index);
+                C2D_SpriteSheet sheet = get_sprite_sheet(swap_frame->texture, &rel_index);
+                C2D_SpriteFromSheet(&vo->spr, sheet, rel_index);
                 C2D_SpriteSetCenter(&vo->spr, 0.5f, 0.5f);
                 
                 sx *= (swap_frame->flip_x ? -1 : 1);
@@ -809,10 +809,10 @@ void spawn_object_at(
                 vo->spr = sprite_templates[id].parent_template;
             } else {
                 int rel_index;
-                C2D_SpriteSheet *sheet = get_sprite_sheet(random_layer, &rel_index);
+                C2D_SpriteSheet sheet = get_sprite_sheet(random_layer, &rel_index);
                 C2D_Sprite rnd = { 0 };
                 vo->spr = rnd;
-                C2D_SpriteFromSheet(&vo->spr, *sheet, rel_index);
+                C2D_SpriteFromSheet(&vo->spr, sheet, rel_index);
                 C2D_SpriteSetCenter(&vo->spr, 0.5f, 0.5f);
             }
         }
@@ -930,8 +930,8 @@ void spawn_object_at(
                     const SwapFrame* swap_frame = &obj->swap_frames[slot_frames->start + index];
 
                     int rel_index;
-                    C2D_SpriteSheet *sheet = get_sprite_sheet(swap_frame->texture, &rel_index);
-                    C2D_SpriteFromSheet(&vo->spr, *sheet, rel_index);
+                    C2D_SpriteSheet sheet = get_sprite_sheet(swap_frame->texture, &rel_index);
+                    C2D_SpriteFromSheet(&vo->spr, sheet, rel_index);
                     C2D_SpriteSetCenter(&vo->spr, 0.5f, 0.5f);
 
                     c_sx *= (swap_frame->flip_x ? -1 : 1);

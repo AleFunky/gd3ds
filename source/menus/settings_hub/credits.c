@@ -76,7 +76,7 @@ void credits_init(UIScreen *s) {
                     char text[256];
                     snprintf(text, sizeof(text) - 1, "- %s", contribution);
                     ui_label_set_text(description, text);
-                    ui_element_set_position((UIElement *) description, -list_width + 8 + get_text_length(&bigFont_fontCharset, contributor_scale, true, contributor), -1);
+                    ui_element_set_position((UIElement *) description, -list_width + 8 + get_text_length(&bigFont_fontCharset, contributor_scale, true, contributor), 0);
                     ui_element_set_scale((UIElement *) description, 0.7f);
                     
                     description->font = 1;

@@ -35,7 +35,7 @@ void ui_image_clear_tint(UIImage* e) {
 void ui_image_set_image(UIImage *e, int sprite_index, int sheet) {
     if (!e) return;
 
-    C2D_SpriteFromSheet(&e->image.sprite, *get_sheet(sheet), sprite_index);
+    C2D_SpriteFromSheet(&e->image.sprite, get_sheet(sheet), sprite_index);
     C3D_TexSetFilter(e->image.sprite.image.tex, GPU_LINEAR, GPU_LINEAR);
 
     e->base.w = e->image.sprite.image.subtex->width;

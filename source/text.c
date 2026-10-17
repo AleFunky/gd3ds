@@ -3,6 +3,7 @@
 #include <citro3d.h>
 #include <3ds/util/utf.h>
 
+#include "c2d/spritesheet.h"
 #include "math_helpers.h"
 
 #include "text.h"
@@ -302,13 +303,21 @@ static float get_font_line_height(const Charset *font) {
     return reference ? reference->height : 29.f;
 }
 
+static float get_font_image_center_y(const Charset *font) {
+    const Glyph *reference = get_glyph(font, 'A');
+    return reference ? reference->yOffset + reference->height * 0.5f : get_font_line_height(font) * 0.5f;
+}
+
 static float get_image_tag_length(const Charset *font, const float zoom_x, char *tag) {
     int image_index = -1;
     int image_sheet = 0;
     if (parse_image_tag(tag, &image_index, &image_sheet)) {
         float height = get_font_line_height(font);
+        
+        C2D_SpriteSheet sheet = get_sheet(image_sheet);
+        if (!sheet) return 0;
 
-        C2D_Image image = C2D_SpriteSheetGetImage(*get_sheet(image_sheet), image_index);
+        C2D_Image image = C2D_SpriteSheetGetImage(sheet, image_index);
         if (!image.subtex) return 0;
 
         float tex_w = image.subtex->width;
@@ -509,13 +518,13 @@ static void get_text_vertical_bounds(const Charset *font, const char *text, int 
         }
 
         if (is_image) {
-            C2D_SpriteSheet *image_sheet_ptr = get_sheet(image_sheet);
+            C2D_SpriteSheet image_sheet_ptr = get_sheet(image_sheet);
             if (image_index >= 0 && image_sheet_ptr) {
-                C2D_Image image = C2D_SpriteSheetGetImage(*image_sheet_ptr, image_index);
+                C2D_Image image = C2D_SpriteSheetGetImage(image_sheet_ptr, image_index);
                 if (image.subtex) {
                     float image_height = get_font_line_height(font) * fabsf(scale_y);
-                    
-                    include_vertical_bounds(offset_y - image_height * 0.5f, offset_y + image_height * 0.5f, &has_bounds, min_y, max_y);
+                    float image_center = offset_y + get_font_image_center_y(font) * scale_y;
+                    include_vertical_bounds(image_center - image_height * 0.5f, image_center + image_height * 0.5f, &has_bounds, min_y, max_y);
                 }
             }
             continue;
@@ -539,7 +548,7 @@ static void get_text_vertical_bounds(const Charset *font, const char *text, int 
 float get_text_height(const Charset *font, C2D_SpriteSheet *sheet, const float scaleY, bool parse_tags, const char *text) {
     int size = strlen(text);
     float mod_scaleY = scaleY * font->scale;
-    
+
     float height = get_font_line_height(font);
     float line_height = height * 1.3f * fabsf(mod_scaleY);
 
@@ -657,9 +666,12 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
             C2D_Sprite sprite = { 0 };
 
             if (image_index >= 0) { 
-                C2D_Image image = C2D_SpriteSheetGetImage(*get_sheet(image_sheet), image_index);
+                C2D_SpriteSheet sheet = get_sheet(image_sheet);
+                if (!sheet) continue;
+
+                C2D_Image image = C2D_SpriteSheetGetImage(sheet, image_index);
                 if (image.subtex) {
-                    C2D_SpriteFromSheet(&sprite, *get_sheet(image_sheet), image_index);
+                    C2D_SpriteFromSheet(&sprite, sheet, image_index);
                     C3D_TexSetFilter(sprite.image.tex, GPU_LINEAR, GPU_LINEAR);
                 
                     float tex_w = sprite.image.subtex->width;
@@ -675,7 +687,7 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
                     float xadvance = image_width;
                     
                     float final_x = x + offset_x - width_offset;
-                    float final_y = base_y + offset_y;
+                    float final_y = base_y + offset_y + get_font_image_center_y(font) * mod_scaleY;
 
                     final_x += image_width * 0.5f;
 
