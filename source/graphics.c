@@ -1527,7 +1527,7 @@ static void update_current_objects(void) {
                 if (calc_x < -x_margin || calc_x >= SCREEN_WIDTH / SCALE + x_margin || calc_y < -y_margin || calc_y >= SCREEN_HEIGHT / SCALE + y_margin) 
                     continue;
 
-                if (!is_valid_object(objects.id[obj]) || objects.flags[obj] & FLAG_TOGGLED) 
+                if (!is_valid_object(objects.id[obj]) || objects.flags[obj] & FLAG_TOGGLED || objects.alpha_trigger_opacity[obj] <= 0) 
                     continue;
 
                 // 0 scale objects are invisible
