@@ -25,3 +25,5 @@ void handle_auto_checkpoints(float delta);
 void set_checkpoint_timer(float timer);
 
 void load_used_channels();
+
+void update_auto_checkpoint_with_p2();

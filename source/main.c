@@ -1050,6 +1050,8 @@ void game_loop() {
                         }
                     }
 
+                    state.just_placed_auto_checkpoint = false;
+
                     state.current_player = 0;
                     state.old_player = state.player;
                     

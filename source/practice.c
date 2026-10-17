@@ -115,6 +115,9 @@ typedef struct CheckpointData {
 } CheckpointData;
 
 CheckpointData checkpoints[MAX_CHECKPOINTS];
+
+static CheckpointData *placed_checkpoint = NULL;
+
 int checkpoint_count = 0;
 int checkpoint_pointer = 0;
 float checkpoint_timer = 0;
@@ -296,6 +299,7 @@ void new_checkpoint() {
     if (next_checkpoint >= MAX_CHECKPOINTS) next_checkpoint = 0;
 
     CheckpointData *check = &checkpoints[next_checkpoint];
+    placed_checkpoint = check;
 
     // release the snapshot of the checkpoint we are about to overwrite
     free_checkpoint_snapshot(check);
@@ -433,8 +437,6 @@ void new_checkpoint() {
     check->camera_y = state.camera_y;
 
     check->p1 = state.player;
-    check->p2 = state.player2;
-    
 
     check->camera_intended_y = state.camera_intended_y;
 
@@ -785,6 +787,15 @@ void exit_practice_mode() {
     }
 }
 
+void update_auto_checkpoint_with_p2() {
+    // Exit if not in practice mode with autocheckpoints enabled
+    if (!(state.practice_mode && settingsState.autoCheckpoints) || state.end_wall_anim_playing) return;
+
+    if (placed_checkpoint) {
+        placed_checkpoint->p2 = state.player2;
+    }
+}
+
 void handle_auto_checkpoints(float delta) {
     // Exit if not in practice mode with autocheckpoints enabled
     if (!(state.practice_mode && settingsState.autoCheckpoints) || state.end_wall_anim_playing) return;
@@ -796,6 +807,7 @@ void handle_auto_checkpoints(float delta) {
             case GAMEMODE_ROBOT:
                 if (state.player.landed_from_jump) {
                     new_checkpoint();
+                    state.just_placed_auto_checkpoint = true;
                 }
                 break;
 
@@ -803,6 +815,7 @@ void handle_auto_checkpoints(float delta) {
             case GAMEMODE_UFO:
             case GAMEMODE_WAVE:
                 new_checkpoint();
+                state.just_placed_auto_checkpoint = true;
                 pseudo_checkpoint_exists = true;
                 break;
 
