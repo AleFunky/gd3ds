@@ -1501,6 +1501,15 @@ void draw_attempt_text() {
     }
 }
 
+static int get_margin(int id) {
+    switch (id) {
+        case 925:
+        case 926:
+            return 120;
+    }
+    return 60;
+}
+
 static void update_current_objects(void) {
     current_object_count = 0;
 
@@ -1521,8 +1530,10 @@ static void update_current_objects(void) {
                 float calc_x = objects.x[obj] - state.camera_x;
                 float calc_y = SCREEN_HEIGHT - (objects.y[obj] - state.camera_y);
                 
-                float x_margin = 60 * objects.scale_x[obj];
-                float y_margin = 60 * objects.scale_y[obj];
+                int margin = get_margin(objects.id[obj]);
+
+                float x_margin = margin * objects.scale_x[obj];
+                float y_margin = margin * objects.scale_y[obj];
 
                 if (calc_x < -x_margin || calc_x >= SCREEN_WIDTH / SCALE + x_margin || calc_y < -y_margin || calc_y >= SCREEN_HEIGHT / SCALE + y_margin) 
                     continue;
