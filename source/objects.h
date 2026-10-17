@@ -20,6 +20,7 @@ typedef enum {
    COLOR_TYPE_BLACK,
    COLOR_TYPE_WHITE,
    COLOR_TYPE_GLOW,
+   COLOR_TYPE_ONLY_DETAIL,
 } ColorType;
 
 typedef enum {

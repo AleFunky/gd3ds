@@ -679,7 +679,7 @@ int get_color_type(const GameObject *game_obj, int obj, int col_type) {
     } else {
         if (col_type == COLOR_TYPE_DETAIL) {
             if (!obj_has_main(game_obj)) {
-                col_type = COLOR_TYPE_BASE;
+                col_type = COLOR_TYPE_ONLY_DETAIL;
             }
         }
     }
@@ -1652,23 +1652,30 @@ void update_tints() {
             
             int game_object = obj->obj;
 
+            // Apply hsv
             if (obj->col_type != COLOR_TYPE_DETAIL) {
                 if (objects.main_col_HSV_enabled[game_object]) {
                     col.color = apply_hsv_to_color(col.color, game_object, true, col_channel);
-                }
-                objects.main_non_pulse_color[game_object] = col.color;
-                if (objects.num_main_pulses[game_object] == 0) {
-                    objects.main_color[game_object] = col.color;
                 }
             } else {
                 if (objects.detail_col_HSV_enabled[game_object]) {
                     col.color = apply_hsv_to_color(col.color, game_object, false, col_channel);
                 }
+            }
+
+            bool detail = obj->col_type == COLOR_TYPE_DETAIL || obj->col_type == COLOR_TYPE_ONLY_DETAIL;
+
+            if (!detail) {
+                objects.main_non_pulse_color[game_object] = col.color;
+                if (objects.num_main_pulses[game_object] == 0) {
+                    objects.main_color[game_object] = col.color;
+                }
+            } else {
                 objects.detail_non_pulse_color[game_object] = col.color;
                 if (objects.num_detail_pulses[game_object] == 0) {
                     objects.detail_color[game_object] = col.color;
                 }
-            }
+            }   
 
             switch (obj->col_type) {
                 case COLOR_TYPE_GLOW:
@@ -1683,9 +1690,9 @@ void update_tints() {
                     break;
             }
 
-            if (obj->col_type != COLOR_TYPE_DETAIL && objects.main_being_pulsed[game_object] && col_channel >= 0) {
+            if (!detail && objects.main_being_pulsed[game_object] && col_channel >= 0) {
                 col.color = objects.main_color[game_object];
-            } else if (obj->col_type == COLOR_TYPE_DETAIL && objects.detail_being_pulsed[game_object] && col_channel >= 0) {
+            } else if (detail && objects.detail_being_pulsed[game_object] && col_channel >= 0) {
                 col.color = objects.detail_color[game_object];
                 if (col_channel == CHANNEL_LIGHTER && objects.main_being_pulsed[game_object]) {
                     col.color = HSV_combine(col.color, lighter_hsv);
@@ -1695,7 +1702,6 @@ void update_tints() {
                     col.blending = false;
                 }
             }
-
             
             if (obj->col_type == COLOR_TYPE_BLACK) {
                 col.color = (Color) {0,0,0};
