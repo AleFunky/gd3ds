@@ -53,6 +53,11 @@ The current release is available on Universal Updater. Alternatively, you can ma
 # Discord
 You can visit our Discord server and get support (or talk if you want to): [Discord](https://discord.gg/Yh6JrS7eSU)
 
+# Licensing
+All original assets and source code of this project are licensed under Creative Commons Attribution-Sharealike 4.0 (CC BY-SA 4.0) - meaning you can redistribute and transform them as long as give appropriate credit, indicate any changes made and distribute your contributions under the same license.\
+Code and assets adapted from other open-source projects belong to their respective authors and are licensed under the same terms as the source material.\
+All original Geometry Dash game assets belong to RobTob Games AB and RobTop Games AB only.
+
 # FAQ
 ### How do I install this on my 3DS?
 The current easiest way is to open the Universal Updater app on your 3DS and download the game from there. If you prefer doing it manually, download either the .3dsx or .cia file from the releases page and place it on your SD Card, then depending on which file you chose, launch it through the Homebrew Launcher, or install it to your home menu through FBI.
