@@ -1,4 +1,4 @@
-# Ok the branch is playable now, you can report issues now
+# Ok the branch is playable, you can report issues now
 
 # Geometry Dash for the 3DS
 
