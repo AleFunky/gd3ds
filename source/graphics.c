@@ -2120,9 +2120,28 @@ static void spawn_icon_at_internal(
         if (params.robot_anim_frame >= anim->frame_count)
             params.robot_anim_frame = 0;
         const RobotFrame *frame = &anim->frames[params.robot_anim_frame];
+        const RobotFrame *next_frame = frame;
+        float anim_fraction = 0.0f;
+        if (anim->frame_count > 1) {
+            int next_idx = params.robot_anim_frame + 1;
+            if (next_idx >= anim->frame_count) next_idx = 0;
+            bool hold_last = next_idx == 0 && (params.robot_anim_id == ROBOT_ANIM_JUMP_START
+                                            || params.robot_anim_id == ROBOT_ANIM_FALL_START);
+            if (!hold_last) {
+                next_frame = &anim->frames[next_idx];
+                anim_fraction = params.robot_anim_timer / frame->delay;
+            }
+        }
         
         for (int i = 0; i < frame->part_count; i++) {
             const RobotSpritePart *animation_part = &frame->parts[i];
+            const RobotSpritePart *next_part = &next_frame->parts[i];
+            float anim_px = animation_part->px + (next_part->px - animation_part->px) * anim_fraction;
+            float anim_py = animation_part->py + (next_part->py - animation_part->py) * anim_fraction;
+            float anim_rot = next_part->rotation - animation_part->rotation;
+            if (anim_rot > 180.0f) anim_rot -= 360.0f;
+            if (anim_rot < -180.0f) anim_rot += 360.0f;
+            anim_rot = animation_part->rotation + anim_rot * anim_fraction;
 
             int texture_part = animation_part->texture_idx / 2;
         
@@ -2160,12 +2179,12 @@ static void spawn_icon_at_internal(
                 if (!sheet) return;
 
                 if (part->texture >= 0) {
-                    float part_rad = rad + C3D_AngleFromDegrees(animation_part->rotation);
+                    float part_rad = rad + C3D_AngleFromDegrees(anim_rot);
                     float part_cos_r = cosf(part_rad);
                     float part_sin_r = sinf(part_rad);
 
-                    float anim_x = animation_part->px * 2.0f;
-                    float anim_y = animation_part->py * 2.0f;
+                    float anim_x = anim_px * 2.0f;
+                    float anim_y = anim_py * 2.0f;
 
                     float part_x = part->x;
                     float part_y = part->y;
@@ -2185,7 +2204,7 @@ static void spawn_icon_at_internal(
 
                     C2D_SpriteSetPos(&spr, p_x, p_y);
                     C2D_SpriteSetScale(&spr, sx, sy);
-                    C2D_SpriteSetRotation(&spr, rad + C3D_AngleFromDegrees(animation_part->rotation));
+                    C2D_SpriteSetRotation(&spr, rad + C3D_AngleFromDegrees(anim_rot));
 
                     C2D_DrawSpriteTinted(&spr, &tints[part->color_type]);
                 }

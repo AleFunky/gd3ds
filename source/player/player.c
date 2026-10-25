@@ -643,9 +643,14 @@ void robot_gamemode(Player *player) {
     }
 
     const RobotAnimation *anim = &robot_animations[player->robot_anim_id];
-    player->robot_anim_timer += STEPS_DT;
+    float anim_speed = (state.speed == SPEED_SLOW) ? 0.9f
+                     : (state.speed == SPEED_FAST) ? 1.15f
+                     : (state.speed == SPEED_FASTER) ? 1.3f : 1.0f;
+    if (player->mini) anim_speed /= 0.85f;
+    anim_speed *= 35.0f / 24.0f;
+    player->robot_anim_timer += STEPS_DT * anim_speed;
     if (player->robot_anim_timer >= anim->frames[player->robot_anim_frame].delay) {
-        player->robot_anim_timer = 0;
+        player->robot_anim_timer -= anim->frames[player->robot_anim_frame].delay;
         int next = player->robot_anim_frame + 1;
         if (next >= anim->frame_count) {
             if (player->robot_anim_id == ROBOT_ANIM_JUMP_START) {
@@ -1109,7 +1114,8 @@ void draw_p1_trail(Player *player, int player_id) {
                 color,
                 (IconParameters) { 
                     .robot_anim_frame = player->robot_anim_frame,
-                    .robot_anim_id = player->robot_anim_id
+                    .robot_anim_id = player->robot_anim_id,
+                    .robot_anim_timer = player->robot_anim_timer
                  }
             );
         }
@@ -1248,7 +1254,8 @@ void draw_player(Player *player) {
                 C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255),
                 (IconParameters) { 
                     .robot_anim_frame = player->robot_anim_frame,
-                    .robot_anim_id = player->robot_anim_id
+                    .robot_anim_id = player->robot_anim_id,
+                    .robot_anim_timer = player->robot_anim_timer
                  }
             );
             break;

@@ -143,6 +143,7 @@ void set_player_colors(Color p1, Color p2, Color glow);
 typedef struct {
     int robot_anim_id;
     int robot_anim_frame;
+    float robot_anim_timer;
 } IconParameters;
 
 void spawn_icon_at(
