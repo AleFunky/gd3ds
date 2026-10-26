@@ -7,6 +7,7 @@
 #include "main.h"
 #include "graphics.h"
 #include "player/player.h"
+#include "player/collision.h"
 #include "state.h"
 #include "mp3_player.h"
 #include "math_helpers.h"
@@ -100,6 +101,9 @@ typedef struct CheckpointData {
 
     int fired_move_count;
     int *fired_move_index;
+
+    int key_count;
+    int *key_index;
 
     int toggle_group_count;
     int *toggle_group_id;
@@ -361,9 +365,14 @@ void new_checkpoint() {
     if (move_y_fmt == 0) move_y_bytes = (int)(sizeof(float) * (size_t)move_cy);
 
     int fired_cap = 0;
-    for (int i = 0; i < objects.count; i++)
+    int key_cap = 0;
+    for (int i = 0; i < objects.count; i++) {
         if (objects.id[i] == MOVE_TRIGGER && GET_ACTIVATED(i))
             fired_cap++;
+        else if (objects.id[i] == KEY_OBJ && (objects.flags[i] & FLAG_TOGGLED)
+                 && (objects.activated[i] & 3))
+            key_cap++;
+    }
 
     int toggle_cap = 0;
     for (int g = 1; g < MAX_GROUPS; g++) {
@@ -407,6 +416,7 @@ void new_checkpoint() {
     CK_ADD(check->move_obj_x,        uint8_t,            move_x_bytes);
     CK_ADD(check->move_obj_y,        uint8_t,            move_y_bytes);
     CK_ADD(check->fired_move_index,  int,                fired_cap);
+    CK_ADD(check->key_index,         int,                key_cap);
     CK_ADD(check->toggle_group_id,   int,                toggle_cap);
     CK_ADD(check->alpha_group_id,    int,                alpha_group_cap);
     CK_ADD(check->alpha_group_alpha, float,              alpha_group_cap);
@@ -562,6 +572,18 @@ void new_checkpoint() {
                 check->fired_move_index[n++] = i;
         }
         check->fired_move_count = n;
+    }
+
+    check->key_count = 0;
+    if (key_cap > 0) {
+        int n = 0;
+        for (int i = 0; i < objects.count; i++) {
+            if (n >= key_cap) break;
+            if (objects.id[i] == KEY_OBJ && (objects.flags[i] & FLAG_TOGGLED)
+                && (objects.activated[i] & 3))
+                check->key_index[n++] = i;
+        }
+        check->key_count = n;
     }
 
     check->toggle_group_count = 0;
@@ -733,6 +755,11 @@ void restore_checkpoint() {
 
     for (int i = 0; i < check->fired_move_count; i++) {
         SET_ACTIVATED(check->fired_move_index[i], true);
+    }
+
+    for (int i = 0; i < check->key_count; i++) {
+        SET_ACTIVATED(check->key_index[i], true);
+        objects.flags[check->key_index[i]] |= FLAG_TOGGLED;
     }
 
     for (int i = 0; i < check->pulse_snap_count; i++) {

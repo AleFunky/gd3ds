@@ -1144,8 +1144,6 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             if (!GET_ACTIVATED(obj)) {
                 SET_ACTIVATED(obj, true);
 
-                if (state.practice_mode) break;
-
                 key_effect_spawn(objects.x[obj], objects.y[obj],
                                  game_objects[KEY_OBJ].texture,
                                  game_objects[KEY_OBJ].children[0].texture,
