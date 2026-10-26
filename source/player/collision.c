@@ -1152,6 +1152,16 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                                  objects.scale_x[obj], objects.scale_y[obj],
                                  objects.flippedH[obj], objects.flippedV[obj]);
 
+                ParticleDefinition prev_cfg = brick_destroy_particles.cfg;
+                brick_destroy_particles.cfg.startColorRed = objects.main_color[obj].r / 255.f;
+                brick_destroy_particles.cfg.startColorGreen = objects.main_color[obj].g / 255.f;
+                brick_destroy_particles.cfg.startColorBlue = objects.main_color[obj].b / 255.f;
+                brick_destroy_particles.cfg.startColorAlpha = 127.0f / 255.0f;
+                brick_destroy_particles.emitterX = objects.x[obj];
+                brick_destroy_particles.emitterY = objects.y[obj];
+                spawnMultipleParticles(&brick_destroy_particles, 10);
+                brick_destroy_particles.cfg = prev_cfg;
+
                 objects.flags[obj] |= FLAG_TOGGLED;
             }
             break;
