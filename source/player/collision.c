@@ -835,6 +835,10 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             if (oi >= 0) {
                 player->y = objects.y[oi];
                 state.old_player.y = player->y;
+                float half_view = SCREEN_HEIGHT_AREA / 2.0f;
+                if (player->y - (state.camera_y + half_view - LEVEL_Y_OFFSET) > half_view + 60.0f) {
+                    set_camera_y(player->y - half_view);
+                }
 
                 UseEffect *eff1 = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
                 if (eff1) {
