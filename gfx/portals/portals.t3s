@@ -1,4 +1,4 @@
---atlas -f rgba8888 -z auto
+--atlas --border edge -f rgba8888 -z auto
 blockPiece_001_001.png
 boost_01_001.png
 boost_02_001.png

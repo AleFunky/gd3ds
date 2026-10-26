@@ -874,6 +874,8 @@ void spawn_object_at(
             vo->hidden = false;
 
             float c_local_x = c->x * flip_x_mult;
+            if ((id == BLUE_TP_PORTAL || id == ORANGE_TP_PORTAL) && i == 0)
+                c_local_x += 2.0f * flip_x_mult;
             float c_local_y = c->y * flip_y_mult;
 
             float c_rot_x = c_local_x * m00 + c_local_y * m01;
