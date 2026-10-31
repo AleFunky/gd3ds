@@ -2181,7 +2181,7 @@ static void spawn_icon_at_internal(
                 if (!sheet) return;
 
                 if (part->texture >= 0) {
-                    float part_rad = rad + C3D_AngleFromDegrees(anim_rot);
+                    float part_rad = rad + C3D_AngleFromDegrees(anim_rot) * state.mirror_mult;
                     float part_cos_r = cosf(part_rad);
                     float part_sin_r = sinf(part_rad);
 
@@ -2206,7 +2206,7 @@ static void spawn_icon_at_internal(
 
                     C2D_SpriteSetPos(&spr, p_x, p_y);
                     C2D_SpriteSetScale(&spr, sx, sy);
-                    C2D_SpriteSetRotation(&spr, rad + C3D_AngleFromDegrees(anim_rot));
+                    C2D_SpriteSetRotation(&spr, part_rad);
 
                     C2D_DrawSpriteTinted(&spr, &tints[part->color_type]);
                 }
