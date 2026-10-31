@@ -1721,7 +1721,7 @@ void update_tints() {
 
             // Handle invisible object opacity
             if (object_fades(game_object)) {
-                float glow_out;
+                float glow_out = 1.f;
                 float fading_opacity = get_fading_obj_fade(game_object, SCREEN_WIDTH / SCALE, &glow_out);
                 
                 // Check if layer is glow
