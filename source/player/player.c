@@ -1379,7 +1379,7 @@ void draw_internal_hitbox(Player *player) {
 void draw_rotated_hitbox(Player *player) {
     Vec2D rect[4];
     // Rotated hitbox
-    get_corners(player->x, player->y, player->width, player->height, -player->rotation, rect);
+    get_corners(player->x, player->y, player->width, player->height, player->rotation, rect);
 
     draw_square(rect, C2D_Color32(0x7f, 0x00, 0x00, 0xff));
 }
