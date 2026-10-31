@@ -236,8 +236,6 @@ typedef struct Section {
 
     int x, y; // Section coordinates
     struct Section *next; // For chaining in hash map
-
-    bool dirty;
 } Section;
 
 typedef struct {

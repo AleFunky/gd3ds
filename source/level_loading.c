@@ -99,18 +99,9 @@ static inline unsigned int section_hash_func(unsigned int x, unsigned int y) {
     return ((unsigned int)x * 73856093u ^ (unsigned int)y * 19349663u) & (SECTION_HASH_SIZE - 1);
 }
 
-static int compare_ids(const void *a, const void *b) {
-    return *(int *)a - *(int *)b;
-}
-
 Section *get_section(int x, int y) {
     unsigned int h = section_hash_func(x, y);
     Section *sec = section_hash[h];
-    if (sec && sec->dirty) {
-        qsort(sec->objects, sec->object_count, sizeof(int), compare_ids);
-        sec->dirty = false;
-    }
-
     while (sec) {
         if (sec->x == x && sec->y == y) return sec;
         sec = sec->next;
@@ -132,7 +123,6 @@ Section *get_or_create_section(int x, int y) {
     sec->x = x;
     sec->y = y;
     sec->next = section_hash[h];
-    sec->dirty = false;
     section_hash[h] = sec;
     return sec;
 }
@@ -161,7 +151,15 @@ void assign_object_to_section(int obj) {
     sec->objects[sec->object_count++] = obj;
     objects.section_x[obj] = sx;
     objects.section_y[obj] = sy;
-    sec->dirty = true;
+}
+
+void remove_object_from_section(Section *sec, int obj) {
+    for (int i = 0; i < sec->object_count; i++) {
+        if (sec->objects[i] == obj) {
+            sec->objects[i] = sec->objects[--sec->object_count];
+            break;
+        }
+    }
 }
 
 void update_object_section(int obj) {
@@ -175,12 +173,7 @@ void update_object_section(int obj) {
     Section *old_sec = get_section(old_sx, old_sy);
 
     if (old_sec) {
-        for (int i = 0; i < old_sec->object_count; i++) {
-            if (old_sec->objects[i] == obj) {
-                old_sec->objects[i] = old_sec->objects[--old_sec->object_count];
-                break;
-            }
-        }
+        remove_object_from_section(old_sec, obj);
     }
 
     assign_object_to_section(obj);

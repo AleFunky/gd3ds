@@ -1512,7 +1512,12 @@ static int get_margin(int id) {
     return 60;
 }
 
-static void update_current_objects(void) {
+
+static int compare_ids(const void *a, const void *b) {
+    return *(int *)a - *(int *)b;
+}
+
+static void load_current_object(void) {
     current_object_count = 0;
 
     int width = ceilf(SCREEN_WIDTH_AREA / SECTION_SIZE);
@@ -1548,57 +1553,70 @@ static void update_current_objects(void) {
                     continue;
                 
                 if (current_object_count < MAX_SPRITES) current_objects[current_object_count++] = obj;
-                
-                if (objects.alpha_trigger_opacity[obj] <= 0) {
-                    continue;
-                }
-            
-                float fade_val = obj_edge_fade(calc_x, SCREEN_WIDTH / SCALE);
-                if (fade_val == 255) {
-                    objects.transition_applied[obj] = FADE_NONE;
-                } else if (objects.transition_applied[obj] == FADE_NONE) {
-                    float calc_y = SCREEN_HEIGHT - (objects.y[obj] - state.camera_y);
-                    handle_special_fading(obj, calc_x, calc_y);
-                }
-                // The rotating objects need to be recalculated
-                float rotation_speed = get_rotation_speed(obj);
-                if (rotation_speed != 0) {
-                    objects.visual_rotation[obj] += ((objects.random[obj] & 1) ? -rotation_speed : rotation_speed) * delta;
-                }
-
-                spawn_object_particles(obj);
-                
-                if (fade_val == 255) {
-                    objects.transition_applied[obj] = FADE_NONE;
-                }
-
-                // Fade when it reaches an edge
-                if (fade_val != 255 && objects.transition_applied[obj] == FADE_NONE) {
-                    handle_special_fading(obj, calc_x, calc_y);
-                }
-                
-                float fade_x = 0;
-                float fade_y = 0;
-                float fade_scale = 1.f;
-                get_fade_vars(obj, calc_x, &fade_x, &fade_y, &fade_scale);
-
-                // Handle special fade types
-                fade_x += get_special_fading_vars(obj, fade_val);
-
-                spawn_object_at(
-                    obj,
-                    objects.id[obj],
-                    get_mirror_x(calc_x + fade_x, state.mirror_factor),
-                    calc_y + fade_y,
-                    objects.visual_rotation[obj],
-                    objects.flippedH[obj] ^ (state.mirror_mult < 0),
-                    objects.flippedV[obj],
-                    fade_scale
-                );
-
-                spawn_object_particles(obj);
             }
         }
+    }
+
+    // Sort it
+    qsort(current_objects, current_object_count, sizeof(int), compare_ids);
+}
+
+static void update_current_objects(void) {
+    for (int i = 0; i < current_object_count; i++) {
+        int obj = current_objects[i];
+
+        if (objects.alpha_trigger_opacity[obj] <= 0) {
+            continue;
+        }
+
+        float calc_x = objects.x[obj] - state.camera_x;
+        float calc_y = SCREEN_HEIGHT - (objects.y[obj] - state.camera_y);
+
+        float fade_val = obj_edge_fade(calc_x, SCREEN_WIDTH / SCALE);
+        if (fade_val == 255) {
+            objects.transition_applied[obj] = FADE_NONE;
+        } else if (objects.transition_applied[obj] == FADE_NONE) {
+            float calc_y = SCREEN_HEIGHT - (objects.y[obj] - state.camera_y);
+            handle_special_fading(obj, calc_x, calc_y);
+        }
+        
+        // The rotating objects need to be recalculated
+        float rotation_speed = get_rotation_speed(obj);
+        if (rotation_speed != 0) {
+            objects.visual_rotation[obj] += ((objects.random[obj] & 1) ? -rotation_speed : rotation_speed) * delta;
+        }
+
+        spawn_object_particles(obj);
+        
+        if (fade_val == 255) {
+            objects.transition_applied[obj] = FADE_NONE;
+        }
+
+        // Fade when it reaches an edge
+        if (fade_val != 255 && objects.transition_applied[obj] == FADE_NONE) {
+            handle_special_fading(obj, calc_x, calc_y);
+        }
+        
+        float fade_x = 0;
+        float fade_y = 0;
+        float fade_scale = 1.f;
+        get_fade_vars(obj, calc_x, &fade_x, &fade_y, &fade_scale);
+
+        // Handle special fade types
+        fade_x += get_special_fading_vars(obj, fade_val);
+
+        spawn_object_at(
+            obj,
+            objects.id[obj],
+            get_mirror_x(calc_x + fade_x, state.mirror_factor),
+            calc_y + fade_y,
+            objects.visual_rotation[obj],
+            objects.flippedH[obj] ^ (state.mirror_mult < 0),
+            objects.flippedV[obj],
+            fade_scale
+        );
+
+        spawn_object_particles(obj);
     }
 }
 
@@ -1765,6 +1783,8 @@ void create_objects() {
     vo->col_channel = 0;
     viewable_objects_ptr[sprite_count] = vo;
     sprite_count++;
+
+    load_current_object();
 
     update_current_objects();
     
