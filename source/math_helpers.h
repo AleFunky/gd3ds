@@ -51,3 +51,4 @@ float reflect(float x, float min, float max);
 float randomf();
 float random_float(float min, float max);
 int random_int(int min, int max);
+bool platform_launch(float previous, float current, float velocity, float dt, float *launch);

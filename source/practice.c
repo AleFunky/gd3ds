@@ -118,9 +118,6 @@ typedef struct CheckpointData {
     float song_offset;
 
     void *alloc_base;
-
-    float move_lock_player_x_delta;
-    float move_lock_player_y_delta;
 } CheckpointData;
 
 CheckpointData checkpoints[MAX_CHECKPOINTS];
@@ -479,9 +476,6 @@ void new_checkpoint() {
 
     check->song_offset = level_info.song_offset + state.player.timeElapsed;
 
-    check->move_lock_player_x_delta = move_lock_player_x_delta;
-    check->move_lock_player_y_delta = move_lock_player_y_delta;
-
     // snapshot only the channels used by this level
     for (int i = 0; i < used_count; i++) {
         int idx = channels_used[i];
@@ -636,6 +630,8 @@ void restore_checkpoint() {
 
     state.player = check->p1;
     state.player2 = check->p2;
+    state.player.platform_velocity = state.player.last_platform_velocity = 0.f;
+    state.player2.platform_velocity = state.player2.last_platform_velocity = 0.f;
 
     state.player.buffering_state = (state.input.holdJump ? BUFFER_READY : BUFFER_NONE);
     state.player2.buffering_state = (state.input.holdJump ? BUFFER_READY : BUFFER_NONE);
@@ -667,9 +663,6 @@ void restore_checkpoint() {
     current_fading_effect = check->current_fading_effect;
     p1_trail = check->p1_trail;
     
-    tmp_move_lock_player_x_delta = check->move_lock_player_x_delta;
-    tmp_move_lock_player_y_delta = check->move_lock_player_y_delta;
-
     if (settingsState.practiceMusicSync) seek_mp3(check->song_offset);
     
     for (int i = 0; i < check->channel_snapshot_count; i++) {
@@ -725,7 +718,7 @@ void restore_checkpoint() {
             oi = (i == 0) ? (int)gap : (oi + (int)gap);
             if (flags & 2u) {
                 float vx = ck_axis_get(check->move_obj_x, check->move_x_fmt, check->move_x_u, kx++);
-                objects.x[oi] = vx; objects.last_x[oi] = vx;
+                objects.x[oi] = vx;
             }
             if (flags & 1u) {
                 float vy = ck_axis_get(check->move_obj_y, check->move_y_fmt, check->move_y_u, ky++);
@@ -846,8 +839,6 @@ void handle_auto_checkpoints(float delta) {
             case GAMEMODE_BALL:
             case GAMEMODE_ROBOT:
                 if (state.player.landed_from_jump) {
-                    move_lock_player_x_delta = state.player.x - player_x_before_physics;
-                    move_lock_player_y_delta = acc_delta_y;
                     new_checkpoint();
                     state.just_placed_auto_checkpoint = true;
                 }
@@ -856,8 +847,6 @@ void handle_auto_checkpoints(float delta) {
             case GAMEMODE_SHIP:
             case GAMEMODE_UFO:
             case GAMEMODE_WAVE:
-                move_lock_player_x_delta = state.player.x - player_x_before_physics;
-                move_lock_player_y_delta = acc_delta_y;
                 new_checkpoint();
                 state.just_placed_auto_checkpoint = true;
                 pseudo_checkpoint_exists = true;

@@ -144,7 +144,7 @@ typedef struct {
 
     int *id;
     float *x, *y;
-    float *last_x, *last_y;
+    float *last_y;
     float *rotation;
     float *visual_rotation;
     int *zlayer, *zorder;
@@ -229,10 +229,16 @@ typedef struct {
 } GDColorChannel;
 
 
+typedef struct SectionTriggers {
+    int count, capacity;
+    int indices[];
+} SectionTriggers;
+
 typedef struct Section {
     int *objects;
     int object_count;
     int object_capacity;
+    SectionTriggers *triggers;
 
     int x, y; // Section coordinates
     struct Section *next; // For chaining in hash map

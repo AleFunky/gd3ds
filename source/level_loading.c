@@ -109,6 +109,49 @@ Section *get_section(int x, int y) {
     return &empty_section;
 }
 
+static SectionTriggers uncached_section_triggers = { .count = -1 };
+
+static void append_section_trigger(Section *sec, int object_index) {
+    if (!is_position_trigger(objects.id[sec->objects[object_index]])) return;
+    SectionTriggers *list = sec->triggers;
+    if (list && list->count < 0) return;
+    if (!list || list->count == list->capacity) {
+        int capacity = list ? list->capacity * 2 : 4;
+        int count = list ? list->count : 0;
+        SectionTriggers *grown = realloc(list, sizeof(*list) + sizeof(int) * capacity);
+        if (!grown) {
+            free(list);
+            sec->triggers = &uncached_section_triggers;
+            return;
+        }
+        grown->count = count;
+        grown->capacity = capacity;
+        sec->triggers = list = grown;
+    }
+    list->indices[list->count++] = object_index;
+}
+
+static void remove_section_trigger(Section *sec, int index, int last_index) {
+    SectionTriggers *list = sec->triggers;
+    if (!list || list->count < 0) return;
+    for (int i = 0; i < list->count; i++) {
+        if (list->indices[i] != index) continue;
+        list->count--;
+        memmove(list->indices + i, list->indices + i + 1,
+            sizeof(int) * (list->count - i));
+        break;
+    }
+    if (list->count && list->indices[list->count - 1] == last_index) {
+        int i = --list->count;
+        while (i && list->indices[i - 1] > index) {
+            list->indices[i] = list->indices[i - 1];
+            i--;
+        }
+        list->indices[i] = index;
+        list->count++;
+    }
+}
+
 Section *get_or_create_section(int x, int y) {
     unsigned int h = section_hash_func(x, y);
     Section *sec = section_hash[h];
@@ -120,6 +163,7 @@ Section *get_or_create_section(int x, int y) {
     sec->objects = malloc(sizeof(int) * 8);
     sec->object_count = 0;
     sec->object_capacity = 8;
+    sec->triggers = NULL;
     sec->x = x;
     sec->y = y;
     sec->next = section_hash[h];
@@ -133,6 +177,7 @@ void free_sections(void) {
         while (sec) {
             Section *next = sec->next;
             free(sec->objects);
+            if (sec->triggers && sec->triggers->count >= 0) free(sec->triggers);
             free(sec);
             sec = next;
         }
@@ -149,6 +194,7 @@ void assign_object_to_section(int obj) {
         sec->objects = realloc(sec->objects, sizeof(int) * sec->object_capacity);
     }
     sec->objects[sec->object_count++] = obj;
+    append_section_trigger(sec, sec->object_count - 1);
     objects.section_x[obj] = sx;
     objects.section_y[obj] = sy;
 }
@@ -156,6 +202,7 @@ void assign_object_to_section(int obj) {
 void remove_object_from_section(Section *sec, int obj) {
     for (int i = 0; i < sec->object_count; i++) {
         if (sec->objects[i] == obj) {
+            remove_section_trigger(sec, i, sec->object_count - 1);
             sec->objects[i] = sec->objects[--sec->object_count];
             break;
         }
@@ -1084,7 +1131,6 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
         case 2:  // X
             if (type == GD_VAL_FLOAT) {
                 objects.x[object] = val.f;
-                objects.last_x[object] = val.f;
                 objects.original_x[object] = val.f;
             }
             break;
@@ -1701,7 +1747,6 @@ void free_arrays() {
     if (objects.id)                 { free(objects.id);                 objects.id = NULL; }
     if (objects.x)                  { free(objects.x);                  objects.x = NULL; }
     if (objects.y)                  { free(objects.y);                  objects.y = NULL; }
-    if (objects.last_x)             { free(objects.last_x);             objects.last_x = NULL; }
     if (objects.last_y)             { free(objects.last_y);             objects.last_y = NULL; }
     if (objects.rotation)           { free(objects.rotation);           objects.rotation = NULL; }
     if (objects.visual_rotation)    { free(objects.visual_rotation);    objects.visual_rotation = NULL; }
@@ -1768,9 +1813,6 @@ bool init_arrays(size_t count) {
     
     objects.y = malloc(sizeof(float) * count);
     if (!objects.y) return false;
-    
-    objects.last_x = malloc(sizeof(float) * count);
-    if (!objects.last_x) return false;
     
     objects.last_y = malloc(sizeof(float) * count);
     if (!objects.last_y) return false;
@@ -2295,7 +2337,6 @@ static void generate_orange_portals(int orange_start) {
         int oi = next_orange++;
         objects.id[oi]           = ORANGE_TP_PORTAL;
         objects.x[oi]            = objects.x[i] - x_off;
-        objects.last_x[oi]       = objects.x[oi];
         objects.y[oi]            = objects.y[i] + objects.tp_y_offset[i];
         objects.last_y[oi]       = objects.y[oi];
         objects.rotation[oi]     = adjust_angle_y(objects.rotation[i], objects.flippedH[i]) + 180.0f;
@@ -2524,7 +2565,6 @@ void reload_level() {
         objects.opacity[i] = 1.f;
         objects.x[i] = objects.original_x[i];
         objects.y[i] = objects.original_y[i];
-        objects.last_x[i] = objects.original_x[i];
         objects.last_y[i] = objects.original_y[i];
         objects.alpha_trigger_opacity[i] = 1.0f;
         objects.scale_x[i] = objects.original_scale_x[i];

@@ -85,6 +85,8 @@ typedef struct {
     float new_vel_y;
 
     float delta_y;
+
+    float platform_velocity, last_platform_velocity;
     
     float gravity;
 

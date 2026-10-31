@@ -25,7 +25,7 @@ Color p1_color;
 Color p2_color;
 Color glow_color;
 
-float g_trigger_dt = 0.f;
+float trigger_dt = 0.f;
 
 ColorChannel channels[COL_CHANNEL_NUM];
 
@@ -137,6 +137,7 @@ void free_trigger_buffers() {
     alpha_trigger_capacity = 0;
 
     move_trigger_count = 0;
+    move_step_dt = 0.f;
     move_trigger_capacity = 0;
 
     spawn_trigger_count = 0;
@@ -149,8 +150,7 @@ void free_trigger_buffers() {
 static unsigned int pulse_activation_counter = 0;
 float move_lock_player_x_delta = 0.0f;
 float move_lock_player_y_delta = 0.0f;
-float tmp_move_lock_player_x_delta = 0.0f;
-float tmp_move_lock_player_y_delta = 0.0f;
+float move_step_dt = 0.0f;
 
 float get_group_opacities(int object) {
     float group_opacity = 1.f;
@@ -435,7 +435,7 @@ void handle_col_channel(int chan) {
         channels[channel].non_pulse_color = lerped_color;
         channels[channel].alpha = lerped_alpha;
 
-        buffer->time_run += g_trigger_dt;
+        buffer->time_run += trigger_dt;
 
         if (buffer->time_run > buffer->seconds) {
             buffer->active = false;
@@ -450,7 +450,7 @@ ColTriggerBuffer *get_buffer(int chan) {
     return &col_trigger_buffer[get_col_channel_index(chan)];
 }
 
-void handle_col_triggers() {
+void handle_col_triggers(void) {
     for (int chan = 1; chan < COL_CHANNEL_NUM; chan++) {
         handle_col_channel(get_col_channel_from_index(chan));
     }
@@ -536,7 +536,7 @@ void handle_alpha_triggers(void) {
             }
         }
 
-        buffer->time_run += g_trigger_dt;
+        buffer->time_run += trigger_dt;
         if (buffer->time_run >= buffer->seconds) {
             if (p) {
                 p->alpha = buffer->new_alpha;
@@ -614,270 +614,54 @@ void upload_to_move_buffer(int obj) {
     buffer->active = true;
 }
 
-bool object_can_be_x_moved(int obj) {
-    int obj_id = objects.id[obj];
-    if (is_trigger_object(obj_id) && !objects.touch_triggered[obj]) {
-        return false;
-    }
-
-    switch (obj_id) {
-        // Speed portals
-        case 200:
-        case 201:
-        case 202:
-        case 203:
-            return false;
-    }
-
-    return true;
-}
-
-
-inline float objTop(float y, int object)  { 
-    return y + objects.height[object] / 2; 
-}
-inline float objBot(float y, int object)  { 
-    return y - objects.height[object] / 2; 
-}
-inline float objgravBot(Player *player, float y, int object) { return player->upside_down ? -objTop(y, object) : objBot(y, object); }
-inline float objgravTop(Player *player, float y, int object) { return player->upside_down ? -objBot(y, object) : objTop(y, object); }
-
-static bool check_rising_platform(Player *player, int object, float delta_y, float offset_y, bool gravity_changed) {
-    if (gravity_changed || grav(player, delta_y) <= 0.f) return false;
-    
-    float player_bottom = gravBottom(player);
-
-    float object_x = objects.x[object];
-    float object_y = objects.y[object];
-    float object_width = objects.width[object];
-
-    float old_top = objgravTop(player, object_y - delta_y, object);
-    float new_top = objgravTop(player, object_y, object);
-
-    bool horizontal_overlap = fabsf(player->x - object_x) <= (player->width + object_width) / 2.f;
-
-    bool vertical_overlap = player_bottom >= old_top && player_bottom <= new_top;
-
-    return horizontal_overlap && vertical_overlap;
-}
-
-static bool check_moving_ceiling(Player *player, int object, float delta_y, float offset_y, bool gravity_changed) {
-    if (gravity_changed || grav(player, delta_y) >= 0.f) return false;
-    if (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_ROBOT) return false;
-
-    float player_top = gravTop(player);
-
-    float object_x = objects.x[object];
-    float object_y = objects.y[object];
-    float object_width = objects.width[object];
-
-    float old_bottom = objgravBot(player, object_y - delta_y, object);
-    float new_bottom = objgravBot(player, object_y, object);
-
-    bool horizontal_overlap = fabsf(player->x - object_x) <= (player->width + object_width) / 2.f;
-    
-    bool vertical_overlap = player_top >= new_bottom && player_top <= old_bottom;
-
-    return horizontal_overlap && vertical_overlap;
-}
-
-static bool has_other_vertical_trigger(MoveTriggerBuffer *buffer) {
+static void begin_object_move_step(void) {
     for (int i = 0; i < move_trigger_count; i++) {
-        MoveTriggerBuffer *other = &move_trigger_buffer[i];
-
-        if (other == buffer || !other->active || other->target_group != buffer->target_group || other->offset_y == 0.f)
-            continue;
-
-        return true;
+        for (GroupNode *node = get_group(move_trigger_buffer[i].target_group); node; node = node->next)
+            objects.last_y[node->obj] = objects.y[node->obj];
     }
-
-    return false;
+    int count = 0;
+    for (int i = 0; i < move_trigger_count; i++)
+        if (move_trigger_buffer[i].active) move_trigger_buffer[count++] = move_trigger_buffer[i];
+    move_trigger_count = count;
 }
 
-static void set_player_to_obj_bottom(Player *player, int obj) {
-    player->y = grav(player, objgravTop(player, objects.y[obj], obj)) + grav(player, player->height / 2);
+static void apply_object_move_delta(int object, float delta_x, float delta_y) {
+    if (objects.flags[object] & FLAG_CAN_BE_X_MOVED) objects.x[object] += delta_x;
+    objects.y[object] += delta_y;
 }
 
-static void set_player_to_obj_top(Player *player, int obj) {
-    player->y = grav(player, objgravBot(player, objects.y[obj], obj)) - grav(player, player->height / 2);
-}
 void handle_move_triggers(void) {
+    if (trigger_dt <= 0.f) return;
+    move_step_dt = trigger_dt;
+    begin_object_move_step();
     for (int slot = 0; slot < move_trigger_count; slot++) {
         MoveTriggerBuffer *buffer = &move_trigger_buffer[slot];
-        if (!buffer->active) continue;
-
-        buffer->time_run += g_trigger_dt;
-
-        float t = easeTime(convert_ease(buffer->easing),
-                           buffer->time_run, buffer->seconds, 2.0f);
+        buffer->time_run += trigger_dt;
+        float t = buffer->seconds > 0.f ? easeTime(convert_ease(buffer->easing),
+            buffer->time_run, buffer->seconds, 2.f) : 1.f;
         float delta_x, delta_y;
-        if (buffer->lock_to_player_x) {
-            delta_x = move_lock_player_x_delta;
-        } else {
+        if (buffer->lock_to_player_x) delta_x = move_lock_player_x_delta;
+        else {
             float current_x = buffer->offset_x * t;
             delta_x = current_x - buffer->move_last_x;
             buffer->move_last_x = current_x;
         }
-        if (buffer->lock_to_player_y) {
-            delta_y = move_lock_player_y_delta;
-        } else {
+        if (buffer->lock_to_player_y) delta_y = move_lock_player_y_delta;
+        else {
             float current_y = buffer->offset_y * t;
             delta_y = current_y - buffer->move_last_y;
             buffer->move_last_y = current_y;
         }
-
-        bool zero_delta = (delta_x == 0.f && delta_y == 0.f);
-
-        float rise_vel = (buffer->seconds > 0.f && g_trigger_dt != 0.f) ? delta_y / g_trigger_dt : 0.f;
-        bool player1_gravity_changed = state.player.gravity_changed_move;
-        bool player2_gravity_changed = state.player2.gravity_changed_move;
-
-        bool player1_can_be_carried = buffer->seconds > 0.f && !player1_gravity_changed && grav(&state.player, rise_vel) > MINIMUM_OBJECT_SPEED;
-        bool player2_can_be_carried = buffer->seconds > 0.f && state.dual && !player2_gravity_changed && grav(&state.player2, rise_vel) > MINIMUM_OBJECT_SPEED;
-        
-        float player1_carry = 0.f, player2_carry = 0.f;
-        bool player1_support = false, player2_support = false;
-        
-        bool player1_moving_with_gravity = !player1_gravity_changed && grav(&state.player, delta_y) < 0.f;
-        bool player2_moving_with_gravity = state.dual && !player2_gravity_changed && grav(&state.player2, delta_y) < 0.f;
-
-        float player1_grav_delta = grav(&state.player, delta_y);
-        float player2_grav_delta = grav(&state.player2, delta_y);
-
-        GroupNode *p = get_group(buffer->target_group);
-        if (p && !zero_delta) {
-            for (GroupNode *cur = p; cur; cur = cur->next) {
-                int group_obj = cur->obj;
-                int old_sx = objects.section_x[group_obj];
-                int old_sy = objects.section_y[group_obj];
-                if (objects.flags[group_obj] & FLAG_CAN_BE_X_MOVED) {
-                    objects.last_x[group_obj] = objects.x[group_obj];
-                    objects.x[group_obj] += delta_x;   
-                }
-
-                objects.last_y[group_obj] = objects.y[group_obj];
-                objects.y[group_obj] += delta_y;
-
-                int new_sx = (int)(objects.x[group_obj] / SECTION_SIZE);
-                int new_sy = (int)(objects.y[group_obj] / SECTION_SIZE);
-
-                if (new_sx != old_sx || new_sy != old_sy)
-                    update_object_section(group_obj);
-    
-                if (state.dead) continue;
-
-                int object_id = objects.id[group_obj];
-
-                if (!is_valid_object(object_id)) continue;
-
-                const GameObject *game_object = &game_objects[object_id];
-                
-                // Ignore no solid hitbox
-                if (!game_object->hitbox || game_object->hitbox->type != HITBOX_SOLID) continue;
-
-                if (buffer->seconds <= 0.f) {
-                    float launch_vel_p1 = 0.f;
-                    float launch_vel_p2 = 0.f;
-
-                    if (g_trigger_dt != 0.f) {
-                        launch_vel_p1 = fminf(fabsf(delta_y) / STEPS_DT, state.player.max_vel);
-                        launch_vel_p2 = fminf(fabsf(delta_y) / STEPS_DT, state.player2.max_vel);
-                    }
-
-                    if (!player1_gravity_changed && state.player.collided_block == group_obj && player1_grav_delta > 0.f) {
-                        state.player.y += delta_y;
-                        state.player.vel_y = launch_vel_p1;
-                    }
-
-                    if (state.dual && !player2_gravity_changed && state.player2.collided_block == group_obj && player2_grav_delta > 0.f) {
-                        state.player2.y += delta_y;
-                        state.player2.vel_y = launch_vel_p2;
-                    }
-                }
-                // Downwards movement
-                else {
-                    if (player1_moving_with_gravity || player2_moving_with_gravity) {
-                        float cont_vel = (g_trigger_dt != 0.f) ? delta_y / g_trigger_dt : 0.f;
-
-                        if (state.player.collided_block == group_obj && player1_moving_with_gravity && grav(&state.player, cont_vel) >= -MINIMUM_OBJECT_SPEED) {
-                            set_player_to_obj_bottom(&state.player, group_obj);
-                        }
-
-                        if (state.dual && state.player2.collided_block == group_obj && player2_moving_with_gravity && grav(&state.player2, cont_vel) >= -MINIMUM_OBJECT_SPEED) {
-                            set_player_to_obj_bottom(&state.player2, group_obj);
-                        }
-                    }
-                }
-
-                // Players riding object
-                if (
-                    player1_can_be_carried && player1_carry == 0.f &&
-                    check_rising_platform(&state.player, group_obj, delta_y, buffer->offset_y, player1_gravity_changed)
-                ) {
-                    set_player_to_obj_bottom(&state.player, group_obj);
-                }
-
-                if (
-                    state.dual && player2_can_be_carried && player2_carry == 0.f &&
-                    check_rising_platform(&state.player2, group_obj, delta_y, buffer->offset_y, player2_gravity_changed)
-                ) {
-                    set_player_to_obj_bottom(&state.player2, group_obj);
-                }
-
-                if (check_moving_ceiling(&state.player, group_obj, delta_y, buffer->offset_y, player1_gravity_changed)) {
-                    set_player_to_obj_top(&state.player, group_obj);
-                }
-                
-                if (state.dual && check_moving_ceiling(&state.player2, group_obj, delta_y, buffer->offset_y, player2_gravity_changed)) {
-                    set_player_to_obj_top(&state.player2, group_obj);
-                }
-                
-                // Support state
-                if (group_obj == state.player.collided_block) player1_support = true;
-                if (state.dual && group_obj == state.player2.collided_block) player2_support = true;
+        if (delta_x != 0.f || delta_y != 0.f) {
+            for (GroupNode *node = get_group(buffer->target_group); node; node = node->next) {
+                int object = node->obj;
+                int old_sx = objects.section_x[object], old_sy = objects.section_y[object];
+                apply_object_move_delta(object, delta_x, delta_y);
+                if ((int)(objects.x[object] / SECTION_SIZE) != old_sx ||
+                    (int)(objects.y[object] / SECTION_SIZE) != old_sy) update_object_section(object);
             }
-            state.player.y += player1_carry;
-            if (state.dual) state.player2.y += player2_carry;
         }
-
-        if (buffer->time_run >= buffer->seconds) {
-            if (p) {
-                for (GroupNode *cur = p; cur; cur = cur->next) {
-                    objects.last_x[cur->obj] = objects.x[cur->obj];
-                    objects.last_y[cur->obj] = objects.y[cur->obj];
-                }
-            }
-            if (buffer->seconds > 0.f && g_trigger_dt != 0.f && p && (player1_support || player2_support)) {
-                float launch;
-
-                if (buffer->time_run - 2.f * g_trigger_dt < 0.f) {
-                    launch = fabsf(delta_y) / g_trigger_dt;
-                } else {
-                    float e1 = easeTime(convert_ease(buffer->easing), buffer->time_run - g_trigger_dt, buffer->seconds, 2.0f);
-                    float e2 = easeTime(convert_ease(buffer->easing), buffer->time_run - 2.f * g_trigger_dt, buffer->seconds, 2.0f);
-
-                    launch = fabsf(buffer->offset_y * (e1 - e2)) / g_trigger_dt;
-                }
-
-                bool player1_should_launch = player1_support && grav(&state.player, launch) > MINIMUM_OBJECT_SPEED;
-                bool player2_should_launch = state.dual && player2_support && grav(&state.player2, launch) > MINIMUM_OBJECT_SPEED;
-
-                if ((player1_should_launch  || player2_should_launch) && !has_other_vertical_trigger(buffer)) {
-                    if (player1_should_launch) state.player.vel_y = grav(&state.player, launch);
-                    if (player2_should_launch) state.player2.vel_y = grav(&state.player2, launch);
-                }
-            }
-
-            buffer->active = false;
-            for (int j = slot; j < move_trigger_count - 1; j++) {
-                // Shift buffer array
-                move_trigger_buffer[j] = move_trigger_buffer[j + 1];
-            }
-            
-            // Make the game run the pulse moved into the current slot
-            slot--;
-            move_trigger_count--;
-        }
+        if (buffer->time_run >= buffer->seconds) buffer->active = false;
     }
 }
 
@@ -911,7 +695,7 @@ void handle_spawn_triggers(void) {
         SpawnTriggerBuffer *buffer = &spawn_trigger_buffer[slot];
         if (!buffer->active || buffer->queued) continue;
 
-        buffer->time_run += g_trigger_dt;
+        buffer->time_run += trigger_dt;
         if (buffer->time_run > buffer->seconds) {
             buffer->active = false;
 
@@ -1173,7 +957,7 @@ void handle_pulse_triggers(void) {
         PulseTriggerBuffer *buffer = &pulse_trigger_buffer[i];
         if (!buffer->active) continue;
 
-        buffer->time_run += g_trigger_dt;
+        buffer->time_run += trigger_dt;
         if (buffer->time_run > buffer->seconds) {
             if (buffer->pulse_target_type == PULSE_TARGET_GROUP) {
                 bool both = !buffer->main_only && !buffer->detail_only;
@@ -1463,19 +1247,49 @@ int compare_triggers(const void *a, const void *b) {
 int triggers_buffer[TRIGGER_BUFFER_SIZE];
 int trigger_count;
 
-void handle_triggers() {
+bool object_can_be_x_moved(int obj) {
+    int obj_id = objects.id[obj];
+    if (is_trigger_object(obj_id) && !objects.touch_triggered[obj]) {
+        return false;
+    }
+
+    // Speed portals
+    if (obj_id >= 200 && obj_id <= 203) return false;
+
+    return true;
+}
+
+bool is_position_trigger(int id) {
+    if (is_trigger_object(id)) return true;
+    switch (id) {
+        case ENABLE_TRAIL: case DISABLE_TRAIL:
+        case TRIGGER_FADE_SIMPLE: case TRIGGER_FADE_UP: case TRIGGER_FADE_DOWN:
+        case TRIGGER_FADE_RIGHT: case TRIGGER_FADE_LEFT:
+        case TRIGGER_FADE_SCALE_IN: case TRIGGER_FADE_SCALE_OUT:
+        case TRIGGER_FADE_INWARDS: case TRIGGER_FADE_OUTWARDS:
+        case TRIGGER_FADE_LEFT_SEMICIRCLE: case TRIGGER_FADE_RIGHT_SEMICIRCLE:
+            return true;
+        default: return false;
+    }
+}
+
+void handle_triggers(void) {
     trigger_count = 0;
     int cam_sx = (int)((state.player.x) / SECTION_SIZE);
     
     for (int sx = -1; sx < 1; sx++) {
         for (int sy = -(400 / SECTION_SIZE); sy <= MAX_LEVEL_HEIGHT / SECTION_SIZE; sy++) {
             int sec_x = cam_sx + sx;
-            int sec_y = sy;
             if (sec_x < 0) continue;
 
-            Section *sec = get_section(sec_x, sec_y);
-            for (int i = 0; i < sec->object_count; i++) {
-                int obj = sec->objects[i];
+            Section *sec = get_section(sec_x, sy);
+            const SectionTriggers *list = sec->triggers;
+            if (!list) continue;
+            bool cached = list->count >= 0;
+            int count = cached ? list->count : sec->object_count;
+            for (int i = 0; i < count; i++) {
+                int obj = sec->objects[cached ? list->indices[i] : i];
+                if (!cached && !is_position_trigger(objects.id[obj])) continue;
                 
                 if (!GET_ACTIVATED(obj)) {
                     if (objects.touch_triggered[obj]) {
@@ -1505,9 +1319,15 @@ void handle_triggers() {
 
     qsort(triggers_buffer, trigger_count, sizeof(int), compare_triggers);
 
-    for (size_t i = 0; i < trigger_count; i++) {
+    for (int i = 0; i < trigger_count; i++) {
         run_trigger(triggers_buffer[i], false);
     }
+}
+
+void handle_step_triggers(void) {
+    handle_triggers();
+    handle_spawn_triggers();
+    handle_move_triggers();
 }
 
 // https://github.com/gd-programming/gd.docs/issues/87

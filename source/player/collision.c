@@ -1360,6 +1360,37 @@ bool circle_rect_collision(float cx, float cy, float radius,
     return distSq <= radius * radius;
 }
 
+static float moving_surface_velocity(Player *player, int obj) {
+    if (move_step_dt <= 0.f) return 0.f;
+    return grav(player, objects.y[obj] - objects.last_y[obj]) / move_step_dt;
+}
+
+static bool moving_support_crossed(Player *player, int obj, float velocity) {
+    if (velocity <= MINIMUM_OBJECT_SPEED || player->gamemode == GAMEMODE_WAVE ||
+        player->upside_down != state.old_player.upside_down || player->just_teleported) return false;
+    float old_top = grav(player, objects.last_y[obj]) + objects.height[obj] * .5f;
+    float new_top = obj_gravTop(player, obj);
+    return gravBottom(&state.old_player) >= old_top - .001f &&
+        gravBottom(player) <= new_top && player->vel_y <= velocity;
+}
+
+static void finish_moving_contact(Player *player) {
+    bool reset = state.dead || player->upside_down != state.old_player.upside_down || player->just_teleported ||
+        player->gamemode != state.old_player.gamemode || player->gamemode == GAMEMODE_WAVE ||
+        player->slope_data.slope_id >= 0;
+    float launch;
+    if (!reset && platform_launch(grav(player, player->last_platform_velocity), grav(player, player->platform_velocity),
+        player->vel_y, STEPS_DT, &launch)) {
+        player->vel_y = launch;
+        player->velocity_override = true;
+        player->on_ground = player->on_ceiling = false;
+        player->left_ground = true;
+        player->inverse_rotation = player->gamemode == GAMEMODE_PLAYER;
+        MotionTrail_ResumeStroke(trail);
+    }
+    player->last_platform_velocity = reset ? 0.f : player->platform_velocity;
+}
+
 void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
     InternalHitbox internal = player->internal_hitbox;
 
@@ -1371,6 +1402,8 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
 
             float x = objects.x[obj];
             float y = objects.y[obj];
+            float object_raw_vel = moving_surface_velocity(player, obj);
+            bool moving_support = moving_support_crossed(player, obj, object_raw_vel);
 
             // This is equal to using the old player y position (a frame of snap leeway)
             clip += fabsf(player->vel_y) * STEPS_DT;
@@ -1390,7 +1423,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
             bool safeZone = player->mini && ((obj_gravTop(player, obj) - gravBottom(player) <= clip) || (gravTop(player) - obj_gravBottom(player, obj) <= clip));
             
             // Check collision with internal hitbox
-            if ((player->gamemode == GAMEMODE_WAVE || (!gravSnap && !safeZone)) && intersect(
+            if ((player->gamemode == GAMEMODE_WAVE || (!gravSnap && !safeZone && !moving_support)) && intersect(
                 player->x, player->y, internal.width, internal.height, 0, 
                 x, y, objects.width[obj], objects.height[obj], 0
             )) {
@@ -1442,13 +1475,8 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                 }
             }
 
-            float y_pos = objects.y[obj];
-            float last_y = objects.last_y[obj];
-
-            float object_raw_vel = grav(player, (y_pos - last_y)) / delta;
-
             // Check snap for player bottom
-            if (obj_gravTop(player, obj) - bottom <= clip && player->vel_y <= fmaxf(object_raw_vel, 0) && player->gamemode != GAMEMODE_WAVE) {
+            if ((obj_gravTop(player, obj) - bottom <= clip || moving_support) && player->vel_y <= fmaxf(object_raw_vel, 0) && player->gamemode != GAMEMODE_WAVE) {
                 player->y = grav(player, obj_gravTop(player, obj)) + grav(player, player->height / 2);
                 if (player->vel_y <= 0) player->vel_y = 0;
                 player->on_ground = true;
@@ -1457,6 +1485,9 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                 player_non_flying_landing(player);
 
                 player->collided_block = obj;
+                player->platform_velocity = grav(player, fmaxf(0.f, object_raw_vel) * .9f);
+                if (object_raw_vel > MINIMUM_OBJECT_SPEED)
+                    player->vel_y = fmaxf(player->vel_y, object_raw_vel * .9f);
 
                 if (player->gamemode == GAMEMODE_PLAYER) {
                     // Check for x snap
@@ -1499,28 +1530,13 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
 }
 
 void handle_moving_block(Player *player, int obj) {
-    float y_pos = objects.y[obj];
-    float last_y = objects.last_y[obj];
-
-    bool drop = false;
-
-    float object_raw_vel = (y_pos - last_y) / delta;
-    float object_velocity = fabsf(object_raw_vel);
-    if (player->upside_down) {
-        if (last_y < y_pos) {
-            // Falling
-            drop = true;
-        }
-    } else {
-        if (last_y > y_pos) {
-            // Falling
-            drop = true;
-        }
-    }
-
-    if (drop && object_velocity <= MINIMUM_OBJECT_SPEED) {
-        player->y += object_raw_vel * STEPS_DT;
-    }
+    if (obj < 0 || obj >= objects.count || objects.flags[obj] & FLAG_TOGGLED ||
+        !state.old_player.on_ground || player->vel_y > 0.f || player->just_teleported ||
+        player->upside_down != state.old_player.upside_down) return;
+    if (fabsf(player->x - objects.x[obj]) > (player->width + objects.width[obj]) * .5f) return;
+    float velocity = moving_surface_velocity(player, obj);
+    if (velocity < 0.f && velocity >= -MINIMUM_OBJECT_SPEED)
+        player->y += objects.y[obj] - objects.last_y[obj];
 }
 
 void collide_with_obj(Player *player, int obj) {
@@ -1620,6 +1636,7 @@ int potential_slopes_buffer[2][MAX_COLLIDED_OBJECTS];
 int potential_slopes[2];
 
 void collide_with_objects(Player *player) {
+    player->platform_velocity = 0.f;
     player->last_collided_block = player->collided_block;
     player->collided_block = -1;
 
@@ -1683,6 +1700,7 @@ void collide_with_objects(Player *player) {
         collide_with_slope(player, obj, has_slope);
     }
     
+    finish_moving_contact(player);
     // Check hazards (spikes, saws)
     for (int i = 0; i < hazard_count; i++) {
         int obj = hazard_buffer[i];

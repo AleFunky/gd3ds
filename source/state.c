@@ -173,6 +173,7 @@ void set_intended_ceiling() {
 }
 
 void set_gamemode(Player *player, int gamemode) {
+    if (player->gamemode != gamemode) player->platform_velocity = player->last_platform_velocity = 0.f;
     player->gamemode = gamemode;
     set_hitbox_size(player, gamemode);
 }
@@ -225,6 +226,7 @@ void init_player(Player *player) {
     player->vel_x = player_speeds[state.speed];  
     player->vel_y = 0;
     player->new_vel_y = __FLT_MAX__;
+    player->platform_velocity = player->last_platform_velocity = 0.f;
     player->frame = 0;
 
     player->on_ground = true;

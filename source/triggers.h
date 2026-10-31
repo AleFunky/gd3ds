@@ -142,14 +142,13 @@ extern SpawnTriggerBuffer *spawn_trigger_buffer;
 extern PulseTriggerBuffer *pulse_trigger_buffer;
 extern float move_lock_player_x_delta;
 extern float move_lock_player_y_delta;
-extern float tmp_move_lock_player_x_delta;
-extern float tmp_move_lock_player_y_delta;
+extern float move_step_dt;
 
 extern Color p1_color;
 extern Color p2_color;
 extern Color glow_color;
 
-extern float g_trigger_dt;
+extern float trigger_dt;
 
 #define BG_TRIGGER 29
 #define GROUND_TRIGGER 30
@@ -200,13 +199,15 @@ int get_col_channel_index(int channel);
 int get_col_channel_from_index(int index);
 void init_col_channels();
 void handle_col_channel(int chan);
-void handle_col_triggers();
+void handle_col_triggers(void);
 void handle_copy_channels();
-void handle_triggers();
+bool is_position_trigger(int id);
+void handle_triggers(void);
 void upload_to_alpha_buffer(int obj);
 void handle_alpha_triggers(void);
 void upload_to_move_buffer(int obj);
 void handle_move_triggers(void);
+void handle_step_triggers(void);
 void upload_to_spawn_buffer(int obj, bool from_spawn);
 void handle_spawn_triggers(void);
 void upload_to_pulse_buffer(int obj);

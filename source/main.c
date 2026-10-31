@@ -97,9 +97,6 @@ float sound_volume;
 int steps = 0;
 int last_steps = 0;
 
-float player_x_before_physics = 0;
-float acc_delta_y = 0;
-
 bool cheats_used[CHEAT_COUNT];
 
 const char *cheat_names[CHEAT_COUNT] = {
@@ -750,7 +747,7 @@ void ui_loop(){
         } else {
             delta = (now - lastTime) / (CPU_TICKS_PER_MSEC * 1000);
         }
-        g_trigger_dt = delta;
+        trigger_dt = delta;
         lastTime = now;
         hidScanInput();
 
@@ -1020,15 +1017,13 @@ void game_loop() {
                 u32 planned = (u32)(accumulator / STEPS_DT);
                 pi_begin_frame((u32)frame_window_start, (u32)now, planned ? planned : 1);
 
-                player_x_before_physics = state.player.x;
-                acc_delta_y = 0.0f;
-
                 state.player.gravity_changed_move = false;
                 state.player2.gravity_changed_move = false;
 
                 // Run simulation in fixed steps
                 while (accumulator >= STEPS_DT) {
                     u64 start_physics = svcGetSystemTick();
+                    float player_x_before_step = state.player.x;
                     bool player1_upside_down_before = state.player.upside_down;
                     bool player2_upside_down_before = state.player2.upside_down;
 
@@ -1097,7 +1092,10 @@ void game_loop() {
                         if (state.dead) break;
                     }
                     
-                    acc_delta_y += state.player.delta_y;
+                    trigger_dt = STEPS_DT;
+                    move_lock_player_x_delta = state.player.x - player_x_before_step;
+                    move_lock_player_y_delta = state.player.delta_y;
+                    handle_step_triggers();
 
                     run_camera();
                     handle_bg_flash();
@@ -1111,12 +1109,6 @@ void game_loop() {
                     steps++;
                     level_frame++;
                 }
-
-                move_lock_player_x_delta = tmp_move_lock_player_x_delta + state.player.x - player_x_before_physics;
-                move_lock_player_y_delta = tmp_move_lock_player_y_delta + acc_delta_y;
-                
-                tmp_move_lock_player_x_delta = 0;
-                tmp_move_lock_player_y_delta = 0;
             }
         }
 
@@ -1129,7 +1121,7 @@ void game_loop() {
         if (!game_paused) {
             frame_counter++;
             frame_timer += delta;
-            g_trigger_dt = (steps > 0) ? (float)steps * STEPS_DT : delta;
+            trigger_dt = delta;
 
             if (state.dead && state.death_timer <= 0.f) {
                 state.death_timer = (settingsState.quickRetry ? 0.5f : 1.f);
@@ -1235,12 +1227,10 @@ void game_loop() {
             }
 
             u64 start_trig = svcGetSystemTick();
-            handle_triggers();
-            handle_spawn_triggers();
+            if (state.death_timer > 0.f) handle_step_triggers();
             handle_col_triggers();
             handle_copy_channels();
             handle_alpha_triggers();
-            handle_move_triggers();
             handle_pulse_triggers();
             calculate_lbg();
             u64 end_trig = svcGetSystemTick();
