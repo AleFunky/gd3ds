@@ -2085,12 +2085,12 @@ static void spawn_icon_at_internal(
     const Icon icon = icons[gamemode][id];
     const IconPart *parts = icon.parts;
 
-    float rad = C3D_AngleFromDegrees(deg);
-    float cos_r = cosf(rad);
-    float sin_r = sinf(rad);
-
     int flip_x_mult = (flip_x ? -1 : 1);
     int flip_y_mult = (flip_y ? -1 : 1);
+
+    float rad = C3D_AngleFromDegrees(deg) * flip_x_mult;
+    float cos_r = cosf(rad);
+    float sin_r = sinf(rad);
 
     float sx = scale * flip_x_mult;
     float sy = scale * flip_y_mult;
@@ -2181,15 +2181,15 @@ static void spawn_icon_at_internal(
                 if (!sheet) return;
 
                 if (part->texture >= 0) {
-                    float part_rad = rad + C3D_AngleFromDegrees(anim_rot) * state.mirror_mult;
+                    float part_rad = rad + C3D_AngleFromDegrees(anim_rot) * flip_x_mult * flip_y_mult;
                     float part_cos_r = cosf(part_rad);
                     float part_sin_r = sinf(part_rad);
 
-                    float anim_x = anim_px * 2.0f;
-                    float anim_y = anim_py * 2.0f;
+                    float anim_x = anim_px * 2.0f * flip_x_mult;
+                    float anim_y = anim_py * 2.0f * flip_y_mult;
 
-                    float part_x = part->x;
-                    float part_y = part->y;
+                    float part_x = part->x * flip_x_mult;
+                    float part_y = part->y * flip_y_mult;
 
                     float rot_anim_x = anim_x * cos_r + anim_y * sin_r;
                     float rot_anim_y = anim_x * sin_r - anim_y * cos_r;
@@ -2197,8 +2197,8 @@ static void spawn_icon_at_internal(
                     float rot_part_x = part_x * part_cos_r + part_y * part_sin_r;
                     float rot_part_y = part_x * part_sin_r - part_y * part_cos_r;
 
-                    float p_x = x + (rot_anim_x + rot_part_x) * scale * flip_x_mult;
-                    float p_y = y + (rot_anim_y + rot_part_y) * scale * flip_y_mult;
+                    float p_x = x + (rot_anim_x + rot_part_x) * scale;
+                    float p_y = y + (rot_anim_y + rot_part_y) * scale;
 
                     C2D_SpriteFromSheet(&spr, *sheet, part->texture);
                     C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);

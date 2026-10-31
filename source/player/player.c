@@ -1171,7 +1171,7 @@ void draw_player(Player *player) {
     float p_y = calc_y + rot_y * scale;
 
     float calc_x_mirror = get_mirror_x(calc_x, state.mirror_factor);
-    float p_rot = player->rotation * state.mirror_mult;
+    float p_rot = player->rotation;
 
     int selected_cube = player->player_icons.cube;
     int selected_ship = player->player_icons.ship;
