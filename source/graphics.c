@@ -1042,7 +1042,7 @@ static inline uint32_t make_sort_key(SpriteObject *s)
 
     // Pack all variables into a nice 32 bit variable
     uint32_t zl = (uint32_t)(zlayer + 8);     // fits in 6 bits
-    uint32_t zs = (uint32_t)(3 - sheet);          // fits in 2 bit
+    uint32_t zs = (uint32_t)(3 - sheet);      // fits in 2 bit
     uint32_t zo = (uint32_t)(zorder + 128);   // fits in 8 bits
     uint32_t cz = (uint32_t)(child_z + 128);  // fits in 8 bits
 

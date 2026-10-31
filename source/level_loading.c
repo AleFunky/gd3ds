@@ -140,6 +140,10 @@ void free_sections(void) {
     }
 }
 
+static int compare_ids(const void *a, const void *b) {
+    return *(int *)a - *(int *)b;
+}
+
 void assign_object_to_section(int obj) {
     int sx = (int)(objects.x[obj] / SECTION_SIZE);
     int sy = (int)(objects.y[obj] / SECTION_SIZE);
@@ -151,6 +155,8 @@ void assign_object_to_section(int obj) {
     sec->objects[sec->object_count++] = obj;
     objects.section_x[obj] = sx;
     objects.section_y[obj] = sy;
+
+    qsort(sec->objects, sec->object_count, sizeof(int), compare_ids);
 }
 
 void update_object_section(int obj) {
