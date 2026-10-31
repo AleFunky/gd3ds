@@ -2154,6 +2154,33 @@ static void spawn_icon_at_internal(
                 anim_fraction = params.robot_anim_timer / frame->delay;
             }
         }
+
+        const RobotAnimation *blend_from_anim = NULL;
+        const RobotFrame *blend_from_frame = NULL;
+        const RobotFrame *blend_from_next_frame = NULL;
+        float blend_from_fraction = 0.f;
+        if (params.robot_blend_fraction > 0.f && params.robot_blend_from_anim_id >= 0 && params.robot_blend_from_anim_id < ROBOT_ANIM_COUNT) {
+            blend_from_anim = &robot_animations[params.robot_blend_from_anim_id];
+
+            if (params.robot_blend_from_frame >= 0 && params.robot_blend_from_frame < blend_from_anim->frame_count) {
+                blend_from_frame = &blend_from_anim->frames[params.robot_blend_from_frame];
+                blend_from_next_frame = blend_from_frame;
+                
+                if (blend_from_anim->frame_count > 1) {
+                    int next_idx = params.robot_blend_from_frame + 1;
+                    if (next_idx >= blend_from_anim->frame_count) next_idx = 0;
+                    bool hold_last = next_idx == 0 && (params.robot_blend_from_anim_id == ROBOT_ANIM_JUMP_START
+                                                    || params.robot_blend_from_anim_id == ROBOT_ANIM_FALL_START);
+                    if (!hold_last) {
+                        blend_from_next_frame = &blend_from_anim->frames[next_idx];
+                        blend_from_fraction = params.robot_blend_from_timer / blend_from_frame->delay;
+                    }
+                }
+                if (blend_from_frame->part_count != frame->part_count) {
+                    blend_from_frame = NULL;
+                }
+            }
+        }
         
         for (int i = 0; i < frame->part_count; i++) {
             const RobotSpritePart *animation_part = &frame->parts[i];
@@ -2164,6 +2191,25 @@ static void spawn_icon_at_internal(
             if (anim_rot > 180.0f) anim_rot -= 360.0f;
             if (anim_rot < -180.0f) anim_rot += 360.0f;
             anim_rot = animation_part->rotation + anim_rot * anim_fraction;
+
+            if (blend_from_frame) {
+                const RobotSpritePart *from_part = &blend_from_frame->parts[i];
+                const RobotSpritePart *from_next_part = &blend_from_next_frame->parts[i];
+                float from_px = from_part->px + (from_next_part->px - from_part->px) * blend_from_fraction;
+                float from_py = from_part->py + (from_next_part->py - from_part->py) * blend_from_fraction;
+                float from_rot = from_next_part->rotation - from_part->rotation;
+                if (from_rot > 180.0f) from_rot -= 360.0f;
+                if (from_rot < -180.0f) from_rot += 360.0f;
+                from_rot = from_part->rotation + from_rot * blend_from_fraction;
+
+                float blend = params.robot_blend_fraction;
+                anim_px = from_px + (anim_px - from_px) * blend;
+                anim_py = from_py + (anim_py - from_py) * blend;
+                float rot_delta = anim_rot - from_rot;
+                if (rot_delta > 180.0f) rot_delta -= 360.0f;
+                if (rot_delta < -180.0f) rot_delta += 360.0f;
+                anim_rot = from_rot + rot_delta * blend;
+            }
 
             int texture_part = animation_part->texture_idx / 2;
         
@@ -2404,4 +2450,3 @@ void handle_mirror_transition() {
         }
     }
 }
-

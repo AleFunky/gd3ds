@@ -144,6 +144,10 @@ typedef struct {
     int robot_anim_id;
     int robot_anim_frame;
     float robot_anim_timer;
+    int robot_blend_from_anim_id;
+    int robot_blend_from_frame;
+    float robot_blend_from_timer;
+    float robot_blend_fraction;
 } IconParameters;
 
 void spawn_icon_at(

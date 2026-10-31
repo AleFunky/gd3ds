@@ -155,6 +155,10 @@ typedef struct {
     int robot_anim_id;
     int robot_anim_frame;
     float robot_anim_timer;
+    int robot_blend_from_anim_id;
+    int robot_blend_from_frame;
+    float robot_blend_from_timer;
+    float robot_landing_blend_timer;
 
     float coyote_frames;
 
@@ -268,6 +272,8 @@ void draw_internal_hitbox(Player *player);
 void draw_rotated_hitbox(Player *player);
 void draw_hitbox_trail(int player);
 void add_new_hitbox(Player *player);
+
+void set_robot_animation(Player *player, int robot_anim_id);
 
 void update_p1_trail(Player *player, int player_id);
 void draw_p1_trail(Player *player, int player_id);

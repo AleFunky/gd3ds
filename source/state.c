@@ -1,5 +1,6 @@
 #include "state.h"
 #include <string.h>
+#include "player/robot_anim_data.h"
 #include "main.h"
 #include "math_helpers.h"
 #include "player/slope.h"
@@ -201,6 +202,7 @@ void clear_snap_data(Player *player) {
 
 void init_player(Player *player) {
     memset(player, 0, sizeof(Player));
+    player->robot_landing_blend_timer = ROBOT_LANDING_BLEND_DURATION;
     
     set_gamemode(player, level_info.initial_gamemode);
     set_mini(player, level_info.initial_mini);

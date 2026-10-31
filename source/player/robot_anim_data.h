@@ -1,6 +1,7 @@
 #pragma once
 
 #define ROBOT_SPRITE_COUNT 8
+#define ROBOT_LANDING_BLEND_DURATION 0.05f
 
 typedef enum {
     ROBOT_PART1_COLOR = 0,

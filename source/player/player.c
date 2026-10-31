@@ -101,6 +101,19 @@ bool player_gamemode_is_flying(Player *player) {
     return player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_UFO || player->gamemode == GAMEMODE_WAVE;
 }
 
+void set_robot_animation(Player *player, int robot_anim_id) {
+    if (player->robot_anim_id != robot_anim_id) {
+        player->robot_blend_from_anim_id = player->robot_anim_id;
+        player->robot_blend_from_frame = player->robot_anim_frame;
+        player->robot_blend_from_timer = player->robot_anim_timer;
+
+        player->robot_anim_id = robot_anim_id;
+        player->robot_anim_frame = 0;
+        player->robot_anim_timer = 0;
+        player->robot_landing_blend_timer = 0;
+    }
+}
+
 void player_non_flying_landing(Player *player) {
     if (!player_gamemode_is_flying(player)) {
         player->landed_from_jump |= player->jumped;
@@ -580,7 +593,7 @@ void robot_gamemode(Player *player) {
     if (player->y > 2794.f) kill_player(DEATH_FELL_OFF_LEVEL);
 
     if (player->on_ground) {
-        player->robot_anim_id = ROBOT_ANIM_RUN;
+        set_robot_animation(player, ROBOT_ANIM_RUN);
         MotionTrail_StopStroke(trail);
         if (player->slope_data.slope_id < 0) player->rotation = roundf(player->rotation / 90.0f) * 90.0f;
     }
@@ -608,9 +621,7 @@ void robot_gamemode(Player *player) {
         set_p_velocity(player, cube_jump_heights[state.speed] / 2, false);
         player->inverse_rotation = false;
         player->on_ground = false;
-        player->robot_anim_timer = 0;
-        player->robot_anim_id = ROBOT_ANIM_JUMP_START;
-        player->robot_anim_frame = 0;
+        set_robot_animation(player, ROBOT_ANIM_JUMP_START);
         player->buffering_state = BUFFER_END;
         player->robot_air_time = 0.f;
         player->gravity = 0;
@@ -620,9 +631,7 @@ void robot_gamemode(Player *player) {
     if (player->robot_air_time >= 1.5f || (!curr_input.holdJump)) {
         player->gravity = -2794.1082f * 0.9f;
         if (player->robot_anim_id == ROBOT_ANIM_JUMP) {
-            player->robot_anim_timer = 0;
-            player->robot_anim_frame = 0;
-            player->robot_anim_id = ROBOT_ANIM_FALL_START;
+            set_robot_animation(player, ROBOT_ANIM_FALL_START);
         }
     } else {
         player->robot_air_time += 5.4f * STEPS_DT;
@@ -637,9 +646,7 @@ void robot_gamemode(Player *player) {
     if (!player->on_ground && player->vel_y < 0
         && player->robot_anim_id != ROBOT_ANIM_FALL_START
         && player->robot_anim_id != ROBOT_ANIM_FALL) {
-        player->robot_anim_id = ROBOT_ANIM_FALL_START;
-        player->robot_anim_frame = 0;
-        player->robot_anim_timer = 0;
+        set_robot_animation(player, ROBOT_ANIM_FALL_START);
     }
 
     const RobotAnimation *anim = &robot_animations[player->robot_anim_id];
@@ -647,20 +654,27 @@ void robot_gamemode(Player *player) {
                      : (state.speed == SPEED_FAST) ? 1.15f
                      : (state.speed == SPEED_FASTER) ? 1.3f : 1.0f;
     if (player->mini) anim_speed /= 0.85f;
+    
     anim_speed *= 35.0f / 24.0f;
     player->robot_anim_timer += STEPS_DT * anim_speed;
+
     if (player->robot_anim_timer >= anim->frames[player->robot_anim_frame].delay) {
         player->robot_anim_timer -= anim->frames[player->robot_anim_frame].delay;
         int next = player->robot_anim_frame + 1;
         if (next >= anim->frame_count) {
             if (player->robot_anim_id == ROBOT_ANIM_JUMP_START) {
-                player->robot_anim_id = ROBOT_ANIM_JUMP;
+                set_robot_animation(player, ROBOT_ANIM_JUMP);
             } else if (player->robot_anim_id == ROBOT_ANIM_FALL_START) {
-                player->robot_anim_id = ROBOT_ANIM_FALL;
+                set_robot_animation(player, ROBOT_ANIM_FALL);
             }
             next = 0;
         }
         player->robot_anim_frame = next;
+    }
+
+    player->robot_landing_blend_timer += STEPS_DT;
+    if (player->robot_landing_blend_timer > ROBOT_LANDING_BLEND_DURATION) {
+        player->robot_landing_blend_timer = ROBOT_LANDING_BLEND_DURATION;
     }
 }
 
@@ -1115,7 +1129,11 @@ void draw_p1_trail(Player *player, int player_id) {
                 (IconParameters) { 
                     .robot_anim_frame = player->robot_anim_frame,
                     .robot_anim_id = player->robot_anim_id,
-                    .robot_anim_timer = player->robot_anim_timer
+                    .robot_anim_timer = player->robot_anim_timer,
+                    .robot_blend_from_anim_id = player->robot_blend_from_anim_id,
+                    .robot_blend_from_frame = player->robot_blend_from_frame,
+                    .robot_blend_from_timer = player->robot_blend_from_timer,
+                    .robot_blend_fraction = player->robot_landing_blend_timer / ROBOT_LANDING_BLEND_DURATION
                  }
             );
         }
@@ -1255,7 +1273,11 @@ void draw_player(Player *player) {
                 (IconParameters) { 
                     .robot_anim_frame = player->robot_anim_frame,
                     .robot_anim_id = player->robot_anim_id,
-                    .robot_anim_timer = player->robot_anim_timer
+                    .robot_anim_timer = player->robot_anim_timer,
+                    .robot_blend_from_anim_id = player->robot_blend_from_anim_id,
+                    .robot_blend_from_frame = player->robot_blend_from_frame,
+                    .robot_blend_from_timer = player->robot_blend_from_timer,
+                    .robot_blend_fraction = player->robot_landing_blend_timer / ROBOT_LANDING_BLEND_DURATION
                  }
             );
             break;
