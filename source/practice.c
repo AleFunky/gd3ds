@@ -732,8 +732,10 @@ void restore_checkpoint() {
         if (p) p->alpha = check->alpha_group_alpha[i];
     }
     for (int i = 0; i < check->alpha_group_count; i++) {
-        for (GroupNode *p = get_group(check->alpha_group_id[i]); p; p = p->next) {
-            objects.alpha_trigger_opacity[p->obj] = get_group_opacities(p->obj);
+        GroupNode *p = get_group(check->alpha_group_id[i]);
+        for (int i = 0; i < p->count; i++) {
+            int object = p->objects[i];
+            objects.alpha_trigger_opacity[object] = get_group_opacities(object);
         }
     }
 
@@ -741,8 +743,9 @@ void restore_checkpoint() {
         GroupNode *p = get_group(check->toggle_group_id[i]);
         if (!p) continue;
         p->toggled = true;
-        for (; p; p = p->next) {
-            objects.flags[p->obj] |= FLAG_TOGGLED;
+        for (int i = 0; i < p->count; i++) {
+            int object = p->objects[i];
+            objects.flags[object] |= FLAG_TOGGLED;
         }
     }
 

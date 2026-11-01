@@ -2,32 +2,47 @@
 #include "level_loading.h"
 #include <stdlib.h>
 
-static GroupNode *group_buckets[MAX_GROUPS] = {NULL};
+static GroupNode groups[MAX_GROUPS];
 
 void add_to_group(int obj, int g) {
     if (g < 1 || g >= MAX_GROUPS) return;
-    GroupNode *n = malloc(sizeof(GroupNode));
-    n->obj = obj;
-    n->alpha = 1.f;
-    n->toggled = false;
-    n->next = group_buckets[g];
-    group_buckets[g] = n;
+    GroupNode *gr = &groups[g]; 
+    
+    // Initialize
+    if (gr->objects == NULL) {
+        gr->toggled = false;
+        gr->alpha = 1.0f;
+    }
+
+    if (gr->count >= gr->capacity) {
+        size_t new_capacity = gr->capacity == 0 ? 32 : gr->capacity + 32;
+
+        int *new_list = realloc(gr->objects, new_capacity * sizeof(int));
+        if (!new_list) {
+            return;
+        }
+
+        gr->objects = new_list;
+        gr->capacity = new_capacity;
+    }
+    gr->objects[gr->count++] = obj;
 }
 
 GroupNode *get_group(int g) {
     if (g < 1 || g >= MAX_GROUPS) return NULL;
-    return group_buckets[g];
+    return &groups[g];
 }
 
 void clear_groups(void) {
     for (int g = 0; g < MAX_GROUPS; g++) {
-        GroupNode *cur = group_buckets[g];
-        while (cur) {
-            GroupNode *tmp = cur;
-            cur = cur->next;
-            free(tmp);
-        }
-        group_buckets[g] = NULL;
+        groups[g].toggled = false;
+        groups[g].alpha = 1.0f;
+
+        groups[g].count = 0;
+        groups[g].capacity = 0;
+        
+        free(groups[g].objects);
+        groups[g].objects = NULL;
     }
 }
 
@@ -44,28 +59,8 @@ int compare_objects(const void *a, const void *b) {
 
 void sort_group(int g) {
     if (g < 1 || g >= MAX_GROUPS) return;
-    size_t count = 0;
-    GroupNode *cur = group_buckets[g];
-    while (cur) { count++; cur = cur->next; }
-    if (count < 2) return;
-
-    // Copy pointers to array
-    int *arr = malloc(count * sizeof(int));
-    cur = group_buckets[g];
-    for (size_t i = 0; i < count; i++) {
-        arr[i] = cur->obj;
-        cur = cur->next;
-    }
-
+    
+    GroupNode *gr = &groups[g];
     // Sort array
-    qsort(arr, count, sizeof(int), compare_objects);
-
-    // Rebuild linked list
-    cur = group_buckets[g];
-    for (size_t i = 0; i < count; i++) {
-        cur->obj = arr[i];
-        cur = cur->next;
-    }
-
-    free(arr);
+    qsort(gr->objects, gr->count, sizeof(int), compare_objects);
 }

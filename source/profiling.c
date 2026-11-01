@@ -56,6 +56,7 @@ typedef enum {
     PROFILER_STAT_PLAYER,
     PROFILER_STAT_PLAYER_COLLISION,
     PROFILER_STAT_PLAYER_HANDLER,
+    PROFILER_STAT_PLAYER_STEP_TRIGGER,
     PROFILER_STAT_PLAYER_STEPS,
     PROFILER_STAT_PLAYER_COLLISIONS,
     PROFILER_STAT_PLAYER_COLLISION_CHECKS,
@@ -124,10 +125,11 @@ static const ProfilerRow gameplay_rows[] = {
     { "Checks",     PROFILER_STAT_PLAYER_COLLISION_CHECKS, PROFILER_VALUE_INTEGER },
     { "Steps",      PROFILER_STAT_PLAYER_STEPS,            PROFILER_VALUE_INTEGER },
     {},
-    { "Physics",     PROFILER_STAT_PHYSICS,          PROFILER_VALUE_MS_PERCENTAGE },
-    { "- Player",    PROFILER_STAT_PLAYER,           PROFILER_VALUE_MS_PERCENTAGE },
-    { "- Collision", PROFILER_STAT_PLAYER_COLLISION, PROFILER_VALUE_MS_PERCENTAGE },
-    { "- Handler",   PROFILER_STAT_PLAYER_HANDLER,   PROFILER_VALUE_MS_PERCENTAGE },
+    { "Physics",        PROFILER_STAT_PHYSICS,            PROFILER_VALUE_MS_PERCENTAGE },
+    { "- Player",       PROFILER_STAT_PLAYER,             PROFILER_VALUE_MS_PERCENTAGE },
+    { "- Collision",    PROFILER_STAT_PLAYER_COLLISION,   PROFILER_VALUE_MS_PERCENTAGE },
+    { "- Handler",      PROFILER_STAT_PLAYER_HANDLER,     PROFILER_VALUE_MS_PERCENTAGE },
+    { "- Step triggers",PROFILER_STAT_PLAYER_STEP_TRIGGER,PROFILER_VALUE_MS_PERCENTAGE },
     {},
     { "Triggers",  PROFILER_STAT_TRIGGERS,  PROFILER_VALUE_MS_PERCENTAGE },
 };
@@ -210,6 +212,7 @@ static float profiler_stat_value(ProfilerStat stat) {
         case PROFILER_STAT_PLAYER: return internal_snapshot.play_ms;
         case PROFILER_STAT_PLAYER_COLLISION: return internal_snapshot.collision_ms;
         case PROFILER_STAT_PLAYER_HANDLER: return internal_snapshot.handler_ms;
+        case PROFILER_STAT_PLAYER_STEP_TRIGGER: return internal_snapshot.step_trigger_ms;
 
         case PROFILER_STAT_RENDER_CREATING: return internal_snapshot.creating_ms;
         case PROFILER_STAT_RENDER_SORTING: return internal_snapshot.sorting_ms;

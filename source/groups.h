@@ -5,10 +5,11 @@
 #include <stdbool.h>
 
 typedef struct GroupNode {
-    int obj;
     float alpha;
     bool toggled;
-    struct GroupNode *next;
+    int *objects;
+    int count;
+    int capacity;
 } GroupNode;
 
 void clear_groups(void);

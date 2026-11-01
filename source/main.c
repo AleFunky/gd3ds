@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <3ds.h>
+#include "3ds/svc.h"
 #include "c3d/renderqueue.h"
 #include "level_loading.h"
 #include "main.h"
@@ -988,6 +989,7 @@ void game_loop() {
             snapshot.collision_ms = 0;
             snapshot.play_ms = 0;
             snapshot.handler_ms = 0;
+            snapshot.handler_ms = 0;
             
             brick_destroy_particles.emitting = false;
             glitter_particles.emitting = false;
@@ -1095,7 +1097,11 @@ void game_loop() {
                     trigger_dt = STEPS_DT;
                     move_lock_player_x_delta = state.player.x - player_x_before_step;
                     move_lock_player_y_delta = state.player.delta_y;
+                    u64 start_step_triggers = svcGetSystemTick();
                     handle_step_triggers();
+                    u64 end_step_triggers = svcGetSystemTick();
+                    float step_trigger_time = (end_step_triggers - start_step_triggers) / (CPU_TICKS_PER_MSEC);
+                    snapshot.step_trigger_ms += step_trigger_time;
 
                     run_camera();
                     handle_bg_flash();

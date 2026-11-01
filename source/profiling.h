@@ -25,6 +25,7 @@ typedef struct {
     float coll_ms;
     float play_ms;
     float handler_ms;
+    float step_trigger_ms;
     int steps;
     int collisions;
     int collision_checks;
