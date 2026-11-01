@@ -1363,7 +1363,7 @@ void draw_background(float x, float y) {
     }
 }
 
-const int ground_indexes[G_COUNT] = {1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14};
+const int ground_indexes[G_COUNT] = {1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26};
 
 void draw_ground(float cam_x, float cam_y, float y, bool is_ceiling, int screen_width) {
     change_blending(false);

@@ -306,8 +306,8 @@ extern const char *default_name;
 
 extern const char *level_lengths[5];
 
-#define BG_COUNT 13
-#define G_COUNT 11
+#define BG_COUNT 20
+#define G_COUNT 17
 
 extern char *curr_level_string;
 

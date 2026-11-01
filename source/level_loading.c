@@ -2186,7 +2186,8 @@ const char *bg_sheet_paths[] = {
     "romfs:/gfx/bg_sheet_01.t3x",
     "romfs:/gfx/bg_sheet_02.t3x",
     "romfs:/gfx/bg_sheet_03.t3x",
-    "romfs:/gfx/bg_sheet_04.t3x"
+    "romfs:/gfx/bg_sheet_04.t3x",
+    "romfs:/gfx/bg_sheet_05.t3x"
 };
 
 const char *level_font_paths[LEVEL_FONT_COUNT] = {
