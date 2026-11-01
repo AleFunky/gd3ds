@@ -618,6 +618,13 @@ void upload_to_move_buffer(int obj) {
 }
 
 static void begin_object_move_step(void) {
+    for (int i = 0; i < move_trigger_count; i++) {
+        GroupNode *p = get_group(move_trigger_buffer[i].target_group);
+        for (int i = 0; i < p->count; i++) {
+            int object = p->objects[i];
+            objects.last_y[object] = objects.y[object];
+        }
+    }
     int count = 0;
     for (int i = 0; i < move_trigger_count; i++)
         if (move_trigger_buffer[i].active) move_trigger_buffer[count++] = move_trigger_buffer[i];
@@ -626,8 +633,6 @@ static void begin_object_move_step(void) {
 
 static void apply_object_move_delta(int object, float delta_x, float delta_y) {
     if (objects.flags[object] & FLAG_CAN_BE_X_MOVED) objects.x[object] += delta_x;
-    
-    objects.last_y[object] = objects.y[object];
     objects.y[object] += delta_y;
 }
 
