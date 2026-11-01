@@ -100,6 +100,7 @@ static bool blending_state = false;
 C2D_SpriteSheet spriteSheet;
 C2D_SpriteSheet spriteSheet2;
 C2D_SpriteSheet spriteSheet3;
+C2D_SpriteSheet spriteSheet4;
 C2D_SpriteSheet animatedSheet;
 C2D_SpriteSheet glowSheet;
 C2D_SpriteSheet bgSheet;
@@ -151,9 +152,14 @@ static C2D_SpriteSheet get_sprite_sheet(int index, int *rel_index) {
         return spriteSheet3;
     }
 
-    // Return spritesheet 4 (animated objects)
-    *rel_index = index - ANIMATEDSHEET_START;
-    return animatedSheet;
+    if (index < SPRITESHEET4_START) {
+        // Return spritesheet 4 (animated objects)
+        *rel_index = index - ANIMATEDSHEET_START;
+        return animatedSheet;
+    }
+
+    *rel_index = index - SPRITESHEET4_START;
+    return spriteSheet4;
 }
 
 C2D_SpriteSheet get_sprite_sheet_ex(int index, int *rel_index) {

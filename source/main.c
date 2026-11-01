@@ -1548,6 +1548,9 @@ void game_assets_init() {
     spriteSheet3 = C2D_SpriteSheetLoad("romfs:/gfx/sprites_2p0.t3x");
     if (!spriteSheet3) svcBreak(USERBREAK_PANIC);
 
+    spriteSheet4 = C2D_SpriteSheetLoad("romfs:/gfx/sprites_2p1.t3x");
+    if (!spriteSheet4) svcBreak(USERBREAK_PANIC);
+
     animatedSheet = C2D_SpriteSheetLoad("romfs:/gfx/animated.t3x");
     if (!animatedSheet) svcBreak(USERBREAK_PANIC);
     
@@ -1754,6 +1757,7 @@ int main(int argc, char* argv[]) {
     C2D_SpriteSheetFree(spriteSheet);
     C2D_SpriteSheetFree(spriteSheet2);
     C2D_SpriteSheetFree(spriteSheet3);
+    C2D_SpriteSheetFree(spriteSheet4);
     C2D_SpriteSheetFree(animatedSheet);
     C2D_SpriteSheetFree(glowSheet);
     C2D_SpriteSheetFree(bgSheet);
