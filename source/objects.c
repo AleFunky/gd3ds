@@ -6693,7 +6693,7 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1810 */ { 112, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1810, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1811 */ { -1, -1, 0.00, 4.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1812 */ { -1, -1, 0.00, 4.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1813 */ { 96, -1, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1813 },
+/* Object 1813 */ { -1, -1, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1813 },
 /* Object 1814 */ { -1, -1, 0.00, 5.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1815 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1816 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1816 },
