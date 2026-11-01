@@ -1131,7 +1131,7 @@ float get_out_scale_fade(float x, int right_edge) {
 
 // Some objects dont change opacity on fade transitions
 int get_obj_opacity(int obj, float x) {
-    if (objects.flags[obj] & FLAG_DONT_FADE) return 255;
+    if ((objects.flags[obj] & FLAG_DONT_FADE) && objects.transition_applied[obj] == FADE_SIMPLE) return 255;
 
     float opacity = obj_edge_fade(x, SCREEN_WIDTH / SCALE);
     bool blending;
