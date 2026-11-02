@@ -879,6 +879,8 @@ void run_player(Player *player) {
         }
     }
 
+    if (player->allow_dart_slide_timer) player->allow_dart_slide_timer--;
+
     // If player is on slope, do slope stuff
     if (player->slope_data.slope_id >= 0) {
         slope_calc(player->slope_data.slope_id, player);
