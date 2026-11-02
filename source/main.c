@@ -9,6 +9,7 @@
 #include <3ds.h>
 #include "3ds/svc.h"
 #include "c3d/renderqueue.h"
+#include "groups.h"
 #include "level_loading.h"
 #include "main.h"
 #include "graphics.h"
@@ -1252,6 +1253,7 @@ void game_loop() {
             handle_alpha_triggers();
             handle_pulse_triggers();
             calculate_lbg();
+            flush_group_combination_visual_moves();
             u64 end_trig = svcGetSystemTick();
             u64 ticks_trig = end_trig - start_trig;
             snapshot.triggers_ms = ticks_trig / CPU_TICKS_PER_MSEC;

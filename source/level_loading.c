@@ -1799,6 +1799,7 @@ void free_arrays() {
     if (objects.section_y)              { free(objects.section_y);              objects.section_y = NULL; }
     if (objects.activated)          { free(objects.activated);          objects.activated = NULL; }
     if (objects.collided)           { free(objects.collided);           objects.collided = NULL; }
+    if (objects.group_combination_index) { free(objects.group_combination_index); objects.group_combination_index = NULL;}
 }
 
 bool init_arrays(size_t count) {
@@ -1970,6 +1971,9 @@ bool init_arrays(size_t count) {
     objects.section_y = malloc(sizeof(int) * count);
     if (!objects.section_y) return false;
 
+    objects.group_combination_index = malloc(sizeof(int) * count);
+    if (!objects.group_combination_index) return false;
+
     // Initialize the values
     memset(objects.random,             0, sizeof(int) * count);
     memset(objects.id,                 0, sizeof(int) * count);
@@ -2045,6 +2049,7 @@ bool init_arrays(size_t count) {
 
     memset(objects.section_x,           0, sizeof(int) * count);
     memset(objects.section_y,           0, sizeof(int) * count);
+    memset(objects.group_combination_index, 0, sizeof(int) * count);
 
     return true;
 }
@@ -2423,6 +2428,11 @@ int load_online_level(char *level_string) {
     if (returned) return returned;
 
     generate_orange_portals(orange_start);
+    
+    if (!build_group_combinations()) {
+        output_log("Failed to build group combinations\n");
+        return LOAD_OUT_OF_MEMORY;
+    }
 
     init_col_channels();
     set_color_channels();
@@ -2533,6 +2543,11 @@ int load_level(char *path) {
     if (returned) return returned;
 
     generate_orange_portals(orange_start);
+    
+    if (!build_group_combinations()) {
+        output_log("Failed to build group combinations\n");
+        return LOAD_OUT_OF_MEMORY;
+    }
 
     init_col_channels();
     set_color_channels();
@@ -2553,7 +2568,6 @@ int load_level(char *path) {
 }
 
 void reload_level() {
-    clear_groups();
 
     free_trigger_buffers();
 
@@ -2603,19 +2617,6 @@ void reload_level() {
 
     init_col_channels();
     set_color_channels();
-
-    for (int i = 0; i < objects.count; i++) {
-        for (int g = 0; g < objects.group_count[i]; g++) {
-            int group_id = objects.groups[i][g];
-            if (group_id > 0) {
-                add_to_group(i, group_id);
-            }
-        }
-    }
-    
-    for (int i = 1; i < MAX_GROUPS; i++) {
-        sort_group(i);
-    }
     
     // Run triggers behind the start
     handle_triggers();

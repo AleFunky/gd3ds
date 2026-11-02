@@ -617,29 +617,24 @@ void upload_to_move_buffer(int obj) {
     buffer->active = true;
 }
 
-static void begin_object_move_step(void) {
-    for (int i = 0; i < move_trigger_count; i++) {
-        GroupNode *p = get_group(move_trigger_buffer[i].target_group);
-        for (int i = 0; i < p->count; i++) {
-            int object = p->objects[i];
-            objects.last_y[object] = objects.y[object];
-        }
-    }
-    int count = 0;
-    for (int i = 0; i < move_trigger_count; i++)
-        if (move_trigger_buffer[i].active) move_trigger_buffer[count++] = move_trigger_buffer[i];
-    move_trigger_count = count;
-}
-
-static void apply_object_move_delta(int object, float delta_x, float delta_y) {
-    if (objects.flags[object] & FLAG_CAN_BE_X_MOVED) objects.x[object] += delta_x;
-    objects.y[object] += delta_y;
-}
-
 void handle_move_triggers(void) {
     if (trigger_dt <= 0.f) return;
     move_step_dt = trigger_dt;
-    begin_object_move_step();
+    
+    begin_group_combination_move_step();
+
+    for (int i = 0; i< move_trigger_count; i++) {
+        if (!move_trigger_buffer[i].active)
+            add_move_to_group_combinations(move_trigger_buffer[i].target_group, 0.f, 0.f);
+    }
+    
+    int count = 0;
+    for (int i = 0; i < move_trigger_count; i++) {
+        if (move_trigger_buffer[i].active) move_trigger_buffer[count++] = move_trigger_buffer[i];
+    }
+
+    move_trigger_count = count;
+
     for (int slot = 0; slot < move_trigger_count; slot++) {
         MoveTriggerBuffer *buffer = &move_trigger_buffer[slot];
         buffer->time_run += trigger_dt;
@@ -658,18 +653,11 @@ void handle_move_triggers(void) {
             delta_y = current_y - buffer->move_last_y;
             buffer->move_last_y = current_y;
         }
-        if (delta_x != 0.f || delta_y != 0.f) {
-            GroupNode *p = get_group(buffer->target_group);
-            for (int i = 0; i < p->count; i++) {
-                int object = p->objects[i];
-                int old_sx = objects.section_x[object], old_sy = objects.section_y[object];
-                apply_object_move_delta(object, delta_x, delta_y);
-                if ((int)(objects.x[object] / SECTION_SIZE) != old_sx ||
-                    (int)(objects.y[object] / SECTION_SIZE) != old_sy) update_object_section(object);
-            }
-        }
+        add_move_to_group_combinations(buffer->target_group, delta_x, delta_y);
         if (buffer->time_run >= buffer->seconds) buffer->active = false;
     }
+
+    apply_group_combination_move();
 }
 
 void upload_to_spawn_buffer(int obj, bool from_spawn) {

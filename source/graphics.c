@@ -1525,7 +1525,7 @@ static int get_margin(int id) {
 }
 
 
-static int compare_ids(const void *a, const void *b) {
+int compare_ids(const void *a, const void *b) {
     return *(int *)a - *(int *)b;
 }
 
