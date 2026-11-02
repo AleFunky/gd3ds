@@ -638,6 +638,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     player->snap_rotation = true;
 
                 player->left_ground = true;
+                flip_other_player(state.current_player);
 
                 player->dashing = true;
                 player->dash_angle = dash_orb_angle(obj);
