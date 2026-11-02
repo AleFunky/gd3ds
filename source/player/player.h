@@ -145,6 +145,11 @@ typedef struct {
     SnapData snap_data;
 
     bool velocity_override;
+    bool velocity_uncapped;
+    bool dashing;
+    float dash_slope;
+    float dash_angle;
+    float dash_fire_timer;
 
     bool jumped;
     bool landed_from_jump;
@@ -226,6 +231,7 @@ extern KeyInput curr_input;
 extern KeyInput curr_old_input;
 
 extern const float player_speeds[SPEED_COUNT];
+extern const float player_speed_mults[SPEED_COUNT];
 
 inline float getTop(Player *player)  { return player->y + player->height / 2; }
 inline float getBottom(Player *player)  { return player->y - player->height / 2; }
@@ -268,6 +274,9 @@ void handle_player(Player *player);
 void draw_player(Player *player);
 void run_player(Player *player);
 
+void draw_dash_fire(Player *player);
+void add_dash_exit(Player *player);
+
 void draw_hitbox(int obj);
 void draw_player_hitbox(Player *player);
 void draw_internal_hitbox(Player *player);
@@ -288,3 +297,5 @@ float convert_to_closest_rotation(float rotation, float angle);
 
 bool player_gamemode_is_flying(Player *player);
 void player_non_flying_landing(Player *player);
+
+void stop_dashing(Player *player);

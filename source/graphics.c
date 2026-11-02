@@ -102,6 +102,7 @@ C2D_SpriteSheet spriteSheet2;
 C2D_SpriteSheet spriteSheet3;
 C2D_SpriteSheet spriteSheet4;
 C2D_SpriteSheet animatedSheet;
+C2D_SpriteSheet playerDashSheet;
 C2D_SpriteSheet glowSheet;
 C2D_SpriteSheet bgSheet;
 int loaded_bg_sheet = 0;
@@ -645,6 +646,10 @@ float get_object_pulse(float amplitude, int id, int layer) {
         case BLUE_ORB:
         case PINK_ORB:
         case GREEN_ORB:
+        case BLACK_ORB:
+        case RED_ORB:
+        case DASH_ORB:
+        case GRAVITY_DASH_ORB:
             return map_range(amplitude, 0.f, 1.f, 0.3f, 1.2f);
         case 15:
         case 16:
@@ -1809,6 +1814,292 @@ void create_objects() {
     update_tints();
 }
 
+#define MAX_DASH_FX 8
+
+typedef struct {
+    bool active;
+    bool exit;
+    float x, y;
+    float rotation;
+    float elapsed;
+    float scale_x, scale_y;
+    Color color;
+    int start_frame;
+} DashEffect;
+
+static DashEffect dash_effects[MAX_DASH_FX];
+
+static const signed char dash_fire_off_x[12] = { -21, -22, -22, -24, -24, -24, -22, -21, -23, -23, -21, -19 };
+static const signed char dash_fire_off_y[12] = { 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+static const signed char dash_outline_off_x[12] = { -21, -22, -22, -24, -24, -24, -22, -21, -23, -22, -21, -19 };
+static const signed char dash_boom_off_x[9] = { -2, -1, -1, -1, -1, -1, 0, 0, 0 };
+static const signed char dash_boom_off_y[9] = { 1, 2, 3, 2, 2, 1, 1, 1, 1 };
+
+static float dash_ease_in_out(float t) {
+    if (t < 0.5f) return 0.5f * (t * 2.f) * (t * 2.f);
+    return 1.f - 0.5f * (2.f - t * 2.f) * (2.f - t * 2.f);
+}
+
+static void dash_sprite_pos(float x, float y, float rotation, float off_x, float off_y, float *out_x, float *out_y) {
+    float rad = C3D_AngleFromDegrees(rotation);
+    float cos_r = cosf(rad);
+    float sin_r = sinf(rad);
+
+    *out_x = x + off_x * cos_r + off_y * sin_r;
+    *out_y = y + off_x * sin_r - off_y * cos_r;
+}
+
+static void dash_fire_state(const Player *player, float *local_x, float *local_y, float *sx, float *sy, Color *color) {
+    float base_x = 0.9f;
+
+    *local_x = 0.f;
+    *local_y = 0.f;
+
+    switch (player->gamemode) {
+        case GAMEMODE_SHIP:
+            *local_y = 2.f;
+            base_x = 1.0f;
+            break;
+        case GAMEMODE_UFO:
+            base_x = 0.95f;
+            break;
+        case GAMEMODE_ROBOT:
+            *local_x = 1.f;
+            break;
+    }
+
+    float final_scale = base_x * 1.1f;
+    float t = player->dash_fire_timer;
+
+    if (t < 0.1f) {
+        float k = dash_ease_in_out(t / 0.1f);
+        *sx = 0.3f + (final_scale * 0.9f - 0.3f) * k;
+        *sy = 0.2f + (final_scale * 0.9f - 0.2f) * k;
+    } else if (t < 0.2f) {
+        float k = dash_ease_in_out((t - 0.1f) / 0.1f);
+        *sx = final_scale * 0.9f + (final_scale * 0.1f) * k;
+        *sy = *sx;
+    } else {
+        *sx = final_scale;
+        *sy = final_scale;
+    }
+
+    float ck = CLAMP((t - 0.1f) / 0.2f, 0.f, 1.f);
+    Color target = (player == &state.player2) ? player->player_icons.p1_color : player->player_icons.p2_color;
+    color->r = (unsigned char)(255.f + ((float)target.r - 255.f) * ck);
+    color->g = (unsigned char)(255.f + ((float)target.g - 255.f) * ck);
+    color->b = (unsigned char)(255.f + ((float)target.b - 255.f) * ck);
+}
+
+void draw_dash_fire(Player *player) {
+    if (!player->dashing || state.dead || !playerDashSheet) return;
+
+    float local_x, local_y, sx, sy;
+    Color color;
+    dash_fire_state(player, &local_x, &local_y, &sx, &sy, &color);
+
+    float calc_x = player->x - state.camera_x;
+    float calc_y = SCREEN_HEIGHT - (player->y - state.camera_y);
+
+    float rotation = -player->dash_angle;
+    float rad = C3D_AngleFromDegrees(rotation);
+    float rot_x = local_x * cosf(rad) + local_y * sinf(rad);
+    float rot_y = local_x * sinf(rad) - local_y * cosf(rad);
+
+    float base_x = get_mirror_x(calc_x + rot_x, state.mirror_factor);
+    float base_y = calc_y + rot_y;
+
+    int frame = (int)(player->timeElapsed / ((0.04f / player_speed_mults[state.speed]) * (1.f - fabsf(player->dash_angle) / 70.f * 0.4f))) % 12;
+
+    C2D_ImageTint tint = { 0 };
+    C2D_PlainImageTint(&tint, C2D_Color32(color.r, color.g, color.b, 255), 1.f);
+
+    C2D_ImageTint outline_tint = { 0 };
+    C2D_PlainImageTint(&outline_tint, C2D_Color32(255, 255, 255, 150), 1.f);
+
+    float px, py;
+
+    change_blending(true);
+
+    C2D_Sprite spr = { 0 };
+    C2D_SpriteFromSheet(&spr, playerDashSheet, PLAYER_DASH_FIRE_START + frame);
+    C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
+    dash_sprite_pos(base_x, base_y, rotation, dash_fire_off_x[frame], dash_fire_off_y[frame], &px, &py);
+    C2D_SpriteSetPos(&spr, (int)px, (int)py);
+    C2D_SpriteSetScale(&spr, sx, sy);
+    C2D_SpriteSetRotationDegrees(&spr, rotation);
+    C2D_DrawSpriteTinted(&spr, &tint);
+
+    change_blending(false);
+
+    C2D_SpriteFromSheet(&spr, playerDashSheet, PLAYER_DASH_OUTLINE_START + frame);
+    C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
+    dash_sprite_pos(base_x, base_y, rotation, dash_outline_off_x[frame], 0.f, &px, &py);
+    C2D_SpriteSetPos(&spr, (int)px, (int)py);
+    C2D_SpriteSetScale(&spr, sx, sy);
+    C2D_SpriteSetRotationDegrees(&spr, rotation);
+    C2D_DrawSpriteTinted(&spr, &outline_tint);
+}
+
+static DashEffect *dash_effect_free(void) {
+    for (int i = 0; i < MAX_DASH_FX; i++) {
+        if (!dash_effects[i].active) return &dash_effects[i];
+    }
+    return NULL;
+}
+
+void add_dash_boom(float x, float y, float rotation) {
+    DashEffect *fx = dash_effect_free();
+    if (!fx) return;
+
+    fx->active = true;
+    fx->exit = false;
+    fx->x = x;
+    fx->y = y;
+    fx->rotation = rotation;
+    fx->elapsed = 0.f;
+    fx->scale_x = 1.2f;
+    fx->scale_y = 1.2f;
+    fx->color = (Color){ 0, 255, 0 };
+    fx->start_frame = state.player.frame;
+}
+
+void add_gravity_dash_boom(float x, float y, float rotation) {
+    DashEffect *fx = dash_effect_free();
+    if (!fx) return;
+
+    fx->active = true;
+    fx->exit = false;
+    fx->x = x;
+    fx->y = y;
+    fx->rotation = rotation;
+    fx->elapsed = 0.f;
+    fx->scale_x = 1.2f;
+    fx->scale_y = 1.2f;
+    fx->color = (Color){ 255, 0, 255 };
+    fx->start_frame = state.player.frame;
+}
+
+void add_dash_exit(Player *player) {
+    DashEffect *fx = dash_effect_free();
+    if (!fx) return;
+
+    float local_x, local_y, sx, sy;
+    Color color;
+    dash_fire_state(player, &local_x, &local_y, &sx, &sy, &color);
+
+    float player_scale = player->mini ? 0.6f : 1.f;
+
+    fx->active = true;
+    fx->exit = true;
+    fx->x = player->x + local_x;
+    fx->y = player->y + local_y;
+    fx->rotation = -player->dash_angle;
+    fx->elapsed = 0.f;
+    fx->scale_x = sx * player_scale;
+    fx->scale_y = sy * player_scale;
+    fx->color = color;
+    fx->start_frame = state.player.frame;
+}
+
+void update_dash_booms(float delta) {
+    for (int i = 0; i < MAX_DASH_FX; i++) {
+        DashEffect *fx = &dash_effects[i];
+        if (!fx->active) continue;
+
+        fx->elapsed += delta;
+        if (fx->elapsed >= (fx->exit ? 0.2f : 0.45f)) fx->active = false;
+    }
+}
+
+void draw_dash_booms(void) {
+    static unsigned int last_frame = 0;
+
+    if (!playerDashSheet) return;
+
+    if (frame_counter != last_frame) {
+        update_dash_booms(1.f / 60.f);
+        last_frame = frame_counter;
+    }
+
+    for (int i = 0; i < MAX_DASH_FX; i++) {
+        DashEffect *fx = &dash_effects[i];
+        if (!fx->active) continue;
+
+        if (state.player.frame < fx->start_frame) {
+            fx->active = false;
+            continue;
+        }
+
+        float x = get_mirror_x(fx->x - state.camera_x, state.mirror_factor);
+        float y = SCREEN_HEIGHT - (fx->y - state.camera_y);
+        float sx, sy;
+        float alpha;
+        int frame;
+
+        C2D_ImageTint tint = { 0 };
+
+        if (fx->exit) {
+            float k = fx->elapsed / 0.2f;
+            frame = 0;
+            sx = fx->scale_x * (1.f - 0.8f * k);
+            sy = fx->scale_y * (1.f - 0.8f * k);
+            alpha = 1.f - k;
+            x -= 20.f * k;
+
+            C2D_PlainImageTint(&tint, C2D_Color32(fx->color.r, fx->color.g, fx->color.b, 255), alpha);
+
+            C2D_Sprite spr = { 0 };
+            float px, py;
+
+            C2D_SpriteFromSheet(&spr, playerDashSheet, PLAYER_DASH_FIRE_START + frame);
+            C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
+            dash_sprite_pos(x, y, fx->rotation, dash_fire_off_x[frame], dash_fire_off_y[frame], &px, &py);
+            C2D_SpriteSetPos(&spr, (int)px, (int)py);
+            C2D_SpriteSetScale(&spr, sx, sy);
+            C2D_SpriteSetRotationDegrees(&spr, fx->rotation);
+            C2D_DrawSpriteTinted(&spr, &tint);
+
+            change_blending(false);
+
+            C2D_SpriteFromSheet(&spr, playerDashSheet, PLAYER_DASH_OUTLINE_START + frame);
+            C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
+            dash_sprite_pos(x, y, fx->rotation, dash_outline_off_x[frame], 0.f, &px, &py);
+            C2D_SpriteSetPos(&spr, (int)px, (int)py);
+            C2D_SpriteSetScale(&spr, sx, sy);
+            C2D_SpriteSetRotationDegrees(&spr, fx->rotation);
+            C2D_PlainImageTint(&tint, C2D_Color32(255, 255, 255, 255), alpha * 150.f / 255.f);
+            C2D_DrawSpriteTinted(&spr, &tint);
+
+            change_blending(true);
+        } else {
+            frame = (int)(fx->elapsed / 0.05f);
+            if (frame > 8) frame = 8;
+            sx = fx->scale_x;
+            sy = fx->scale_y;
+            alpha = (fx->elapsed <= 0.2f) ? 1.f : 1.f - (fx->elapsed - 0.2f) / 0.3f;
+
+            float ck = CLAMP(fx->elapsed / 0.3f, 0.f, 1.f);
+            unsigned char cr = (unsigned char)(255.f + ((float)fx->color.r - 255.f) * ck);
+            unsigned char cg = (unsigned char)(255.f + ((float)fx->color.g - 255.f) * ck);
+            unsigned char cb = (unsigned char)(255.f + ((float)fx->color.b - 255.f) * ck);
+
+            C2D_PlainImageTint(&tint, C2D_Color32(cr, cg, cb, 255), alpha);
+
+            C2D_Sprite spr = { 0 };
+            float px, py;
+
+            C2D_SpriteFromSheet(&spr, playerDashSheet, PLAYER_DASH_BOOM_START + frame);
+            C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
+            dash_sprite_pos(x, y, fx->rotation, dash_boom_off_x[frame], dash_boom_off_y[frame], &px, &py);
+            C2D_SpriteSetPos(&spr, (int)px, (int)py);
+            C2D_SpriteSetScale(&spr, sx, sy);
+            C2D_SpriteSetRotationDegrees(&spr, fx->rotation);
+            C2D_DrawSpriteTinted(&spr, &tint);
+        }
+    }
+}
+
 void draw_player_effects() {
     change_blending(true);
     for (int i = 0; i < 2; i++) {
@@ -1860,11 +2151,18 @@ void draw_player_graphics() {
     MotionTrail_DrawWaveTrail(&wave_trail_p2);
     change_blending(false);
     state.current_player = 0;
+
+    change_blending(true);
+    draw_dash_booms();
+    change_blending(false);
+
     draw_checkpoints();
+    draw_dash_fire(&state.player);
     draw_player(&state.player);
     
     if (state.dual) {
         state.current_player = 1;
+        draw_dash_fire(&state.player2);
         draw_player(&state.player2);
     }  
 

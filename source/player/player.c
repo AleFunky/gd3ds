@@ -134,6 +134,13 @@ void update_rotation_direction(Player *player) {
     player->rotation_direction = (player->upside_down ? -1 : 1);
 }
 
+void stop_dashing(Player *player) {
+    if (!player->dashing) return;
+    add_dash_exit(player);
+    player->dashing = false;
+    player->dash_fire_timer = 0.f;
+}
+
 float convert_to_closest_rotation(float rotation, float angle) {
     float rot = (int)rotation % 360;
 
@@ -162,8 +169,11 @@ void cube_gamemode(Player *player) {
     player->max_vel = 1080;
 
     // Limit player speed (there is a upwards cap interestingly)
-    if (player->vel_y < player->min_vel) player->vel_y = player->min_vel;
-    if (player->vel_y > player->max_vel) player->vel_y = player->max_vel;
+    if (player->on_ground) player->velocity_uncapped = false;
+    if (!player->velocity_uncapped) {
+        if (player->vel_y < player->min_vel) player->vel_y = player->min_vel;
+        if (player->vel_y > player->max_vel) player->vel_y = player->max_vel;
+    }
 
     // If player fell above the level, die
     if (player->y > 2794.f) kill_player(DEATH_FELL_OFF_LEVEL);
@@ -173,7 +183,7 @@ void cube_gamemode(Player *player) {
     }
 
     // Do cube rotation
-    if (player->slope_data.slope_id < 0 && !player->on_ground) {
+    if (player->slope_data.slope_id < 0 && !player->on_ground && !player->dashing) {
         if (player->inverse_rotation) {
             player->cube_target_rotation -= (cube_rotation_speed[player->mini] / 2) * STEPS_DT * mult;
         } else {
@@ -192,7 +202,7 @@ void cube_gamemode(Player *player) {
 
     drag_particles[state.current_player].cfg.sourcePositionVariancey = (player->mini ? 4.f : 2.f);
 
-    if (curr_input.holdJump) {
+    if (curr_input.holdJump && !player->dashing) {
         jump = true;
     } else if (player->on_ground) {
         player->consecutive_jumps = 0;
@@ -389,10 +399,13 @@ void ship_gamemode(Player *player) {
     player->min_vel = player->mini ? -406.566f : -345.6f;
     player->max_vel = player->mini ? 508.248f : 432.0f;
 
-    if (player->gravity < 0 && player->vel_y < player->min_vel) {
-        player->vel_y = player->min_vel;
-    } else if (player->gravity > 0 && player->vel_y > player->max_vel) {
-        player->vel_y = player->max_vel;
+    if (player->on_ground) player->velocity_uncapped = false;
+    if (!player->velocity_uncapped) {
+        if (player->gravity < 0 && player->vel_y < player->min_vel) {
+            player->vel_y = player->min_vel;
+        } else if (player->gravity > 0 && player->vel_y > player->max_vel) {
+            player->vel_y = player->max_vel;
+        }
     }
 }
 
@@ -430,7 +443,7 @@ void ball_gamemode(Player *player) {
 
     bool should_coyote = (state.dual || player->upside_down) && player->coyote_frames < 16;
     // If on ground (block or slope) and its buffering, do a jump
-    if ((player->slope_data.slope_id >= 0 || player->on_ground || player->on_ceiling || should_coyote) && player->buffering_state == BUFFER_READY) {        
+    if ((player->slope_data.slope_id >= 0 || player->on_ground || player->on_ceiling || should_coyote) && player->buffering_state == BUFFER_READY && !player->dashing) {        
         player->upside_down ^= 1;
 
         set_p_velocity(player, ballJumpHeights[state.speed], state.old_player.buffering_state == BUFFER_READY);
@@ -448,15 +461,18 @@ void ball_gamemode(Player *player) {
         player->jumped = true;
     }
     
-    player->rotation += player->ball_rotation_speed * get_ball_rotation_speed(player) * mult * STEPS_DT;
+    if (!player->dashing) player->rotation += player->ball_rotation_speed * get_ball_rotation_speed(player) * mult * STEPS_DT;
 
     player->min_vel = -810;
     player->max_vel = 810;
 
-    if (player->vel_y < player->min_vel) {
-        player->vel_y = player->min_vel;
-    } else if (player->vel_y > player->max_vel) {
-        player->vel_y = player->max_vel;
+    if (player->on_ground) player->velocity_uncapped = false;
+    if (!player->velocity_uncapped) {
+        if (player->vel_y < player->min_vel) {
+            player->vel_y = player->min_vel;
+        } else if (player->vel_y > player->max_vel) {
+            player->vel_y = player->max_vel;
+        }
     }
 }
 
@@ -504,7 +520,7 @@ void ufo_gamemode(Player *player) {
 
     bool buffering_check = ((state.old_player.gamemode == GAMEMODE_PLAYER || state.old_player.gamemode == GAMEMODE_SHIP || state.old_player.gamemode == GAMEMODE_WAVE || player->buffer_ufo) && (curr_input.holdJump));
     // If buffering, jump
-    if (player->buffering_state == BUFFER_READY && (curr_input.pressedJump || buffering_check)) {
+    if (player->buffering_state == BUFFER_READY && (curr_input.pressedJump || buffering_check) && !player->dashing) {
         player->vel_y = fmaxf(player->vel_y, player->mini ? 358.992 : 371.034);
         player->buffering_state = BUFFER_END;
         player->velocity_override = true;
@@ -540,10 +556,13 @@ void ufo_gamemode(Player *player) {
     player->min_vel = player->mini ? -406.566f : -345.6f;
     player->max_vel = player->mini ? 508.248f : 432.0f;
 
-    if (player->vel_y < player->min_vel) {
-        player->vel_y = player->min_vel;
-    } else if (player->vel_y > player->max_vel) {
-        player->vel_y = player->max_vel;
+    if (player->on_ground) player->velocity_uncapped = false;
+    if (!player->velocity_uncapped) {
+        if (player->vel_y < player->min_vel) {
+            player->vel_y = player->min_vel;
+        } else if (player->vel_y > player->max_vel) {
+            player->vel_y = player->max_vel;
+        }
     }
 }
 
@@ -587,15 +606,18 @@ void robot_gamemode(Player *player) {
     player->min_vel = -810;
     player->max_vel = 1080;
 
-    if (player->vel_y < player->min_vel) player->vel_y = player->min_vel;
-    if (player->vel_y > player->max_vel) player->vel_y = player->max_vel;
+    if (player->on_ground) player->velocity_uncapped = false;
+    if (!player->velocity_uncapped) {
+        if (player->vel_y < player->min_vel) player->vel_y = player->min_vel;
+        if (player->vel_y > player->max_vel) player->vel_y = player->max_vel;
+    }
 
     if (player->y > 2794.f) kill_player(DEATH_FELL_OFF_LEVEL);
 
     if (player->on_ground) {
         set_robot_animation(player, ROBOT_ANIM_RUN);
         MotionTrail_StopStroke(trail);
-        if (player->slope_data.slope_id < 0) player->rotation = roundf(player->rotation / 90.0f) * 90.0f;
+        if (player->slope_data.slope_id < 0 && !player->dashing) player->rotation = roundf(player->rotation / 90.0f) * 90.0f;
     }
     
     drag_particles[state.current_player].emitterX = player->x;
@@ -617,7 +639,7 @@ void robot_gamemode(Player *player) {
         player->rotation = 0;
     }
 
-    if ((slope_data.slope_id >= 0 || player->on_ground) && (curr_input.holdJump && player->buffering_state == BUFFER_READY)) {
+    if ((slope_data.slope_id >= 0 || player->on_ground) && (curr_input.holdJump && player->buffering_state == BUFFER_READY) && !player->dashing) {
         set_p_velocity(player, cube_jump_heights[state.speed] / 2, false);
         player->inverse_rotation = false;
         player->on_ground = false;
@@ -816,7 +838,7 @@ void run_player(Player *player) {
     }
 
     // Weird stuff indeed
-    if (!player->velocity_override) {
+    if (!player->velocity_override && !player->dashing) {
 		float newVel = player->vel_y + player->gravity * STEPS_DT;
 
 		// Player will fall off blocks a frame faster than expected
@@ -873,7 +895,7 @@ void run_player(Player *player) {
     float lerp_speed = player_speed_mults[state.speed] * 0.175f;
 
     // Handle rotation for ship and wave
-    switch (player->gamemode) {
+    if (!player->dashing) switch (player->gamemode) {
         case GAMEMODE_PLAYER:
             if (player->on_ground || player->slope_data.slope_id >= 0) {
                 lerp_speed *= 3.0f;
@@ -913,6 +935,7 @@ void handle_player(Player *player) {
         }
     } else {
         player->buffering_state = BUFFER_NONE;
+        stop_dashing(player);
     }
     
     player->on_ground = false;
@@ -928,7 +951,15 @@ void handle_player(Player *player) {
 
     player->vel_x = player_speeds[state.speed]; 
     player->x += player->vel_x * STEPS_DT;
-    player->y += player_get_vel(player, player->vel_y) * STEPS_DT;
+    if (player->dashing) {
+        player->vel_y = 0;
+        player->y += (player->vel_x * STEPS_DT) * player->dash_slope;
+        player->dash_fire_timer += STEPS_DT;
+        if (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_BALL)
+            player->rotation += (player->upside_down ? -1.f : 1.f) * (288.f / 0.3f) * STEPS_DT;
+    } else {
+        player->y += player_get_vel(player, player->vel_y) * STEPS_DT;
+    }
 
     clamp_player_ground(player);
 
@@ -957,11 +988,15 @@ void handle_player(Player *player) {
     
     if (state.noclip || state.end_wall_anim_playing) state.dead = false;
     
-    if (state.dead) return;
+    if (state.dead) {
+        stop_dashing(player);
+        return;
+    }
 
     start = svcGetSystemTick();
 
     if (player->x >= level_info.wall_x - END_ANIMATION_X_START) {
+        stop_dashing(player);
         state.end_wall_anim_playing = true;
         p1_trail = true;
         if (player->cutscene_timer == 0) {
@@ -982,6 +1017,9 @@ void handle_player(Player *player) {
     } 
 
     run_player(player);
+
+    if (state.dead) stop_dashing(player);
+
     end = svcGetSystemTick();
     ticks = end - start;
     snapshot.play_ms += ticks / CPU_TICKS_PER_MSEC;

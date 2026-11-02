@@ -35,6 +35,7 @@ const float jump_heights_table[SPEED_COUNT][JUMP_TYPES_COUNT][GAMEMODE_COUNT][2]
     /* BLUE ORB   */ {{-229.392, -183.519}, {-229.392, -183.519}, {-160.574397, -128.463298}, {-229.392, -183.519}, {0, 0},   {-229.392, -183.519} },
     /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0},   {561.6,    449.28} },
     /* PINK ORB   */ {{412.884,  330.318},  {212.166,  169.776},  {309.090595,  247.287596},  {240.84,   192.672},  {0, 0},   {412.884,  330.318} },
+    /* RED ORB    */ {{791.4024, 633.12192},  {573.48, 642.2976},  {537.92423, 430.33939},  {584.9496, 623.94624},  {0, 0},  {660.64896, 551.55917}},
     },
     { // NORMAL
     /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0},   {864,      691.2} },
@@ -43,6 +44,7 @@ const float jump_heights_table[SPEED_COUNT][JUMP_TYPES_COUNT][GAMEMODE_COUNT][2]
     /* BLUE ORB   */ {{-241.488, -193.185}, {-241.488, -193.18},  {-169.04160,  -135.2295},   {-241.488, -193.185}, {0, 0},   {-241.488, -193.185} },
     /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0},   {561.6,    449.28} },
     /* PINK ORB   */ {{434.7,    347.76},   {223.398,  178.686},  {325.42019,   260.3286},    {258.984,  207.198},  {0, 0},   {434.7,    347.76} },
+    /* RED ORB    */ {{833.1336, 666.50688},  {603.72, 676.1664},  {566.28935, 453.03147},  {615.7944, 656.84736},  {0, 0},  {695.48544, 556.38835}},
     },
     { // FAST
     /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0},   {864,      691.2} },
@@ -51,6 +53,7 @@ const float jump_heights_table[SPEED_COUNT][JUMP_TYPES_COUNT][GAMEMODE_COUNT][2]
     /* BLUE ORB   */ {{-246.672, -197.343}, {-246.672, -197.343}, {-172.6704,   -138.1401},   {-246.672, -197.343}, {0, 0},   {-246.672, -197.343} },
     /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0},   {561.6,    449.28} },
     /* PINK ORB   */ {{443.988,  355.212},  {228.15,   182.52},   {332.37539,   265.923},     {258.984,  207.198},  {0, 0},   {443.988,  355.212} },
+    /* RED ORB    */ {{851.0184, 664.79292},  {616.68, 674.4276},  {578.44583, 462.75666},  {629.0136, 655.15824},  {0, 0},  {710.41536, 554.96794}},
     },
     { // FASTER
     /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0},   {864,      691.2} },
@@ -59,6 +62,7 @@ const float jump_heights_table[SPEED_COUNT][JUMP_TYPES_COUNT][GAMEMODE_COUNT][2]
     /* BLUE ORB   */ {{-242.568, -194.049}, {-242.568, -194.049}, {-169.7976,   -135.8343},   {-242.568, -194.049}, {0, 0},   {-242.568, -194.049} },
     /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0},   {561.6,    449.28} },
     /* PINK ORB   */ {{436.644,  349.272},  {224.37,   179.496},  {326.85659,   261.5004},    {254.718,  203.742},  {0, 0},   {436.644,  349.272} },
+    /* RED ORB    */ {{836.8596, 669.48768},  {606.42, 679.1904},  {568.82195, 455.05755},  {618.5484, 659.78496},  {0, 0},  {698.59584, 558.87667}},
     }
 };
 
@@ -331,6 +335,31 @@ void setup_dual() {
     }
 }
 
+static float snap_rotation_360(float rotation) {
+    if (rotation <= 180.f) {
+        if (rotation < -180.f) rotation += 360.f;
+    } else {
+        rotation -= 360.f;
+    }
+    return rotation;
+}
+
+static float dash_orb_angle(int obj) {
+    float rotation = objects.rotation[obj];
+
+    if (objects.flippedH[obj]) rotation += 180.f;
+    if (objects.flippedH[obj] != objects.flippedV[obj]) rotation += 180.f;
+
+    float angle = snap_rotation_360(fmodf(-rotation, 360.f));
+
+    if (fabsf(angle) > 90.f) angle = snap_rotation_360((angle <= 0.f ? -180.f : 180.f) - angle);
+
+    if (angle > 70.f) angle = (angle >= 180.f) ? -70.f : 70.f;
+    else if (angle < -70.f) angle = (angle > -180.f) ? -70.f : 70.f;
+
+    return angle;
+}
+
 // Handle collision with special objects (orbs, pads, portals)
 void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
     switch (objects.id[obj]) {
@@ -467,6 +496,125 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 255 / 255.f;
                 }
                 
+                SET_ACTIVATED(obj, true);
+            } 
+            break;
+        case RED_ORB:
+            if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
+            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
+                MotionTrail_ResumeStroke(trail);
+                player->vel_y = jump_heights_table[state.speed][JUMP_RED_ORB][player->gamemode][player->mini];
+                
+                player->ball_rotation_speed = -BALL_SLOW_ROTATION;
+                
+                player->on_ground = false;
+                player->on_ceiling = false;
+                player->inverse_rotation = false;
+                player->left_ground = true;
+                player->buffering_state = BUFFER_END;
+                player->jumped = true;
+                player->velocity_uncapped = true;
+                update_rotation_direction(player);
+                set_robot_animation(player, ROBOT_ANIM_JUMP_START);
+                
+                state.current_data.jumps++;
+                
+                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                if (effect) {
+                    effect->def.colorR = 255 / 255.f;
+                    effect->def.colorG = 100 / 255.f;
+                    effect->def.colorB = 0;
+                }
+                
+                SET_ACTIVATED(obj, true);
+            } 
+            break;
+        case BLACK_ORB:
+            if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
+            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
+                MotionTrail_ResumeStroke(trail);
+                float black_vel = (player->gamemode == GAMEMODE_UFO) ? -604.8f : (player_gamemode_is_flying(player) ? -756.f : -810.f);
+                player->vel_y = player->upside_down ? -black_vel : black_vel;
+                
+                player->ball_rotation_speed = -BALL_SLOW_ROTATION;
+                
+                player->on_ground = false;
+                player->on_ceiling = false;
+                player->inverse_rotation = false;
+                player->left_ground = true;
+                player->buffering_state = BUFFER_END;
+                player->jumped = true;
+                player->velocity_uncapped = true;
+                update_rotation_direction(player);
+                set_robot_animation(player, ROBOT_ANIM_JUMP_START);
+                
+                state.current_data.jumps++;
+                
+                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                if (effect) {
+                    effect->def.colorR = 255 / 255.f;
+                    effect->def.colorG = 255 / 255.f;
+                    effect->def.colorB = 255 / 255.f;
+                }
+                
+                SET_ACTIVATED(obj, true);
+            } 
+            break;
+        case DASH_ORB:
+            if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
+            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY && !player->dashing) {
+                if (player->gamemode != GAMEMODE_WAVE) MotionTrail_StopStroke(trail);
+                player->dashing = true;
+                player->dash_angle = dash_orb_angle(obj);
+                player->dash_slope = sinf(DegToRad(player->dash_angle)) / fabsf(cosf(DegToRad(player->dash_angle)));
+                player->rotation = -player->dash_angle;
+                player->vel_y = 0;
+
+                add_dash_boom(objects.x[obj], objects.y[obj], -player->dash_angle);
+
+                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                if (effect) {
+                    effect->def.colorR = 0 / 255.f;
+                    effect->def.colorG = 255 / 255.f;
+                    effect->def.colorB = 0;
+                }
+
+                SET_ACTIVATED(obj, true);
+            } 
+            break;
+        case GRAVITY_DASH_ORB:
+            if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
+            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY && !player->dashing) {
+                player->ceiling_inv_time = CEILING_INVUL_TIME;
+                if (player->gamemode != GAMEMODE_BALL) MotionTrail_ResumeStroke(trail);
+                if (player->gamemode == GAMEMODE_WAVE) MotionTrail_AddWavePoint(wave_trail);
+                player->vel_y /= -2;
+                player->upside_down = !player->upside_down;
+                player->inverse_rotation = false;
+                player->robot_air_time = 999.f;
+
+                if (player->gamemode == GAMEMODE_UFO)
+                    player->rotation = 0;
+                else
+                    player->snap_rotation = true;
+
+                player->left_ground = true;
+
+                player->dashing = true;
+                player->dash_angle = dash_orb_angle(obj);
+                player->dash_slope = sinf(DegToRad(player->dash_angle)) / fabsf(cosf(DegToRad(player->dash_angle)));
+                player->rotation = -player->dash_angle;
+                player->vel_y = 0;
+
+                add_gravity_dash_boom(objects.x[obj], objects.y[obj], -player->dash_angle);
+
+                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                if (effect) {
+                    effect->def.colorR = 255 / 255.f;
+                    effect->def.colorG = 0 / 255.f;
+                    effect->def.colorB = 255 / 255.f;
+                }
+
                 SET_ACTIVATED(obj, true);
             } 
             break;
