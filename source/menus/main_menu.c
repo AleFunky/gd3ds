@@ -284,6 +284,7 @@ static void main_menu_update(UIScreen *s, UIInput *input){
     normal_speed_particles_bottom.emitting = false;
     fast_speed_particles_bottom.emitting = false;
     faster_speed_particles_bottom.emitting = false;
+    fastest_speed_particles_bottom.emitting = false;
 
     p1_trail = false;
 

@@ -19,7 +19,8 @@ const float falls[SPEED_COUNT] = {
     226.044054,
     280.422108,
     348.678108,
-    421.200108
+    421.200108,
+    518.400173
 };
 
 #define SLOPE_EPSILON 0.01f

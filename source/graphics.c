@@ -2202,6 +2202,7 @@ void draw_objects() {
     drawParticleSystem(&normal_speed_particles, 0, 0, 1.f);
     drawParticleSystem(&fast_speed_particles, 0, 0, 1.f);
     drawParticleSystem(&faster_speed_particles, 0, 0, 1.f);
+    drawParticleSystem(&fastest_speed_particles, 0, 0, 1.f);
     change_blending(false);
 
     if (state.hitbox_display) {
@@ -2284,6 +2285,7 @@ void draw_bottom_particles() {
     drawParticleSystem(&normal_speed_particles_bottom, 0, 0, 1.f);
     drawParticleSystem(&fast_speed_particles_bottom, 0, 0, 1.f);
     drawParticleSystem(&faster_speed_particles_bottom, 0, 0, 1.f);
+    drawParticleSystem(&fastest_speed_particles_bottom, 0, 0, 1.f);
 }
 
 void update_bottom_particles(float delta) {
@@ -2314,6 +2316,10 @@ void update_bottom_particles(float delta) {
         faster_speed_particles_bottom.emitting = faster_speed_particles_timer > 0;
         faster_speed_particles_bottom.emitterX = 320/SCALE;
         faster_speed_particles_bottom.emitterY = 240/2;
+
+        fastest_speed_particles_bottom.emitting = fastest_speed_particles_timer > 0;
+        fastest_speed_particles_bottom.emitterX = 320/SCALE;
+        fastest_speed_particles_bottom.emitterY = 240/2;
     }
 
     updateParticleSystem(&glitter_particles_bottom, delta);
@@ -2321,6 +2327,7 @@ void update_bottom_particles(float delta) {
     updateParticleSystem(&normal_speed_particles_bottom, delta);
     updateParticleSystem(&fast_speed_particles_bottom, delta);
     updateParticleSystem(&faster_speed_particles_bottom, delta);
+    updateParticleSystem(&fastest_speed_particles_bottom, delta);
 }
 
 C2D_SpriteSheet *get_icon_sheet(const IconPart *part, int gamemode) {

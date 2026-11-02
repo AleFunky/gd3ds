@@ -127,6 +127,7 @@ ParticleSystem slow_speed_particles_bottom;
 ParticleSystem normal_speed_particles_bottom;
 ParticleSystem fast_speed_particles_bottom;
 ParticleSystem faster_speed_particles_bottom;
+ParticleSystem fastest_speed_particles_bottom;
 ParticleSystem end_wall_particles;
 ParticleSystem end_wall_firework;
 ParticleSystem level_complete_effect_p1;
@@ -136,6 +137,7 @@ float slow_speed_particles_timer = 0.f;
 float normal_speed_particles_timer = 0.f;
 float fast_speed_particles_timer = 0.f;
 float faster_speed_particles_timer = 0.f;
+float fastest_speed_particles_timer = 0.f;
 
 bool alt_title_screen;
 
@@ -374,6 +376,7 @@ void update_player_effects(float delta) {
     updateParticleSystem(&normal_speed_particles, delta);
     updateParticleSystem(&fast_speed_particles, delta);
     updateParticleSystem(&faster_speed_particles, delta);
+    updateParticleSystem(&fastest_speed_particles, delta);
     updateParticleSystem(&coin_pickup_particles, delta);
 }
 
@@ -411,6 +414,7 @@ void allocate_particles() {
     initParticleSystem(&normal_speed_particles, &speed_effect_normal);
     initParticleSystem(&fast_speed_particles, &speed_effect_fast);
     initParticleSystem(&faster_speed_particles, &speed_effect_vfast);
+    initParticleSystem(&fastest_speed_particles, &speed_effect_fastest);
     initParticleSystem(&coin_pickup_particles, &coin_pickup_effect);
 
     initParticleSystem(&end_wall_particles, &end_effect_portal);
@@ -438,6 +442,7 @@ void free_particles() {
     freeParticleData(&normal_speed_particles.data);
     freeParticleData(&fast_speed_particles.data);
     freeParticleData(&faster_speed_particles.data);
+    freeParticleData(&fastest_speed_particles.data);
     freeParticleData(&coin_pickup_particles.data);
 
     freeParticleData(&end_wall_particles.data);
@@ -451,11 +456,13 @@ void init_particles(Color p1_color, Color p2_color) {
     normal_speed_particles.stationary = true;
     fast_speed_particles.stationary = true;
     faster_speed_particles.stationary = true;
+    fastest_speed_particles.stationary = true;
 
     slow_speed_particles.affectedByMirror = false;
     normal_speed_particles.affectedByMirror = false;
     fast_speed_particles.affectedByMirror = false;
     faster_speed_particles.affectedByMirror = false;
+    fastest_speed_particles.affectedByMirror = false;
 
     end_wall_firework.affectedByMirror = false;
 
@@ -485,6 +492,7 @@ void init_particles(Color p1_color, Color p2_color) {
     normal_speed_particles.depth = 0.6f;
     fast_speed_particles.depth = 0.6f;
     faster_speed_particles.depth = 0.6f;
+    fastest_speed_particles.depth = 0.6f;
 
     // Its particles spiral inwards, so they start at you and fall into the portal
     end_wall_particles.depth = 0.7f;
@@ -597,6 +605,10 @@ void init_particles(Color p1_color, Color p2_color) {
     faster_speed_particles.cfg.startColorRed   = 230 / 255.f;
     faster_speed_particles.cfg.startColorGreen = 65 / 255.f;
     faster_speed_particles.cfg.startColorBlue  = 255 / 255.f;
+
+    fastest_speed_particles.cfg.startColorRed   = 255 / 255.f;
+    fastest_speed_particles.cfg.startColorGreen = 65 / 255.f;
+    fastest_speed_particles.cfg.startColorBlue  = 65 / 255.f;
 
     coin_pickup_particles.cfg.startColorRed   = 255 / 255.f;
     coin_pickup_particles.cfg.startColorGreen = state.custom_level ? 1.f : 190 / 255.f;
@@ -998,6 +1010,7 @@ void game_loop() {
             normal_speed_particles_bottom.emitting = false;
             fast_speed_particles_bottom.emitting = false;
             faster_speed_particles_bottom.emitting = false;
+            fastest_speed_particles_bottom.emitting = false;
             
             if (physics_delta > 0.5f) physics_delta = STEPS_DT; // Avoid spiral of death
 
@@ -1297,6 +1310,13 @@ void game_loop() {
             faster_speed_particles.emitting = faster_speed_particles_timer > 0;
             if (faster_speed_particles_timer > 0) {
                 faster_speed_particles_timer -= delta;
+            }
+
+            fastest_speed_particles.emitterX = calc_x_speed_particles;
+            fastest_speed_particles.emitterY = calc_y_speed_particles;
+            fastest_speed_particles.emitting = fastest_speed_particles_timer > 0;
+            if (fastest_speed_particles_timer > 0) {
+                fastest_speed_particles_timer -= delta;
             }
             
             end_wall_particles.emitterX = level_info.wall_x - 15;
@@ -1608,6 +1628,9 @@ void game_assets_init() {
 
     initParticleSystem(&faster_speed_particles_bottom, &speed_effect_vfast);
     faster_speed_particles_bottom.relativeStationary = true;
+
+    initParticleSystem(&fastest_speed_particles_bottom, &speed_effect_fastest);
+    fastest_speed_particles_bottom.relativeStationary = true;
 }
 
 int main(int argc, char* argv[]) {
@@ -1732,6 +1755,10 @@ int main(int argc, char* argv[]) {
         faster_speed_particles_bottom.cfg.startColorRed = 230 / 255.f;
         faster_speed_particles_bottom.cfg.startColorGreen = 65 / 255.f;
         faster_speed_particles_bottom.cfg.startColorBlue = 255 / 255.f;
+
+        fastest_speed_particles_bottom.cfg.startColorRed = 255 / 255.f;
+        fastest_speed_particles_bottom.cfg.startColorGreen = 65 / 255.f;
+        fastest_speed_particles_bottom.cfg.startColorBlue = 65 / 255.f;
 
         switch (game_state) {
             case STATE_MENU:

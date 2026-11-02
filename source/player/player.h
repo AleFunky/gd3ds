@@ -195,6 +195,7 @@ enum PlayerSpeeds {
     SPEED_NORMAL,
     SPEED_FAST,
     SPEED_FASTER,
+    SPEED_FASTEST,
     SPEED_COUNT
 };
 
@@ -223,6 +224,7 @@ extern ParticleSystem slow_speed_particles;
 extern ParticleSystem normal_speed_particles;
 extern ParticleSystem fast_speed_particles;
 extern ParticleSystem faster_speed_particles;
+extern ParticleSystem fastest_speed_particles;
 extern ParticleSystem coin_pickup_particles;
 
 typedef struct KeyInput KeyInput;

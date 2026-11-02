@@ -52,6 +52,7 @@ ParticleSystem slow_speed_particles;
 ParticleSystem normal_speed_particles;
 ParticleSystem fast_speed_particles;
 ParticleSystem faster_speed_particles;
+ParticleSystem fastest_speed_particles;
 ParticleSystem coin_pickup_particles;
 
 PlayerAction player_actions[2][MAX_ACTIONS];
@@ -61,6 +62,7 @@ const float velocity_thresholds[SPEED_COUNT] = {
 	101.541492,
 	103.485494592,
 	103.377492,
+	103.809492,
 	103.809492
 };
 
@@ -68,7 +70,8 @@ const float player_speeds[SPEED_COUNT] = {
 	251.16007972276924,
 	311.580093712804,
 	387.42014039710523,
-	468.0001388338566
+	468.0001388338566,
+	576.000192
 };
 
 const float cube_jump_heights[SPEED_COUNT] = {
@@ -76,12 +79,14 @@ const float cube_jump_heights[SPEED_COUNT] = {
     603.7217172,
     616.681728,
     606.421728,
+    606.421728,
 };
 
-const float cube_accelerations[] = {
+const float cube_accelerations[SPEED_COUNT] = {
     -2747.52,
     -2794.1082,
     -2786.4,
+    -2799.36,
     -2799.36,
 };
 
@@ -89,7 +94,8 @@ const float player_speed_mults[SPEED_COUNT] = {
 	0.7f,
 	0.9f,
 	1.1f,
-	1.3f	
+	1.3f,
+	1.6f
 };
 
 const float cube_rotation_speed[2] = {
@@ -414,6 +420,7 @@ static float ballJumpHeights[SPEED_COUNT] = {
     -172.044007,
     -181.11601,
     -185.00401,
+    -181.92601,
     -181.92601
 };
 
@@ -674,7 +681,8 @@ void robot_gamemode(Player *player) {
     const RobotAnimation *anim = &robot_animations[player->robot_anim_id];
     float anim_speed = (state.speed == SPEED_SLOW) ? 0.9f
                      : (state.speed == SPEED_FAST) ? 1.15f
-                     : (state.speed == SPEED_FASTER) ? 1.3f : 1.0f;
+                     : (state.speed == SPEED_FASTER) ? 1.3f
+                     : (state.speed == SPEED_FASTEST) ? 1.5f : 1.0f;
     if (player->mini) anim_speed /= 0.85f;
     
     anim_speed *= 35.0f / 24.0f;

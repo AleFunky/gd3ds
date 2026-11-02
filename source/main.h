@@ -86,6 +86,7 @@ extern ParticleSystem slow_speed_particles_bottom;
 extern ParticleSystem normal_speed_particles_bottom;
 extern ParticleSystem fast_speed_particles_bottom;
 extern ParticleSystem faster_speed_particles_bottom;
+extern ParticleSystem fastest_speed_particles_bottom;
 extern ParticleSystem end_wall_particles;
 extern ParticleSystem end_wall_firework;
 extern ParticleSystem level_complete_effect_p1;
@@ -95,6 +96,7 @@ extern float slow_speed_particles_timer;
 extern float normal_speed_particles_timer;
 extern float fast_speed_particles_timer;
 extern float faster_speed_particles_timer;
+extern float fastest_speed_particles_timer;
 
 #define SCREEN_WIDTH  400
 #define SCREEN_BOT_WIDTH  320

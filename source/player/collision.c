@@ -67,6 +67,16 @@ const float jump_heights_table[SPEED_COUNT][JUMP_TYPES_COUNT][GAMEMODE_COUNT][2]
     /* PINK ORB   */ {{436.644,  349.272},  {224.37,   179.496},  {326.85659,   261.5004},    {254.718,  203.742},  {0, 0},   {436.644,  349.272} },
     /* RED ORB    */ {{836.8596, 669.48768},  {606.42, 679.1904},  {568.82195, 455.05755},  {618.5484, 659.78496},  {0, 0},  {698.59584, 558.87667}},
     /* RED PAD    */ {{1080,     864},      {544.32,   656.64},   {648,         518.4},       {518.4,    677.376},  {0, 0},   {1080,     864} },
+    },
+    { // FASTEST
+    /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0},   {864,      691.2} },
+    /* YELLOW ORB */ {{606.42,   485.136},  {606.42,   485.136},  {424.493993,  339.59519},   {606.42,   485.136},  {0, 0},   {545.778,  436.6224} },
+    /* BLUE PAD   */ {{-345.6,   -276.48},  {-345.6,   -276.48},  {-207.36001,  -165.88801},  {-345.6,   -276.48},  {0, 0},   {-345.6,   -276.48} },
+    /* BLUE ORB   */ {{-242.568, -194.049}, {-242.568, -194.049}, {-169.7976,   -135.8343},   {-242.568, -194.049}, {0, 0},   {-242.568, -194.049} },
+    /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0},   {561.6,    449.28} },
+    /* PINK ORB   */ {{436.644,  349.272},  {224.37,   179.496},  {326.85659,   261.5004},    {254.718,  203.742},  {0, 0},   {436.644,  349.272} },
+    /* RED ORB    */ {{836.8596, 669.48768},  {606.42, 679.1904},  {568.82195, 455.05755},  {618.5484, 659.78496},  {0, 0},  {698.59584, 558.87667}},
+    /* RED PAD    */ {{1080,     864},      {544.32,   656.64},   {648,         518.4},       {518.4,    677.376},  {0, 0},   {1080,     864} },
     }
 };
 
@@ -182,6 +192,11 @@ float snap_player(Vec2D diff, Player *player) {
             stairs[1].x = (player->mini ? 90 : 150);
             break;
         case SPEED_FASTER:
+            memcpy(&stairs, &fasterSpeedSnaps, sizeof(Vec2D) * 3);
+            threshold = 2;
+            stairs[1].x = (player->mini ? 90 : 180);
+            break;
+        case SPEED_FASTEST:
             memcpy(&stairs, &fasterSpeedSnaps, sizeof(Vec2D) * 3);
             threshold = 2;
             stairs[1].x = (player->mini ? 90 : 180);
@@ -936,6 +951,23 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 if (state.speed != SPEED_FASTER) {
                     state.speed = SPEED_FASTER;
                     faster_speed_particles_timer = 0.7f;
+                }
+            }
+            break;
+        case FASTEST_SPEED_PORTAL:
+            if (!GET_ACTIVATED(obj)) {
+                SET_ACTIVATED(obj, true);
+
+                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &speed_collide_effect, get_use_effect_array_ptr(GFX_TOP));
+                if (effect) {
+                    effect->def.colorR = 255 / 255.f;
+                    effect->def.colorG = 65  / 255.f;
+                    effect->def.colorB = 65  / 255.f;
+                }
+
+                if (state.speed != SPEED_FASTEST) {
+                    state.speed = SPEED_FASTEST;
+                    fastest_speed_particles_timer = 0.7f;
                 }
             }
             break;
