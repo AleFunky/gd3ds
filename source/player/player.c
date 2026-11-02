@@ -175,11 +175,8 @@ void cube_gamemode(Player *player) {
     player->max_vel = 1080;
 
     // Limit player speed (there is a upwards cap interestingly)
-    if (player->on_ground) player->velocity_uncapped = false;
-    if (!player->velocity_uncapped) {
-        if (player->vel_y < player->min_vel) player->vel_y = player->min_vel;
-        if (player->vel_y > player->max_vel) player->vel_y = player->max_vel;
-    }
+    if (player->vel_y < player->min_vel) player->vel_y = player->min_vel;
+    if (player->vel_y > player->max_vel) player->vel_y = player->max_vel;
 
     // If player fell above the level, die
     if (player->y > 2794.f) kill_player(DEATH_FELL_OFF_LEVEL);
@@ -405,7 +402,6 @@ void ship_gamemode(Player *player) {
     player->min_vel = player->mini ? -406.566f : -345.6f;
     player->max_vel = player->mini ? 508.248f : 432.0f;
 
-    if (player->on_ground) player->velocity_uncapped = false;
     if (!player->velocity_uncapped) {
         if (player->gravity < 0 && player->vel_y < player->min_vel) {
             player->vel_y = player->min_vel;
@@ -473,13 +469,10 @@ void ball_gamemode(Player *player) {
     player->min_vel = -810;
     player->max_vel = 810;
 
-    if (player->on_ground) player->velocity_uncapped = false;
-    if (!player->velocity_uncapped) {
-        if (player->vel_y < player->min_vel) {
-            player->vel_y = player->min_vel;
-        } else if (player->vel_y > player->max_vel) {
-            player->vel_y = player->max_vel;
-        }
+    if (player->vel_y < player->min_vel) {
+        player->vel_y = player->min_vel;
+    } else if (player->vel_y > player->max_vel) {
+        player->vel_y = player->max_vel;
     }
 }
 
@@ -532,6 +525,7 @@ void ufo_gamemode(Player *player) {
         player->buffering_state = BUFFER_END;
         player->velocity_override = true;
         player->burst_particle_timer = BURST_PARTICLES_DURATION;
+        player->velocity_uncapped = false;
     } else {
         // Same as ship
         if (!state.dual) {
@@ -563,7 +557,6 @@ void ufo_gamemode(Player *player) {
     player->min_vel = player->mini ? -406.566f : -345.6f;
     player->max_vel = player->mini ? 508.248f : 432.0f;
 
-    if (player->on_ground) player->velocity_uncapped = false;
     if (!player->velocity_uncapped) {
         if (player->vel_y < player->min_vel) {
             player->vel_y = player->min_vel;
@@ -613,11 +606,8 @@ void robot_gamemode(Player *player) {
     player->min_vel = -810;
     player->max_vel = 1080;
 
-    if (player->on_ground) player->velocity_uncapped = false;
-    if (!player->velocity_uncapped) {
-        if (player->vel_y < player->min_vel) player->vel_y = player->min_vel;
-        if (player->vel_y > player->max_vel) player->vel_y = player->max_vel;
-    }
+    if (player->vel_y < player->min_vel) player->vel_y = player->min_vel;
+    if (player->vel_y > player->max_vel) player->vel_y = player->max_vel;
 
     if (player->y > 2794.f) kill_player(DEATH_FELL_OFF_LEVEL);
 
@@ -793,6 +783,9 @@ void run_player(Player *player) {
 	} else {
 		player->coyote_frames = INT32_MAX;
 	}
+
+    // Disable cap
+    if (player->on_ground) player->velocity_uncapped = false;
 
     switch (player->gamemode) {
         case GAMEMODE_PLAYER:
