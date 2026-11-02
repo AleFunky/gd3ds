@@ -956,8 +956,11 @@ void handle_player(Player *player) {
         player->vel_y = 0;
         player->y += (player->vel_x * STEPS_DT) * player->dash_slope;
         player->dash_fire_timer += STEPS_DT;
-        if (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_BALL)
+        if (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_BALL) {
             player->rotation += (player->upside_down ? -1.f : 1.f) * (288.f / 0.3f) * STEPS_DT;
+        } else {
+            player->rotation = -player->dash_angle;
+        }
     } else {
         player->y += player_get_vel(player, player->vel_y) * STEPS_DT;
     }
