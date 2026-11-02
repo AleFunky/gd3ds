@@ -79,4 +79,4 @@ UIScreen *ui_stack_get_screen_from_pair(UIScreenPair *pair, Screens screen);
 UIScreen *ui_stack_get_screen_relative(UIScreen *screen, Screens which);
 
 FadeStatus ui_stack_get_fade_status();
-char *ui_stack_get_current_screen_name();
+const char *ui_stack_get_current_screen_name();
