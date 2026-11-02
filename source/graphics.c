@@ -620,6 +620,7 @@ float get_rotation_speed(int obj) {
         case 1056:
         case 1057:
         case GREEN_ORB:
+        case BLACK_ORB:
             return 180.f;
         case 1019:
             return 180.f + map_range(objects.random[obj] & 0xff, 0, 255, -10, 10);

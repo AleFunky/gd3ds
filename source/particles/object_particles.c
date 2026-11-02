@@ -79,6 +79,10 @@ static float get_object_particle_depth(int id) {
         case BLUE_ORB:
         case PINK_ORB:
         case GREEN_ORB:
+        case RED_ORB:
+        case BLACK_ORB:
+        case DASH_ORB:
+        case GRAVITY_DASH_ORB:
         case SECRET_COIN:
             return 0.7f;
     }
@@ -236,6 +240,50 @@ void spawn_object_particles(int obj) {
                 }
             }
             break;
+        case RED_ORB:
+            if (!is_ps_already_loaded(obj)) {
+                index = load_object_particles(obj, &ring_effect, false);
+                if (index >= 0) {
+                    set_particle_color(&object_particle[index].ps.cfg, 1, 0.39216f, 0.98039f);
+
+                    object_particle[index].ps.emitterX = objects.x[obj];
+                    object_particle[index].ps.emitterY = objects.y[obj];
+                }
+            }
+            break;
+        case BLACK_ORB:
+            if (!is_ps_already_loaded(obj)) {
+                index = load_object_particles(obj, &ring_effect, false);
+                if (index >= 0) {
+                    set_particle_color(&object_particle[index].ps.cfg, 1, 1, 1);
+
+                    object_particle[index].ps.emitterX = objects.x[obj];
+                    object_particle[index].ps.emitterY = objects.y[obj];
+                }
+            }
+            break;
+        case DASH_ORB:
+            if (!is_ps_already_loaded(obj)) {
+                index = load_object_particles(obj, &ring_effect, false);
+                if (index >= 0) {
+                    set_particle_color(&object_particle[index].ps.cfg, 0, 1, 0);
+
+                    object_particle[index].ps.emitterX = objects.x[obj];
+                    object_particle[index].ps.emitterY = objects.y[obj];
+                }
+            }
+            break;
+        case GRAVITY_DASH_ORB:
+            if (!is_ps_already_loaded(obj)) {
+                index = load_object_particles(obj, &ring_effect, false);
+                if (index >= 0) {
+                    set_particle_color(&object_particle[index].ps.cfg, 1, 0, 0);
+
+                    object_particle[index].ps.emitterX = objects.x[obj];
+                    object_particle[index].ps.emitterY = objects.y[obj];
+                }
+            }
+            break;
         case YELLOW_PAD:
             if (!is_ps_already_loaded(obj)) {
                 index = load_object_particles(obj, &bump_effect, false);
@@ -269,6 +317,20 @@ void spawn_object_particles(int obj) {
                 index = load_object_particles(obj, &bump_effect, false);
                 if (index >= 0) {
                     set_particle_color(&object_particle[index].ps.cfg, 1, 0, 1);
+
+                    object_particle[index].ps.cfg.angle = 180.f - (adjust_angle_y(objects.rotation[obj], objects.flippedV[obj]) + 90.f);
+
+                    object_particle[index].ps.emitterX = objects.x[obj];
+                    object_particle[index].ps.emitterY = objects.y[obj];
+                    object_particle[index].ps.posVarRotates = true;
+                }
+            }
+            break;
+        case RED_PAD:
+            if (!is_ps_already_loaded(obj)) {
+                index = load_object_particles(obj, &bump_effect, false);
+                if (index >= 0) {
+                    set_particle_color(&object_particle[index].ps.cfg, 1, 0.19608f, 0.19608f);
 
                     object_particle[index].ps.cfg.angle = 180.f - (adjust_angle_y(objects.rotation[obj], objects.flippedV[obj]) + 90.f);
 
