@@ -364,10 +364,7 @@ static float snap_rotation_360(float rotation) {
 }
 
 static float dash_orb_angle(int obj) {
-    float rotation = objects.rotation[obj];
-
-    if (objects.flippedH[obj]) rotation += 180.f;
-    if (objects.flippedH[obj] != objects.flippedV[obj]) rotation += 180.f;
+    float rotation = adjust_angle_y(objects.rotation[obj], objects.flippedH[obj]);
 
     float angle = snap_rotation_360(fmodf(-rotation, 360.f));
 
@@ -603,6 +600,14 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
             if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY && !player->dashing) {
                 if (player->gamemode != GAMEMODE_WAVE) MotionTrail_StopStroke(trail);
+
+                player->on_ground = false;
+                player->on_ceiling = false;
+                player->inverse_rotation = false;
+                player->left_ground = true;
+                player->robot_air_time = 999.f;
+                player->buffering_state = BUFFER_END;
+                
                 player->dashing = true;
                 player->dash_angle = dash_orb_angle(obj);
                 player->dash_slope = sinf(DegToRad(player->dash_angle)) / fabsf(cosf(DegToRad(player->dash_angle)));
@@ -629,8 +634,13 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 if (player->gamemode == GAMEMODE_WAVE) MotionTrail_AddWavePoint(wave_trail);
                 player->vel_y /= -2;
                 player->upside_down = !player->upside_down;
-                player->inverse_rotation = false;
                 player->robot_air_time = 999.f;
+                
+                player->on_ground = false;
+                player->on_ceiling = false;
+                player->inverse_rotation = false;
+                player->left_ground = true;
+                player->buffering_state = BUFFER_END;
 
                 if (player->gamemode == GAMEMODE_UFO)
                     player->rotation = 0;

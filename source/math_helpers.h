@@ -43,7 +43,7 @@ float adjust_angle(float angle, int flipX, int flipY);
 float ip1_ceilf(float x);
 float iSlerp(float a, float b, float ratio, float dt);
 float slerp_fancy(float fromAngle, float toAngle, float t);
-float adjust_angle_y(float angle, int flipY);
+float adjust_angle_y(float angle, int flipX);
 float square_distance(float xa, float ya, float xb, float yb);
 
 float reflect(float x, float min, float max);
