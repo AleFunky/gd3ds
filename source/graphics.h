@@ -127,6 +127,8 @@ inline float normalize_angle(float a)
     return a;
 }
 
+int compare_ids(const void *a, const void *b);
+
 void create_objects();
 void change_blending(bool blending);
 Color get_white_if_black(Color color);

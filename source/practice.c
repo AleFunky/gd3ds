@@ -301,6 +301,8 @@ void set_checkpoint_timer(float timer) {
 void new_checkpoint() {
     if (state.dead) return;
 
+    flush_group_combination_visual_moves();
+
     int next_checkpoint = checkpoint_pointer + 1;
     if (next_checkpoint >= MAX_CHECKPOINTS) next_checkpoint = 0;
 
@@ -624,6 +626,7 @@ void new_checkpoint() {
 
 void restore_checkpoint() {
     CheckpointData *check = &checkpoints[checkpoint_pointer];
+    discard_group_combination_visual_moves();
 
     state.camera_x = check->camera_x;
     state.camera_y = check->camera_y;

@@ -201,6 +201,8 @@ typedef struct {
     bool *flippedH, *flippedV;
 
     short (*groups)[MAX_GROUPS_PER_OBJECT];
+    int *group_combination_index;
+
     u8 *group_count;
     u8 *flags;
 
