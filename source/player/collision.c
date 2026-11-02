@@ -573,7 +573,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
                 MotionTrail_ResumeStroke(trail);
                 float black_vel = (player->gamemode == GAMEMODE_UFO) ? -604.8f : (player_gamemode_is_flying(player) ? -756.f : -810.f);
-                player->vel_y = player->upside_down ? -black_vel : black_vel;
+                player->vel_y = black_vel;
                 
                 player->ball_rotation_speed = -BALL_SLOW_ROTATION;
                 
