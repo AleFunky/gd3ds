@@ -10,6 +10,7 @@ enum JumpType {
     JUMP_PINK_PAD,
     JUMP_PINK_ORB,
     JUMP_RED_ORB,
+    JUMP_RED_PAD,
     JUMP_TYPES_COUNT
 };
 
@@ -42,6 +43,7 @@ enum JumpType {
 #define YELLOW_PAD 35
 #define PINK_PAD 140
 #define BLUE_PAD 67
+#define RED_PAD 1332
 
 #define YELLOW_ORB 36
 #define PINK_ORB 141

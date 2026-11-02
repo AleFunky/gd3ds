@@ -36,6 +36,7 @@ const float jump_heights_table[SPEED_COUNT][JUMP_TYPES_COUNT][GAMEMODE_COUNT][2]
     /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0},   {561.6,    449.28} },
     /* PINK ORB   */ {{412.884,  330.318},  {212.166,  169.776},  {309.090595,  247.287596},  {240.84,   192.672},  {0, 0},   {412.884,  330.318} },
     /* RED ORB    */ {{791.4024, 633.12192},  {573.48, 642.2976},  {537.92423, 430.33939},  {584.9496, 623.94624},  {0, 0},  {660.64896, 551.55917}},
+    /* RED PAD    */ {{1080,     864},      {544.32,   656.64},   {648,         518.4},       {518.4,    677.376},  {0, 0},   {1080,     864} },
     },
     { // NORMAL
     /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0},   {864,      691.2} },
@@ -45,6 +46,7 @@ const float jump_heights_table[SPEED_COUNT][JUMP_TYPES_COUNT][GAMEMODE_COUNT][2]
     /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0},   {561.6,    449.28} },
     /* PINK ORB   */ {{434.7,    347.76},   {223.398,  178.686},  {325.42019,   260.3286},    {258.984,  207.198},  {0, 0},   {434.7,    347.76} },
     /* RED ORB    */ {{833.1336, 666.50688},  {603.72, 676.1664},  {566.28935, 453.03147},  {615.7944, 656.84736},  {0, 0},  {695.48544, 556.38835}},
+    /* RED PAD    */ {{1080,     864},      {544.32,   656.64},   {648,         518.4},       {518.4,    677.376},  {0, 0},   {1080,     864} },
     },
     { // FAST
     /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0},   {864,      691.2} },
@@ -54,6 +56,7 @@ const float jump_heights_table[SPEED_COUNT][JUMP_TYPES_COUNT][GAMEMODE_COUNT][2]
     /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0},   {561.6,    449.28} },
     /* PINK ORB   */ {{443.988,  355.212},  {228.15,   182.52},   {332.37539,   265.923},     {258.984,  207.198},  {0, 0},   {443.988,  355.212} },
     /* RED ORB    */ {{851.0184, 664.79292},  {616.68, 674.4276},  {578.44583, 462.75666},  {629.0136, 655.15824},  {0, 0},  {710.41536, 554.96794}},
+    /* RED PAD    */ {{1080,     864},      {544.32,   656.64},   {648,         518.4},       {518.4,    677.376},  {0, 0},   {1080,     864} },
     },
     { // FASTER
     /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0},   {864,      691.2} },
@@ -63,6 +66,7 @@ const float jump_heights_table[SPEED_COUNT][JUMP_TYPES_COUNT][GAMEMODE_COUNT][2]
     /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0},   {561.6,    449.28} },
     /* PINK ORB   */ {{436.644,  349.272},  {224.37,   179.496},  {326.85659,   261.5004},    {254.718,  203.742},  {0, 0},   {436.644,  349.272} },
     /* RED ORB    */ {{836.8596, 669.48768},  {606.42, 679.1904},  {568.82195, 455.05755},  {618.5484, 659.78496},  {0, 0},  {698.59584, 558.87667}},
+    /* RED PAD    */ {{1080,     864},      {544.32,   656.64},   {648,         518.4},       {518.4,    677.376},  {0, 0},   {1080,     864} },
     }
 };
 
@@ -398,6 +402,26 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorR = 255 / 255.f;
                     effect->def.colorG = 50 / 255.f;
                     effect->def.colorB = 255 / 255.f;
+                }
+            }
+            break;
+        case RED_PAD:
+            if (!GET_ACTIVATED(obj)) {
+                MotionTrail_ResumeStroke(trail);
+                player->vel_y = jump_heights_table[state.speed][JUMP_RED_PAD][player->gamemode][player->mini];
+                player->on_ground = false;
+                player->inverse_rotation = false;
+                player->left_ground = true;
+                player->jumped = true;
+                player->velocity_uncapped = true;
+                set_robot_animation(player, ROBOT_ANIM_JUMP_START);
+                SET_ACTIVATED(obj, true);
+                update_rotation_direction(player);
+                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &pad_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                if (effect) {
+                    effect->def.colorR = 255 / 255.f;
+                    effect->def.colorG = 200 / 255.f;
+                    effect->def.colorB = 0;
                 }
             }
             break;
