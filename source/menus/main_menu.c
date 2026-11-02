@@ -9,14 +9,18 @@
 #include "state.h"
 #include "triggers.h"
 #include "mp3_player.h"
+#include "utils/server_utils.h"
+#include "utils/utils.h"
 
-#include "menus/components/ui_list.h"
 #include "menus/core/ui_screen.h"
+#include "menus/components/ui_list.h"
 #include "menus/components/ui_image.h"
 
 #include "menus/palette_kit.h"
 #include "menus/main_menu.h"
 #include "menus/level_select.h"
+#include "menus/updater.h"
+#include "menus/updater_settings.h"
 #include "menus/settings_hub/settings_hub.h"
 #include "menus/settings_hub/settings.h"
 #include "menus/statistics.h"
@@ -25,10 +29,10 @@
 #include "menus/settings_hub/how_to_play.h"
 #include "menus/settings_hub/info_card.h"
 #include "menus/creator_menu/online/two_option_pop_up.h"
+#include "menus/creator_menu/search/server_switcher.h"
 
 #include "particles/object_particles.h"
 #include "particles/circles.h"
-#include "menus/creator_menu/search/server_switcher.h"
 
 #include "save/saving.h"
 
@@ -240,6 +244,8 @@ static void main_menu_init(UIScreen *s){
 
     old_wide = settingsState.wideEnabled;
     old_stereo = settingsState.stereoEnabled;
+
+    if (doAutoUpdates && !checkedForUpdate) updater_thread = create_generic_thread(&updater_task);
 }
 
 static void main_menu_init_top(UIScreen *s){

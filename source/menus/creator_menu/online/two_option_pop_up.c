@@ -8,7 +8,7 @@
 #include "menus/components/ui_window_button.h"
 #include "menus/creator_menu/online/online_level_menu.h"
 #include "menus/creator_menu/online/two_option_pop_up.h"
-
+#include "menus/updater.h"
 #include "fonts/goldFont.h"
 
 static void two_option_pop_up_init(UIScreen *s) {
@@ -109,6 +109,7 @@ static void action_quit_game(UIElement *e, const UIPropertyList *args){
     return;
 }
 
+
 const UIActionDef quit_pop_up_actions[] = {
     { "on_confirm", action_quit_game }
 };
@@ -121,6 +122,30 @@ const UIScreenDefPair quit_pop_up_def = {
         .action_list = {
             .action_count = ARRAY_LEN(quit_pop_up_actions),
             .actions = quit_pop_up_actions
+        }
+    },
+    .free_data = two_option_pop_up_free_data,
+};
+
+// AUTOUPDATE POPUP
+
+static void action_open_updater(UIElement *e, const UIPropertyList *args){
+    ui_stack_push(&updater_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_AFTER_CLOSE);
+    return;
+}
+
+const UIActionDef autoupdate_pop_up_actions[] = {
+    { "on_confirm", action_open_updater }
+};
+
+const UIScreenDefPair autoupdate_pop_up_def = {
+    .name = "autoupdate_pop_up",
+    .btm = {
+        .path = "romfs:/menus/creator_menu/online/two_option_pop_up.txt",
+        .init = two_option_pop_up_init,
+        .action_list = {
+            .action_count = ARRAY_LEN(autoupdate_pop_up_actions),
+            .actions = autoupdate_pop_up_actions
         }
     },
     .free_data = two_option_pop_up_free_data,
