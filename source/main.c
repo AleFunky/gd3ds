@@ -43,17 +43,12 @@
 #include "menus/level_select.h"
 #include "menus/icon_kit.h"
 #include "menus/gameplay.h"
-#include "menus/creator_menu/soggy.h"
-#include "menus/core/screen_definitions.h"
+#include "menus/updater.h"
+#include "menus/creator_menu/online/two_option_pop_up.h"
 #include "menus/settings_hub/settings.h"
-#include "menus/creator_menu/creator_menu.h"
-#include "menus/creator_menu/external/external_levels.h"
 #include "menus/creator_menu/search_menu.h"
-#include "menus/creator_menu/saved_levels.h"
 #include "menus/loading_screen.h"
 #include "menus/level_complete.h"
-#include "menus/creator_menu/online/online_level_menu.h"
-#include "menus/creator_menu/online/online_menu.h"
 
 #include "save/saving.h"
 
@@ -764,6 +759,28 @@ void ui_loop(){
         hidCircleRead(&touch.cpad);
 
         ui_stack_update(&touch);
+
+        if (updater_task.finished && !checkedForUpdate && ui_stack_get_fade_status() == FADE_STATUS_NONE && strcmp("updater", ui_stack_get_current_screen_name()) != 0) {
+        // Handle result
+        if (updater_task.result == 0) {
+            if (update_data->isAvailable) {
+                checkedForUpdate = true;
+                TwoOptionPopupData *autoupdate_data = malloc(sizeof(TwoOptionPopupData));
+                if (!autoupdate_data)
+                    return;
+
+                autoupdate_data->text = strdup("Updates were found for the game.\nOpen the updater?");
+                autoupdate_data->title = strdup("Updates Found");
+                autoupdate_data->proceed_text = strdup("Open");
+                autoupdate_data->cancel_text = strdup("Later");
+                ui_stack_push(&autoupdate_pop_up_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+                ui_stack_push_data(autoupdate_data);
+            }
+            else
+                output_log("no updates found");
+        } 
+        updater_task.finished = false;
+    }
         
         // Frees a render target, so keep it out of the frame below
         update_stereo_target();

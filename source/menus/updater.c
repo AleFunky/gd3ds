@@ -29,11 +29,11 @@ static UILabel *error_label;
 static UIButton *updater_button;
 static UISpinner *spinner;
 
-static GenericTask updater_task = {
+GenericTask updater_task = {
     .func = check_for_updates
 };
 
-static Thread updater_thread;
+Thread updater_thread;
 bool checkedForUpdate = false;
 
 static void action_update(UIElement *e, const UIPropertyList *p) {
@@ -235,7 +235,7 @@ static void updater_init(UIScreen *s) {
     } else {
         ui_disable_element((UIElement *) updater_button);
         ui_enable_element((UIElement *) spinner);
-        updater_thread = create_generic_thread(&updater_task);
+        if (!updater_task.running) updater_thread = create_generic_thread(&updater_task);
     }
 }
 
