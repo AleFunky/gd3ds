@@ -205,7 +205,7 @@ void cube_gamemode(Player *player) {
 
     drag_particles[state.current_player].cfg.sourcePositionVariancey = (player->mini ? 4.f : 2.f);
 
-    if (curr_input.holdJump && !player->dashing) {
+    if (curr_input.holdJump && !player->dashing && !player->holding_jump_cancelled) {
         jump = true;
     } else if (player->on_ground) {
         player->consecutive_jumps = 0;
@@ -931,11 +931,12 @@ void run_player(Player *player) {
 void handle_player(Player *player) {
     u64 start_player = svcGetSystemTick();
     if (curr_input.holdJump) {
-        if (player->buffering_state == BUFFER_NONE) {
+        if (!player->holding_jump_cancelled && player->buffering_state == BUFFER_NONE) {
             player->buffering_state = BUFFER_READY;
         }
     } else {
         player->buffering_state = BUFFER_NONE;
+        player->holding_jump_cancelled = false;
         stop_dashing(player);
     }
     

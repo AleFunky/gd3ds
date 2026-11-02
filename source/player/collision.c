@@ -1391,6 +1391,13 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             }
             break;
 
+        case S_MODIFIERBLOCK:
+            if (player->dashing) {
+                stop_dashing(player);
+                player->holding_jump_cancelled = true;
+            }
+            break;
+
     }
     if (!GET_COLLIDED(obj)) SET_HITBOX_COUNTER(obj, GET_HITBOX_COUNTER(obj) + 1); 
 }

@@ -146,6 +146,7 @@ typedef struct {
 
     bool velocity_override;
     bool velocity_uncapped;
+    bool holding_jump_cancelled;
     bool dashing;
     float dash_slope;
     float dash_angle;
