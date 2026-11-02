@@ -609,6 +609,8 @@ void robot_gamemode(Player *player) {
 
     SlopeData slope_data = player->slope_data;
 
+    bool should_coyote = (state.dual || player->upside_down) && curr_input.holdJump && player->coyote_frames < 11;
+
     if (player->slope_data.slope_id < 0 && player->slope_slide_coyote_time) {
         slope_data = player->coyote_slope;
     }
@@ -617,7 +619,7 @@ void robot_gamemode(Player *player) {
         player->rotation = 0;
     }
 
-    if ((slope_data.slope_id >= 0 || player->on_ground) && (curr_input.holdJump && player->buffering_state == BUFFER_READY)) {
+    if ((slope_data.slope_id >= 0 || player->on_ground || should_coyote) && (curr_input.holdJump && player->buffering_state == BUFFER_READY)) {
         set_p_velocity(player, cube_jump_heights[state.speed] / 2, false);
         player->inverse_rotation = false;
         player->on_ground = false;
