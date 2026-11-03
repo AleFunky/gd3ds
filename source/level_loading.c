@@ -1709,10 +1709,7 @@ int parse_gd_object(const char *objStr, int obj) {
             if (hitbox->type == COLLISION_CIRCLE) {
                 float s = fmaxf(fabsf(objects.scale_x[obj]), fabsf(objects.scale_y[obj]));
                 objects.width[obj] *= s;
-            } else if (hitbox->type == COLLISION_SLOPE) {
-                objects.width[obj] *= fabsf(objects.scale_x[obj]);
-                objects.height[obj] *= fabsf(objects.scale_y[obj]);
-            } else if (hitbox->collision_type == HITBOX_SOLID) {
+            } else if (hitbox->type == COLLISION_SLOPE || hitbox->collision_type == HITBOX_SOLID) {
                 if ((int) fabsf(objects.rotation[obj]) % 180 != 0) {
                     objects.width[obj] *= fabsf(objects.scale_y[obj]);
                     objects.height[obj] *= fabsf(objects.scale_x[obj]);
