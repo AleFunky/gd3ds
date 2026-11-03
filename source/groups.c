@@ -325,14 +325,22 @@ void discard_group_combination_visual_moves(void) {
 
 // Groups
 
+void reset_group_data(int g) {
+    if (g < 1 || g >= MAX_GROUPS) return;
+    
+    GroupNode *gr = &groups[g]; 
+
+    gr->toggled = false;
+    gr->alpha = 1.0f;
+}
+
 void add_to_group(int obj, int g) {
     if (g < 1 || g >= MAX_GROUPS) return;
     GroupNode *gr = &groups[g]; 
     
     // Initialize
     if (gr->objects == NULL) {
-        gr->toggled = false;
-        gr->alpha = 1.0f;
+        reset_group_data(g);
     }
 
     if (gr->count >= gr->capacity) {

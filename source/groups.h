@@ -26,5 +26,6 @@ void discard_group_combination_visual_moves(void);
 void clear_groups(void);
 GroupNode *get_group(int g);
 void add_to_group(int obj, int g);
+void reset_group_data(int g);
 
 void sort_group(int g);

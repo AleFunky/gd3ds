@@ -2604,6 +2604,10 @@ void reload_level() {
 
     free_trigger_buffers();
 
+    for (int i = 1; i < MAX_GROUPS; i++) {
+        reset_group_data(i);
+    }
+
     for (int i = 0; i < objects.count; i++) {
         objects.activated[i] = false;
         objects.collided[i] = false;
