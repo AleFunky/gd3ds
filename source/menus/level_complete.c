@@ -13,6 +13,7 @@
 #include "level_select.h"
 #include "state.h"
 #include "level_loading.h"
+#include "practice.h"
 #include "particles/circles.h"
 
 #include "menus/components/ui_darken.h"
@@ -39,6 +40,7 @@
 static bool yes_exit = false;
 static bool restart = false;
 static bool init = false;
+static bool checkpoint_restart_flag = false;
 
 static bool animating_down = false;
 static bool animating_reward = false;
@@ -89,6 +91,99 @@ char *do_not_completion_texts[] = {
     "I lied, you got 99%",
     "I have no words.... oh wait",
     "we really doing anything now"
+    "+100 dollars",
+    "360 FPS detected",
+    "A swing and a hit!",
+    "A swing and a home run!",
+    "Absolute Geometry Dash",
+    "After all this time...",
+    "Astounded. Flabbergasted really.",
+    "Auto-Safe Mode Disabled!",
+    "Back to back?",
+    "Believe in magic",
+    "But is it possible with accurate hitboxes?",
+    "Calm down!",
+    "CBF Detected, loser! Click Between Frames\nis illegitimate and will not be allowed\nfor use in GD3DS. Please disable the mod to\ncontinue playing.",
+    "Cheats Not Detected! Verification not voided.",
+    "Cheats used: Skill",
+    "Clap Clap Clap",
+    "Congragurlationals!",
+    "dear god they did it...",
+    "Do it again, I wasn't paying attention",
+    "engineer gaming",
+    "epic sauce",
+    "Error 404: Completion not found",
+    "exit(0)",
+    "famidash ReTraY 100% complete",
+    "First try!!",
+    "GAMING",
+    "gg freakin ez",
+    "go outside",
+    "Good enough.",
+    "good j*b ig",
+    "Good job, now beat Grief.",
+    "good yob",
+    "Goop job!",
+    "Have a cookie",
+    "hi you did it bye",
+    "HOLY SHIT YOU JUST VERIFIED... oh wait.",
+    "horse",
+    "How",
+    "I could do this in half the attempts",
+    "If it's not a demon I don't care",
+    "ITS BLUE ITS BLUE",
+    "John GD3DS congratulates you",
+    "Like Doggie Jr.!",
+    "Nah this is pay to win",
+    "Nice! Now try to complete it with 3D on!",
+    "Now beat it while playing piano",
+    "Now do it again",
+    "Now do it blindfolded",
+    "Now you can beat Grief!",
+    "One Level, Two Level, Beat Level, New Level",
+    "Please touch some grass.",
+    "Possible top 1 - Said no one ever",
+    "Project zoink",
+    "Put me in the screenshot",
+    "RubRub is always watching",
+    "Scream louder!",
+    "slow clap",
+    "So what now?",
+    "Son im crine",
+    "Stop screaming!",
+    "That doesn't count",
+    "That's just dumb luck",
+    "That's not Aeternus",
+    "The End.",
+    "The servers are currently experiencing a\ntemporary period of heavy load,\nplease try again tomorrow.",
+    "They cleared it for an amazing reason!",
+    "Time to rest...",
+    "To celebrate, they became purple",
+    "Took you long enough...",
+    "Unc still got it",
+    "W bro",
+    "W larp",
+    "W speed (heart emoji)",
+    "Was it worth it?",
+    "WE beat it, yes BOTH of us.",
+    "Well done! Now try to complete it withou- oh.",
+    "Well played!",
+    "Why didn't anyone wake me up?",
+    "why u hacker",
+    "Winner winner chicken dinner!!!",
+    "Yea whatever, that wasn't even difficult...",
+    "YIPPEE!!!!",
+    "You are peak!",
+    "You are the Geometry Dash",
+    "You cannot beat a practice in normal mode.",
+    "you di dit!",
+    "You took THAT many attempts? Pathetic.",
+    "You verified The Golden, let's go",
+    "YOU WIN!",
+    "You've just beaten Stereo Madness",
+    "Your dids it!",
+    "your winner!",
+    "You can now play as Luigi!"
 };
 
 char *completion_texts[] = {
@@ -131,6 +226,19 @@ static void restart_level(UIElement* e, const UIPropertyList *args) {
     }
 }
 
+static void checkpoint_restart(UIElement* e, const UIPropertyList *args) {
+    if (!state.practice_mode) return;
+
+    if (!animating_up) {
+        play_sfx(&play_sound, 1);
+        animating_up = true;
+        animating_down = false;
+        anim_time = 0;
+        pause_playback_mp3();
+        checkpoint_restart_flag = true;
+    }
+}
+
 static void scale_bottom_buttons_anim(UIElement* e){
     UIButton *button = (UIButton *) e;
 
@@ -142,6 +250,7 @@ static void scale_bottom_buttons_anim(UIElement* e){
 static UIActionDef actions[] = {
     { "restart", restart_level },
     { "exit", exit_level_complete },
+    { "checkpointRestart", checkpoint_restart },
 };
 
 // This runs the initial animation of the menu coming off screen
@@ -278,7 +387,9 @@ static void run_end_animation(float delta) {
     // Animation end
     if (anim_time >= RESTART_ANIM_DURATION) {
         animating_up = false;
-        restart = true;
+        if (!checkpoint_restart_flag) {
+            restart = true;
+        }
         anim_time = 0;
     }
     anim_time += delta;
@@ -327,6 +438,11 @@ void level_complete_init() {
     ui_load_screen_old(&screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/level_complete_top.txt");
     ui_load_screen_old(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/level_complete.txt");
 
+    if (!state.practice_mode) {
+        UIElement *checkpoint_button = ui_get_element_by_tag(&screen, "checkpointRestartButton");
+        if (checkpoint_button) ui_disable_element(checkpoint_button);
+    }
+
     state.current_data.time_end = svcGetSystemTick() / (CPU_TICKS_PER_MSEC * 1000);
 
     char attempts[64];
@@ -359,6 +475,7 @@ void level_complete_init() {
 
     yes_exit = false;
     restart = false;
+    checkpoint_restart_flag = false;
     animating_down = true;
     animating_reward = false;
     animating_up = false;
@@ -554,6 +671,10 @@ int level_complete_loop(UIInput *touch) {
 
     if (restart) {
         return 2;
+    }
+
+    if (checkpoint_restart_flag && !animating_up) {
+        return 3;
     }
 
     ui_screen_update(&screen, touch);
