@@ -136,6 +136,7 @@ typedef struct {
     float cutscene_initial_player_y;
 
     int slope_slide_coyote_time;
+    int allow_dart_slide_timer;
 
     int frame;
 
@@ -146,6 +147,7 @@ typedef struct {
 
     bool velocity_override;
     bool velocity_uncapped;
+    bool holding_jump_cancelled;
     bool dashing;
     float dash_slope;
     float dash_angle;

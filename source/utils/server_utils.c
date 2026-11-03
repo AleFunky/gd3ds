@@ -674,7 +674,6 @@ void fill_gdps_comment_author_entries(char **authorStrings, int authorStringCoun
 
 int parse_latest_commit(char *jsonString) {
     // parse response from github as json object 
-    output_log(jsonString);
     json_object *jsonObject = json_tokener_parse(jsonString);
     json_object *commitObject = NULL;
     json_object *hashObject = NULL;

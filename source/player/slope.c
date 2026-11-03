@@ -514,11 +514,12 @@ void slope_collide(int obj, Player *player) {
 
     // Normal slope - resting on bottom
     if (
+        !(player->gamemode == GAMEMODE_WAVE && player->allow_dart_slide_timer) &&
         state.old_player.slope_data.slope_id < 0 &&
         orient < ORIENT_UD_DOWN && 
         gravTop(player) - obj_gravBottom(player, obj) <= clip + 5 * !player->mini // Remove extra if mini
     ) {
-        if (player->gamemode != GAMEMODE_WAVE && ((player->gamemode != GAMEMODE_PLAYER && (player->vel_y >= 0)) || gravSnap)) {
+        if ((player->gamemode != GAMEMODE_WAVE || player->allow_dart_slide_timer) && ((player->gamemode != GAMEMODE_PLAYER && (player->vel_y >= 0)) || gravSnap)) {
             player->vel_y = 0;
             player->collided_block = obj;
             if (!gravSnap) player->on_ceiling = true;
@@ -538,11 +539,12 @@ void slope_collide(int obj, Player *player) {
 
     // Upside down slope - resting on top
     if (
+        !(player->gamemode == GAMEMODE_WAVE && player->allow_dart_slide_timer) &&
         state.old_player.slope_data.slope_id < 0 &&
         orient >= ORIENT_UD_DOWN && 
         obj_gravTop(player, obj) - gravBottom(player) <= clip + 5 * !player->mini // Remove extra if mini
     ) {
-        if (player->gamemode != GAMEMODE_WAVE && player->vel_y <= 0) {
+        if ((player->gamemode != GAMEMODE_WAVE || player->allow_dart_slide_timer) && player->vel_y <= 0) {
             player->vel_y = 0;
             if (!gravSnap) player->on_ground = true;
             player->time_since_ground = 0;
@@ -577,7 +579,7 @@ void slope_collide(int obj, Player *player) {
         }
         
         // Touching slope before center is in slope
-        if (player->gamemode != GAMEMODE_WAVE && player->vel_y * mult <= 0) {
+        if ((player->gamemode != GAMEMODE_WAVE || player->allow_dart_slide_timer) && player->vel_y * mult <= 0) {
             if (orient == ORIENT_NORMAL_DOWN) {
                 player->y = grav(player, obj_gravTop(player, obj)) + grav(player, player->height / 2);
             } else {
@@ -647,7 +649,7 @@ void slope_collide(int obj, Player *player) {
 
         if ((projectedHit && clip) || snapDown) {
             // If wave, just die, nothing else, wave hates slopes
-            if (player->gamemode == GAMEMODE_WAVE) {
+            if (player->gamemode == GAMEMODE_WAVE && !player->allow_dart_slide_timer) {
                 kill_player(DEATH_SLOPE);
                 return;
             }

@@ -566,3 +566,11 @@ UIScreen *ui_stack_get_screen(const char *name, Screens screen) {
     
     return &pair->screens[screen];
 }
+
+FadeStatus ui_stack_get_fade_status(){
+    return stack->fade;
+}
+
+const char *ui_stack_get_current_screen_name() {
+    return stack->screen_stack[ui_stack_max_index()]->name;
+}

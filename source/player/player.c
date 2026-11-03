@@ -205,7 +205,7 @@ void cube_gamemode(Player *player) {
 
     drag_particles[state.current_player].cfg.sourcePositionVariancey = (player->mini ? 4.f : 2.f);
 
-    if (curr_input.holdJump && !player->dashing) {
+    if (curr_input.holdJump && !player->dashing && !player->holding_jump_cancelled) {
         jump = true;
     } else if (player->on_ground) {
         player->consecutive_jumps = 0;
@@ -628,6 +628,8 @@ void robot_gamemode(Player *player) {
 
     SlopeData slope_data = player->slope_data;
 
+    bool should_coyote = (state.dual || player->upside_down) && curr_input.holdJump && player->coyote_frames < 11;
+
     if (player->slope_data.slope_id < 0 && player->slope_slide_coyote_time) {
         slope_data = player->coyote_slope;
     }
@@ -636,7 +638,7 @@ void robot_gamemode(Player *player) {
         player->rotation = 0;
     }
 
-    if ((slope_data.slope_id >= 0 || player->on_ground) && (curr_input.holdJump && player->buffering_state == BUFFER_READY) && !player->dashing) {
+    if ((slope_data.slope_id >= 0 || player->on_ground || should_coyote) && (curr_input.holdJump && player->buffering_state == BUFFER_READY) && !player->dashing) {
         set_p_velocity(player, cube_jump_heights[state.speed] / 2, false);
         player->inverse_rotation = false;
         player->on_ground = false;
@@ -879,6 +881,8 @@ void run_player(Player *player) {
         }
     }
 
+    if (player->allow_dart_slide_timer) player->allow_dart_slide_timer--;
+
     // If player is on slope, do slope stuff
     if (player->slope_data.slope_id >= 0) {
         slope_calc(player->slope_data.slope_id, player);
@@ -931,11 +935,12 @@ void run_player(Player *player) {
 void handle_player(Player *player) {
     u64 start_player = svcGetSystemTick();
     if (curr_input.holdJump) {
-        if (player->buffering_state == BUFFER_NONE) {
+        if (!player->holding_jump_cancelled && player->buffering_state == BUFFER_NONE) {
             player->buffering_state = BUFFER_READY;
         }
     } else {
         player->buffering_state = BUFFER_NONE;
+        player->holding_jump_cancelled = false;
         stop_dashing(player);
     }
     

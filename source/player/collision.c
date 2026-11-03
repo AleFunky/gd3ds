@@ -1029,7 +1029,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     update_rotation_direction(player);
 
                     set_robot_animation(player, ROBOT_ANIM_JUMP_START);
-                    player->robot_air_time = 0;
+                    player->robot_air_time = 999.f;
 
                     UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
                     if (effect) {
@@ -1391,6 +1391,27 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             }
             break;
 
+        case S_MODIFIERBLOCK:
+            if (player->dashing) {
+                stop_dashing(player);
+                player->holding_jump_cancelled = true;
+            }
+            break;
+
+        case D_MODIFIERBLOCK:
+            player->allow_dart_slide_timer = 2;
+            break;
+
+        case 1813:
+        case 1859:
+            break;
+
+        case 1329:
+        case 1331:
+        case 1594:
+        case 1816:
+            break;
+
     }
     if (!GET_COLLIDED(obj)) SET_HITBOX_COUNTER(obj, GET_HITBOX_COUNTER(obj) + 1); 
 }
@@ -1622,6 +1643,11 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
 
             // This is equal to using the old player y position (a frame of snap leeway)
             clip += fabsf(player->vel_y) * STEPS_DT;
+
+            bool mode_snap = state.old_player.gamemode != player->gamemode &&
+                state.old_player.gamemode == GAMEMODE_WAVE && player->allow_dart_slide_timer;
+
+            if (mode_snap) clip += (player->height - state.old_player.height) / 2;
             
             if (player->ceiling_inv_time > 0) {
                 // Only do the funny grav snap if player is touching a gravity object and internal hitbox is touching block
@@ -1637,8 +1663,18 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
 
             bool safeZone = player->mini && ((obj_gravTop(player, obj) - gravBottom(player) <= clip) || (gravTop(player) - obj_gravBottom(player, obj) <= clip));
             
+            bool dart_slide = player->gamemode == GAMEMODE_WAVE && player->allow_dart_slide_timer &&
+                objects.id[obj] != BREAKABLE_BLOCK &&
+                ((((obj_gravTop(player, obj) - gravBottom(player) <= clip) || moving_support) && player->vel_y <= fmaxf(object_raw_vel, 0)) ||
+                ((gravTop(player) - obj_gravBottom(player, obj) <= clip) && player->vel_y >= object_raw_vel));
+
+            bool land_face = ((obj_gravTop(player, obj) - gravBottom(player) <= clip) || moving_support) && player->vel_y <= fmaxf(object_raw_vel, 0);
+            bool ceil_face = (gravTop(player) - obj_gravBottom(player, obj) <= clip) && player->vel_y >= object_raw_vel;
+            float snap_gap = land_face ? (obj_gravTop(player, obj) - gravBottom(player)) : (gravTop(player) - obj_gravBottom(player, obj));
+            bool snap_grace = mode_snap && (land_face || ceil_face) && snap_gap > 0.f && snap_gap <= player->height / 2;
+
             // Check collision with internal hitbox
-            if ((player->gamemode == GAMEMODE_WAVE || (!gravSnap && !safeZone && !moving_support)) && intersect(
+            if (!dart_slide && !snap_grace && (player->gamemode == GAMEMODE_WAVE || (!gravSnap && !safeZone && !moving_support)) && intersect(
                 player->x, player->y, internal.width, internal.height, 0, 
                 x, y, objects.width[obj], objects.height[obj], 0
             )) {
@@ -1691,7 +1727,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
             }
 
             // Check snap for player bottom
-            if ((obj_gravTop(player, obj) - bottom <= clip || moving_support) && player->vel_y <= fmaxf(object_raw_vel, 0) && player->gamemode != GAMEMODE_WAVE) {
+            if ((obj_gravTop(player, obj) - bottom <= clip || moving_support) && player->vel_y <= fmaxf(object_raw_vel, 0) && (player->gamemode != GAMEMODE_WAVE || player->allow_dart_slide_timer)) {
                 player->y = grav(player, obj_gravTop(player, obj)) + grav(player, player->height / 2);
                 if (player->vel_y <= 0) player->vel_y = 0;
                 player->on_ground = true;
@@ -1717,7 +1753,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                     player->snap_data.player_snap_diff = player->x - x;
                 }
             // Check snap for player top
-            } else if (player->gamemode != GAMEMODE_WAVE) {
+            } else if (player->gamemode != GAMEMODE_WAVE || player->allow_dart_slide_timer) {
                 // Ufo can break breakable blocks from above, so dont use as a ceiling
                 if (player->gamemode == GAMEMODE_UFO && objects.id[obj] == BREAKABLE_BLOCK) {
                     break;

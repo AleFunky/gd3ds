@@ -73,6 +73,8 @@ extern bool is_nightly;
 
 extern bool queued_restart;
 
+extern bool _3dWarningPassed;
+
 extern char *_3dsx_path;
 
 extern float global_volume;

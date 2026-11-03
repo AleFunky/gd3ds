@@ -238,6 +238,7 @@ void init_player(Player *player) {
     player->cutscene_initial_player_x = 0;
     player->cutscene_initial_player_y = 0;
 
+    player->allow_dart_slide_timer = 0;
     clear_slope_data(player);
     clear_snap_data(player);
 }
