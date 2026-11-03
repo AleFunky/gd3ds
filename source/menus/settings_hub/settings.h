@@ -64,3 +64,6 @@ extern Setting settings[30];
 extern SettingState settingsState;
 
 extern const UIScreenDefPair settings_def;
+
+bool condition_supports_3D();
+void turn_off_setting(const char *id, bool *var);

@@ -1029,7 +1029,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     update_rotation_direction(player);
 
                     set_robot_animation(player, ROBOT_ANIM_JUMP_START);
-                    player->robot_air_time = 0;
+                    player->robot_air_time = 999.f;
 
                     UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
                     if (effect) {

@@ -8,8 +8,10 @@
 #include "menus/components/ui_window_button.h"
 #include "menus/creator_menu/online/online_level_menu.h"
 #include "menus/creator_menu/online/two_option_pop_up.h"
+#include "menus/settings_hub/settings.h"
 #include "menus/updater.h"
 #include "fonts/goldFont.h"
+#include "save/config.h"
 
 static void two_option_pop_up_init(UIScreen *s) {
     TwoOptionPopupData *pop_up_data = s->pair->data;
@@ -146,6 +148,32 @@ const UIScreenDefPair autoupdate_pop_up_def = {
         .action_list = {
             .action_count = ARRAY_LEN(autoupdate_pop_up_actions),
             .actions = autoupdate_pop_up_actions
+        }
+    },
+    .free_data = two_option_pop_up_free_data,
+};
+
+// AUTOUPDATE POPUP
+
+static void action_disable_3d(UIElement *e, const UIPropertyList *args){
+    turn_off_setting("stereoEnabled", &settingsState.stereoEnabled);
+    return;
+}
+
+const UIActionDef _3d_warning_pop_up_actions[] = {
+    // { "on_confirm", action_open_updater }
+    { "on_decline", action_disable_3d },
+    { "on_confirm", cfg_save }
+};
+
+const UIScreenDefPair _3d_warning_pop_up_def = {
+    .name = "3d_warning_pop_up",
+    .btm = {
+        .path = "romfs:/menus/creator_menu/online/two_option_pop_up.txt",
+        .init = two_option_pop_up_init,
+        .action_list = {
+            .action_count = ARRAY_LEN(_3d_warning_pop_up_actions),
+            .actions = _3d_warning_pop_up_actions
         }
     },
     .free_data = two_option_pop_up_free_data,

@@ -704,16 +704,17 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
     }
 
     // Pre 1.9
-    int bg_r = atoi(get_metadata_value(level_string, "kS1"));
-    int bg_g = atoi(get_metadata_value(level_string, "kS2"));
-    int bg_b = atoi(get_metadata_value(level_string, "kS3"));
+
+    char *bg_r = get_metadata_value(level_string, "kS1");
+    char *bg_g = get_metadata_value(level_string, "kS2");
+    char *bg_b = get_metadata_value(level_string, "kS3");
 
     GDColorChannel bg_channel = {0};
     bg_channel.fromOpacity = 1.0f;
     bg_channel.channelID = CHANNEL_BG;
-    bg_channel.fromRed = bg_r;
-    bg_channel.fromGreen = bg_g;
-    bg_channel.fromBlue = bg_b;
+    bg_channel.fromRed = atoi(bg_r);
+    bg_channel.fromGreen = atoi(bg_g);
+    bg_channel.fromBlue = atoi(bg_b);
 
     char *bg_player_color = get_metadata_value(level_string, "kS16");
     if (bg_player_color) {
@@ -721,26 +722,34 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
         free(bg_player_color);
     }
 
+    free(bg_r);
+    free(bg_g);
+    free(bg_b);
+
     channels[i] = bg_channel;
 
     i++;
 
-    int g_r = atoi(get_metadata_value(level_string, "kS4"));
-    int g_g = atoi(get_metadata_value(level_string, "kS5"));
-    int g_b = atoi(get_metadata_value(level_string, "kS6"));
+    char *g_r = get_metadata_value(level_string, "kS4");
+    char *g_g = get_metadata_value(level_string, "kS5");
+    char *g_b = get_metadata_value(level_string, "kS6");
 
     GDColorChannel g_channel = {0};
     g_channel.fromOpacity = 1.0f;
     g_channel.channelID = CHANNEL_GROUND;
-    g_channel.fromRed = g_r;
-    g_channel.fromGreen = g_g;
-    g_channel.fromBlue = g_b;
+    g_channel.fromRed = atoi(g_r);
+    g_channel.fromGreen = atoi(g_g);
+    g_channel.fromBlue = atoi(g_b);
 
     char *g_player_color = get_metadata_value(level_string, "kS17");
     if (g_player_color) {
         g_channel.playerColor = atoi(g_player_color);
         free(g_player_color);
     }
+
+    free(g_r);
+    free(g_g);
+    free(g_b);
     
     channels[i] = g_channel;
     i++;
@@ -767,6 +776,10 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
         channels[i] = line_channel;
         i++;
     }
+    
+    free(line_r);
+    free(line_g);
+    free(line_b);
 
     char *obj_r = get_metadata_value(level_string, "kS10");
     char *obj_g = get_metadata_value(level_string, "kS11");
@@ -790,6 +803,10 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
         channels[i] = obj_channel;
         i++;
     }
+
+    free(obj_r);
+    free(obj_g);
+    free(obj_b);
 
     char *obj_2_r = get_metadata_value(level_string, "kS13");
     char *obj_2_g = get_metadata_value(level_string, "kS14");
@@ -819,6 +836,10 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
         channels[i] = obj_2_channel;
         i++;
     }
+    
+    free(obj_2_r);
+    free(obj_2_g);
+    free(obj_2_b);
 
     *outArray = channels;
 
@@ -2079,6 +2100,7 @@ int parse_string(const char *levelString, int extra_slots, int *out_object_count
     
     if (!init_arrays(objectCount + extra_slots)) {
         free_arrays();
+        free_string_array(sections, sectionCount);
         output_log("Failed to allocate object array\n");
         return LOAD_OUT_OF_MEMORY;
     }
@@ -2096,6 +2118,7 @@ int parse_string(const char *levelString, int extra_slots, int *out_object_count
         // Parse
         if (!parse_gd_object(sections[i + 1], i)) {
             output_log("Failed to parse object %d\n", i);
+            free_arrays();
             free_string_array(sections, sectionCount);
             return LOAD_COULDNT_PARSE_OBJECTS;
         }
@@ -2395,6 +2418,8 @@ int load_online_level(char *level_string) {
     if (metaStr) {
         channelCount = parse_color_channels(metaStr, &colorChannels, &out_code);
         if (out_code) {
+            free(data);
+            free(metaStr);
             return out_code;
         }
     }
@@ -2402,6 +2427,7 @@ int load_online_level(char *level_string) {
     else {
         channelCount = parse_old_channels(data, &colorChannels, &out_code);
         if (out_code) {
+            free(data);
             return out_code;
         }
     }
@@ -2497,6 +2523,9 @@ int load_level(char *path) {
     if (!level) return 1;
 
     level = convert_if_gdlvl(level, path);
+    if (!level) {
+        return LOAD_OUT_OF_MEMORY;
+    }
 
     char *data = decompress_level(level, &out_code);
     if (!data) {
@@ -2509,6 +2538,9 @@ int load_level(char *path) {
     if (metaStr) {
         channelCount = parse_color_channels(metaStr, &colorChannels, &out_code);
         if (out_code) {
+            free(data);
+            free(level);
+            free(metaStr);
             return out_code;
         }
     }
@@ -2516,6 +2548,8 @@ int load_level(char *path) {
     else {
         channelCount = parse_old_channels(data, &colorChannels, &out_code);
         if (out_code) {
+            free(data);
+            free(level);
             return out_code;
         }
     }
@@ -2570,6 +2604,10 @@ int load_level(char *path) {
 void reload_level() {
 
     free_trigger_buffers();
+
+    for (int i = 1; i < MAX_GROUPS; i++) {
+        reset_group_data(i);
+    }
 
     for (int i = 0; i < objects.count; i++) {
         objects.activated[i] = false;
@@ -2631,10 +2669,8 @@ void unload_level() {
     init_col_channels();
     
     channelCount = 0;
-    if (colorChannels) {
-        free(colorChannels);
-        colorChannels = NULL;
-    }
+    free(colorChannels);
+    colorChannels = NULL;
 
     if (level_font_sheet) {
         C2D_SpriteSheetFree(level_font_sheet);
@@ -2667,6 +2703,7 @@ char *convert_if_gdlvl(char *gmd, char *path) {
     if (strcmp(extension, "gdlvl") == 0) {
         unsigned char *decoded = malloc(strlen(gmd));
         if (!decoded) {
+            free(gmd);
             return NULL;
         }
 
@@ -2684,10 +2721,11 @@ char *convert_if_gdlvl(char *gmd, char *path) {
         char *decompressed = decompress_data(decoded, decoded_len, &decompressed_len, &out_code);
         if (!decompressed) {
             output_log("Decompression failed (check zlib error above)\n");
+            free(gmd);
             free(decoded);
             return NULL;
         }
-
+        free(gmd);
         free(decoded);
         return decompressed;
     }

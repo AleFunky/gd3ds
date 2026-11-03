@@ -45,6 +45,7 @@
 #include "menus/gameplay.h"
 #include "menus/updater.h"
 #include "menus/creator_menu/online/two_option_pop_up.h"
+#include "menus/settings_hub/info_card.h"
 #include "menus/settings_hub/settings.h"
 #include "menus/creator_menu/search_menu.h"
 #include "menus/loading_screen.h"
@@ -142,6 +143,8 @@ bool is_3DSX;
 bool is_nightly;
 
 bool queued_restart;
+
+bool _3dWarningPassed;
 
 char *_3dsx_path;
 
@@ -772,28 +775,51 @@ void ui_loop(){
 
         ui_stack_update(&touch);
 
-        if (updater_task.finished && !checkedForUpdate && ui_stack_get_fade_status() == FADE_STATUS_NONE && strcmp("updater", ui_stack_get_current_screen_name()) != 0) {
-        // Handle result
-        if (updater_task.result == 0) {
-            if (update_data->isAvailable) {
-                checkedForUpdate = true;
-                TwoOptionPopupData *autoupdate_data = malloc(sizeof(TwoOptionPopupData));
-                if (!autoupdate_data)
-                    return;
+        // autoupdater pop up stuff
 
-                autoupdate_data->text = strdup("Updates were found for the game.\nOpen the updater?");
-                autoupdate_data->title = strdup("Updates Found");
-                autoupdate_data->proceed_text = strdup("Open");
-                autoupdate_data->cancel_text = strdup("Later");
-                ui_stack_push(&autoupdate_pop_up_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
-                ui_stack_push_data(autoupdate_data);
+        if (updater_task.finished && !checkedForUpdate && ui_stack_get_fade_status() == FADE_STATUS_NONE && strcmp("updater", ui_stack_get_current_screen_name()) != 0 && strcmp("3d_warning_pop_up", ui_stack_get_current_screen_name()) != 0)
+        {
+            // Handle result
+            if (updater_task.result == 0)
+            {
+                if (update_data->isAvailable)
+                {
+                    checkedForUpdate = true;
+                    TwoOptionPopupData *autoupdate_data = malloc(sizeof(TwoOptionPopupData));
+                    if (!autoupdate_data)
+                        return;
+
+                    autoupdate_data->text = strdup("Updates were found for the game.\nOpen the updater?");
+                    autoupdate_data->title = strdup("Updates Found");
+                    autoupdate_data->proceed_text = strdup("Open");
+                    autoupdate_data->cancel_text = strdup("Later");
+                    ui_stack_push(&autoupdate_pop_up_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+                    ui_stack_push_data(autoupdate_data);
+                }
+                else
+                    output_log("no updates found");
             }
-            else
-                output_log("no updates found");
-        } 
-        updater_task.finished = false;
-    }
-        
+            updater_task.finished = false;
+        }
+
+        // 3d first time use warning pop up stuff
+
+        if (stereo_supported() && settingsState.stereoEnabled && ui_stack_get_fade_status() == FADE_STATUS_NONE && !_3dWarningPassed && get_stereo_slider() > 0.f && strcmp("settings", ui_stack_get_current_screen_name()) != 0)
+        {
+            TwoOptionPopupData *_3d_warning_data = malloc(sizeof(TwoOptionPopupData));
+            if (!_3d_warning_data)
+                return;
+
+            _3d_warning_data->text = strdup("Stereoscopic 3D can significantly lower performance.\nAre you sure you want to keep it enabled?");
+            _3d_warning_data->title = strdup("Disclaimer");
+            _3d_warning_data->proceed_text = strdup("Enable");
+            _3d_warning_data->cancel_text = strdup("Cancel");
+            ui_stack_push(&_3d_warning_pop_up_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+            ui_stack_push_data(_3d_warning_data);
+            _3dWarningPassed = true;
+        }
+
+
         // Frees a render target, so keep it out of the frame below
         update_stereo_target();
 
@@ -872,6 +898,7 @@ void game_loop() {
             ui_stack_update(&touch);
             state.online_level = false;
             exiting_level = true;
+            unload_level();
             return;
         }
     } else {
@@ -890,6 +917,7 @@ void game_loop() {
             ui_stack_push_game_state(STATE_MENU);
             ui_stack_update(&touch);
             exiting_level = true;
+            unload_level();
             return;
         }
 
@@ -1373,6 +1401,21 @@ void game_loop() {
         }
 
         ui_stack_update(&touch);
+
+        if (stereo_supported() && settingsState.stereoEnabled && !_3dWarningPassed && get_stereo_slider() > 0.f && strcmp("3d_warning_pop_up", ui_stack_get_current_screen_name()) != 0 && ui_stack_get_fade_status() == FADE_STATUS_NONE) {
+            if (!game_paused) pause_game();
+            if (!game_paused) return; 
+            TwoOptionPopupData *_3d_warning_data = malloc(sizeof(TwoOptionPopupData));
+            if (!_3d_warning_data) return;
+
+            _3d_warning_data->text = strdup("3D can significantly lower performance.\nAre you sure you want to keep it on?");
+            _3d_warning_data->title = strdup("Disclaimer");
+            _3d_warning_data->proceed_text = strdup("Enable");
+            _3d_warning_data->cancel_text = strdup("Disable");
+            ui_stack_push(&_3d_warning_pop_up_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+            ui_stack_push_data(_3d_warning_data);
+            _3dWarningPassed = true;
+        }
 
         // If the wide or 3D settings have been changed, reinitialize screens
         if (settingsState.wideEnabled != old_wide || settingsState.stereoEnabled != old_stereo) {

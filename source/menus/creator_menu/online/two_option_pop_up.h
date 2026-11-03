@@ -13,3 +13,4 @@ extern const UIScreenDefPair warning_pop_up_def;
 extern const UIScreenDefPair delete_pop_up_def;
 extern const UIScreenDefPair quit_pop_up_def;
 extern const UIScreenDefPair autoupdate_pop_up_def;
+extern const UIScreenDefPair _3d_warning_pop_up_def;
