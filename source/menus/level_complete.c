@@ -40,6 +40,7 @@
 static bool yes_exit = false;
 static bool restart = false;
 static bool init = false;
+static bool checkpoint_restart_selected = false;
 static bool checkpoint_restart_flag = false;
 
 static bool animating_down = false;
@@ -235,7 +236,7 @@ static void checkpoint_restart(UIElement* e, const UIPropertyList *args) {
         animating_down = false;
         anim_time = 0;
         pause_playback_mp3();
-        checkpoint_restart_flag = true;
+        checkpoint_restart_selected = true;
     }
 }
 
@@ -387,7 +388,9 @@ static void run_end_animation(float delta) {
     // Animation end
     if (anim_time >= RESTART_ANIM_DURATION) {
         animating_up = false;
-        if (!checkpoint_restart_flag) {
+        if (checkpoint_restart_selected) {
+            checkpoint_restart_flag = true;
+        } else {
             restart = true;
         }
         anim_time = 0;
@@ -475,6 +478,7 @@ void level_complete_init() {
 
     yes_exit = false;
     restart = false;
+    checkpoint_restart_selected = false;
     checkpoint_restart_flag = false;
     animating_down = true;
     animating_reward = false;
@@ -673,7 +677,7 @@ int level_complete_loop(UIInput *touch) {
         return 2;
     }
 
-    if (checkpoint_restart_flag && !animating_up) {
+    if (checkpoint_restart_flag) {
         return 3;
     }
 
