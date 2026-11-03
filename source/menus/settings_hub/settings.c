@@ -24,6 +24,7 @@
 #include "menus/settings_hub/settings.h"
 
 #include "menus/settings_hub/info_card.h"
+#include "menus/creator_menu/online/two_option_pop_up.h"
 
 static int current_page = 0;
 
@@ -406,7 +407,7 @@ UICheckBox *get_setting_checkbox_by_id(const char *id) {
 }
 
 // Wide and 3D both want the whole top screen, so only one of them gets it
-static void turn_off_setting(const char *id, bool *var) {
+void turn_off_setting(const char *id, bool *var) {
     *var = false;
 
     UICheckBox *checkbox = get_setting_checkbox_by_id(id);
@@ -420,6 +421,18 @@ void wide_setting(bool checked) {
 
 void stereo_setting(bool checked) {
     if (!checked) return;
+    if (!_3dWarningPassed) {
+        TwoOptionPopupData *_3d_warning_data = malloc(sizeof(TwoOptionPopupData));
+        if (!_3d_warning_data) return;
+        
+        _3d_warning_data->text = strdup("3D can significantly lower performance.\nAre you sure you want to keep it on?");
+        _3d_warning_data->title = strdup("Disclaimer");
+        _3d_warning_data->proceed_text = strdup("Enable");
+        _3d_warning_data->cancel_text = strdup("Disable");
+        ui_stack_push(&_3d_warning_pop_up_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+        ui_stack_push_data(_3d_warning_data);
+        _3dWarningPassed = true;
+    }
 
     // No 3D on this console, so don't let the box stay ticked
     if (!stereo_supported()) {

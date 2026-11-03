@@ -186,7 +186,7 @@ float opacity = 0;
 static int stereo_idle_frames = 0;
 
 // The slider, snapped to 0 where 3D wouldn't show up anyway
-static float get_stereo_slider() {
+float get_stereo_slider() {
     if (!settingsState.stereoEnabled) return 0.f;
 
     float slider = osGet3DSliderState();
