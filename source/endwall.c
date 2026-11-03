@@ -14,6 +14,8 @@
 #include "menus/level_complete.h"
 #include "practice.h"
 #include "menus/level_select.h"
+#include "menus/settings_hub/settings.h"
+#include "menus/gameplay.h"
 
 static int fireworks_spawned = 0;
 static int circunferences_spawned = 0;
@@ -167,7 +169,7 @@ int handle_wall_cutscene(float delta, UIInput *touch) {
 
         if(status){
             LevelData *level_data_sel = &current_level_entry->data;
-            if (!cheated) {
+            if (!cheated && status != 3) {
                 if (state.practice_mode) {
                     state.current_data.max_practice = 100;
                     level_data_sel->practice_progress = 100;
@@ -250,11 +252,32 @@ int handle_wall_cutscene(float delta, UIInput *touch) {
                 }
 
                 unpause_playback_mp3();
+            } else if (status == 3) { // Restarting from le checkpòint
+                init_variables();
+                reload_level();
+                reset_coins();
+                if (state.practice_mode) {
+                    if (settingsState.autoCheckpoints && pseudo_checkpoint_exists) {
+                        delete_last_checkpoint();
+                        pseudo_checkpoint_exists = false;
+                    }
+
+                    if (get_checkpoint_count() > 0) {
+                        restore_checkpoint();
+                    } 
+                    
+                    else if (settingsState.practiceMusicSync) {
+                        seek_mp3(level_info.song_offset);
+                    } 
+                }
+                unpause_playback_mp3();
             }
             level_complete_initialized = false;
             completion_timer = 0.0f;
             circunference_timer = 0.0f;
-            return status;
+            int result = (status == 3) ? 2 : status;
+            status = 0;
+            return result; 
         }
     }
 
