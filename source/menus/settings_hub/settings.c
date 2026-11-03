@@ -374,6 +374,16 @@ Setting settings[] = {
         .var = &settingsState.noWaveTrailBehind,
         .key = CONFIG_COSMETIC_PATH "noWaveTrailBehind"
     },
+    {
+        .id = "showFpsCounter",
+        .label = "FPS counter",
+        .additionalInfo = "Shows current FPS.",
+        .page = PAGE_GAMEPLAY, 
+
+        .defaultValue = false,
+        .var = &settingsState.showFpsCounter,
+        .key = CONFIG_GAMEPLAY_PATH "showFpsCounter"
+    },
 };
 
 typedef struct CheckboxData {

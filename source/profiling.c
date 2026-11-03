@@ -28,7 +28,7 @@ static ProfilerPage current_page = PROFILER_PAGE_OVERVIEW;
 #define PROFILER_LABEL_X 0.f
 #define PROFILER_VALUE_X 180.f
 #define PROFILER_SEC_VALUE_X 260.f
-#define PROFILER_START_Y 20.f
+#define PROFILER_START_Y 25.f
 
 typedef enum {
     PROFILER_VALUE_NONE,
@@ -185,7 +185,7 @@ static void draw_page_header(void) {
     draw_text(
         &chatFont_fontCharset,
         &chatFont_sheet,
-        0, 5,
+        0, 10,
         PROFILER_SCALE, PROFILER_SCALE,
         0,
         true,

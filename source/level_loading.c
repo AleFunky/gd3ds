@@ -480,6 +480,7 @@ char **split_string_str_del(const char *str, const char *delimiter, int *outCoun
                 strncpy(token, start, len);
                 token[len] = '\0';
                 result = (char **)realloc(result, sizeof(char *) * (count + 1));
+                if (result == NULL) return NULL;
                 result[count++] = token;
             }
 
@@ -497,6 +498,7 @@ char **split_string_str_del(const char *str, const char *delimiter, int *outCoun
             strncpy(token, start, len);
             token[len] = '\0';
             result = realloc(result, sizeof(char *) * (count + 1));
+            if (result == NULL) return NULL;
             result[count++] = token;
         }
     }
@@ -520,6 +522,7 @@ char **split_string(const char *str, char delimiter, int *outCount, bool ignoreZ
                 token[len] = '\0';
 
                 result = (char **)realloc(result, sizeof(char*) * (count + 1));
+                if (result == NULL) return NULL;
                 result[count++] = token;
             }
             start = ptr + 1;
@@ -533,6 +536,7 @@ char **split_string(const char *str, char delimiter, int *outCount, bool ignoreZ
             strncpy(token, start, len);
             token[len] = '\0';
             result = realloc(result, sizeof(char*) * (count + 1));
+            if (result == NULL) return NULL;
             result[count++] = token;
         }
     }
