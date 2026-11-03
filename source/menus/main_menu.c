@@ -8,8 +8,6 @@
 #include "graphics.h"
 #include "state.h"
 #include "triggers.h"
-#include "mp3_player.h"
-#include "utils/server_utils.h"
 #include "utils/utils.h"
 
 #include "menus/core/ui_screen.h"
@@ -21,15 +19,9 @@
 #include "menus/level_select.h"
 #include "menus/updater.h"
 #include "menus/updater_settings.h"
-#include "menus/settings_hub/settings_hub.h"
 #include "menus/settings_hub/settings.h"
-#include "menus/statistics.h"
-#include "menus/settings_hub/credits.h"
-#include "menus/settings_hub/songs.h"
-#include "menus/settings_hub/how_to_play.h"
-#include "menus/settings_hub/info_card.h"
 #include "menus/creator_menu/online/two_option_pop_up.h"
-#include "menus/creator_menu/search/server_switcher.h"
+#include "menus/settings_hub/info_card.h"
 
 #include "particles/object_particles.h"
 #include "particles/circles.h"
@@ -244,6 +236,18 @@ static void main_menu_init(UIScreen *s){
 
     old_wide = settingsState.wideEnabled;
     old_stereo = settingsState.stereoEnabled;
+
+    if (!is_N3DS && is_3DSX && !is_citra()) {
+      InfoCardData *warning_data = malloc(sizeof(InfoCardData));
+      if (!warning_data)
+        return;
+
+      warning_data->text = strdup("The .3dsx release lacks RAM\non non-New 3DS hardware.\nPlease install the .cia.");
+      warning_data->title = strdup("Warning");
+      warning_data->copied = true;
+      ui_stack_push(&info_card_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+      ui_stack_push_data(warning_data);
+    }
 
     if (doAutoUpdates && !checkedForUpdate) updater_thread = create_generic_thread(&updater_task);
 }

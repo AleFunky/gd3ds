@@ -25,7 +25,6 @@
 #include "text.h"
 #include "utils/network.h"
 
-#include "player/collision.h"
 #include "state.h"
 
 #include "particles/particles.h"
@@ -41,11 +40,9 @@
 #include "level/main_levels.h"
 #include "menus/main_menu.h"
 #include "menus/level_select.h"
-#include "menus/icon_kit.h"
 #include "menus/gameplay.h"
 #include "menus/updater.h"
 #include "menus/creator_menu/online/two_option_pop_up.h"
-#include "menus/settings_hub/info_card.h"
 #include "menus/settings_hub/settings.h"
 #include "menus/creator_menu/search_menu.h"
 #include "menus/loading_screen.h"
@@ -765,7 +762,7 @@ void ui_loop(){
 
         // autoupdater pop up stuff
 
-        if (updater_task.finished && !checkedForUpdate && ui_stack_get_fade_status() == FADE_STATUS_NONE && strcmp("updater", ui_stack_get_current_screen_name()) != 0 && strcmp("3d_warning_pop_up", ui_stack_get_current_screen_name()) != 0)
+        if (updater_task.finished && !checkedForUpdate && ui_stack_get_fade_status() == FADE_STATUS_NONE && strcmp("updater", ui_stack_get_current_screen_name()) != 0 && strcmp("3d_warning_pop_up", ui_stack_get_current_screen_name()) != 0 && strcmp("info_card", ui_stack_get_current_screen_name()) != 0 && strcmp("updater_settings", ui_stack_get_current_screen_name()) != 0)
         {
             // Handle result
             if (updater_task.result == 0)
