@@ -264,11 +264,14 @@ int handle_wall_cutscene(float delta, UIInput *touch) {
 
                     if (get_checkpoint_count() > 0) {
                         restore_checkpoint();
-                    } 
-                    
-                    else if (settingsState.practiceMusicSync) {
+                    } else if (settingsState.practiceMusicSync) {
                         seek_mp3(level_info.song_offset);
-                    } 
+                    }
+
+                    if (!settingsState.practiceMusicSync) {
+                        stop_mp3();
+                        play_practice_song();
+                    }
                 }
                 unpause_playback_mp3();
             }
