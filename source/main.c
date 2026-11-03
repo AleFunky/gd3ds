@@ -860,6 +860,7 @@ void game_loop() {
             ui_stack_update(&touch);
             state.online_level = false;
             exiting_level = true;
+            unload_level();
             return;
         }
     } else {
@@ -878,6 +879,7 @@ void game_loop() {
             ui_stack_push_game_state(STATE_MENU);
             ui_stack_update(&touch);
             exiting_level = true;
+            unload_level();
             return;
         }
 

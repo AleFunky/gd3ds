@@ -816,6 +816,7 @@ void exit_practice_mode() {
     state.practice_mode = false;
     init_variables();
     reload_level(); 
+    clear_practice_mode();
 
     if (settingsState.practiceMusicSync) {
         seek_mp3(level_info.song_offset);
