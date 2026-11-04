@@ -304,7 +304,7 @@ void spawn_object_particles(int obj) {
 
             if (index >= 0) {
                 if (!object_particle[index].color_applied) {
-                    Color base = channels[get_col_channel_index(game_objects[objects.id[obj]].detail_color)].non_pulse_color;
+                    Color base = channels[get_col_channel_index(objects.detail_col_channel[obj])].non_pulse_color;
                     set_particle_color(&object_particle[index].ps.cfg, base.r / 255.f, base.g / 255.f, base.b / 255.f);
                     object_particle[index].color_applied = true;
                 }
