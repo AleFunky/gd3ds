@@ -64,6 +64,9 @@ static void copy_particle(ParticleData* d, int dst, int src) {
 void initParticle(ParticleSystem* ps, const ParticleDefinition* cfg, int i) {
     ParticleData* d = &ps->data;
 
+    if (!ps->data.couldLoad) 
+        return;
+
     // Lifetime
     float life = cfg->particleLifespan +
                  cfg->particleLifespanVariance * rand_minus1_1();
@@ -219,7 +222,7 @@ void initParticle(ParticleSystem* ps, const ParticleDefinition* cfg, int i) {
 void spawnMultipleParticles(ParticleSystem* ps, int emitCount) {
     if (settingsState.particlesDisabled) return;
     
-    if (!ps->active)
+    if (!ps->active || !ps->data.couldLoad)
         return;
 
     ParticleData* d = &ps->data;
@@ -233,7 +236,7 @@ void spawnMultipleParticles(ParticleSystem* ps, int emitCount) {
 void updateParticleSystem(ParticleSystem* ps, float dt) {
     if (settingsState.particlesDisabled) return;
     
-    if (!ps->active)
+    if (!ps->active || !ps->data.couldLoad)
         return;
 
     ParticleData* d = &ps->data;
@@ -364,46 +367,78 @@ static float* alloc_array(int count) {
 void initParticleData(ParticleData* d, int capacity) {
     d->count = 0;
     d->capacity = capacity;
+    d->couldLoad = false;
 
     d->timeToLive = alloc_array(capacity);
+    if (!d->timeToLive) return;
+
     d->totalTimeToLive = alloc_array(capacity);
+    if (!d->totalTimeToLive) return;
 
     d->posx = alloc_array(capacity);
+    if (!d->posx) return;
     d->posy = alloc_array(capacity);
+    if (!d->posy) return;
 
     d->relx = alloc_array(capacity);
+    if (!d->relx) return;
     d->rely = alloc_array(capacity);
+    if (!d->rely) return;
 
     d->dirX = alloc_array(capacity);
+    if (!d->dirX) return;
     d->dirY = alloc_array(capacity);
+    if (!d->dirY) return;
 
     d->gravityX = alloc_array(capacity);
+    if (!d->gravityX) return;
     d->gravityY = alloc_array(capacity);
+    if (!d->gravityY) return;
 
     d->radialAccel = alloc_array(capacity);
+    if (!d->radialAccel) return;
     d->tangentialAccel = alloc_array(capacity);
+    if (!d->tangentialAccel) return;
 
     d->colorR = alloc_array(capacity);
+    if (!d->colorR) return;
     d->colorG = alloc_array(capacity);
+    if (!d->colorG) return;
     d->colorB = alloc_array(capacity);
+    if (!d->colorB) return;
     d->colorA = alloc_array(capacity);
+    if (!d->colorA) return;
 
     d->deltaColorR = alloc_array(capacity);
+    if (!d->deltaColorR) return;
     d->deltaColorG = alloc_array(capacity);
+    if (!d->deltaColorG) return;
     d->deltaColorB = alloc_array(capacity);
+    if (!d->deltaColorB) return;
     d->deltaColorA = alloc_array(capacity);
+    if (!d->deltaColorA) return;
 
     d->size = alloc_array(capacity);
+    if (!d->size) return;
     d->deltaSize = alloc_array(capacity);
+    if (!d->deltaSize) return;
 
     d->rotation = alloc_array(capacity);
+    if (!d->rotation) return;
     d->deltaRotation = alloc_array(capacity);
+    if (!d->deltaRotation) return;
 
     // Mode B
     d->angle = alloc_array(capacity);
+    if (!d->angle) return;
     d->degreesPerSecond = alloc_array(capacity);
+    if (!d->degreesPerSecond) return;
     d->radius = alloc_array(capacity);
+    if (!d->radius) return;
     d->deltaRadius = alloc_array(capacity);
+    if (!d->deltaRadius) return;
+
+    d->couldLoad = true;
 }
 
 void initParticleSystem(ParticleSystem* ps, const ParticleDefinition* cfg) {
