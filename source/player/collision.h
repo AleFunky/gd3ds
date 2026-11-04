@@ -46,6 +46,7 @@ enum JumpType {
 #define RED_PAD 1332
 #define S_MODIFIERBLOCK 1829
 #define D_MODIFIERBLOCK 1755
+#define J_MODIFIERBLOCK 1813
 
 #define YELLOW_ORB 36
 #define PINK_ORB 141

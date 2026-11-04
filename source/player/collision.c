@@ -504,6 +504,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 0;
                 }
                 
+                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_pending) { player->holding_jump_cancelled = true; player->no_auto_jump_pending = false; }
                 SET_ACTIVATED(obj, true);
             } 
             break;
@@ -533,6 +534,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 255 / 255.f;
                 }
                 
+                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_pending) { player->holding_jump_cancelled = true; player->no_auto_jump_pending = false; }
                 SET_ACTIVATED(obj, true);
             } 
             break;
@@ -563,6 +565,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 0;
                 }
                 
+                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_pending) { player->holding_jump_cancelled = true; player->no_auto_jump_pending = false; }
                 SET_ACTIVATED(obj, true);
             } 
             break;
@@ -594,6 +597,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 255 / 255.f;
                 }
                 
+                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_pending) { player->holding_jump_cancelled = true; player->no_auto_jump_pending = false; }
                 SET_ACTIVATED(obj, true);
             } 
             break;
@@ -702,6 +706,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 255 / 255.f;
                 }
 
+                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_pending) { player->holding_jump_cancelled = true; player->no_auto_jump_pending = false; }
                 SET_ACTIVATED(obj, true);
             } 
             break;
@@ -742,6 +747,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 0;
                 }
 
+                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_pending) { player->holding_jump_cancelled = true; player->no_auto_jump_pending = false; }
                 SET_ACTIVATED(obj, true);
             } 
             break;
@@ -1421,7 +1427,10 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             player->allow_dart_slide_timer = 2;
             break;
 
-        case 1813:
+        case J_MODIFIERBLOCK:
+            player->no_auto_jump_pending = true;
+            break;
+
         case 1859:
             break;
 
