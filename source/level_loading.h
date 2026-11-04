@@ -106,6 +106,7 @@ typedef struct {
     bool multi_triggered;
     int target_group;
     bool activate_group;
+    bool spawn_only;
 } ToggleTrigger;
 
 typedef struct {

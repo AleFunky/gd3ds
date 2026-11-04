@@ -929,6 +929,7 @@ GDValueType get_value_type_for_key(int key) {
         case 128: return GD_VAL_FLOAT; // scale X
         case 129: return GD_VAL_FLOAT; // scale Y
         case 57: return GD_VAL_INT_ARRAY; // groups
+        case 504: return GD_VAL_BOOL;   // spawn only (toggle orb)
         default:
             return GD_VAL_INT; // Default fallback
     }
@@ -1103,6 +1104,7 @@ int allocate_trigger_component(int obj) {
             }
             break;
         case TOGGLE_TRIGGER:
+        case 1594:
             index = trigger_pool_add(&toggle_pool, sizeof(ToggleTrigger));
             if (index >= 0) {
                 objects.trigger_index[obj] = index;
@@ -1135,7 +1137,7 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                 objects.id[object] = convert_object(val.i);
 
                 init_default_variables(object);
-                if (is_trigger_object(val.i)) {
+                if (is_trigger_object(val.i) || val.i == 1594) {
                     // Allocate its data
                     trigger_index = allocate_trigger_component(object);
                     if (trigger_index < 0) {
@@ -1390,6 +1392,9 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                         case TOGGLE_TRIGGER:
                             get_toggle_trigger(object)->target_group = val.i;
                             break;
+                        case 1594:
+                            get_toggle_trigger(object)->target_group = val.i;
+                            break;
                         case SPAWN_TRIGGER:
                             get_spawn_trigger(object)->target_group = val.i;
                             break;
@@ -1406,7 +1411,7 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
             if (type == GD_VAL_FLOAT) objects.tp_y_offset[object] = val.f;
             break;
         case 56: // Activate group
-            if (type == GD_VAL_BOOL && objects.id[object] == TOGGLE_TRIGGER) {
+            if (type == GD_VAL_BOOL && (objects.id[object] == TOGGLE_TRIGGER || objects.id[object] == 1594)) {
                 get_toggle_trigger(object)->activate_group = val.b;
             }
             break;
@@ -1515,6 +1520,11 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                     if (val.int_array[i] != 0) gcount++;
                 }
                 objects.group_count[object] = gcount;
+            }
+            break;
+        case 504:
+            if (type == GD_VAL_BOOL && objects.id[object] == 1594) {
+                get_toggle_trigger(object)->spawn_only = val.b;
             }
             break;
     }

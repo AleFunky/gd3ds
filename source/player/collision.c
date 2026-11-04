@@ -15,6 +15,7 @@
 #include "menus/core/ui_screen.h"
 #include "math_helpers.h"
 #include "slope.h"
+#include "triggers.h"
 #include "main.h"
 
 #include "particles/object_particles.h"
@@ -744,6 +745,24 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 SET_ACTIVATED(obj, true);
             } 
             break;
+        case 1594:
+            if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
+            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
+                ToggleTrigger *trigger = get_toggle_trigger(obj);
+
+                if (trigger->spawn_only) spawn_group(trigger->target_group);
+                else toggle_group(trigger->target_group, trigger->activate_group);
+
+                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                if (effect) {
+                    effect->def.colorR = objects.detail_color[obj].r / 255.f;
+                    effect->def.colorG = objects.detail_color[obj].g / 255.f;
+                    effect->def.colorB = objects.detail_color[obj].b / 255.f;
+                }
+
+                SET_ACTIVATED(obj, true);
+            }
+            break;
         case BLUE_GRAVITY_PORTAL:
             player->gravObj_id = obj;
             if (!GET_ACTIVATED(obj)) {
@@ -1408,7 +1427,6 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
 
         case 1329:
         case 1331:
-        case 1594:
         case 1816:
             break;
 

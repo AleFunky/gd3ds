@@ -1,6 +1,7 @@
 #include "object_particles.h"
 #include <math.h>
 #include "level_loading.h"
+#include "triggers.h"
 #include "particles/particles.h"
 #include "state.h"
 #include "main.h"
@@ -35,6 +36,7 @@ void init_op_system() {
     for (size_t i = 0; i < MAX_OBJECT_PS; i++) {
         object_particle[i].id = -1;
         object_particle[i].occupied = false;
+        object_particle[i].color_applied = false;
     }
 }
 
@@ -83,6 +85,7 @@ static float get_object_particle_depth(int id) {
         case BLACK_ORB:
         case DASH_ORB:
         case GRAVITY_DASH_ORB:
+        case 1594:
         case SECRET_COIN:
             return 0.7f;
     }
@@ -131,6 +134,7 @@ static void remove_offscreen_object_particles() {
 
             if (x < -60 || x >= (SCREEN_WIDTH / SCALE) + 60 || y < -60 || y >= (SCREEN_HEIGHT / SCALE) + 60) {
                 object_particle[i].occupied = false;
+                object_particle[i].color_applied = false;
                 freeParticleData(&object_particle[i].ps.data);
             }
         }
@@ -244,7 +248,7 @@ void spawn_object_particles(int obj) {
             if (!is_ps_already_loaded(obj)) {
                 index = load_object_particles(obj, &ring_effect, false);
                 if (index >= 0) {
-                    set_particle_color(&object_particle[index].ps.cfg, 1, 0.39216f, 0.98039f);
+                    set_particle_color(&object_particle[index].ps.cfg, 1, 0.39216f, 0);
 
                     object_particle[index].ps.emitterX = objects.x[obj];
                     object_particle[index].ps.emitterY = objects.y[obj];
@@ -281,6 +285,28 @@ void spawn_object_particles(int obj) {
 
                     object_particle[index].ps.emitterX = objects.x[obj];
                     object_particle[index].ps.emitterY = objects.y[obj];
+                }
+            }
+            break;
+        case 1594:
+            index = -1;
+            for (size_t i = 0; i < MAX_OBJECT_PS; i++) {
+                if (object_particle[i].occupied && object_particle[i].id == obj) { index = (int)i; break; }
+            }
+
+            if (index < 0) {
+                index = load_object_particles(obj, &ring_effect, false);
+                if (index >= 0) {
+                    object_particle[index].ps.emitterX = objects.x[obj];
+                    object_particle[index].ps.emitterY = objects.y[obj];
+                }
+            }
+
+            if (index >= 0) {
+                if (!object_particle[index].color_applied) {
+                    Color base = channels[get_col_channel_index(game_objects[objects.id[obj]].detail_color)].non_pulse_color;
+                    set_particle_color(&object_particle[index].ps.cfg, base.r / 255.f, base.g / 255.f, base.b / 255.f);
+                    object_particle[index].color_applied = true;
                 }
             }
             break;

@@ -152,6 +152,10 @@ float move_lock_player_x_delta = 0.0f;
 float move_lock_player_y_delta = 0.0f;
 float move_step_dt = 0.0f;
 
+static int toggle_spawn_buffer[8];
+static int toggle_spawn_count = 0;
+static bool toggle_spawn_active = false;
+
 float get_group_opacities(int object) {
     float group_opacity = 1.f;
     for (int i = 0; i < MAX_GROUPS_PER_OBJECT; i++) {
@@ -694,16 +698,7 @@ void handle_spawn_triggers(void) {
         if (buffer->time_run > buffer->seconds) {
             buffer->active = false;
 
-            GroupNode *p = get_group(buffer->target_group);
-            for (int i = 0; i < p->count; i++) {
-                int obj_idx = p->objects[i];
-                if (trigger_is_spawn_triggered(objects.id[obj_idx], obj_idx)
-                    && is_trigger_object(objects.id[obj_idx])
-                    && (trigger_is_multi_triggered(objects.id[obj_idx], obj_idx) || !GET_ACTIVATED(obj_idx))
-                    && !(objects.flags[obj_idx] & FLAG_TOGGLED)) {
-                    run_trigger(obj_idx, true);
-                }
-            }
+            spawn_group(buffer->target_group);
 
             for (int j = slot; j < spawn_trigger_count - 1; j++) {
                 // Shift buffer array
@@ -1085,6 +1080,48 @@ void upload_color_to_buffer(int channel, u32 color, float seconds) {
     buffer->active = true;
 }
 
+void toggle_group(int group, bool activate) {
+    GroupNode *p = get_group(group);
+    if (p) {
+        p->toggled = !activate;
+        for (int i = 0; i < p->count; i++) {
+            int object = p->objects[i];
+            objects.flags[object] &= ~FLAG_TOGGLED;
+            objects.flags[object] |= get_group_toggles(object) ? FLAG_TOGGLED : 0;
+        }
+
+        if (activate) {
+            if (toggle_spawn_count < 8) toggle_spawn_buffer[toggle_spawn_count++] = group;
+            if (toggle_spawn_active) return;
+
+            toggle_spawn_active = true;
+            int guard = 0;
+            while (toggle_spawn_count > 0 && guard++ < 64) {
+                int next = toggle_spawn_buffer[0];
+                for (int i = 1; i < toggle_spawn_count; i++) toggle_spawn_buffer[i - 1] = toggle_spawn_buffer[i];
+                toggle_spawn_count--;
+                spawn_group(next);
+            }
+            toggle_spawn_active = false;
+        }
+    }
+}
+
+void spawn_group(int group) {
+    GroupNode *p = get_group(group);
+    if (!p) return;
+
+    for (int i = 0; i < p->count; i++) {
+        int obj_idx = p->objects[i];
+        if (trigger_is_spawn_triggered(objects.id[obj_idx], obj_idx)
+            && is_trigger_object(objects.id[obj_idx])
+            && (trigger_is_multi_triggered(objects.id[obj_idx], obj_idx) || !GET_ACTIVATED(obj_idx))
+            && !(objects.flags[obj_idx] & FLAG_TOGGLED)) {
+            run_trigger(obj_idx, true);
+        }
+    }
+}
+
 void run_trigger(int obj, bool from_spawn) {
     if (objects.flags[obj] & FLAG_TOGGLED) return;
 
@@ -1204,15 +1241,7 @@ void run_trigger(int obj, bool from_spawn) {
         case TOGGLE_TRIGGER:
         {
             ToggleTrigger *trigger = get_toggle_trigger(obj);
-            GroupNode *p = get_group(trigger->target_group);
-            if (p) {
-                p->toggled = !trigger->activate_group;
-                for (int i = 0; i < p->count; i++) {
-                    int object = p->objects[i];
-                    objects.flags[object] &= ~FLAG_TOGGLED;
-                    objects.flags[object] |= get_group_toggles(object) ? FLAG_TOGGLED : 0;
-                }
-            }
+            toggle_group(trigger->target_group, trigger->activate_group);
             break;
         }
         default:

@@ -4220,6 +4220,10 @@ const ChildSprite children_1593[] = {
  { -1, 0.00, -3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_1594[] = {
+ { 631, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_1600[] = {
  { 2129, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
@@ -6474,7 +6478,7 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1591 */ { 1969, -1, 0.00, 0.00, 3, 9, 1, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1591, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1592 */ { 1871, -1, -3.00, 0.00, 3, 9, 1, 2, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1592, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1593 */ { 1969, -1, 0.00, 0.00, 3, 9, 1, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1593, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1594 */ { 2073, -1, 0.00, 0.00, 3, 12, 0, 1, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1594 },
+/* Object 1594 */ { 2073, -1, 0.00, 0.00, 3, 12, 0, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1594, 0, NULL, 0, NULL, 0, NULL, hitbox_1594 },
 /* Object 1595 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1596 */ { 1906, -1, 0.00, 0.00, 3, 1, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1597 */ { 1907, -1, 0.00, 0.00, 3, 1, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
