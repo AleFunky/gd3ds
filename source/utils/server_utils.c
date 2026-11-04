@@ -1,32 +1,21 @@
 #include <3ds.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include <citro2d.h>
 #include <string.h>
 
 #include "json-c/json_object.h"
-#include "json-c/json_object_iterator.h"
 #include "json-c/json_tokener.h"
 #include "json-c/json_types.h"
-#include "json-c/json_util.h"
 
 #include "level_loading.h"
 #include "main.h"
-#include "mp3_player.h"
-#include "graphics.h"
 #include "save/saving.h"
 #include "utils/folders.h"
 #include "utils/server_utils.h"
 #include "network.h"
 #include "utils/string_helpers.h"
 
-#include "menus/core/ui_screen.h"
 #include "menus/components/ui_list.h"
-#include "menus/components/ui_image.h"
-#include "menus/components/ui_label.h"
-#include "menus/components/ui_button.h"
-#include "menus/components/ui_rectangle.h"
-#include "menus/components/ui_window_button.h"
 #include "menus/updater_pop_up.h"
 #include "menus/updater_settings.h"
 #include "menus/creator_menu/search_menu.h"
@@ -602,7 +591,7 @@ void fill_gdps_comment_entries(char **commentStrings, int commentStringCount) {
                             break;
                         }
                         comment_entries[i].content = malloc(strlen(valStr) + 1);
-                        snprintf(comment_entries[i].content, strlen(valStr) + 1, valStr);
+                        snprintf(comment_entries[i].content, strlen(valStr) + 1, "%s", valStr);
                         break;
                     case 3:
                         // author's player id
@@ -662,7 +651,7 @@ void fill_gdps_comment_author_entries(char **authorStrings, int authorStringCoun
         // Find the song
         for (commentIndex = 0; commentIndex < commentStringCount; commentIndex++) {
             if (playerId == comment_entries[commentIndex].authorPlayerId) {
-                snprintf(comment_entries[commentIndex].name, sizeof(comment_entries[commentIndex].name), name);
+                snprintf(comment_entries[commentIndex].name, sizeof(comment_entries[commentIndex].name), "%s", name);
                 comment_entries[commentIndex].authorAccountId = userId;
                 break;
             }
@@ -839,7 +828,7 @@ int parse_releases_data(char *jsonString, bool useNightly) {
         json_object *assets = NULL;
 
         // get release name
-        if (json_object_object_get_ex(targetRelease, "name", &name)) snprintf(update_data->releaseTitle, sizeof(update_data->releaseTitle), json_object_get_string(name));
+        if (json_object_object_get_ex(targetRelease, "name", &name)) snprintf(update_data->releaseTitle, sizeof(update_data->releaseTitle), "%s", json_object_get_string(name));
 
         // get release body
         if (json_object_object_get_ex(targetRelease, "body", &body)) {
@@ -861,7 +850,7 @@ int parse_releases_data(char *jsonString, bool useNightly) {
                         if (json_object_object_get_ex(currAssetObject, "browser_download_url", &url)) {
                             // we found the freaking download link lets go
                             const char *tempUrl = json_object_get_string(url);
-                            snprintf(update_data->releaseDownloadUrl, sizeof(update_data->releaseDownloadUrl), tempUrl);
+                            snprintf(update_data->releaseDownloadUrl, sizeof(update_data->releaseDownloadUrl), "%s", tempUrl);
                         }
                         if (json_object_object_get_ex(currAssetObject, "size", &size)) {
                             // also get the file size

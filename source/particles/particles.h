@@ -8,6 +8,8 @@ typedef struct {
     int count;
     int capacity;
 
+    bool couldLoad;
+
     float* timeToLive;
     float* totalTimeToLive;
 

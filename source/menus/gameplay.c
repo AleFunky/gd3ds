@@ -12,7 +12,6 @@
 #include "particles/circles.h"
 
 #include "menus/core/common_setters.h"
-#include "menus/core/ui_screen.h"
 #include "menus/components/ui_use_effect.h"
 #include "menus/components/ui_list.h"
 #include "menus/components/ui_window.h"
@@ -34,6 +33,7 @@ bool game_paused = false;
 bool in_level_complete = false;
 
 static UIImage *bg_gradient;
+static UILabel *fps_label;
 static UIProgressBar *progress_bar;
 static UILabel *percent;
 static UILabel *level_name;
@@ -63,6 +63,7 @@ static UIScreen *screen_top;
 static UIScreen *screen;
 
 int decimal;
+float fps;
 
 static void update_progress_bars() {
     LevelData *level_data_sel = &current_level_entry->data;
@@ -248,6 +249,7 @@ static UIActionDef gameplay_actions[] = {
 void gameplay_init_top(UIScreen *s){
     screen_top = s;
 
+    fps_label = (UILabel *) ui_get_element_by_tag(screen_top, "fps");
     progress_bar = (UIProgressBar *) ui_get_element_by_tag(screen_top, "progressalert");
     percent = (UILabel *) ui_get_element_by_tag(screen_top, "percent");
     level_name = (UILabel *) ui_get_element_by_tag(screen_top, "level_title");
@@ -325,14 +327,18 @@ void gameplay_init(UIScreen *s) {
 
 void gameplay_update_top(UIScreen *s, UIInput *touch) { 
     decimal = 0;
+    fps = delta * 1000.f;
     if (settingsState.decimalPercent) decimal = 2;
     if (settingsState.ultraDecimalPercent) decimal = MAX_DECIMAL_PERCENT;
+
+    snprintf(fps_label->text, 32, "<#FFFFFF55>FPS: %.*f</>", 0, fps > 0 ? 1000.f / fps : 0.f);
 
     progress_bar->value = state.level_progress;
     snprintf(percent->text, 32, "%.*f%%", decimal, state.level_progress);
 
     ui_run_func_on_tag(s, "progressalert", ui_disable_element);
     ui_run_func_on_tag(s, "percent", ui_disable_element);
+    ui_run_func_on_tag(s, "fps", ui_disable_element);
     ui_set_pos_on_tag(s, 200, 8, "percent");
     percent->alignment = 0.5;
 
@@ -344,6 +350,10 @@ void gameplay_update_top(UIScreen *s, UIInput *touch) {
 
     if (settingsState.showProgressPercent) {
         ui_run_func_on_tag(s, "percent", ui_enable_element);
+    }
+
+    if (settingsState.showFpsCounter) {
+        ui_run_func_on_tag(s, "fps", ui_enable_element);
     }
 }
 

@@ -1,4 +1,5 @@
 #pragma once
+#include "menus/core/ui_screen.h"
 
 #define MAX_DECIMAL_PERCENT 17
 

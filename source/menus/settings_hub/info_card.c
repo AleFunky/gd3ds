@@ -1,22 +1,11 @@
 #include <3ds.h>
 #include <citro2d.h>
 
-#include "main.h"
-#include "easing.h"
-#include "triggers.h"
-#include "mp3_player.h"
-#include "graphics.h"
-#include "math_helpers.h"
-
 #include "menus/core/ui_screen.h"
 #include "menus/components/ui_list.h"
-#include "menus/components/ui_window.h"
-#include "menus/components/ui_textbox.h"
-#include "menus/components/ui_image.h"
 #include "menus/components/ui_label.h"
+#include "menus/core/ui_stack.h"
 
-#include "menus/level_select.h"
-#include "menus/main_menu.h"
 #include "menus/settings_hub/info_card.h"
 
 void set_info_title(const char *text, UIScreen *s) {

@@ -3,7 +3,6 @@
 #include "state.h"
 #include "math_helpers.h"
 #include "mp3_player.h"
-#include "utils/gfx.h"
 #include "particles/circles.h"
 
 #include "endwall.h"

@@ -480,6 +480,7 @@ char **split_string_str_del(const char *str, const char *delimiter, int *outCoun
                 strncpy(token, start, len);
                 token[len] = '\0';
                 result = (char **)realloc(result, sizeof(char *) * (count + 1));
+                if (result == NULL) return NULL;
                 result[count++] = token;
             }
 
@@ -497,6 +498,7 @@ char **split_string_str_del(const char *str, const char *delimiter, int *outCoun
             strncpy(token, start, len);
             token[len] = '\0';
             result = realloc(result, sizeof(char *) * (count + 1));
+            if (result == NULL) return NULL;
             result[count++] = token;
         }
     }
@@ -520,6 +522,7 @@ char **split_string(const char *str, char delimiter, int *outCount, bool ignoreZ
                 token[len] = '\0';
 
                 result = (char **)realloc(result, sizeof(char*) * (count + 1));
+                if (result == NULL) return NULL;
                 result[count++] = token;
             }
             start = ptr + 1;
@@ -533,6 +536,7 @@ char **split_string(const char *str, char delimiter, int *outCount, bool ignoreZ
             strncpy(token, start, len);
             token[len] = '\0';
             result = realloc(result, sizeof(char*) * (count + 1));
+            if (result == NULL) return NULL;
             result[count++] = token;
         }
     }
@@ -1719,10 +1723,7 @@ int parse_gd_object(const char *objStr, int obj) {
             if (hitbox->type == COLLISION_CIRCLE) {
                 float s = fmaxf(fabsf(objects.scale_x[obj]), fabsf(objects.scale_y[obj]));
                 objects.width[obj] *= s;
-            } else if (hitbox->type == COLLISION_SLOPE) {
-                objects.width[obj] *= fabsf(objects.scale_x[obj]);
-                objects.height[obj] *= fabsf(objects.scale_y[obj]);
-            } else if (hitbox->collision_type == HITBOX_SOLID) {
+            } else if (hitbox->type == COLLISION_SLOPE || hitbox->collision_type == HITBOX_SOLID) {
                 if ((int) fabsf(objects.rotation[obj]) % 180 != 0) {
                     objects.width[obj] *= fabsf(objects.scale_y[obj]);
                     objects.height[obj] *= fabsf(objects.scale_x[obj]);
@@ -2092,15 +2093,23 @@ int compare_coins(const void *a, const void *b) {
     return objects.x[*c1] - objects.x[*c2];
 }
 
-int parse_string(const char *levelString, int extra_slots, int *out_object_count) {
+int parse_string(char *levelString, int extra_slots, int *out_object_count) {
     int sectionCount = 0;
 
-    // Split the string in object sections
-    char **sections = split_string(levelString, ';', &sectionCount, false);
+    // Count sections
+    const char *sectionStart = levelString;
+    char *cursor = levelString;
+    while(true) {
+        if (*cursor == ';' || *cursor == '\0') {
+            if (cursor > sectionStart) sectionCount++;
+            if (*cursor == '\0') break;
+            sectionStart = cursor + 1;
+        }
+        cursor++;
+    }
 
     if (sectionCount < 1) {
         output_log("Level string missing sections!\n");
-        free_string_array(sections, sectionCount);
         return LOAD_LEVEL_STRING_MISSING_SECTIONS;
     }
     
@@ -2110,7 +2119,6 @@ int parse_string(const char *levelString, int extra_slots, int *out_object_count
     
     if (!init_arrays(objectCount + extra_slots)) {
         free_arrays();
-        free_string_array(sections, sectionCount);
         output_log("Failed to allocate object array\n");
         return LOAD_OUT_OF_MEMORY;
     }
@@ -2124,16 +2132,32 @@ int parse_string(const char *levelString, int extra_slots, int *out_object_count
     
     coin_count = 0;
 
-    for (int i = 0; i < objectCount; i++) {
-        // Parse
-        if (!parse_gd_object(sections[i + 1], i)) {
-            output_log("Failed to parse object %d\n", i);
-            free_arrays();
-            free_string_array(sections, sectionCount);
-            return LOAD_COULDNT_PARSE_OBJECTS;
-        }
+    sectionStart = levelString;
+    int sectionIndex = 0;
+    int objectIndex = 0;
 
-        assign_object_to_section(i);
+    cursor = levelString;
+    while (true) {
+        if (*cursor == ';' || *cursor == '\0') {
+            bool at_end = *cursor == '\0';
+            if (cursor > sectionStart) {
+                if (!at_end) *cursor = '\0';
+                if (sectionIndex > 0) {
+                    // Parse
+                    if (!parse_gd_object(sectionStart, objectIndex)) {
+                        output_log("Failed to parse object %d\n", objectIndex);
+                        free_arrays();
+                        return LOAD_COULDNT_PARSE_OBJECTS;
+                    }
+                    assign_object_to_section(objectIndex);
+                    objectIndex++;
+                }
+                sectionIndex++;
+            }
+            if (at_end) break;
+            sectionStart = cursor + 1;
+        }
+        cursor++;
     }
 
     for (int i = 0; i < objectCount; i++) {
@@ -2154,8 +2178,6 @@ int parse_string(const char *levelString, int extra_slots, int *out_object_count
     }
     
     level_info.last_obj_x += (11 * 30.f);
-
-    free_string_array(sections, sectionCount);
 
     for (int i = 1; i < MAX_GROUPS; i++) {
         sort_group(i);
