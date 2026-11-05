@@ -143,20 +143,21 @@ static C2D_SpriteSheet get_sprite_sheet(int index, int *rel_index) {
         return spriteSheet2;
     }
 
-    if (index < ANIMATEDSHEET_START) {
+    if (index < SPRITESHEET4_START) {
         // Return spritesheet 3 (2.0 objects)
         *rel_index = index - SPRITESHEET3_START;
         return spriteSheet3;
     }
 
-    if (index < SPRITESHEET4_START) {
-        // Return spritesheet 4 (animated objects)
-        *rel_index = index - ANIMATEDSHEET_START;
-        return animatedSheet;
+    if (index < ANIMATEDSHEET_START) {
+        // Return spritesheet 4 (2.1 objects)
+        *rel_index = index - SPRITESHEET4_START;
+        return spriteSheet4;
     }
 
-    *rel_index = index - SPRITESHEET4_START;
-    return spriteSheet4;
+    // Return spritesheet 5 (animated objects)
+    *rel_index = index - ANIMATEDSHEET_START;
+    return animatedSheet;
 }
 
 C2D_SpriteSheet get_sprite_sheet_ex(int index, int *rel_index) {
@@ -271,6 +272,13 @@ void cache_all_sprites() {
     for (int id = 0; id < GAME_OBJECT_COUNT; id++) {
         const GameObject* obj = &game_objects[id];
 
+        // Get glow frame
+        if (obj->glow_frame >= 0) {
+            C2D_SpriteFromSheet(&sprite_templates[id].glow_template, glowSheet, obj->glow_frame);
+            C3D_TexSetFilter(sprite_templates[id].glow_template.image.tex, GPU_LINEAR, GPU_LINEAR);
+            C2D_SpriteSetCenter(&sprite_templates[id].glow_template, 0.5f, 0.5f);
+        }
+
         // Skip if object has no texture
         if (obj->texture < 0 && obj->child_count == 0) continue;
 
@@ -282,13 +290,6 @@ void cache_all_sprites() {
             C2D_SpriteFromSheet(&sprite_templates[id].parent_template, sheet, tex);
             C3D_TexSetFilter(sprite_templates[id].parent_template.image.tex, GPU_LINEAR, GPU_LINEAR);
             C2D_SpriteSetCenter(&sprite_templates[id].parent_template, 0.5f, 0.5f);
-        }
-
-        // Get glow frame
-        if (obj->glow_frame >= 0) {
-            C2D_SpriteFromSheet(&sprite_templates[id].glow_template, glowSheet, obj->glow_frame);
-            C3D_TexSetFilter(sprite_templates[id].glow_template.image.tex, GPU_LINEAR, GPU_LINEAR);
-            C2D_SpriteSetCenter(&sprite_templates[id].glow_template, 0.5f, 0.5f);
         }
 
         // Children
