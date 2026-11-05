@@ -584,6 +584,16 @@ float get_rotation_speed(int obj) {
         case 740:
         case 741:
         case 742:
+        case 1705:
+        case 1706:
+        case 1707:
+        case 1708:
+        case 1709:
+        case 1710:
+        case 1734:
+        case 1735:
+        case 1736:
+        case 1752:
             return 360.f;
         
         case 85:
@@ -618,7 +628,19 @@ float get_rotation_speed(int obj) {
         case 1057:
         case GREEN_ORB:
         case BLACK_ORB:
+        case 1521:
+        case 1525:
+        case 1582:
             return 180.f;
+        case 1522:
+        case 1526:
+            return 150.f;
+        case 1523:
+        case 1527:
+            return 120.f;
+        case 1524:
+        case 1528:
+            return 80.f;
         case 1019:
             return 180.f + map_range(objects.random[obj] & 0xff, 0, 255, -10, 10);
         case 1020:
@@ -629,7 +651,14 @@ float get_rotation_speed(int obj) {
         case 1059:
         case 1060:
         case 1061:
+        case 1831:
+        case 1832:
+        case 1833:
+        case 1834:
             return 300.f;
+        case 1619:
+        case 1620:
+            return 720;
     }
     return 0.f;
 }
