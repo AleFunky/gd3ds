@@ -1,5 +1,8 @@
 #include <3ds.h>
 #include <citro2d.h>
+#include "c2d/base.h"
+#include "menus/core/ui_element.h"
+#include "menus/core/ui_screen.h"
 #include "utils/precise_input.h"
 
 #include "main.h"
@@ -20,23 +23,22 @@
 #include "menus/components/ui_label.h"
 #include "menus/components/ui_button.h"
 #include "menus/settings_hub/settings.h"
-#include "menus/settings_hub/info_card.h"
 #include "menus/gameplay.h"
-#include "menus/main_menu.h"
-#include "menus/level_select.h"
 
 #include "practice.h"
 
 #include "save/saving.h"
 
-bool game_paused = false;
-bool in_level_complete = false;
+bool game_paused, in_level_complete = false;
+static float anim_time, target_pos, current_pos;
+static bool hide_pause_menu = false;
 
-static UIImage *bg_gradient;
 static UILabel *fps_label;
 static UIProgressBar *progress_bar;
 static UILabel *percent;
 static UILabel *level_name;
+
+static UIWindow *pause_window;
 
 static UIProgressBar *normal_progress;
 static UILabel *normal_progress_val;
@@ -145,8 +147,28 @@ void pause_game() {
     ui_run_func_on_tag(screen, "not_paused", ui_disable_element);
 }
 
+static void handle_hide_animation(float delta) {
+    if (hide_pause_menu) {
+        target_pos = 0.f - 120.f;
+    } else {
+        target_pos = 0.f + 120.f;
+    }
+
+    if (pause_window->base.y == target_pos) return;
+    
+    current_pos = easeValue(QUAD_IN, pause_window->base.y, target_pos, anim_time, 4.f, 1.f);
+    ui_element_set_position((UIElement *) pause_window, (float)SCREEN_WIDTH / 2.f, current_pos);
+    
+    anim_time += delta;
+}
+
 void unpause_game() {
     game_paused = false;
+    hide_pause_menu = false;
+    ui_image_set_tint((UIImage *) ui_get_element_by_tag(screen, "hide_btn"), C2D_Color32(255, 255, 255, 170));
+
+    ui_element_set_position((UIElement *) pause_window, (float)SCREEN_WIDTH / 2.f, (float)SCREEN_HEIGHT / 2.f);
+
     if (pi_enabled) {
         sync_precise_input(true);
     }
@@ -203,6 +225,13 @@ static void restart_level() {
     unpause_game();
 }
 
+static void hide_menu() {
+    hide_pause_menu = !hide_pause_menu;
+    ui_image_set_tint((UIImage *) ui_get_element_by_tag(screen, "hide_btn"), C2D_Color32(255, 255, 255, hide_pause_menu ? 255 : 170));
+
+    anim_time = 0.f;
+}
+
 static void action_pause(UIElement *e, const UIPropertyList *args) { 
     pause_game();
 }
@@ -235,6 +264,9 @@ static void action_add_checkpoint(UIElement *e, const UIPropertyList *args) {
 static void action_remove_checkpoint(UIElement *e, const UIPropertyList *args) {
     delete_last_checkpoint();
 }
+static void action_hide_menu(UIElement *e, const UIPropertyList *args) {
+    hide_menu();
+}
 
 static UIActionDef gameplay_actions[] = {
     {"pause", action_pause },
@@ -244,6 +276,7 @@ static UIActionDef gameplay_actions[] = {
     {"practice", action_practice_mode },
     {"add_check", action_add_checkpoint },
     {"remove_check", action_remove_checkpoint },
+    {"hide_menu", action_hide_menu}
 };
 
 void gameplay_init_top(UIScreen *s){
@@ -252,13 +285,15 @@ void gameplay_init_top(UIScreen *s){
     fps_label = (UILabel *) ui_get_element_by_tag(screen_top, "fps");
     progress_bar = (UIProgressBar *) ui_get_element_by_tag(screen_top, "progressalert");
     percent = (UILabel *) ui_get_element_by_tag(screen_top, "percent");
+
+    pause_window = (UIWindow *) ui_get_element_by_tag(s, "bgwindow");
     level_name = (UILabel *) ui_get_element_by_tag(screen_top, "level_title");
 
     Color color = get_white_if_black(p1_color);
 
     ui_progress_bar_set_tint(progress_bar, C2D_Color32(color.r, color.g, color.b, 255));
-    
-    ui_window_set_tint((UIWindow *) ui_get_element_by_tag(screen_top, "bgwindow"), C2D_Color32(0, 0, 0, 150));
+
+    ui_window_set_tint(pause_window, C2D_Color32(0, 0, 0, 150));
 
     ui_label_set_text(level_name, level_info.level_name);
 
@@ -283,20 +318,14 @@ void gameplay_init_top(UIScreen *s){
 
 void gameplay_init(UIScreen *s) {
     screen = s;
+    hide_pause_menu = false;
 
     level_unrated_online_refresh();
-
-    bg_gradient = (UIImage *) ui_get_element_by_tag(s, "gradient");
-
-    ui_window_set_tint((UIWindow *) ui_get_element_by_tag(s, "bgwindow"), C2D_Color32(0, 0, 0, 150));
-
-    ui_run_func_on_tag(s, "paused", ui_disable_element);
-    ui_run_func_on_tag(s, "practice_buttons", ui_disable_element);
-
+    
     coin_1 = (UIImage *) ui_get_element_by_tag(s, "coin_1");
     coin_2 = (UIImage *) ui_get_element_by_tag(s, "coin_2");
     coin_3 = (UIImage *) ui_get_element_by_tag(s, "coin_3");
-
+    
     coins_full[0] = (UIImage *) ui_get_element_by_tag(s, "coin_1_full");
     coins_full[1] = (UIImage *) ui_get_element_by_tag(s, "coin_2_full");
     coins_full[2] = (UIImage *) ui_get_element_by_tag(s, "coin_3_full");
@@ -313,6 +342,12 @@ void gameplay_init(UIScreen *s) {
             if (unrated) ui_image_set_tint(coins_full[i], USER_COIN_UNRATED_TINT);
         }
     }
+
+    ui_window_set_tint((UIWindow *) ui_get_element_by_tag(s, "bgwindow"), C2D_Color32(0, 0, 0, 150));
+    ui_image_set_tint((UIImage *) ui_get_element_by_tag(s, "hide_btn"), C2D_Color32(255, 255, 255, 150));
+
+    ui_run_func_on_tag(s, "paused", ui_disable_element);
+    ui_run_func_on_tag(s, "practice_buttons", ui_disable_element);
     
     reset_coins();
 
@@ -355,6 +390,8 @@ void gameplay_update_top(UIScreen *s, UIInput *touch) {
     if (settingsState.showFpsCounter) {
         ui_run_func_on_tag(s, "fps", ui_enable_element);
     }
+
+    handle_hide_animation(delta);
 }
 
 void gameplay_update(UIScreen *s, UIInput *touch) {
