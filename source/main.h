@@ -30,13 +30,13 @@
 #define ARRAY_LEN(arr) (sizeof(arr) / sizeof(arr[0]))
 #define IN_BOUNDS(index, arr) (index >= 0 && index < ARRAY_LEN(arr))
 
-#define GD_VERSION 2.0
-#define LAST_GD_VERSION_ID 28384582  // Last 2.0 id
+#define GD_VERSION 2.1
+#define LAST_GD_VERSION_ID 97454394  // Last 2.1 id (skibidi level)
 
 #define GAME_TITLE_ID 0x000400000BB41C00
 
 // leave empty for main
-#define REPO_BRANCH "2.0"
+#define REPO_BRANCH "2.1"
 
 // When making a release, uncomment this please thanks
 // #define IS_RELEASE
