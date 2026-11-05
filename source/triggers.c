@@ -17,6 +17,7 @@
 #include <string.h>
 
 #include "player/player.h"
+#include "player/trail.h"
 #include "state.h"
 
 #define LAUNCH_CAP 1080.f
@@ -1244,6 +1245,22 @@ void run_trigger(int obj, bool from_spawn) {
             toggle_group(trigger->target_group, trigger->activate_group);
             break;
         }
+        case HIDE_PLAYER_TRIGGER:
+            MotionTrail_StopStroke(&trail_p1);
+            MotionTrail_StopStroke(&trail_p2);
+            MotionTrail_Clear(&wave_trail_p1);
+            MotionTrail_Clear(&wave_trail_p2);
+            MotionTrail_StopStroke(&wave_trail_p1);
+            MotionTrail_StopStroke(&wave_trail_p2);
+            state.show_player = false;
+            break;
+        case SHOW_PLAYER_TRIGGER:
+            MotionTrail_ResumeStroke(&trail_p1);
+            MotionTrail_ResumeStroke(&trail_p2);
+            MotionTrail_ResumeStroke(&wave_trail_p1);
+            MotionTrail_ResumeStroke(&wave_trail_p2);
+            state.show_player = true;
+            break;
         default:
             return;
     }
@@ -1284,20 +1301,6 @@ bool object_can_be_x_moved(int obj) {
     return true;
 }
 
-bool is_position_trigger(int id) {
-    if (is_trigger_object(id)) return true;
-    switch (id) {
-        case ENABLE_TRAIL: case DISABLE_TRAIL:
-        case TRIGGER_FADE_SIMPLE: case TRIGGER_FADE_UP: case TRIGGER_FADE_DOWN:
-        case TRIGGER_FADE_RIGHT: case TRIGGER_FADE_LEFT:
-        case TRIGGER_FADE_SCALE_IN: case TRIGGER_FADE_SCALE_OUT:
-        case TRIGGER_FADE_INWARDS: case TRIGGER_FADE_OUTWARDS:
-        case TRIGGER_FADE_LEFT_SEMICIRCLE: case TRIGGER_FADE_RIGHT_SEMICIRCLE:
-            return true;
-        default: return false;
-    }
-}
-
 void handle_triggers(void) {
     trigger_count = 0;
     int cam_sx = (int)((state.player.x) / SECTION_SIZE);
@@ -1314,7 +1317,7 @@ void handle_triggers(void) {
             int count = cached ? list->count : sec->object_count;
             for (int i = 0; i < count; i++) {
                 int obj = sec->objects[cached ? list->indices[i] : i];
-                if (!cached && !is_position_trigger(objects.id[obj])) continue;
+                if (!cached && !is_trigger_object(objects.id[obj])) continue;
                 
                 if (!GET_ACTIVATED(obj)) {
                     if (objects.touch_triggered[obj]) {

@@ -112,7 +112,7 @@ Section *get_section(int x, int y) {
 static SectionTriggers uncached_section_triggers = { .count = -1 };
 
 static void append_section_trigger(Section *sec, int object_index) {
-    if (!is_position_trigger(objects.id[sec->objects[object_index]])) return;
+    if (!is_trigger_object(objects.id[sec->objects[object_index]])) return;
     SectionTriggers *list = sec->triggers;
     if (list && list->count < 0) return;
     if (!list || list->count == list->capacity) {
@@ -1141,7 +1141,7 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                 objects.id[object] = convert_object(val.i);
 
                 init_default_variables(object);
-                if (is_trigger_object(val.i) || val.i == 1594) {
+                if (is_complex_trigger_object(val.i) || val.i == 1594) {
                     // Allocate its data
                     trigger_index = allocate_trigger_component(object);
                     if (trigger_index < 0) {
@@ -1576,13 +1576,27 @@ bool is_color_trigger(int id) {
         || id == GROUND_2_TRIGGER;
 }
 
-bool is_trigger_object(int id) {
+bool is_complex_trigger_object(int id) {
     return is_color_trigger(id)
         || id == MOVE_TRIGGER
         || id == ALPHA_TRIGGER
         || id == TOGGLE_TRIGGER
         || id == PULSE_TRIGGER
         || id == SPAWN_TRIGGER;
+}
+bool is_trigger_object(int id) {
+    if (is_complex_trigger_object(id)) return true;
+    switch (id) {
+        case ENABLE_TRAIL: case DISABLE_TRAIL:
+        case TRIGGER_FADE_SIMPLE: case TRIGGER_FADE_UP: case TRIGGER_FADE_DOWN:
+        case TRIGGER_FADE_RIGHT: case TRIGGER_FADE_LEFT:
+        case TRIGGER_FADE_SCALE_IN: case TRIGGER_FADE_SCALE_OUT:
+        case TRIGGER_FADE_INWARDS: case TRIGGER_FADE_OUTWARDS:
+        case TRIGGER_FADE_LEFT_SEMICIRCLE: case TRIGGER_FADE_RIGHT_SEMICIRCLE:
+        case HIDE_PLAYER_TRIGGER: case SHOW_PLAYER_TRIGGER:
+            return true;
+        default: return false;
+    }
 }
 
 bool trigger_is_spawn_triggered(int id, int obj) {
@@ -2145,6 +2159,7 @@ int parse_string(char *levelString, int extra_slots, int *out_object_count) {
                 if (sectionIndex > 0) {
                     // Parse
                     if (!parse_gd_object(sectionStart, objectIndex)) {
+                        output_log("what %s\n", sectionStart);
                         output_log("Failed to parse object %d\n", objectIndex);
                         free_arrays();
                         return LOAD_COULDNT_PARSE_OBJECTS;

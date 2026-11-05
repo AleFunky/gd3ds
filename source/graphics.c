@@ -2100,16 +2100,18 @@ void draw_dash_booms(void) {
 
 void draw_player_effects() {
     change_blending(true);
-    for (int i = 0; i < 2; i++) {
-        drawParticleSystem(&drag_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&ship_fire_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&ship_secondary_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&secondary_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&burst_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&robot_fire_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&robot_fire_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&land_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&explosion_particles[i], 0, 0, 1.f);
+    if (state.show_player) {
+        for (int i = 0; i < 2; i++) {
+            drawParticleSystem(&drag_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&ship_fire_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&ship_secondary_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&secondary_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&burst_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&robot_fire_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&robot_fire_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&land_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&explosion_particles[i], 0, 0, 1.f);
+        }
     }
     drawParticleSystem(&brick_destroy_particles, 0, 0, 1.f);
     drawParticleSystem(&coin_pickup_particles, 0, 0, 1.f);
@@ -2150,21 +2152,25 @@ void draw_player_graphics() {
     change_blending(false);
     state.current_player = 0;
 
-    change_blending(true);
-    draw_dash_booms();
-    change_blending(false);
+    if (state.show_player) {
+        change_blending(true);
+        draw_dash_booms();
+        change_blending(false);
+    }
 
     draw_checkpoints();
-    draw_dash_fire(&state.player);
-    draw_player(&state.player);
-    
-    if (state.dual) {
-        state.current_player = 1;
-        draw_dash_fire(&state.player2);
-        draw_player(&state.player2);
-    }  
+    if (state.show_player) {
+        draw_dash_fire(&state.player);
+        draw_player(&state.player);
+        
+        if (state.dual) {
+            state.current_player = 1;
+            draw_dash_fire(&state.player2);
+            draw_player(&state.player2);
+        }  
+    }
 
-    draw_post_player_effects();
+    if (state.show_player) draw_post_player_effects();
 }
 
 void draw_objects() {

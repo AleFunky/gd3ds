@@ -66,7 +66,7 @@ static void clear_group_combinations(void) {
 static bool object_is_240hz(int object) {
     int id = objects.id[object];
 
-    return objects.touch_triggered[object] || is_position_trigger(id) || (is_valid_object(id) && game_objects[id].hitbox != NULL);
+    return objects.touch_triggered[object] || is_trigger_object(id) || (is_valid_object(id) && game_objects[id].hitbox != NULL);
 }
 
 static int collect_groups(int object, short *group_ids) {

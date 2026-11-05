@@ -283,6 +283,8 @@ void init_state() {
     state.current_data.coin3 = false;
     state.last_hitbox_trail = 0;
 
+    state.show_player = true;
+
     in_level_complete = false;
 
     cheated = false;
@@ -433,23 +435,25 @@ void handle_death(Player *player, bool pause_song) {
         }
     }
 
-    // Spawn death particles
-    UseEffect *effect = add_use_effect(player->x, player->y, USE_EFFECT_OBJ_NOTHING, &death_effect, get_use_effect_array_ptr(GFX_TOP));
-    if (effect) {
-        Color color_not_white = get_white_if_black((state.current_player == 1 ? p2_color : p1_color));
+    if (state.show_player) {
+        // Spawn death particles
+        UseEffect *effect = add_use_effect(player->x, player->y, USE_EFFECT_OBJ_NOTHING, &death_effect, get_use_effect_array_ptr(GFX_TOP));
+        if (effect) {
+            Color color_not_white = get_white_if_black((state.current_player == 1 ? p2_color : p1_color));
 
-        effect->def.colorR = color_not_white.r / 255.f;
-        effect->def.colorG = color_not_white.g / 255.f;
-        effect->def.colorB = color_not_white.b / 255.f;
+            effect->def.colorR = color_not_white.r / 255.f;
+            effect->def.colorG = color_not_white.g / 255.f;
+            effect->def.colorB = color_not_white.b / 255.f;
 
-        effect->def.end_rad *= (player->mini ? 0.6 : 1.0f);
-        effect->def.start_rad *= (player->mini ? 0.6 : 1.0f);
+            effect->def.end_rad *= (player->mini ? 0.6 : 1.0f);
+            effect->def.start_rad *= (player->mini ? 0.6 : 1.0f);
+        }
+
+        explosion_particles[state.current_player].emitterX = player->x;
+        explosion_particles[state.current_player].emitterY = player->y;
+        explosion_particles[state.current_player].scale = (player->mini ? 0.6 : 1.0f);
+        spawnMultipleParticles(&explosion_particles[state.current_player], 90);
     }
-
-    explosion_particles[state.current_player].emitterX = player->x;
-    explosion_particles[state.current_player].emitterY = player->y;
-    explosion_particles[state.current_player].scale = (player->mini ? 0.6 : 1.0f);
-    spawnMultipleParticles(&explosion_particles[state.current_player], 90);
 
     if (!state.practice_mode) start_shake(0.15f, 1.f);
     
