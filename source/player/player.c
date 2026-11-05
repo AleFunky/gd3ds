@@ -705,7 +705,7 @@ void clamp_player_ground(Player *player) {
 
     // Check for ground collision
     if (getGroundBottom(player) < state.ground_y && !player->just_teleported) {
-        if (player->ceiling_inv_time <= 0 && (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_ROBOT) && player->upside_down) {
+        if (player->ceiling_inv_time <= 0 && player->allow_head_hit_timer <= 0 && (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_ROBOT) && player->upside_down) {
             kill_player(DEATH_CEILING);
         }
 
@@ -720,7 +720,7 @@ void clamp_player_ground(Player *player) {
 
     // Check for ceiling collision
     if (getGroundTop(player) > state.ceiling_y && !player->just_teleported) {
-        if (player->ceiling_inv_time <= 0 && (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_ROBOT) && !player->upside_down) {
+        if (player->ceiling_inv_time <= 0 && player->allow_head_hit_timer <= 0 && (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_ROBOT) && !player->upside_down) {
             kill_player(DEATH_CEILING);
         }
 
@@ -882,6 +882,8 @@ void run_player(Player *player) {
     }
 
     if (player->allow_dart_slide_timer) player->allow_dart_slide_timer--;
+    if (player->allow_head_hit_timer) player->allow_head_hit_timer--;
+    if (player->no_auto_jump_timer && player->on_ground) player->no_auto_jump_timer--;
 
     // If player is on slope, do slope stuff
     if (player->slope_data.slope_id >= 0) {

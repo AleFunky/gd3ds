@@ -504,7 +504,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 0;
                 }
                 
-                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_pending) { player->holding_jump_cancelled = true; player->no_auto_jump_pending = false; }
+                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_timer > 0) { player->holding_jump_cancelled = true; }
                 SET_ACTIVATED(obj, true);
             } 
             break;
@@ -534,7 +534,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 255 / 255.f;
                 }
                 
-                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_pending) { player->holding_jump_cancelled = true; player->no_auto_jump_pending = false; }
+                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_timer > 0) { player->holding_jump_cancelled = true; }
                 SET_ACTIVATED(obj, true);
             } 
             break;
@@ -565,7 +565,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 0;
                 }
                 
-                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_pending) { player->holding_jump_cancelled = true; player->no_auto_jump_pending = false; }
+                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_timer > 0) { player->holding_jump_cancelled = true; }
                 SET_ACTIVATED(obj, true);
             } 
             break;
@@ -597,7 +597,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 255 / 255.f;
                 }
                 
-                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_pending) { player->holding_jump_cancelled = true; player->no_auto_jump_pending = false; }
+                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_timer > 0) { player->holding_jump_cancelled = true; }
                 SET_ACTIVATED(obj, true);
             } 
             break;
@@ -706,7 +706,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 255 / 255.f;
                 }
 
-                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_pending) { player->holding_jump_cancelled = true; player->no_auto_jump_pending = false; }
+                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_timer > 0) { player->holding_jump_cancelled = true; }
                 SET_ACTIVATED(obj, true);
             } 
             break;
@@ -747,7 +747,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 0;
                 }
 
-                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_pending) { player->holding_jump_cancelled = true; player->no_auto_jump_pending = false; }
+                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_timer > 0) { player->holding_jump_cancelled = true; }
                 SET_ACTIVATED(obj, true);
             } 
             break;
@@ -1428,10 +1428,11 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
 
         case J_MODIFIERBLOCK:
-            player->no_auto_jump_pending = true;
+            player->no_auto_jump_timer = 2;
             break;
 
-        case 1859:
+        case H_MODIFIERBLOCK:
+            player->allow_head_hit_timer = 2;
             break;
 
         case 1329:
@@ -1711,6 +1712,15 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                     brick_destroy_particles.emitterY = y;
                     spawnMultipleParticles(&brick_destroy_particles, 25);
                     objects.flags[obj] |= FLAG_TOGGLED;
+                } else if (player->allow_head_hit_timer > 0 && player->vel_y >= object_raw_vel &&
+                           (gravInternalBottom(player) <= obj_gravBottom(player, obj) ||
+                            (player->x >= obj_getLeft(obj) && player->x <= obj_getRight(obj))) &&
+                           (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_ROBOT)) {
+                    player->on_ceiling = true;
+                    player->inverse_rotation = false;
+                    player->time_since_ground = 0;
+                    player->y = grav(player, obj_gravBottom(player, obj)) - grav(player, player->height / 2);
+                    if (player->vel_y >= 0) player->vel_y = 0;
                 } else {
                     // Not a brick, die
                     kill_player(DEATH_BLOCK);

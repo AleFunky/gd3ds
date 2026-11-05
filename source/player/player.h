@@ -137,7 +137,8 @@ typedef struct {
 
     int slope_slide_coyote_time;
     int allow_dart_slide_timer;
-    bool no_auto_jump_pending;
+    int allow_head_hit_timer;
+    int no_auto_jump_timer;
 
     int frame;
 
