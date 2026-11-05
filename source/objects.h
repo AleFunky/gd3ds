@@ -6,7 +6,7 @@
 #define SPRITESHEET2_START 766
 #define SPRITESHEET3_START (SPRITESHEET2_START + 70)
 #define SPRITESHEET4_START (SPRITESHEET3_START + 601)
-#define ANIMATEDSHEET_START (SPRITESHEET4_START + 689)
+#define ANIMATEDSHEET_START (SPRITESHEET4_START + 670)
 
 typedef enum {
    COLLISION_NONE = 0,
@@ -94,7 +94,7 @@ typedef struct {
     const ObjectHitbox* hitbox;
 } GameObject;
 
-#define TEXTURE_COUNT 2443
+#define TEXTURE_COUNT 2472
 #define GAME_OBJECT_COUNT 1912
 
 extern const GameObject game_objects[GAME_OBJECT_COUNT];
