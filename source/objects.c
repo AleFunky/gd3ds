@@ -2627,11 +2627,11 @@ const ChildSprite children_904[] = {
 };
 
 const ChildSprite children_918[] = {
- { 2186, 0.00, -11.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_GLOW, 1.00 },
- { 2185, 0.00, -11.00, 1.00, 1.00, 0, 0, -2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2184, 0.00, 11.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_GLOW, 1.00 },
- { 2183, 0.00, 11.00, 1.00, 1.00, 0, 0, -2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2187, -3.00, 12.00, 1.00, 1.00, 0, 0, -2, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2187, 0.00, -11.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_GLOW, 1.00 },
+ { 2186, 0.00, -11.00, 1.00, 1.00, 0, 0, -2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2185, 0.00, 11.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_GLOW, 1.00 },
+ { 2184, 0.00, 11.00, 1.00, 1.00, 0, 0, -2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2188, -3.00, 12.00, 1.00, 1.00, 0, 0, -2, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildGroup groups_918[] = {
@@ -2640,9 +2640,9 @@ const ChildGroup groups_918[] = {
 };
 
 const ChildSprite children_919[] = {
- { 2197, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2198, 7.00, 7.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2198, -7.00, 7.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2198, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2199, 7.00, 7.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2199, -7.00, 7.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildGroup groups_919[] = {
@@ -2652,11 +2652,10 @@ const ChildGroup groups_919[] = {
 };
 
 const ChildSprite children_920[] = {
- { 2143, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2144, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_920[] = {
-    { 2152, 0, 0 },
     { 2153, 0, 0 },
     { 2154, 0, 0 },
     { 2155, 0, 0 },
@@ -2665,7 +2664,7 @@ const SwapFrame swap_frames_920[] = {
     { 2158, 0, 0 },
     { 2159, 0, 0 },
     { 2160, 0, 0 },
-    { 2143, 0, 0 },
+    { 2161, 0, 0 },
     { 2144, 0, 0 },
     { 2145, 0, 0 },
     { 2146, 0, 0 },
@@ -2674,6 +2673,7 @@ const SwapFrame swap_frames_920[] = {
     { 2149, 0, 0 },
     { 2150, 0, 0 },
     { 2151, 0, 0 },
+    { 2152, 0, 0 },
 };
 
 const SlotFrames slot_frames_920[] = {
@@ -2682,11 +2682,10 @@ const SlotFrames slot_frames_920[] = {
 };
 
 const ChildSprite children_921[] = {
- { 2164, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2165, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_921[] = {
-    { 2172, 0, 0 },
     { 2173, 0, 0 },
     { 2174, 0, 0 },
     { 2175, 0, 0 },
@@ -2695,7 +2694,7 @@ const SwapFrame swap_frames_921[] = {
     { 2178, 0, 0 },
     { 2179, 0, 0 },
     { 2180, 0, 0 },
-    { 2161, 0, 0 },
+    { 2181, 0, 0 },
     { 2162, 0, 0 },
     { 2163, 0, 0 },
     { 2164, 0, 0 },
@@ -2704,6 +2703,7 @@ const SwapFrame swap_frames_921[] = {
     { 2167, 0, 0 },
     { 2168, 0, 0 },
     { 2169, 0, 0 },
+    { 2170, 0, 0 },
 };
 
 const SlotFrames slot_frames_921[] = {
@@ -2712,11 +2712,10 @@ const SlotFrames slot_frames_921[] = {
 };
 
 const ChildSprite children_923[] = {
- { 2107, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2108, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_923[] = {
-    { 2116, 0, 0 },
     { 2117, 0, 0 },
     { 2118, 0, 0 },
     { 2119, 0, 0 },
@@ -2725,7 +2724,7 @@ const SwapFrame swap_frames_923[] = {
     { 2122, 0, 0 },
     { 2123, 0, 0 },
     { 2124, 0, 0 },
-    { 2107, 0, 0 },
+    { 2125, 0, 0 },
     { 2108, 0, 0 },
     { 2109, 0, 0 },
     { 2110, 0, 0 },
@@ -2734,6 +2733,7 @@ const SwapFrame swap_frames_923[] = {
     { 2113, 0, 0 },
     { 2114, 0, 0 },
     { 2115, 0, 0 },
+    { 2116, 0, 0 },
 };
 
 const SlotFrames slot_frames_923[] = {
@@ -2742,11 +2742,10 @@ const SlotFrames slot_frames_923[] = {
 };
 
 const ChildSprite children_924[] = {
- { 2125, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2126, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_924[] = {
-    { 2134, 0, 0 },
     { 2135, 0, 0 },
     { 2136, 0, 0 },
     { 2137, 0, 0 },
@@ -2755,7 +2754,7 @@ const SwapFrame swap_frames_924[] = {
     { 2140, 0, 0 },
     { 2141, 0, 0 },
     { 2142, 0, 0 },
-    { 2125, 0, 0 },
+    { 2143, 0, 0 },
     { 2126, 0, 0 },
     { 2127, 0, 0 },
     { 2128, 0, 0 },
@@ -2764,6 +2763,7 @@ const SwapFrame swap_frames_924[] = {
     { 2131, 0, 0 },
     { 2132, 0, 0 },
     { 2133, 0, 0 },
+    { 2134, 0, 0 },
 };
 
 const SlotFrames slot_frames_924[] = {
@@ -3074,15 +3074,15 @@ const ChildSprite children_1040[] = {
 
 const SwapFrame swap_frames_1050[] = {
     { 140, 0, 0 },
-    { 2234, 0, 0 },
     { 2235, 0, 0 },
-    { 2235, 1, 0 },
-    { 2234, 1, 0 },
     { 2236, 0, 0 },
+    { 2236, 1, 0 },
+    { 2235, 1, 0 },
     { 2237, 0, 0 },
     { 2238, 0, 0 },
+    { 2239, 0, 0 },
+    { 2239, 1, 0 },
     { 2238, 1, 0 },
-    { 2237, 1, 0 },
 };
 
 const SlotFrames slot_frames_1050[] = {
@@ -3091,15 +3091,15 @@ const SlotFrames slot_frames_1050[] = {
 
 const SwapFrame swap_frames_1051[] = {
     { 141, 0, 0 },
-    { 2240, 0, 0 },
     { 2241, 0, 0 },
     { 2242, 0, 0 },
     { 2243, 0, 0 },
     { 2244, 0, 0 },
+    { 2245, 0, 0 },
+    { 2244, 1, 0 },
     { 2243, 1, 0 },
     { 2242, 1, 0 },
     { 2241, 1, 0 },
-    { 2240, 1, 0 },
 };
 
 const SlotFrames slot_frames_1051[] = {
@@ -3108,15 +3108,15 @@ const SlotFrames slot_frames_1051[] = {
 
 const SwapFrame swap_frames_1052[] = {
     { 142, 0, 0 },
-    { 2246, 0, 0 },
     { 2247, 0, 0 },
     { 2248, 0, 0 },
     { 2249, 0, 0 },
     { 2250, 0, 0 },
+    { 2251, 0, 0 },
+    { 2250, 1, 0 },
     { 2249, 1, 0 },
     { 2248, 1, 0 },
     { 2247, 1, 0 },
-    { 2246, 1, 0 },
 };
 
 const SlotFrames slot_frames_1052[] = {
@@ -3124,11 +3124,10 @@ const SlotFrames slot_frames_1052[] = {
 };
 
 const ChildSprite children_1053[] = {
- { 2205, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2206, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1053[] = {
-    { 2199, 0, 0 },
     { 2200, 0, 0 },
     { 2201, 0, 0 },
     { 2202, 0, 0 },
@@ -3140,6 +3139,7 @@ const SwapFrame swap_frames_1053[] = {
     { 2208, 0, 0 },
     { 2209, 0, 0 },
     { 2210, 0, 0 },
+    { 2211, 0, 0 },
 };
 
 const SlotFrames slot_frames_1053[] = {
@@ -3148,11 +3148,10 @@ const SlotFrames slot_frames_1053[] = {
 };
 
 const ChildSprite children_1054[] = {
- { 2218, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2219, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1054[] = {
-    { 2211, 0, 0 },
     { 2212, 0, 0 },
     { 2213, 0, 0 },
     { 2214, 0, 0 },
@@ -3166,6 +3165,7 @@ const SwapFrame swap_frames_1054[] = {
     { 2222, 0, 0 },
     { 2223, 0, 0 },
     { 2224, 0, 0 },
+    { 2225, 0, 0 },
 };
 
 const SlotFrames slot_frames_1054[] = {
@@ -3820,9 +3820,9 @@ const ChildSprite children_1326[] = {
 };
 
 const ChildSprite children_1327[] = {
- { 2190, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2189, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_GLOW, 1.00 },
- { 2188, 0.00, 0.00, 1.00, 1.00, 0, 0, -2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2191, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2190, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_GLOW, 1.00 },
+ { 2189, 0.00, 0.00, 1.00, 1.00, 0, 0, -2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildGroup groups_1327[] = {
@@ -3831,9 +3831,9 @@ const ChildGroup groups_1327[] = {
 };
 
 const ChildSprite children_1328[] = {
- { 2195, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_GLOW, 1.00 },
- { 2194, 0.00, 0.00, 1.00, 1.00, 0, 0, -2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2196, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2196, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_GLOW, 1.00 },
+ { 2195, 0.00, 0.00, 1.00, 1.00, 0, 0, -2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2197, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildGroup groups_1328[] = {
@@ -3842,19 +3842,19 @@ const ChildGroup groups_1328[] = {
 };
 
 const ChildSprite children_1341[] = {
- { 1841, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 45.00, COLOR_TYPE_BASE, 1.00 },
+ { 1841, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1342[] = {
- { 1842, 0.45, -0.89, 1.00, 1.00, 0, 0, -1, 0, 26.50, COLOR_TYPE_BASE, 1.00 },
+ { 1842, 0.00, -1.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1344[] = {
- { 1844, -0.71, -2.12, 1.00, 1.00, 0, 0, -1, 0, 45.00, COLOR_TYPE_BASE, 1.00 },
+ { 1844, -2.00, -1.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1345[] = {
- { 1845, -2.24, -2.23, 1.00, 1.00, 0, 0, -1, 0, 26.50, COLOR_TYPE_BASE, 1.00 },
+ { 1845, -3.00, -1.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1348[] = {
@@ -4094,12 +4094,11 @@ const ChildSprite children_1515[] = {
 };
 
 const ChildSprite children_1516[] = {
- { 2521, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2531, 0.00, -6.00, 2.00, 2.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2522, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2532, 0.00, -6.00, 2.00, 2.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1516[] = {
-    { 2521, 0, 0 },
     { 2522, 0, 0 },
     { 2523, 0, 0 },
     { 2524, 0, 0 },
@@ -4119,6 +4118,7 @@ const SwapFrame swap_frames_1516[] = {
     { 2538, 0, 0 },
     { 2539, 0, 0 },
     { 2540, 0, 0 },
+    { 2541, 0, 0 },
 };
 
 const SlotFrames slot_frames_1516[] = {
@@ -4127,26 +4127,26 @@ const SlotFrames slot_frames_1516[] = {
 };
 
 const ChildSprite children_1517[] = {
- { 2537, 0.00, 3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2538, 0.00, 3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1518[] = {
- { 2515, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2516, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1518[] = {
-    { 2515, 0, 0 },
     { 2516, 0, 0 },
     { 2517, 0, 0 },
     { 2518, 0, 0 },
     { 2519, 0, 0 },
     { 2520, 0, 0 },
-    { 2515, 0, 0 },
+    { 2521, 0, 0 },
     { 2516, 0, 0 },
     { 2517, 0, 0 },
     { 2518, 0, 0 },
     { 2519, 0, 0 },
     { 2520, 0, 0 },
+    { 2521, 0, 0 },
 };
 
 const SlotFrames slot_frames_1518[] = {
@@ -4155,7 +4155,6 @@ const SlotFrames slot_frames_1518[] = {
 };
 
 const SwapFrame swap_frames_1519[] = {
-    { 2507, 0, 0 },
     { 2508, 0, 0 },
     { 2509, 0, 0 },
     { 2510, 0, 0 },
@@ -4163,9 +4162,10 @@ const SwapFrame swap_frames_1519[] = {
     { 2512, 0, 0 },
     { 2513, 0, 0 },
     { 2514, 0, 0 },
-    { 2504, 0, 0 },
+    { 2515, 0, 0 },
     { 2505, 0, 0 },
     { 2506, 0, 0 },
+    { 2507, 0, 0 },
 };
 
 const SlotFrames slot_frames_1519[] = {
@@ -4173,7 +4173,7 @@ const SlotFrames slot_frames_1519[] = {
 };
 
 const ChildSprite children_1529[] = {
- { 1972, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1973, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1531[] = {
@@ -4181,11 +4181,11 @@ const ChildSprite children_1531[] = {
 };
 
 const ChildSprite children_1532[] = {
- { 1973, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1974, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1533[] = {
- { 1974, 2.50, 2.50, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1975, 2.50, 2.50, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1534[] = {
@@ -4197,19 +4197,19 @@ const ChildSprite children_1535[] = {
 };
 
 const ChildSprite children_1536[] = {
- { 1975, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
-};
-
-const ChildSprite children_1537[] = {
  { 1976, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_1538[] = {
+const ChildSprite children_1537[] = {
  { 1977, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_1539[] = {
+const ChildSprite children_1538[] = {
  { 1978, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
+const ChildSprite children_1539[] = {
+ { 1979, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1540[] = {
@@ -4217,48 +4217,48 @@ const ChildSprite children_1540[] = {
 };
 
 const ChildSprite children_1552[] = {
- { 1979, 3.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1980, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1980, 3.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1981, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1553[] = {
- { 1981, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1982, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1982, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1983, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1554[] = {
- { 1983, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1984, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
  { 1876, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1555[] = {
- { 1984, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1985, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1985, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1986, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1556[] = {
- { 1986, 2.50, 2.50, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1987, 2.50, 2.50, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1987, 2.50, 2.50, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1988, 2.50, 2.50, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1557[] = {
- { 1988, 0.00, 3.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1989, 0.00, 3.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
  { 1882, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1558[] = {
- { 1989, 3.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1990, 3.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
  { 1880, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1559[] = {
- { 1990, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1991, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1991, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1992, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1560[] = {
- { 1992, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1993, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1993, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1994, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1582[] = {
@@ -4274,11 +4274,10 @@ const ChildSprite children_1586[] = {
 };
 
 const ChildSprite children_1591[] = {
- { 2492, 0.00, -3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2493, 0.00, -3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1591[] = {
-    { 2484, 0, 0 },
     { 2485, 0, 0 },
     { 2486, 0, 0 },
     { 2487, 0, 0 },
@@ -4294,6 +4293,7 @@ const SwapFrame swap_frames_1591[] = {
     { 2497, 0, 0 },
     { 2498, 0, 0 },
     { 2499, 0, 0 },
+    { 2500, 0, 0 },
 };
 
 const SlotFrames slot_frames_1591[] = {
@@ -4302,11 +4302,10 @@ const SlotFrames slot_frames_1591[] = {
 };
 
 const ChildSprite children_1592[] = {
- { 1994, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1995, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1592[] = {
-    { 2225, 0, 0 },
     { 2226, 0, 0 },
     { 2227, 0, 0 },
     { 2228, 0, 0 },
@@ -4314,7 +4313,7 @@ const SwapFrame swap_frames_1592[] = {
     { 2230, 0, 0 },
     { 2231, 0, 0 },
     { 2232, 0, 0 },
-    { 2225, 0, 0 },
+    { 2233, 0, 0 },
     { 2226, 0, 0 },
     { 2227, 0, 0 },
     { 2228, 0, 0 },
@@ -4322,6 +4321,7 @@ const SwapFrame swap_frames_1592[] = {
     { 2230, 0, 0 },
     { 2231, 0, 0 },
     { 2232, 0, 0 },
+    { 2233, 0, 0 },
 };
 
 const SlotFrames slot_frames_1592[] = {
@@ -4330,11 +4330,10 @@ const SlotFrames slot_frames_1592[] = {
 };
 
 const ChildSprite children_1593[] = {
- { 2492, 0.00, -3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2493, 0.00, -3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1593[] = {
-    { 2484, 0, 0 },
     { 2485, 0, 0 },
     { 2486, 0, 0 },
     { 2487, 0, 0 },
@@ -4350,6 +4349,7 @@ const SwapFrame swap_frames_1593[] = {
     { 2497, 0, 0 },
     { 2498, 0, 0 },
     { 2499, 0, 0 },
+    { 2500, 0, 0 },
 };
 
 const SlotFrames slot_frames_1593[] = {
@@ -4357,8 +4357,12 @@ const SlotFrames slot_frames_1593[] = {
     { 1, 12, 8, 8 },
 };
 
+const ChildSprite children_1594[] = {
+ { 1967, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_1600[] = {
- { 1995, -0.25, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1996, -0.25, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1601[] = {
@@ -4366,10 +4370,10 @@ const ChildSprite children_1601[] = {
 };
 
 const SwapFrame swap_frames_1614[] = {
-    { 2500, 0, 0 },
     { 2501, 0, 0 },
     { 2502, 0, 0 },
     { 2503, 0, 0 },
+    { 2504, 0, 0 },
 };
 
 const SlotFrames slot_frames_1614[] = {
@@ -4381,13 +4385,13 @@ const ChildSprite children_1617[] = {
 };
 
 const SwapFrame swap_frames_1618[] = {
-    { 2265, 0, 0 },
     { 2266, 0, 0 },
     { 2267, 0, 0 },
     { 2268, 0, 0 },
     { 2269, 0, 0 },
     { 2270, 0, 0 },
     { 2271, 0, 0 },
+    { 2272, 0, 0 },
 };
 
 const SlotFrames slot_frames_1618[] = {
@@ -4395,12 +4399,12 @@ const SlotFrames slot_frames_1618[] = {
 };
 
 const ChildSprite children_1619[] = {
- { 1996, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1967, 12.00, -18.00, 1.00, 1.00, 1, 1, 2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1997, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1968, 12.00, -18.00, 1.00, 1.00, 1, 1, 2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1620[] = {
- { 1970, -3.00, 9.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1971, -3.00, 9.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1621[] = {
@@ -4468,76 +4472,76 @@ const ChildSprite children_1650[] = {
 };
 
 const ChildSprite children_1685[] = {
- { 1997, -4.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1998, -4.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1998, -4.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1999, -4.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1686[] = {
- { 1999, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2000, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2000, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2001, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1687[] = {
- { 2001, -4.00, 4.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2002, -4.00, 4.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2002, -4.00, 4.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2003, -4.00, 4.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1688[] = {
- { 2003, 0.00, 4.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2004, 0.00, 4.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2004, 0.00, 4.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2005, 0.00, 4.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1689[] = {
- { 2005, 0.00, 4.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2006, 0.00, 4.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2006, 0.00, 4.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2007, 0.00, 4.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1690[] = {
- { 2007, -4.00, 4.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2008, -4.00, 4.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2008, -4.00, 4.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2009, -4.00, 4.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1691[] = {
- { 2009, 0.00, 4.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2010, 0.00, 4.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2010, 0.00, 4.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2011, 0.00, 4.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1692[] = {
- { 2011, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2012, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2012, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2013, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1693[] = {
- { 2013, 0.00, 4.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2014, 0.00, 4.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2014, 0.00, 4.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2015, 0.00, 4.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1694[] = {
- { 2015, 0.00, 4.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2016, 0.00, 4.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2016, 0.00, 4.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2017, 0.00, 4.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1695[] = {
- { 2017, 0.00, 4.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2018, 0.00, 4.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2018, 0.00, 4.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2019, 0.00, 4.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1696[] = {
- { 2019, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2020, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2020, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2021, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1697[] = {
- { 2254, 0.00, -1.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2255, 0.00, -1.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1697[] = {
-    { 2251, 0, 0 },
     { 2252, 0, 0 },
     { 2253, 0, 0 },
     { 2254, 0, 0 },
     { 2255, 0, 0 },
     { 2256, 0, 0 },
+    { 2257, 0, 0 },
 };
 
 const SlotFrames slot_frames_1697[] = {
@@ -4546,14 +4550,14 @@ const SlotFrames slot_frames_1697[] = {
 };
 
 const ChildSprite children_1698[] = {
- { 2259, 3.00, -4.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2260, 3.00, -4.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1698[] = {
-    { 2257, 0, 0 },
     { 2258, 0, 0 },
     { 2259, 0, 0 },
     { 2260, 0, 0 },
+    { 2261, 0, 0 },
 };
 
 const SlotFrames slot_frames_1698[] = {
@@ -4562,14 +4566,14 @@ const SlotFrames slot_frames_1698[] = {
 };
 
 const ChildSprite children_1699[] = {
- { 2263, 1.00, -5.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2264, 1.00, -5.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1699[] = {
-    { 2261, 0, 0 },
     { 2262, 0, 0 },
     { 2263, 0, 0 },
     { 2264, 0, 0 },
+    { 2265, 0, 0 },
 };
 
 const SlotFrames slot_frames_1699[] = {
@@ -4582,17 +4586,17 @@ const ChildSprite children_1700[] = {
 };
 
 const ChildSprite children_1701[] = {
- { 2021, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2022, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
  { 1438, 9.00, 0.00, 1.00, 1.00, 1, 0, 2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1702[] = {
- { 2022, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2023, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
  { 1440, 7.00, 0.00, 1.00, 1.00, 1, 0, 2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1703[] = {
- { 2023, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2024, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
  { 1442, 6.00, 1.00, 1.00, 1.00, 1, 0, 2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
@@ -4602,7 +4606,7 @@ const ChildSprite children_1705[] = {
 
 const ChildSprite children_1708[] = {
  { 1811, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2024, -0.09, 0.09, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2025, -0.09, 0.09, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1709[] = {
@@ -4630,8 +4634,8 @@ const ChildSprite children_1724[] = {
 };
 
 const ChildSprite children_1734[] = {
- { 2025, -0.09, 0.09, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2026, -0.09, 0.09, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2026, -0.09, 0.09, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2027, -0.09, 0.09, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1735[] = {
@@ -4643,35 +4647,35 @@ const ChildSprite children_1736[] = {
 };
 
 const ChildSprite children_1743[] = {
- { 1738, 0.00, 0.00, 1.00, 1.00, 0, 0, 2, 0, 45.00, COLOR_TYPE_BASE, 1.00 },
+ { 1738, 0.00, 0.00, 1.00, 1.00, 0, 0, 2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1744[] = {
- { 1740, 0.00, 0.00, 1.00, 1.00, 0, 0, 2, 0, 26.50, COLOR_TYPE_BASE, 1.00 },
+ { 1740, 0.00, 0.00, 1.00, 1.00, 0, 0, 2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1745[] = {
- { 1738, 0.00, 0.00, 1.00, 1.00, 0, 0, 2, 0, 45.00, COLOR_TYPE_BASE, 1.00 },
+ { 1738, 0.00, 0.00, 1.00, 1.00, 0, 0, 2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1746[] = {
- { 1740, 0.00, 0.00, 1.00, 1.00, 0, 0, 2, 0, 26.50, COLOR_TYPE_BASE, 1.00 },
+ { 1740, 0.00, 0.00, 1.00, 1.00, 0, 0, 2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1747[] = {
- { 1738, 0.00, 0.00, 1.00, 1.00, 0, 0, 2, 0, 45.00, COLOR_TYPE_BASE, 1.00 },
+ { 1738, 0.00, 0.00, 1.00, 1.00, 0, 0, 2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1748[] = {
- { 1740, 0.00, 0.00, 1.00, 1.00, 0, 0, 2, 0, 26.50, COLOR_TYPE_BASE, 1.00 },
+ { 1740, 0.00, 0.00, 1.00, 1.00, 0, 0, 2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1749[] = {
- { 1738, 0.00, 0.00, 1.00, 1.00, 0, 0, 2, 0, 45.00, COLOR_TYPE_BASE, 1.00 },
+ { 1738, 0.00, 0.00, 1.00, 1.00, 0, 0, 2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1750[] = {
- { 1740, 0.00, 0.00, 1.00, 1.00, 0, 0, 2, 0, 26.50, COLOR_TYPE_BASE, 1.00 },
+ { 1740, 0.00, 0.00, 1.00, 1.00, 0, 0, 2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1758[] = {
@@ -4699,147 +4703,147 @@ const ChildSprite children_1763[] = {
 };
 
 const ChildSprite children_1773[] = {
- { 2027, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2028, 15.00, -2.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2028, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2029, 15.00, -2.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1774[] = {
- { 2029, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2030, 18.00, -3.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2030, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2031, 18.00, -3.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1775[] = {
- { 2031, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2032, -15.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2032, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2033, -15.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1776[] = {
- { 2033, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2034, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1781[] = {
- { 2096, -2.00, 1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2097, -2.00, 1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1782[] = {
- { 2097, -2.00, -2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2098, -2.00, -2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1783[] = {
- { 2098, 1.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2099, 1.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1784[] = {
- { 2099, -2.00, 2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2100, -2.00, 2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1785[] = {
- { 2034, -0.75, -2.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2035, -0.75, -2.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1786[] = {
- { 2035, 0.25, 1.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2036, 0.25, 1.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1787[] = {
- { 2036, -0.75, -2.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2037, -0.75, -2.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1788[] = {
- { 2037, 0.25, 1.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2038, 0.25, 1.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1789[] = {
- { 2038, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2039, 5.50, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2039, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2040, 5.50, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1790[] = {
- { 2040, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2041, -1.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2041, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2042, -1.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1791[] = {
- { 2042, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2043, 2.25, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2043, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2044, 2.25, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1792[] = {
- { 2044, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2045, -1.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2045, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2046, -1.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1793[] = {
- { 2100, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1794[] = {
- { 2046, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2047, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1796[] = {
- { 2048, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2049, 14.00, 1.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1797[] = {
- { 2050, 0.00, -4.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2051, 4.25, -8.25, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
-};
-
-const ChildSprite children_1799[] = {
  { 2101, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1800[] = {
- { 2052, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2053, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+const ChildSprite children_1794[] = {
+ { 2047, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2048, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1801[] = {
+const ChildSprite children_1796[] = {
+ { 2049, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2050, 14.00, 1.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1797[] = {
+ { 2051, 0.00, -4.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2052, 4.25, -8.25, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
+const ChildSprite children_1799[] = {
  { 2102, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1802[] = {
- { 2054, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2055, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+const ChildSprite children_1800[] = {
+ { 2053, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2054, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1803[] = {
+const ChildSprite children_1801[] = {
  { 2103, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1804[] = {
- { 2056, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2057, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+const ChildSprite children_1802[] = {
+ { 2055, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2056, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1805[] = {
+const ChildSprite children_1803[] = {
  { 2104, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_1804[] = {
+ { 2057, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2058, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1805[] = {
+ { 2105, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_1806[] = {
- { 2058, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2059, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2059, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2060, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1807[] = {
- { 2105, -1.00, 1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2106, -1.00, 1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1808[] = {
- { 2060, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2061, -0.25, 1.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2061, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2062, -0.25, 1.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1809[] = {
- { 2106, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2107, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1810[] = {
- { 2062, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2063, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2063, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2064, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1831[] = {
@@ -4859,19 +4863,19 @@ const ChildSprite children_1834[] = {
 };
 
 const ChildSprite children_1839[] = {
- { 2064, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1840[] = {
  { 2065, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1841[] = {
+const ChildSprite children_1840[] = {
  { 2066, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1842[] = {
+const ChildSprite children_1841[] = {
  { 2067, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1842[] = {
+ { 2068, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1843[] = {
@@ -4879,11 +4883,10 @@ const ChildSprite children_1843[] = {
 };
 
 const ChildSprite children_1849[] = {
- { 2468, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2469, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1849[] = {
-    { 2462, 0, 0 },
     { 2463, 0, 0 },
     { 2464, 0, 0 },
     { 2465, 0, 0 },
@@ -4895,6 +4898,7 @@ const SwapFrame swap_frames_1849[] = {
     { 2471, 0, 0 },
     { 2472, 0, 0 },
     { 2473, 0, 0 },
+    { 2474, 0, 0 },
 };
 
 const SlotFrames slot_frames_1849[] = {
@@ -4903,11 +4907,10 @@ const SlotFrames slot_frames_1849[] = {
 };
 
 const ChildSprite children_1850[] = {
- { 2479, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2480, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1850[] = {
-    { 2474, 0, 0 },
     { 2475, 0, 0 },
     { 2476, 0, 0 },
     { 2477, 0, 0 },
@@ -4917,6 +4920,7 @@ const SwapFrame swap_frames_1850[] = {
     { 2481, 0, 0 },
     { 2482, 0, 0 },
     { 2483, 0, 0 },
+    { 2484, 0, 0 },
 };
 
 const SlotFrames slot_frames_1850[] = {
@@ -4925,11 +4929,10 @@ const SlotFrames slot_frames_1850[] = {
 };
 
 const ChildSprite children_1851[] = {
- { 2310, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2311, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1851[] = {
-    { 2302, 0, 0 },
     { 2303, 0, 0 },
     { 2304, 0, 0 },
     { 2305, 0, 0 },
@@ -4945,6 +4948,7 @@ const SwapFrame swap_frames_1851[] = {
     { 2315, 0, 0 },
     { 2316, 0, 0 },
     { 2317, 0, 0 },
+    { 2318, 0, 0 },
 };
 
 const SlotFrames slot_frames_1851[] = {
@@ -4953,26 +4957,26 @@ const SlotFrames slot_frames_1851[] = {
 };
 
 const ChildSprite children_1852[] = {
- { 2330, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2331, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1852[] = {
-    { 2322, 0, 0 },
     { 2323, 0, 0 },
     { 2324, 0, 0 },
     { 2325, 0, 0 },
-    { 2318, 0, 0 },
+    { 2326, 0, 0 },
     { 2319, 0, 0 },
     { 2320, 0, 0 },
     { 2321, 0, 0 },
-    { 2330, 0, 0 },
+    { 2322, 0, 0 },
     { 2331, 0, 0 },
     { 2332, 0, 0 },
     { 2333, 0, 0 },
-    { 2326, 0, 0 },
+    { 2334, 0, 0 },
     { 2327, 0, 0 },
     { 2328, 0, 0 },
     { 2329, 0, 0 },
+    { 2330, 0, 0 },
 };
 
 const SlotFrames slot_frames_1852[] = {
@@ -4981,11 +4985,10 @@ const SlotFrames slot_frames_1852[] = {
 };
 
 const ChildSprite children_1853[] = {
- { 2342, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2343, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1853[] = {
-    { 2334, 0, 0 },
     { 2335, 0, 0 },
     { 2336, 0, 0 },
     { 2337, 0, 0 },
@@ -5001,6 +5004,7 @@ const SwapFrame swap_frames_1853[] = {
     { 2347, 0, 0 },
     { 2348, 0, 0 },
     { 2349, 0, 0 },
+    { 2350, 0, 0 },
 };
 
 const SlotFrames slot_frames_1853[] = {
@@ -5009,11 +5013,10 @@ const SlotFrames slot_frames_1853[] = {
 };
 
 const ChildSprite children_1854[] = {
- { 2366, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2367, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1854[] = {
-    { 2352, 0, 0 },
     { 2353, 0, 0 },
     { 2354, 0, 0 },
     { 2355, 0, 0 },
@@ -5025,9 +5028,9 @@ const SwapFrame swap_frames_1854[] = {
     { 2361, 0, 0 },
     { 2362, 0, 0 },
     { 2363, 0, 0 },
-    { 2350, 0, 0 },
+    { 2364, 0, 0 },
     { 2351, 0, 0 },
-    { 2366, 0, 0 },
+    { 2352, 0, 0 },
     { 2367, 0, 0 },
     { 2368, 0, 0 },
     { 2369, 0, 0 },
@@ -5039,8 +5042,9 @@ const SwapFrame swap_frames_1854[] = {
     { 2375, 0, 0 },
     { 2376, 0, 0 },
     { 2377, 0, 0 },
-    { 2364, 0, 0 },
+    { 2378, 0, 0 },
     { 2365, 0, 0 },
+    { 2366, 0, 0 },
 };
 
 const SlotFrames slot_frames_1854[] = {
@@ -5049,12 +5053,11 @@ const SlotFrames slot_frames_1854[] = {
 };
 
 const ChildSprite children_1855[] = {
- { 2271, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2068, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2272, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2069, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1855[] = {
-    { 2378, 0, 0 },
     { 2379, 0, 0 },
     { 2380, 0, 0 },
     { 2381, 0, 0 },
@@ -5086,6 +5089,7 @@ const SwapFrame swap_frames_1855[] = {
     { 2407, 0, 0 },
     { 2408, 0, 0 },
     { 2409, 0, 0 },
+    { 2410, 0, 0 },
 };
 
 const SlotFrames slot_frames_1855[] = {
@@ -5094,11 +5098,10 @@ const SlotFrames slot_frames_1855[] = {
 };
 
 const ChildSprite children_1856[] = {
- { 2291, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2292, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1856[] = {
-    { 2276, 0, 0 },
     { 2277, 0, 0 },
     { 2278, 0, 0 },
     { 2279, 0, 0 },
@@ -5109,11 +5112,11 @@ const SwapFrame swap_frames_1856[] = {
     { 2284, 0, 0 },
     { 2285, 0, 0 },
     { 2286, 0, 0 },
-    { 2272, 0, 0 },
+    { 2287, 0, 0 },
     { 2273, 0, 0 },
     { 2274, 0, 0 },
     { 2275, 0, 0 },
-    { 2291, 0, 0 },
+    { 2276, 0, 0 },
     { 2292, 0, 0 },
     { 2293, 0, 0 },
     { 2294, 0, 0 },
@@ -5124,10 +5127,11 @@ const SwapFrame swap_frames_1856[] = {
     { 2299, 0, 0 },
     { 2300, 0, 0 },
     { 2301, 0, 0 },
-    { 2287, 0, 0 },
+    { 2302, 0, 0 },
     { 2288, 0, 0 },
     { 2289, 0, 0 },
     { 2290, 0, 0 },
+    { 2291, 0, 0 },
 };
 
 const SlotFrames slot_frames_1856[] = {
@@ -5136,16 +5140,16 @@ const SlotFrames slot_frames_1856[] = {
 };
 
 const ChildSprite children_1857[] = {
- { 2437, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2438, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1857[] = {
-    { 2434, 0, 0 },
     { 2435, 0, 0 },
     { 2436, 0, 0 },
     { 2437, 0, 0 },
     { 2438, 0, 0 },
     { 2439, 0, 0 },
+    { 2440, 0, 0 },
 };
 
 const SlotFrames slot_frames_1857[] = {
@@ -5154,11 +5158,10 @@ const SlotFrames slot_frames_1857[] = {
 };
 
 const ChildSprite children_1858[] = {
- { 2069, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2070, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1858[] = {
-    { 2410, 0, 0 },
     { 2411, 0, 0 },
     { 2412, 0, 0 },
     { 2413, 0, 0 },
@@ -5182,6 +5185,7 @@ const SwapFrame swap_frames_1858[] = {
     { 2431, 0, 0 },
     { 2432, 0, 0 },
     { 2433, 0, 0 },
+    { 2434, 0, 0 },
 };
 
 const SlotFrames slot_frames_1858[] = {
@@ -5191,11 +5195,10 @@ const SlotFrames slot_frames_1858[] = {
 };
 
 const ChildSprite children_1860[] = {
- { 2454, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2455, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1860[] = {
-    { 2443, 0, 0 },
     { 2444, 0, 0 },
     { 2445, 0, 0 },
     { 2446, 0, 0 },
@@ -5203,10 +5206,10 @@ const SwapFrame swap_frames_1860[] = {
     { 2448, 0, 0 },
     { 2449, 0, 0 },
     { 2450, 0, 0 },
-    { 2440, 0, 0 },
+    { 2451, 0, 0 },
     { 2441, 0, 0 },
     { 2442, 0, 0 },
-    { 2454, 0, 0 },
+    { 2443, 0, 0 },
     { 2455, 0, 0 },
     { 2456, 0, 0 },
     { 2457, 0, 0 },
@@ -5214,9 +5217,10 @@ const SwapFrame swap_frames_1860[] = {
     { 2459, 0, 0 },
     { 2460, 0, 0 },
     { 2461, 0, 0 },
-    { 2451, 0, 0 },
+    { 2462, 0, 0 },
     { 2452, 0, 0 },
     { 2453, 0, 0 },
+    { 2454, 0, 0 },
 };
 
 const SlotFrames slot_frames_1860[] = {
@@ -5325,15 +5329,15 @@ const ChildSprite children_1885[] = {
 };
 
 const ChildSprite children_1886[] = {
- { 2070, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1887[] = {
  { 2071, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1888[] = {
+const ChildSprite children_1887[] = {
  { 2072, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1888[] = {
+ { 2073, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1899[] = {
@@ -5357,12 +5361,12 @@ const ChildSprite children_1905[] = {
 };
 
 const ChildSprite children_1906[] = {
- { 2073, 0.00, 0.00, 1.00, 1.00, 0, 0, -102, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2074, 0.00, 0.00, 1.00, 1.00, 0, 0, -102, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
  { 618, 0.00, 0.00, 1.00, 1.00, 0, 0, 10, 0, 45.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1907[] = {
- { 2074, 0.00, 0.00, 1.00, 1.00, 0, 0, -102, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2075, 0.00, 0.00, 1.00, 1.00, 0, 0, -102, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
  { 620, 0.00, 0.00, 1.00, 1.00, 0, 0, 10, 0, 26.57, COLOR_TYPE_BASE, 1.00 },
 };
 
@@ -6299,11 +6303,11 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 0917 */ { 339, -1, 0.00, 0.00, 3, -5, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0918 */ { -1, -1, 0.00, 5.00, 5, 2, 1010, 1011, COLOR_TYPE_BASE, 0, ANIMATION_MOVEMENT, 1.00, 5, children_918, 2, groups_918, 0, NULL, 0, NULL, hitbox_918 },
 /* Object 0919 */ { -1, -1, 0.00, 5.00, 5, 2, 1010, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_MOVEMENT, 1.00, 3, children_919, 3, groups_919, 0, NULL, 0, NULL, hitbox_919 },
-/* Object 0920 */ { 2152, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_920, 0, NULL, 9, swap_frames_920, 2, slot_frames_920, NULL },
-/* Object 0921 */ { 2175, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_921, 0, NULL, 9, swap_frames_921, 2, slot_frames_921, NULL },
+/* Object 0920 */ { 2153, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_920, 0, NULL, 9, swap_frames_920, 2, slot_frames_920, NULL },
+/* Object 0921 */ { 2176, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_921, 0, NULL, 9, swap_frames_921, 2, slot_frames_921, NULL },
 /* Object 0922 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0923 */ { 2116, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_923, 0, NULL, 9, swap_frames_923, 2, slot_frames_923, NULL },
-/* Object 0924 */ { 2134, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_924, 0, NULL, 9, swap_frames_924, 2, slot_frames_924, NULL },
+/* Object 0923 */ { 2117, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_923, 0, NULL, 9, swap_frames_923, 2, slot_frames_923, NULL },
+/* Object 0924 */ { 2135, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_924, 0, NULL, 9, swap_frames_924, 2, slot_frames_924, NULL },
 /* Object 0925 */ { -1, -1, 0.00, 5.00, 1, 2, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_925, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0926 */ { -1, -1, 0.00, 5.00, 1, 2, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_926, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0927 */ { 1159, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -6432,8 +6436,8 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1050 */ { 140, -1, 0.00, 0.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_FRAME_SWAP, 1.00, 0, NULL, 0, NULL, 10, swap_frames_1050, 1, slot_frames_1050, NULL },
 /* Object 1051 */ { 141, -1, 0.00, 0.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_FRAME_SWAP, 1.00, 0, NULL, 0, NULL, 10, swap_frames_1051, 1, slot_frames_1051, NULL },
 /* Object 1052 */ { 142, -1, 0.00, 0.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_FRAME_SWAP, 1.00, 0, NULL, 0, NULL, 10, swap_frames_1052, 1, slot_frames_1052, NULL },
-/* Object 1053 */ { 2199, -1, 0.00, 0.00, 3, 9, 1, 1010, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1053, 0, NULL, 6, swap_frames_1053, 2, slot_frames_1053, NULL },
-/* Object 1054 */ { 2211, -1, 0.00, 0.00, 3, 9, 1, 1010, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1054, 0, NULL, 7, swap_frames_1054, 2, slot_frames_1054, NULL },
+/* Object 1053 */ { 2200, -1, 0.00, 0.00, 3, 9, 1, 1010, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1053, 0, NULL, 6, swap_frames_1053, 2, slot_frames_1053, NULL },
+/* Object 1054 */ { 2212, -1, 0.00, 0.00, 3, 9, 1, 1010, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1054, 0, NULL, 7, swap_frames_1054, 2, slot_frames_1054, NULL },
 /* Object 1055 */ { 1191, -1, -11.00, 11.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1055, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1056 */ { 1191, -1, -11.00, 11.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1056, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1057 */ { 1191, -1, -11.00, 11.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1057, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -6896,9 +6900,9 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1514 */ { 1582, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1514, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1515 */ { 1584, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1515, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1516 */ { -1, -1, 0.00, 5.00, 3, 9, 1, 1012, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 2, children_1516, 0, NULL, 10, swap_frames_1516, 2, slot_frames_1516, NULL },
-/* Object 1517 */ { 2527, -1, 0.00, 0.00, 3, 9, 1, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1517, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1518 */ { 2515, -1, 0.00, 0.00, 5, 2, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_FRAME_SWAP, 1.00, 1, children_1518, 0, NULL, 6, swap_frames_1518, 2, slot_frames_1518, NULL },
-/* Object 1519 */ { 2507, -1, 0.00, 0.00, 5, 2, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_FRAME_SWAP, 1.00, 0, NULL, 0, NULL, 11, swap_frames_1519, 1, slot_frames_1519, NULL },
+/* Object 1517 */ { 2528, -1, 0.00, 0.00, 3, 9, 1, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1517, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1518 */ { 2516, -1, 0.00, 0.00, 5, 2, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_FRAME_SWAP, 1.00, 1, children_1518, 0, NULL, 6, swap_frames_1518, 2, slot_frames_1518, NULL },
+/* Object 1519 */ { 2508, -1, 0.00, 0.00, 5, 2, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_FRAME_SWAP, 1.00, 0, NULL, 0, NULL, 11, swap_frames_1519, 1, slot_frames_1519, NULL },
 /* Object 1520 */ { -1, -1, 0.00, 1.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1521 */ { 1766, -1, 0.00, 28.00, 3, 9, 1005, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1522 */ { 1767, -1, 0.00, 22.00, 3, 9, 1006, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -6918,7 +6922,7 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1536 */ { -1, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1536, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1537 */ { -1, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1537, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1538 */ { -1, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1538, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1539 */ { -1, 140, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1539, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1539 */ { -1, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1539, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1540 */ { -1, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1540, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1541 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1542 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -6970,10 +6974,10 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1588 */ { 1755, -1, 0.00, 0.00, 5, 9, 1, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1589 */ { 1763, -1, 0.00, 0.00, 5, 9, 1, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1590 */ { 1764, -1, 0.00, 0.00, 5, 9, 1, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1591 */ { 2484, -1, 0.00, 0.00, 3, 9, 1, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1591, 0, NULL, 8, swap_frames_1591, 2, slot_frames_1591, NULL },
-/* Object 1592 */ { 2225, -1, -3.00, 0.00, 3, 9, 1, 2, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1592, 0, NULL, 8, swap_frames_1592, 2, slot_frames_1592, NULL },
-/* Object 1593 */ { 2484, -1, 0.00, 0.00, 3, 9, 1, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1593, 0, NULL, 8, swap_frames_1593, 2, slot_frames_1593, NULL },
-/* Object 1594 */ { 1966, 128, 0.00, 0.00, 3, 12, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1594 },
+/* Object 1591 */ { 2485, -1, 0.00, 0.00, 3, 9, 1, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1591, 0, NULL, 8, swap_frames_1591, 2, slot_frames_1591, NULL },
+/* Object 1592 */ { 2226, -1, -3.00, 0.00, 3, 9, 1, 2, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1592, 0, NULL, 8, swap_frames_1592, 2, slot_frames_1592, NULL },
+/* Object 1593 */ { 2485, -1, 0.00, 0.00, 3, 9, 1, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1593, 0, NULL, 8, swap_frames_1593, 2, slot_frames_1593, NULL },
+/* Object 1594 */ { 1966, 128, 0.00, 0.00, 3, 12, 1011, 1, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 1, children_1594, 0, NULL, 0, NULL, 0, NULL, hitbox_1594 },
 /* Object 1595 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1596 */ { 1796, -1, 0.00, 0.00, 3, 1, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1597 */ { 1797, -1, 0.00, 0.00, 3, 1, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -6993,13 +6997,13 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1611 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1612 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1613 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1614 */ { 2500, -1, 0.00, 0.00, 5, 9, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_FRAME_SWAP, 1.00, 0, NULL, 0, NULL, 4, swap_frames_1614, 1, slot_frames_1614, NULL },
+/* Object 1614 */ { 2501, -1, 0.00, 0.00, 5, 9, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_FRAME_SWAP, 1.00, 0, NULL, 0, NULL, 4, swap_frames_1614, 1, slot_frames_1614, NULL },
 /* Object 1615 */ { -1, -1, 0.00, 0.00, 5, 1, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1616 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1617 */ { 1604, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1617, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1618 */ { 2265, -1, 0.00, 0.00, 3, 9, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_FRAME_SWAP, 1.00, 0, NULL, 0, NULL, 7, swap_frames_1618, 1, slot_frames_1618, NULL },
-/* Object 1619 */ { 1967, -1, -12.00, 18.00, 5, 1, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1619, 0, NULL, 0, NULL, 0, NULL, hitbox_1619 },
-/* Object 1620 */ { 1969, -1, -9.00, 9.00, 5, 1, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1620, 0, NULL, 0, NULL, 0, NULL, hitbox_1620 },
+/* Object 1618 */ { 2266, -1, 0.00, 0.00, 3, 9, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_FRAME_SWAP, 1.00, 0, NULL, 0, NULL, 7, swap_frames_1618, 1, slot_frames_1618, NULL },
+/* Object 1619 */ { 1968, -1, -12.00, 18.00, 5, 1, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1619, 0, NULL, 0, NULL, 0, NULL, hitbox_1619 },
+/* Object 1620 */ { 1970, -1, -9.00, 9.00, 5, 1, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1620, 0, NULL, 0, NULL, 0, NULL, hitbox_1620 },
 /* Object 1621 */ { 1606, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1621, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1622 */ { 1608, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1623 */ { 1609, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1623, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -7076,9 +7080,9 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1694 */ { 1957, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1694, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1695 */ { 1957, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1695, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1696 */ { 1957, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1696, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1697 */ { 2251, -1, 0.00, 0.00, 3, 9, 1006, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1697, 0, NULL, 3, swap_frames_1697, 2, slot_frames_1697, NULL },
-/* Object 1698 */ { 2257, -1, 5.00, -6.00, 3, 9, 1006, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1698, 0, NULL, 2, swap_frames_1698, 2, slot_frames_1698, NULL },
-/* Object 1699 */ { 2261, -1, 0.00, -7.00, 3, 9, 1006, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1699, 0, NULL, 2, swap_frames_1699, 2, slot_frames_1699, NULL },
+/* Object 1697 */ { 2252, -1, 0.00, 0.00, 3, 9, 1006, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1697, 0, NULL, 3, swap_frames_1697, 2, slot_frames_1697, NULL },
+/* Object 1698 */ { 2258, -1, 5.00, -6.00, 3, 9, 1006, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1698, 0, NULL, 2, swap_frames_1698, 2, slot_frames_1698, NULL },
+/* Object 1699 */ { 2262, -1, 0.00, -7.00, 3, 9, 1006, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1699, 0, NULL, 2, swap_frames_1699, 2, slot_frames_1699, NULL },
 /* Object 1700 */ { -1, -1, 0.00, 5.00, 3, 0, 1011, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1700, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1701 */ { 1438, -1, -9.00, 0.00, 5, 1, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1701, 0, NULL, 0, NULL, 0, NULL, hitbox_1701 },
 /* Object 1702 */ { 1440, -1, -7.00, 0.00, 5, 1, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1702, 0, NULL, 0, NULL, 0, NULL, hitbox_1702 },
@@ -7148,47 +7152,47 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1766 */ { 1800, -1, 0.00, 0.00, 3, -5, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1767 */ { 1801, -1, 0.00, 0.00, 3, -5, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1768 */ { 1802, -1, 0.00, 0.00, 3, -5, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1769 */ { 2075, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1770 */ { 2076, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1771 */ { 2077, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1772 */ { 2078, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1773 */ { -1, 45, 0.00, 5.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1773, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1774 */ { -1, 45, 0.00, 5.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1774, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1775 */ { -1, 45, 0.00, 5.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1775, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1776 */ { -1, 45, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1776, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1777 */ { 2079, -1, 0.00, -2.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1778 */ { 2080, -1, 1.00, -2.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1779 */ { 2081, -1, 0.00, -2.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1780 */ { 2082, -1, -1.00, 1.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1781 */ { 2083, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1781, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1782 */ { 2084, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1782, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1783 */ { 2085, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1783, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1784 */ { 2086, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1784, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1785 */ { -1, 45, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1785, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1786 */ { -1, 45, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1786, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1787 */ { -1, 45, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1787, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1788 */ { -1, 45, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1788, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1789 */ { -1, 45, 0.00, 5.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1789, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1790 */ { -1, 45, 0.00, 5.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1790, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1791 */ { -1, 45, 0.00, 5.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1791, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1792 */ { -1, 45, 0.00, 5.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1792, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1793 */ { 2087, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1793, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1769 */ { 2076, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1770 */ { 2077, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1771 */ { 2078, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1772 */ { 2079, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1773 */ { -1, -1, 0.00, 5.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1773, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1774 */ { -1, -1, 0.00, 5.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1774, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1775 */ { -1, -1, 0.00, 5.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1775, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1776 */ { -1, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1776, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1777 */ { 2080, -1, 0.00, -2.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1778 */ { 2081, -1, 1.00, -2.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1779 */ { 2082, -1, 0.00, -2.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1780 */ { 2083, -1, -1.00, 1.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1781 */ { 2084, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1781, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1782 */ { 2085, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1782, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1783 */ { 2086, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1783, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1784 */ { 2087, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1784, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1785 */ { -1, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1785, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1786 */ { -1, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1786, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1787 */ { -1, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1787, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1788 */ { -1, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1788, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1789 */ { -1, -1, 0.00, 5.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1789, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1790 */ { -1, -1, 0.00, 5.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1790, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1791 */ { -1, -1, 0.00, 5.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1791, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1792 */ { -1, -1, 0.00, 5.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1792, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1793 */ { 2088, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1793, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1794 */ { -1, 45, 0.00, 5.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1794, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1795 */ { 2088, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1795 */ { 2089, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1796 */ { -1, 45, 0.00, 5.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1796, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1797 */ { 2089, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1797, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1797 */ { 2090, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1797, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1798 */ { 1739, 45, 0.00, 0.00, 3, 9, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1799 */ { 2090, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1799, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1799 */ { 2091, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1799, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1800 */ { -1, 45, 0.00, 5.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1800, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1801 */ { 2091, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1801, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1801 */ { 2092, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1801, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1802 */ { -1, 45, 0.00, 5.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1802, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1803 */ { 2092, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1803, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1803 */ { 2093, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1803, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1804 */ { -1, 45, 0.00, 5.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1804, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1805 */ { 2093, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1805, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1805 */ { 2094, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1805, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1806 */ { -1, 45, 0.00, 5.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1806, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1807 */ { 2094, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1807, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1807 */ { 2095, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1807, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1808 */ { -1, 45, 0.00, 5.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1808, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1809 */ { 2095, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1809, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1809 */ { 2096, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1809, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1810 */ { -1, 45, 0.00, 5.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1810, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1811 */ { -1, -1, 0.00, 4.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1812 */ { -1, -1, 0.00, 4.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -7228,18 +7232,18 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1846 */ { 1833, -1, 0.00, 0.00, 3, 9, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1847 */ { 1834, -1, 0.00, 0.00, 3, 9, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1848 */ { 1835, -1, 0.00, 0.00, 3, 9, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1849 */ { 2462, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1849, 0, NULL, 6, swap_frames_1849, 2, slot_frames_1849, NULL },
-/* Object 1850 */ { 2474, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1850, 0, NULL, 5, swap_frames_1850, 2, slot_frames_1850, NULL },
-/* Object 1851 */ { 2302, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1851, 0, NULL, 8, swap_frames_1851, 2, slot_frames_1851, NULL },
-/* Object 1852 */ { 2322, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1852, 0, NULL, 8, swap_frames_1852, 2, slot_frames_1852, NULL },
-/* Object 1853 */ { 2334, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1853, 0, NULL, 8, swap_frames_1853, 2, slot_frames_1853, NULL },
-/* Object 1854 */ { 2352, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1854, 0, NULL, 14, swap_frames_1854, 2, slot_frames_1854, NULL },
-/* Object 1855 */ { 2378, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 2, children_1855, 0, NULL, 16, swap_frames_1855, 2, slot_frames_1855, NULL },
-/* Object 1856 */ { 2276, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1856, 0, NULL, 15, swap_frames_1856, 2, slot_frames_1856, NULL },
-/* Object 1857 */ { 2434, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1857, 0, NULL, 3, swap_frames_1857, 2, slot_frames_1857, NULL },
-/* Object 1858 */ { 2410, -1, 0.00, 0.00, 5, 2, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_FRAME_SWAP, 1.00, 1, children_1858, 0, NULL, 8, swap_frames_1858, 3, slot_frames_1858, NULL },
+/* Object 1849 */ { 2463, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1849, 0, NULL, 6, swap_frames_1849, 2, slot_frames_1849, NULL },
+/* Object 1850 */ { 2475, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1850, 0, NULL, 5, swap_frames_1850, 2, slot_frames_1850, NULL },
+/* Object 1851 */ { 2303, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1851, 0, NULL, 8, swap_frames_1851, 2, slot_frames_1851, NULL },
+/* Object 1852 */ { 2323, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1852, 0, NULL, 8, swap_frames_1852, 2, slot_frames_1852, NULL },
+/* Object 1853 */ { 2335, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1853, 0, NULL, 8, swap_frames_1853, 2, slot_frames_1853, NULL },
+/* Object 1854 */ { 2353, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1854, 0, NULL, 14, swap_frames_1854, 2, slot_frames_1854, NULL },
+/* Object 1855 */ { 2379, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 2, children_1855, 0, NULL, 16, swap_frames_1855, 2, slot_frames_1855, NULL },
+/* Object 1856 */ { 2277, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1856, 0, NULL, 15, swap_frames_1856, 2, slot_frames_1856, NULL },
+/* Object 1857 */ { 2435, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1857, 0, NULL, 3, swap_frames_1857, 2, slot_frames_1857, NULL },
+/* Object 1858 */ { 2411, -1, 0.00, 0.00, 5, 2, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_FRAME_SWAP, 1.00, 1, children_1858, 0, NULL, 8, swap_frames_1858, 3, slot_frames_1858, NULL },
 /* Object 1859 */ { -1, -1, 0.00, 5.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1859 },
-/* Object 1860 */ { 2443, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1860, 0, NULL, 11, swap_frames_1860, 2, slot_frames_1860, NULL },
+/* Object 1860 */ { 2444, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1860, 0, NULL, 11, swap_frames_1860, 2, slot_frames_1860, NULL },
 /* Object 1861 */ { 1686, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1861, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1862 */ { 1688, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1862, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1863 */ { 1690, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1863, 0, NULL, 0, NULL, 0, NULL, NULL },
