@@ -61,7 +61,7 @@ typedef struct {
     bool goldenBest;
 } SettingState;
 
-extern Setting settings[31];
+extern Setting settings[32];
 extern SettingState settingsState;
 
 extern const UIScreenDefPair settings_def;
