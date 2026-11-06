@@ -94,6 +94,14 @@ const float cube_accelerations[SPEED_COUNT] = {
     -2799.36,
 };
 
+const float robot_accelerations[SPEED_COUNT] = {
+    -2467.4583,
+    -2514.6975,
+    -2512.0731,
+    -2522.5707,
+    -2522.5707,
+};
+
 const float player_speed_mults[SPEED_COUNT] = {
 	0.7f,
 	0.9f,
@@ -667,7 +675,7 @@ void robot_gamemode(Player *player) {
     }
 
     if (player->robot_air_time >= 1.5f || (!curr_input.holdJump)) {
-        player->gravity = -2794.1082f * 0.9f;
+        player->gravity = robot_accelerations[state.speed];
         if (player->anim_id == ROBOT_ANIM_JUMP) {
             set_animation(player, ROBOT_ANIM_FALL_START);
         }
