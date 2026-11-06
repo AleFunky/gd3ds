@@ -2631,12 +2631,15 @@ static void spawn_icon_at_internal(
                     float p_x = x + (rot_anim_x + rot_part_x) * scale;
                     float p_y = y + (rot_anim_y + rot_part_y) * scale;
 
+                    float part_sx = (animation_part->scale_x < 0.0f) ? -sx : sx;
+                    float part_sy = (animation_part->scale_y < 0.0f) ? -sy : sy;
+
                     C2D_SpriteFromSheet(&spr, *sheet, part->texture);
                     C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
                     C3D_TexSetFilter(spr.image.tex, GPU_LINEAR, GPU_LINEAR);
 
                     C2D_SpriteSetPos(&spr, p_x, p_y);
-                    C2D_SpriteSetScale(&spr, sx, sy);
+                    C2D_SpriteSetScale(&spr, part_sx, part_sy);
                     C2D_SpriteSetRotation(&spr, part_rad);
 
                     C2D_DrawSpriteTinted(&spr, &tints[part->color_type]);
