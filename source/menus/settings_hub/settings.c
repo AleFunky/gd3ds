@@ -113,9 +113,19 @@ Setting settings[] = {
         .key = CONFIG_GRAPHICS_PATH "glowEnabled"
     },
     {
+        .id = "showFpsCounter",
+        .label = "FPS counter",
+        .additionalInfo = "Displays current FPS in gameplay.",
+        .page = PAGE_GRAPHICS, 
+
+        .defaultValue = false,
+        .var = &settingsState.showFpsCounter,
+        .key = CONFIG_GRAPHICS_PATH "showFpsCounter"
+    },
+    {
         .id = "vsyncEnabled",
-        .label = "VSync",
-        .additionalInfo = "Disables vertical sync and uncaps FPS.",
+        .label = "V-Sync",
+        .additionalInfo = "Prevents screen tearing at the cost\nof some performance.\nCaps FPS at 60.",
         .page = PAGE_GRAPHICS, 
 
         .defaultValue = true,
@@ -374,16 +384,7 @@ Setting settings[] = {
         .var = &settingsState.noWaveTrailBehind,
         .key = CONFIG_COSMETIC_PATH "noWaveTrailBehind"
     },
-    {
-        .id = "showFpsCounter",
-        .label = "FPS counter",
-        .additionalInfo = "Shows current FPS.",
-        .page = PAGE_GAMEPLAY, 
-
-        .defaultValue = false,
-        .var = &settingsState.showFpsCounter,
-        .key = CONFIG_GAMEPLAY_PATH "showFpsCounter"
-    },
+    
 };
 
 typedef struct CheckboxData {

@@ -6,11 +6,9 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdio.h>
-#include "3ds/util/utf.h"
 #include "practice.h"
 #include "triggers.h"
 #include "main.h"
-#include "menus/creator_menu/online/online_menu.h"
 #include "objects.h"
 #include "groups.h"
 #include "mp3_player.h"
@@ -20,7 +18,6 @@
 #include "math_helpers.h"
 #include "particles/object_particles.h"
 #include "utils/json_config.h"
-#include "state.h"
 
 #include "utils/server_utils.h"
 #include "utils/string_helpers.h"

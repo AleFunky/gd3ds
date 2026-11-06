@@ -6,11 +6,9 @@
 #include "menus/core/common_setters.h"
 
 #include "math_helpers.h"
-#include "fonts/bigFont.h"
 #include "main.h"
 #include "easing.h"
 #include "mp3_player.h"
-#include "level_select.h"
 #include "state.h"
 #include "level_loading.h"
 #include "particles/circles.h"
@@ -88,7 +86,7 @@ char *do_not_completion_texts[] = {
     "Auto Safe Mode cheat detected:\nNoclipped through the end wall",
     "I lied, you got 99%",
     "I have no words.... oh wait",
-    "we really doing anything now"
+    "we really doing anything now",
     "+100 dollars",
     "360 FPS detected",
     "A swing and a hit!",
@@ -248,8 +246,8 @@ static void run_start_animation(float delta) {
 
     ui_run_func_on_tag(&screen, "bottomWindow", scale_bottom_buttons_anim);
     
-    ui_set_pos_on_tag(&screen, SCREEN_BOT_WIDTH / 2, window_y_pos, "window");
-    ui_set_pos_on_tag(&screen_top, SCREEN_WIDTH / 2, window_y_pos, "window");
+    ui_set_pos_on_tag(&screen, (float)SCREEN_BOT_WIDTH / 2, window_y_pos, "window");
+    ui_set_pos_on_tag(&screen_top, (float)SCREEN_WIDTH / 2, window_y_pos, "window");
 
     if(anim_time > 0.6f){
         animating_reward = true;
@@ -364,8 +362,8 @@ static void run_end_animation(float delta) {
     float fade_value = easeValue(QUAD_IN, up_y_start, 0, anim_time, RESTART_ANIM_DURATION, 1.f);
     window_y_pos = -120 + fade_value;
 
-    ui_set_pos_on_tag(&screen, SCREEN_BOT_WIDTH / 2, window_y_pos, "window");
-    ui_set_pos_on_tag(&screen_top, SCREEN_WIDTH / 2, window_y_pos, "window");
+    ui_set_pos_on_tag(&screen, (float)SCREEN_BOT_WIDTH / 2.f, window_y_pos, "window");
+    ui_set_pos_on_tag(&screen_top, (float)SCREEN_WIDTH / 2.f, window_y_pos, "window");
     
     // Animation end
     if (anim_time >= RESTART_ANIM_DURATION) {
