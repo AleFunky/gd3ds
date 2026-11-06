@@ -291,6 +291,40 @@ const UseEffectDefinition respawn_effect = {
     .line_thickness = 1.f
 }; 
 
+const UseEffectDefinition spider_in_effect = {
+    .colorR = 1, 
+    .colorG = 1,
+    .colorB = 1,
+    .duration = 0.2f,
+    .start_opacity = 0.95f,
+    .end_opacity = 0.f,
+    .start_rad = 25.f,
+    .end_rad = 3.f,
+    .hollow = false,
+    .trifading = false,
+    .start_opacity_ease = EASE_IN,
+    .end_opacity_ease = EASE_LINEAR,
+    .start_rad_ease = EASE_IN,
+    .end_rad_ease = EASE_LINEAR,
+}; 
+
+const UseEffectDefinition spider_out_effect = {
+    .colorR = 1, 
+    .colorG = 1,
+    .colorB = 1,
+    .duration = 0.1f,
+    .start_opacity = 0.95f,
+    .end_opacity = 0.f,
+    .start_rad = 10.f,
+    .end_rad = 3.f,
+    .hollow = false,
+    .trifading = false,
+    .start_opacity_ease = EASE_IN,
+    .end_opacity_ease = EASE_LINEAR,
+    .start_rad_ease = EASE_IN,
+    .end_rad_ease = EASE_LINEAR,
+}; 
+
 UseEffectPool use_effects_top = {
     .stationary = false
 };

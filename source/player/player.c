@@ -1,5 +1,7 @@
 #include "player.h"
 #include "level_loading.h"
+#include "particles/circles.h"
+#include "player/trail.h"
 #include "practice.h"
 #include "profiling.h"
 #include "state.h"
@@ -905,6 +907,7 @@ void spider_test_jump(Player *player, bool is_retry) {
         }
     }
 
+    float old_y = player->y;
     player->y = land_y;
     player->upside_down = !player->upside_down;
     player->vel_y = player->upside_down ? 1.0f : -1.0f;
@@ -915,8 +918,29 @@ void spider_test_jump(Player *player, bool is_retry) {
     player->snap_rotation = true;
     player->buffering_state = BUFFER_END;
 
+    UseEffect *effect = add_use_effect(player->x, land_y, USE_EFFECT_OBJ_NOTHING, &spider_in_effect, get_use_effect_array_ptr(SCREEN_TOP));
+    if (effect) {
+        Color p2_not_white = get_white_if_black(p2_color);
+
+        effect->def.colorR = p2_not_white.r / 255.f;
+        effect->def.colorG = p2_not_white.g / 255.f;
+        effect->def.colorB = p2_not_white.b / 255.f;
+        effect->def.start_rad = spider_in_effect.start_rad * (player->mini ? 0.6f : 1);
+    }
+    effect = add_use_effect(player->x, old_y, USE_EFFECT_OBJ_NOTHING, &spider_out_effect, get_use_effect_array_ptr(SCREEN_TOP));
+    if (effect) {
+        Color p2_not_white = get_white_if_black(p2_color);
+
+        effect->def.colorR = p2_not_white.r / 255.f;
+        effect->def.colorG = p2_not_white.g / 255.f;
+        effect->def.colorB = p2_not_white.b / 255.f;
+        effect->def.start_rad = spider_out_effect.start_rad * (player->mini ? 0.6f : 1);
+    }
     update_rotation_direction(player);
     clear_slope_data(player);
+    
+    MotionTrail_Clear(trail);
+    trail->positionR = (Vec2D){player->x, player->y};
 }
 
 void spider_gamemode(Player *player) {
@@ -943,6 +967,15 @@ void spider_gamemode(Player *player) {
     if (player->snap_rotation) {
         player->rotation = 0;
     }
+
+    drag_particles[state.current_player].emitterX = player->x;
+    drag_particles[state.current_player].emitterY = fabsf(gravBottom(player)) + (player->upside_down ? -2 : 2);
+    drag_particles[state.current_player].emitting = player->on_ground || player->on_ceiling;
+
+    drag_particles[state.current_player].gravityFlipped = player->upside_down;
+    drag_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
+
+    drag_particles[state.current_player].cfg.sourcePositionVariancey = 0;
 
     if ((player->slope_data.slope_id >= 0 || player->on_ground) && (curr_input.holdJump && player->buffering_state == BUFFER_READY) && !player->dashing) {
         spider_test_jump(player, false);
