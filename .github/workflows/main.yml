@@ -42,13 +42,23 @@ jobs:
         run: |
           chmod -R 755 buildtools/
           make 3dsx cia
+      - name: Install zip
+        uses: montudor/action-zip@v1
+      - name: Create zip files for updater
+        run: |
+          zip -qq -r out/GeometryDash3DS.3dsx.zip out/GeometryDash3DS.3dsx
+          zip -qq -r out/GeometryDash3DS.cia.zip out/GeometryDash3DS.cia
       - name: Prepare for build publishing
         run: |
           mkdir -p out/3dsx/rom
+          mkdir -p out/3dsx/zip
           mkdir -p out/cia/rom
+          mkdir -p out/cia/zip
           mkdir -p out/elf
           cp output/GeometryDash3DS.3dsx out/3dsx/rom
+          cp output/GeometryDash3DS.3dsx.zip out/3dsx/zip
           cp output/GeometryDash3DS.cia out/cia/rom
+          cp output/GeometryDash3DS.cia.zip out/cia/zip
           cp output/GeometryDash3DS.elf out/elf
       - name: Publish 3dsx to GH Actions
         uses: actions/upload-artifact@main
@@ -56,11 +66,23 @@ jobs:
           name: gd3ds-3dsx
           path: out/3dsx/rom
           archive: false
+      - name: Publish 3dsx zip to GH Actions
+        uses: actions/upload-artifact@main
+        with:
+          name: gd3ds-3dsx-zip
+          path: out/3dsx/zip
+          archive: true
       - name: Publish cia to GH Actions
         uses: actions/upload-artifact@main
         with:
           name: gd3ds-cia
           path: out/cia/rom
+          archive: false
+      - name: Publish cia zip to GH Actions
+        uses: actions/upload-artifact@main
+        with:
+          name: gd3ds-cia-zip
+          path: out/cia/zip
           archive: false
       - name: Publish debug info to GH Actions
         uses: actions/upload-artifact@main
@@ -78,23 +100,6 @@ jobs:
             Latest nightly build from commit ${{ github.sha }}
           prerelease: true
           make_latest: true
-          files: |
-            out/3dsx/rom/*
-            out/cia/rom/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Create or update 2.0 nightly release
-        if: github.ref == 'refs/heads/2.0'
-        uses: softprops/action-gh-release@v3
-        with:
-          tag_name: nightly-2.0
-          name: Nightly 2.0
-          body: |
-            Latest 2.0 test build from commit ${{ github.sha }}
-            This is a dev build, therefore bugs and crashes are expected.
-            Enjoy!
-          prerelease: true
-          make_latest: false
           files: |
             out/3dsx/rom/*
             out/cia/rom/*
