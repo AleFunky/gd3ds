@@ -31,7 +31,7 @@ jobs:
           #define CURRENT_COMMIT_HASH "${{ github.sha }}"
           #define REPO_AUTHOR "${{ github.repository_owner }}"
           #define REPO_NAME "${{ github.event.repository.name }}"
-          #define CURRENT_LATEST_COMMIT_ID ${{ steps.releaseinfo.outputs.id }}
+          #define CURRENT_LATEST_RELEASE_ID ${{ steps.releaseinfo.outputs.id }}
           EOF
       - name: Make application
         run: |
