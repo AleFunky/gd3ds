@@ -226,10 +226,8 @@ static void updater_init(UIScreen *s) {
     updater_button = (UIButton *)ui_get_element_by_tag(s, "updatebutton");
     spinner = (UISpinner *)ui_get_element_by_tag(s, "spinner");
     error_label = (UILabel *)ui_get_element_by_tag(s, "errorlabel");
-    if (REPO_BRANCH) output_log("Current branch: %s\n", REPO_BRANCH); else output_log("no branch defined??? \n");
     if (checkedForUpdate && update_data->isAvailable) {
         ui_disable_element((UIElement *) spinner);
-        // ui_label_set_text(error_label, update_data->releaseTitle);
         populate_info();
     } else {
         ui_disable_element((UIElement *) updater_button);
@@ -246,10 +244,9 @@ static void updater_update(UIScreen *s, UIInput *i) {
         if (updater_task.result == 0) {
             if (update_data->isAvailable) {
                 ui_enable_element((UIElement *) updater_button);
-                // ui_label_set_text(error_label, update_data->releaseTitle);
                 populate_info();
                 checkedForUpdate = true;
-            } else output_log("no updates found");
+            }
         } else {
             output_log(handle_updater_error_codes(updater_task.result));
             ui_label_set_text(error_label, handle_updater_error_codes(updater_task.result));
