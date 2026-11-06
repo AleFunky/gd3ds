@@ -150,16 +150,13 @@ void update_player_colors();
 void set_player_colors(Color p1, Color p2, Color glow);
 
 typedef struct {
-    int robot_anim_id;
-    int robot_anim_frame;
-    float robot_anim_timer;
-    int robot_blend_from_anim_id;
-    int robot_blend_from_frame;
-    float robot_blend_from_timer;
-    float robot_blend_fraction;
-    int spider_anim_id;
-    int spider_anim_frame;
-    float spider_anim_timer;
+    int anim_id;
+    int anim_frame;
+    float anim_timer;
+    int blend_from_anim_id;
+    int blend_from_frame;
+    float blend_from_timer;
+    float blend_fraction;
 } IconParameters;
 
 void spawn_icon_at(

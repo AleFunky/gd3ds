@@ -109,25 +109,30 @@ bool player_gamemode_is_flying(Player *player) {
     return player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_UFO || player->gamemode == GAMEMODE_WAVE;
 }
 
-void set_robot_animation(Player *player, int robot_anim_id) {
-    if (player->robot_anim_id != robot_anim_id) {
-        player->robot_blend_from_anim_id = player->robot_anim_id;
-        player->robot_blend_from_frame = player->robot_anim_frame;
-        player->robot_blend_from_timer = player->robot_anim_timer;
+void set_animation(Player *player, int anim_id) {
+    if (player->anim_id != anim_id) {
+        player->blend_from_anim_id = player->anim_id;
+        player->blend_from_frame = player->anim_frame;
+        player->blend_from_timer = player->anim_timer;
 
-        player->robot_anim_id = robot_anim_id;
-        player->robot_anim_frame = 0;
-        player->robot_anim_timer = 0;
-        player->robot_landing_blend_timer = 0;
+        player->anim_id = anim_id;
+        player->anim_frame = 0;
+        player->anim_timer = 0;
+        player->blend_timer = 0;
     }
 }
 
-void set_spider_animation(Player *player, int spider_anim_id) {
-    if (player->spider_anim_id != spider_anim_id) {
-        player->spider_anim_id = spider_anim_id;
-        player->spider_anim_frame = 0;
-        player->spider_anim_timer = 0;
+float get_blend_duration(Player *player) {
+    if (player->gamemode == GAMEMODE_ROBOT) {
+        return ROBOT_BLEND_DURATION;
+    } else if (player->gamemode == GAMEMODE_SPIDER) {
+        return SPIDER_BLEND_DURATION;
     }
+    return 0.1f;
+}
+
+void set_blend_timer(Player *player, float timer) {
+    player->blend_timer = timer;
 }
 
 void player_non_flying_landing(Player *player) {
@@ -622,7 +627,7 @@ void robot_gamemode(Player *player) {
     if (player->y > 2794.f) kill_player(DEATH_FELL_OFF_LEVEL);
 
     if (player->on_ground) {
-        set_robot_animation(player, ROBOT_ANIM_RUN);
+        set_animation(player, ROBOT_ANIM_RUN);
         MotionTrail_StopStroke(trail);
         if (player->slope_data.slope_id < 0 && !player->dashing) player->rotation = roundf(player->rotation / 90.0f) * 90.0f;
     }
@@ -652,7 +657,7 @@ void robot_gamemode(Player *player) {
         set_p_velocity(player, cube_jump_heights[state.speed] / 2, false);
         player->inverse_rotation = false;
         player->on_ground = false;
-        set_robot_animation(player, ROBOT_ANIM_JUMP_START);
+        set_animation(player, ROBOT_ANIM_JUMP_START);
         player->buffering_state = BUFFER_END;
         player->robot_air_time = 0.f;
         player->gravity = 0;
@@ -661,8 +666,8 @@ void robot_gamemode(Player *player) {
 
     if (player->robot_air_time >= 1.5f || (!curr_input.holdJump)) {
         player->gravity = -2794.1082f * 0.9f;
-        if (player->robot_anim_id == ROBOT_ANIM_JUMP) {
-            set_robot_animation(player, ROBOT_ANIM_FALL_START);
+        if (player->anim_id == ROBOT_ANIM_JUMP) {
+            set_animation(player, ROBOT_ANIM_FALL_START);
         }
     } else {
         player->robot_air_time += 5.4f * STEPS_DT;
@@ -675,12 +680,12 @@ void robot_gamemode(Player *player) {
     robot_fire_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
 
     if (!player->on_ground && player->vel_y < 0
-        && player->robot_anim_id != ROBOT_ANIM_FALL_START
-        && player->robot_anim_id != ROBOT_ANIM_FALL) {
-        set_robot_animation(player, ROBOT_ANIM_FALL_START);
+        && player->anim_id != ROBOT_ANIM_FALL_START
+        && player->anim_id != ROBOT_ANIM_FALL) {
+        set_animation(player, ROBOT_ANIM_FALL_START);
     }
 
-    const PlayerAnimation *anim = &robot_animations[player->robot_anim_id];
+    const PlayerAnimation *anim = &robot_animations[player->anim_id];
     float anim_speed = (state.speed == SPEED_SLOW) ? 0.9f
                      : (state.speed == SPEED_FAST) ? 1.15f
                      : (state.speed == SPEED_FASTER) ? 1.3f
@@ -688,25 +693,20 @@ void robot_gamemode(Player *player) {
     if (player->mini) anim_speed /= 0.85f;
     
     anim_speed *= 35.0f / 24.0f;
-    player->robot_anim_timer += STEPS_DT * anim_speed;
+    player->anim_timer += STEPS_DT * anim_speed;
 
-    if (player->robot_anim_timer >= anim->frames[player->robot_anim_frame].delay) {
-        player->robot_anim_timer -= anim->frames[player->robot_anim_frame].delay;
-        int next = player->robot_anim_frame + 1;
+    if (player->anim_timer >= anim->frames[player->anim_frame].delay) {
+        player->anim_timer -= anim->frames[player->anim_frame].delay;
+        int next = player->anim_frame + 1;
         if (next >= anim->frame_count) {
-            if (player->robot_anim_id == ROBOT_ANIM_JUMP_START) {
-                set_robot_animation(player, ROBOT_ANIM_JUMP);
-            } else if (player->robot_anim_id == ROBOT_ANIM_FALL_START) {
-                set_robot_animation(player, ROBOT_ANIM_FALL);
+            if (player->anim_id == ROBOT_ANIM_JUMP_START) {
+                set_animation(player, ROBOT_ANIM_JUMP);
+            } else if (player->anim_id == ROBOT_ANIM_FALL_START) {
+                set_animation(player, ROBOT_ANIM_FALL);
             }
             next = 0;
         }
-        player->robot_anim_frame = next;
-    }
-
-    player->robot_landing_blend_timer += STEPS_DT;
-    if (player->robot_landing_blend_timer > ROBOT_LANDING_BLEND_DURATION) {
-        player->robot_landing_blend_timer = ROBOT_LANDING_BLEND_DURATION;
+        player->anim_frame = next;
     }
 }
 
@@ -934,10 +934,14 @@ void spider_gamemode(Player *player) {
     if (player->y > 2794.f) kill_player(DEATH_FELL_OFF_LEVEL);
 
     if (player->on_ground) {
-        set_spider_animation(player, (state.speed <= SPEED_NORMAL) ? SPIDER_ANIM_WALK : SPIDER_ANIM_RUN);
+        set_animation(player, (state.speed <= SPEED_NORMAL) ? SPIDER_ANIM_WALK : SPIDER_ANIM_RUN);
         MotionTrail_StopStroke(trail);
 
         if (player->slope_data.slope_id < 0 && !player->dashing) player->rotation = roundf(player->rotation / 90.0f) * 90.0f;
+    }
+
+    if (player->snap_rotation) {
+        player->rotation = 0;
     }
 
     if ((player->slope_data.slope_id >= 0 || player->on_ground) && (curr_input.holdJump && player->buffering_state == BUFFER_READY) && !player->dashing) {
@@ -946,11 +950,11 @@ void spider_gamemode(Player *player) {
         player->jumped = true;
     }
 
-    if (!player->on_ground && player->vel_y < 0 && player->spider_anim_id != SPIDER_ANIM_FALL) {
-        set_spider_animation(player, SPIDER_ANIM_FALL);
+    if (!player->on_ground && player->vel_y < 0 && player->anim_id != SPIDER_ANIM_FALL) {
+        set_animation(player, SPIDER_ANIM_FALL);
     }
 
-    const PlayerAnimation *anim = &spider_animations[player->spider_anim_id];
+    const PlayerAnimation *anim = &spider_animations[player->anim_id];
 
     float anim_speed = (state.speed == SPEED_SLOW) ? 0.9f
                      : (state.speed == SPEED_FAST) ? 1.15f
@@ -960,16 +964,16 @@ void spider_gamemode(Player *player) {
     if (player->mini) anim_speed /= 0.85f;
     if (state.speed >= SPEED_FAST) anim_speed /= 1.1f;
 
-    player->spider_anim_timer += STEPS_DT * anim_speed;
+    player->anim_timer += STEPS_DT * anim_speed;
 
-    if (player->spider_anim_timer >= anim->frames[player->spider_anim_frame].delay) {
-        player->spider_anim_timer -= anim->frames[player->spider_anim_frame].delay;
+    if (player->anim_timer >= anim->frames[player->anim_frame].delay) {
+        player->anim_timer -= anim->frames[player->anim_frame].delay;
 
-        int next = player->spider_anim_frame + 1;
+        int next = player->anim_frame + 1;
 
         if (next >= anim->frame_count) next = 0;
 
-        player->spider_anim_frame = next;
+        player->anim_frame = next;
     }
 }
 
@@ -1103,6 +1107,12 @@ void run_player(Player *player) {
             spider_gamemode(player);
             break;
     } 
+    
+
+    player->blend_timer += STEPS_DT;
+    if (player->blend_timer > get_blend_duration(player)) {
+        set_blend_timer(player, get_blend_duration(player));
+    }
     
     player->time_since_ground += STEPS_DT;
 
@@ -1460,13 +1470,13 @@ void draw_p1_trail(Player *player, int player_id) {
                 trail_data->scale,
                 color,
                 (IconParameters) { 
-                    .robot_anim_frame = player->robot_anim_frame,
-                    .robot_anim_id = player->robot_anim_id,
-                    .robot_anim_timer = player->robot_anim_timer,
-                    .robot_blend_from_anim_id = player->robot_blend_from_anim_id,
-                    .robot_blend_from_frame = player->robot_blend_from_frame,
-                    .robot_blend_from_timer = player->robot_blend_from_timer,
-                    .robot_blend_fraction = player->robot_landing_blend_timer / ROBOT_LANDING_BLEND_DURATION
+                    .anim_frame = player->anim_frame,
+                    .anim_id = player->anim_id,
+                    .anim_timer = player->anim_timer,
+                    .blend_from_anim_id = player->blend_from_anim_id,
+                    .blend_from_frame = player->blend_from_frame,
+                    .blend_from_timer = player->blend_from_timer,
+                    .blend_fraction = player->blend_timer / get_blend_duration(player)
                  }
             );
         }
@@ -1599,32 +1609,36 @@ void draw_player(Player *player) {
                 (IconParameters) { 0 }
             );
             break;
-        case GAMEMODE_SPIDER: {
-            spawn_icon_at(GAMEMODE_SPIDER, selected_spider, glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale,
-                primary_color,
-                secondary_color,
-                C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255),
-                (IconParameters) {
-                    .spider_anim_frame = player->spider_anim_frame,
-                    .spider_anim_id = player->spider_anim_id,
-                    .spider_anim_timer = player->spider_anim_timer
-                 }
-            );
-            break;
-        }
         case GAMEMODE_ROBOT: {
             spawn_icon_at(GAMEMODE_ROBOT, selected_robot, glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale,
                 primary_color,
                 secondary_color,
                 C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255),
                 (IconParameters) { 
-                    .robot_anim_frame = player->robot_anim_frame,
-                    .robot_anim_id = player->robot_anim_id,
-                    .robot_anim_timer = player->robot_anim_timer,
-                    .robot_blend_from_anim_id = player->robot_blend_from_anim_id,
-                    .robot_blend_from_frame = player->robot_blend_from_frame,
-                    .robot_blend_from_timer = player->robot_blend_from_timer,
-                    .robot_blend_fraction = player->robot_landing_blend_timer / ROBOT_LANDING_BLEND_DURATION
+                    .anim_frame = player->anim_frame,
+                    .anim_id = player->anim_id,
+                    .anim_timer = player->anim_timer,
+                    .blend_from_anim_id = player->blend_from_anim_id,
+                    .blend_from_frame = player->blend_from_frame,
+                    .blend_from_timer = player->blend_from_timer,
+                    .blend_fraction = player->blend_timer / get_blend_duration(player)
+                 }
+            );
+            break;
+        }
+        case GAMEMODE_SPIDER: {
+            spawn_icon_at(GAMEMODE_SPIDER, selected_spider, glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale,
+                primary_color,
+                secondary_color,
+                C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255),
+                (IconParameters) {
+                    .anim_frame = player->anim_frame,
+                    .anim_id = player->anim_id,
+                    .anim_timer = player->anim_timer,
+                    .blend_from_anim_id = player->blend_from_anim_id,
+                    .blend_from_frame = player->blend_from_frame,
+                    .blend_from_timer = player->blend_from_timer,
+                    .blend_fraction = player->blend_timer / get_blend_duration(player)
                  }
             );
             break;

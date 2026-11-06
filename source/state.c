@@ -1,5 +1,6 @@
 #include "state.h"
 #include <string.h>
+#include "player/player.h"
 #include "player/robot_anim_data.h"
 #include "main.h"
 #include "math_helpers.h"
@@ -209,10 +210,11 @@ void clear_snap_data(Player *player) {
 
 void init_player(Player *player) {
     memset(player, 0, sizeof(Player));
-    player->robot_landing_blend_timer = ROBOT_LANDING_BLEND_DURATION;
     
     set_gamemode(player, level_info.initial_gamemode);
     set_mini(player, level_info.initial_mini);
+
+    set_blend_timer(player, get_blend_duration(player));
 
     player->player_icons.cube = selected_cube;
     player->player_icons.ship = selected_ship;
@@ -302,15 +304,8 @@ void init_state() {
 
 void init_level_bounds() {
     switch (level_info.initial_gamemode) {
-        case GAMEMODE_SHIP:
-        case GAMEMODE_UFO:
-        case GAMEMODE_WAVE:
-        case GAMEMODE_SPIDER:
-            state.ceiling_y = state.ground_y + 300;
-            set_intended_ceiling();
-            break;
-        case GAMEMODE_BALL:
-            state.ceiling_y = state.ground_y + 240;
+        default:
+            state.ceiling_y = state.ground_y + gamemode_heights[level_info.initial_gamemode];
             set_intended_ceiling();
             break;
         case GAMEMODE_PLAYER:

@@ -89,7 +89,7 @@ const float gamemode_heights[GAMEMODE_COUNT] = {
     300, // Ufo
     300, // Wave
     999999, // Robot
-    300 // Spider
+    270 // Spider
 };
 
 const int dual_gamemode_heights[GAMEMODE_COUNT] = {
@@ -392,8 +392,8 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->inverse_rotation = false;
                 player->left_ground = true;
                 player->jumped = true;
-                set_robot_animation(player, ROBOT_ANIM_JUMP_START);
-                if (player->gamemode == GAMEMODE_SPIDER) set_spider_animation(player, SPIDER_ANIM_FALL);
+                if (player->gamemode == GAMEMODE_ROBOT) set_animation(player, ROBOT_ANIM_JUMP_START);
+                if (player->gamemode == GAMEMODE_SPIDER) set_animation(player, SPIDER_ANIM_FALL);
                 SET_ACTIVATED(obj, true);
                 update_rotation_direction(player);
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &pad_use_effect, get_use_effect_array_ptr(GFX_TOP));
@@ -412,8 +412,8 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->inverse_rotation = false;
                 player->left_ground = true;
                 player->jumped = true;
-                set_robot_animation(player, ROBOT_ANIM_JUMP_START);
-                if (player->gamemode == GAMEMODE_SPIDER) set_spider_animation(player, SPIDER_ANIM_FALL);
+                if (player->gamemode == GAMEMODE_ROBOT) set_animation(player, ROBOT_ANIM_JUMP_START);
+                if (player->gamemode == GAMEMODE_SPIDER) set_animation(player, SPIDER_ANIM_FALL);
                 SET_ACTIVATED(obj, true);
                 update_rotation_direction(player);
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &pad_use_effect, get_use_effect_array_ptr(GFX_TOP));
@@ -433,8 +433,8 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->left_ground = true;
                 player->jumped = true;
                 player->velocity_uncapped = true;
-                set_robot_animation(player, ROBOT_ANIM_JUMP_START);
-                if (player->gamemode == GAMEMODE_SPIDER) set_spider_animation(player, SPIDER_ANIM_FALL);
+                if (player->gamemode == GAMEMODE_ROBOT) set_animation(player, ROBOT_ANIM_JUMP_START);
+                if (player->gamemode == GAMEMODE_SPIDER) set_animation(player, SPIDER_ANIM_FALL);
                 SET_ACTIVATED(obj, true);
                 update_rotation_direction(player);
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &pad_use_effect, get_use_effect_array_ptr(GFX_TOP));
@@ -500,8 +500,8 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->buffering_state = BUFFER_END;
                 player->jumped = true;
                 update_rotation_direction(player);
-                set_robot_animation(player, ROBOT_ANIM_JUMP_START);
-                if (player->gamemode == GAMEMODE_SPIDER) set_spider_animation(player, SPIDER_ANIM_JUMP);
+                if (player->gamemode == GAMEMODE_ROBOT) set_animation(player, ROBOT_ANIM_JUMP_START);
+                if (player->gamemode == GAMEMODE_SPIDER) set_animation(player, SPIDER_ANIM_JUMP);
                 
                 state.current_data.jumps++;
                 
@@ -531,8 +531,8 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->buffering_state = BUFFER_END;
                 player->jumped = true;
                 update_rotation_direction(player);
-                set_robot_animation(player, ROBOT_ANIM_JUMP_START);
-                if (player->gamemode == GAMEMODE_SPIDER) set_spider_animation(player, SPIDER_ANIM_JUMP);
+                if (player->gamemode == GAMEMODE_ROBOT) set_animation(player, ROBOT_ANIM_JUMP_START);
+                if (player->gamemode == GAMEMODE_SPIDER) set_animation(player, SPIDER_ANIM_JUMP);
 
                 state.current_data.jumps++;
 
@@ -563,8 +563,8 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->jumped = true;
                 player->velocity_uncapped = true;
                 update_rotation_direction(player);
-                set_robot_animation(player, ROBOT_ANIM_JUMP_START);
-                if (player->gamemode == GAMEMODE_SPIDER) set_spider_animation(player, SPIDER_ANIM_JUMP);
+                if (player->gamemode == GAMEMODE_ROBOT) set_animation(player, ROBOT_ANIM_JUMP_START);
+                if (player->gamemode == GAMEMODE_SPIDER) set_animation(player, SPIDER_ANIM_JUMP);
                 
                 state.current_data.jumps++;
                 
@@ -596,7 +596,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->jumped = true;
                 player->velocity_uncapped = true;
                 update_rotation_direction(player);
-                set_robot_animation(player, ROBOT_ANIM_JUMP_START);
+                if (player->gamemode == GAMEMODE_ROBOT) set_animation(player, ROBOT_ANIM_JUMP_START);
                 
                 state.current_data.jumps++;
                 
@@ -708,7 +708,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->buffering_state = BUFFER_END;
                 player->ceiling_inv_time = CEILING_INVUL_TIME;
                 player->jumped = true;
-                if (player->gamemode == GAMEMODE_SPIDER) set_spider_animation(player, SPIDER_ANIM_JUMP);
+                if (player->gamemode == GAMEMODE_SPIDER) set_animation(player, SPIDER_ANIM_JUMP);
                 
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, get_use_effect_array_ptr(GFX_TOP));
                 if (effect) {
@@ -741,8 +741,8 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
 
                 player->ball_rotation_speed = -BALL_SLOW_ROTATION;
                 
-                set_robot_animation(player, ROBOT_ANIM_JUMP_START);
-                if (player->gamemode == GAMEMODE_SPIDER) set_spider_animation(player, SPIDER_ANIM_JUMP);
+                if (player->gamemode == GAMEMODE_ROBOT) set_animation(player, ROBOT_ANIM_JUMP_START);
+                if (player->gamemode == GAMEMODE_SPIDER) set_animation(player, SPIDER_ANIM_JUMP);
 
                 player->on_ground = false;
                 player->on_ceiling = false;
@@ -1065,7 +1065,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     flip_other_player(state.current_player ^ 1);
                     update_rotation_direction(player);
 
-                    set_robot_animation(player, ROBOT_ANIM_JUMP_START);
+                    set_animation(player, ROBOT_ANIM_JUMP_START);
                     player->robot_air_time = 999.f;
 
                     UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
@@ -1104,7 +1104,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     flip_other_player(state.current_player ^ 1);
                     update_rotation_direction(player);
 
-                    set_spider_animation(player, SPIDER_ANIM_RUN);
+                    set_animation(player, SPIDER_ANIM_RUN);
 
                     UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
                     if (effect) {

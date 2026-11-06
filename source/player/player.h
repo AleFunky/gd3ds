@@ -165,17 +165,13 @@ typedef struct {
     bool just_teleported;
 
     float robot_air_time;
-    int robot_anim_id;
-    int robot_anim_frame;
-    float robot_anim_timer;
-    int robot_blend_from_anim_id;
-    int robot_blend_from_frame;
-    float robot_blend_from_timer;
-    float robot_landing_blend_timer;
-
-    int spider_anim_id;
-    int spider_anim_frame;
-    float spider_anim_timer;
+    int anim_id;
+    int anim_frame;
+    float anim_timer;
+    int blend_from_anim_id;
+    int blend_from_frame;
+    float blend_from_timer;
+    float blend_timer;
 
     float coyote_frames;
 
@@ -296,8 +292,8 @@ void draw_rotated_hitbox(Player *player);
 void draw_hitbox_trail(int player);
 void add_new_hitbox(Player *player);
 
-void set_robot_animation(Player *player, int robot_anim_id);
-void set_spider_animation(Player *player, int spider_anim_id);
+void set_animation(Player *player, int robot_anim_id);
+void set_animation(Player *player, int spider_anim_id);
 
 void update_p1_trail(Player *player, int player_id);
 void draw_p1_trail(Player *player, int player_id);
@@ -310,5 +306,8 @@ float convert_to_closest_rotation(float rotation, float angle);
 
 bool player_gamemode_is_flying(Player *player);
 void player_non_flying_landing(Player *player);
+
+float get_blend_duration(Player *player);
+void set_blend_timer(Player *player, float timer);
 
 void stop_dashing(Player *player);

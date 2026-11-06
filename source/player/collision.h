@@ -102,6 +102,8 @@ enum JumpType {
 extern int potential_slopes_buffer[2][MAX_COLLIDED_OBJECTS];
 extern int potential_slopes[2];
 
+extern const float gamemode_heights[GAMEMODE_COUNT];
+
 void setup_dual();
 void set_dual_bounds();
 void do_ball_reflection();
