@@ -1,5 +1,6 @@
 #include <3ds.h>
 #include <citro2d.h>
+#include "icons.h"
 #include "menus/core/ui_screen.h"
 #include "math_helpers.h"
 #include "menus/components/ui_list.h"
@@ -116,7 +117,7 @@ static void set_icon_index(UIElement *e) {
         ui_icon_set_selected((UIIcon *) e, *current_icons[gamemode_page] == new_index);
         ui_icon_set_gamemode_index((UIIcon *) e, gamemode_page, new_index);
 
-        if (gamemode_page == GAMEMODE_SHIP || gamemode_page == GAMEMODE_UFO) {
+        if (gamemode_page == GAMEMODE_SHIP || gamemode_page == GAMEMODE_UFO || gamemode_page == GAMEMODE_SPIDER) {
             ui_element_set_scale(e, .7f);
         } else if (gamemode_page == GAMEMODE_WAVE) {
             ui_element_set_scale(e, .95f);

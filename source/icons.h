@@ -49,7 +49,7 @@ typedef enum {
 #define ICON_COUNT_BIRD 150
 #define ICON_COUNT_DART 97
 #define ICON_COUNT_ROBOT 69
-#define ICON_COUNT_SPIDER 2
+#define ICON_COUNT_SPIDER 70
 
 #define ATLAS_COUNT_PLAYER 2
 #define ATLAS_COUNT_SHIP 1
