@@ -46,8 +46,8 @@ jobs:
         uses: montudor/action-zip@v1
       - name: Create zip files for updater
         run: |
-          zip -qq -r out/GeometryDash3DS.3dsx.zip . -i out/GeometryDash3DS.3dsx
-          zip -qq -r out/GeometryDash3DS.cia.zip . -i out/GeometryDash3DS.cia
+          zip -qq -r output/GeometryDash3DS.3dsx.zip . -i output/GeometryDash3DS.3dsx
+          zip -qq -r output/GeometryDash3DS.cia.zip . -i output/GeometryDash3DS.cia
       - name: Prepare for build publishing
         run: |
           mkdir -p out/3dsx/rom
