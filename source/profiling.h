@@ -25,6 +25,7 @@ typedef struct {
     float coll_ms;
     float play_ms;
     float handler_ms;
+    float step_trigger_ms;
     int steps;
     int collisions;
     int collision_checks;
@@ -34,9 +35,6 @@ typedef struct {
     float sorting_ms;
     float tint_ms;
     float drawing_ms;
-
-    // Dirty system
-    int draw_dirty;
     int draw_count;
 
     // Touch

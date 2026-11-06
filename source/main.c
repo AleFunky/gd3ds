@@ -7,11 +7,14 @@
 #include <stdlib.h>
 #include <time.h>
 #include <3ds.h>
+#include "3ds/svc.h"
 #include "c3d/renderqueue.h"
+#include "groups.h"
 #include "level_loading.h"
 #include "main.h"
 #include "graphics.h"
-#include "color_channels.h"
+#include "particles/rays.h"
+#include "triggers.h"
 #include "menus/core/ui_element.h"
 #include "mp3_player.h"
 #include "fonts/bigFont.h"
@@ -22,12 +25,12 @@
 #include "text.h"
 #include "utils/network.h"
 
-#include "player/collision.h"
 #include "state.h"
 
 #include "particles/particles.h"
 #include "particles/object_particles.h"
 #include "particles/coin_effect.h"
+#include "particles/key_effect.h"
 
 #include <stdarg.h>
 
@@ -37,19 +40,13 @@
 #include "level/main_levels.h"
 #include "menus/main_menu.h"
 #include "menus/level_select.h"
-#include "menus/icon_kit.h"
 #include "menus/gameplay.h"
-#include "menus/creator_menu/soggy.h"
-#include "menus/core/screen_definitions.h"
+#include "menus/updater.h"
+#include "menus/creator_menu/online/two_option_pop_up.h"
 #include "menus/settings_hub/settings.h"
-#include "menus/creator_menu/creator_menu.h"
-#include "menus/creator_menu/external/external_levels.h"
 #include "menus/creator_menu/search_menu.h"
-#include "menus/creator_menu/saved_levels.h"
 #include "menus/loading_screen.h"
 #include "menus/level_complete.h"
-#include "menus/creator_menu/online/online_level_menu.h"
-#include "menus/creator_menu/online/online_menu.h"
 
 #include "save/saving.h"
 
@@ -61,6 +58,7 @@
 #include "math_helpers.h"
 #include "profiling.h"
 
+#include "utils/gfx.h"
 #include "utils/utils.h"
 #include "utils/precise_input.h"
 #include "utils/server_utils.h"
@@ -72,7 +70,9 @@
 #define CITRA_TYPE 0x20000
 #define CITRA_VERSION 11
 
-u32 __ctru_linear_heap_size = 36 << 20;
+u32 __ctru_linear_heap_size = 44 << 20;
+
+bool inExclusiveState = false;
 
 int game_state = STATE_MENU;
 bool escape_state;
@@ -89,6 +89,9 @@ bool cheated = false;
 float global_volume;
 float music_volume;
 float sound_volume;
+
+int steps = 0;
+int last_steps = 0;
 
 bool cheats_used[CHEAT_COUNT];
 
@@ -132,6 +135,14 @@ float faster_speed_particles_timer = 0.f;
 bool alt_title_screen;
 
 bool is_N3DS;
+bool is_3DSX;
+bool is_nightly;
+
+bool queued_restart;
+
+bool _3dWarningPassed;
+
+char *_3dsx_path;
 
 UIStack menu_stack = { 0 };
 UIStack gameplay_stack = { 0 };
@@ -185,6 +196,22 @@ void no_dsp_firmware(void) {
     gfxExit();
     romfsExit();
     exit(22);
+}
+
+static aptHookCookie cookie = {0};
+
+static void aptCallback(APT_HookType hook, void *param) {
+    (void)param;
+
+    switch (hook) {
+        case APTHOOK_ONSUSPEND: // Home button
+        case APTHOOK_ONSLEEP: // Lid closed
+            pause_game();
+            break;
+
+        default:
+            break;
+    }
 }
 
 static FILE *log_file = NULL;
@@ -253,6 +280,12 @@ void set_channel_volume(int channel, float volume) {
     ndspChnSetMix(channel, mix);
 }
 
+static void check_rom_type() {
+    u64 id;
+    APT_GetProgramID(&id);
+    is_3DSX = (id != GAME_TITLE_ID);
+}
+
 void apply_volume_settings() {
     set_channel_volume(0, music_volume);
 
@@ -267,10 +300,58 @@ void check_system_model() {
 }
 
 float delta = 0;
+float frame_timer = 0;
 unsigned int level_frame = 0;
 unsigned int frame_counter = 0;
-
 bool song_loaded;
+
+static int restart_game() {
+    aptInit();
+    Result result = 0;
+	u8 param[0x300] = {};
+	u8 hmac[0x20] = {};
+
+	if (R_FAILED(result = APT_PrepareToDoApplicationJump(0, GAME_TITLE_ID, MEDIATYPE_SD))) {
+		return result;
+	}
+
+	if (R_FAILED(result = APT_DoApplicationJump(param, sizeof(param), hmac))) {
+		return result;
+	}
+
+	return 0;
+}
+
+// adapted from Luma3DS - sysmodules/rosalina/source/minisoc.c
+void enterExclusiveState() {
+    Result res = 0;
+    __dmb();
+
+    if (!inExclusiveState) {
+        ndmuInit();
+        res = NDMU_EnterExclusiveState(NDM_EXCLUSIVE_STATE_INFRASTRUCTURE);
+        if (R_SUCCEEDED(res)) res = NDMU_LockState(); // prevents ndm from switching to StreetPass when the lid is closed
+        inExclusiveState = R_SUCCEEDED(res);
+        __dmb();
+    }
+}
+
+void exitExclusiveState(bool force) {
+    Result res = 0;
+    __dmb();
+
+    if (inExclusiveState)
+    {
+        if (!force) {
+            res = NDMU_UnlockState();
+            if (R_SUCCEEDED(res)) res = NDMU_LeaveExclusiveState();
+        }
+        ndmuExit();
+        inExclusiveState = R_FAILED(res);
+        __dmb();
+    }
+}
+
 
 void update_player_effects(float delta) {
     for (int i = 0; i < 2; i++) {
@@ -280,6 +361,7 @@ void update_player_effects(float delta) {
         updateParticleSystem(&ship_secondary_particles[i], delta);
         updateParticleSystem(&secondary_particles[i], delta);
         updateParticleSystem(&burst_particles[i], delta);
+        updateParticleSystem(&robot_fire_particles[i], delta);
         updateParticleSystem(&land_particles[i], delta);
         updateParticleSystem(&explosion_particles[i], delta);
     }
@@ -311,6 +393,9 @@ void allocate_particles() {
     initParticleSystem(&burst_particles[0], &burst_effect);
     initParticleSystem(&burst_particles[1], &burst_effect);
 
+    initParticleSystem(&robot_fire_particles[0], &burst_effect2);
+    initParticleSystem(&robot_fire_particles[1], &burst_effect2);
+
     initParticleSystem(&land_particles[0], &land_effect);
     initParticleSystem(&land_particles[1], &land_effect);
     
@@ -339,6 +424,7 @@ void free_particles() {
         freeParticleData(&secondary_particles[i].data);
         freeParticleData(&ship_secondary_particles[i].data);
         freeParticleData(&burst_particles[i].data);
+        freeParticleData(&robot_fire_particles[i].data);
         freeParticleData(&land_particles[i].data);
         freeParticleData(&explosion_particles[i].data);
     }
@@ -379,6 +465,9 @@ void init_particles(Color p1_color, Color p2_color) {
 
     burst_particles[0].depth = 0.5f;
     burst_particles[1].depth = 0.5f;
+    
+    robot_fire_particles[0].depth = 0.5f;
+    robot_fire_particles[1].depth = 0.5f;
 
     land_particles[0].depth = 0.35f;
     land_particles[1].depth = 0.35f;
@@ -507,8 +596,8 @@ void init_particles(Color p1_color, Color p2_color) {
     faster_speed_particles.cfg.startColorBlue  = 255 / 255.f;
 
     coin_pickup_particles.cfg.startColorRed   = 255 / 255.f;
-    coin_pickup_particles.cfg.startColorGreen = 190 / 255.f;
-    coin_pickup_particles.cfg.startColorBlue  = 0 / 255.f;
+    coin_pickup_particles.cfg.startColorGreen = state.custom_level ? 1.f : 190 / 255.f;
+    coin_pickup_particles.cfg.startColorBlue  = state.custom_level ? 1.f : 0.f;
     
     end_wall_particles.cfg.startColorRed   = p1_not_white.r / 255.f;
     end_wall_particles.cfg.startColorGreen = p1_not_white.g / 255.f;
@@ -656,6 +745,7 @@ void ui_loop(){
         } else {
             delta = (now - lastTime) / (CPU_TICKS_PER_MSEC * 1000);
         }
+        trigger_dt = delta;
         lastTime = now;
         hidScanInput();
 
@@ -670,7 +760,52 @@ void ui_loop(){
         hidCircleRead(&touch.cpad);
 
         ui_stack_update(&touch);
-        
+
+        // autoupdater pop up stuff
+
+        if (updater_task.finished && !checkedForUpdate && ui_stack_get_fade_status() == FADE_STATUS_NONE && strcmp("updater", ui_stack_get_current_screen_name()) != 0 && strcmp("3d_warning_pop_up", ui_stack_get_current_screen_name()) != 0 && strcmp("info_card", ui_stack_get_current_screen_name()) != 0 && strcmp("updater_settings", ui_stack_get_current_screen_name()) != 0)
+        {
+            // Handle result
+            if (updater_task.result == 0)
+            {
+                if (update_data->isAvailable)
+                {
+                    checkedForUpdate = true;
+                    TwoOptionPopupData *autoupdate_data = malloc(sizeof(TwoOptionPopupData));
+                    if (!autoupdate_data)
+                        return;
+
+                    autoupdate_data->text = strdup("Updates were found for the game.\nOpen the updater?");
+                    autoupdate_data->title = strdup("Updates Found");
+                    autoupdate_data->proceed_text = strdup("Open");
+                    autoupdate_data->cancel_text = strdup("Later");
+                    ui_stack_push(&autoupdate_pop_up_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+                    ui_stack_push_data(autoupdate_data);
+                }
+                else
+                    output_log("no updates found");
+            }
+            updater_task.finished = false;
+        }
+
+        // 3d first time use warning pop up stuff
+
+        if (stereo_supported() && settingsState.stereoEnabled && ui_stack_get_fade_status() == FADE_STATUS_NONE && !_3dWarningPassed && get_stereo_slider() > 0.f && strcmp("settings", ui_stack_get_current_screen_name()) != 0)
+        {
+            TwoOptionPopupData *_3d_warning_data = malloc(sizeof(TwoOptionPopupData));
+            if (!_3d_warning_data)
+                return;
+
+            _3d_warning_data->text = strdup("Stereoscopic 3D can significantly lower performance.\nAre you sure you want to keep it enabled?");
+            _3d_warning_data->title = strdup("Disclaimer");
+            _3d_warning_data->proceed_text = strdup("Enable");
+            _3d_warning_data->cancel_text = strdup("Cancel");
+            ui_stack_push(&_3d_warning_pop_up_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+            ui_stack_push_data(_3d_warning_data);
+            _3dWarningPassed = true;
+        }
+
+
         // Frees a render target, so keep it out of the frame below
         update_stereo_target();
 
@@ -749,6 +884,7 @@ void game_loop() {
             ui_stack_update(&touch);
             state.online_level = false;
             exiting_level = true;
+            unload_level();
             return;
         }
     } else {
@@ -767,6 +903,7 @@ void game_loop() {
             ui_stack_push_game_state(STATE_MENU);
             ui_stack_update(&touch);
             exiting_level = true;
+            unload_level();
             return;
         }
 
@@ -777,6 +914,7 @@ void game_loop() {
 
     play_level_song(level_info.song_offset);
 
+    frame_timer = 0;
     if (song_loaded) {
         pause_playback_mp3();
     }
@@ -801,6 +939,8 @@ void game_loop() {
     u64 start = svcGetSystemTick();
     bool old_wide = settingsState.wideEnabled;
     bool old_stereo = settingsState.stereoEnabled;
+    
+    aptHook(&cookie, aptCallback, NULL);
 
     // Main loop
     while (aptMainLoop()) {
@@ -857,8 +997,6 @@ void game_loop() {
             cheats_used[CHEAT_HITBOX_DISPLAY] = true;
         }
         
-        int steps = 0;
-        
         kHeldPaused &= ~touch.up;
         if(!game_paused){
             touch.held &= ~kHeldPaused;
@@ -878,6 +1016,7 @@ void game_loop() {
             secondary_particles[i].emitting = false;
             ship_secondary_particles[i].emitting = false;
             burst_particles[i].emitting = false;
+            robot_fire_particles[i].emitting = false;
             land_particles[i].emitting = false;
         }
 
@@ -894,6 +1033,7 @@ void game_loop() {
             snapshot.collision_ms = 0;
             snapshot.play_ms = 0;
             snapshot.handler_ms = 0;
+            snapshot.handler_ms = 0;
             
             brick_destroy_particles.emitting = false;
             glitter_particles.emitting = false;
@@ -903,26 +1043,35 @@ void game_loop() {
             fast_speed_particles_bottom.emitting = false;
             faster_speed_particles_bottom.emitting = false;
             
-            if (physics_delta > 0.5f) physics_delta = STEPS_DT_UNMOD; // Avoid spiral of death
+            if (physics_delta > 0.5f) physics_delta = STEPS_DT; // Avoid spiral of death
 
             if (!game_paused) {
                 if (fixed_dt) {
-                    physics_delta = STEPS_DT_UNMOD;
+                    physics_delta = STEPS_DT;
                     if (!being_faded) fixed_dt = false;
                 }
                 accumulator += physics_delta;
+                
+                last_steps = steps;
+                steps = 0;
 
                 // in case of merge conflicts: this needs to stay after the accumulator deposit above.
                 // planned is how many substeps this frame is about to run, so if we calculate it
                 // before the deposit, the accumulator only has the leftover from last frame and
                 // planned will always be 1, making every input land on a single substep like normal
                 // frame latching (no error, it will just silently get less precise)
-                u32 planned = (u32)(accumulator / STEPS_DT_UNMOD);
+                u32 planned = (u32)(accumulator / STEPS_DT);
                 pi_begin_frame((u32)frame_window_start, (u32)now, planned ? planned : 1);
 
+                state.player.gravity_changed_move = false;
+                state.player2.gravity_changed_move = false;
+
                 // Run simulation in fixed steps
-                while (accumulator >= STEPS_DT_UNMOD) {
+                while (accumulator >= STEPS_DT) {
                     u64 start_physics = svcGetSystemTick();
+                    float player_x_before_step = state.player.x;
+                    bool player1_upside_down_before = state.player.upside_down;
+                    bool player2_upside_down_before = state.player2.upside_down;
 
                     if (pi_enabled) {
                         pi_apply_substep((u32)steps);
@@ -945,6 +1094,8 @@ void game_loop() {
                         }
                     }
 
+                    state.just_placed_auto_checkpoint = false;
+
                     state.current_player = 0;
                     state.old_player = state.player;
                     
@@ -954,6 +1105,7 @@ void game_loop() {
                     trail = &trail_p1;
                     wave_trail = &wave_trail_p1;
                     handle_player(&state.player);
+                    state.player.gravity_changed_move |= state.player.upside_down != player1_upside_down_before;
                     handle_mirror_transition();
 
                     state.level_progress = (state.player.x / level_info.last_obj_x) * 100;
@@ -977,23 +1129,30 @@ void game_loop() {
                         curr_input = state.input_p2;
                         curr_old_input = state.old_input_p2;
                         handle_player(&state.player2);
+                        state.player2.gravity_changed_move |= state.player2.upside_down != player2_upside_down_before;
+
+                        //revert state back to first player
+                        state.current_player = 0;
+                        state.old_player = state.player;
 
                         if (state.dead) break;
                     }
                     
+                    trigger_dt = STEPS_DT;
+                    move_lock_player_x_delta = state.player.x - player_x_before_step;
+                    move_lock_player_y_delta = state.player.delta_y;
+                    u64 start_step_triggers = svcGetSystemTick();
+                    handle_step_triggers();
+                    u64 end_step_triggers = svcGetSystemTick();
+                    float step_trigger_time = (end_step_triggers - start_step_triggers) / (CPU_TICKS_PER_MSEC);
+                    snapshot.step_trigger_ms += step_trigger_time;
+
                     run_camera();
                     handle_bg_flash();
                     handle_respawn_effect();
-                    handle_auto_checkpoints(STEPS_DT);
 
                     u64 end_physics = svcGetSystemTick();
                     float physics_time = (end_physics - start_physics) / (CPU_TICKS_PER_MSEC);
-
-                    if (physics_time / 1000 >= STEPS_DT_UNMOD) {
-                        frame_skipped = (int) ((physics_time / 1000) * STEPS_HZ);
-                    }
-                    else frame_skipped = 0;
-
                     snapshot.physics_ms += physics_time;
 
                     accumulator -= STEPS_DT;
@@ -1003,8 +1162,16 @@ void game_loop() {
             }
         }
 
+        // Death stops the lock triggers
+        if (state.dead) {
+            move_lock_player_x_delta = 0; 
+            move_lock_player_y_delta = 0;
+        }
+
         if (!game_paused) {
             frame_counter++;
+            frame_timer += delta;
+            trigger_dt = delta;
 
             if (state.dead && state.death_timer <= 0.f) {
                 state.death_timer = (settingsState.quickRetry ? 0.5f : 1.f);
@@ -1083,6 +1250,7 @@ void game_loop() {
                     fixed_dt = true;
                     state.dead = false;
                     state.hitbox_display = 0;
+                    continue;
                 }
             }
 
@@ -1109,9 +1277,13 @@ void game_loop() {
             }
 
             u64 start_trig = svcGetSystemTick();
-            handle_triggers();
+            if (state.death_timer > 0.f) handle_step_triggers();
             handle_col_triggers();
+            handle_copy_channels();
+            handle_alpha_triggers();
+            handle_pulse_triggers();
             calculate_lbg();
+            flush_group_combination_visual_moves();
             u64 end_trig = svcGetSystemTick();
             u64 ticks_trig = end_trig - start_trig;
             snapshot.triggers_ms = ticks_trig / CPU_TICKS_PER_MSEC;
@@ -1124,6 +1296,7 @@ void game_loop() {
 
             u64 start_part = svcGetSystemTick();
             update_player_effects(delta);
+            update_rays(delta);
 
             // End wall particles
             if (level_info.wall_y > 0) {
@@ -1138,6 +1311,7 @@ void game_loop() {
             handle_new_best_popup(delta);
 
             update_collect_effect(delta);
+            update_key_effect(delta);
 
             float calc_x_speed_particles = SCREEN_WIDTH_AREA;
             float calc_y_speed_particles = (SCREEN_HEIGHT_AREA / 2);
@@ -1205,6 +1379,21 @@ void game_loop() {
         }
 
         ui_stack_update(&touch);
+
+        if (stereo_supported() && settingsState.stereoEnabled && !_3dWarningPassed && get_stereo_slider() > 0.f && strcmp("3d_warning_pop_up", ui_stack_get_current_screen_name()) != 0 && ui_stack_get_fade_status() == FADE_STATUS_NONE) {
+            if (!game_paused) pause_game();
+            if (!game_paused) return; 
+            TwoOptionPopupData *_3d_warning_data = malloc(sizeof(TwoOptionPopupData));
+            if (!_3d_warning_data) return;
+
+            _3d_warning_data->text = strdup("3D can significantly lower performance.\nAre you sure you want to keep it on?");
+            _3d_warning_data->title = strdup("Disclaimer");
+            _3d_warning_data->proceed_text = strdup("Enable");
+            _3d_warning_data->cancel_text = strdup("Disable");
+            ui_stack_push(&_3d_warning_pop_up_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+            ui_stack_push_data(_3d_warning_data);
+            _3dWarningPassed = true;
+        }
 
         // If the wide or 3D settings have been changed, reinitialize screens
         if (settingsState.wideEnabled != old_wide || settingsState.stereoEnabled != old_stereo) {
@@ -1367,6 +1556,10 @@ void game_loop() {
         }
     }
 
+    if (!aptMainLoop()) return;
+    
+    aptUnhook(&cookie);
+
     LevelData *level_data_sel = &current_level_entry->data;
 
     level_data_sel->attempts += state.current_data.attempts;
@@ -1411,6 +1604,12 @@ void game_assets_init() {
     
     spriteSheet2 = C2D_SpriteSheetLoad("romfs:/gfx/portals.t3x");
     if (!spriteSheet2) svcBreak(USERBREAK_PANIC);
+
+    spriteSheet3 = C2D_SpriteSheetLoad("romfs:/gfx/sprites_2p0.t3x");
+    if (!spriteSheet3) svcBreak(USERBREAK_PANIC);
+
+    animatedSheet = C2D_SpriteSheetLoad("romfs:/gfx/animated.t3x");
+    if (!animatedSheet) svcBreak(USERBREAK_PANIC);
     
     glowSheet = C2D_SpriteSheetLoad("romfs:/gfx/glow.t3x");
     if (!glowSheet) svcBreak(USERBREAK_PANIC);
@@ -1432,6 +1631,9 @@ void game_assets_init() {
     
     waveSheet = C2D_SpriteSheetLoad("romfs:/gfx/dart.t3x");
     if (!waveSheet) svcBreak(USERBREAK_PANIC);
+
+    robotSheet = C2D_SpriteSheetLoad("romfs:/gfx/robot.t3x");
+    if (!robotSheet) svcBreak(USERBREAK_PANIC);
 
     trailSheet = C2D_SpriteSheetLoad("romfs:/gfx/trails.t3x");
     if (!trailSheet) svcBreak(USERBREAK_PANIC);
@@ -1460,8 +1662,6 @@ void game_assets_init() {
 
     initParticleSystem(&faster_speed_particles_bottom, &speed_effect_vfast);
     faster_speed_particles_bottom.relativeStationary = true;
-
-    
 }
 
 int main(int argc, char* argv[]) {
@@ -1476,7 +1676,15 @@ int main(int argc, char* argv[]) {
     osSetSpeedupEnable(1);
     soc_init();
     check_system_model();
+    check_rom_type();
+    // output_log("argc: %d\n", argc);
+    if (argc > 0) { 
+        _3dsx_path = argv[0];
+        // output_log("3dsx path: %s\n", _3dsx_path);
+    }
+    
 #ifndef IS_RELEASE
+    is_nightly = true;
     consoleDebugInit(debugDevice_SVC);
 #endif
 
@@ -1489,6 +1697,7 @@ int main(int argc, char* argv[]) {
 
     srand(time(NULL));
     alt_title_screen = random_float(0, 1) < (1.f / 256);
+    queued_restart = false;
     
     C2D_SetTintMode(C2D_TintMult);
     
@@ -1500,19 +1709,29 @@ int main(int argc, char* argv[]) {
 
     loading_screen_init();
 
-    loading_screen_update(0);
+    //short fade in to loading screen
+    int fade = 255;
+    while(aptMainLoop()){
+        loading_screen_update(0, fade);
+
+        fade -= FADE_SPEED * (1 / 60.f);
+
+        if(fade < 0){
+            break;
+        }
+    }
 
     ui_assets_init();
     game_assets_init();
-    loading_screen_update(10);
+    loading_screen_update(10, 0);
 
     load_save_file(SAVE_ROBTOP_SERVER_FILE, &gd_server_file);
     
-    loading_screen_update(20);
+    loading_screen_update(20, 0);
 
     load_save_file(SAVE_1P9_SERVER_FILE, &gdps_file);
 
-    loading_screen_update(30);
+    loading_screen_update(30, 0);
 
     load_external_file(SAVE_EXTERNAL_LEVELS_FILE, &external_file);
 
@@ -1520,24 +1739,24 @@ int main(int argc, char* argv[]) {
 
     migrate_old_data();
     
-    loading_screen_update(40);
+    loading_screen_update(40, 0);
 
     calculate_stats();
 
     cache_all_sprites();
 
-    loading_screen_update(55);
+    loading_screen_update(55, 0);
     
     init_default_use_effect_pools();
     update_player_colors();
 
-    loading_screen_update(75);
+    loading_screen_update(75, 0);
 
     load_sfx();
 
     memset(&level_info, 0, sizeof(LoadedLevelInfo));
 
-    loading_screen_update(100);
+    loading_screen_update(100, 0);
 
     // Unload loading screen
     ui_unload_screen(&default_screen);
@@ -1550,25 +1769,8 @@ int main(int argc, char* argv[]) {
     ui_stack_push_root_instant(&main_menu_def);
 
     bool exit = false;
+    
     while (aptMainLoop() && !exit) {
-        // Update color if changed menus
-        Color p1_not_white = get_white_if_black(p1_color);
-
-        touch_drag_particles.cfg.startColorRed = p1_not_white.r / 255.f;
-        touch_drag_particles.cfg.startColorGreen = p1_not_white.g / 255.f;
-        touch_drag_particles.cfg.startColorBlue = p1_not_white.b / 255.f;
-
-        touch_explosion_particles.cfg.startColorRed = p1_not_white.r / 255.f;
-        touch_explosion_particles.cfg.startColorGreen = p1_not_white.g / 255.f;
-        touch_explosion_particles.cfg.startColorBlue = p1_not_white.b / 255.f;
-
-        glitter_particles_bottom.cfg.startColorRed = get_white_if_black(p1_color).r / 255.f;
-        glitter_particles_bottom.cfg.startColorGreen = get_white_if_black(p1_color).g / 255.f;
-        glitter_particles_bottom.cfg.startColorBlue = get_white_if_black(p1_color).b / 255.f;
-        glitter_particles_bottom.cfg.finishColorRed = get_white_if_black(p1_color).r / 255.f;
-        glitter_particles_bottom.cfg.finishColorGreen = get_white_if_black(p1_color).g / 255.f;
-        glitter_particles_bottom.cfg.finishColorBlue = get_white_if_black(p1_color).b / 255.f;
-
         slow_speed_particles_bottom.cfg.startColorRed = 255 / 255.f;
         slow_speed_particles_bottom.cfg.startColorGreen = 255 / 255.f;
         slow_speed_particles_bottom.cfg.startColorBlue = 0 / 255.f;
@@ -1597,6 +1799,9 @@ int main(int argc, char* argv[]) {
                 break;
         }
     }
+    
+    // Wait for the game to save
+    wait_for_saving();
 
     ui_stack_set_stack(&menu_stack);
     ui_stack_clear();
@@ -1608,15 +1813,17 @@ int main(int argc, char* argv[]) {
     // Delete graphics
     C2D_SpriteSheetFree(spriteSheet);
     C2D_SpriteSheetFree(spriteSheet2);
+    C2D_SpriteSheetFree(spriteSheet3);
+    C2D_SpriteSheetFree(animatedSheet);
     C2D_SpriteSheetFree(glowSheet);
     C2D_SpriteSheetFree(bgSheet);
-    C2D_SpriteSheetFree(bg2Sheet);
     C2D_SpriteSheetFree(cube0Sheet);
     C2D_SpriteSheetFree(cube1Sheet);
     C2D_SpriteSheetFree(shipSheet);
     C2D_SpriteSheetFree(ballSheet);
     C2D_SpriteSheetFree(ufoSheet);
     C2D_SpriteSheetFree(waveSheet);
+    C2D_SpriteSheetFree(robotSheet);
     C2D_SpriteSheetFree(trailSheet);
     C2D_SpriteSheetFree(particleSheet);
     C2D_SpriteSheetFree(ui_sheet);
@@ -1636,5 +1843,11 @@ int main(int argc, char* argv[]) {
     gfxExit();
     romfsExit();
     ndspExit();
+
+    // restart game if a restart was queued
+    if (queued_restart) {
+        restart_game();
+    }
+
     return 0;
 }

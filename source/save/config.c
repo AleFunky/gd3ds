@@ -2,16 +2,15 @@
 
 #include <3ds.h>
 #include "main.h"
-#include "graphics.h"
 
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "utils/gfx.h"
 #include "menus/icon_kit.h"
 #include "menus/settings_hub/settings.h"
 #include "menus/creator_menu/soggy.h"
 #include "menus/creator_menu/search_menu.h"
+#include "menus/updater_settings.h"
 
 #include "save/saving.h"
 #include "utils/json_config.h"
@@ -70,6 +69,9 @@ void save_user_config(Config *cfg) {
 void init_values() {
     config_init_bool(&cfg, CONFIG_FLAGS "sogged", false);
     config_init_bool(&cfg, CONFIG_FLAGS "gdps", false);
+    config_init_bool(&cfg, CONFIG_FLAGS "nightlyUpdates", is_nightly);
+    config_init_bool(&cfg, CONFIG_FLAGS "autoUpdate", false);
+    config_init_bool(&cfg, CONFIG_FLAGS "3dWarningPassed", false);
     
     config_init_int(&cfg, CONFIG_VALUES "playersDestroyed", 0);
     config_init_float(&cfg, CONFIG_VALUES "music_volume", 1);
@@ -115,9 +117,13 @@ void cfg_init() {
 
     init_values();
 
+    doAutoUpdates = config_get_bool(&cfg, CONFIG_FLAGS "autoUpdate", false);
+    useNightlyBranch = config_get_bool(&cfg, CONFIG_FLAGS "nightlyUpdates", false);
+
     gotSogged = config_get_bool(&cfg, CONFIG_FLAGS "sogged", false);
     gdps = config_get_bool(&cfg, CONFIG_FLAGS "gdps", false);
     strcpy(menu_loop_path, gdps ? "romfs:/songs/menuLoopGDPS.mp3" : "romfs:/songs/menuLoop.mp3");
+    _3dWarningPassed = config_get_bool(&cfg, CONFIG_FLAGS "3dWarningPassed", false);
 
     players_destroyed = config_get_int(&cfg, CONFIG_VALUES "playersDestroyed", 0);
     music_volume = config_get_float(&cfg, CONFIG_VALUES "music_volume", 1);
@@ -130,6 +136,8 @@ void cfg_init() {
     selected_ball = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ball", 1);
     selected_ufo  = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ufo",  1);
     selected_wave = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "wave", 1);
+    selected_robot = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "robot", 1);
+    if (selected_robot < 1 || selected_robot >= ICON_COUNT_ROBOT) selected_robot = 1;
     selected_trail = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "trail", 0);
     selected_p1   = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "p1",   DEFAULT_P1);
     selected_p2   = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "p2",   DEFAULT_P2);
@@ -157,8 +165,11 @@ void cfg_init() {
 }
 
 void cfg_save() {
+    config_set_bool(&cfg, CONFIG_FLAGS "autoUpdate", doAutoUpdates);
+    config_set_bool(&cfg, CONFIG_FLAGS "nightlyUpdates", useNightlyBranch);
     config_set_bool(&cfg, CONFIG_FLAGS "sogged", gotSogged);
     config_set_bool(&cfg, CONFIG_FLAGS "gdps", gdps);
+    config_set_bool(&cfg, CONFIG_FLAGS "3dWarningPassed", _3dWarningPassed);
 
     config_set_int(&cfg, CONFIG_VALUES "playersDestroyed", players_destroyed);
     config_set_float(&cfg, CONFIG_VALUES "music_volume", music_volume);
@@ -169,6 +180,7 @@ void cfg_save() {
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ball", selected_ball);
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ufo",  selected_ufo );
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "wave", selected_wave);
+    config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "robot", selected_robot);
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "trail", selected_trail);
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "p1",   selected_p1  );
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "p2",   selected_p2  );

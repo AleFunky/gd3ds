@@ -1,5 +1,6 @@
 #include "state.h"
 #include <string.h>
+#include "player/robot_anim_data.h"
 #include "main.h"
 #include "math_helpers.h"
 #include "player/slope.h"
@@ -23,6 +24,27 @@
 
 GameState state;
 
+bool level_unrated_online = false;
+bool level_verified_coins = false;
+
+bool level_has_unverified_coins(void) {
+    if (state.custom_level && !state.online_level) return false; // External level
+    if (!state.custom_level) return false; // Main level
+    return level_unrated_online || !level_verified_coins;
+}
+
+void level_unrated_online_refresh(void) {
+    level_unrated_online = state.online_level
+        && current_level_entry
+        && !level_has_rate(&current_level_entry->data);
+}
+
+
+u32 user_coin_icon_tint(bool collected, bool has_rate) {
+    if (collected) return has_rate ? C2D_Color32(255, 255, 255, 255) : USER_COIN_UNRATED_TINT;
+    return has_rate ? C2D_Color32(165, 165, 165, 255) : USER_COIN_UNRATED_EMPTY_TINT;
+}
+
 void set_camera_x(float x) {
     state.camera_x = x;
     state.unmod_cam_x = x;
@@ -41,7 +63,7 @@ void run_camera() {
     float playable_height = state.ceiling_y - state.ground_y;
     float calc_height = 0;
 
-    if (player->gamemode != GAMEMODE_PLAYER || state.dual) {
+    if ((player->gamemode != GAMEMODE_PLAYER && player->gamemode != GAMEMODE_ROBOT) || state.dual) {
         calc_height = (SCREEN_HEIGHT_AREA - playable_height) / 2;
     }
     state.ground_y_gfx = ease_out(state.ground_y_gfx, calc_height, 0.02f);
@@ -80,7 +102,7 @@ void run_camera() {
 
         float target_y = cam_y;
 
-        if (player->gamemode == GAMEMODE_PLAYER && !state.dual) {
+        if ((player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_ROBOT) && !state.dual) {
             float player_y = player->y;
 
             float upside_down_offset = (player->upside_down ? -30.f : 0);
@@ -151,6 +173,7 @@ void set_intended_ceiling() {
 }
 
 void set_gamemode(Player *player, int gamemode) {
+    if (player->gamemode != gamemode) player->platform_velocity = player->last_platform_velocity = 0.f;
     player->gamemode = gamemode;
     set_hitbox_size(player, gamemode);
 }
@@ -180,6 +203,7 @@ void clear_snap_data(Player *player) {
 
 void init_player(Player *player) {
     memset(player, 0, sizeof(Player));
+    player->robot_landing_blend_timer = ROBOT_LANDING_BLEND_DURATION;
     
     set_gamemode(player, level_info.initial_gamemode);
     set_mini(player, level_info.initial_mini);
@@ -189,6 +213,7 @@ void init_player(Player *player) {
     player->player_icons.ball = selected_ball;
     player->player_icons.ufo  = selected_ufo;
     player->player_icons.wave = selected_wave;
+    player->player_icons.robot = selected_robot;
     player->player_icons.glow = player_glow_enabled;
 
     player->player_icons.p1_color = p1_color;
@@ -201,6 +226,7 @@ void init_player(Player *player) {
     player->vel_x = player_speeds[state.speed];  
     player->vel_y = 0;
     player->new_vel_y = __FLT_MAX__;
+    player->platform_velocity = player->last_platform_velocity = 0.f;
     player->frame = 0;
 
     player->on_ground = true;
@@ -252,6 +278,7 @@ void init_state() {
     state.current_data.coin1 = false;
     state.current_data.coin2 = false;
     state.current_data.coin3 = false;
+    state.last_hitbox_trail = 0;
 
     in_level_complete = false;
 
@@ -274,6 +301,7 @@ void init_level_bounds() {
             set_intended_ceiling();
             break;
         case GAMEMODE_PLAYER:
+        case GAMEMODE_ROBOT:
             state.camera_intended_y = 0;
     }
     
@@ -292,7 +320,7 @@ void init_level_bounds() {
     float playable_height = state.ceiling_y - state.ground_y;
     float calc_height = 0;
 
-    if (state.player.gamemode != GAMEMODE_PLAYER || state.dual) {
+    if ((state.player.gamemode != GAMEMODE_PLAYER && state.player.gamemode != GAMEMODE_ROBOT) || state.dual) {
         calc_height = (SCREEN_HEIGHT_AREA - playable_height) / 2;
     }
     
@@ -302,6 +330,7 @@ void init_level_bounds() {
 }
 
 void first_load_init_variables() {
+    level_unrated_online_refresh();
     memset(&state.current_data, 0, sizeof(StateLevelData));
     
     level_info.wall_x = roundf(level_info.last_obj_x / 30) * 30;
@@ -321,6 +350,9 @@ void first_load_init_variables() {
 
     clear_new_best_popup();
     init_variables();
+    
+    // Run triggers behind the start
+    handle_triggers();
     
     LevelData *level_data_sel = &current_level_entry->data;
     state.current_data.time_start = svcGetSystemTick() / (CPU_TICKS_PER_MSEC * 1000);
@@ -587,7 +619,7 @@ void clear_respawn_effect() {
 }
 
 bool is_coin_collected(int obj) {
-    if (state.custom_level) return false;
+    if (!current_level_entry) return false;
 
     if (objects.id[obj] != SECRET_COIN) return false;
 

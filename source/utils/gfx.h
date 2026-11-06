@@ -59,6 +59,8 @@ void begin_eye_layer(float depth);
 void end_eye_layer();
 float get_depth_shift(float depth);
 
+float get_stereo_slider();
+
 float get_mirror_x(float x, float factor);
 
 void draw_9_slice(const C2D_Image atlas, const float x, const float y, const float sx, const float sy, const int width, const int height, const float border, const u32 color);
@@ -72,4 +74,4 @@ void custom_circle (const float x, const float y, const float radius,
                      const u32 color);
 
 void calc_quad_params(SpriteObject *vo);
-bool C2D_DrawImageFast(C2D_Image img, const QuadParams quad_params, const C2D_DrawParams* params, const C2D_ImageTint* tint);
+bool C2D_DrawImageFast(C2D_Image *img, const QuadParams *quad_params, const C2D_DrawParams *params, const u32 color);

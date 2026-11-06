@@ -14,6 +14,7 @@ typedef struct SearchEntry {
     int downloads;
     int likes;
     int stars;
+    int coins;
     int reqStars;
     int difficulty;
     int objCount;
@@ -25,6 +26,7 @@ typedef struct SearchEntry {
     bool isTwoPlayer;
     bool isDemon;
     bool isAuto;
+    bool verifiedCoins;
     int creatorIndex;
     int songIndex;
 } SearchEntry;
@@ -81,10 +83,20 @@ typedef struct CommentAuthorEntry {
     
 } CommentAuthorEntry;
 
+typedef struct UpdateData {
+    bool isAvailable;
+    char releaseTitle[64];
+    char *releaseBody;
+    char releaseDownloadUrl[128];
+    int releaseFileSize;
+} UpdateData;
+
 int search_levels(GenericTask *task);
 int get_level(GenericTask *task);
 int get_comments(GenericTask *task);
 int get_song_data(GenericTask *task);
+int check_for_updates(GenericTask *task);
+int install_update();
 
 float derive_gj_version(int version);
 
@@ -99,6 +111,8 @@ extern CommentEntry *comment_entries;
 
 extern SearchFilters filters;
 
+extern UpdateData *update_data;
+
 extern int creatorEntriesLength;
 extern int songEntriesLength;
 extern int searchEntriesLength;
@@ -106,3 +120,6 @@ extern int searchEntriesLength;
 extern int levelEntryLength;
 
 extern int commentEntriesLength;
+
+extern char **latestCommits;
+extern int latestCommitCount;

@@ -6,12 +6,11 @@
 #include "menus/core/common_setters.h"
 
 #include "math_helpers.h"
-#include "fonts/bigFont.h"
 #include "main.h"
 #include "easing.h"
 #include "mp3_player.h"
-#include "level_select.h"
 #include "state.h"
+#include "level_loading.h"
 #include "particles/circles.h"
 
 #include "menus/components/ui_darken.h"
@@ -28,6 +27,12 @@
 
 #define ANIM_DURATION 1.f
 #define RESTART_ANIM_DURATION 0.5f
+
+#define SECRET_COIN_UI2_ID 401
+
+#define COIN_UNCOLLECTED_CUSTOM_ID 62
+#define COIN_UNCOLLECTED_CUSTOM_SHEET 4
+#define COIN_UNCOLLECTED_CUSTOM_SCALE 0.968f
 
 static bool yes_exit = false;
 static bool restart = false;
@@ -60,6 +65,7 @@ static UILabel *time_text;
 static UILabel *completion_text;
 
 static UIImage *coins_full[3];
+static UIImage *coins_base[3];
 static UIParticle *particles[4];
 
 char *practice_completion_text = "Well done... Now try to complete it\nwithout any checkpoints!";
@@ -80,7 +86,99 @@ char *do_not_completion_texts[] = {
     "Auto Safe Mode cheat detected:\nNoclipped through the end wall",
     "I lied, you got 99%",
     "I have no words.... oh wait",
-    "we really doing anything now"
+    "we really doing anything now",
+    "+100 dollars",
+    "360 FPS detected",
+    "A swing and a hit!",
+    "A swing and a home run!",
+    "Absolute Geometry Dash",
+    "After all this time...",
+    "Astounded. Flabbergasted really.",
+    "Auto-Safe Mode Disabled!",
+    "Back to back?",
+    "Believe in magic",
+    "But is it possible with accurate hitboxes?",
+    "Calm down!",
+    "CBF Detected, loser! Click Between Frames\nis illegitimate and will not be allowed\nfor use in GD3DS. Please disable the mod to\ncontinue playing.",
+    "Cheats Not Detected! Verification not voided.",
+    "Cheats used: Skill",
+    "Clap Clap Clap",
+    "Congragurlationals!",
+    "dear god they did it...",
+    "Do it again, I wasn't paying attention",
+    "engineer gaming",
+    "epic sauce",
+    "Error 404: Completion not found",
+    "exit(0)",
+    "famidash ReTraY 100% complete",
+    "First try!!",
+    "GAMING",
+    "gg freakin ez",
+    "go outside",
+    "Good enough.",
+    "good j*b ig",
+    "Good job, now beat Grief.",
+    "good yob",
+    "Goop job!",
+    "Have a cookie",
+    "hi you did it bye",
+    "HOLY SHIT YOU JUST VERIFIED... oh wait.",
+    "horse",
+    "How",
+    "I could do this in half the attempts",
+    "If it's not a demon I don't care",
+    "ITS BLUE ITS BLUE",
+    "John GD3DS congratulates you",
+    "Like Doggie Jr.!",
+    "Nah this is pay to win",
+    "Nice! Now try to complete it with 3D on!",
+    "Now beat it while playing piano",
+    "Now do it again",
+    "Now do it blindfolded",
+    "Now you can beat Grief!",
+    "One Level, Two Level, Beat Level, New Level",
+    "Please touch some grass.",
+    "Possible top 1 - Said no one ever",
+    "Project zoink",
+    "Put me in the screenshot",
+    "RubRub is always watching",
+    "Scream louder!",
+    "slow clap",
+    "So what now?",
+    "Son im crine",
+    "Stop screaming!",
+    "That doesn't count",
+    "That's just dumb luck",
+    "That's not Aeternus",
+    "The End.",
+    "The servers are currently experiencing a\ntemporary period of heavy load,\nplease try again tomorrow.",
+    "They cleared it for an amazing reason!",
+    "Time to rest...",
+    "To celebrate, they became purple",
+    "Took you long enough...",
+    "Unc still got it",
+    "W bro",
+    "W larp",
+    "W speed (heart emoji)",
+    "Was it worth it?",
+    "WE beat it, yes BOTH of us.",
+    "Well done! Now try to complete it withou- oh.",
+    "Well played!",
+    "Why didn't anyone wake me up?",
+    "why u hacker",
+    "Winner winner chicken dinner!!!",
+    "Yea whatever, that wasn't even difficult...",
+    "YIPPEE!!!!",
+    "You are peak!",
+    "You are the Geometry Dash",
+    "You cannot beat a practice in normal mode.",
+    "you di dit!",
+    "You took THAT many attempts? Pathetic.",
+    "You verified The Golden, let's go",
+    "YOU WIN!",
+    "You've just beaten Stereo Madness",
+    "Your dids it!",
+    "your winner!"
 };
 
 char *completion_texts[] = {
@@ -148,8 +246,8 @@ static void run_start_animation(float delta) {
 
     ui_run_func_on_tag(&screen, "bottomWindow", scale_bottom_buttons_anim);
     
-    ui_set_pos_on_tag(&screen, SCREEN_BOT_WIDTH / 2, window_y_pos, "window");
-    ui_set_pos_on_tag(&screen_top, SCREEN_WIDTH / 2, window_y_pos, "window");
+    ui_set_pos_on_tag(&screen, (float)SCREEN_BOT_WIDTH / 2, window_y_pos, "window");
+    ui_set_pos_on_tag(&screen_top, (float)SCREEN_WIDTH / 2, window_y_pos, "window");
 
     if(anim_time > 0.6f){
         animating_reward = true;
@@ -174,7 +272,9 @@ static void spawn_reward_firework(UIImage* e){
         ui_add_use_effect(
             (UIUseEffect *) ui_get_element_by_tag(&screen_top, "rewardCircle"),
         x, y, &death_effect),
-    1.f, 0.75f, 0.f);
+    1.f,
+    level_has_unverified_coins() ? USER_COIN_UNRATED_G / 255.f : (state.custom_level ? 1.f : 0.75f),
+    level_has_unverified_coins() ? USER_COIN_UNRATED_B / 255.f : (state.custom_level ? 1.f : 0.f));
 }
 
 // This plays the animation of the coins popping into place and the stars
@@ -213,7 +313,9 @@ static void run_rewards_animation(float delta){
 
         ui_element_set_scale((UIElement *) coin, scale_value * 0.88f);
 
-        ui_image_set_tint(coin, C2D_Color32f(1, 1, 1, opacity_value));
+        ui_image_set_tint(coin, level_has_unverified_coins()
+            ? C2D_Color32(USER_COIN_UNRATED_R, USER_COIN_UNRATED_G, USER_COIN_UNRATED_B, (u8)(opacity_value * 255.f))
+            : C2D_Color32f(1, 1, 1, opacity_value));
     } else{
         if(showStars) {
             UIImage* star = (UIImage *) ui_get_element_by_tag(&screen_top, "star");
@@ -260,8 +362,8 @@ static void run_end_animation(float delta) {
     float fade_value = easeValue(QUAD_IN, up_y_start, 0, anim_time, RESTART_ANIM_DURATION, 1.f);
     window_y_pos = -120 + fade_value;
 
-    ui_set_pos_on_tag(&screen, SCREEN_BOT_WIDTH / 2, window_y_pos, "window");
-    ui_set_pos_on_tag(&screen_top, SCREEN_WIDTH / 2, window_y_pos, "window");
+    ui_set_pos_on_tag(&screen, (float)SCREEN_BOT_WIDTH / 2.f, window_y_pos, "window");
+    ui_set_pos_on_tag(&screen_top, (float)SCREEN_WIDTH / 2.f, window_y_pos, "window");
     
     // Animation end
     if (anim_time >= RESTART_ANIM_DURATION) {
@@ -281,9 +383,31 @@ static const UIScreenDefinition level_complete_def = {
     }
 };
 
+static void enable_saved_coins(LevelData *level_data_sel) {
+    for (int i = 0; i < 3; i++) {
+        bool alreadyCollectedCoin = false;
+        if ((i == 0 && level_data_sel->coin1)
+        || (i == 1 && level_data_sel->coin2)
+        || (i == 2 && level_data_sel->coin3)) {
+            alreadyCollectedCoin = true;
+        }
+
+        UIImage *coin = coins_full[i];
+
+        if (alreadyCollectedCoin) {
+            coin->base.enabled = true;
+            coin->base.opacity = 1.f;
+
+            ui_element_set_scale((UIElement *) coin, 0.88f);
+        }
+    }
+}
+
 void level_complete_init() {
     init = true;
     in_level_complete = true;
+
+    level_unrated_online_refresh();
     
     ui_unload_screen(&screen);
     ui_unload_screen(&screen_top);
@@ -339,12 +463,37 @@ void level_complete_init() {
     coins_full[1] = (UIImage *) ui_get_element_by_tag(&screen_top, "coin2full");
     coins_full[2] = (UIImage *) ui_get_element_by_tag(&screen_top, "coin3full");
 
+    coins_base[0] = (UIImage *) ui_get_element_by_tag(&screen_top, "coin1");
+    coins_base[1] = (UIImage *) ui_get_element_by_tag(&screen_top, "coin2");
+    coins_base[2] = (UIImage *) ui_get_element_by_tag(&screen_top, "coin3");
+
+    int coin_display_count = get_level_coin_count();
+    if (coin_display_count > 3) coin_display_count = 3;
+
+    if (state.custom_level) {
+        for (int i = 0; i < 3; i++) {
+            ui_image_set_image(coins_full[i], SECRET_COIN_UI2_ID, 0);
+            if (level_has_unverified_coins()) ui_image_set_tint(coins_full[i], USER_COIN_UNRATED_TINT);
+        }
+    }
+
     ui_run_func_on_tag(&screen_top, "coinfull", ui_disable_element);
 
     particles[0] = (UIParticle *) ui_get_element_by_tag(&screen_top, "coinParticle1");
     particles[1] = (UIParticle *) ui_get_element_by_tag(&screen_top, "coinParticle2");
     particles[2] = (UIParticle *) ui_get_element_by_tag(&screen_top, "coinParticle3");
     particles[3] = (UIParticle *) ui_get_element_by_tag(&screen_top, "starParticle");
+
+    if (level_has_unverified_coins()) {
+        for (int i = 0; i < 3; i++) {
+            particles[i]->particle.cfg.startColorRed    = USER_COIN_UNRATED_R / 255.f;
+            particles[i]->particle.cfg.startColorGreen  = USER_COIN_UNRATED_G / 255.f;
+            particles[i]->particle.cfg.startColorBlue   = USER_COIN_UNRATED_B / 255.f;
+            particles[i]->particle.cfg.finishColorRed   = USER_COIN_UNRATED_R / 255.f;
+            particles[i]->particle.cfg.finishColorGreen = USER_COIN_UNRATED_G / 255.f;
+            particles[i]->particle.cfg.finishColorBlue  = USER_COIN_UNRATED_B / 255.f;
+        }
+    }
 
     // Set completion text
     completion_text = (UILabel *) ui_get_element_by_tag(&screen_top, "funnytext");
@@ -364,9 +513,26 @@ void level_complete_init() {
     showStars = stars > 0 && level_data_sel->normal_progress < 100;
 
     if(state.custom_level == true || state.practice_mode || cheated) {
-        ui_run_func_on_tag(&screen_top, "coin1", ui_disable_element);
-        ui_run_func_on_tag(&screen_top, "coin2", ui_disable_element);
-        ui_run_func_on_tag(&screen_top, "coin3", ui_disable_element);
+        if (state.custom_level && !state.practice_mode && !cheated) {
+            for (int k = 0; k < 3; k++) {
+                bool saved = (k == 0 && level_data_sel->coin1)
+                          || (k == 1 && level_data_sel->coin2)
+                          || (k == 2 && level_data_sel->coin3);
+                if (k < coin_display_count && !saved) {
+                    ui_image_set_image(coins_base[k], COIN_UNCOLLECTED_CUSTOM_ID, COIN_UNCOLLECTED_CUSTOM_SHEET);
+                    ui_element_set_scale((UIElement *) coins_base[k], COIN_UNCOLLECTED_CUSTOM_SCALE);
+                    if (level_has_unverified_coins()) ui_image_set_tint(coins_base[k], USER_COIN_UNRATED_TINT);
+                    coins_base[k]->base.enabled = true;
+                } else {
+                    coins_base[k]->base.enabled = false;
+                }
+            }
+            enable_saved_coins(level_data_sel);
+        } else {
+            ui_run_func_on_tag(&screen_top, "coin1", ui_disable_element);
+            ui_run_func_on_tag(&screen_top, "coin2", ui_disable_element);
+            ui_run_func_on_tag(&screen_top, "coin3", ui_disable_element);
+        }
     
         int start_index = 0;
 
@@ -423,23 +589,25 @@ void level_complete_init() {
     } else {
         ui_run_func_on_tag(&screen_top, "funnytext", ui_disable_element);
 
-        for(int i = 0; i < 3; i++){
-            bool alreadyCollectedCoin = false;
-            if((i == 0 && level_data_sel->coin1)
-            || (i == 1 && level_data_sel->coin2)
-            || (i == 2 && level_data_sel->coin3)){
-                alreadyCollectedCoin = true;
-            }
-            
-            UIImage* coin = coins_full[i];
+        enable_saved_coins(level_data_sel);
+    }
 
-            if(alreadyCollectedCoin){
-                coin->base.enabled = true;
-                coin->base.opacity = 1.f;
-                
-                ui_element_set_scale((UIElement *) coin, 0.88f);
-            }
+    for (int k = coin_display_count; k < 3; k++) {
+        if (coins_base[k]) coins_base[k]->base.enabled = false;
+    }
+
+    for (int k = 0; k < 3; k++) {
+        float coin_x = (SCREEN_WIDTH / 2.f) + (k - (coin_display_count - 1) / 2.f) * 50.f;
+        if (coins_base[k]) ui_element_set_position((UIElement *) coins_base[k], coin_x, coins_base[k]->base.y);
+        if (coins_full[k]) ui_element_set_position((UIElement *) coins_full[k], coin_x, coins_full[k]->base.y);
+        if (particles[k]) {
+            particles[k]->base.x = coin_x;
+            ui_particle_update_pos(particles[k]);
         }
+    }
+
+    if (get_level_coin_count() > 0 && !state.practice_mode && !cheated) {
+        ui_run_func_on_tag(&screen_top, "funnytext", ui_disable_element);
     }
 
     if (state.practice_mode) {

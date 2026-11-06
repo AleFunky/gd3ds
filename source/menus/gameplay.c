@@ -1,17 +1,22 @@
 #include <3ds.h>
 #include <citro2d.h>
+#include <math.h>
+#include "c2d/base.h"
+#include "menus/core/ui_element.h"
+#include "menus/core/ui_screen.h"
+#include "menus/core/ui_stack.h"
 #include "utils/precise_input.h"
 
 #include "main.h"
 #include "graphics.h"
 #include "state.h"
-#include "color_channels.h"
+#include "level_loading.h"
+#include "triggers.h"
 #include "easing.h"
 #include "mp3_player.h"
 #include "particles/circles.h"
 
 #include "menus/core/common_setters.h"
-#include "menus/core/ui_screen.h"
 #include "menus/components/ui_use_effect.h"
 #include "menus/components/ui_list.h"
 #include "menus/components/ui_window.h"
@@ -20,22 +25,22 @@
 #include "menus/components/ui_label.h"
 #include "menus/components/ui_button.h"
 #include "menus/settings_hub/settings.h"
-#include "menus/settings_hub/info_card.h"
 #include "menus/gameplay.h"
-#include "menus/main_menu.h"
-#include "menus/level_select.h"
 
 #include "practice.h"
 
 #include "save/saving.h"
 
-bool game_paused = false;
-bool in_level_complete = false;
+bool game_paused, in_level_complete = false;
+static float anim_time, target_pos, current_pos;
+static bool hide_pause_menu = false;
 
-static UIImage *bg_gradient;
+static UILabel *fps_label;
 static UIProgressBar *progress_bar;
 static UILabel *percent;
 static UILabel *level_name;
+
+static UIWindow *pause_window;
 
 static UIProgressBar *normal_progress;
 static UILabel *normal_progress_val;
@@ -62,6 +67,7 @@ static UIScreen *screen_top;
 static UIScreen *screen;
 
 int decimal;
+float fps;
 
 static void update_progress_bars() {
     LevelData *level_data_sel = &current_level_entry->data;
@@ -105,6 +111,21 @@ void reset_coins(){
     }
 }
 
+static void apply_coin_slot_count(){
+    int count = get_level_coin_count();
+    if (count > 3) count = 3;
+
+    UIImage *slots[3] = { coin_1, coin_2, coin_3 };
+    for(int i = 0; i < 3; i++){
+        if (slots[i]) slots[i]->base.enabled = (i < count);
+        if (i >= count && coins_full[i]) coins_full[i]->base.enabled = false;
+    }
+
+    if (count == 0) {
+        ui_run_func_on_tag(screen, "coin_circle", ui_disable_element);
+    }
+}
+
 void pause_game() {
     if (state.end_wall_anim_playing) return;
 
@@ -128,8 +149,28 @@ void pause_game() {
     ui_run_func_on_tag(screen, "not_paused", ui_disable_element);
 }
 
+static void handle_hide_animation(float delta) {
+    if (hide_pause_menu) {
+        target_pos = 0.f - 120.f;
+    } else {
+        target_pos = 0.f + 120.f;
+    }
+
+    if (pause_window->base.y == target_pos) return;
+    
+    current_pos = easeValue(QUAD_IN, pause_window->base.y, target_pos, anim_time, 4.f, 1.f);
+    ui_element_set_position((UIElement *) pause_window, (float)SCREEN_WIDTH / 2.f, current_pos);
+    
+    anim_time += delta;
+}
+
 void unpause_game() {
     game_paused = false;
+    hide_pause_menu = false;
+    ui_image_set_tint((UIImage *) ui_get_element_by_tag(screen, "hide_btn"), C2D_Color32(255, 255, 255, 170));
+
+    ui_element_set_position((UIElement *) pause_window, (float)SCREEN_WIDTH / 2.f, (float)SCREEN_HEIGHT / 2.f);
+
     if (pi_enabled) {
         sync_precise_input(true);
     }
@@ -147,6 +188,7 @@ void unpause_game() {
             reset_coin(&current_level_entry->data, i);
         }
         ui_run_func_on_tag(screen, "coin_circle", ui_enable_element);
+        apply_coin_slot_count();
     }
     ui_run_func_on_tag(screen_top, "pause_menu", ui_disable_element);
     ui_run_func_on_tag(screen, "paused", ui_disable_element);
@@ -185,6 +227,13 @@ static void restart_level() {
     unpause_game();
 }
 
+static void hide_menu() {
+    hide_pause_menu = !hide_pause_menu;
+    ui_image_set_tint((UIImage *) ui_get_element_by_tag(screen, "hide_btn"), C2D_Color32(255, 255, 255, hide_pause_menu ? 255 : 170));
+
+    anim_time = 0.f;
+}
+
 static void action_pause(UIElement *e, const UIPropertyList *args) { 
     pause_game();
 }
@@ -217,6 +266,9 @@ static void action_add_checkpoint(UIElement *e, const UIPropertyList *args) {
 static void action_remove_checkpoint(UIElement *e, const UIPropertyList *args) {
     delete_last_checkpoint();
 }
+static void action_hide_menu(UIElement *e, const UIPropertyList *args) {
+    hide_menu();
+}
 
 static UIActionDef gameplay_actions[] = {
     {"pause", action_pause },
@@ -226,20 +278,24 @@ static UIActionDef gameplay_actions[] = {
     {"practice", action_practice_mode },
     {"add_check", action_add_checkpoint },
     {"remove_check", action_remove_checkpoint },
+    {"hide_menu", action_hide_menu}
 };
 
 void gameplay_init_top(UIScreen *s){
     screen_top = s;
 
+    fps_label = (UILabel *) ui_get_element_by_tag(screen_top, "fps");
     progress_bar = (UIProgressBar *) ui_get_element_by_tag(screen_top, "progressalert");
     percent = (UILabel *) ui_get_element_by_tag(screen_top, "percent");
+
+    pause_window = (UIWindow *) ui_get_element_by_tag(s, "bgwindow");
     level_name = (UILabel *) ui_get_element_by_tag(screen_top, "level_title");
 
     Color color = get_white_if_black(p1_color);
 
     ui_progress_bar_set_tint(progress_bar, C2D_Color32(color.r, color.g, color.b, 255));
-    
-    ui_window_set_tint((UIWindow *) ui_get_element_by_tag(screen_top, "bgwindow"), C2D_Color32(0, 0, 0, 150));
+
+    ui_window_set_tint(pause_window, C2D_Color32(0, 0, 0, 150));
 
     ui_label_set_text(level_name, level_info.level_name);
 
@@ -264,30 +320,40 @@ void gameplay_init_top(UIScreen *s){
 
 void gameplay_init(UIScreen *s) {
     screen = s;
+    hide_pause_menu = false;
 
-    bg_gradient = (UIImage *) ui_get_element_by_tag(s, "gradient");
-
-    ui_window_set_tint((UIWindow *) ui_get_element_by_tag(s, "bgwindow"), C2D_Color32(0, 0, 0, 150));
-
-    // hide coins if level is a custom level
-    if(state.custom_level == true){
-        ui_run_func_on_tag(s, "coin_1", ui_disable_element);
-        ui_run_func_on_tag(s, "coin_2", ui_disable_element);
-        ui_run_func_on_tag(s, "coin_3", ui_disable_element);
-    }
+    level_unrated_online_refresh();
     
-    ui_run_func_on_tag(s, "paused", ui_disable_element);
-    ui_run_func_on_tag(s, "practice_buttons", ui_disable_element);
-
     coin_1 = (UIImage *) ui_get_element_by_tag(s, "coin_1");
     coin_2 = (UIImage *) ui_get_element_by_tag(s, "coin_2");
     coin_3 = (UIImage *) ui_get_element_by_tag(s, "coin_3");
-
+    
     coins_full[0] = (UIImage *) ui_get_element_by_tag(s, "coin_1_full");
     coins_full[1] = (UIImage *) ui_get_element_by_tag(s, "coin_2_full");
     coins_full[2] = (UIImage *) ui_get_element_by_tag(s, "coin_3_full");
     
+    if (state.custom_level) {
+        bool unrated = level_has_unverified_coins();
+        UIImage *coin_slots[3] = { coin_1, coin_2, coin_3 };
+        for (int i = 0; i < 3; i++) {
+            ui_image_set_image(coin_slots[i], COIN_BIG_USER_ID, 0);
+            ui_element_set_scale((UIElement *) coin_slots[i], COIN_BIG_USER_SCALE);
+            ui_image_set_tint(coin_slots[i], unrated ? USER_COIN_UNRATED_EMPTY_TINT : C2D_Color32(165, 165, 165, 255));
+            ui_image_set_image(coins_full[i], COIN_BIG_USER_ID, 0);
+            ui_element_set_scale((UIElement *) coins_full[i], COIN_BIG_USER_SCALE);
+            if (unrated) ui_image_set_tint(coins_full[i], USER_COIN_UNRATED_TINT);
+        }
+    }
+
+    ui_window_set_tint((UIWindow *) ui_get_element_by_tag(s, "bgwindow"), C2D_Color32(0, 0, 0, 150));
+    ui_image_set_tint((UIImage *) ui_get_element_by_tag(s, "hide_btn"), C2D_Color32(255, 255, 255, 150));
+
+    ui_run_func_on_tag(s, "paused", ui_disable_element);
+    ui_run_func_on_tag(s, "practice_buttons", ui_disable_element);
+    
     reset_coins();
+
+    apply_coin_slot_count();
 
     music_slider_bar = (UISlider*) ui_get_element_by_tag(s, "music_slider");
     sound_slider_bar = (UISlider*) ui_get_element_by_tag(s, "sound_slider");
@@ -298,26 +364,47 @@ void gameplay_init(UIScreen *s) {
 
 void gameplay_update_top(UIScreen *s, UIInput *touch) { 
     decimal = 0;
+    fps = delta * 1000.f;
     if (settingsState.decimalPercent) decimal = 2;
     if (settingsState.ultraDecimalPercent) decimal = MAX_DECIMAL_PERCENT;
+    if (settingsState.goldenBest && (state.current_data.max_normal > 1.f ? state.current_data.max_normal : 1.f) < ceilf(state.level_progress) && !state.practice_mode) {
+        percent->font = 2;
+        percent->base.y = 7.f;
+        percent->base.scaleX = 0.57f;
+        percent->base.scaleY = 0.57f;
+    } else {
+        percent->font = 0;
+        percent->base.y = 8.f;
+        percent->base.scaleX = 0.45f;
+        percent->base.scaleY = 0.45f;
+    };
+    // update fps counter but only when game isnt paused cuz otherwise it shows like a bajillion frame per sec ond
+    if(!game_paused) snprintf(fps_label->text, 32, "<#FFFFFF55>FPS: %.*f</>", 0, fps > 0 ? 1000.f / fps : 0.f);
 
     progress_bar->value = state.level_progress;
     snprintf(percent->text, 32, "%.*f%%", decimal, state.level_progress);
 
     ui_run_func_on_tag(s, "progressalert", ui_disable_element);
     ui_run_func_on_tag(s, "percent", ui_disable_element);
-    ui_set_pos_on_tag(s, 200, 8, "percent");
+    ui_run_func_on_tag(s, "fps", ui_disable_element);
+    percent->base.x = 200.f;
     percent->alignment = 0.5;
 
     if (settingsState.showProgressBar) {
         ui_run_func_on_tag(s, "progressalert", ui_enable_element);
-        ui_set_pos_on_tag(s, 282, 8, "percent");
+        percent->base.x = 282.f;
         percent->alignment = 0;
     }
 
     if (settingsState.showProgressPercent) {
         ui_run_func_on_tag(s, "percent", ui_enable_element);
     }
+
+    if (settingsState.showFpsCounter) {
+        ui_run_func_on_tag(s, "fps", ui_enable_element);
+    }
+
+    handle_hide_animation(delta);
 }
 
 void gameplay_update(UIScreen *s, UIInput *touch) {
@@ -329,12 +416,14 @@ void gameplay_update(UIScreen *s, UIInput *touch) {
 
     for(int i = 0; i < 3; i++){
         if(coins_got[i] && !game_paused){
-            float scale = easeValue(BOUNCE_OUT, 2.f, 0.65f, coin_anims[i], 0.35f, 1.f);
+            float scale = easeValue(BOUNCE_OUT, 2.f, state.custom_level ? COIN_BIG_USER_SCALE : 0.65f, coin_anims[i], 0.35f, 1.f);
             float opacity = easeValue(EASE_LINEAR, 0.f, 1.f, coin_anims[i], 0.1f, 1.f);
 
             coins_full[i]->base.enabled = true;
             ui_element_set_scale((UIElement *) coins_full[i], scale);
-            ui_image_set_tint(coins_full[i], C2D_Color32f(1, 1, 1, opacity));
+            ui_image_set_tint(coins_full[i], level_has_unverified_coins()
+                ? C2D_Color32(USER_COIN_UNRATED_R, USER_COIN_UNRATED_G, USER_COIN_UNRATED_B, (u8)(opacity * 255.f))
+                : C2D_Color32f(1, 1, 1, opacity));
 
             if(coin_anims[i] >= 0.05f){
                 if(!coins_circles_spawned[i]){
@@ -342,7 +431,9 @@ void gameplay_update(UIScreen *s, UIInput *touch) {
                         ui_add_use_effect(
                             (UIUseEffect *) ui_get_element_by_tag(s, "coin_circle"), 
                         coins_full[i]->base.x, coins_full[i]->base.y, &end_wall_firework_circle),
-                    1.f, 0.75f, 0.f);
+                    1.f,
+                    level_has_unverified_coins() ? USER_COIN_UNRATED_G / 255.f : (state.custom_level ? 1.f : 0.75f),
+                    level_has_unverified_coins() ? USER_COIN_UNRATED_B / 255.f : (state.custom_level ? 1.f : 0.f));
                     
                     coins_circles_spawned[i] = true;
                 }

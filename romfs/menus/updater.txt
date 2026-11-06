@@ -1,0 +1,21 @@
+darken opacity=0.4
+
+window x=160 y=120 w=280 h=200 style=0
+{
+
+    button x=62.5 y=50 id=127 actions=open_menu[screen="updater_settings" btm_anim="zoom"] scale=0.8
+    button x=112.5 y=50 id=202 actions=refresh id=202 scale=0.8 keyBinds="Y"
+    window w=170 h=166 style=9 x=-50 y=10
+    list w=160 h=156 x=-50 y=10 tag="list" bgColor="#bf723e00"
+    label x=-50 y=10 scale=0.8 tag="errorlabel" font=1 text="" align=CENTER w=300
+    spinner x=-50 y=10 id=53 sheet=1 scale=1 speed=240 tag="spinner"
+    label x=-50 y=-85 text="Updater" font=2 scale=0.9 align=CENTER
+    button x=87.5 y=-20 tag="updatebutton" actions="update" style=5 keyBinds="A" id=58 sheet=1
+
+    button x=-136 y=-96 id=31 actions=close_menu keyBinds="B"
+}
+
+
+
+
+

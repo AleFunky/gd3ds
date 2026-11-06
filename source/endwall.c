@@ -3,7 +3,6 @@
 #include "state.h"
 #include "math_helpers.h"
 #include "mp3_player.h"
-#include "utils/gfx.h"
 #include "particles/circles.h"
 
 #include "endwall.h"
@@ -198,14 +197,28 @@ int handle_wall_cutscene(float delta, UIInput *touch) {
                         total_stars += stars;
                     }
 
-                    if (!level_data_sel->coin1 && state.current_data.coin1) {
-                        total_coins++;
-                    }
-                    if (!level_data_sel->coin2 && state.current_data.coin2) {
-                        total_coins++;
-                    }
-                    if (!level_data_sel->coin3 && state.current_data.coin3) {
-                        total_coins++;
+                    if (state.online_level) {
+                        if (level_has_rate(level_data_sel)) {
+                            if (!level_data_sel->coin1 && state.current_data.coin1) {
+                                total_user_coins++;
+                            }
+                            if (!level_data_sel->coin2 && state.current_data.coin2) {
+                                total_user_coins++;
+                            }
+                            if (!level_data_sel->coin3 && state.current_data.coin3) {
+                                total_user_coins++;
+                            }
+                        }
+                    } else if (!state.custom_level) {
+                        if (!level_data_sel->coin1 && state.current_data.coin1) {
+                            total_coins++;
+                        }
+                        if (!level_data_sel->coin2 && state.current_data.coin2) {
+                            total_coins++;
+                        }
+                        if (!level_data_sel->coin3 && state.current_data.coin3) {
+                            total_coins++;
+                        }
                     }
                     
                     level_data_sel->normal_progress = 100;

@@ -56,12 +56,14 @@ static SavedLevelDataList *saved_levels;
 int currentPage;
 int maxPages;
 bool needsRefresh;
+static bool keep_page;
 
 static void action_open_online_level_menu(UIElement* e, const UIPropertyList *args) {
     OnlineCardData *entry = e->userdata;
     curr_search_id = entry->entryId;
     online_menu_level_id = entry->levelId;
     redownload = false; 
+    keep_page = true;
     ui_stack_push(&online_level_menu_def, ANIM_NONE, ANIM_NONE, PUSH_ROOT);
 }
 
@@ -144,7 +146,7 @@ static void populate_list() {
             creator_name = creator_entry->creatorName;
         }
 
-        snprintf(tmp_creator, sizeof(tmp_creator), "<#%s>By %s</>", (creator_entry->userId == 0) ? "5AFFFF" : "FFFFFF", creator_name);
+        snprintf(tmp_creator, sizeof(tmp_creator), "<#%s>By %s</>", (creator_entry->userId == 0 || !creator_entry) ? "5AFFFF" : "FFFFFF", creator_name);
 
         // Get song name
         char *song_name = "Unknown";
@@ -153,7 +155,7 @@ static void populate_list() {
             if (song_entry) {
                 song_name = song_entry->songTitle;
             }
-        } else if (entry->songIndex != -1) {
+        } else {
             if (entry->mainSongId >= 0 && entry->mainSongId < current_main_level_pack->count) {
                 song_name = (char *) current_main_level_pack->levels[entry->mainSongId].song_data.title;
             }
@@ -442,8 +444,10 @@ static void saved_levels_init(UIScreen *s) {
     ui_label_set_text(list_title, "Saved Levels");
     ui_run_func_on_tag(s, "spinner", ui_disable_element);
 
-    currentPage = 0;
+    if (!keep_page) currentPage = 0;
+    keep_page = false;
     maxPages = (int)ceilf(saved_levels->count / (float)MAX_LEVELS_PER_PAGE);
+    if (currentPage >= maxPages) currentPage = maxPages > 0 ? maxPages - 1 : 0;
     needsRefresh = false;
 
     if (saved_levels->count > 0) {

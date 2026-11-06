@@ -1,6 +1,6 @@
 #pragma once
 #include <citro2d.h>
-#include "color_channels.h"
+#include "triggers.h"
 #include "player/collision.h"
 
 #define RGB8(r, g, b) (r | (g << (u32)8) | (b << (u32)16))
@@ -51,3 +51,4 @@ float reflect(float x, float min, float max);
 float randomf();
 float random_float(float min, float max);
 int random_int(int min, int max);
+bool platform_launch(float previous, float current, float velocity, float dt, float *launch);

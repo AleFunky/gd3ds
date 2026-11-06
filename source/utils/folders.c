@@ -80,7 +80,7 @@ FileOrFolder *load_folder(GenericTask *task, char *dir, int *count) {
         } else {
             // File
             const char *ext = strrchr(pent->d_name, '.');
-            if (ext && strcmp(ext, ".gmd") == 0) {
+            if (ext && (strcmp(ext, ".gmd") == 0 || strcmp(ext, ".gdlvl") == 0)) {
                 // Funny level
                 snprintf(sd_level_paths[sd_level_count].name, MAX_PATH_LEN, "%s/%s", current_directory, pent->d_name);
                 sd_level_paths[sd_level_count].is_dir = false;

@@ -1,4 +1,5 @@
 
+#include "main.h"
 #include "particles/particle_definitions.h"
 #include <citro2d.h>
 #include "menus/core/ui_screen.h"

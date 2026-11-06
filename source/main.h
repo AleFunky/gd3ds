@@ -4,9 +4,11 @@
 #include "sounds.h"
 
 #include "particles/particles.h"
-#include "color_channels.h"
+#include "triggers.h"
 
 #include "save/saving.h"
+
+#include "github_info.h"
 
 #define CAM_SPEED 5.19300155f
 
@@ -28,19 +30,30 @@
 #define ARRAY_LEN(arr) (sizeof(arr) / sizeof(arr[0]))
 #define IN_BOUNDS(index, arr) (index >= 0 && index < ARRAY_LEN(arr))
 
-#define GD_VERSION 1.9
-#define LAST_GD_VERSION_ID 11020426 // Last 1.9 id
+#define GD_VERSION 2.0
+#define LAST_GD_VERSION_ID 28384582  // Last 2.0 id
+
+#define GAME_TITLE_ID 0x000400000BB41C00
+
+// leave empty for main
+#define REPO_BRANCH "2.0"
 
 // When making a release, uncomment this please thanks
 // #define IS_RELEASE
+
+// Increment this every time new properties are added to the server entries
+#define SAVED_LEVELS_VERSION 2
 
 typedef struct {
     float x, y;
 } Vec2D;
 
 extern float delta;
+extern float frame_timer;
 extern unsigned int frame_counter;
 
+extern int steps;
+extern int last_steps;
 extern unsigned int level_frame;
 
 extern bool exiting_level;
@@ -49,6 +62,14 @@ extern bool song_loaded;
 
 extern bool alt_title_screen;
 extern bool is_N3DS;
+extern bool is_3DSX;
+extern bool is_nightly;
+
+extern bool queued_restart;
+
+extern bool _3dWarningPassed;
+
+extern char *_3dsx_path;
 
 extern float global_volume;
 extern float music_volume;
@@ -128,6 +149,9 @@ u32 jump_key_mask_p1(void);
 u32 jump_key_mask_p2(void);
 u32 jump_key_mask(void);
 void sync_precise_input(bool suppress_held);
+
+void enterExclusiveState();
+void exitExclusiveState(bool force);
 
 bool is_citra();
 

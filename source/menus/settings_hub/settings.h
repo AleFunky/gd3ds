@@ -1,7 +1,6 @@
 #pragma once
-#include "main.h"
+#include "menus/core/ui_screen.h"
 #include <3ds.h>
-#include "menus/core/ui_stack.h"
 
 typedef enum {
     PAGE_GRAPHICS,
@@ -58,9 +57,14 @@ typedef struct {
     bool skipVersionWarning;
     bool skipSongWarning;
     bool vsync;
+    bool showFpsCounter;
+    bool goldenBest;
 } SettingState;
 
-extern Setting settings[30];
+extern Setting settings[31];
 extern SettingState settingsState;
 
 extern const UIScreenDefPair settings_def;
+
+bool condition_supports_3D();
+void turn_off_setting(const char *id, bool *var);

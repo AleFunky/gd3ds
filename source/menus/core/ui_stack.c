@@ -4,8 +4,8 @@
 #include "menus/core/ui_element.h"
 #include "ui_screen.h"
 #include "screen_definitions.h"
-#include "mp3_player.h"
 #include "fonts/bigFont.h"
+#include "utils/gfx.h"
 #include <string.h>
 
 static UIStack *stack = NULL;
@@ -508,7 +508,7 @@ void draw_stack_debug(){
     char capacitySlop[] = "Capacity:....";
     snprintf(capacitySlop, sizeof(capacitySlop), "Capacity: %d", stack->stack_capacity);
 
-    draw_text(&bigFont_fontCharset, &bigFont_sheet, SCREEN_BOT_WIDTH / 2, SCREEN_HEIGHT / 2, 0.5f, 0.5f, 0, true, debug);
+    draw_text(&bigFont_fontCharset, &bigFont_sheet, SCREEN_BOT_WIDTH / 2.f, SCREEN_HEIGHT / 2.f, 0.5f, 0.5f, 0, true, debug);
     draw_text(&bigFont_fontCharset, &bigFont_sheet, 10, 10, 0.5f, 0.5f, 0, true, rootSlop);
     draw_text(&bigFont_fontCharset, &bigFont_sheet, 10, 25, 0.5f, 0.5f, 0, true, activeSlop);
     draw_text(&bigFont_fontCharset, &bigFont_sheet, 10, 40, 0.5f, 0.5f, 0, true, capacitySlop);
@@ -565,4 +565,12 @@ UIScreen *ui_stack_get_screen(const char *name, Screens screen) {
     if(!pair) return NULL;
     
     return &pair->screens[screen];
+}
+
+FadeStatus ui_stack_get_fade_status(){
+    return stack->fade;
+}
+
+const char *ui_stack_get_current_screen_name() {
+    return stack->screen_stack[ui_stack_max_index()]->name;
 }

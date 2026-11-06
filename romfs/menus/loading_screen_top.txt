@@ -1,4 +1,4 @@
 image x=200 y=50 id=4 sheet=1 sx=0.9 sy=0.9
 image x=200 y=120 id=0 sheet=1 sx=0.75 sy=0.75 tag="title"
 progressbar x=200 y=180 max_value=100 style=2 scale=0.75 tag="loadprogress"
-label x=200 y=210 text="Welcome to robert game" font=2 scale=0.6 align=CENTER tag="splashtext"
+label x=200 y=210 text="Welcome to robert game" font=2 scale=0.6 align=CENTER tag="splashtext" w=300

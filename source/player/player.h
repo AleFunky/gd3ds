@@ -7,11 +7,8 @@
 
 #include "trail.h"
 
-extern int frame_skipped;
-
 #define STEPS_HZ 240
-#define STEPS_DT ((1.f + frame_skipped) / STEPS_HZ) // 1/240 seconds per physics step
-#define STEPS_DT_UNMOD (1.f / STEPS_HZ) // 1/240 seconds per physics step
+#define STEPS_DT (1.f / STEPS_HZ) // 1/240 seconds per physics step
 
 #define P1_TRAIL_LENGTH 10
 #define P1_TRAIL_DURATION 0.45f
@@ -69,6 +66,7 @@ typedef struct {
     int ball;
     int ufo;
     int wave;
+    int robot;
 
     Color p1_color;
     Color p2_color;
@@ -87,6 +85,8 @@ typedef struct {
     float new_vel_y;
 
     float delta_y;
+
+    float platform_velocity, last_platform_velocity;
     
     float gravity;
 
@@ -151,9 +151,28 @@ typedef struct {
 
     bool buffer_ufo;
 
+    bool just_teleported;
+
+    float robot_air_time;
+    int robot_anim_id;
+    int robot_anim_frame;
+    float robot_anim_timer;
+    int robot_blend_from_anim_id;
+    int robot_blend_from_frame;
+    float robot_blend_from_timer;
+    float robot_landing_blend_timer;
+
     float coyote_frames;
 
     IconsDrawing player_icons;
+
+    int collided_block;
+    int last_collided_block;
+
+    bool gravity_changed_move;
+
+    float min_vel;
+    float max_vel;
 } Player;
 
 typedef struct {
@@ -191,6 +210,7 @@ extern ParticleSystem ship_fire_particles[2];
 extern ParticleSystem ship_secondary_particles[2];
 extern ParticleSystem secondary_particles[2];
 extern ParticleSystem burst_particles[2];
+extern ParticleSystem robot_fire_particles[2];
 extern ParticleSystem land_particles[2];
 extern ParticleSystem explosion_particles[2];
 extern ParticleSystem glitter_particles;
@@ -250,8 +270,12 @@ void run_player(Player *player);
 
 void draw_hitbox(int obj);
 void draw_player_hitbox(Player *player);
+void draw_internal_hitbox(Player *player);
+void draw_rotated_hitbox(Player *player);
 void draw_hitbox_trail(int player);
 void add_new_hitbox(Player *player);
+
+void set_robot_animation(Player *player, int robot_anim_id);
 
 void update_p1_trail(Player *player, int player_id);
 void draw_p1_trail(Player *player, int player_id);

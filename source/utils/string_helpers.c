@@ -161,3 +161,10 @@ void remove_char(char *str, char character) {
     }
     *dst = '\0';
 }
+
+// Taken from: https://stackoverflow.com/a/5309508
+const char *get_filename_ext(const char *filename) {
+    const char *dot = strrchr(filename, '.');
+    if(!dot || dot == filename) return "";
+    return dot + 1;
+}

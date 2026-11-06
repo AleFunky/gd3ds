@@ -9,6 +9,7 @@
 #include "state.h"
 
 ProfilerSnapshot snapshot;
+static ProfilerSnapshot internal_snapshot;
 
 typedef enum {
     PROFILER_PAGE_OVERVIEW,
@@ -27,7 +28,7 @@ static ProfilerPage current_page = PROFILER_PAGE_OVERVIEW;
 #define PROFILER_LABEL_X 0.f
 #define PROFILER_VALUE_X 180.f
 #define PROFILER_SEC_VALUE_X 260.f
-#define PROFILER_START_Y 20.f
+#define PROFILER_START_Y 25.f
 
 typedef enum {
     PROFILER_VALUE_NONE,
@@ -55,6 +56,7 @@ typedef enum {
     PROFILER_STAT_PLAYER,
     PROFILER_STAT_PLAYER_COLLISION,
     PROFILER_STAT_PLAYER_HANDLER,
+    PROFILER_STAT_PLAYER_STEP_TRIGGER,
     PROFILER_STAT_PLAYER_STEPS,
     PROFILER_STAT_PLAYER_COLLISIONS,
     PROFILER_STAT_PLAYER_COLLISION_CHECKS,
@@ -64,7 +66,6 @@ typedef enum {
     PROFILER_STAT_RENDER_TINT,
     PROFILER_STAT_RENDER_DRAWING,
 
-    PROFILER_STAT_OPTIM_DIRTY,
     PROFILER_STAT_OPTIM_COUNT,
     PROFILER_STAT_OPTIM_IN_CACHE,
 
@@ -100,6 +101,7 @@ static const ProfilerRow overview_rows[] = {
     {},
     { "Rendering", PROFILER_STAT_RENDERING, PROFILER_VALUE_MS_PERCENTAGE },
     { "Physics",   PROFILER_STAT_PHYSICS,   PROFILER_VALUE_MS_PERCENTAGE },
+    { "Triggers",  PROFILER_STAT_TRIGGERS,  PROFILER_VALUE_MS_PERCENTAGE },
 };
 
 static const ProfilerRow render_rows[] = {
@@ -115,7 +117,6 @@ static const ProfilerRow render_rows[] = {
     { "Particles",  PROFILER_STAT_PARTICLES,       PROFILER_VALUE_MS_PERCENTAGE },
     {},
     { "Optim" },
-    { "- Dirty",    PROFILER_STAT_OPTIM_DIRTY,    PROFILER_VALUE_INTEGER},
     { "- Total",    PROFILER_STAT_OPTIM_COUNT,    PROFILER_VALUE_INTEGER},
 };
 
@@ -124,10 +125,13 @@ static const ProfilerRow gameplay_rows[] = {
     { "Checks",     PROFILER_STAT_PLAYER_COLLISION_CHECKS, PROFILER_VALUE_INTEGER },
     { "Steps",      PROFILER_STAT_PLAYER_STEPS,            PROFILER_VALUE_INTEGER },
     {},
-    { "Physics",     PROFILER_STAT_PHYSICS,          PROFILER_VALUE_MS_PERCENTAGE },
-    { "- Player",    PROFILER_STAT_PLAYER,           PROFILER_VALUE_MS_PERCENTAGE },
-    { "- Collision", PROFILER_STAT_PLAYER_COLLISION, PROFILER_VALUE_MS_PERCENTAGE },
-    { "- Handler",   PROFILER_STAT_PLAYER_HANDLER,   PROFILER_VALUE_MS_PERCENTAGE }
+    { "Physics",        PROFILER_STAT_PHYSICS,            PROFILER_VALUE_MS_PERCENTAGE },
+    { "- Player",       PROFILER_STAT_PLAYER,             PROFILER_VALUE_MS_PERCENTAGE },
+    { "- Collision",    PROFILER_STAT_PLAYER_COLLISION,   PROFILER_VALUE_MS_PERCENTAGE },
+    { "- Handler",      PROFILER_STAT_PLAYER_HANDLER,     PROFILER_VALUE_MS_PERCENTAGE },
+    { "- Step triggers",PROFILER_STAT_PLAYER_STEP_TRIGGER,PROFILER_VALUE_MS_PERCENTAGE },
+    {},
+    { "Triggers",  PROFILER_STAT_TRIGGERS,  PROFILER_VALUE_MS_PERCENTAGE },
 };
 
 static const ProfilerRow player_camera_rows[] = {
@@ -181,7 +185,7 @@ static void draw_page_header(void) {
     draw_text(
         &chatFont_fontCharset,
         &chatFont_sheet,
-        0, 5,
+        0, 10,
         PROFILER_SCALE, PROFILER_SCALE,
         0,
         true,
@@ -194,34 +198,35 @@ static void draw_page_header(void) {
 
 static float profiler_stat_value(ProfilerStat stat) {
     switch (stat) {
-        case PROFILER_STAT_FRAME: return snapshot.frame_ms;
-        case PROFILER_STAT_FPS: return snapshot.frame_ms > 0 ? 1000.f / snapshot.frame_ms : 0.f;
-        case PROFILER_STAT_CPU: return snapshot.cpu_ms;
-        case PROFILER_STAT_GPU: return snapshot.gpu_ms;
+        case PROFILER_STAT_FRAME: return internal_snapshot.frame_ms;
+        case PROFILER_STAT_FPS: return internal_snapshot.frame_ms > 0 ? 1000.f / internal_snapshot.frame_ms : 0.f;
+        case PROFILER_STAT_CPU: return internal_snapshot.cpu_ms;
+        case PROFILER_STAT_GPU: return internal_snapshot.gpu_ms;
 
-        case PROFILER_STAT_PHYSICS: return snapshot.physics_ms;
-        case PROFILER_STAT_TRIGGERS: return snapshot.triggers_ms;
-        case PROFILER_STAT_COLLISION: return snapshot.collision_ms;
-        case PROFILER_STAT_PARTICLES: return snapshot.particles_ms;
-        case PROFILER_STAT_RENDERING: return snapshot.rendering_ms;
+        case PROFILER_STAT_PHYSICS: return internal_snapshot.physics_ms;
+        case PROFILER_STAT_TRIGGERS: return internal_snapshot.triggers_ms;
+        case PROFILER_STAT_COLLISION: return internal_snapshot.collision_ms;
+        case PROFILER_STAT_PARTICLES: return internal_snapshot.particles_ms;
+        case PROFILER_STAT_RENDERING: return internal_snapshot.rendering_ms;
 
-        case PROFILER_STAT_PLAYER: return snapshot.play_ms;
-        case PROFILER_STAT_PLAYER_COLLISION: return snapshot.collision_ms;
-        case PROFILER_STAT_PLAYER_HANDLER: return snapshot.handler_ms;
+        case PROFILER_STAT_PLAYER: return internal_snapshot.play_ms;
+        case PROFILER_STAT_PLAYER_COLLISION: return internal_snapshot.collision_ms;
+        case PROFILER_STAT_PLAYER_HANDLER: return internal_snapshot.handler_ms;
+        case PROFILER_STAT_PLAYER_STEP_TRIGGER: return internal_snapshot.step_trigger_ms;
 
-        case PROFILER_STAT_RENDER_CREATING: return snapshot.creating_ms;
-        case PROFILER_STAT_RENDER_SORTING: return snapshot.sorting_ms;
-        case PROFILER_STAT_RENDER_TINT: return snapshot.tint_ms;
-        case PROFILER_STAT_RENDER_DRAWING: return snapshot.drawing_ms;
+        case PROFILER_STAT_RENDER_CREATING: return internal_snapshot.creating_ms;
+        case PROFILER_STAT_RENDER_SORTING: return internal_snapshot.sorting_ms;
+        case PROFILER_STAT_RENDER_TINT: return internal_snapshot.tint_ms;
+        case PROFILER_STAT_RENDER_DRAWING: return internal_snapshot.drawing_ms;
 
-        case PROFILER_STAT_PLAYER_X: return snapshot.ply_pos_x;
-        case PROFILER_STAT_PLAYER_Y: return snapshot.ply_pos_y;
-        case PROFILER_STAT_PLAYER_VX: return snapshot.ply_vel_x;
-        case PROFILER_STAT_PLAYER_VY: return snapshot.ply_vel_y;
+        case PROFILER_STAT_PLAYER_X: return internal_snapshot.ply_pos_x;
+        case PROFILER_STAT_PLAYER_Y: return internal_snapshot.ply_pos_y;
+        case PROFILER_STAT_PLAYER_VX: return internal_snapshot.ply_vel_x;
+        case PROFILER_STAT_PLAYER_VY: return internal_snapshot.ply_vel_y;
         
-        case PROFILER_STAT_CAMERA_X: return snapshot.cam_pos_x;
-        case PROFILER_STAT_CAMERA_Y: return snapshot.cam_pos_y;
-        case PROFILER_STAT_CAMERA_INTENDED_Y: return snapshot.cam_itd_y;
+        case PROFILER_STAT_CAMERA_X: return internal_snapshot.cam_pos_x;
+        case PROFILER_STAT_CAMERA_Y: return internal_snapshot.cam_pos_y;
+        case PROFILER_STAT_CAMERA_INTENDED_Y: return internal_snapshot.cam_itd_y;
 
         default: return 0.f;
     }
@@ -229,22 +234,21 @@ static float profiler_stat_value(ProfilerStat stat) {
 
 static unsigned int profiler_stat_integer(ProfilerStat stat) {
     switch (stat) {
-        case PROFILER_STAT_PLAYER_STEPS: return snapshot.steps;
-        case PROFILER_STAT_PLAYER_COLLISIONS: return snapshot.collisions;
-        case PROFILER_STAT_PLAYER_COLLISION_CHECKS: return snapshot.collision_checks;
+        case PROFILER_STAT_PLAYER_STEPS: return internal_snapshot.steps;
+        case PROFILER_STAT_PLAYER_COLLISIONS: return internal_snapshot.collisions;
+        case PROFILER_STAT_PLAYER_COLLISION_CHECKS: return internal_snapshot.collision_checks;
 
-        case PROFILER_STAT_OPTIM_DIRTY: return snapshot.draw_dirty;
-        case PROFILER_STAT_OPTIM_COUNT: return snapshot.draw_count;
+        case PROFILER_STAT_OPTIM_COUNT: return internal_snapshot.draw_count;
 
-        case PROFILER_STAT_INPUT_X: return snapshot.input_x;
-        case PROFILER_STAT_INPUT_Y: return snapshot.input_y;
+        case PROFILER_STAT_INPUT_X: return internal_snapshot.input_x;
+        case PROFILER_STAT_INPUT_Y: return internal_snapshot.input_y;
 
-        case PROFILER_STAT_PLAYER_TICK: return snapshot.tick;
+        case PROFILER_STAT_PLAYER_TICK: return internal_snapshot.tick;
 
-        case PROFILER_STAT_LINEAR_FREE: return snapshot.linear_free;
-        case PROFILER_STAT_HEAP_USED: return snapshot.heap_used;
-        case PROFILER_STAT_HEAP_FREE: return snapshot.heap_free;
-        case PROFILER_STAT_HEAP_TOTAL: return snapshot.heap_total;
+        case PROFILER_STAT_LINEAR_FREE: return internal_snapshot.linear_free;
+        case PROFILER_STAT_HEAP_USED: return internal_snapshot.heap_used;
+        case PROFILER_STAT_HEAP_FREE: return internal_snapshot.heap_free;
+        case PROFILER_STAT_HEAP_TOTAL: return internal_snapshot.heap_total;
         default: return 0;
     }
 }
@@ -363,6 +367,8 @@ void profiler_update(ProfilerUpdateData data) {
     snapshot.heap_used = mi.uordblks;
     snapshot.heap_free = envGetHeapSize() - mi.uordblks;
     snapshot.heap_total = envGetHeapSize();
+
+    if (!game_paused) internal_snapshot = snapshot;
 
     profiler_handle_input(data.kDown);
 }

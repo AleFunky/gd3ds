@@ -1,4 +1,5 @@
 #include "saving.h"
+#include "3ds/thread.h"
 #include "json-c/json_object.h"
 #include "json-c/json_object_iterator.h"
 #include "json-c/json_tokener.h"
@@ -28,10 +29,17 @@
 
 LevelDataEntry *current_level_entry;
 
+static CreatorEntry empty_creator = (CreatorEntry) {
+    .creatorName = "-",
+    .userId = 0
+};
+
 static SavingTask tasks[SAVE_TYPE_COUNT] = { 0 };
+static Thread saving_threads[SAVE_TYPE_COUNT] = { 0 };
 
 int total_stars = 0;
 int total_coins = 0;
+int total_user_coins = 0;
 int total_attempts = 0;
 int total_jumps = 0;
 int total_demons = 0;
@@ -146,9 +154,27 @@ static void calculate_stats_level_list(LevelDataList *list, bool is_main_level, 
     }
 }
 
+bool level_has_rate(const LevelData *data) {
+    return data->stars > 0;
+}
+
+static int count_list_user_coins(LevelDataList *list) {
+    int count = 0;
+    for (int i = 0; i < list->count; i++) {
+        LevelData *data = &list->list[i].data;
+        if (data->normal_progress == 100 && level_has_rate(data)) {
+            count += data->coin1;
+            count += data->coin2;
+            count += data->coin3;
+        }
+    }
+    return count;
+}
+
 void calculate_stats() {
     total_stars = 0;
     total_coins = 0;
+    total_user_coins = 0;
     total_attempts = 0;
     total_jumps = 0;
     total_demons = 0;
@@ -163,6 +189,9 @@ void calculate_stats() {
     calculate_stats_level_list(&gdps_file.online_levels, false, NULL);
 
     calculate_stats_level_list(&external_file.external_levels, false, NULL);
+
+    total_user_coins += count_list_user_coins(&gd_server_file.online_levels);
+    total_user_coins += count_list_user_coins(&gdps_file.online_levels);
 }
 
 // New save file format
@@ -321,6 +350,14 @@ static struct json_object *search_entry_to_json(const SearchEntry *entry) {
     json_object_object_add(obj, "songIndex",
         json_object_new_int(entry->songIndex)
     );
+    
+    json_object_object_add(obj, "coins",
+        json_object_new_int(entry->coins)
+    );
+    
+    json_object_object_add(obj, "verifiedCoins",
+        json_object_new_boolean(entry->verifiedCoins)
+    );
 
     return obj;
 }
@@ -419,8 +456,8 @@ static struct json_object *make_saved_level_data_list_json(const SavedLevelDataL
             json_object_put(data);
             json_object_put(object);
             return NULL;
-        }
-
+        }  
+        json_object_object_add(data, "version", json_object_new_int(entry->version));
         json_object_object_add(data, "search", search);
         json_object_object_add(data, "creator", creator);
         if (song) json_object_object_add(data, "song", song);
@@ -546,6 +583,7 @@ static bool parse_saved_level_data_list(SavedLevelDataList *level_data, struct j
 
     json_object_object_foreach(object, key, value)
     {
+        struct json_object *version = NULL;
         struct json_object *search = NULL;
         struct json_object *creator = NULL;
         struct json_object *song = NULL;
@@ -563,6 +601,12 @@ static bool parse_saved_level_data_list(SavedLevelDataList *level_data, struct j
         memset(&entry->creator_entry, 0, sizeof(entry->creator_entry));
         memset(&entry->song_entry, 0, sizeof(entry->song_entry));
         memset(&entry->level_entry, 0, sizeof(entry->level_entry));
+
+        if (json_object_object_get_ex(value, "version", &version)) {
+            entry->version = json_object_get_int(version);
+        } else {
+            entry->version = 0;
+        }
 
         // Level entry
         if (json_object_object_get_ex(value, "search", &search)) {
@@ -589,6 +633,8 @@ static bool parse_saved_level_data_list(SavedLevelDataList *level_data, struct j
             struct json_object *is_auto = NULL;
             struct json_object *creator_index = NULL;
             struct json_object *song_index = NULL;
+            struct json_object *coins = NULL;
+            struct json_object *verified_coins = NULL;
 
             if (json_object_object_get_ex(search, "name", &name))
                 snprintf(entry->search_entry.name, sizeof(entry->search_entry.name), "%s", json_object_get_string(name));
@@ -665,6 +711,12 @@ static bool parse_saved_level_data_list(SavedLevelDataList *level_data, struct j
 
             if (json_object_object_get_ex(search, "songIndex", &song_index))
                 entry->search_entry.songIndex = json_object_get_int(song_index);
+
+            if (json_object_object_get_ex(search, "coins", &coins))
+                entry->search_entry.coins = json_object_get_int(coins);
+
+            if (json_object_object_get_ex(search, "verifiedCoins", &verified_coins))
+                entry->search_entry.verifiedCoins = json_object_get_boolean(verified_coins);
         }
 
         // Creator entry
@@ -804,6 +856,7 @@ static bool saved_level_data_list_add(SavedLevelDataList *level_data, const char
         return false;
     }
 
+    entry->version = SAVED_LEVELS_VERSION;
     entry->search_entry = *search;
     entry->creator_entry = *creator;
     if (song) {
@@ -874,11 +927,22 @@ static LevelDataEntry *level_data_list_get_or_add(LevelDataList *level_data, con
 
 static bool saved_data_list_add(SavedLevelDataList *level_data, const char *key, const SearchEntry *search, const CreatorEntry *creator, const SongEntry *song) {
     SavedLevelDataEntry *entry = saved_level_data_list_find(level_data, key);
+
+    const CreatorEntry *c_entry;
+    if (creator) {
+        c_entry = creator;
+    } else {
+        c_entry = &empty_creator;
+    }
+
     if (entry) {
+        entry->search_entry = *search;
+        entry->creator_entry = *c_entry;
+        entry->song_entry = *song;
         return true;
     }
     
-    if (!saved_level_data_list_add(level_data, key, search, creator, song)) {
+    if (!saved_level_data_list_add(level_data, key, search, c_entry, song)) {
         return false;
     }
 
@@ -1086,7 +1150,6 @@ SavingError save_save_file(const char *path, const ServerFile *save_data) {
 
     json_object_object_add(root, SAVE_SAVED_LEVEL_KEY, saved_levels);
 
-    const char *json = json_object_to_json_string_ext(root, JSON_C_TO_STRING_PLAIN);
 
     SaveType type = (save_data == &gdps_file ? SAVE_1P9_GDPS : SAVE_ROBTOP);
 
@@ -1100,7 +1163,6 @@ SavingError save_save_file(const char *path, const ServerFile *save_data) {
     snprintf(task->tmp_file, sizeof(task->tmp_file), "%s.tmp", tmp_path);
 
     task->root = root;
-    task->data = strdup(json);
     
     begin_saving(type);
 
@@ -1121,8 +1183,6 @@ SavingError save_external_file(const char *path, const ExternalLevelFile *save_d
 
     json_object_object_add(root, SAVE_EXTERNAL_KEY, external);
 
-    const char *json = json_object_to_json_string_ext(root, JSON_C_TO_STRING_PLAIN);
-
     SavingTask *task = &tasks[SAVE_EXTERNAL];
 
     char tmp_path[250];
@@ -1133,7 +1193,6 @@ SavingError save_external_file(const char *path, const ExternalLevelFile *save_d
     snprintf(task->tmp_file, sizeof(task->tmp_file), "%s.tmp", tmp_path);
 
     task->root = root;
-    task->data = strdup(json);
     
     begin_saving(SAVE_EXTERNAL);
 
@@ -1365,11 +1424,11 @@ bool migrate_old_data() {
 }
 
 static SavingError threaded_save(SavingTask *task) {
-    if (!task->data) {
-        return SAVE_ERROR_DATA;
+    const char *json = json_object_to_json_string_ext(task->root, JSON_C_TO_STRING_PLAIN);
+    if (!json) {
+        return SAVE_ERROR_OUTOFMEM;
     }
 
-    const char *json = task->data;
     size_t out_len;
     int out_code;
     unsigned char *compressed = compress_data((const unsigned char *) json, strlen(json), &out_len, &out_code);
@@ -1447,8 +1506,6 @@ static void saving_thread(void *arg) {
     if (error) {
         output_log("An error has occured while saving: %d\n", error);
     }
-
-    free((void *) task->data);
     task->running = false;
 }
 
@@ -1457,6 +1514,15 @@ bool is_saving() {
         if (tasks[i].running) return true;
     }
     return false;
+}
+
+void wait_for_saving() {
+    for (int i = 0; i < SAVE_TYPE_COUNT; i++) {
+        if (!saving_threads[i]) continue;
+
+        threadJoin(saving_threads[i], U64_MAX);
+        saving_threads[i] = NULL;
+    }
 }
 
 void begin_saving(SaveType type) {
@@ -1470,13 +1536,13 @@ void begin_saving(SaveType type) {
         tasks[type].type = type;
         tasks[type].running = true;
     
-        threadCreate(
+        saving_threads[type] = threadCreate(
             saving_thread,
             &tasks[type],
             32 * 1024,
             priority,
             (is_N3DS ? 2 : 0),
-            true
+            false
         );
     }
 }

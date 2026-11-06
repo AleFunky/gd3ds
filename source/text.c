@@ -1,12 +1,15 @@
 #include <3ds.h>
 #include <citro2d.h>
 #include <citro3d.h>
+#include <3ds/util/utf.h>
 
+#include "c2d/spritesheet.h"
 #include "math_helpers.h"
 
 #include "text.h"
 #include "fonts/bigFont.h"
 #include <stdarg.h>
+#include <string.h>
 
 #include "menus/core/ui_screen.h"
 
@@ -136,7 +139,7 @@ static bool parse_image_tag(const char *tag, int *image, int *sheet) {
 }
 
 // Count da lines
-static int count_lines(const char *text, bool parse_tags) {
+int count_lines(const char *text, bool parse_tags) {
     if (!parse_tags) return 1;
     
     int lines = 1;
@@ -150,7 +153,21 @@ static int count_lines(const char *text, bool parse_tags) {
     return lines;
 }
 
-const Glyph *get_glyph(const Charset *font, char character) {
+static int decode_utf8_codepoint(const char *text, int remaining, uint32_t *codepoint) {
+    uint8_t sequence[4] = { 0 };
+    int available = remaining < sizeof(sequence) ? remaining : sizeof(sequence);
+    memcpy(sequence, text, available);
+
+    ssize_t bytes = decode_utf8(codepoint, sequence);
+    if (bytes <= 0 || bytes > remaining) {
+        *codepoint = '?'; // robert when binaryVersion is not 49
+        return 1;
+    }
+
+    return bytes;
+}
+
+const Glyph *get_glyph(const Charset *font, uint32_t character) {
     // Find matching character
     for (int i = 0; i < font->count; i++) {
         if (character == font->glyphs[i].id) {
@@ -176,6 +193,8 @@ const Glyph *get_glyph(const Charset *font, char character) {
 char *wrap_text(const Charset *font, float zoom_x, const char *text, float max_width) {
     wrap_buffer[0] = '\0';
 
+    zoom_x *= font->scale;
+
     float line_width = 0.f;
     const char *p = text;
     while (*p) {
@@ -198,12 +217,17 @@ char *wrap_text(const Charset *font, float zoom_x, const char *text, float max_w
         // Extract next word
         char word[256];
         int len = 0;
+        int remaining = strlen(p);
 
-        while (*p && *p != ' ' && *p != '<') {
-            if (len < sizeof(word) - 1) {
-                word[len++] = *p;
+        while (remaining && *p != ' ' && *p != '<') {
+            uint32_t codepoint;
+            int bytes = decode_utf8_codepoint(p, remaining, &codepoint);
+            if (len + bytes < sizeof(word)) {
+                memcpy(word + len, p, bytes);
+                len += bytes;
             }
-            p++;
+            p += bytes;
+            remaining -= bytes;
         }
 
         word[len] = '\0';
@@ -238,11 +262,10 @@ char *wrap_text(const Charset *font, float zoom_x, const char *text, float max_w
 
                 // Find the largest chunk that fits
                 while (end < len) {
-                    char c[2] = { 
-                        word[end], '\0' 
-                    };
-
-                    float char_width = get_text_length(font, zoom_x, true, c);
+                    uint32_t codepoint;
+                    int bytes = decode_utf8_codepoint(word + end, len - end, &codepoint);
+                    const Glyph *glyph = get_glyph(font, codepoint);
+                    float char_width = glyph ? glyph->xAdvance * zoom_x : 0.f;
 
                     // If already outside the max width, break
                     if (end > start && chunk_width + char_width > max_width) {
@@ -250,7 +273,7 @@ char *wrap_text(const Charset *font, float zoom_x, const char *text, float max_w
                     }
 
                     chunk_width += char_width;
-                    end++;
+                    end += bytes;
                 }
 
                 // Append this chunk
@@ -275,18 +298,26 @@ char *wrap_text(const Charset *font, float zoom_x, const char *text, float max_w
     return wrap_buffer;
 }
 
+static float get_font_line_height(const Charset *font) {
+    const Glyph *reference = get_glyph(font, 'A');
+    return reference ? reference->height : 29.f;
+}
+
+static float get_font_image_center_y(const Charset *font) {
+    const Glyph *reference = get_glyph(font, 'A');
+    return reference ? reference->yOffset + reference->height * 0.5f : get_font_line_height(font) * 0.5f;
+}
+
 static float get_image_tag_length(const Charset *font, const float zoom_x, char *tag) {
     int image_index = -1;
     int image_sheet = 0;
     if (parse_image_tag(tag, &image_index, &image_sheet)) {
-        float height = HEIGHT_OFFSET;
+        float height = get_font_line_height(font);
+        
+        C2D_SpriteSheet sheet = get_sheet(image_sheet);
+        if (!sheet) return 0;
 
-        const Glyph *aCharacter = get_glyph(font, 'A');
-        if (aCharacter) {
-            height = aCharacter->height * HEIGHT_OFFSET_MULT;
-        }
-
-        C2D_Image image = C2D_SpriteSheetGetImage(*get_sheet(image_sheet), image_index);
+        C2D_Image image = C2D_SpriteSheetGetImage(sheet, image_index);
         if (!image.subtex) return 0;
 
         float tex_w = image.subtex->width;
@@ -308,20 +339,25 @@ static void get_line_metrics(const Charset *font, float zoom_x, bool parse_tags,
     float first_char = 0.f, last_char = 0.f;
     bool first = true;
 
-    for (int i = start; text[i]; i++) {
-        // Skip tags
+    int text_size = strlen(text);
+    for (int i = start; i < text_size;) {
         if (text[i] == '<' && parse_tags) {
             char tag[64];
-            if (read_tag(text, &i, tag, sizeof(tag))) {
+            int tag_end = i;
+            if (read_tag(text, &tag_end, tag, sizeof(tag))) {
                 length += get_image_tag_length(font, zoom_x, tag);
-                
+                i = tag_end + 1;
                 continue;
             }
-        } else if (text[i] == '\n') {
+        }
+
+        if (text[i] == '\n') {
             break;
         }
 
-        const Glyph *character = get_glyph(font, text[i]);
+        uint32_t codepoint;
+        int bytes = decode_utf8_codepoint(text + i, text_size - i, &codepoint);
+        const Glyph *character = get_glyph(font, codepoint);
         if (character) {
             // First character
             if (first) { 
@@ -333,6 +369,7 @@ static void get_line_metrics(const Charset *font, float zoom_x, bool parse_tags,
             last_char = (character->xAdvance - character->xOffset - character->width) * zoom_x;
             length += character->xAdvance * zoom_x;
         }
+        i += bytes;
     }
 
     *out_length = length;
@@ -340,28 +377,33 @@ static void get_line_metrics(const Charset *font, float zoom_x, bool parse_tags,
     *out_last_char = last_char;
 }
 
-float get_line_length(const Charset *font, const float zoom_x, bool parse_tags, const char *text, int start) {
+float get_line_length(const Charset *font, const float zoom_x, bool parse_tags, const char *text, size_t start) {
     float text_length = 0;
+    int text_size = strlen(text);
 
-    for (int i = start; text[i]; i++) {
-        const Glyph *character = get_glyph(font, text[i]);
-
+    for (int i = start; i < text_size;) {
         // Skip tags
         if (text[i] == '<' && parse_tags) {
             char tag[64];
-
-            if (read_tag(text, &i, tag, sizeof(tag))) {
+            int tag_end = i;
+            if (read_tag(text, &tag_end, tag, sizeof(tag))) {
                 text_length += get_image_tag_length(font, zoom_x, tag);
-
+                i = tag_end + 1;
                 continue;
             }
-        } else if (text[i] == '\n') {
+        }
+
+        if (text[i] == '\n') {
             break;
         }
 
+        uint32_t codepoint;
+        int bytes = decode_utf8_codepoint(text + i, text_size - i, &codepoint);
+        const Glyph *character = get_glyph(font, codepoint);
         if (character) {
             text_length += character->xAdvance * zoom_x;
         }
+        i += bytes;
     }
 
     return text_length;
@@ -371,34 +413,24 @@ float get_longest_line_length(const Charset *font, const float zoom_x, const cha
     float longest = 0.0f;
 
     int start = 0;
-    int i = 0;
-    while (true) {
-        if (text[i] == '<' || text[i] == '\0') {
-            bool newline = false;
-            
-            if (text[i] == '\n') {
-                newline = true;
-            }
-
-            // Measure line
-            if (newline || text[i] == '\0') {
-                float length = get_line_length(font, zoom_x, true, text, start);
-
-                // Set if longer than last saved line
-                if (length > longest) {
-                    longest = length;
-                }
-
-                start = i + 1;
+    int text_size = strlen(text);
+    for (size_t i = 0; i <= text_size; i++) {
+        if (i < text_size && text[i] == '<') {
+            char tag[64];
+            int tag_end = i;
+            if (read_tag(text, &tag_end, tag, sizeof(tag))) {
+                i = tag_end;
+                continue;
             }
         }
 
-        // Break if end of text
-        if (text[i] == '\0') {
-            break;
+        if (i == text_size || text[i] == '\n') {
+            float length = get_line_length(font, zoom_x, true, text, start);
+            if (length > longest) {
+                longest = length;
+            }
+            start = i + 1;
         }
-
-        i++;
     }
 
     return longest;
@@ -407,31 +439,124 @@ float get_longest_line_length(const Charset *font, const float zoom_x, const cha
 float get_text_length(const Charset *font, const float zoom_x, bool parse_tags, const char *text) {
     float text_length = 0;
     int size = strlen(text);
-    for (int i = 0; i < size; i++) {
-        const Glyph *character = get_glyph(font, text[i]);
-        
+    for (int i = 0; i < size;) {
         // Skip tags
         if (text[i] == '<' && parse_tags) {
             char tag[64];
-
-            if (read_tag(text, &i, tag, sizeof(tag))) {
+            int tag_end = i;
+            if (read_tag(text, &tag_end, tag, sizeof(tag))) {
                 text_length += get_image_tag_length(font, zoom_x, tag);
+                i = tag_end + 1;
                 continue;
             }
-        } else if (text[i] == '\n') {
+        }
+
+        if (text[i] == '\n') {
+            i++;
             continue;
         }
 
+        uint32_t codepoint;
+        int bytes = decode_utf8_codepoint(text + i, size - i, &codepoint);
+        const Glyph *character = get_glyph(font, codepoint);
         if (character != NULL) {
             float xadvance = character->xAdvance * zoom_x;
-
             text_length += xadvance;
         }
+        i += bytes;
     }
     return text_length;
 }
 
 #define SPACING 6.f
+
+static void include_vertical_bounds(float top, float bottom, bool *has_bounds, float *min_y, float *max_y) {
+    if (!(*has_bounds)) {
+        *min_y = top;
+        *max_y = bottom;
+        *has_bounds = true;
+        return;
+    }
+
+    if (top < *min_y) *min_y = top;
+    if (bottom > *max_y) *max_y = bottom;
+}
+
+static void get_text_vertical_bounds(const Charset *font, const char *text, int size, bool parse_tags, float scale_y, float line_height, float *min_y, float *max_y) {
+    float offset_y = 0.f;
+    bool has_bounds = false;
+
+    for (int i = 0; i < size;) {
+        uint32_t codepoint;
+        int bytes = decode_utf8_codepoint(text + i, size - i, &codepoint);
+
+        if (codepoint == '\n') {
+            i += bytes;
+            offset_y += line_height;
+            continue;
+        }
+
+        bool is_image = false;
+        int image_index = -1;
+        int image_sheet = 0;
+
+        if (codepoint == '<' && parse_tags) {
+            char tag[64];
+            int tag_end = i;
+            if (read_tag(text, &tag_end, tag, sizeof(tag))) {
+                i = tag_end + 1;
+                if (parse_image_tag(tag, &image_index, &image_sheet)) {
+                    is_image = true;
+                } else {
+                    continue;
+                }
+            } else {
+                i += bytes;
+            }
+        } else {
+            i += bytes;
+        }
+
+        if (is_image) {
+            C2D_SpriteSheet image_sheet_ptr = get_sheet(image_sheet);
+            if (image_index >= 0 && image_sheet_ptr) {
+                C2D_Image image = C2D_SpriteSheetGetImage(image_sheet_ptr, image_index);
+                if (image.subtex) {
+                    float image_height = get_font_line_height(font) * fabsf(scale_y);
+                    float image_center = offset_y + get_font_image_center_y(font) * scale_y;
+                    include_vertical_bounds(image_center - image_height * 0.5f, image_center + image_height * 0.5f, &has_bounds, min_y, max_y);
+                }
+            }
+            continue;
+        }
+
+        const Glyph *character = get_glyph(font, codepoint);
+        if (character) {
+            float glyph_center = offset_y + (character->yOffset + character->height * 0.5f) * scale_y;
+            float glyph_half_height = character->height * fabsf(scale_y) * 0.5f;
+            
+            include_vertical_bounds(glyph_center - glyph_half_height, glyph_center + glyph_half_height, &has_bounds, min_y, max_y);
+        }
+    }
+
+    if (!has_bounds) {
+        *min_y = 0.f;
+        *max_y = 0.f;
+    }
+}
+
+float get_text_height(const Charset *font, C2D_SpriteSheet *sheet, const float scaleY, bool parse_tags, const char *text) {
+    int size = strlen(text);
+    float mod_scaleY = scaleY * font->scale;
+
+    float height = get_font_line_height(font);
+    float line_height = height * 0.9f * fabsf(scaleY);
+
+    float min_y;
+    float max_y;
+    get_text_vertical_bounds(font, text, size, parse_tags, mod_scaleY, line_height, &min_y, &max_y);
+    return max_y - min_y;
+}
 
 void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const float y, const float scaleX, const float scaleY, float alignment, bool parse_tags, const char *text, ...) {
     if (!text || !sheet) {
@@ -445,80 +570,84 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
     const int size = vsnprintf(tmp, sizeof(tmp), text, argp);
     va_end(argp);
 
-    float height = HEIGHT_OFFSET;
-
-    const Glyph *aCharacter = get_glyph(font, 'A');
-    if (aCharacter) {
-        height = aCharacter->height * HEIGHT_OFFSET_MULT;
-    }
-
     float line_length;
     float first_char;
     float last_char;
 
-    get_line_metrics(font, fabsf(scaleX), parse_tags, tmp, 0, &line_length, &first_char, &last_char);
+    float mod_scaleX = scaleX * font->scale;
+    float mod_scaleY = scaleY * font->scale;
+
+    get_line_metrics(font, fabsf(mod_scaleX), parse_tags, tmp, 0, &line_length, &first_char, &last_char);
 
     float offset_x = 0;
     float offset_y = 0;
 
-    // Get total text height
-    int line_count = count_lines(tmp, parse_tags) - 1;
-    float line_height = (height * fabsf(scaleY)) + SPACING * fabsf(scaleY);
-    float total_height = (line_count * line_height);
+    float height = get_font_line_height(font);
+    float line_height = height * 0.9f * fabsf(scaleY);
+
+    float min_y;
+    float max_y;
+    get_text_vertical_bounds(font, tmp, size, parse_tags, mod_scaleY, line_height, &min_y, &max_y);
+    float base_y = y - (min_y + max_y) * 0.5f;
 
     C2D_ImageTint tint = { 0 };
     u32 current_color = white_c;
 
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < size;) {
+        uint32_t codepoint;
+        int bytes = decode_utf8_codepoint(tmp + i, size - i, &codepoint);
         bool is_image = false;
         int image_index = -1;
         int image_sheet = 0;
         
         // Parse tags
-        if (tmp[i] == '<' && parse_tags) {
+        if (codepoint == '<' && parse_tags) {
             char tag[64];
-
-            if (read_tag(tmp, &i, tag, sizeof(tag))) {   
+            int tag_end = i;
+            if (read_tag(tmp, &tag_end, tag, sizeof(tag))) {
+                i = tag_end + 1;
                 if (parse_image_tag(tag, &image_index, &image_sheet)) {
                     is_image = true;
                 } else {
                     parse_color_tag(tag, &current_color);
                     continue;
                 }
+            } else {
+                i += bytes;
             }
-        } else if (tmp[i] == '\n') {
+        } else if (codepoint == '\n') {
+            i += bytes;
             offset_x = 0;
             
             offset_y += line_height;
 
-            get_line_metrics(font, fabsf(scaleX), true, tmp, i + 1, &line_length, &first_char, &last_char);
+            get_line_metrics(font, fabsf(mod_scaleX), parse_tags, tmp, i, &line_length, &first_char, &last_char);
 
             continue;
+        } else {
+            i += bytes;
         }
 
+        const Glyph *character = get_glyph(font, codepoint);
         C2D_PlainImageTint(&tint, current_color, 1.f);
         
         float width_offset = alignment * (line_length - first_char - last_char) + first_char;
 
         if (!is_image) {
-            const Glyph *character = get_glyph(font, tmp[i]);
-            
             if (character != NULL) {
                 C2D_Sprite sprite = { 0 };
 
-                float xoffset = (character->xOffset) * scaleX;
-                float yoffset = (character->yOffset) * scaleY;
-                float xadvance = character->xAdvance * scaleX;
+                float xoffset = (character->xOffset) * mod_scaleX;
+                float yoffset = (character->yOffset) * mod_scaleY;
+                float xadvance = character->xAdvance * mod_scaleX;
 
                 int index = character->spriteIndex;
                 
-                float base_y = y - total_height / 2.f;
-
                 float final_x = x + offset_x + xoffset - width_offset;
-                float final_y = base_y + offset_y + yoffset - height * scaleY;
+                float final_y = base_y + offset_y + yoffset;
 
-                final_x += (character->width  * scaleX) * 0.5f;
-                final_y += (character->height * scaleY) * 0.5f;
+                final_x += (character->width  * mod_scaleX) * 0.5f;
+                final_y += (character->height * mod_scaleY) * 0.5f;
 
                 if (index >= 0) { 
                     // Draw glyph so its center is at (final_x, final_y)
@@ -526,7 +655,7 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
                     C3D_TexSetFilter(sprite.image.tex, GPU_LINEAR, GPU_LINEAR);
                     C2D_SpriteSetCenter(&sprite, 0.5f, 0.5f);
                     C2D_SpriteSetPos(&sprite, final_x, final_y);
-                    C2D_SpriteSetScale(&sprite, scaleX, scaleY);
+                    C2D_SpriteSetScale(&sprite, mod_scaleX, mod_scaleY);
                     C2D_DrawSpriteTinted(&sprite, &tint);
                 }
 
@@ -537,9 +666,12 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
             C2D_Sprite sprite = { 0 };
 
             if (image_index >= 0) { 
-                C2D_Image image = C2D_SpriteSheetGetImage(*get_sheet(image_sheet), image_index);
+                C2D_SpriteSheet sheet = get_sheet(image_sheet);
+                if (!sheet) continue;
+
+                C2D_Image image = C2D_SpriteSheetGetImage(sheet, image_index);
                 if (image.subtex) {
-                    C2D_SpriteFromSheet(&sprite, *get_sheet(image_sheet), image_index);
+                    C2D_SpriteFromSheet(&sprite, sheet, image_index);
                     C3D_TexSetFilter(sprite.image.tex, GPU_LINEAR, GPU_LINEAR);
                 
                     float tex_w = sprite.image.subtex->width;
@@ -547,20 +679,17 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
 
                     float image_scale = height / tex_h;
                     
-                    float image_scale_x = scaleX * image_scale;
-                    float image_scale_y = scaleY * image_scale;
+                    float image_scale_x = mod_scaleX * image_scale;
+                    float image_scale_y = mod_scaleY * image_scale;
 
                     float image_width = tex_w * image_scale_x;
-                    float image_height = tex_h * image_scale_y;
 
                     float xadvance = image_width;
                     
-                    float base_y = y - total_height / 2.f;
                     float final_x = x + offset_x - width_offset;
-                    float final_y = base_y + offset_y - image_height * 0.5f;
+                    float final_y = base_y + offset_y + get_font_image_center_y(font) * mod_scaleY;
 
                     final_x += image_width * 0.5f;
-                    final_y += image_height * 0.5f;
 
                     // Draw image so its center is at (final_x, final_y)
                     C2D_SpriteSetCenter(&sprite, 0.5f, 0.5f);
@@ -573,4 +702,37 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
             }
         }
     }
+}
+
+unsigned char text_object_layout(const Charset *font, const char *text, TextGlyphPlacement *out, unsigned char max_out) {
+    if (!font || !text || !out || max_out == 0) return 0;
+
+    float width = 0.f;
+    for (int i = 0; text[i]; i++) {
+        const Glyph *g = get_glyph(font, text[i]);
+        if (g) width += g->xAdvance;
+    }
+    width *= TEXT_OBJECT_SCALE;
+
+    const Glyph *reference = get_glyph(font, 'A');
+    float line_height = reference ? (float)reference->height : 29.f;
+
+    float cursor = -width * 0.5f;
+    unsigned char count = 0;
+
+    for (int i = 0; text[i]; i++) {
+        const Glyph *g = get_glyph(font, text[i]);
+        if (!g) continue;
+
+        if (g->spriteIndex >= 0 && count < max_out) {
+            out[count].x = cursor + (g->xOffset + g->width * 0.5f) * TEXT_OBJECT_SCALE;
+            out[count].y = (g->yOffset + g->height * 0.5f) * TEXT_OBJECT_SCALE - line_height * TEXT_OBJECT_SCALE * 0.5f;
+            out[count].sprite = g->spriteIndex;
+            count++;
+        }
+
+        cursor += g->xAdvance * TEXT_OBJECT_SCALE;
+    }
+
+    return count;
 }

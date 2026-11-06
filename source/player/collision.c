@@ -1,6 +1,9 @@
 #include "collision.h"
 #include "icons.h"
+#include "level_loading.h"
 #include "player.h"
+#include "player/trail.h"
+#include "robot_anim_data.h"
 #include <math.h>
 #include "practice.h"
 #include "profiling.h"
@@ -17,6 +20,7 @@
 #include "particles/object_particles.h"
 #include "particles/circles.h"
 #include "particles/coin_effect.h"
+#include "particles/key_effect.h"
 #include "save/saving.h"
 #include "menus/level_select.h"
 
@@ -24,37 +28,37 @@ Player *player_1 = &state.player;
 Player *player_2 = &state.player2;
 
 const float jump_heights_table[SPEED_COUNT][JUMP_TYPES_COUNT][GAMEMODE_COUNT][2] = {
-    { // SLOW                        CUBE                              SHIP                                BALL                               UFO            WAVE   },
-    /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {573.48,   458.784},  {0, 0} },
-    /* YELLOW ORB */ {{573.48,   458.784},  {573.48,   458.784},  {401.435993,  321.148795},  {573.48,   458.784},  {0, 0} },
-    /* BLUE PAD   */ {{-345.6,   -276.48},  {-229.392, -183.519}, {-160.574397, -128.463298}, {-229.392, -183.519}, {0, 0} },
-    /* BLUE ORB   */ {{-229.392, -183.519}, {-229.392, -183.519}, {-160.574397, -128.463298}, {-229.392, -183.519}, {0, 0} },
-    /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0} },
-    /* PINK ORB   */ {{412.884,  330.318},  {212.166,  169.776},  {309.090595,  247.287596},  {240.84,   192.672},  {0, 0} },
+    { // SLOW                        CUBE                              SHIP                                BALL                               UFO            WAVE              ROBOT  },
+    /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {573.48,   458.784},  {0, 0},   {864,      691.2} },
+    /* YELLOW ORB */ {{573.48,   458.784},  {573.48,   458.784},  {401.435993,  321.148795},  {573.48,   458.784},  {0, 0},   {516.132,  430.9056} },
+    /* BLUE PAD   */ {{-345.6,   -276.48},  {-229.392, -183.519}, {-160.574397, -128.463298}, {-229.392, -183.519}, {0, 0},   {-345.6,   -276.48} },
+    /* BLUE ORB   */ {{-229.392, -183.519}, {-229.392, -183.519}, {-160.574397, -128.463298}, {-229.392, -183.519}, {0, 0},   {-229.392, -183.519} },
+    /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0},   {561.6,    449.28} },
+    /* PINK ORB   */ {{412.884,  330.318},  {212.166,  169.776},  {309.090595,  247.287596},  {240.84,   192.672},  {0, 0},   {412.884,  330.318} },
     },
     { // NORMAL
-    /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0} },
-    /* YELLOW ORB */ {{603.72,   482.976},  {603.72,   482.976},  {422.60399,   338.08319},   {603.72,   482.976},  {0, 0} },
-    /* BLUE PAD   */ {{-345.6,   -276.48},  {-345.6,   -276.48},  {-207.36001,  -165.88801},  {-345.6,   -276.48},  {0, 0} },
-    /* BLUE ORB   */ {{-241.488, -193.185}, {-241.488, -193.18},  {-169.04160,  -135.2295},   {-241.488, -193.185}, {0, 0} },
-    /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0} },
-    /* PINK ORB   */ {{434.7,    347.76},   {223.398,  178.686},  {325.42019,   260.3286},    {258.984,  207.198},  {0, 0} },
+    /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0},   {864,      691.2} },
+    /* YELLOW ORB */ {{603.72,   482.976},  {603.72,   482.976},  {422.60399,   338.08319},   {603.72,   482.976},  {0, 0},   {543.348,  434.6784} },
+    /* BLUE PAD   */ {{-345.6,   -276.48},  {-345.6,   -276.48},  {-207.36001,  -165.88801},  {-345.6,   -276.48},  {0, 0},   {-345.6,   -276.48} },
+    /* BLUE ORB   */ {{-241.488, -193.185}, {-241.488, -193.18},  {-169.04160,  -135.2295},   {-241.488, -193.185}, {0, 0},   {-241.488, -193.185} },
+    /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0},   {561.6,    449.28} },
+    /* PINK ORB   */ {{434.7,    347.76},   {223.398,  178.686},  {325.42019,   260.3286},    {258.984,  207.198},  {0, 0},   {434.7,    347.76} },
     },
     { // FAST
-    /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0} },
-    /* YELLOW ORB */ {{616.68,   481.734},  {616.68,   481.734},  {431.67599,   345.34079},   {616.68,   481.734},  {0, 0} },
-    /* BLUE PAD   */ {{-345.6,   -276.48},  {-345.6,   -276.48},  {-207.36001,  -165.88801},  {-345.6,   -276.48},  {0, 0} },
-    /* BLUE ORB   */ {{-246.672, -197.343}, {-246.672, -197.343}, {-172.6704,   -138.1401},   {-246.672, -197.343}, {0, 0} },
-    /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0} },
-    /* PINK ORB   */ {{443.988,  355.212},  {228.15,   182.52},   {332.37539,   265.923},     {258.984,  207.198},  {0, 0} },
+    /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0},   {864,      691.2} },
+    /* YELLOW ORB */ {{616.68,   481.734},  {616.68,   481.734},  {431.67599,   345.34079},   {616.68,   481.734},  {0, 0},   {555.012,  433.5687} },
+    /* BLUE PAD   */ {{-345.6,   -276.48},  {-345.6,   -276.48},  {-207.36001,  -165.88801},  {-345.6,   -276.48},  {0, 0},   {-345.6,   -276.48} },
+    /* BLUE ORB   */ {{-246.672, -197.343}, {-246.672, -197.343}, {-172.6704,   -138.1401},   {-246.672, -197.343}, {0, 0},   {-246.672, -197.343} },
+    /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0},   {561.6,    449.28} },
+    /* PINK ORB   */ {{443.988,  355.212},  {228.15,   182.52},   {332.37539,   265.923},     {258.984,  207.198},  {0, 0},   {443.988,  355.212} },
     },
     { // FASTER
-    /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0} },
-    /* YELLOW ORB */ {{606.42,   485.136},  {606.42,   485.136},  {424.493993,  339.59519},   {606.42,   485.136},  {0, 0} },
-    /* BLUE PAD   */ {{-345.6,   -276.48},  {-345.6,   -276.48},  {-207.36001,  -165.88801},  {-345.6,   -276.48},  {0, 0} },
-    /* BLUE ORB   */ {{-242.568, -194.049}, {-242.568, -194.049}, {-169.7976,   -135.8343},   {-242.568, -194.049}, {0, 0} },
-    /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0} },
-    /* PINK ORB   */ {{436.644,  349.272},  {224.37,   179.496},  {326.85659,   261.5004},    {254.718,  203.742},  {0, 0} },
+    /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0},   {864,      691.2} },
+    /* YELLOW ORB */ {{606.42,   485.136},  {606.42,   485.136},  {424.493993,  339.59519},   {606.42,   485.136},  {0, 0},   {545.778,  436.6224} },
+    /* BLUE PAD   */ {{-345.6,   -276.48},  {-345.6,   -276.48},  {-207.36001,  -165.88801},  {-345.6,   -276.48},  {0, 0},   {-345.6,   -276.48} },
+    /* BLUE ORB   */ {{-242.568, -194.049}, {-242.568, -194.049}, {-169.7976,   -135.8343},   {-242.568, -194.049}, {0, 0},   {-242.568, -194.049} },
+    /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0},   {561.6,    449.28} },
+    /* PINK ORB   */ {{436.644,  349.272},  {224.37,   179.496},  {326.85659,   261.5004},    {254.718,  203.742},  {0, 0},   {436.644,  349.272} },
     }
 };
 
@@ -63,7 +67,8 @@ const float gamemode_heights[GAMEMODE_COUNT] = {
     300, // Ship
     240,  // Ball
     300, // Ufo
-    300 // Wave
+    300, // Wave
+    999999 // Robot
 };
 
 const int dual_gamemode_heights[GAMEMODE_COUNT] = {
@@ -71,7 +76,8 @@ const int dual_gamemode_heights[GAMEMODE_COUNT] = {
     10, // Ship
     9,  // Ball
     10, // Ufo
-    10 // Wave
+    10, // Wave
+    9  // Robot
 };
 
 const Vec2D slowSpeedSnaps[3] = {
@@ -215,11 +221,12 @@ void trySnap(int block, Player *player) {
 
 // Table that says if gravity changes should affect the other gamemode
 static const bool gamemode_linked_gravity[GAMEMODE_COUNT][GAMEMODE_COUNT] = {
-    /* CUBE */ { Y, N, N, N, Y},
-    /* SHIP */ { N, Y, N, N, N},
-    /* BALL */ { N, N, Y, N, N},
-    /* UFO  */ { N, N, N, Y, N},
-    /* WAVE */ { Y, N, N, N, Y},
+    /* CUBE  */ { Y, N, N, N, Y, N},
+    /* SHIP  */ { N, Y, N, N, N, N},
+    /* BALL  */ { N, N, Y, N, N, N},
+    /* UFO   */ { N, N, N, Y, N, N},
+    /* WAVE  */ { Y, N, N, N, Y, N},
+    /* ROBOT */ { N, N, N, N, N, Y},
 };
 
 #undef Y
@@ -335,6 +342,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->inverse_rotation = false;
                 player->left_ground = true;
                 player->jumped = true;
+                set_robot_animation(player, ROBOT_ANIM_JUMP_START);
                 SET_ACTIVATED(obj, true);
                 update_rotation_direction(player);
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &pad_use_effect, get_use_effect_array_ptr(GFX_TOP));
@@ -353,6 +361,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->inverse_rotation = false;
                 player->left_ground = true;
                 player->jumped = true;
+                set_robot_animation(player, ROBOT_ANIM_JUMP_START);
                 SET_ACTIVATED(obj, true);
                 update_rotation_direction(player);
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &pad_use_effect, get_use_effect_array_ptr(GFX_TOP));
@@ -391,6 +400,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->inverse_rotation = false;
                 player->ceiling_inv_time = CEILING_INVUL_TIME;
                 player->jumped = true;
+                player->robot_air_time = 999.f;
 
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &pad_use_effect, get_use_effect_array_ptr(GFX_TOP));
                 if (effect) {
@@ -417,6 +427,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->buffering_state = BUFFER_END;
                 player->jumped = true;
                 update_rotation_direction(player);
+                set_robot_animation(player, ROBOT_ANIM_JUMP_START);
                 
                 state.current_data.jumps++;
                 
@@ -445,6 +456,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->buffering_state = BUFFER_END;
                 player->jumped = true;
                 update_rotation_direction(player);
+                set_robot_animation(player, ROBOT_ANIM_JUMP_START);
 
                 state.current_data.jumps++;
 
@@ -494,6 +506,46 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 SET_ACTIVATED(obj, true);
             } 
             break;
+        case GREEN_ORB:
+            if (GET_ACTIVATED(obj)) player->gravObj_id = obj;
+            if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
+            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
+                MotionTrail_ResumeStroke(trail);
+                player->gravObj_id = obj;
+
+                player->upside_down ^= 1;
+                player->vel_y = jump_heights_table[state.speed][JUMP_YELLOW_ORB][player->gamemode][player->mini];
+                
+                update_rotation_direction(player);
+
+                if (player->gamemode == GAMEMODE_SHIP) player->vel_y *= 0.7f;
+
+                flip_other_player(state.current_player);
+
+                state.current_data.jumps++;
+
+                player->ball_rotation_speed = -BALL_SLOW_ROTATION;
+                
+                set_robot_animation(player, ROBOT_ANIM_JUMP_START);
+
+                player->on_ground = false;
+                player->on_ceiling = false;
+                player->inverse_rotation = false;
+                player->left_ground = true;
+                player->buffering_state = BUFFER_END;
+                player->ceiling_inv_time = 0.5f;
+                player->jumped = true;
+
+                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                if (effect) {
+                    effect->def.colorR = 0;
+                    effect->def.colorG = 255 / 255.f;
+                    effect->def.colorB = 0;
+                }
+
+                SET_ACTIVATED(obj, true);
+            } 
+            break;
         case BLUE_GRAVITY_PORTAL:
             player->gravObj_id = obj;
             if (!GET_ACTIVATED(obj)) {
@@ -504,6 +556,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     player->vel_y /= -2;
                     player->upside_down = false;
                     player->inverse_rotation = false;
+                    player->robot_air_time = 999.f;
 
                     if (player->gamemode == GAMEMODE_UFO) 
                         player->rotation = 0;
@@ -533,6 +586,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     player->vel_y /= -2;
                     player->upside_down = true;
                     player->inverse_rotation = false;
+                    player->robot_air_time = 999.f;
 
                     if (player->gamemode == GAMEMODE_UFO) 
                         player->rotation = 0;
@@ -718,7 +772,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 state.ground_y = 0;
                 state.ceiling_y = 999999;
                 if (player->gamemode != GAMEMODE_PLAYER) {
-                    if (player->gamemode != GAMEMODE_BALL) {
+                    if (player->gamemode != GAMEMODE_BALL && player->gamemode != GAMEMODE_ROBOT) {
                         player->vel_y /= 2;
                     }
 
@@ -740,9 +794,90 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 SET_ACTIVATED(obj, true);
             }
             break;
+        case ROBOT_PORTAL:
+            if (!GET_ACTIVATED(obj)) {
+                state.ground_y = 0;
+                state.ceiling_y = 999999;
+                if (player->gamemode != GAMEMODE_ROBOT) {
+                    if (player->gamemode != GAMEMODE_BALL && player->gamemode != GAMEMODE_PLAYER) {
+                        player->vel_y /= 2;
+                    }
+                    if (player->gamemode == GAMEMODE_WAVE) player->vel_y *= 0.9f;
+
+                    player->ceiling_inv_time = GAMEMODE_INVUL_TIME;
+                    player->snap_rotation = true;
+                    player->inverse_rotation = false;
+                    set_gamemode(player, GAMEMODE_ROBOT);
+                    set_checkpoint_timer(0);
+                    pseudo_checkpoint_exists = false;
+                    flip_other_player(state.current_player ^ 1);
+                    update_rotation_direction(player);
+
+                    set_robot_animation(player, ROBOT_ANIM_JUMP_START);
+                    player->robot_air_time = 999.f;
+
+                    UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                    if (effect) {
+                        effect->def.colorR = 255 / 255.f;
+                        effect->def.colorG = 100 / 255.f;
+                        effect->def.colorB = 0 / 255.f;
+                    }
+                }
+
+                if (state.dual) {
+                    set_dual_bounds();
+                } 
+
+                SET_ACTIVATED(obj, true);
+            }
+            break;
+        case BLUE_TP_PORTAL: {
+            if (GET_ACTIVATED(obj)) break;
+            int oi = objects.child_object[obj];
+            if (oi >= 0) {
+                player->y = objects.y[oi];
+                state.old_player.y = player->y;
+
+                float half_view = SCREEN_HEIGHT_AREA / 2.0f;
+                float player_screen_y = player->y - (state.camera_y + half_view - LEVEL_Y_OFFSET);
+
+                float upside_down_offset = (player->upside_down ? -30.f : 0);
+                if (player_screen_y > half_view + 60.0f) {
+                    // Top bound
+                    set_camera_y(player->y - (140.f + upside_down_offset));
+                } else if (player_screen_y < -(half_view + 60.0f)) {
+                    // Bottom bound
+                    set_camera_y(player->y - (30.f + upside_down_offset));
+                }
+
+                UseEffect *eff1 = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                if (eff1) {
+                    eff1->def.colorR = 56 / 255.f;
+                    eff1->def.colorG = 200 / 255.f;
+                    eff1->def.colorB = 255 / 255.f;
+                }
+
+                UseEffect *eff2 = add_use_effect(objects.x[oi], objects.y[oi], oi, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                if (eff2) {
+                    eff2->def.colorR = 255 / 255.f;
+                    eff2->def.colorG = 255 / 255.f;
+                    eff2->def.colorB = 0 / 255.f;
+                }
+            }
+            SET_ACTIVATED(obj, true);
+            player->just_teleported = true;
+            MotionTrail_Clear(trail);
+            MotionTrail_Clear(wave_trail);
+            if (player->gamemode == GAMEMODE_WAVE) {
+                wave_trail->positionR = (Vec2D){player->x, player->y};  
+                wave_trail->startingPositionInitialized = true;
+                MotionTrail_AddWavePoint(wave_trail);
+            }
+            break;
+        }
         case SHIP_PORTAL: 
             if (!GET_ACTIVATED(obj)) {
-                state.ground_y = fmaxf(0, ip1_ceilf((objects.y[obj] - ((gamemode_heights[GAMEMODE_SHIP] + 60.f) / 2.f)) / 30.f)) * 30;
+                state.ground_y = fmaxf(0, ip1_ceilf((objects.original_y[obj] - ((gamemode_heights[GAMEMODE_SHIP] + 60.f) / 2.f)) / 30.f)) * 30;
                 state.ceiling_y = state.ground_y + gamemode_heights[GAMEMODE_SHIP];
                 set_intended_ceiling();
 
@@ -786,7 +921,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case BALL_PORTAL: 
             if (!GET_ACTIVATED(obj)) {
-                state.ground_y = fmaxf(0, ip1_ceilf((objects.y[obj] - ((gamemode_heights[GAMEMODE_BALL] + 60.f) / 2.f)) / 30.f)) * 30;
+                state.ground_y = fmaxf(0, ip1_ceilf((objects.original_y[obj] - ((gamemode_heights[GAMEMODE_BALL] + 60.f) / 2.f)) / 30.f)) * 30;
                 state.ceiling_y = state.ground_y + gamemode_heights[GAMEMODE_BALL];
                 set_intended_ceiling();
 
@@ -830,7 +965,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case UFO_PORTAL:
             if (!GET_ACTIVATED(obj)) {
-                state.ground_y = fmaxf(0, ip1_ceilf((objects.y[obj] - ((gamemode_heights[GAMEMODE_UFO] + 60.f) / 2.f)) / 30.f)) * 30;
+                state.ground_y = fmaxf(0, ip1_ceilf((objects.original_y[obj] - ((gamemode_heights[GAMEMODE_UFO] + 60.f) / 2.f)) / 30.f)) * 30;
                 state.ceiling_y = state.ground_y + gamemode_heights[GAMEMODE_UFO];
                 set_intended_ceiling();
                 
@@ -869,7 +1004,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case WAVE_PORTAL:
             if (!GET_ACTIVATED(obj)) {
-                state.ground_y = fmaxf(0, ip1_ceilf((objects.y[obj] - ((gamemode_heights[GAMEMODE_WAVE] + 60.f) / 2.f)) / 30.f)) * 30;
+                state.ground_y = fmaxf(0, ip1_ceilf((objects.original_y[obj] - ((gamemode_heights[GAMEMODE_WAVE] + 60.f) / 2.f)) / 30.f)) * 30;
                 state.ceiling_y = state.ground_y + gamemode_heights[GAMEMODE_WAVE];
                 set_intended_ceiling();
 
@@ -914,14 +1049,17 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 if (!state.dual){
                     player->ceiling_inv_time = CEILING_INVUL_TIME;
                     state.dual = true;
-                    state.dual_portal_y = objects.y[obj];
+                    state.dual_portal_y = objects.original_y[obj];
                     setup_dual();
                     if (state.current_player == 0) state.player2.x = state.old_player.x; // Sync them
                 }
                 set_dual_bounds();
+
+                MotionTrail_Clear(&trail_p2);
                 if (state.player2.gamemode == GAMEMODE_WAVE) {
                     wave_trail_p2.positionR = (Vec2D){state.player2.x, state.player2.y};  
                     wave_trail_p2.startingPositionInitialized = true;
+                    MotionTrail_Clear(&wave_trail_p2);
                     MotionTrail_AddWavePoint(&wave_trail_p2);
                 }
                 SET_ACTIVATED(obj, true);                
@@ -940,6 +1078,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     }
                     switch (state.player.gamemode) {
                         case GAMEMODE_PLAYER:
+                        case GAMEMODE_ROBOT:
                             state.ground_y = 0;
                             state.ceiling_y = 999999;
                             break;
@@ -953,7 +1092,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     
                     MotionTrail_StopStroke(&trail_p2);
                     MotionTrail_StopStroke(&wave_trail_p2);
-
+                    
                     UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
                     if (effect) {
                         effect->def.colorR = 145 / 255.f;
@@ -976,16 +1115,16 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
 
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &coin_use_effect, get_use_effect_array_ptr(GFX_TOP));
                 if (effect) {
-                    effect->def.colorR = 255 / 255.f;
-                    effect->def.colorG = 190 / 255.f;
-                    effect->def.colorB = 0 / 255.f;
+                    effect->def.colorR = 1.f;
+                    effect->def.colorG = state.custom_level ? 1.f : 190 / 255.f;
+                    effect->def.colorB = state.custom_level ? 1.f : 0 / 255.f;
                 }
 
                 UseEffect *effect2 = add_use_effect(objects.x[obj], objects.y[obj], obj, &coin_radius_effect, get_use_effect_array_ptr(GFX_TOP));
                 if (effect2) {
-                    effect2->def.colorR = 255 / 255.f;
-                    effect2->def.colorG = 190 / 255.f;
-                    effect2->def.colorB = 0 / 255.f;
+                    effect2->def.colorR = 1.f;
+                    effect2->def.colorG = state.custom_level ? 1.f : 190 / 255.f;
+                    effect2->def.colorB = state.custom_level ? 1.f : 0 / 255.f;
                 }
                 coin_pickup_particles.emitterX = objects.x[obj];
                 coin_pickup_particles.emitterY = objects.y[obj];
@@ -1007,7 +1146,33 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                         break;
                 }
 
-                objects.toggled[obj] = true;
+                objects.flags[obj] |= FLAG_TOGGLED;
+            }
+            break;
+
+        case KEY_OBJ:
+            if (!GET_ACTIVATED(obj)) {
+                SET_ACTIVATED(obj, true);
+
+                key_effect_spawn(objects.x[obj], objects.y[obj],
+                                 game_objects[KEY_OBJ].texture,
+                                 game_objects[KEY_OBJ].children[0].texture,
+                                 objects.col_channel[obj],
+                                 objects.detail_col_channel[obj],
+                                 objects.scale_x[obj], objects.scale_y[obj],
+                                 objects.flippedH[obj], objects.flippedV[obj]);
+
+                ParticleDefinition prev_cfg = brick_destroy_particles.cfg;
+                brick_destroy_particles.cfg.startColorRed = objects.main_color[obj].r / 255.f;
+                brick_destroy_particles.cfg.startColorGreen = objects.main_color[obj].g / 255.f;
+                brick_destroy_particles.cfg.startColorBlue = objects.main_color[obj].b / 255.f;
+                brick_destroy_particles.cfg.startColorAlpha = 127.0f / 255.0f;
+                brick_destroy_particles.emitterX = objects.x[obj];
+                brick_destroy_particles.emitterY = objects.y[obj];
+                spawnMultipleParticles(&brick_destroy_particles, 10);
+                brick_destroy_particles.cfg = prev_cfg;
+
+                objects.flags[obj] |= FLAG_TOGGLED;
             }
             break;
 
@@ -1038,8 +1203,50 @@ void get_corners(float cx, float cy, float w, float h, float angle, Vec2D out[4]
     out[3].y = cy - hw_sin + hh_cos;
 }
 
-static inline float dot_product(float ax, float ay, float bx, float by) {
-    return ax * bx + ay * by;
+static bool sat_overlap_exclusive(const Vec2D a[4], const Vec2D b[4]) {
+    // Test all axes (normals of edges)
+    for (int shape = 0; shape < 2; ++shape) {
+        const Vec2D *verts = (shape == 0) ? a : b;
+        for (int i = 0; i < 4; ++i) {
+            // Edge from verts[i] to verts[(i+1)%4]
+            float dx = verts[(i+1)%4].x - verts[i].x;
+            float dy = verts[(i+1)%4].y - verts[i].y;
+            // Normal axis
+            float ax = -dy, ay = dx;
+
+            // Project both shapes onto axis
+            float minA = INFINITY, maxA = -INFINITY;
+            float minB = INFINITY, maxB = -INFINITY;
+            for (int j = 0; j < 4; ++j) {
+                float projA = a[j].x * ax + a[j].y * ay;
+                float projB = b[j].x * ax + b[j].y * ay;
+                if (projA < minA) minA = projA;
+                if (projA > maxA) maxA = projA;
+                if (projB < minB) minB = projB;
+                if (projB > maxB) maxB = projB;
+            }
+            // If projections do not overlap, there is a separating axis
+            if (maxA <= minB || maxB <= minA) return false;
+        }
+    }
+    return true;
+}
+
+bool intersect_exclusive(float x1, float y1, float w1, float h1, float angle1,
+                    float x2, float y2, float w2, float h2, float angle2) {
+    // Tighter AABB check
+    float max_extent = fmaxf(w1, h1) + fmaxf(w2, h2);
+    float dx = fabsf(x1 - x2);
+    float dy = fabsf(y1 - y2);
+    
+    if (dx > max_extent || dy > max_extent) {
+        return false;
+    }
+    
+    Vec2D rect1[4], rect2[4];
+    get_corners(x1, y1, w1, h1, angle1, rect1);
+    get_corners(x2, y2, w2, h2, angle2, rect2);
+    return sat_overlap_exclusive(rect1, rect2);
 }
 
 static bool sat_overlap(const Vec2D a[4], const Vec2D b[4]) {
@@ -1065,7 +1272,7 @@ static bool sat_overlap(const Vec2D a[4], const Vec2D b[4]) {
                 if (projB > maxB) maxB = projB;
             }
             // If projections do not overlap, there is a separating axis
-            if (maxA <= minB || maxB <= minA) return false;
+            if (maxA < minB || maxB < minA) return false;
         }
     }
     return true;
@@ -1153,6 +1360,37 @@ bool circle_rect_collision(float cx, float cy, float radius,
     return distSq <= radius * radius;
 }
 
+static float moving_surface_velocity(Player *player, int obj) {
+    if (move_step_dt <= 0.f) return 0.f;
+    return grav(player, objects.y[obj] - objects.last_y[obj]) / move_step_dt;
+}
+
+static bool moving_support_crossed(Player *player, int obj, float velocity) {
+    if (velocity <= MINIMUM_OBJECT_SPEED || player->gamemode == GAMEMODE_WAVE ||
+        player->upside_down != state.old_player.upside_down || player->just_teleported) return false;
+    float old_top = grav(player, objects.last_y[obj]) + objects.height[obj] * .5f;
+    float new_top = obj_gravTop(player, obj);
+    return gravBottom(&state.old_player) >= old_top - .001f &&
+        gravBottom(player) <= new_top && player->vel_y <= velocity;
+}
+
+static void finish_moving_contact(Player *player) {
+    bool reset = state.dead || player->upside_down != state.old_player.upside_down || player->just_teleported ||
+        player->gamemode != state.old_player.gamemode || player->gamemode == GAMEMODE_WAVE ||
+        player->slope_data.slope_id >= 0;
+    float launch;
+    if (!reset && platform_launch(grav(player, player->last_platform_velocity), grav(player, player->platform_velocity),
+        player->vel_y, STEPS_DT, &launch)) {
+        player->vel_y = launch;
+        player->velocity_override = true;
+        player->on_ground = player->on_ceiling = false;
+        player->left_ground = true;
+        player->inverse_rotation = player->gamemode == GAMEMODE_PLAYER;
+        MotionTrail_ResumeStroke(trail);
+    }
+    player->last_platform_velocity = reset ? 0.f : player->platform_velocity;
+}
+
 void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
     InternalHitbox internal = player->internal_hitbox;
 
@@ -1162,6 +1400,11 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
         case HITBOX_SOLID: 
             bool gravSnap = false;
 
+            float x = objects.x[obj];
+            float y = objects.y[obj];
+            float object_raw_vel = moving_surface_velocity(player, obj);
+            bool moving_support = moving_support_crossed(player, obj, object_raw_vel);
+
             // This is equal to using the old player y position (a frame of snap leeway)
             clip += fabsf(player->vel_y) * STEPS_DT;
             
@@ -1169,7 +1412,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                 // Only do the funny grav snap if player is touching a gravity object and internal hitbox is touching block
                 bool internalCollidingBlock = intersect(
                     player->x, player->y, internal.width, internal.height, 0, 
-                    objects.x[obj], objects.y[obj], hitbox->width, hitbox->height, objects.rotation[obj]
+                    x, y, objects.width[obj], objects.height[obj], objects.rotation[obj]
                 );
 
                 float diff = obj_gravBottom(player, obj) - gravInternalBottom(player);
@@ -1180,16 +1423,16 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
             bool safeZone = player->mini && ((obj_gravTop(player, obj) - gravBottom(player) <= clip) || (gravTop(player) - obj_gravBottom(player, obj) <= clip));
             
             // Check collision with internal hitbox
-            if ((player->gamemode == GAMEMODE_WAVE || (!gravSnap && !safeZone)) && intersect(
+            if ((player->gamemode == GAMEMODE_WAVE || (!gravSnap && !safeZone && !moving_support)) && intersect(
                 player->x, player->y, internal.width, internal.height, 0, 
-                objects.x[obj], objects.y[obj], hitbox->width, hitbox->height, objects.rotation[obj]
+                x, y, objects.width[obj], objects.height[obj], 0
             )) {
                 if (objects.id[obj] == BREAKABLE_BLOCK) {
                     // Spawn breakable brick particles
-                    brick_destroy_particles.emitterX = objects.x[obj];
-                    brick_destroy_particles.emitterY = objects.y[obj];
+                    brick_destroy_particles.emitterX = x;
+                    brick_destroy_particles.emitterY = y;
                     spawnMultipleParticles(&brick_destroy_particles, 25);
-                    objects.toggled[obj] = true;
+                    objects.flags[obj] |= FLAG_TOGGLED;
                 } else {
                     // Not a brick, die
                     kill_player(DEATH_BLOCK);
@@ -1233,13 +1476,18 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
             }
 
             // Check snap for player bottom
-            if (obj_gravTop(player, obj) - bottom <= clip && player->vel_y <= 0 && player->gamemode != GAMEMODE_WAVE) {
+            if ((obj_gravTop(player, obj) - bottom <= clip || moving_support) && player->vel_y <= fmaxf(object_raw_vel, 0) && player->gamemode != GAMEMODE_WAVE) {
                 player->y = grav(player, obj_gravTop(player, obj)) + grav(player, player->height / 2);
                 if (player->vel_y <= 0) player->vel_y = 0;
                 player->on_ground = true;
                 player->inverse_rotation = false;
                 player->time_since_ground = 0;
                 player_non_flying_landing(player);
+
+                player->collided_block = obj;
+                player->platform_velocity = grav(player, fmaxf(0.f, object_raw_vel) * .9f);
+                if (object_raw_vel > MINIMUM_OBJECT_SPEED)
+                    player->vel_y = fmaxf(player->vel_y, object_raw_vel * .9f);
 
                 if (player->gamemode == GAMEMODE_PLAYER) {
                     // Check for x snap
@@ -1251,7 +1499,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
 
                     player->snap_data.player_frame = level_frame;
                     player->snap_data.object_id = obj;
-                    player->snap_data.player_snap_diff = player->x - objects.x[obj];
+                    player->snap_data.player_snap_diff = player->x - x;
                 }
             // Check snap for player top
             } else if (player->gamemode != GAMEMODE_WAVE) {
@@ -1260,8 +1508,8 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                     break;
                 }
                 // Behave normally
-                if (player->gamemode != GAMEMODE_PLAYER || gravSnap) {
-                    if (((gravTop(player) - obj_gravBottom(player, obj) <= clip && player->vel_y >= 0) || gravSnap)) {
+                if ((player->gamemode != GAMEMODE_PLAYER && player->gamemode != GAMEMODE_ROBOT) || gravSnap) {
+                    if (((gravTop(player) - obj_gravBottom(player, obj) <= clip && player->vel_y >= object_raw_vel) || gravSnap)) {
                         if (!gravSnap) player->on_ceiling = true;
                         else player->vel_y = 0;
                         player->inverse_rotation = false;
@@ -1281,23 +1529,44 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
     }
 }
 
+void handle_moving_block(Player *player, int obj) {
+    if (obj < 0 || obj >= objects.count || objects.flags[obj] & FLAG_TOGGLED ||
+        !state.old_player.on_ground || player->vel_y > 0.f || player->just_teleported ||
+        player->upside_down != state.old_player.upside_down) return;
+    if (fabsf(player->x - objects.x[obj]) > (player->width + objects.width[obj]) * .5f) return;
+    float velocity = moving_surface_velocity(player, obj);
+    if (velocity < 0.f && velocity >= -MINIMUM_OBJECT_SPEED)
+        player->y += objects.y[obj] - objects.last_y[obj];
+}
+
 void collide_with_obj(Player *player, int obj) {
     int obj_id = objects.id[obj];
     const ObjectHitbox *hitbox = game_objects[obj_id].hitbox;
 
-    if (!hitbox || objects.toggled[obj]) return;
+    if (!hitbox || objects.flags[obj] & FLAG_TOGGLED) return;
 
     snapshot.collision_checks++;
 
-    float x = objects.x[obj];
-    float y = objects.y[obj];
+    // hitbox offset by object rotation
+    float angle = -objects.rotation[obj];
+    float rot_rad = C3D_AngleFromDegrees(adjust_angle_y(angle, objects.flippedH[obj]));
+    float cos_r = cosf(rot_rad), sin_r = sinf(rot_rad);
+
+    float raw_off_x = hitbox->x * objects.scale_x[obj];
+    float raw_off_y = hitbox->y * objects.scale_y[obj];
+
+    float off_x = raw_off_x * cos_r - raw_off_y * sin_r;
+    float off_y = raw_off_x * sin_r + raw_off_y * cos_r;
+    
+    float x = objects.x[obj] + off_x;
+    float y = objects.y[obj] + off_y;
     float width = objects.width[obj];
     float height = objects.height[obj];
 
     if (UNLIKELY(hitbox->type == COLLISION_CIRCLE)) {
         if (intersect_rect_circle(
             player->x, player->y, player->width, player->height, 0, 
-            x, y, hitbox->width
+            x, y, objects.width[obj]
         )) {
             handle_collision(player, obj, hitbox);
             SET_COLLIDED(obj, true);
@@ -1341,14 +1610,14 @@ void collide_with_obj(Player *player, int obj) {
 void collide_with_slope(Player *player, int obj, bool has_slope) {
     const ObjectHitbox *hitbox = game_objects[objects.id[obj]].hitbox;
     
-    if (!hitbox) return;
+    if (!hitbox || objects.flags[obj] & FLAG_TOGGLED) return;
     
-    float width = hitbox->width;
-    float height = hitbox->height;
+    float width = objects.width[obj];
+    float height = objects.height[obj];
 
-    if (intersect(
+    if (intersect_exclusive(
         player->x, player->y, player->width, player->height, 0, 
-        objects.x[obj], objects.y[obj], width, height, objects.rotation[obj]
+        objects.x[obj], objects.y[obj], width, height, 0
     )) {
         slope_collide(obj, player);
     }
@@ -1367,6 +1636,14 @@ int potential_slopes_buffer[2][MAX_COLLIDED_OBJECTS];
 int potential_slopes[2];
 
 void collide_with_objects(Player *player) {
+    player->platform_velocity = 0.f;
+    player->last_collided_block = player->collided_block;
+    player->collided_block = -1;
+
+    if (player->last_collided_block >= 0) {
+        handle_moving_block(player, player->last_collided_block);
+    }
+    
     int sx = (int)(player->x / SECTION_SIZE);
     int sy = (int)(player->y / SECTION_SIZE);
     
@@ -1423,6 +1700,7 @@ void collide_with_objects(Player *player) {
         collide_with_slope(player, obj, has_slope);
     }
     
+    finish_moving_contact(player);
     // Check hazards (spikes, saws)
     for (int i = 0; i < hazard_count; i++) {
         int obj = hazard_buffer[i];

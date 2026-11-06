@@ -1,4 +1,5 @@
 #pragma once
+#include "menus/core/ui_screen.h"
 
 #define MAX_DECIMAL_PERCENT 17
 
@@ -6,6 +7,9 @@
 #define COIN_UNFILLED_ID 16
 #define PAUSE_COIN_FILLED_ID 418
 #define PAUSE_COIN_UNFILLED_ID 419
+
+#define COIN_BIG_USER_ID 417
+#define COIN_BIG_USER_SCALE 0.325f
 
 void reset_coins();
 void unpause_game();

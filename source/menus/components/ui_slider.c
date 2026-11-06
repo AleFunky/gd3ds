@@ -1,8 +1,7 @@
-#include "menus/core/common_setters.h"
-
 #include <citro2d.h>
 #include "menus/core/ui_screen.h"
 #include "menus/core/ui_props.h"
+#include "utils/gfx.h"
 #include "ui_slider.h"
 
 // If currently using an slider
@@ -43,7 +42,7 @@ static void draw_bar(UISlider *e, UITransform *transform) {
         C2D_Image img;
         C2D_ImageTint tint;
         
-        float x = transform->x - (e->base.w / 2) * transform->scaleX;
+        float x = transform->x - (e->base.w / 2.f) * transform->scaleX;
         
         C2D_PlainImageTint(&tint, C2D_Color32(50, 190, 240, 255), 1.f);
 

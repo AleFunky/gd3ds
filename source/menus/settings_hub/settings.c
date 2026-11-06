@@ -20,10 +20,10 @@
 #include "menus/components/ui_list.h"
 #include "menus/core/ui_screen.h"
 
-#include "menus/main_menu.h"
 #include "menus/settings_hub/settings.h"
 
 #include "menus/settings_hub/info_card.h"
+#include "menus/creator_menu/online/two_option_pop_up.h"
 
 static int current_page = 0;
 
@@ -112,9 +112,19 @@ Setting settings[] = {
         .key = CONFIG_GRAPHICS_PATH "glowEnabled"
     },
     {
+        .id = "showFpsCounter",
+        .label = "FPS counter",
+        .additionalInfo = "Displays current FPS in gameplay.",
+        .page = PAGE_GRAPHICS, 
+
+        .defaultValue = false,
+        .var = &settingsState.showFpsCounter,
+        .key = CONFIG_GRAPHICS_PATH "showFpsCounter"
+    },
+    {
         .id = "vsyncEnabled",
-        .label = "VSync",
-        .additionalInfo = "Disables vertical sync and uncaps FPS.",
+        .label = "V-Sync",
+        .additionalInfo = "Prevents screen tearing at the cost\nof some performance.\nCaps FPS at 60.",
         .page = PAGE_GRAPHICS, 
 
         .defaultValue = true,
@@ -284,6 +294,16 @@ Setting settings[] = {
         .key = CONFIG_GAMEPLAY_PATH "ultraDecimalPercent"
     },
     {
+        .id = "goldenBest",
+        .label = "Golden best",
+        .additionalInfo = "Changes the percentage counter to\nbe gold when you pass\nyour previous best.",
+        .page = PAGE_GAMEPLAY, 
+
+        .defaultValue = false,
+        .var = &settingsState.goldenBest,
+        .key = CONFIG_GAMEPLAY_PATH "goldenBest"
+    },
+    {
         .id = "quickRetry",
         .label = "Quick retry",
         .additionalInfo = "Restarts in 0.5 seconds instead of 1.",
@@ -362,17 +382,7 @@ Setting settings[] = {
         .defaultValue = false,
         .var = &settingsState.noPlayerTrail,
         .key = CONFIG_COSMETIC_PATH "noPlayerTrail"
-    },
-    {
-        .id = "noWaveTrailBehind",
-        .label = "No wave trail behind",
-        .additionalInfo = "Disables player trail for the wave.",
-        .page = PAGE_COSMETIC, 
-
-        .defaultValue = false,
-        .var = &settingsState.noWaveTrailBehind,
-        .key = CONFIG_COSMETIC_PATH "noWaveTrailBehind"
-    },
+    },    
 };
 
 typedef struct CheckboxData {
@@ -406,7 +416,7 @@ UICheckBox *get_setting_checkbox_by_id(const char *id) {
 }
 
 // Wide and 3D both want the whole top screen, so only one of them gets it
-static void turn_off_setting(const char *id, bool *var) {
+void turn_off_setting(const char *id, bool *var) {
     *var = false;
 
     UICheckBox *checkbox = get_setting_checkbox_by_id(id);
@@ -420,6 +430,18 @@ void wide_setting(bool checked) {
 
 void stereo_setting(bool checked) {
     if (!checked) return;
+    if (!_3dWarningPassed) {
+        TwoOptionPopupData *_3d_warning_data = malloc(sizeof(TwoOptionPopupData));
+        if (!_3d_warning_data) return;
+        
+        _3d_warning_data->text = strdup("3D can significantly lower performance.\nAre you sure you want to keep it on?");
+        _3d_warning_data->title = strdup("Disclaimer");
+        _3d_warning_data->proceed_text = strdup("Enable");
+        _3d_warning_data->cancel_text = strdup("Disable");
+        ui_stack_push(&_3d_warning_pop_up_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+        ui_stack_push_data(_3d_warning_data);
+        _3dWarningPassed = true;
+    }
 
     // No 3D on this console, so don't let the box stay ticked
     if (!stereo_supported()) {

@@ -22,4 +22,5 @@
 
 void rays_start();
 void rays_start_fade();
-void draw_rays(float delta);
+void update_rays(float delta);
+void draw_rays();

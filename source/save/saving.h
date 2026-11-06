@@ -34,8 +34,11 @@ typedef struct LevelData {
     bool coin3;
 } LevelData;
 
+bool level_has_rate(const LevelData *data);
+
 typedef struct SavedLevelDataEntry {
     char *key;
+    int version;
     SearchEntry search_entry;
     CreatorEntry creator_entry;
     SongEntry song_entry;
@@ -84,7 +87,6 @@ typedef enum {
 } SaveType;
 
 typedef struct SavingTask {
-    const char *data;
     struct json_object *root;
     char file[256];
     char tmp_file[256];
@@ -104,13 +106,16 @@ typedef enum {
     SAVE_ERROR_RENAME_FILE,
     SAVE_ERROR_DATA,
     SAVE_ERROR_MAKE_SAVE_DATA_LIST,
+    SAVE_ERROR_OUTOFMEM,
 } SavingError;
 
 void begin_saving(SaveType type);
 bool is_saving();
+void wait_for_saving();
 
 extern int total_stars;
 extern int total_coins;
+extern int total_user_coins;
 extern int total_attempts;
 extern int total_jumps;
 extern int total_demons;

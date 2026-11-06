@@ -1,6 +1,6 @@
 #include <math.h>
 #include "math_helpers.h"
-#include "color_channels.h"
+#include "triggers.h"
 
 #include <stdlib.h>
 #include <float.h>
@@ -232,4 +232,12 @@ float reflect(float x, float min, float max) {
         r = period - r;
 
     return min + r;
+}
+bool platform_launch(float previous, float current, float velocity, float dt, float *launch) {
+    if (dt <= 0.f || previous <= 5.f * 54.f || previous <= current ||
+        previous - current <= .5f * 60.f * 54.f * dt) return false;
+    float speed = roundf(fminf(previous, 20.f * 54.f) * (1000.f / 54.f)) * (54.f / 1000.f);
+    if (speed < velocity) return false;
+    *launch = speed;
+    return true;
 }

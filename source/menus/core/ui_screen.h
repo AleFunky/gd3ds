@@ -115,7 +115,7 @@ extern const UIBitfieldEntry keybind_table[22];
 void required_loading_screen_assets_init();
 void ui_assets_init();
 
-C2D_SpriteSheet *get_sheet(int sheet);
+C2D_SpriteSheet get_sheet(int sheet);
 
 void copy_tag_array(UIElement *e, const char *tags);
 

@@ -100,3 +100,4 @@ extern const ParticleDefinition ship_fire_effect;
 extern const ParticleDefinition touch_explosion_effect;
 extern const ParticleDefinition touch_drag_effect;
 extern const ParticleDefinition star_effect;
+extern const ParticleDefinition burst_effect2;

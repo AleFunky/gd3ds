@@ -7,6 +7,7 @@
 extern int checkpoint_count;
 extern int checkpoint_pointer;
 extern bool pseudo_checkpoint_exists;
+extern bool restored_checkpoint;
 
 void start_practice_mode();
 void exit_practice_mode();
@@ -23,3 +24,7 @@ void clear_practice_mode();
 
 void handle_auto_checkpoints(float delta);
 void set_checkpoint_timer(float timer);
+
+void load_used_channels();
+
+void update_checkpoint_with_p2();

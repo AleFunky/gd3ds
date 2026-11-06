@@ -16,6 +16,7 @@ button x=200 y=200 id=154 tag="practice_buttons,remove_checkpoint,not_paused" ac
 window x=160 y=120 w=300 h=220 style=2 tag="paused,bgwindow"
 
 button x=280 y=40 id=127 scale=0.8 tag="paused" actions=open_menu[screen="settings" btm_anim="zoom"] keyBinds="SELECT"
+button x=280 y=80 id=428 scale=0.6 tag="paused,hide_btn" actions=hide_menu keyBinds="R"
 
 button x=48 y=172 id=146 scale=0.90 tag="paused,practice_mode" action="practice" keyBinds="Y"
 button x=128 y=172 id=139 scale=1.15 tag="paused" action="unpause" keyBinds="A,START"

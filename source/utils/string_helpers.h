@@ -12,3 +12,4 @@ void strip_enclosures(char* s);
 char *url_decode(const char *str);
 void url_convert_to_http(char *str);
 void remove_char(char *str, char character);
+const char *get_filename_ext(const char *filename);

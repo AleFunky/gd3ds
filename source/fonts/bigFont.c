@@ -101,5 +101,6 @@ const Glyph bigFont_fontGlyphs[96] = {
 
 const Charset bigFont_fontCharset = {
     bigFont_fontGlyphs,
-    96
+    96,
+    1
 };

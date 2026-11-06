@@ -2,21 +2,11 @@
 #include <citro2d.h>
 
 #include "menus/core/ui_screen.h"
-#include "math_helpers.h"
 #include "menus/components/ui_list.h"
-#include "menus/components/ui_window.h"
-#include "menus/components/ui_textbox.h"
-#include "menus/components/ui_image.h"
 #include "menus/components/ui_rectangle.h"
 #include "menus/components/ui_label.h"
 #include "fonts/bigFont.h"
 #include "main.h"
-#include "easing.h"
-#include "color_channels.h"
-#include "mp3_player.h"
-#include "graphics.h"
-#include "menus/main_menu.h"
-#include "menus/level_select.h"
 #include "menus/settings_hub/credits.h"
 
 typedef struct CreditsEntries {
@@ -26,18 +16,20 @@ typedef struct CreditsEntries {
 } CreditsEntries;
 
 static const CreditsEntries credits[] = {
-    { "<i400s0>", "Geometry Dash", 0.7f }, // Robert
-    { "AleFunky", "Lead Developer", 0.5f },
-    { "camila314", "Pathfinder (Physics)", 0.5f },
-    { "advexed", "Menus and VFX", 0.5f },
-    { "nittynatty", "VFX", 0.5f }, 
-    { "orionconstel", "Concepts, Menus", 0.5f },
-    { "Cloud54", "Menus", 0.5f },
-    { "novex", "Optimization", 0.5f },
-    { "DiegoWearden", "240hz input", 0.5f },
-    { "zylonity", "3D Support", 0.5f },
-    { "Crafty Jumper", "UI Assets", 0.5f},
-    { "AleYoshi", "Bugfixes, Menus", 0.5f},
+    {"<i400s0>", "Geometry Dash", 0.7f}, // Robert
+    {"AleFunky", "Lead Developer", 0.5f},
+    {"novex", "General Developer", 0.5f},
+    {"Cloud54", "General Developer", 0.5f},
+    {"advexed", "UI and Online", 0.5f},
+    {"DiegoWearden", "240 Hz Input", 0.5f},
+    {"orionconstel", "Concepts, Menus", 0.48f},
+    {"StarryDawn72", "Decompilation", 0.5f},
+    {"iliasHDZ", "Trigger Optimization", 0.5f},
+    {"zylonity", "3D Support", 0.5f},
+    {"camila314", "Pathfinder (Physics)", 0.5f},
+    {"Crafty Jumper", "UI Assets", 0.5f},
+    {"nittynatty", "VFX Tweaks", 0.5f},
+    {"AleYoshi", "Tweaks", 0.5f},
 };
 
 void credits_init(UIScreen *s) {
@@ -76,7 +68,7 @@ void credits_init(UIScreen *s) {
                     char text[256];
                     snprintf(text, sizeof(text) - 1, "- %s", contribution);
                     ui_label_set_text(description, text);
-                    ui_element_set_position((UIElement *) description, -list_width + 8 + get_text_length(&bigFont_fontCharset, contributor_scale, true, contributor), -1);
+                    ui_element_set_position((UIElement *) description, -list_width + 8 + get_text_length(&bigFont_fontCharset, contributor_scale, true, contributor), 0);
                     ui_element_set_scale((UIElement *) description, 0.7f);
                     
                     description->font = 1;

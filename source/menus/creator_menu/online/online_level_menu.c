@@ -8,7 +8,6 @@
 #include "main.h"
 #include "menus/core/ui_element.h"
 #include "mp3_player.h"
-#include "graphics.h"
 #include "save/saving.h"
 #include "state.h"
 #include "utils/folders.h"
@@ -21,20 +20,15 @@
 #include "menus/components/ui_image.h"
 #include "menus/components/ui_label.h"
 #include "menus/components/ui_button.h"
-#include "menus/components/ui_rectangle.h"
 #include "menus/components/ui_progress_bar.h"
-#include "menus/components/ui_window_button.h"
 
 #include "menus/creator_menu/search_menu.h"
-#include "menus/creator_menu/external/external_level_infobox.h"
 #include "menus/creator_menu/online/online_level_comments.h"
 #include "menus/creator_menu/online/online_level_infobox.h"
 #include "menus/creator_menu/online/two_option_pop_up.h"
 #include "menus/creator_menu/online/online_menu.h"
 #include "menus/creator_menu/external/external_popup.h"
 #include "menus/creator_menu/online/online_level_comments.h"
-#include "menus/settings_hub/songs.h"
-#include "menus/settings_hub/settings.h"
 #include "menus/settings_hub/info_card.h"
 
 #include "fonts/chatFont.h"
@@ -46,6 +40,11 @@
 #define HARD_DEMON_FACE_1 257
 #define INSANE_DEMON_FACE_1 263
 #define EXTREME_DEMON_FACE_1 265
+
+#define USER_COIN_CENTER_X      165.f
+#define USER_COIN_STEP_X        9.f
+#define USER_COIN_ROW_Y_RATED   131.f
+#define USER_COIN_ROW_Y_UNRATED 123.f
 
 const int demon_faces_1[] = {
     NA_FACE,
@@ -91,7 +90,8 @@ static GenericTask song_data_task = {
 static Thread song_data_thread;
 
 static DownloadTask song_task = {
-    .path = USER_SONGS_DIR
+    .path = USER_SONGS_DIR,
+    .extension = "mp3"
 };
 
 static Thread saved_level_thread;
@@ -129,6 +129,7 @@ static UILabel *description_label;
 static UILabel *level_id_label;
 static UIImage *difficulty_face_image;
 static UIImage *featured_glow_image;
+static UIImage *usercoin_slots[3];
 
 static UIProgressBar *normal_percent_prog;
 static UIProgressBar *practice_percent_prog;
@@ -350,13 +351,13 @@ static void populate_level_info(int level_id) {
     ui_label_set_text(level_id_label, lvlid);
 
     // Creator
-    char creator[36] = "By -";
-    snprintf(creator, sizeof(creator), "<#%s>By %s</>", (entry_c->userId == 0) ? "5AFFFF" : "FFFFFF", entry_c->creatorName );
+    char creator[36] = "<#5AFFFF>By -</>";
+    if (entry_c) snprintf(creator, sizeof(creator), "<#%s>By %s</>", (entry_c->userId == 0) ? "5AFFFF" : "FFFFFF", entry_c->creatorName);
     ui_label_set_text(level_creator_label, creator);
 
     // Song and song artist
     char *song_name = "Unknown";
-    char *song_artist_name = "By Unknown";
+    char *song_artist_name = "Unknown";
 
     if (entry_srch->songId != 0) {
         // Custom song
@@ -454,7 +455,7 @@ static void populate_level_info(int level_id) {
     ui_label_set_text(song_id_label, song_id );
 
     // Level icons
-    float half_creator_length = get_text_length(&goldFont_fontCharset, 0.7f, false, entry_c->creatorName) / 2;
+    float half_creator_length = get_text_length(&goldFont_fontCharset, 0.7f, false, (entry_c ? entry_c->creatorName : "-")) / 2;
 
     // Original icon
     bool is_copy = entry_srch->originalId != 0;
@@ -479,6 +480,30 @@ static void populate_level_info(int level_id) {
 
     current_level_entry->data.level_id = entry_srch->levelId;
     current_level_entry->data.stars = entry_srch->stars;
+
+    int coin_count = entry_srch->coins;
+    if (coin_count < 0) coin_count = 0;
+    if (coin_count > 3) coin_count = 3;
+    bool coins_visible = user_coins_counter_visible();
+    bool has_verified_coins = entry_srch->stars > 0 && entry_srch->verifiedCoins;
+    level_verified_coins = entry_srch->verifiedCoins;
+    float coin_row_y = entry_srch->stars > 0 ? USER_COIN_ROW_Y_RATED : USER_COIN_ROW_Y_UNRATED;
+    for (int i = 0; i < 3; i++) {
+        UIImage *slot = usercoin_slots[i];
+        if (!slot) continue;
+        if (coins_visible && i < coin_count) {
+            float coin_x = USER_COIN_CENTER_X + (i - (coin_count - 1) / 2.f) * USER_COIN_STEP_X;
+            bool collected = current_level_entry &&
+                (i == 0 ? current_level_entry->data.coin1 :
+                 i == 1 ? current_level_entry->data.coin2 :
+                          current_level_entry->data.coin3);
+            ui_element_set_position((UIElement *) slot, coin_x, coin_row_y);
+            ui_image_set_tint(slot, user_coin_icon_tint(collected, has_verified_coins));
+            slot->base.enabled = true;
+        } else {
+            slot->base.enabled = false;
+        }
+    }
 
     update_progress_bars();
 }
@@ -621,6 +646,10 @@ static void online_level_init_top (UIScreen *s) {
     difficulty_face_image = (UIImage *) ui_get_element_by_tag(screen_top, "difficultyface");
     featured_glow_image = (UIImage *) ui_get_element_by_tag(screen_top, "glow");
 
+    usercoin_slots[0] = (UIImage *) ui_get_element_by_tag(screen_top, "usercoin_slot_1");
+    usercoin_slots[1] = (UIImage *) ui_get_element_by_tag(screen_top, "usercoin_slot_2");
+    usercoin_slots[2] = (UIImage *) ui_get_element_by_tag(screen_top, "usercoin_slot_3");
+
     likes_image = (UIImage *) ui_get_element_by_tag(screen_top, "thumbsup");
 
     description_label = (UILabel *) ui_get_element_by_tag(screen_top, "description");
@@ -664,14 +693,15 @@ static void online_level_init (UIScreen *s) {
     ui_disable_element((UIElement *) speed_label);
 
     SavedLevelDataEntry *data = get_saved_level_data(online_menu_level_id);
-    if (data && !refresh) {
+    if (data && !refresh && !redownload) {
         current_search_entry = &data->search_entry;
         current_creator_entry = &data->creator_entry;
         current_song_entry = &data->song_entry;
     } else {
         current_search_entry = &search_entries[curr_search_id];
-        current_creator_entry = &creator_entries[current_search_entry->creatorIndex];
-        current_song_entry = (current_search_entry->songId != 0) ? &song_entries[current_search_entry->songIndex] : NULL;
+        int creator_index = current_search_entry->creatorIndex;
+        current_creator_entry = (creator_index >= 0 ? &creator_entries[creator_index] : NULL);
+        current_song_entry = (current_search_entry->songId >= 0 ? &song_entries[current_search_entry->songIndex] : NULL);
         bool could_save = save_level_to_server_file(current_server_file, online_menu_level_id, current_search_entry, current_creator_entry, current_song_entry);
         if (!could_save) {
             output_log("Oops, couldn't save da level!\n");
@@ -717,16 +747,18 @@ static void online_level_menu_update(UIScreen *s, UIInput *i) {
         // Handle result
         if (song_data_result == 0) {
             song_data_task.finished = false;
-            snprintf(song_task.song_id, sizeof(song_task.song_id), "%d", current_search_entry->songId);
+            snprintf(song_task.file_name, sizeof(song_task.file_name), "%d", current_search_entry->songId);
             song_task.url = current_song_entry->songLink;
-            song_thread = create_download_song_thread(&song_task);
+
+            // enter exclusive mode, disable sleep mode and begin download 
+            aptSetSleepAllowed(false);
+            enterExclusiveState();
+            song_thread = create_file_download_thread(&song_task);
         } else { handle_song_data_errors(song_data_result); }
-        
     }
 
     if (song_task.running) {
         song_progress_bar->value = song_task.progress;
-
         
         char *speed = truncate_speed(song_task.speed);
         if (speed) {
@@ -740,6 +772,8 @@ static void online_level_menu_update(UIScreen *s, UIInput *i) {
     if (song_task.finished) {
         // Handle result
         handle_song_codes(song_task.result);
+        exitExclusiveState(false);
+        aptSetSleepAllowed(true);
         song_task.finished = false;
     }
 
@@ -788,6 +822,18 @@ static void online_level_menu_exit() {
     if (level_task.running) {
         level_task.cancelled = true;
         threadJoin(level_thread, U64_MAX);
+    }
+
+    if (song_data_task.running) {
+        song_data_task.cancelled = true;
+        threadJoin(song_data_thread, U64_MAX);
+    }
+
+    if (song_task.running) {
+        song_task.cancelled = true;
+        exitExclusiveState(false);
+        aptSetSleepAllowed(true);
+        threadJoin(song_thread, U64_MAX);
     }
 
     already_played_online_level = false;

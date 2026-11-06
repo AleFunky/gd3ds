@@ -7,9 +7,6 @@
 #include "level/main_levels.h"
 #include "level_loading.h"
 #include "main.h"
-#include "graphics.h"
-#include "menus/creator_menu/online/two_option_pop_up.h"
-#include "mp3_player.h"
 #include "save/saving.h"
 #include "state.h"
 
@@ -27,14 +24,11 @@
 #include "menus/components/ui_label.h"
 #include "menus/components/ui_button.h"
 #include "menus/components/ui_rectangle.h"
-#include "menus/components/ui_particle.h"
 #include "menus/creator_menu/online/online_level_menu.h"
 #include "menus/creator_menu/external/external_popup.h"
 #include "menus/creator_menu/search_menu.h"
 #include "menus/creator_menu/online/online_menu.h"
 #include "menus/settings_hub/info_card.h"
-#include "menus/settings_hub/songs.h"
-#include "menus/main_menu.h"
 
 #include "fonts/bigFont.h"
 #include "fonts/goldFont.h"
@@ -189,22 +183,24 @@ static void populate_list() {
         strncpy(tmp_name, entry->name, sizeof(tmp_name) - 1);
         
         // Get creator name
-        char *creator_name = "By -";
+        char *creator_name = "-";
 
-        if (entry->creatorIndex < creatorEntriesLength) {
+        bool creator_in_bounds = entry->creatorIndex >= 0 && entry->creatorIndex < creatorEntriesLength;
+        
+        if (creator_in_bounds) {
             creator_name = creator_entries[entry->creatorIndex].creatorName;
         }
 
-        snprintf(tmp_creator, sizeof(tmp_creator), "<#%s>By %s</>", (creator_entries[entry->creatorIndex].userId == 0) ? "5AFFFF" : "FFFFFF", creator_name);
+        snprintf(tmp_creator, sizeof(tmp_creator), "<#%s>By %s</>", (!creator_in_bounds || creator_entries[entry->creatorIndex].userId == 0) ? "5AFFFF" : "FFFFFF", creator_name);
 
         // Get song name
         char *song_name = "Unknown";
 
         if (entry->songId != 0) {
-            if (entry->songIndex < songEntriesLength) {
+            if (entry->songIndex >= 0 && entry->songIndex < songEntriesLength) {
                 song_name = song_entries[entry->songIndex].songTitle;
             }
-        } else if (entry->songIndex != -1) {
+        } else {
             if (entry->mainSongId >= 0 && entry->mainSongId < current_main_level_pack->count) {
                 song_name = (char *) current_main_level_pack->levels[entry->mainSongId].song_data.title;
             }
@@ -463,6 +459,11 @@ static void populate_list() {
                     if (saved_data->search_entry.levelVersion != entry->levelVersion) {
                         ui_window_button_set_style(button, 14);
                         ui_button_set_text((UIButton *)button, "Update");
+                        button->base.textScale = 0.30f;
+                        data->redownload = true;
+                    } else if (saved_data->version != SAVED_LEVELS_VERSION) {
+                        ui_window_button_set_style(button, 10);
+                        ui_button_set_text((UIButton *)button, "Refresh");
                         button->base.textScale = 0.30f;
                         data->redownload = true;
                     } else {

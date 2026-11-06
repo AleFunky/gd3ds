@@ -137,11 +137,32 @@ void rays_start_fade() {
     }
 }
 
-void draw_rays(float delta) {
+void update_rays(float delta) {
     if (!started) return;
+    
+    for (int i = 0; i < BEAM_COUNT; i++) {
+        RayData *data = &ray_data[i];
 
-    // The rays tick as they draw, so don't let extra eyes speed them up
-    if (is_extra_eye()) delta = 0;
+        // Check if it should start
+        if (data->start_delay < timer) {
+            if (fading) {
+                data->fade_timer += delta;
+            }
+            data->timer += delta;
+        }
+    }
+
+    timer += delta;
+
+    // Remove rays
+    if (ray_data[0].fade_timer > RAY_FADE_DURATION) {
+        started = false;
+        fading = false;
+    }
+}
+
+void draw_rays() {
+    if (!started) return;
 
     for (int i = 0; i < BEAM_COUNT; i++) {
         RayData *data = &ray_data[i];
@@ -163,7 +184,6 @@ void draw_rays(float delta) {
 
             if (fading) {
                 alpha = easeValue(EASE_LINEAR, alpha, 0, data->fade_timer, RAY_FADE_DURATION, 1);
-                data->fade_timer += delta;
             }
 
             Color col = get_p2_if_black(p1_color);
@@ -173,16 +193,6 @@ void draw_rays(float delta) {
             float t = easeValue(QUAD_OUT, 0, 1, elapsed, duration, 1);
 
             draw_ray(x, y, length, startWidth, endWidth, data->angle, t, color);
-
-            data->timer += delta;
         }
-    }
-
-    timer += delta;
-
-    // Remove rays
-    if (ray_data[0].fade_timer > RAY_FADE_DURATION) {
-        started = false;
-        fading = false;
     }
 }

@@ -2,10 +2,8 @@
 #include "math_helpers.h"
 #include "main.h"
 #include "state.h"
-#include "utils/gfx.h"
 #include "easing.h"
 #include "graphics.h"
-#include "save/config.h"
 
 #include "menus/core/ui_screen.h"
 #include "menus/settings_hub/settings.h"
@@ -20,42 +18,156 @@
 #define IMPOSSIBLE_TIMING_ID 1
 #define STORY_MADNESS_ID 2
 #define DIED_TO_ID 3
+#define HARDER_THAN_ID 4
 
 char *new_best_text[] = {
-    "Not 100%",
-    "Impossible timing",
-    "Have you tried Story Madness yet?",
-    "<DIED TO X>",
-    "Not GG",
+    [NOT_100_ID] = "Not 100%",
+    [IMPOSSIBLE_TIMING_ID] = "Impossible timing",
+    [STORY_MADNESS_ID] = "Have you tried Story Madness yet?",
+    [DIED_TO_ID] = "<DIED TO X>",
+    [HARDER_THAN_ID] = "Harder than %d%% btw!",
+    "<#5AFFFF>I'm green for an amazing reason</>",
+    "6000 FPS would've fixed that",
+    "!tseB weN",
+    "+1 dollar",
+    ":(",
+    "A swing and a miss...",
+    "Absolutely peak",
+    "Ain't going anywhere",
+    "Alefunky detected progress",
+    "Another 1000 attempts and you’ll beat it",
+    "At 1x speed, does this look possible to you?",
+    "Avert your eyes...",
+    "Back to 0%% we go",
+    "Best new!",
+    "Better luck next time",
+    "Better than ever",
+    "Better than yesterday",
+    "Bew Nest!",
+    "Blame it on RobTop",
+    "Blame the lag",
+    "Blame the low resolution display",
+    "Buff it",
+    "Can I offer you a New Best! in these trying times?",
+    "Can we cut that out in post?",
+    "Cry if you want to",
+    "Did you reach here in the real GD?",
+    "Dies of death",
+    "Do a practice run next time",
+    "Do it the same, but, uhhh, better",
+    "Do you have muscle dementia",
+    "Erm... so that just happened!",
+    "Failure.",
+    "Focus, M.",
+    "free click",
+    "GAME OVER!",
+    "Generation Retro is better",
+    "Get back on grief",
     "GGWP",
     "Git gud nub",
-    "Skill issue",
-    "New % when",
-    "Do a practice run next time",
-    "Did you reach here in the real GD?",
-    "Not 0%",
-    "Buff it",
-    "Nerf it",
-    "Level Complete... just kidding!",
+    "Git Gud",
+    "Give up",
+    "Go to sleep",
+    "GO",
+    "Good job!",
+    "Good luck on veryfing grief",
+    "Good one",
+    "Hands cramped yet?",
+    "Have you tried Story Madness yet?",
+    "haxx0r mode disabled lololol",
+    "hey i didn't see it, did it go in? i wasn't looking did you win? did you hit the end wall",
+    "Hey. Go wash your dishes",
+    "HIGH SCORE!",
+    "horse",
+    "How can you die it's just pixels on screen",
+    "HOW",
+    "I bet that hurt",
+    "I can do better",
+    "Impossible timing",
+    "It was the fps!!",
     "Its easy bro, just click",
-    "Never gonna give you up",
-    "Wrong click pattern",
-    "Cry if you want to",
-    "Please scream loudly",
+    "jajajaja you have not win",
     "Just beat it!",
+    "Keep going, I'm betting on you",
+    "Lag is not an excuse",
+    "Let me guess, it didn't register",
+    "Level Complete... just kidding!",
+    "Level Uncomplete!",
+    "Lol",
+    "Maybe next time",
+    "Maybe you should eat something",
+    "mefewe 98%% was worse",
+    "Most cubes can interact with spikes just fine, yours is just allergic.",
+    "Nerf it",
+    "Never gonna give you up",
+    "New %% when",
+    "NEW BEST! INTERESTING",
+    "New worst!",
+    "Not 0%%",
+    "Not 97%% btw",
+    "Not 100%%",
+    "Not event 1%% of Grief",
+    "Not GG",
+    "Not quite my tempo",
+    "Oh that me? Pure aura!",
+    "Okay buddy",
+    "oops mb",
+    "Oops",
+    "Ouch",
+    "peter alert",
+    "Please scream loudly",
+    "Poor screen...",
+    "Press ALT F4 for noclip",
+    "Pro combination: Home Button then X",
     "Progress alert!",
+    "Progress NOT saved loser",
+    "Progress? In this economy?",
+    "Push further!",
+    "Quit while you're ahead",
+    "Ragebait",
+    "Really?!",
+    "Revive for $2.99",
+    "Rip bozo",
+    "Sad",
+    "Should've dodged that GameObject",
+    "SIGSEGV",
+    "Skill issue",
+    "Stop clip farming",
+    "STOP DYING THERE",
+    "That was fun to watch",
+    "That was kinda amateurish",
+    "That was painful to watch",
+    "There's a long path ahead still!",
+    "This is a new best message",
+    "Thought you were gonna fluke it?",
+    "Too late... or too early",
+    "Try harder next time",
     "Try it in Famidash",
-    "Blame it on RobTop",
-    "Do you have muscle dementia",
-    "New worst!"
+    "Try with your feet",
+    "Well",
+    "Welp",
+    "What did I miss?",
+    "What's this, some kind of impossible timing?",
+    "Whatever",
+    "Why didn't you jump",
+    "womp womp",
+    "Wrap it up",
+    "Wrong click pattern",
+    "YOLO attempt",
+    "you actually SUCK and it was a fluke",
+    "you are fuk map",
+    "You didn't do it!",
+    "You really couldn't do better?",
+    "You should try practice mode",
+    "You successed failfully"
 };
 
 char *died_to_text[DEATH_REASON_COUNT] = {
     "Bro died magically",
     "Bro died to a <i646s3>spike",
     "Bro died to a <#000000><i639s3></>saw",
-    "Bro died to a <i650s3>block",
-    "Bro died to a <i758s3>slope",
+    "Bro died to a <i696s3>block",
+    "Bro died to a <i731s3>slope",
     "Bro fell out of the level",
     "Bro died to the ground",
 };
@@ -161,15 +273,31 @@ void handle_new_best_popup(float delta) {
 void draw_new_best_popup() {
     if (new_best_popup.active) {
         float scale = new_best_popup.scale;
+        char buf[256];
 
         if (settingsState.doNot) {
             char *text = new_best_text[new_best_popup.text_id];
 
             if (new_best_popup.text_id == DIED_TO_ID) {
                 text = died_to_text[state.death_reason];
+            } 
+
+            if (new_best_popup.text_id == HARDER_THAN_ID) {
+                snprintf(buf, sizeof(buf), text, new_best_popup.progress - 1);
+            } else {
+                snprintf(buf, sizeof(buf), "%s", text);
             }
 
-            draw_text(&goldFont_fontCharset, &goldFont_sheet, SCREEN_WIDTH_AREA / 2, (SCREEN_HEIGHT_AREA / 2) - (NEW_BEST_SEPARATION * scale), scale, scale, 0.5f, true, "%s", text);
+            float text_scale = scale;
+
+            int width = 390;
+            float length = get_longest_line_length(&goldFont_fontCharset, NEW_BEST_STATE_0_TARGET_SCALE, buf);
+
+            if (width < length && length > 0) {
+                text_scale *= (width / length);
+            }
+            
+            draw_text(&goldFont_fontCharset, &goldFont_sheet, SCREEN_WIDTH_AREA / 2, (SCREEN_HEIGHT_AREA / 2) - (NEW_BEST_SEPARATION * text_scale), text_scale, text_scale, 0.5f, true, buf);
         } else {
             C2D_Sprite text = { 0 };
             C2D_SpriteFromSheet(&text, ui_sheet, (NEW_BEST_IMAGE_ID));

@@ -1,7 +1,6 @@
 #include <3ds.h>
 #include "mp3_player.h"
 #include "level_loading.h"
-#include "math_helpers.h"
 #include <mpg123.h>
 #include <stdio.h>
 #include <string.h>
@@ -172,7 +171,7 @@ bool mp3_init(void *file) {
         }
     }
 
-    if (mpg123_getformat(mh, &rate, &audio_channels, &encoding) != MPG123_OK) {
+    if (mpg123_getformat(mh, (long *)&rate, &audio_channels, &encoding) != MPG123_OK) {
         output_log("Couldn't get format\n");
         return 0;
     }
