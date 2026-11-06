@@ -17,6 +17,12 @@ jobs:
         uses: actions/checkout@v7
         with:
           submodules: recursive
+      - name: Get releases info
+        id: releaseinfo
+        uses: pozetroninc/github-action-get-latest-release@master
+        with:
+          repository: ${{ github.repository }}
+          excludes: prerelease, draft
       - name: Generate github_info header file
         run: |
           cat > source/github_info.h <<EOF
@@ -25,6 +31,7 @@ jobs:
           #define CURRENT_COMMIT_HASH "${{ github.sha }}"
           #define REPO_AUTHOR "${{ github.repository_owner }}"
           #define REPO_NAME "${{ github.event.repository.name }}"
+          #define CURRENT_LATEST_RELEASE_ID ${{ steps.releaseinfo.outputs.id }}
           EOF
       - name: Make application
         run: |
