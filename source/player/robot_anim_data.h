@@ -1,5 +1,7 @@
 #pragma once
 
+#include "player_anim_data.h"
+
 #define ROBOT_SPRITE_COUNT 8
 #define ROBOT_LANDING_BLEND_DURATION 0.05f
 
@@ -30,23 +32,4 @@ typedef enum {
     ROBOT_ANIM_COUNT      = 12,
 } RobotAnimId;
 
-typedef struct {
-    int   texture_idx;
-    float px, py;
-    float rotation;
-    float scale_x, scale_y;
-    int   z_order;
-} RobotSpritePart;
-
-typedef struct {
-    const RobotSpritePart *parts;
-    int   part_count;
-    float delay;
-} RobotFrame;
-
-typedef struct {
-    const RobotFrame *frames;
-    int frame_count;
-} RobotAnimation;
-
-extern const RobotAnimation robot_animations[ROBOT_ANIM_COUNT];
+extern const PlayerAnimation robot_animations[ROBOT_ANIM_COUNT];

@@ -34,13 +34,14 @@ typedef enum {
  GAMEMODE_UFO,
  GAMEMODE_WAVE,
  GAMEMODE_ROBOT,
+ GAMEMODE_SPIDER,
  GAMEMODE_COUNT
 } IconGamemode;
 
-#define GAMEMODE_COUNT 6
-#define ICON_GAMEMODE_COUNT 6
+#define GAMEMODE_COUNT 7
+#define ICON_GAMEMODE_COUNT 7
 
-#define TRAIL 6
+#define TRAIL 7
 
 #define ICON_COUNT_PLAYER 486
 #define ICON_COUNT_SHIP 170
@@ -48,6 +49,7 @@ typedef enum {
 #define ICON_COUNT_BIRD 150
 #define ICON_COUNT_DART 97
 #define ICON_COUNT_ROBOT 69
+#define ICON_COUNT_SPIDER 2
 
 #define ATLAS_COUNT_PLAYER 2
 #define ATLAS_COUNT_SHIP 1
@@ -55,6 +57,7 @@ typedef enum {
 #define ATLAS_COUNT_BIRD 1
 #define ATLAS_COUNT_DART 1
 #define ATLAS_COUNT_ROBOT 1
+#define ATLAS_COUNT_SPIDER 1
 #define TRAIL_COUNT 17
 
 extern const Icon* icons[ICON_GAMEMODE_COUNT];

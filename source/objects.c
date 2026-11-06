@@ -1190,27 +1190,27 @@ const ChildSprite children_88[] = {
 };
 
 const ChildSprite children_90[] = {
- { 888, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 1.00 },
+ { 890, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 1.00 },
 };
 
 const ChildSprite children_91[] = {
- { 888, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 1.00 },
+ { 890, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 1.00 },
 };
 
 const ChildSprite children_92[] = {
- { 888, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 1.00 },
+ { 890, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 1.00 },
 };
 
 const ChildSprite children_93[] = {
- { 888, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 1.00 },
+ { 890, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 1.00 },
 };
 
 const ChildSprite children_95[] = {
- { 888, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 1.00 },
+ { 890, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 1.00 },
 };
 
 const ChildSprite children_96[] = {
- { 888, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 1.00 },
+ { 890, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 1.00 },
  { 101, 14.00, 0.00, -1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
@@ -1295,27 +1295,27 @@ const ChildSprite children_196[] = {
 };
 
 const ChildSprite children_207[] = {
- { 888, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 890, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_208[] = {
- { 888, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 890, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_209[] = {
- { 888, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 890, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_210[] = {
- { 888, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 890, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_212[] = {
- { 888, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 890, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_213[] = {
- { 888, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 890, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_215[] = {
@@ -1902,405 +1902,405 @@ const ChildSprite children_749[] = {
 };
 
 const ChildSprite children_752[] = {
- { 838, 0.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 840, 0.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_753[] = {
- { 841, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 843, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_754[] = {
- { 843, -8.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 845, -8.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_756[] = {
- { 847, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 849, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_757[] = {
- { 1379, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1381, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_758[] = {
- { 1380, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1382, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_759[] = {
- { 852, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 854, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_762[] = {
- { 862, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 864, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_763[] = {
- { 864, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 866, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_764[] = {
- { 872, -9.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 874, -9.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_765[] = {
- { 874, -4.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 876, -4.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_769[] = {
- { 1234, 0.00, 5.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_770[] = {
  { 1236, 0.00, 5.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_771[] = {
- { 862, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+const ChildSprite children_770[] = {
+ { 1238, 0.00, 5.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_772[] = {
+const ChildSprite children_771[] = {
  { 864, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_772[] = {
+ { 866, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_773[] = {
- { 872, -9.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 874, -9.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_774[] = {
- { 874, -4.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 876, -4.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_807[] = {
- { 1002, 0.00, 11.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 990, 0.00, -1.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
+ { 1004, 0.00, 11.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 992, 0.00, -1.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
 };
 
 const ChildSprite children_808[] = {
- { 1002, 0.00, 11.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 990, 0.00, -1.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
+ { 1004, 0.00, 11.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 992, 0.00, -1.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
 };
 
 const ChildSprite children_809[] = {
- { 1381, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 991, 1.00, -1.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
+ { 1383, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 993, 1.00, -1.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
 };
 
 const ChildSprite children_810[] = {
- { 1382, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 991, 1.00, -1.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
+ { 1384, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 993, 1.00, -1.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
 };
 
 const ChildSprite children_811[] = {
- { 1383, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 992, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
-};
-
-const ChildSprite children_812[] = {
- { 1384, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 992, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
-};
-
-const ChildSprite children_813[] = {
  { 1385, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 993, 0.00, -1.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
-};
-
-const ChildSprite children_814[] = {
- { 1386, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 993, 0.00, -1.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
-};
-
-const ChildSprite children_815[] = {
- { 1387, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
  { 994, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
 };
 
-const ChildSprite children_816[] = {
- { 1388, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+const ChildSprite children_812[] = {
+ { 1386, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
  { 994, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
 };
 
-const ChildSprite children_817[] = {
+const ChildSprite children_813[] = {
+ { 1387, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 995, 0.00, -1.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
+};
+
+const ChildSprite children_814[] = {
+ { 1388, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 995, 0.00, -1.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
+};
+
+const ChildSprite children_815[] = {
  { 1389, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 989, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
+ { 996, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
+};
+
+const ChildSprite children_816[] = {
+ { 1390, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 996, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
+};
+
+const ChildSprite children_817[] = {
+ { 1391, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 991, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
 };
 
 const ChildSprite children_818[] = {
- { 1390, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 989, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
+ { 1392, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 991, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
 };
 
 const ChildSprite children_819[] = {
- { 985, 0.00, 7.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 995, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
+ { 987, 0.00, 7.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 997, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
 };
 
 const ChildSprite children_820[] = {
- { 985, 0.00, 7.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 995, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
+ { 987, 0.00, 7.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 997, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
 };
 
 const ChildSprite children_821[] = {
- { 987, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1391, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
-};
-
-const ChildSprite children_822[] = {
- { 987, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1392, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
-};
-
-const ChildSprite children_823[] = {
- { 989, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
-};
-
-const ChildSprite children_824[] = {
- { 989, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
-};
-
-const ChildSprite children_825[] = {
  { 989, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_826[] = {
- { 1012, 0.00, -3.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 997, 4.00, -3.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
-};
-
-const ChildSprite children_827[] = {
- { 1012, 0.00, -3.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 997, 4.00, -3.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
-};
-
-const ChildSprite children_828[] = {
- { 1014, 0.00, -2.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
  { 1393, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
 };
 
-const ChildSprite children_829[] = {
- { 1014, 0.00, -2.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+const ChildSprite children_822[] = {
+ { 989, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
  { 1394, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
 };
 
+const ChildSprite children_823[] = {
+ { 991, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
+};
+
+const ChildSprite children_824[] = {
+ { 991, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
+};
+
+const ChildSprite children_825[] = {
+ { 991, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_826[] = {
+ { 1014, 0.00, -3.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 999, 4.00, -3.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
+};
+
+const ChildSprite children_827[] = {
+ { 1014, 0.00, -3.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 999, 4.00, -3.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
+};
+
+const ChildSprite children_828[] = {
+ { 1016, 0.00, -2.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1395, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
+};
+
+const ChildSprite children_829[] = {
+ { 1016, 0.00, -2.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1396, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
+};
+
 const ChildSprite children_830[] = {
- { 1016, -11.00, 13.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 989, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
+ { 1018, -11.00, 13.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 991, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
 };
 
 const ChildSprite children_831[] = {
- { 1016, -11.00, 13.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 989, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
+ { 1018, -11.00, 13.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 991, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
 };
 
 const ChildSprite children_832[] = {
- { 1018, -9.00, 13.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 989, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
+ { 1020, -9.00, 13.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 991, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
 };
 
 const ChildSprite children_833[] = {
- { 1018, -9.00, 13.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 989, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
+ { 1020, -9.00, 13.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 991, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.70 },
 };
 
 const ChildSprite children_841[] = {
- { 1020, 5.00, -5.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1022, 5.00, -5.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_842[] = {
- { 1395, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1021, 0.00, 5.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1397, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1023, 0.00, 5.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_843[] = {
- { 1022, 0.00, -12.00, 1.00, -1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1023, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1024, 0.00, -12.00, 1.00, -1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1025, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_844[] = {
- { 1022, 0.00, -12.00, 1.00, -1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1024, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_845[] = {
- { 1396, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1024, 0.00, -12.00, 1.00, -1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
  { 1026, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_845[] = {
+ { 1398, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1028, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_846[] = {
- { 1028, 0.00, -5.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1030, 0.00, -5.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_847[] = {
- { 1030, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_848[] = {
  { 1032, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_848[] = {
+ { 1034, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_850[] = {
- { 1041, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1043, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_853[] = {
- { 1043, 0.00, 4.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1045, 0.00, 4.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_854[] = {
- { 1045, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1047, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_855[] = {
- { 1047, -5.00, 5.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1049, -5.00, 5.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_856[] = {
- { 1397, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_857[] = {
- { 1052, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_859[] = {
- { 1054, -4.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_861[] = {
- { 1398, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_862[] = {
  { 1399, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_863[] = {
+const ChildSprite children_857[] = {
+ { 1054, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_859[] = {
+ { 1056, -4.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_861[] = {
  { 1400, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_867[] = {
- { 1084, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_868[] = {
- { 1086, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_869[] = {
- { 1088, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_870[] = {
- { 1090, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_871[] = {
- { 1092, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_872[] = {
- { 1094, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_873[] = {
- { 1100, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_874[] = {
- { 1102, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_877[] = {
- { 1104, 6.00, -3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_878[] = {
- { 1106, 15.00, -3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_880[] = {
- { 1108, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_881[] = {
- { 1110, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_882[] = {
- { 1112, 5.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_883[] = {
- { 1114, -5.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_884[] = {
- { 1116, 2.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_885[] = {
- { 1118, -2.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_886[] = {
- { 1128, 5.00, -1.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1127, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
-};
-
-const ChildSprite children_887[] = {
- { 1130, 5.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1129, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
-};
-
-const ChildSprite children_888[] = {
- { 1128, 5.00, -1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_889[] = {
- { 1130, 5.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_890[] = {
+const ChildSprite children_862[] = {
  { 1401, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_891[] = {
- { 1133, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_893[] = {
- { 1135, -2.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_894[] = {
- { 1137, -2.00, -1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_895[] = {
+const ChildSprite children_863[] = {
  { 1402, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_896[] = {
+const ChildSprite children_867[] = {
+ { 1086, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_868[] = {
+ { 1088, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_869[] = {
+ { 1090, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_870[] = {
+ { 1092, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_871[] = {
+ { 1094, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_872[] = {
+ { 1096, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_873[] = {
+ { 1102, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_874[] = {
+ { 1104, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_877[] = {
+ { 1106, 6.00, -3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_878[] = {
+ { 1108, 15.00, -3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_880[] = {
+ { 1110, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_881[] = {
+ { 1112, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_882[] = {
+ { 1114, 5.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_883[] = {
+ { 1116, -5.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_884[] = {
+ { 1118, 2.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_885[] = {
+ { 1120, -2.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_886[] = {
+ { 1130, 5.00, -1.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1129, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
+const ChildSprite children_887[] = {
+ { 1132, 5.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1131, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
+const ChildSprite children_888[] = {
+ { 1130, 5.00, -1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_889[] = {
+ { 1132, 5.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_890[] = {
  { 1403, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_891[] = {
+ { 1135, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_893[] = {
+ { 1137, -2.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_894[] = {
+ { 1139, -2.00, -1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_895[] = {
+ { 1404, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_896[] = {
+ { 1405, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_902[] = {
- { 1404, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1406, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_903[] = {
- { 854, 0.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_904[] = {
  { 856, 0.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_904[] = {
+ { 858, 0.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_918[] = {
- { 1516, 0.00, -11.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_GLOW, 1.00 },
- { 1515, 0.00, -11.00, 1.00, 1.00, 0, 0, -2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1514, 0.00, 11.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_GLOW, 1.00 },
- { 1513, 0.00, 11.00, 1.00, 1.00, 0, 0, -2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1517, -3.00, 12.00, 1.00, 1.00, 0, 0, -2, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1518, 0.00, -11.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_GLOW, 1.00 },
+ { 1517, 0.00, -11.00, 1.00, 1.00, 0, 0, -2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1516, 0.00, 11.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_GLOW, 1.00 },
+ { 1515, 0.00, 11.00, 1.00, 1.00, 0, 0, -2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1519, -3.00, 12.00, 1.00, 1.00, 0, 0, -2, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildGroup groups_918[] = {
@@ -2309,9 +2309,9 @@ const ChildGroup groups_918[] = {
 };
 
 const ChildSprite children_919[] = {
- { 1527, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1528, 7.00, 7.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1528, -7.00, 7.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1529, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1530, 7.00, 7.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1530, -7.00, 7.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildGroup groups_919[] = {
@@ -2321,12 +2321,10 @@ const ChildGroup groups_919[] = {
 };
 
 const ChildSprite children_920[] = {
- { 1473, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1475, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_920[] = {
-    { 1482, 0, 0 },
-    { 1483, 0, 0 },
     { 1484, 0, 0 },
     { 1485, 0, 0 },
     { 1486, 0, 0 },
@@ -2334,8 +2332,8 @@ const SwapFrame swap_frames_920[] = {
     { 1488, 0, 0 },
     { 1489, 0, 0 },
     { 1490, 0, 0 },
-    { 1473, 0, 0 },
-    { 1474, 0, 0 },
+    { 1491, 0, 0 },
+    { 1492, 0, 0 },
     { 1475, 0, 0 },
     { 1476, 0, 0 },
     { 1477, 0, 0 },
@@ -2343,6 +2341,8 @@ const SwapFrame swap_frames_920[] = {
     { 1479, 0, 0 },
     { 1480, 0, 0 },
     { 1481, 0, 0 },
+    { 1482, 0, 0 },
+    { 1483, 0, 0 },
 };
 
 const SlotFrames slot_frames_920[] = {
@@ -2351,12 +2351,10 @@ const SlotFrames slot_frames_920[] = {
 };
 
 const ChildSprite children_921[] = {
- { 1494, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1496, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_921[] = {
-    { 1502, 0, 0 },
-    { 1503, 0, 0 },
     { 1504, 0, 0 },
     { 1505, 0, 0 },
     { 1506, 0, 0 },
@@ -2364,8 +2362,8 @@ const SwapFrame swap_frames_921[] = {
     { 1508, 0, 0 },
     { 1509, 0, 0 },
     { 1510, 0, 0 },
-    { 1491, 0, 0 },
-    { 1492, 0, 0 },
+    { 1511, 0, 0 },
+    { 1512, 0, 0 },
     { 1493, 0, 0 },
     { 1494, 0, 0 },
     { 1495, 0, 0 },
@@ -2373,6 +2371,8 @@ const SwapFrame swap_frames_921[] = {
     { 1497, 0, 0 },
     { 1498, 0, 0 },
     { 1499, 0, 0 },
+    { 1500, 0, 0 },
+    { 1501, 0, 0 },
 };
 
 const SlotFrames slot_frames_921[] = {
@@ -2381,12 +2381,10 @@ const SlotFrames slot_frames_921[] = {
 };
 
 const ChildSprite children_923[] = {
- { 1437, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1439, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_923[] = {
-    { 1446, 0, 0 },
-    { 1447, 0, 0 },
     { 1448, 0, 0 },
     { 1449, 0, 0 },
     { 1450, 0, 0 },
@@ -2394,8 +2392,8 @@ const SwapFrame swap_frames_923[] = {
     { 1452, 0, 0 },
     { 1453, 0, 0 },
     { 1454, 0, 0 },
-    { 1437, 0, 0 },
-    { 1438, 0, 0 },
+    { 1455, 0, 0 },
+    { 1456, 0, 0 },
     { 1439, 0, 0 },
     { 1440, 0, 0 },
     { 1441, 0, 0 },
@@ -2403,6 +2401,8 @@ const SwapFrame swap_frames_923[] = {
     { 1443, 0, 0 },
     { 1444, 0, 0 },
     { 1445, 0, 0 },
+    { 1446, 0, 0 },
+    { 1447, 0, 0 },
 };
 
 const SlotFrames slot_frames_923[] = {
@@ -2411,12 +2411,10 @@ const SlotFrames slot_frames_923[] = {
 };
 
 const ChildSprite children_924[] = {
- { 1455, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1457, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_924[] = {
-    { 1464, 0, 0 },
-    { 1465, 0, 0 },
     { 1466, 0, 0 },
     { 1467, 0, 0 },
     { 1468, 0, 0 },
@@ -2424,8 +2422,8 @@ const SwapFrame swap_frames_924[] = {
     { 1470, 0, 0 },
     { 1471, 0, 0 },
     { 1472, 0, 0 },
-    { 1455, 0, 0 },
-    { 1456, 0, 0 },
+    { 1473, 0, 0 },
+    { 1474, 0, 0 },
     { 1457, 0, 0 },
     { 1458, 0, 0 },
     { 1459, 0, 0 },
@@ -2433,6 +2431,8 @@ const SwapFrame swap_frames_924[] = {
     { 1461, 0, 0 },
     { 1462, 0, 0 },
     { 1463, 0, 0 },
+    { 1464, 0, 0 },
+    { 1465, 0, 0 },
 };
 
 const SlotFrames slot_frames_924[] = {
@@ -2441,204 +2441,204 @@ const SlotFrames slot_frames_924[] = {
 };
 
 const ChildSprite children_925[] = {
- { 1405, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1407, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_926[] = {
- { 1406, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1408, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_928[] = {
- { 1170, 8.00, -8.00, -1.00, -1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1172, 8.00, -8.00, -1.00, -1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_931[] = {
- { 1407, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1409, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_932[] = {
- { 1169, -8.00, 8.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1171, -8.00, 8.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_935[] = {
- { 1408, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1410, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_939[] = {
- { 1409, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1411, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_943[] = {
- { 1410, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
-};
-
-const ChildSprite children_944[] = {
- { 1411, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
-};
-
-const ChildSprite children_945[] = {
- { 1199, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
-};
-
-const ChildSprite children_946[] = {
  { 1412, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_947[] = {
+const ChildSprite children_944[] = {
  { 1413, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_948[] = {
+const ChildSprite children_945[] = {
  { 1201, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_949[] = {
- { 1200, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
-};
-
-const ChildSprite children_950[] = {
+const ChildSprite children_946[] = {
  { 1414, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_951[] = {
+const ChildSprite children_947[] = {
  { 1415, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
+const ChildSprite children_948[] = {
+ { 1203, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
+const ChildSprite children_949[] = {
+ { 1202, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
+const ChildSprite children_950[] = {
+ { 1416, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
+const ChildSprite children_951[] = {
+ { 1417, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
 const ChildSprite children_952[] = {
- { 838, 0.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 840, 0.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_953[] = {
- { 841, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 843, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_954[] = {
- { 843, -8.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 845, -8.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_956[] = {
- { 847, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 849, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_957[] = {
- { 1416, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1418, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_958[] = {
- { 1417, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1419, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_959[] = {
- { 852, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 854, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_960[] = {
- { 862, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 864, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_961[] = {
- { 864, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 866, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_964[] = {
- { 872, -9.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 874, -9.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_965[] = {
- { 874, -4.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 876, -4.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_967[] = {
- { 1234, 0.00, 5.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_968[] = {
  { 1236, 0.00, 5.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_969[] = {
- { 862, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+const ChildSprite children_968[] = {
+ { 1238, 0.00, 5.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_970[] = {
+const ChildSprite children_969[] = {
  { 864, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_970[] = {
+ { 866, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_971[] = {
- { 872, -9.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 874, -9.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_972[] = {
- { 874, -4.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 876, -4.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_974[] = {
- { 854, 0.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_975[] = {
  { 856, 0.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_980[] = {
- { 1418, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1419, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+const ChildSprite children_975[] = {
+ { 858, 0.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_981[] = {
+const ChildSprite children_980[] = {
  { 1420, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
  { 1421, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_982[] = {
+const ChildSprite children_981[] = {
  { 1422, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1209, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1423, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
+const ChildSprite children_982[] = {
+ { 1424, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1211, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_983[] = {
- { 1423, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1424, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
-};
-
-const ChildSprite children_984[] = {
  { 1425, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
  { 1426, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_985[] = {
+const ChildSprite children_984[] = {
  { 1427, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1213, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1428, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
+const ChildSprite children_985[] = {
+ { 1429, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1215, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_986[] = {
- { 1428, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1211, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1430, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1213, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_987[] = {
- { 1429, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1430, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
-};
-
-const ChildSprite children_988[] = {
  { 1431, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
  { 1432, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
+const ChildSprite children_988[] = {
+ { 1433, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1434, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
 const ChildSprite children_997[] = {
- { 1433, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_998[] = {
- { 1434, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_999[] = {
  { 1435, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_998[] = {
+ { 1436, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_999[] = {
+ { 1437, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_1000[] = {
- { 1262, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1264, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1001[] = {
@@ -2662,96 +2662,96 @@ const ChildSprite children_1005[] = {
 };
 
 const ChildSprite children_1019[] = {
- { 1263, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1020[] = {
- { 1264, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1021[] = {
  { 1265, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_1020[] = {
+ { 1266, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1021[] = {
+ { 1267, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_1024[] = {
- { 1266, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
-};
-
-const ChildSprite children_1025[] = {
- { 1267, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
-};
-
-const ChildSprite children_1026[] = {
- { 1204, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
-};
-
-const ChildSprite children_1027[] = {
  { 1268, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_1028[] = {
+const ChildSprite children_1025[] = {
  { 1269, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_1029[] = {
+const ChildSprite children_1026[] = {
  { 1206, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_1030[] = {
- { 1205, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
-};
-
-const ChildSprite children_1031[] = {
+const ChildSprite children_1027[] = {
  { 1270, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_1032[] = {
+const ChildSprite children_1028[] = {
  { 1271, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
+const ChildSprite children_1029[] = {
+ { 1208, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
+const ChildSprite children_1030[] = {
+ { 1207, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
+const ChildSprite children_1031[] = {
+ { 1272, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
+const ChildSprite children_1032[] = {
+ { 1273, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
 const ChildSprite children_1033[] = {
- { 862, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 864, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1034[] = {
- { 864, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 866, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1035[] = {
- { 872, -9.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 874, -9.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1036[] = {
- { 874, -4.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 876, -4.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1037[] = {
- { 862, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1038[] = {
  { 864, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_1038[] = {
+ { 866, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_1039[] = {
- { 872, -9.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 874, -9.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1040[] = {
- { 874, -4.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 876, -4.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1050[] = {
-    { 1555, 0, 0 },
-    { 1556, 0, 0 },
     { 1557, 0, 0 },
-    { 1557, 1, 0 },
-    { 1556, 1, 0 },
     { 1558, 0, 0 },
     { 1559, 0, 0 },
-    { 1560, 0, 0 },
-    { 1560, 1, 0 },
     { 1559, 1, 0 },
+    { 1558, 1, 0 },
+    { 1560, 0, 0 },
+    { 1561, 0, 0 },
+    { 1562, 0, 0 },
+    { 1562, 1, 0 },
+    { 1561, 1, 0 },
 };
 
 const SlotFrames slot_frames_1050[] = {
@@ -2759,16 +2759,16 @@ const SlotFrames slot_frames_1050[] = {
 };
 
 const SwapFrame swap_frames_1051[] = {
-    { 1561, 0, 0 },
-    { 1562, 0, 0 },
     { 1563, 0, 0 },
     { 1564, 0, 0 },
     { 1565, 0, 0 },
     { 1566, 0, 0 },
+    { 1567, 0, 0 },
+    { 1568, 0, 0 },
+    { 1567, 1, 0 },
+    { 1566, 1, 0 },
     { 1565, 1, 0 },
     { 1564, 1, 0 },
-    { 1563, 1, 0 },
-    { 1562, 1, 0 },
 };
 
 const SlotFrames slot_frames_1051[] = {
@@ -2776,16 +2776,16 @@ const SlotFrames slot_frames_1051[] = {
 };
 
 const SwapFrame swap_frames_1052[] = {
-    { 1567, 0, 0 },
-    { 1568, 0, 0 },
     { 1569, 0, 0 },
     { 1570, 0, 0 },
     { 1571, 0, 0 },
     { 1572, 0, 0 },
+    { 1573, 0, 0 },
+    { 1574, 0, 0 },
+    { 1573, 1, 0 },
+    { 1572, 1, 0 },
     { 1571, 1, 0 },
     { 1570, 1, 0 },
-    { 1569, 1, 0 },
-    { 1568, 1, 0 },
 };
 
 const SlotFrames slot_frames_1052[] = {
@@ -2793,12 +2793,10 @@ const SlotFrames slot_frames_1052[] = {
 };
 
 const ChildSprite children_1053[] = {
- { 1535, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1537, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1053[] = {
-    { 1529, 0, 0 },
-    { 1530, 0, 0 },
     { 1531, 0, 0 },
     { 1532, 0, 0 },
     { 1533, 0, 0 },
@@ -2809,6 +2807,8 @@ const SwapFrame swap_frames_1053[] = {
     { 1538, 0, 0 },
     { 1539, 0, 0 },
     { 1540, 0, 0 },
+    { 1541, 0, 0 },
+    { 1542, 0, 0 },
 };
 
 const SlotFrames slot_frames_1053[] = {
@@ -2817,12 +2817,10 @@ const SlotFrames slot_frames_1053[] = {
 };
 
 const ChildSprite children_1054[] = {
- { 1548, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1550, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1054[] = {
-    { 1541, 0, 0 },
-    { 1542, 0, 0 },
     { 1543, 0, 0 },
     { 1544, 0, 0 },
     { 1545, 0, 0 },
@@ -2835,6 +2833,8 @@ const SwapFrame swap_frames_1054[] = {
     { 1552, 0, 0 },
     { 1553, 0, 0 },
     { 1554, 0, 0 },
+    { 1555, 0, 0 },
+    { 1556, 0, 0 },
 };
 
 const SlotFrames slot_frames_1054[] = {
@@ -2843,198 +2843,198 @@ const SlotFrames slot_frames_1054[] = {
 };
 
 const ChildSprite children_1055[] = {
- { 1272, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1056[] = {
- { 1273, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1057[] = {
  { 1274, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_1056[] = {
+ { 1275, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1057[] = {
+ { 1276, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_1062[] = {
- { 1120, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1122, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1063[] = {
- { 1275, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
-};
-
-const ChildSprite children_1064[] = {
- { 1276, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
-};
-
-const ChildSprite children_1275[] = {
- { 1574, 0.00, KEY_DETAIL_UP_PX_WORLD, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1065[] = {
- { 1219, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
-};
-
-const ChildSprite children_1066[] = {
  { 1277, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_1067[] = {
+const ChildSprite children_1064[] = {
  { 1278, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_1068[] = {
- { 1222, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+const ChildSprite children_1275[] = {
+ { 1576, 0.00, KEY_DETAIL_UP_PX_WORLD, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1069[] = {
+const ChildSprite children_1065[] = {
  { 1221, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_1070[] = {
+const ChildSprite children_1066[] = {
  { 1279, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_1071[] = {
+const ChildSprite children_1067[] = {
  { 1280, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
+const ChildSprite children_1068[] = {
+ { 1224, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
+const ChildSprite children_1069[] = {
+ { 1223, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
+const ChildSprite children_1070[] = {
+ { 1281, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
+const ChildSprite children_1071[] = {
+ { 1282, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1075[] = {
  { 54, 0.00, -3.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1281, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1283, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1076[] = {
  { 53, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1282, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1284, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1077[] = {
  { 53, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1283, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1285, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1078[] = {
- { 1284, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1000, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
+ { 1286, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1002, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
 };
 
 const ChildSprite children_1079[] = {
- { 1285, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1001, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
+ { 1287, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1003, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
 };
 
 const ChildSprite children_1080[] = {
- { 1286, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1001, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
+ { 1288, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1003, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
 };
 
 const ChildSprite children_1081[] = {
- { 1287, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1001, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
+ { 1289, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1003, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BLACK, 0.50 },
 };
 
 const ChildSprite children_1082[] = {
- { 1002, 0.00, 11.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1004, 0.00, 11.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1083[] = {
- { 1288, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1084[] = {
- { 1289, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1085[] = {
  { 1290, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1086[] = {
+const ChildSprite children_1084[] = {
  { 1291, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1087[] = {
+const ChildSprite children_1085[] = {
  { 1292, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1088[] = {
- { 985, 0.00, 7.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1089[] = {
- { 987, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1091[] = {
- { 1012, 0.00, -3.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1092[] = {
- { 1014, 0.00, -2.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1093[] = {
- { 1016, -11.00, 13.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1094[] = {
- { 1018, -9.00, 13.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1095[] = {
+const ChildSprite children_1086[] = {
  { 1293, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1096[] = {
+const ChildSprite children_1087[] = {
  { 1294, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1097[] = {
+const ChildSprite children_1088[] = {
+ { 987, 0.00, 7.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1089[] = {
+ { 989, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1091[] = {
+ { 1014, 0.00, -3.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1092[] = {
+ { 1016, 0.00, -2.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1093[] = {
+ { 1018, -11.00, 13.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1094[] = {
+ { 1020, -9.00, 13.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1095[] = {
  { 1295, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1098[] = {
+const ChildSprite children_1096[] = {
  { 1296, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_1097[] = {
+ { 1297, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1098[] = {
+ { 1298, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_1108[] = {
- { 1297, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1123[] = {
- { 1072, 0.00, -9.00, 1.00, -1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1126[] = {
- { 1298, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1127[] = {
  { 1299, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_1123[] = {
+ { 1074, 0.00, -9.00, 1.00, -1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1126[] = {
+ { 1300, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1127[] = {
+ { 1301, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_1132[] = {
- { 1075, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1077, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1133[] = {
- { 1076, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1078, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1134[] = {
- { 1078, -1.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1080, -1.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1135[] = {
- { 1079, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1081, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1136[] = {
- { 1080, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1082, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1137[] = {
- { 1081, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1083, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1157[] = {
@@ -3042,143 +3042,143 @@ const ChildSprite children_1157[] = {
 };
 
 const ChildSprite children_1159[] = {
- { 1122, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1124, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1160[] = {
- { 1124, 2.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1126, 2.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1161[] = {
- { 1126, -2.00, 1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1128, -2.00, 1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1162[] = {
- { 960, 0.00, 11.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 962, 0.00, 11.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1163[] = {
- { 961, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 963, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1164[] = {
- { 962, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1165[] = {
- { 1300, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1166[] = {
  { 964, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1167[] = {
- { 1301, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1168[] = {
- { 963, -11.00, 11.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1169[] = {
+const ChildSprite children_1165[] = {
  { 1302, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1170[] = {
- { 965, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+const ChildSprite children_1166[] = {
+ { 966, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1171[] = {
+const ChildSprite children_1167[] = {
  { 1303, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1172[] = {
+const ChildSprite children_1168[] = {
+ { 965, -11.00, 11.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1169[] = {
  { 1304, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1173[] = {
- { 1305, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1174[] = {
- { 1306, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1175[] = {
- { 1307, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1176[] = {
- { 1308, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1177[] = {
- { 1309, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1178[] = {
- { 1310, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1179[] = {
- { 1311, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1180[] = {
- { 1312, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1181[] = {
- { 1313, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1182[] = {
- { 1314, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1183[] = {
- { 1315, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1184[] = {
- { 1316, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1185[] = {
- { 1317, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1187[] = {
+const ChildSprite children_1170[] = {
  { 967, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1188[] = {
+const ChildSprite children_1171[] = {
+ { 1305, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1172[] = {
+ { 1306, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1173[] = {
+ { 1307, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1174[] = {
+ { 1308, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1175[] = {
+ { 1309, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1176[] = {
+ { 1310, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1177[] = {
+ { 1311, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1178[] = {
+ { 1312, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1179[] = {
+ { 1313, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1180[] = {
+ { 1314, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1181[] = {
+ { 1315, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1182[] = {
+ { 1316, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1183[] = {
+ { 1317, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1184[] = {
+ { 1318, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1185[] = {
+ { 1319, 0.00, 0.00, 1.00, 1.00, 0, 0, -101, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1187[] = {
  { 969, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_1188[] = {
+ { 971, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_1189[] = {
- { 971, -11.00, 11.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 973, -11.00, 11.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1190[] = {
- { 973, -7.00, 11.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 975, -7.00, 11.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1197[] = {
- { 960, 0.00, -11.00, 1.00, -1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 962, 0.00, -11.00, 1.00, -1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1203[] = {
- { 1178, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1180, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1204[] = {
- { 1318, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1320, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1208[] = {
- { 1319, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1321, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1209[] = {
@@ -3186,15 +3186,15 @@ const ChildSprite children_1209[] = {
 };
 
 const ChildSprite children_1210[] = {
- { 1320, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1322, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1221[] = {
- { 1179, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1181, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1222[] = {
- { 1321, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1323, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1226[] = {
@@ -3202,296 +3202,300 @@ const ChildSprite children_1226[] = {
 };
 
 const ChildSprite children_1227[] = {
- { 1322, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1324, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1229[] = {
- { 1323, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1230[] = {
- { 1324, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1231[] = {
  { 1325, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1232[] = {
+const ChildSprite children_1230[] = {
  { 1326, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1233[] = {
+const ChildSprite children_1231[] = {
  { 1327, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1234[] = {
+const ChildSprite children_1232[] = {
  { 1328, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1235[] = {
+const ChildSprite children_1233[] = {
  { 1329, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1236[] = {
+const ChildSprite children_1234[] = {
  { 1330, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1237[] = {
+const ChildSprite children_1235[] = {
  { 1331, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1238[] = {
+const ChildSprite children_1236[] = {
  { 1332, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_1237[] = {
+ { 1333, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1238[] = {
+ { 1334, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_1239[] = {
- { 1169, 8.00, -8.00, -1.00, -1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1171, 8.00, -8.00, -1.00, -1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1240[] = {
- { 1170, -8.00, 8.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1172, -8.00, 8.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1246[] = {
- { 1333, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1335, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1247[] = {
- { 1334, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1142, 0.00, -12.00, 1.00, -1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
- { 1142, 0.00, 12.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1336, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1144, 0.00, -12.00, 1.00, -1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
+ { 1144, 0.00, 12.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1248[] = {
- { 1335, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1144, 12.00, -12.00, -1.00, -1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
- { 1336, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1337, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1146, 12.00, -12.00, -1.00, -1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
+ { 1338, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1249[] = {
- { 1337, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1338, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
- { 1144, -12.00, 12.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1339, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1340, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
+ { 1146, -12.00, 12.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1250[] = {
- { 1339, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1143, 12.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, -90.00, COLOR_TYPE_BLACK, 0.30 },
- { 1340, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1251[] = {
- { 1341, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1252[] = {
+ { 1341, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1145, 12.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, -90.00, COLOR_TYPE_BLACK, 0.30 },
  { 1342, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_1251[] = {
+ { 1343, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1252[] = {
+ { 1344, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_1253[] = {
- { 1343, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1344, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
- { 1345, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1345, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1346, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
+ { 1347, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1254[] = {
- { 1346, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1347, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
- { 1348, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1348, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1349, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
+ { 1350, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1255[] = {
- { 1349, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1350, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
- { 1351, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1256[] = {
- { 1148, 12.00, -12.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
- { 1352, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1257[] = {
- { 1149, 25.00, -12.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
+ { 1351, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1352, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
  { 1353, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1258[] = {
- { 1146, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
- { 1148, 12.00, -12.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+const ChildSprite children_1256[] = {
+ { 1150, 12.00, -12.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
+ { 1354, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1259[] = {
- { 1147, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
- { 1149, 25.00, -12.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1266[] = {
- { 1092, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1267[] = {
- { 1094, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1277[] = {
- { 1150, 0.00, 14.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1142, 0.00, 12.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1278[] = {
- { 1150, 0.00, -14.00, 1.00, -1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1142, 0.00, -12.00, 1.00, -1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
-};
-
-const ChildSprite children_1279[] = {
- { 1354, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+const ChildSprite children_1257[] = {
+ { 1151, 25.00, -12.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
  { 1355, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1280[] = {
+const ChildSprite children_1258[] = {
+ { 1148, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
+ { 1150, 12.00, -12.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1259[] = {
+ { 1149, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
+ { 1151, 25.00, -12.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1266[] = {
+ { 1094, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1267[] = {
+ { 1096, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1277[] = {
+ { 1152, 0.00, 14.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1144, 0.00, 12.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1278[] = {
+ { 1152, 0.00, -14.00, 1.00, -1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1144, 0.00, -12.00, 1.00, -1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
+};
+
+const ChildSprite children_1279[] = {
  { 1356, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1357, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
+ { 1357, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1280[] = {
+ { 1358, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1359, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
 };
 
 const ChildSprite children_1281[] = {
- { 1358, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1143, 12.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, -90.00, COLOR_TYPE_BLACK, 0.30 },
- { 1359, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1282[] = {
  { 1360, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1145, 12.00, 12.00, -1.00, -1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
+ { 1145, 12.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, -90.00, COLOR_TYPE_BLACK, 0.30 },
  { 1361, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1283[] = {
+const ChildSprite children_1282[] = {
  { 1362, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1363, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
- { 1145, -12.00, -12.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1147, 12.00, 12.00, -1.00, -1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
+ { 1363, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1283[] = {
+ { 1364, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1365, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
+ { 1147, -12.00, -12.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1284[] = {
- { 1364, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1144, 12.00, -12.00, -1.00, -1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
- { 1144, -12.00, 12.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1366, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1146, 12.00, -12.00, -1.00, -1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
+ { 1146, -12.00, 12.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1285[] = {
- { 1365, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1366, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
- { 1367, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1367, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1368, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
+ { 1369, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1286[] = {
- { 1368, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1369, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
- { 1370, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1370, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1371, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
+ { 1372, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1287[] = {
- { 1371, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1144, 12.00, -12.00, -1.00, -1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
- { 1142, 0.00, 12.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1373, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1146, 12.00, -12.00, -1.00, -1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
+ { 1144, 0.00, 12.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1288[] = {
- { 1372, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1145, 12.00, -12.00, 1.00, 1.00, 0, 0, 1, 0, -270.00, COLOR_TYPE_BLACK, 0.30 },
- { 1373, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1374, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1147, 12.00, -12.00, 1.00, 1.00, 0, 0, 1, 0, -270.00, COLOR_TYPE_BLACK, 0.30 },
+ { 1375, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1289[] = {
- { 1374, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1142, 0.00, -12.00, 1.00, -1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
- { 1144, -12.00, 12.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1376, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1144, 0.00, -12.00, 1.00, -1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
+ { 1146, -12.00, 12.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1290[] = {
- { 1375, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1376, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
- { 1377, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1377, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1378, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BLACK, 0.30 },
+ { 1379, 0.00, 0.00, 1.00, 1.00, 0, 0, 99, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1294[] = {
- { 849, -8.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 851, -8.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1295[] = {
- { 843, -8.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 845, -8.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1296[] = {
- { 849, -8.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 851, -8.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1297[] = {
- { 843, -8.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 845, -8.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1298[] = {
  { 53, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1378, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1380, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1299[] = {
- { 838, 0.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 840, 0.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1300[] = {
- { 841, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 843, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1301[] = {
- { 843, -8.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 845, -8.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1302[] = {
- { 854, 0.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1303[] = {
  { 856, 0.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_1303[] = {
+ { 858, 0.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_1304[] = {
- { 847, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 849, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1305[] = {
- { 862, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1306[] = {
  { 864, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_1306[] = {
+ { 866, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_1307[] = {
- { 872, -9.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 874, -9.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1308[] = {
- { 874, -4.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 876, -4.00, 8.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1322[] = {
- { 961, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 963, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1325[] = {
- { 971, -11.00, 11.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 973, -11.00, 11.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1326[] = {
- { 973, -7.00, 11.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 975, -7.00, 11.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1331[] = {
+ { 820, -11.00, 0.00, 1.00, 1.00, 0, 0, -1, -1, 0.00, COLOR_TYPE_WHITE, 1.00 },
 };
 
 const ChildSprite children_1327[] = {
- { 1520, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1519, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_GLOW, 1.00 },
- { 1518, 0.00, 0.00, 1.00, 1.00, 0, 0, -2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1522, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1521, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_GLOW, 1.00 },
+ { 1520, 0.00, 0.00, 1.00, 1.00, 0, 0, -2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildGroup groups_1327[] = {
@@ -3500,9 +3504,9 @@ const ChildGroup groups_1327[] = {
 };
 
 const ChildSprite children_1328[] = {
- { 1525, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_GLOW, 1.00 },
- { 1524, 0.00, 0.00, 1.00, 1.00, 0, 0, -2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 1526, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1527, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_GLOW, 1.00 },
+ { 1526, 0.00, 0.00, 1.00, 1.00, 0, 0, -2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 1528, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildGroup groups_1328[] = {
@@ -3859,341 +3863,341 @@ const ChildSprite children_1345[] = {
 };
 
 const ChildSprite children_1348[] = {
- { 1583, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1585, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1349[] = {
- { 1585, 1.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1587, 1.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1350[] = {
- { 1587, -1.00, -3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1589, -1.00, -3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1351[] = {
- { 1589, -1.00, 1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1591, -1.00, 1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1352[] = {
- { 1634, -2.00, 1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1636, -2.00, 1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1353[] = {
- { 1636, -2.00, -2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1638, -2.00, -2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1354[] = {
- { 1638, 1.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1640, 1.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1355[] = {
- { 1640, -2.00, 2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1642, -2.00, 2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1356[] = {
- { 1593, 0.00, -3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1595, 0.00, -3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1357[] = {
- { 1595, -5.00, -1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1597, -5.00, -1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1358[] = {
- { 1597, -1.00, -1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1599, -1.00, -1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1359[] = {
- { 1599, -1.00, -2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1601, -1.00, -2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1360[] = {
- { 1601, 1.00, -1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1603, 1.00, -1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1361[] = {
- { 1603, 3.00, 5.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1605, 3.00, 5.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1362[] = {
- { 1605, -1.00, 3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1607, -1.00, 3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1363[] = {
- { 1607, 0.00, -2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1609, 0.00, -2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1364[] = {
- { 1609, -1.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1611, -1.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1365[] = {
- { 1611, -2.00, 3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1613, -2.00, 3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1387[] = {
- { 1642, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1644, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1388[] = {
- { 1644, 5.00, 4.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1646, 5.00, 4.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1389[] = {
- { 1646, -4.00, -6.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1648, -4.00, -6.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1390[] = {
- { 1648, 4.00, -3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1650, 4.00, -3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1391[] = {
- { 1650, -7.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1652, -7.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1392[] = {
- { 1652, 2.00, 6.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1654, 2.00, 6.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1393[] = {
- { 1654, 4.00, -1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1656, 4.00, -1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1394[] = {
- { 1656, 0.00, -6.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1658, 0.00, -6.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1395[] = {
- { 1591, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1593, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1431[] = {
- { 1662, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1432[] = {
  { 1664, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1433[] = {
+const ChildSprite children_1432[] = {
  { 1666, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_1433[] = {
+ { 1668, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_1434[] = {
- { 1668, 5.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1670, 5.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1435[] = {
- { 1670, 0.00, -6.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1672, 0.00, -6.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1436[] = {
- { 1672, -6.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1674, -6.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1437[] = {
- { 1674, 0.00, 5.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1676, 0.00, 5.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1438[] = {
- { 1676, 9.00, -10.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1678, 9.00, -10.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1439[] = {
- { 1678, -11.00, -8.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1680, -11.00, -8.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1440[] = {
- { 1680, 5.00, 12.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1682, 5.00, 12.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1442[] = {
- { 1697, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1443[] = {
  { 1699, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1444[] = {
+const ChildSprite children_1443[] = {
  { 1701, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_1444[] = {
+ { 1703, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_1445[] = {
- { 1703, 9.00, -1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1705, 9.00, -1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1446[] = {
- { 1705, 0.00, -10.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1707, 0.00, -10.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1447[] = {
- { 1707, -10.00, -2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1709, -10.00, -2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1448[] = {
- { 1709, 2.00, 8.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1711, 2.00, 8.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1461[] = {
- { 1721, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1723, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1462[] = {
- { 1723, 0.00, -2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1725, 0.00, -2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1463[] = {
- { 1725, 7.00, -1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1727, 7.00, -1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1464[] = {
- { 1727, 3.00, -3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1729, 3.00, -3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1471[] = {
- { 1729, 0.00, 4.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1472[] = {
  { 1731, 0.00, 4.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_1472[] = {
+ { 1733, 0.00, 4.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_1473[] = {
- { 1733, -5.00, 1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1735, -5.00, 1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1496[] = {
- { 1735, -1.00, 3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1737, -1.00, 3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1507[] = {
- { 1737, 0.00, 4.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1739, 0.00, 4.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1510[] = {
- { 1683, 0.00, 1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1685, 0.00, 1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1511[] = {
- { 1685, -1.00, 1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1687, -1.00, 1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1512[] = {
- { 1687, 0.00, 2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1689, 0.00, 2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1513[] = {
- { 1715, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1514[] = {
  { 1717, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1515[] = {
+const ChildSprite children_1514[] = {
  { 1719, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_1515[] = {
+ { 1721, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_1516[] = {
- { 2086, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2096, 0.00, -6.00, 2.00, 2.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2087, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2097, 0.00, -6.00, 2.00, 2.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1517[] = {
- { 2102, 0.00, 3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2103, 0.00, 3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1518[] = {
- { 2080, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2081, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1529[] = {
- { 2106, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
-};
-
-const ChildSprite children_1531[] = {
- { 2006, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
-};
-
-const ChildSprite children_1532[] = {
  { 2107, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_1533[] = {
- { 2108, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
-};
-
-const ChildSprite children_1534[] = {
+const ChildSprite children_1531[] = {
  { 2008, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_1535[] = {
- { 2007, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+const ChildSprite children_1532[] = {
+ { 2108, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_1536[] = {
+const ChildSprite children_1533[] = {
  { 2109, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_1537[] = {
+const ChildSprite children_1534[] = {
+ { 2010, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
+const ChildSprite children_1535[] = {
+ { 2009, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
+const ChildSprite children_1536[] = {
  { 2110, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_1538[] = {
+const ChildSprite children_1537[] = {
  { 2111, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_1539[] = {
+const ChildSprite children_1538[] = {
  { 2112, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
+const ChildSprite children_1539[] = {
+ { 2113, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
 const ChildSprite children_1540[] = {
- { 2013, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2015, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1552[] = {
- { 2113, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2114, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2114, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2115, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1553[] = {
- { 2115, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2116, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2116, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2117, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1554[] = {
- { 2117, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1990, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2118, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1992, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1555[] = {
- { 2118, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2119, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
-};
-
-const ChildSprite children_1556[] = {
- { 2121, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2119, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
  { 2120, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_1557[] = {
+const ChildSprite children_1556[] = {
  { 2122, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1996, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2121, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
+const ChildSprite children_1557[] = {
+ { 2123, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1998, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1558[] = {
- { 2123, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 1994, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2124, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1996, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1559[] = {
- { 2125, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2124, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2126, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2125, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1560[] = {
- { 2126, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2127, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2127, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2128, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1582[] = {
@@ -4213,7 +4217,7 @@ const ChildSprite children_1591[] = {
 };
 
 const ChildSprite children_1592[] = {
- { 2128, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2129, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1593[] = {
@@ -4225,7 +4229,7 @@ const ChildSprite children_1594[] = {
 };
 
 const ChildSprite children_1600[] = {
- { 2129, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2130, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1601[] = {
@@ -4233,12 +4237,12 @@ const ChildSprite children_1601[] = {
 };
 
 const ChildSprite children_1617[] = {
- { 1739, 0.00, 3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1741, 0.00, 3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1619[] = {
- { 2130, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2075, 12.00, -18.00, 1.00, 1.00, 1, 1, 2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2131, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2076, 12.00, -18.00, 1.00, 1.00, 1, 1, 2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1620[] = {
@@ -4246,127 +4250,127 @@ const ChildSprite children_1620[] = {
 };
 
 const ChildSprite children_1621[] = {
- { 1741, 2.00, -6.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1743, 2.00, -6.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1623[] = {
- { 1744, 2.00, 6.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1746, 2.00, 6.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1624[] = {
- { 1746, 0.00, 8.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1748, 0.00, 8.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1627[] = {
- { 1750, -2.00, -6.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1752, -2.00, -6.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1629[] = {
- { 1753, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1630[] = {
  { 1755, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1631[] = {
+const ChildSprite children_1630[] = {
  { 1757, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_1631[] = {
+ { 1759, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_1632[] = {
- { 1759, 0.00, -1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1761, 0.00, -1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1637[] = {
- { 1765, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1767, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1638[] = {
- { 1767, -1.00, 3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1769, -1.00, 3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1641[] = {
- { 1771, 1.00, 2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1773, 1.00, 2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1642[] = {
- { 1773, -1.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1775, -1.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1645[] = {
- { 1777, 1.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1779, 1.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1646[] = {
- { 1779, 0.00, 2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1781, 0.00, 2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1649[] = {
- { 1783, 0.00, 3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1785, 0.00, 3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1650[] = {
- { 1785, 0.00, 1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1787, 0.00, 1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1685[] = {
- { 2132, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2131, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2133, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2132, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1686[] = {
- { 2133, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2134, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2134, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2135, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1687[] = {
- { 2135, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2136, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2136, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2137, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1688[] = {
- { 2137, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2138, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2138, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2139, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1689[] = {
- { 2139, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2140, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
-};
-
-const ChildSprite children_1690[] = {
- { 2142, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2140, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
  { 2141, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
+const ChildSprite children_1690[] = {
+ { 2143, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2142, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+};
+
 const ChildSprite children_1691[] = {
- { 2144, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2143, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2145, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2144, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1692[] = {
- { 2145, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2146, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2146, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2147, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1693[] = {
- { 2147, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2148, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2148, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2149, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1694[] = {
- { 2149, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2150, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2150, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2151, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1695[] = {
- { 2151, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2152, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2152, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2153, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1696[] = {
- { 2154, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2153, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2155, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2154, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1697[] = {
@@ -4386,17 +4390,17 @@ const ChildSprite children_1700[] = {
 };
 
 const ChildSprite children_1701[] = {
- { 2155, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2156, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
  { 6, 9.00, 0.00, 1.00, 1.00, 1, 0, 2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1702[] = {
- { 2156, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2157, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
  { 8, 7.00, 0.00, 1.00, 1.00, 1, 0, 2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1703[] = {
- { 2157, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2158, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
  { 10, 6.00, 1.00, 1.00, 1.00, 1, 0, 2, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
@@ -4406,7 +4410,7 @@ const ChildSprite children_1705[] = {
 
 const ChildSprite children_1708[] = {
  { 341, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2158, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2159, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1709[] = {
@@ -4434,8 +4438,8 @@ const ChildSprite children_1724[] = {
 };
 
 const ChildSprite children_1734[] = {
- { 2160, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2159, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2161, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2160, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1735[] = {
@@ -4503,179 +4507,179 @@ const ChildSprite children_1763[] = {
 };
 
 const ChildSprite children_1773[] = {
- { 2161, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2162, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2162, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2163, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1774[] = {
- { 2163, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2164, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2164, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2165, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1775[] = {
- { 2165, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2166, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2166, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2167, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1776[] = {
- { 2167, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
-};
-
-const ChildSprite children_1781[] = {
- { 1634, -2.00, 1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1782[] = {
- { 1636, -2.00, -2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1783[] = {
- { 1638, 1.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1784[] = {
- { 1640, -2.00, 2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1785[] = {
  { 2168, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_1786[] = {
+const ChildSprite children_1781[] = {
+ { 1636, -2.00, 1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1782[] = {
+ { 1638, -2.00, -2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1783[] = {
+ { 1640, 1.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1784[] = {
+ { 1642, -2.00, 2.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1785[] = {
  { 2169, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_1787[] = {
+const ChildSprite children_1786[] = {
  { 2170, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_1788[] = {
+const ChildSprite children_1787[] = {
  { 2171, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
-const ChildSprite children_1789[] = {
+const ChildSprite children_1788[] = {
  { 2172, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2173, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1790[] = {
- { 2175, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+const ChildSprite children_1789[] = {
+ { 2173, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
  { 2174, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_1790[] = {
+ { 2176, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2175, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_1791[] = {
- { 2177, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2176, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2178, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2177, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1792[] = {
- { 2178, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2179, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2179, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2180, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1793[] = {
- { 1666, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1668, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1794[] = {
- { 2180, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2181, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1796[] = {
- { 2183, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2181, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
  { 2182, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_1796[] = {
+ { 2184, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2183, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_1797[] = {
- { 2185, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
- { 2184, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2186, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2185, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1799[] = {
- { 1701, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1703, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1800[] = {
- { 2186, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2187, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1801[] = {
- { 1715, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1802[] = {
- { 2189, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2187, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
  { 2188, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1803[] = {
- { 1662, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1804[] = {
- { 2191, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2190, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1805[] = {
- { 1697, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1806[] = {
- { 2192, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2193, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1807[] = {
- { 1685, -1.00, 1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1808[] = {
- { 2194, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2195, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1809[] = {
+const ChildSprite children_1801[] = {
  { 1717, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1810[] = {
- { 2197, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+const ChildSprite children_1802[] = {
+ { 2190, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2189, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1803[] = {
+ { 1664, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1804[] = {
+ { 2192, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2191, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1805[] = {
+ { 1699, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1806[] = {
+ { 2193, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2194, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1807[] = {
+ { 1687, -1.00, 1.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1808[] = {
+ { 2195, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
  { 2196, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
+const ChildSprite children_1809[] = {
+ { 1719, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1810[] = {
+ { 2198, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2197, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
 const ChildSprite children_1831[] = {
- { 1888, -15.00, 15.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1890, -15.00, 15.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1832[] = {
- { 1890, -7.50, 7.50, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1892, -7.50, 7.50, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1833[] = {
- { 1889, -15.00, 15.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1891, -15.00, 15.00, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1834[] = {
- { 1891, -7.50, 7.50, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1893, -7.50, 7.50, 1.00, 1.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1839[] = {
- { 2198, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1840[] = {
  { 2199, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1841[] = {
+const ChildSprite children_1840[] = {
  { 2200, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1842[] = {
+const ChildSprite children_1841[] = {
  { 2201, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1842[] = {
+ { 2202, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1843[] = {
@@ -4730,115 +4734,115 @@ const ChildSprite children_1860[] = {
 };
 
 const ChildSprite children_1861[] = {
- { 1821, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
-};
-
-const ChildSprite children_1862[] = {
  { 1823, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1863[] = {
+const ChildSprite children_1862[] = {
  { 1825, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1864[] = {
+const ChildSprite children_1863[] = {
  { 1827, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1865[] = {
+const ChildSprite children_1864[] = {
  { 1829, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1866[] = {
+const ChildSprite children_1865[] = {
  { 1831, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1867[] = {
+const ChildSprite children_1866[] = {
  { 1833, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1868[] = {
+const ChildSprite children_1867[] = {
  { 1835, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1869[] = {
+const ChildSprite children_1868[] = {
  { 1837, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1870[] = {
+const ChildSprite children_1869[] = {
  { 1839, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1871[] = {
+const ChildSprite children_1870[] = {
  { 1841, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1872[] = {
+const ChildSprite children_1871[] = {
  { 1843, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1873[] = {
+const ChildSprite children_1872[] = {
  { 1845, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1874[] = {
+const ChildSprite children_1873[] = {
  { 1847, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1875[] = {
+const ChildSprite children_1874[] = {
  { 1849, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1876[] = {
+const ChildSprite children_1875[] = {
  { 1851, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1877[] = {
+const ChildSprite children_1876[] = {
  { 1853, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1878[] = {
+const ChildSprite children_1877[] = {
  { 1855, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1879[] = {
+const ChildSprite children_1878[] = {
  { 1857, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1880[] = {
+const ChildSprite children_1879[] = {
  { 1859, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1881[] = {
+const ChildSprite children_1880[] = {
  { 1861, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1882[] = {
+const ChildSprite children_1881[] = {
  { 1863, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1883[] = {
+const ChildSprite children_1882[] = {
  { 1865, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1884[] = {
+const ChildSprite children_1883[] = {
  { 1867, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1885[] = {
+const ChildSprite children_1884[] = {
  { 1869, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1886[] = {
- { 2202, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+const ChildSprite children_1885[] = {
+ { 1871, 0.00, 0.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1887[] = {
+const ChildSprite children_1886[] = {
  { 2203, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
-const ChildSprite children_1888[] = {
+const ChildSprite children_1887[] = {
  { 2204, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+};
+
+const ChildSprite children_1888[] = {
+ { 2205, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1899[] = {
@@ -4862,12 +4866,12 @@ const ChildSprite children_1905[] = {
 };
 
 const ChildSprite children_1906[] = {
- { 2205, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2206, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
  { 619, 0.00, 0.00, 1.00, 1.00, 0, 0, 10, 0, 45.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1907[] = {
- { 2206, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2207, 0.00, 0.00, 1.00, 1.00, 0, 0, -100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
  { 621, 0.00, 0.00, 1.00, 1.00, 0, 0, 10, 0, 26.57, COLOR_TYPE_BASE, 1.00 },
 };
 
@@ -5026,7 +5030,7 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 0139 */ { 337, -1, 0.00, 0.00, 3, 9, 1006, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0140 */ { 120, 57, 0.00, 0.00, 3, 12, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_140 },
 /* Object 0141 */ { 630, 127, 0.00, 0.00, 3, 12, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_141 },
-/* Object 0142 */ { 821, -1, 0.00, 0.00, 5, 9, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_142 },
+/* Object 0142 */ { 823, -1, 0.00, 0.00, 5, 9, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_142 },
 /* Object 0143 */ { 118, 54, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_143 },
 /* Object 0144 */ { 360, 76, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_144 },
 /* Object 0145 */ { 362, 78, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_145 },
@@ -5636,30 +5640,30 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 0749 */ { 819, -1, 7.00, 0.00, 5, 10, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 1, children_749, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0750 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0751 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0752 */ { 837, -1, 0.00, -4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_752, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0753 */ { 840, -1, 4.00, -4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_753, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0754 */ { 842, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_754, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0755 */ { 845, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0756 */ { 846, -1, 0.00, -4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_756, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0757 */ { 848, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_757, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0758 */ { 850, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_758, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0759 */ { 851, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_759, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0752 */ { 839, -1, 0.00, -4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_752, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0753 */ { 842, -1, 4.00, -4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_753, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0754 */ { 844, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_754, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0755 */ { 847, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0756 */ { 848, -1, 0.00, -4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_756, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0757 */ { 850, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_757, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0758 */ { 852, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_758, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0759 */ { 853, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_759, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0760 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0761 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0762 */ { 861, -1, 6.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_762, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0763 */ { 863, -1, 11.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_763, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0764 */ { 871, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_764, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0765 */ { 873, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_765, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0766 */ { 875, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0762 */ { 863, -1, 6.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_762, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0763 */ { 865, -1, 11.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_763, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0764 */ { 873, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_764, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0765 */ { 875, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_765, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0766 */ { 877, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0767 */ { 299, -1, 0.00, 0.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0768 */ { 600, -1, 0.00, 0.00, 5, 1, 1004, 0, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_768 },
-/* Object 0769 */ { 1233, -1, 0.00, -4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_769, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0770 */ { 1235, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_770, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0771 */ { 1237, -1, 6.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_771, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0772 */ { 1239, -1, 11.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_772, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0773 */ { 1241, -1, -1.00, 3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_773, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0774 */ { 1243, -1, 0.00, 2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_774, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0775 */ { 1245, -1, -2.00, 10.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0769 */ { 1235, -1, 0.00, -4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_769, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0770 */ { 1237, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_770, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0771 */ { 1239, -1, 6.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_771, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0772 */ { 1241, -1, 11.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_772, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0773 */ { 1243, -1, -1.00, 3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_773, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0774 */ { 1245, -1, 0.00, 2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_774, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0775 */ { 1247, -1, -2.00, 10.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0776 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0777 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0778 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -5691,33 +5695,33 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 0804 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0805 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0806 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0807 */ { 976, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_807, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0808 */ { 976, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_808, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0809 */ { 978, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_809, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0810 */ { 978, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_810, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0811 */ { 979, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_811, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0812 */ { 979, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_812, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0813 */ { 980, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_813, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0814 */ { 980, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_814, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0815 */ { 981, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_815, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0816 */ { 981, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_816, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0817 */ { 982, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_817, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0818 */ { 982, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_818, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0819 */ { 984, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_819, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0820 */ { 984, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_820, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0821 */ { 986, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_821, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0822 */ { 986, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_822, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0823 */ { 988, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 1, children_823, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0824 */ { 988, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 1, children_824, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0825 */ { 988, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 1, children_825, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0826 */ { 1011, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_826, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0827 */ { 1011, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_827, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0828 */ { 1013, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_828, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0829 */ { 1013, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_829, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0830 */ { 1015, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_830, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0831 */ { 1015, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_831, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0832 */ { 1017, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_832, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0833 */ { 1017, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_833, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0807 */ { 978, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_807, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0808 */ { 978, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_808, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0809 */ { 980, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_809, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0810 */ { 980, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_810, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0811 */ { 981, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_811, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0812 */ { 981, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_812, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0813 */ { 982, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_813, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0814 */ { 982, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_814, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0815 */ { 983, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_815, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0816 */ { 983, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_816, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0817 */ { 984, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_817, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0818 */ { 984, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_818, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0819 */ { 986, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_819, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0820 */ { 986, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_820, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0821 */ { 988, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_821, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0822 */ { 988, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_822, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0823 */ { 990, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 1, children_823, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0824 */ { 990, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 1, children_824, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0825 */ { 990, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 1, children_825, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0826 */ { 1013, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_826, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0827 */ { 1013, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_827, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0828 */ { 1015, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_828, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0829 */ { 1015, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_829, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0830 */ { 1017, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_830, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0831 */ { 1017, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_831, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0832 */ { 1019, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_832, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0833 */ { 1019, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_833, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0834 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0835 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0836 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -5725,77 +5729,77 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 0838 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0839 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0840 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0841 */ { 1019, -1, 0.00, 0.00, 1, -7, 1004, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_841, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0842 */ { 1025, -1, -12.00, 12.00, 1, -7, 1004, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_842, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0843 */ { 1022, -1, 0.00, 12.00, 1, -7, 1004, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_843, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0844 */ { 1022, -1, 0.00, 12.00, 1, -7, 1004, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_844, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0845 */ { 1025, -1, -12.00, 12.00, 1, -7, 1004, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_845, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0846 */ { 1027, -1, 0.00, 0.00, 1, -7, 1004, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_846, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0847 */ { 1029, -1, 0.00, 0.00, 1, -7, 1004, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_847, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0848 */ { 1031, -1, 0.00, 0.00, 1, -7, 1004, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_848, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0841 */ { 1021, -1, 0.00, 0.00, 1, -7, 1004, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_841, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0842 */ { 1027, -1, -12.00, 12.00, 1, -7, 1004, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_842, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0843 */ { 1024, -1, 0.00, 12.00, 1, -7, 1004, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_843, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0844 */ { 1024, -1, 0.00, 12.00, 1, -7, 1004, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_844, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0845 */ { 1027, -1, -12.00, 12.00, 1, -7, 1004, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_845, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0846 */ { 1029, -1, 0.00, 0.00, 1, -7, 1004, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_846, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0847 */ { 1031, -1, 0.00, 0.00, 1, -7, 1004, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_847, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0848 */ { 1033, -1, 0.00, 0.00, 1, -7, 1004, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_848, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0849 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0850 */ { 1040, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_850, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0850 */ { 1042, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_850, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0851 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0852 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0853 */ { 1042, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_853, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0854 */ { 1044, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_854, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0855 */ { 1046, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_855, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0856 */ { 1048, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_856, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0857 */ { 1051, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_857, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0853 */ { 1044, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_853, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0854 */ { 1046, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_854, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0855 */ { 1048, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_855, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0856 */ { 1050, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_856, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0857 */ { 1053, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_857, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0858 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0859 */ { 1053, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_859, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0859 */ { 1055, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_859, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0860 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0861 */ { 1055, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_861, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0862 */ { 1056, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_862, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0863 */ { 1057, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_863, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0861 */ { 1057, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_861, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0862 */ { 1058, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_862, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0863 */ { 1059, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_863, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0864 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0865 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0866 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0867 */ { 1083, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_867, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0868 */ { 1085, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_868, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0869 */ { 1087, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_869, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0870 */ { 1089, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_870, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0871 */ { 1091, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_871, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0872 */ { 1093, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_872, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0873 */ { 1099, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_873, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0874 */ { 1101, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_874, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0867 */ { 1085, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_867, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0868 */ { 1087, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_868, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0869 */ { 1089, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_869, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0870 */ { 1091, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_870, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0871 */ { 1093, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_871, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0872 */ { 1095, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_872, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0873 */ { 1101, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_873, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0874 */ { 1103, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_874, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0875 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0876 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0877 */ { 1103, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_877, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0878 */ { 1105, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_878, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0877 */ { 1105, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_877, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0878 */ { 1107, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_878, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0879 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0880 */ { 1107, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_880, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0881 */ { 1109, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_881, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0882 */ { 1111, -1, 4.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_882, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0883 */ { 1113, -1, -4.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_883, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0884 */ { 1115, -1, 1.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_884, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0885 */ { 1117, -1, -1.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_885, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0880 */ { 1109, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_880, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0881 */ { 1111, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_881, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0882 */ { 1113, -1, 4.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_882, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0883 */ { 1115, -1, -4.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_883, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0884 */ { 1117, -1, 1.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_884, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0885 */ { 1119, -1, -1.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_885, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0886 */ { 110, 43, 0.00, 0.00, 5, 2, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_886, 0, NULL, 0, NULL, 0, NULL, hitbox_886 },
 /* Object 0887 */ { 112, 45, 0.00, 0.00, 5, 2, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_887, 0, NULL, 0, NULL, 0, NULL, hitbox_887 },
-/* Object 0888 */ { 1127, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_888, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0889 */ { 1129, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_889, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0890 */ { 1131, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_890, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0891 */ { 1132, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_891, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0888 */ { 1129, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_888, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0889 */ { 1131, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_889, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0890 */ { 1133, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_890, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0891 */ { 1134, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_891, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0892 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0893 */ { 1134, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_893, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0894 */ { 1136, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_894, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0895 */ { 1154, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_895, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0896 */ { 1156, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_896, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0893 */ { 1136, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_893, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0894 */ { 1138, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_894, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0895 */ { 1156, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_895, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0896 */ { 1158, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_896, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0897 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0898 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0899 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0900 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0901 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0902 */ { 346, -1, 0.00, 5.00, 1, -6, 3, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_902, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0903 */ { 853, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_903, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0904 */ { 855, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_904, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0905 */ { 857, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0903 */ { 855, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_903, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0904 */ { 857, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_904, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0905 */ { 859, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0906 */ { 225, -1, 0.00, 0.00, 3, 1, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0907 */ { 1186, -1, 0.00, 0.00, 3, -5, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0908 */ { 1187, -1, 0.00, 0.00, 3, -5, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0909 */ { 1188, -1, 0.00, 0.00, 3, -5, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0910 */ { 1189, -1, 0.00, 0.00, 3, -5, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0911 */ { 858, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0907 */ { 1188, -1, 0.00, 0.00, 3, -5, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0908 */ { 1189, -1, 0.00, 0.00, 3, -5, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0909 */ { 1190, -1, 0.00, 0.00, 3, -5, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0910 */ { 1191, -1, 0.00, 0.00, 3, -5, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0911 */ { 860, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0912 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0913 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0914 */ { -1, -1, 0.00, 0.00, 5, 1, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -5804,25 +5808,25 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 0917 */ { 339, -1, 0.00, 0.00, 3, -5, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0918 */ { 346, -1, 0.00, 5.00, 5, 2, 1010, 1011, COLOR_TYPE_BASE, 0, ANIMATION_MOVEMENT, 1.00, 5, children_918, 2, groups_918, 0, NULL, 0, NULL, hitbox_918 },
 /* Object 0919 */ { 346, -1, 0.00, 5.00, 5, 2, 1010, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_MOVEMENT, 1.00, 3, children_919, 3, groups_919, 0, NULL, 0, NULL, hitbox_919 },
-/* Object 0920 */ { 1482, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_920, 0, NULL, 9, swap_frames_920, 2, slot_frames_920, NULL },
-/* Object 0921 */ { 1505, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_921, 0, NULL, 9, swap_frames_921, 2, slot_frames_921, NULL },
+/* Object 0920 */ { 1484, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_920, 0, NULL, 9, swap_frames_920, 2, slot_frames_920, NULL },
+/* Object 0921 */ { 1507, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_921, 0, NULL, 9, swap_frames_921, 2, slot_frames_921, NULL },
 /* Object 0922 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0923 */ { 1446, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_923, 0, NULL, 9, swap_frames_923, 2, slot_frames_923, NULL },
-/* Object 0924 */ { 1464, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_924, 0, NULL, 9, swap_frames_924, 2, slot_frames_924, NULL },
+/* Object 0923 */ { 1448, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_923, 0, NULL, 9, swap_frames_923, 2, slot_frames_923, NULL },
+/* Object 0924 */ { 1466, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_924, 0, NULL, 9, swap_frames_924, 2, slot_frames_924, NULL },
 /* Object 0925 */ { 346, -1, 0.00, 5.00, 1, 2, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_925, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0926 */ { 346, -1, 0.00, 5.00, 1, 2, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_926, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0927 */ { 1160, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0928 */ { 1161, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_928, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0929 */ { 1162, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0930 */ { 1163, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0931 */ { 1167, -1, 0.00, -6.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_931, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0932 */ { 1164, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_932, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0933 */ { 1165, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0934 */ { 1166, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0935 */ { 1167, -1, 0.00, -6.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_935, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0936 */ { 1180, -1, 0.00, 0.00, 3, -5, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0937 */ { 1181, -1, 0.00, 0.00, 3, -5, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0938 */ { 1182, -1, 0.00, 0.00, 3, -5, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0927 */ { 1162, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0928 */ { 1163, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_928, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0929 */ { 1164, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0930 */ { 1165, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0931 */ { 1169, -1, 0.00, -6.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_931, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0932 */ { 1166, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_932, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0933 */ { 1167, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0934 */ { 1168, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0935 */ { 1169, -1, 0.00, -6.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_935, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0936 */ { 1182, -1, 0.00, 0.00, 3, -5, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0937 */ { 1183, -1, 0.00, 0.00, 3, -5, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0938 */ { 1184, -1, 0.00, 0.00, 3, -5, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0939 */ { 195, -1, 0.00, -4.00, 3, -5, 1, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_939, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0940 */ { 218, -1, 0.00, 0.00, 3, -5, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0941 */ { 219, -1, 0.00, 0.00, 3, -5, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -5836,32 +5840,32 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 0949 */ { 346, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_949, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0950 */ { 346, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_950, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0951 */ { 346, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_951, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0952 */ { 880, -1, 0.00, -4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_952, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0953 */ { 883, -1, 4.00, -4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_953, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0954 */ { 885, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_954, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0955 */ { 888, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0956 */ { 889, -1, 0.00, -4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_956, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0957 */ { 891, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_957, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0958 */ { 893, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_958, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0959 */ { 894, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_959, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0960 */ { 904, -1, 6.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_960, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0961 */ { 906, -1, 11.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_961, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0952 */ { 882, -1, 0.00, -4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_952, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0953 */ { 885, -1, 4.00, -4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_953, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0954 */ { 887, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_954, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0955 */ { 890, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0956 */ { 891, -1, 0.00, -4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_956, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0957 */ { 893, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_957, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0958 */ { 895, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_958, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0959 */ { 896, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_959, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0960 */ { 906, -1, 6.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_960, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0961 */ { 908, -1, 11.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_961, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0962 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0963 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0964 */ { 914, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_964, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0965 */ { 916, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_965, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0966 */ { 918, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0967 */ { 1246, -1, 0.00, -4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_967, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0968 */ { 1248, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_968, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0969 */ { 1250, -1, 6.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_969, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0970 */ { 1252, -1, 11.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_970, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0971 */ { 1254, -1, -1.00, 3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_971, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0972 */ { 1256, -1, 0.00, 2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_972, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0973 */ { 1258, -1, -2.00, 10.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0974 */ { 896, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_974, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0975 */ { 898, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_975, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0976 */ { 900, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0977 */ { 901, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0964 */ { 916, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_964, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0965 */ { 918, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_965, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0966 */ { 920, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0967 */ { 1248, -1, 0.00, -4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_967, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0968 */ { 1250, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_968, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0969 */ { 1252, -1, 6.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_969, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0970 */ { 1254, -1, 11.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_970, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0971 */ { 1256, -1, -1.00, 3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_971, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0972 */ { 1258, -1, 0.00, 2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_972, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0973 */ { 1260, -1, -2.00, 10.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0974 */ { 898, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_974, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0975 */ { 900, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_975, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0976 */ { 902, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0977 */ { 903, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0978 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0979 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0980 */ { 346, -1, 0.00, 5.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_980, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -5881,10 +5885,10 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 0994 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0995 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0996 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0997 */ { 1194, -1, -32.00, 32.00, 3, 9, 1005, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_997, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0998 */ { 1195, -1, -25.00, 25.00, 3, 9, 1005, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_998, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 0999 */ { 1196, -1, -19.00, 19.00, 3, 9, 1005, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_999, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1000 */ { 1197, -1, -13.00, 13.00, 3, 9, 1005, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1000, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0997 */ { 1196, -1, -32.00, 32.00, 3, 9, 1005, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_997, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0998 */ { 1197, -1, -25.00, 25.00, 3, 9, 1005, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_998, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 0999 */ { 1198, -1, -19.00, 19.00, 3, 9, 1005, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_999, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1000 */ { 1199, -1, -13.00, 13.00, 3, 9, 1005, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1000, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1001 */ { 254, -1, 0.00, 0.00, 3, 9, 1005, 1006, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1001, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1002 */ { 256, -1, 7.00, -7.00, 3, 9, 1005, 1006, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1002, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1003 */ { 258, -1, 0.00, -7.00, 3, 9, 1005, 1006, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1003, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -5898,15 +5902,15 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1011 */ { 212, -1, 0.00, -1.00, 1, 9, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1012 */ { 213, -1, 0.00, 0.00, 1, 9, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1013 */ { 214, -1, 0.00, 0.00, 1, 9, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1014 */ { 1173, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1015 */ { 1174, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1016 */ { 1175, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1017 */ { 1176, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1018 */ { 1177, -1, 0.00, 7.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1019 */ { 1183, -1, 0.00, 37.00, 3, 9, 1005, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1019, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1020 */ { 1184, -1, 0.00, 31.00, 3, 9, 1005, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1020, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1021 */ { 1185, -1, 0.00, 25.00, 3, 9, 1005, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1021, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1022 */ { 1198, -1, 0.00, 0.00, 3, 12, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1022 },
+/* Object 1014 */ { 1175, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1015 */ { 1176, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1016 */ { 1177, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1017 */ { 1178, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1018 */ { 1179, -1, 0.00, 7.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1019 */ { 1185, -1, 0.00, 37.00, 3, 9, 1005, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1019, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1020 */ { 1186, -1, 0.00, 31.00, 3, 9, 1005, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1020, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1021 */ { 1187, -1, 0.00, 25.00, 3, 9, 1005, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1021, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1022 */ { 1200, -1, 0.00, 0.00, 3, 12, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1022 },
 /* Object 1023 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1024 */ { 346, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1024, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1025 */ { 346, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1025, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -5917,36 +5921,36 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1030 */ { 346, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1030, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1031 */ { 346, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1031, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1032 */ { 346, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1032, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1033 */ { 865, -1, 6.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1033, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1034 */ { 867, -1, 11.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1034, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1035 */ { 876, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1035, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1036 */ { 878, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1036, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1037 */ { 908, -1, 6.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1037, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1038 */ { 910, -1, 11.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1038, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1039 */ { 919, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1039, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1040 */ { 921, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1040, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1041 */ { 869, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1042 */ { 870, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1043 */ { 912, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1044 */ { 913, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1045 */ { 859, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1046 */ { 860, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1047 */ { 902, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1048 */ { 903, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1033 */ { 867, -1, 6.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1033, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1034 */ { 869, -1, 11.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1034, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1035 */ { 878, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1035, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1036 */ { 880, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1036, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1037 */ { 910, -1, 6.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1037, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1038 */ { 912, -1, 11.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1038, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1039 */ { 921, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1039, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1040 */ { 923, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1040, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1041 */ { 871, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1042 */ { 872, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1043 */ { 914, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1044 */ { 915, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1045 */ { 861, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1046 */ { 862, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1047 */ { 904, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1048 */ { 905, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1049 */ { -1, -1, 0.00, 10.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1050 */ { 1555, -1, 0.00, 0.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_FRAME_SWAP, 1.00, 0, NULL, 0, NULL, 10, swap_frames_1050, 1, slot_frames_1050, NULL },
-/* Object 1051 */ { 1561, -1, 0.00, 0.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_FRAME_SWAP, 1.00, 0, NULL, 0, NULL, 10, swap_frames_1051, 1, slot_frames_1051, NULL },
-/* Object 1052 */ { 1567, -1, 0.00, 0.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_FRAME_SWAP, 1.00, 0, NULL, 0, NULL, 10, swap_frames_1052, 1, slot_frames_1052, NULL },
-/* Object 1053 */ { 1529, -1, 0.00, 0.00, 3, 9, 1, 1010, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1053, 0, NULL, 6, swap_frames_1053, 2, slot_frames_1053, NULL },
-/* Object 1054 */ { 1541, -1, 0.00, 0.00, 3, 9, 1, 1010, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1054, 0, NULL, 7, swap_frames_1054, 2, slot_frames_1054, NULL },
-/* Object 1055 */ { 1190, -1, -11.00, 11.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1055, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1056 */ { 1190, -1, -11.00, 11.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1056, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1057 */ { 1190, -1, -11.00, 11.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1057, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1050 */ { 1557, -1, 0.00, 0.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_FRAME_SWAP, 1.00, 0, NULL, 0, NULL, 10, swap_frames_1050, 1, slot_frames_1050, NULL },
+/* Object 1051 */ { 1563, -1, 0.00, 0.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_FRAME_SWAP, 1.00, 0, NULL, 0, NULL, 10, swap_frames_1051, 1, slot_frames_1051, NULL },
+/* Object 1052 */ { 1569, -1, 0.00, 0.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_FRAME_SWAP, 1.00, 0, NULL, 0, NULL, 10, swap_frames_1052, 1, slot_frames_1052, NULL },
+/* Object 1053 */ { 1531, -1, 0.00, 0.00, 3, 9, 1, 1010, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1053, 0, NULL, 6, swap_frames_1053, 2, slot_frames_1053, NULL },
+/* Object 1054 */ { 1543, -1, 0.00, 0.00, 3, 9, 1, 1010, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 1, children_1054, 0, NULL, 7, swap_frames_1054, 2, slot_frames_1054, NULL },
+/* Object 1055 */ { 1192, -1, -11.00, 11.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1055, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1056 */ { 1192, -1, -11.00, 11.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1056, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1057 */ { 1192, -1, -11.00, 11.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1057, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1058 */ { 310, -1, -1.00, 2.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1059 */ { 311, -1, 1.00, 1.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1060 */ { 312, -1, 0.00, 0.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1061 */ { 313, -1, 0.00, 0.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1062 */ { 1119, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1062, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1062 */ { 1121, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1062, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1063 */ { 346, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1063, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1064 */ { 346, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1064, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1065 */ { 346, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1065, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -5962,56 +5966,56 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1075 */ { 61, -1, 0.00, 8.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1075, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1076 */ { 59, -1, -8.00, 8.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1076, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1077 */ { 59, -1, -8.00, 8.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1077, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1078 */ { 977, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_1078, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1079 */ { 1259, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_1079, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1080 */ { 1260, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_1080, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1081 */ { 1261, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_1081, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1082 */ { 976, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1082, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1083 */ { 978, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1083, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1084 */ { 979, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1084, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1085 */ { 980, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1085, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1086 */ { 981, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1086, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1087 */ { 982, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1087, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1088 */ { 984, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1088, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1089 */ { 986, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1089, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1090 */ { 988, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1091 */ { 1011, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1091, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1092 */ { 1013, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1092, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1093 */ { 1015, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1093, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1094 */ { 1017, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1094, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1095 */ { 977, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1095, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1096 */ { 1259, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1096, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1097 */ { 1260, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1097, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1098 */ { 1261, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1098, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1099 */ { 989, -1, 0.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1100 */ { 990, -1, 0.00, -1.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1101 */ { 991, -1, 1.00, -1.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1102 */ { 992, -1, 0.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1103 */ { 993, -1, 0.00, -1.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1104 */ { 994, -1, 0.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1105 */ { 995, -1, 0.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1106 */ { 996, -1, -7.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1107 */ { 997, -1, 4.00, -3.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1078 */ { 979, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_1078, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1079 */ { 1261, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_1079, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1080 */ { 1262, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_1080, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1081 */ { 1263, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 2, children_1081, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1082 */ { 978, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1082, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1083 */ { 980, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1083, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1084 */ { 981, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1084, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1085 */ { 982, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1085, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1086 */ { 983, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1086, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1087 */ { 984, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1087, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1088 */ { 986, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1088, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1089 */ { 988, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1089, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1090 */ { 990, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1091 */ { 1013, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1091, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1092 */ { 1015, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1092, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1093 */ { 1017, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1093, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1094 */ { 1019, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1094, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1095 */ { 979, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1095, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1096 */ { 1261, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1096, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1097 */ { 1262, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1097, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1098 */ { 1263, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1098, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1099 */ { 991, -1, 0.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1100 */ { 992, -1, 0.00, -1.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1101 */ { 993, -1, 1.00, -1.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1102 */ { 994, -1, 0.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1103 */ { 995, -1, 0.00, -1.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1104 */ { 996, -1, 0.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1105 */ { 997, -1, 0.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1106 */ { 998, -1, -7.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1107 */ { 999, -1, 4.00, -3.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1108 */ { 346, -1, 0.00, 5.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1108, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1109 */ { 989, -1, 0.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1110 */ { 1000, -1, 0.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1111 */ { 1001, -1, 0.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1112 */ { 1033, -1, 3.00, -3.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1113 */ { 1034, -1, 0.00, 3.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1114 */ { 1035, -1, 0.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1115 */ { 1036, -1, 0.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1116 */ { 1037, -1, 0.00, -3.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1117 */ { 1038, -1, 0.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1118 */ { 1039, -1, 0.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1109 */ { 991, -1, 0.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1110 */ { 1002, -1, 0.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1111 */ { 1003, -1, 0.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1112 */ { 1035, -1, 3.00, -3.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1113 */ { 1036, -1, 0.00, 3.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1114 */ { 1037, -1, 0.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1115 */ { 1038, -1, 0.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1116 */ { 1039, -1, 0.00, -3.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1117 */ { 1040, -1, 0.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1118 */ { 1041, -1, 0.00, 0.00, 1, -8, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1119 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1120 */ { 1059, -1, 0.00, 0.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1120 */ { 1061, -1, 0.00, 0.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1121 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1122 */ { 1082, -1, 0.00, 0.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1123 */ { 1072, -1, 0.00, 9.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1123, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1124 */ { 1073, -1, 2.00, -2.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1125 */ { 1074, -1, 0.00, -2.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1126 */ { 1077, -1, -11.00, 11.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1126, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1127 */ { 1077, -1, -11.00, 11.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1127, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1122 */ { 1084, -1, 0.00, 0.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1123 */ { 1074, -1, 0.00, 9.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1123, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1124 */ { 1075, -1, 2.00, -2.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1125 */ { 1076, -1, 0.00, -2.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1126 */ { 1079, -1, -11.00, 11.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1126, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1127 */ { 1079, -1, -11.00, 11.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1127, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1128 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1129 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1130 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -6022,8 +6026,8 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1135 */ { 346, -1, 0.00, 5.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1135, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1136 */ { 346, -1, 0.00, 5.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1136, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1137 */ { 346, -1, 0.00, 5.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1137, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1138 */ { 1070, -1, 0.00, 0.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1139 */ { 1071, -1, 0.00, 0.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1138 */ { 1072, -1, 0.00, 0.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1139 */ { 1073, -1, 0.00, 0.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1140 */ { 677, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1141 */ { 678, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1142 */ { 679, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -6043,49 +6047,49 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1156 */ { 643, 131, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1156 },
 /* Object 1157 */ { 644, 132, -6.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1157, 0, NULL, 0, NULL, 0, NULL, hitbox_1157 },
 /* Object 1158 */ { 645, 35, -6.00, 6.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1159 */ { 1121, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1159, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1160 */ { 1123, -1, 1.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1160, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1161 */ { 1125, -1, -1.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1161, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1162 */ { 934, -1, 0.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1162, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1163 */ { 935, -1, 3.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1163, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1164 */ { 936, -1, 0.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1164, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1165 */ { 937, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1165, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1166 */ { 938, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1166, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1167 */ { 939, -1, 3.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1167, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1168 */ { 940, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1168, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1169 */ { 941, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1169, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1170 */ { 942, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1170, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1171 */ { 943, -1, -3.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1171, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1172 */ { 944, -1, -3.00, 3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1172, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1173 */ { 945, -1, 3.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1173, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1174 */ { 946, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1174, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1175 */ { 947, -1, 0.00, 3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1175, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1176 */ { 948, -1, 3.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1176, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1177 */ { 949, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1177, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1178 */ { 950, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1178, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1179 */ { 951, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1179, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1180 */ { 952, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1180, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1181 */ { 953, -1, 0.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1181, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1182 */ { 954, -1, 0.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1182, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1183 */ { 955, -1, 3.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1183, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1184 */ { 956, -1, 3.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1184, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1185 */ { 957, -1, 0.00, 3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1185, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1186 */ { 958, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1187 */ { 966, -1, 3.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1187, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1188 */ { 968, -1, 7.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1188, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1189 */ { 970, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1189, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1190 */ { 972, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1190, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1191 */ { 960, -1, 0.00, 11.00, 5, 10, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1192 */ { 961, -1, 0.00, 0.00, 5, 10, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1193 */ { 962, -1, 0.00, 0.00, 5, 10, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1194 */ { 963, -1, -11.00, 11.00, 5, 10, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1195 */ { 964, -1, 0.00, 0.00, 5, 10, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1196 */ { 965, -1, 0.00, 0.00, 5, 10, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1197 */ { 960, -1, 0.00, 11.00, 5, 10, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1197, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1198 */ { 967, -1, 0.00, 0.00, 5, 10, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1199 */ { 969, -1, 0.00, 0.00, 5, 10, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1200 */ { 971, -1, -11.00, 11.00, 5, 10, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1201 */ { 973, -1, -7.00, 11.00, 5, 10, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1159 */ { 1123, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1159, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1160 */ { 1125, -1, 1.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1160, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1161 */ { 1127, -1, -1.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1161, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1162 */ { 936, -1, 0.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1162, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1163 */ { 937, -1, 3.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1163, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1164 */ { 938, -1, 0.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1164, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1165 */ { 939, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1165, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1166 */ { 940, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1166, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1167 */ { 941, -1, 3.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1167, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1168 */ { 942, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1168, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1169 */ { 943, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1169, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1170 */ { 944, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1170, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1171 */ { 945, -1, -3.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1171, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1172 */ { 946, -1, -3.00, 3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1172, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1173 */ { 947, -1, 3.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1173, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1174 */ { 948, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1174, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1175 */ { 949, -1, 0.00, 3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1175, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1176 */ { 950, -1, 3.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1176, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1177 */ { 951, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1177, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1178 */ { 952, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1178, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1179 */ { 953, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1179, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1180 */ { 954, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1180, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1181 */ { 955, -1, 0.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1181, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1182 */ { 956, -1, 0.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1182, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1183 */ { 957, -1, 3.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1183, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1184 */ { 958, -1, 3.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1184, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1185 */ { 959, -1, 0.00, 3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1185, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1186 */ { 960, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1187 */ { 968, -1, 3.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1187, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1188 */ { 970, -1, 7.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1188, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1189 */ { 972, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1189, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1190 */ { 974, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1190, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1191 */ { 962, -1, 0.00, 11.00, 5, 10, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1192 */ { 963, -1, 0.00, 0.00, 5, 10, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1193 */ { 964, -1, 0.00, 0.00, 5, 10, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1194 */ { 965, -1, -11.00, 11.00, 5, 10, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1195 */ { 966, -1, 0.00, 0.00, 5, 10, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1196 */ { 967, -1, 0.00, 0.00, 5, 10, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1197 */ { 962, -1, 0.00, 11.00, 5, 10, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1197, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1198 */ { 969, -1, 0.00, 0.00, 5, 10, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1199 */ { 971, -1, 0.00, 0.00, 5, 10, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1200 */ { 973, -1, -11.00, 11.00, 5, 10, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1201 */ { 975, -1, -7.00, 11.00, 5, 10, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1202 */ { 81, 12, 0.00, 0.00, 5, 3, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1202 },
 /* Object 1203 */ { 82, 13, 0.00, 13.00, 5, 3, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1203, 0, NULL, 0, NULL, 0, NULL, hitbox_1203 },
 /* Object 1204 */ { 83, 14, 0.00, 13.00, 5, 3, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1204, 0, NULL, 0, NULL, 0, NULL, hitbox_1204 },
@@ -6113,45 +6117,45 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1226 */ { 95, 27, 0.00, 13.00, 5, 3, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1226, 0, NULL, 0, NULL, 0, NULL, hitbox_1226 },
 /* Object 1227 */ { 91, -1, 0.00, 12.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1227, 0, NULL, 0, NULL, 0, NULL, hitbox_1227 },
 /* Object 1228 */ { 331, -1, 0.00, 0.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1229 */ { 1167, -1, 0.00, -6.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1229, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1230 */ { 1167, -1, 0.00, -6.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1230, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1231 */ { 1167, -1, 0.00, -6.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1231, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1232 */ { 1168, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1232, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1233 */ { 1168, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1233, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1234 */ { 1168, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1234, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1235 */ { 1168, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1235, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1236 */ { 1168, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1236, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1237 */ { 1168, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1237, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1238 */ { 1167, -1, 0.00, -6.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1238, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1239 */ { 1161, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1239, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1240 */ { 1164, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1240, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1241 */ { 1060, -1, 0.00, 0.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1242 */ { 1061, -1, 0.00, 0.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1243 */ { 1062, -1, 2.00, -2.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1244 */ { 1065, -1, 0.00, -2.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1245 */ { 1067, -1, 0.00, 2.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1246 */ { 1069, -1, -4.00, 4.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1246, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1247 */ { 1140, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1247, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1248 */ { 1140, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1248, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1249 */ { 1140, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1249, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1250 */ { 1140, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1250, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1251 */ { 1138, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1251, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1252 */ { 1139, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1252, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1253 */ { 1140, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1253, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1254 */ { 1140, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1254, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1255 */ { 1140, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1255, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1256 */ { 1158, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1256, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1257 */ { 1159, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1257, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1258 */ { 1158, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1258, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1259 */ { 1159, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1259, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1229 */ { 1169, -1, 0.00, -6.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1229, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1230 */ { 1169, -1, 0.00, -6.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1230, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1231 */ { 1169, -1, 0.00, -6.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1231, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1232 */ { 1170, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1232, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1233 */ { 1170, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1233, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1234 */ { 1170, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1234, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1235 */ { 1170, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1235, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1236 */ { 1170, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1236, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1237 */ { 1170, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1237, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1238 */ { 1169, -1, 0.00, -6.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1238, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1239 */ { 1163, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1239, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1240 */ { 1166, -1, 0.00, 0.00, 1, -7, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1240, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1241 */ { 1062, -1, 0.00, 0.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1242 */ { 1063, -1, 0.00, 0.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1243 */ { 1064, -1, 2.00, -2.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1244 */ { 1067, -1, 0.00, -2.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1245 */ { 1069, -1, 0.00, 2.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1246 */ { 1071, -1, -4.00, 4.00, 5, 4, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1246, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1247 */ { 1142, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1247, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1248 */ { 1142, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1248, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1249 */ { 1142, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1249, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1250 */ { 1142, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1250, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1251 */ { 1140, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1251, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1252 */ { 1141, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1252, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1253 */ { 1142, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1253, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1254 */ { 1142, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1254, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1255 */ { 1142, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1255, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1256 */ { 1160, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1256, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1257 */ { 1161, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1257, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1258 */ { 1160, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1258, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1259 */ { 1161, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1259, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1260 */ { 98, 30, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1260 },
 /* Object 1261 */ { 78, 9, -15.00, 15.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1262 */ { 81, 12, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1262 },
 /* Object 1263 */ { 79, 10, -16.00, 16.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1264 */ { 89, 20, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1264 },
 /* Object 1265 */ { 80, 11, -17.00, 17.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1266 */ { 1095, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1266, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1267 */ { 1097, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1267, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1266 */ { 1097, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1266, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1267 */ { 1099, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1267, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1268 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1269 */ { 215, -1, 5.00, 0.00, 1, 9, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1270 */ { 216, -1, 9.00, 0.00, 1, 9, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -6159,127 +6163,127 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1272 */ { 210, -1, 3.00, 0.00, 1, 9, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1273 */ { 204, -1, 3.00, 0.00, 1, 9, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1274 */ { 205, -1, 6.00, 0.00, 1, 9, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1275 */ { 1573, -1, 0.00, 0.00, 5, 9, 1, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1275, 0, NULL, 0, NULL, 0, NULL, hitbox_1275 },
-/* Object 1276 */ { 1436, -1, 0.00, 0.00, 5, 9, 1, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1277 */ { 1140, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1277, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1278 */ { 1140, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1278, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1279 */ { 1140, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1279, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1280 */ { 1140, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1280, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1281 */ { 1140, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1281, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1282 */ { 1140, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1282, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1283 */ { 1140, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1283, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1284 */ { 1140, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1284, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1285 */ { 1140, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1285, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1286 */ { 1140, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1286, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1287 */ { 1140, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1287, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1288 */ { 1140, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1288, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1289 */ { 1140, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1289, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1290 */ { 1140, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1290, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1275 */ { 1575, -1, 0.00, 0.00, 5, 9, 1, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1275, 0, NULL, 0, NULL, 0, NULL, hitbox_1275 },
+/* Object 1276 */ { 1438, -1, 0.00, 0.00, 5, 9, 1, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1277 */ { 1142, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1277, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1278 */ { 1142, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1278, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1279 */ { 1142, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1279, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1280 */ { 1142, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1280, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1281 */ { 1142, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1281, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1282 */ { 1142, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1282, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1283 */ { 1142, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1283, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1284 */ { 1142, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1284, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1285 */ { 1142, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1285, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1286 */ { 1142, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1286, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1287 */ { 1142, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1287, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1288 */ { 1142, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1288, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1289 */ { 1142, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1289, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1290 */ { 1142, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1290, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1291 */ { 206, -1, 0.00, 0.00, 1, 9, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1292 */ { 211, -1, 0.00, 0.00, 1, 9, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1293 */ { 217, -1, 0.00, -1.00, 1, 9, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1294 */ { 839, -1, 4.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1294, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1295 */ { 844, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1295, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1296 */ { 882, -1, 4.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1296, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1297 */ { 887, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1297, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1294 */ { 841, -1, 4.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1294, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1295 */ { 846, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1295, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1296 */ { 884, -1, 4.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1296, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1297 */ { 889, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1297, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1298 */ { 59, -1, -8.00, 8.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1298, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1299 */ { 923, -1, 0.00, 2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1299, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1300 */ { 924, -1, 3.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1300, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1301 */ { 925, -1, -6.00, 6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1301, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1302 */ { 927, -1, 0.00, 4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1302, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1303 */ { 928, -1, 0.00, 4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1303, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1304 */ { 926, -1, 0.00, -4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1304, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1305 */ { 929, -1, 6.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1305, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1306 */ { 930, -1, 10.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1306, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1307 */ { 931, -1, -5.00, 6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1307, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1308 */ { 932, -1, 0.00, 6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1308, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1309 */ { 933, -1, -11.00, 13.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1310 */ { 923, -1, 0.00, 2.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1311 */ { 924, -1, 3.00, -3.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1312 */ { 925, -1, -6.00, 6.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1313 */ { 927, -1, 0.00, 4.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1314 */ { 928, -1, 0.00, 4.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1315 */ { 926, -1, 0.00, -4.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1316 */ { 929, -1, 6.00, -6.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1317 */ { 930, -1, 10.00, -6.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1318 */ { 931, -1, -5.00, 6.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1319 */ { 932, -1, 0.00, 6.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1320 */ { 933, -1, -11.00, 13.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1299 */ { 925, -1, 0.00, 2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1299, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1300 */ { 926, -1, 3.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1300, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1301 */ { 927, -1, -6.00, 6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1301, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1302 */ { 929, -1, 0.00, 4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1302, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1303 */ { 930, -1, 0.00, 4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1303, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1304 */ { 928, -1, 0.00, -4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1304, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1305 */ { 931, -1, 6.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1305, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1306 */ { 932, -1, 10.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1306, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1307 */ { 933, -1, -5.00, 6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1307, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1308 */ { 934, -1, 0.00, 6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1308, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1309 */ { 935, -1, -11.00, 13.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1310 */ { 925, -1, 0.00, 2.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1311 */ { 926, -1, 3.00, -3.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1312 */ { 927, -1, -6.00, 6.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1313 */ { 929, -1, 0.00, 4.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1314 */ { 930, -1, 0.00, 4.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1315 */ { 928, -1, 0.00, -4.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1316 */ { 931, -1, 6.00, -6.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1317 */ { 932, -1, 10.00, -6.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1318 */ { 933, -1, -5.00, 6.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1319 */ { 934, -1, 0.00, 6.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1320 */ { 935, -1, -11.00, 13.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1321 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1322 */ { 959, -1, 3.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1322, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1322 */ { 961, -1, 3.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1322, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1323 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1324 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1325 */ { 974, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1325, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1326 */ { 975, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1326, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1325 */ { 976, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1325, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1326 */ { 977, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1326, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1327 */ { 346, -1, 0.00, 5.00, 5, 2, 1010, 1011, COLOR_TYPE_BASE, 0, ANIMATION_MOVEMENT, 1.00, 3, children_1327, 2, groups_1327, 0, NULL, 0, NULL, hitbox_1327 },
 /* Object 1328 */ { 346, -1, 0.00, 5.00, 5, 2, 1010, 1011, COLOR_TYPE_BASE, 0, ANIMATION_MOVEMENT, 1.00, 3, children_1328, 2, groups_1328, 0, NULL, 0, NULL, hitbox_1328 },
-/* Object 1329 */ { 825, -1, 0.00, 0.00, 5, 9, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1329 },
-/* Object 1330 */ { 1920, -1, 0.00, 0.00, 3, 12, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1330 },
-/* Object 1331 */ { 2070, -1, 5.00, 0.00, 5, 10, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1331 },
-/* Object 1332 */ { 1870, -1, 0.00, 0.00, 3, 12, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1332 },
-/* Object 1333 */ { 2072, -1, 0.00, 0.00, 3, 12, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1333 },
+/* Object 1329 */ { 827, -1, 0.00, 0.00, 5, 9, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1329 },
+/* Object 1330 */ { 1922, -1, 0.00, 0.00, 3, 12, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1330 },
+/* Object 1331 */ { 821, -1, 5.00, 0.00, 5, 10, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 1, children_1331, 0, NULL, 0, NULL, 0, NULL, hitbox_1331 },
+/* Object 1332 */ { 1872, -1, 0.00, 0.00, 3, 12, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1332 },
+/* Object 1333 */ { 2073, -1, 0.00, 0.00, 3, 12, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1333 },
 /* Object 1334 */ { 772, -1, 0.00, 0.00, 1, -6, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1334 },
 /* Object 1335 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1336 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1337 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1338 */ { 110, -1, 0.00, 0.00, 5, 3, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1338 },
 /* Object 1339 */ { 112, -1, 0.00, 0.00, 5, 3, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1339 },
-/* Object 1340 */ { 1967, -1, -1.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1340 },
+/* Object 1340 */ { 1969, -1, -1.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1340 },
 /* Object 1341 */ { 110, -1, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1341, 0, NULL, 0, NULL, 0, NULL, hitbox_1341 },
 /* Object 1342 */ { 112, -1, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1342, 0, NULL, 0, NULL, 0, NULL, hitbox_1342 },
-/* Object 1343 */ { 1968, -1, -2.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1343 },
+/* Object 1343 */ { 1970, -1, -2.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1343 },
 /* Object 1344 */ { 110, -1, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1344, 0, NULL, 0, NULL, 0, NULL, hitbox_1344 },
 /* Object 1345 */ { 112, -1, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1345, 0, NULL, 0, NULL, 0, NULL, hitbox_1345 },
 /* Object 1346 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1347 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1348 */ { 1582, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1348, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1349 */ { 1584, -1, 1.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1349, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1350 */ { 1586, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1350, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1351 */ { 1588, -1, -1.00, 1.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1351, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1352 */ { 1633, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1352, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1353 */ { 1635, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1353, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1354 */ { 1637, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1354, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1355 */ { 1639, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1355, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1356 */ { 1592, -1, 0.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1356, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1357 */ { 1594, -1, -1.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1357, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1358 */ { 1596, -1, -1.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1358, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1359 */ { 1598, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1359, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1360 */ { 1600, -1, 0.00, -1.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1360, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1361 */ { 1602, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1361, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1362 */ { 1604, -1, 1.00, 1.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1362, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1363 */ { 1606, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1363, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1364 */ { 1608, -1, -1.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1364, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1365 */ { 1610, -1, 0.00, 1.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1365, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1366 */ { 1612, -1, -1.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1367 */ { 1613, -1, 0.00, -3.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1368 */ { 1614, -1, 0.00, -2.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1369 */ { 1615, -1, 0.00, -2.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1370 */ { 1616, -1, -1.00, -2.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1371 */ { 1617, -1, 0.00, -2.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1372 */ { 1618, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1373 */ { 1619, -1, 1.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1374 */ { 1620, -1, 0.00, 1.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1375 */ { 1621, -1, 0.00, -1.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1376 */ { 1622, -1, 0.00, -1.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1377 */ { 1623, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1378 */ { 1624, -1, 0.00, -1.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1379 */ { 1625, -1, -12.00, 2.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1380 */ { 1626, -1, -8.00, 2.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1381 */ { 1627, -1, 7.00, -2.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1382 */ { 1628, -1, 8.00, -3.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1383 */ { 1629, -1, -2.00, 10.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1384 */ { 1630, -1, -1.00, 4.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1385 */ { 1631, -1, 1.00, -10.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1386 */ { 1632, -1, 1.00, -10.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1387 */ { 1641, -1, -1.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1387, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1388 */ { 1643, -1, 3.00, 2.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1388, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1389 */ { 1645, -1, -2.00, -5.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1389, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1390 */ { 1647, -1, 1.00, -2.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1390, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1391 */ { 1649, -1, -3.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1391, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1392 */ { 1651, -1, 0.00, 3.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1392, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1393 */ { 1653, -1, 3.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1393, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1394 */ { 1655, -1, 0.00, -5.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1394, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1395 */ { 1590, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1395, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1348 */ { 1584, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1348, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1349 */ { 1586, -1, 1.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1349, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1350 */ { 1588, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1350, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1351 */ { 1590, -1, -1.00, 1.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1351, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1352 */ { 1635, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1352, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1353 */ { 1637, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1353, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1354 */ { 1639, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1354, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1355 */ { 1641, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1355, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1356 */ { 1594, -1, 0.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1356, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1357 */ { 1596, -1, -1.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1357, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1358 */ { 1598, -1, -1.00, -3.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1358, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1359 */ { 1600, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1359, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1360 */ { 1602, -1, 0.00, -1.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1360, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1361 */ { 1604, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1361, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1362 */ { 1606, -1, 1.00, 1.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1362, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1363 */ { 1608, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1363, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1364 */ { 1610, -1, -1.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1364, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1365 */ { 1612, -1, 0.00, 1.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1365, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1366 */ { 1614, -1, -1.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1367 */ { 1615, -1, 0.00, -3.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1368 */ { 1616, -1, 0.00, -2.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1369 */ { 1617, -1, 0.00, -2.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1370 */ { 1618, -1, -1.00, -2.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1371 */ { 1619, -1, 0.00, -2.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1372 */ { 1620, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1373 */ { 1621, -1, 1.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1374 */ { 1622, -1, 0.00, 1.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1375 */ { 1623, -1, 0.00, -1.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1376 */ { 1624, -1, 0.00, -1.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1377 */ { 1625, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1378 */ { 1626, -1, 0.00, -1.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1379 */ { 1627, -1, -12.00, 2.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1380 */ { 1628, -1, -8.00, 2.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1381 */ { 1629, -1, 7.00, -2.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1382 */ { 1630, -1, 8.00, -3.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1383 */ { 1631, -1, -2.00, 10.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1384 */ { 1632, -1, -1.00, 4.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1385 */ { 1633, -1, 1.00, -10.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1386 */ { 1634, -1, 1.00, -10.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1387 */ { 1643, -1, -1.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1387, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1388 */ { 1645, -1, 3.00, 2.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1388, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1389 */ { 1647, -1, -2.00, -5.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1389, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1390 */ { 1649, -1, 1.00, -2.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1390, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1391 */ { 1651, -1, -3.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1391, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1392 */ { 1653, -1, 0.00, 3.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1392, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1393 */ { 1655, -1, 3.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1393, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1394 */ { 1657, -1, 0.00, -5.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1394, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1395 */ { 1592, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1395, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1396 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1397 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1398 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -6315,49 +6319,49 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1428 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1429 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1430 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1431 */ { 1661, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1431, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1432 */ { 1663, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1432, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1433 */ { 1665, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1433, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1434 */ { 1667, -1, 4.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1434, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1435 */ { 1669, -1, 0.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1435, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1436 */ { 1671, -1, -6.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1436, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1437 */ { 1673, -1, 0.00, 4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1437, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1438 */ { 1675, -1, 9.00, -9.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1438, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1439 */ { 1677, -1, -9.00, -9.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1439, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1440 */ { 1679, -1, 9.00, 9.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1440, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1441 */ { 1681, -1, -9.00, 9.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1442 */ { 1696, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1442, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1443 */ { 1698, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1443, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1444 */ { 1700, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1444, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1445 */ { 1702, -1, 6.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1445, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1446 */ { 1704, -1, 0.00, -8.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1446, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1447 */ { 1706, -1, -8.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1447, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1448 */ { 1708, -1, 0.00, 3.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1448, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1449 */ { 1710, -1, 7.00, -8.00, 1, -9, 2, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1450 */ { 1711, -1, -8.00, -8.00, 1, -9, 2, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1451 */ { 1712, -1, 7.00, 7.00, 1, -9, 2, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1452 */ { 1713, -1, -8.00, 7.00, 1, -9, 2, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1453 */ { 1688, -1, -2.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1454 */ { 1689, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1455 */ { 1690, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1456 */ { 1691, -1, 0.00, -2.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1457 */ { 1692, -1, 6.00, -8.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1458 */ { 1693, -1, -7.00, -8.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1459 */ { 1694, -1, 6.00, 6.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1460 */ { 1695, -1, -7.00, 6.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1461 */ { 1720, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1461, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1462 */ { 1722, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1462, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1463 */ { 1724, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1463, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1464 */ { 1726, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1464, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1431 */ { 1663, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1431, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1432 */ { 1665, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1432, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1433 */ { 1667, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1433, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1434 */ { 1669, -1, 4.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1434, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1435 */ { 1671, -1, 0.00, -6.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1435, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1436 */ { 1673, -1, -6.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1436, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1437 */ { 1675, -1, 0.00, 4.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1437, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1438 */ { 1677, -1, 9.00, -9.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1438, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1439 */ { 1679, -1, -9.00, -9.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1439, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1440 */ { 1681, -1, 9.00, 9.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1440, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1441 */ { 1683, -1, -9.00, 9.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1442 */ { 1698, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1442, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1443 */ { 1700, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1443, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1444 */ { 1702, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1444, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1445 */ { 1704, -1, 6.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1445, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1446 */ { 1706, -1, 0.00, -8.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1446, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1447 */ { 1708, -1, -8.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1447, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1448 */ { 1710, -1, 0.00, 3.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1448, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1449 */ { 1712, -1, 7.00, -8.00, 1, -9, 2, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1450 */ { 1713, -1, -8.00, -8.00, 1, -9, 2, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1451 */ { 1714, -1, 7.00, 7.00, 1, -9, 2, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1452 */ { 1715, -1, -8.00, 7.00, 1, -9, 2, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1453 */ { 1690, -1, -2.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1454 */ { 1691, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1455 */ { 1692, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1456 */ { 1693, -1, 0.00, -2.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1457 */ { 1694, -1, 6.00, -8.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1458 */ { 1695, -1, -7.00, -8.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1459 */ { 1696, -1, 6.00, 6.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1460 */ { 1697, -1, -7.00, 6.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1461 */ { 1722, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1461, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1462 */ { 1724, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1462, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1463 */ { 1726, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1463, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1464 */ { 1728, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1464, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1465 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1466 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1467 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1468 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1469 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1470 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1471 */ { 1728, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1471, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1472 */ { 1730, -1, 0.00, 1.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1472, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1473 */ { 1732, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1473, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1471 */ { 1730, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1471, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1472 */ { 1732, -1, 0.00, 1.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1472, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1473 */ { 1734, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1473, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1474 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1475 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1476 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -6380,7 +6384,7 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1493 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1494 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1495 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1496 */ { 1734, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1496, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1496 */ { 1736, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1496, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1497 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1498 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1499 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -6391,30 +6395,30 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1504 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1505 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1506 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1507 */ { 1736, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1507, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1507 */ { 1738, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1507, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1508 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1509 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1510 */ { 1682, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1510, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1511 */ { 1684, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1511, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1512 */ { 1686, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1512, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1513 */ { 1714, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1513, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1514 */ { 1716, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1514, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1515 */ { 1718, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1515, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1510 */ { 1684, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1510, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1511 */ { 1686, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1511, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1512 */ { 1688, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1512, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1513 */ { 1716, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1513, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1514 */ { 1718, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1514, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1515 */ { 1720, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1515, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1516 */ { 346, -1, 0.00, 5.00, 3, 9, 1, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1516, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1517 */ { 2092, -1, 0.00, 0.00, 3, 9, 1, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1517, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1518 */ { 2080, -1, 0.00, 0.00, 5, 2, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1518, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1517 */ { 2093, -1, 0.00, 0.00, 3, 9, 1, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1517, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1518 */ { 2081, -1, 0.00, 0.00, 5, 2, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1518, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1519 */ { 704, -1, 0.00, 0.00, 5, 2, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1520 */ { -1, -1, 0.00, 1.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1521 */ { 1884, -1, 0.00, 28.00, 3, 9, 1005, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1522 */ { 1885, -1, 0.00, 22.00, 3, 9, 1006, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1523 */ { 1886, -1, 0.00, 16.00, 3, 9, 1005, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1524 */ { 1887, -1, 0.00, 10.00, 3, 9, 1006, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1521 */ { 1886, -1, 0.00, 28.00, 3, 9, 1005, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1522 */ { 1887, -1, 0.00, 22.00, 3, 9, 1006, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1523 */ { 1888, -1, 0.00, 16.00, 3, 9, 1005, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1524 */ { 1889, -1, 0.00, 10.00, 3, 9, 1006, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1525 */ { 280, -1, 0.00, 56.00, 3, 9, 1005, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1526 */ { 281, -1, 0.00, 45.00, 3, 9, 1006, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1527 */ { 282, -1, 0.00, 32.00, 3, 9, 1005, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1528 */ { 283, -1, 0.00, 21.00, 3, 9, 1006, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1529 */ { 346, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1529, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1530 */ { 2014, -1, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1530 */ { 2016, -1, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1531 */ { 346, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1531, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1532 */ { 346, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1532, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1533 */ { 346, -1, 0.00, 5.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1533, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -6466,129 +6470,129 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1579 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1580 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1581 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1582 */ { 1941, -1, 0.00, 0.00, 3, 9, 1, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1582, 0, NULL, 0, NULL, 0, NULL, hitbox_1582 },
-/* Object 1583 */ { 1942, -1, -5.00, 0.00, 3, 9, 1, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1583, 0, NULL, 0, NULL, 0, NULL, hitbox_1583 },
-/* Object 1584 */ { 1575, -1, 0.00, 0.00, 5, 2, 0, 1011, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1582 */ { 1943, -1, 0.00, 0.00, 3, 9, 1, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1582, 0, NULL, 0, NULL, 0, NULL, hitbox_1582 },
+/* Object 1583 */ { 1944, -1, -5.00, 0.00, 3, 9, 1, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1583, 0, NULL, 0, NULL, 0, NULL, hitbox_1583 },
+/* Object 1584 */ { 1577, -1, 0.00, 0.00, 5, 2, 0, 1011, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1585 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1586 */ { -1, -1, 0.00, 5.00, 1, 0, 1011, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1586, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1587 */ { 1879, -1, 0.00, 0.00, 5, 9, 1, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1588 */ { 1880, -1, 0.00, 0.00, 5, 9, 1, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1589 */ { 1881, -1, 0.00, 0.00, 5, 9, 1, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1590 */ { 1882, -1, 0.00, 0.00, 5, 9, 1, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1591 */ { 1969, -1, 0.00, 0.00, 3, 9, 1, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1591, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1592 */ { 1871, -1, -3.00, 0.00, 3, 9, 1, 2, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1592, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1593 */ { 1969, -1, 0.00, 0.00, 3, 9, 1, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1593, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1594 */ { 2073, -1, 0.00, 0.00, 3, 12, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1594, 0, NULL, 0, NULL, 0, NULL, hitbox_1594 },
+/* Object 1587 */ { 1881, -1, 0.00, 0.00, 5, 9, 1, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1588 */ { 1882, -1, 0.00, 0.00, 5, 9, 1, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1589 */ { 1883, -1, 0.00, 0.00, 5, 9, 1, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1590 */ { 1884, -1, 0.00, 0.00, 5, 9, 1, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1591 */ { 1971, -1, 0.00, 0.00, 3, 9, 1, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1591, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1592 */ { 1873, -1, -3.00, 0.00, 3, 9, 1, 2, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1592, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1593 */ { 1971, -1, 0.00, 0.00, 3, 9, 1, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1593, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1594 */ { 2074, -1, 0.00, 0.00, 3, 12, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1594, 0, NULL, 0, NULL, 0, NULL, hitbox_1594 },
 /* Object 1595 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1596 */ { 1906, -1, 0.00, 0.00, 3, 1, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1597 */ { 1907, -1, 0.00, 0.00, 3, 1, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1598 */ { 1904, -1, 0.00, 0.00, 5, 9, 1, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1599 */ { 1905, -1, 0.00, 0.00, 5, 9, 1, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1600 */ { 1892, -1, 0.00, 0.00, 3, 9, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1600, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1601 */ { 1902, -1, 0.00, 0.00, 3, 8, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1601, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1602 */ { 1893, -1, 0.00, 0.00, 3, 12, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1603 */ { 1894, -1, 0.00, 0.00, 3, 12, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1604 */ { 1895, -1, 0.00, 0.00, 3, 12, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1605 */ { 1896, -1, 0.00, 0.00, 3, 12, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1606 */ { 1897, -1, 0.00, 0.00, 3, 12, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1607 */ { 1898, -1, 0.00, 0.00, 3, 12, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1608 */ { 1899, -1, 0.00, 0.00, 3, 10, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1609 */ { 1900, -1, 0.00, 0.00, 3, 10, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1610 */ { 1901, -1, 0.00, 0.00, 3, 10, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1596 */ { 1908, -1, 0.00, 0.00, 3, 1, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1597 */ { 1909, -1, 0.00, 0.00, 3, 1, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1598 */ { 1906, -1, 0.00, 0.00, 5, 9, 1, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1599 */ { 1907, -1, 0.00, 0.00, 5, 9, 1, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1600 */ { 1894, -1, 0.00, 0.00, 3, 9, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1600, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1601 */ { 1904, -1, 0.00, 0.00, 3, 8, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1601, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1602 */ { 1895, -1, 0.00, 0.00, 3, 12, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1603 */ { 1896, -1, 0.00, 0.00, 3, 12, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1604 */ { 1897, -1, 0.00, 0.00, 3, 12, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1605 */ { 1898, -1, 0.00, 0.00, 3, 12, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1606 */ { 1899, -1, 0.00, 0.00, 3, 12, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1607 */ { 1900, -1, 0.00, 0.00, 3, 12, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1608 */ { 1901, -1, 0.00, 0.00, 3, 10, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1609 */ { 1902, -1, 0.00, 0.00, 3, 10, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1610 */ { 1903, -1, 0.00, 0.00, 3, 10, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1611 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1612 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1613 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1614 */ { 2074, -1, 0.00, 0.00, 5, 9, 0, 1010, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1614 */ { 2075, -1, 0.00, 0.00, 5, 9, 0, 1010, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1615 */ { -1, -1, 0.00, 0.00, 5, 1, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1616 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1617 */ { 1738, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1617, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1618 */ { 1940, -1, 0.00, 0.00, 3, 9, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1619 */ { 2075, -1, -12.00, 18.00, 5, 1, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1619, 0, NULL, 0, NULL, 0, NULL, hitbox_1619 },
-/* Object 1620 */ { 2076, -1, -9.00, 9.00, 5, 1, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1620, 0, NULL, 0, NULL, 0, NULL, hitbox_1620 },
-/* Object 1621 */ { 1740, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1621, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1622 */ { 1742, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1623 */ { 1743, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1623, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1624 */ { 1745, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1624, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1625 */ { 1747, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1626 */ { 1748, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1627 */ { 1749, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1627, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1628 */ { 1751, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1629 */ { 1752, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1629, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1630 */ { 1754, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1630, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1631 */ { 1756, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1631, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1632 */ { 1758, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1632, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1633 */ { 1760, -1, 0.00, 1.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1634 */ { 1761, -1, 0.00, 1.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1635 */ { 1762, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1636 */ { 1763, -1, 0.00, 1.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1637 */ { 1764, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1637, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1638 */ { 1766, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1638, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1639 */ { 1768, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1640 */ { 1769, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1641 */ { 1770, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1641, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1642 */ { 1772, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1642, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1643 */ { 1774, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1644 */ { 1775, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1645 */ { 1776, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1645, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1646 */ { 1778, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1646, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1647 */ { 1780, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1648 */ { 1781, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1649 */ { 1782, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1649, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1650 */ { 1784, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1650, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1651 */ { 1786, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1652 */ { 1787, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1653 */ { 1788, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1654 */ { 1789, -1, -1.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1655 */ { 1790, -1, -1.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1656 */ { 1791, -1, -1.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1657 */ { 1792, -1, 1.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1658 */ { 1793, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1659 */ { 1794, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1660 */ { 1795, -1, 1.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1661 */ { 1796, -1, 0.00, 2.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1662 */ { 1797, -1, 0.00, 1.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1663 */ { 1798, -1, 0.00, 3.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1664 */ { 1799, -1, 0.00, 1.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1665 */ { 1800, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1666 */ { 1801, -1, 0.00, -1.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1667 */ { 1802, -1, 0.00, -1.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1668 */ { 1803, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1669 */ { 1804, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1670 */ { 1805, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1671 */ { 1806, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1672 */ { 1807, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1673 */ { 1808, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1674 */ { 1809, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1675 */ { 1810, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1676 */ { 1811, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1677 */ { 1812, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1678 */ { 1813, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1679 */ { 1814, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1680 */ { 1815, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1681 */ { 1816, -1, -1.00, 1.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1682 */ { 1817, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1683 */ { 1818, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1684 */ { 1819, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1685 */ { 2071, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1685, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1686 */ { 2071, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1686, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1687 */ { 2071, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1687, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1688 */ { 2071, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1688, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1689 */ { 2071, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1689, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1690 */ { 2071, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1690, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1691 */ { 2071, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1691, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1692 */ { 2071, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1692, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1693 */ { 2071, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1693, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1694 */ { 2071, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1694, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1695 */ { 2071, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1695, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1696 */ { 2071, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1696, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1697 */ { 1915, -1, 0.00, 0.00, 3, 9, 1006, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1697, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1698 */ { 1916, -1, 5.00, -6.00, 3, 9, 1006, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1698, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1699 */ { 1917, -1, 0.00, -7.00, 3, 9, 1006, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1699, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1617 */ { 1740, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1617, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1618 */ { 1942, -1, 0.00, 0.00, 3, 9, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1619 */ { 2076, -1, -12.00, 18.00, 5, 1, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1619, 0, NULL, 0, NULL, 0, NULL, hitbox_1619 },
+/* Object 1620 */ { 2077, -1, -9.00, 9.00, 5, 1, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1620, 0, NULL, 0, NULL, 0, NULL, hitbox_1620 },
+/* Object 1621 */ { 1742, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1621, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1622 */ { 1744, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1623 */ { 1745, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1623, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1624 */ { 1747, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1624, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1625 */ { 1749, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1626 */ { 1750, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1627 */ { 1751, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1627, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1628 */ { 1753, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1629 */ { 1754, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1629, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1630 */ { 1756, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1630, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1631 */ { 1758, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1631, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1632 */ { 1760, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1632, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1633 */ { 1762, -1, 0.00, 1.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1634 */ { 1763, -1, 0.00, 1.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1635 */ { 1764, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1636 */ { 1765, -1, 0.00, 1.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1637 */ { 1766, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1637, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1638 */ { 1768, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1638, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1639 */ { 1770, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1640 */ { 1771, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1641 */ { 1772, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1641, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1642 */ { 1774, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1642, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1643 */ { 1776, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1644 */ { 1777, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1645 */ { 1778, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1645, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1646 */ { 1780, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1646, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1647 */ { 1782, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1648 */ { 1783, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1649 */ { 1784, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1649, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1650 */ { 1786, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1650, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1651 */ { 1788, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1652 */ { 1789, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1653 */ { 1790, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1654 */ { 1791, -1, -1.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1655 */ { 1792, -1, -1.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1656 */ { 1793, -1, -1.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1657 */ { 1794, -1, 1.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1658 */ { 1795, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1659 */ { 1796, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1660 */ { 1797, -1, 1.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1661 */ { 1798, -1, 0.00, 2.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1662 */ { 1799, -1, 0.00, 1.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1663 */ { 1800, -1, 0.00, 3.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1664 */ { 1801, -1, 0.00, 1.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1665 */ { 1802, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1666 */ { 1803, -1, 0.00, -1.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1667 */ { 1804, -1, 0.00, -1.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1668 */ { 1805, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1669 */ { 1806, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1670 */ { 1807, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1671 */ { 1808, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1672 */ { 1809, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1673 */ { 1810, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1674 */ { 1811, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1675 */ { 1812, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1676 */ { 1813, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1677 */ { 1814, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1678 */ { 1815, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1679 */ { 1816, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1680 */ { 1817, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1681 */ { 1818, -1, -1.00, 1.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1682 */ { 1819, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1683 */ { 1820, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1684 */ { 1821, -1, 0.00, 0.00, 3, -5, 4, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1685 */ { 2072, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1685, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1686 */ { 2072, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1686, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1687 */ { 2072, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1687, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1688 */ { 2072, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1688, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1689 */ { 2072, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1689, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1690 */ { 2072, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1690, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1691 */ { 2072, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1691, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1692 */ { 2072, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1692, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1693 */ { 2072, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1693, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1694 */ { 2072, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1694, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1695 */ { 2072, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1695, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1696 */ { 2072, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1696, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1697 */ { 1917, -1, 0.00, 0.00, 3, 9, 1006, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1697, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1698 */ { 1918, -1, 5.00, -6.00, 3, 9, 1006, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1698, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1699 */ { 1919, -1, 0.00, -7.00, 3, 9, 1006, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1699, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1700 */ { -1, -1, 0.00, 5.00, 3, 0, 1011, 1011, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1700, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1701 */ { 6, -1, -9.00, 0.00, 5, 1, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1701, 0, NULL, 0, NULL, 0, NULL, hitbox_1701 },
 /* Object 1702 */ { 8, -1, -7.00, 0.00, 5, 1, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1702, 0, NULL, 0, NULL, 0, NULL, hitbox_1702 },
 /* Object 1703 */ { 10, -1, -6.00, 1.00, 5, 1, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1703, 0, NULL, 0, NULL, 0, NULL, hitbox_1703 },
-/* Object 1704 */ { 1918, -1, 2.00, 0.00, 3, 12, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1704 },
+/* Object 1704 */ { 1920, -1, 2.00, 0.00, 3, 12, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1704 },
 /* Object 1705 */ { 638, -1, -21.00, 0.00, 5, 1, 1010, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1705, 0, NULL, 0, NULL, 0, NULL, hitbox_1705 },
 /* Object 1706 */ { 639, -1, 0.00, 0.00, 5, 1, 1010, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1706 },
 /* Object 1707 */ { 640, -1, 0.00, 0.00, 5, 1, 1010, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1707 },
@@ -6635,13 +6639,13 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1748 */ { 441, -1, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BLACK, 0, ANIMATION_NONE, 1.00, 1, children_1748, 0, NULL, 0, NULL, 0, NULL, hitbox_1748 },
 /* Object 1749 */ { 724, -1, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1749, 0, NULL, 0, NULL, 0, NULL, hitbox_1749 },
 /* Object 1750 */ { 725, -1, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1750, 0, NULL, 0, NULL, 0, NULL, hitbox_1750 },
-/* Object 1751 */ { 1919, -1, 2.00, 0.00, 3, 12, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1751 },
-/* Object 1752 */ { 1883, -1, 4.00, -4.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1753 */ { 1963, -1, 0.00, 0.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1754 */ { 1964, -1, 0.00, 0.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1751 */ { 1921, -1, 2.00, 0.00, 3, 12, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1751 },
+/* Object 1752 */ { 1885, -1, 4.00, -4.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1753 */ { 1965, -1, 0.00, 0.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1754 */ { 1966, -1, 0.00, 0.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1755 */ { -1, -1, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1755 },
 /* Object 1756 */ { 243, -1, 0.00, 0.00, 3, 9, 1007, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1757 */ { 1965, -1, 0.00, 0.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1757 */ { 1967, -1, 0.00, 0.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1758 */ { 346, -1, 0.00, 5.00, 1, 9, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1758, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1759 */ { 346, -1, 0.00, 5.00, 1, 9, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1759, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1760 */ { 346, -1, 0.00, 5.00, 1, 9, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1760, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -6653,22 +6657,22 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1766 */ { 289, -1, 0.00, 0.00, 3, -5, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1767 */ { 290, -1, 0.00, 0.00, 3, -5, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1768 */ { 291, -1, 0.00, 0.00, 3, -5, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1769 */ { 1720, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1770 */ { 1724, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1771 */ { 1722, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1772 */ { 1726, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1769 */ { 1722, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1770 */ { 1726, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1771 */ { 1724, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1772 */ { 1728, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1773 */ { 112, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1773, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1774 */ { 112, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1774, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1775 */ { 112, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1775, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1776 */ { 112, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1776, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1777 */ { 1582, -1, 0.00, -2.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1778 */ { 1584, -1, 1.00, -2.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1779 */ { 1586, -1, 0.00, -2.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1780 */ { 1588, -1, -1.00, 1.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1781 */ { 1633, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1781, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1782 */ { 1635, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1782, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1783 */ { 1637, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1783, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1784 */ { 1639, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1784, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1777 */ { 1584, -1, 0.00, -2.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1778 */ { 1586, -1, 1.00, -2.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1779 */ { 1588, -1, 0.00, -2.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1780 */ { 1590, -1, -1.00, 1.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1781 */ { 1635, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1781, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1782 */ { 1637, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1782, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1783 */ { 1639, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1783, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1784 */ { 1641, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1784, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1785 */ { 112, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1785, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1786 */ { 112, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1786, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1787 */ { 112, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1787, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -6677,23 +6681,23 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1790 */ { 112, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1790, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1791 */ { 112, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1791, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1792 */ { 112, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1792, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1793 */ { 1665, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1793, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1793 */ { 1667, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1793, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1794 */ { 112, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1794, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1795 */ { 1682, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1795 */ { 1684, -1, 0.00, 0.00, 1, -7, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1796 */ { 112, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1796, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1797 */ { 2071, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1797, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1797 */ { 2072, -1, 0.00, 0.00, 3, 9, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1797, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1798 */ { 112, -1, 0.00, 0.00, 3, 9, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1799 */ { 1700, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1799, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1799 */ { 1702, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1799, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1800 */ { 112, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1800, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1801 */ { 1714, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1801, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1801 */ { 1716, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1801, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1802 */ { 112, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1802, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1803 */ { 1661, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1803, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1803 */ { 1663, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1803, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1804 */ { 112, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1804, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1805 */ { 1696, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1805, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1805 */ { 1698, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1805, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1806 */ { 112, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1806, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1807 */ { 1684, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1807, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1807 */ { 1686, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1807, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1808 */ { 112, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1808, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1809 */ { 1716, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1809, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1809 */ { 1718, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1809, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1810 */ { 112, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 2, children_1810, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1811 */ { -1, -1, 0.00, 4.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1812 */ { -1, -1, 0.00, 4.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -6714,62 +6718,62 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1827 */ { 402, -1, 0.00, 0.00, 1, -7, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1828 */ { 404, -1, 0.00, 0.00, 1, -7, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1829 */ { -1, -1, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1829 },
-/* Object 1830 */ { 1966, -1, 7.00, -7.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1830 */ { 1968, -1, 7.00, -7.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1831 */ { 346, -1, 0.00, 5.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1831, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1832 */ { 346, -1, 0.00, 5.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1832, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1833 */ { 346, -1, 0.00, 5.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1833, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1834 */ { 346, -1, 0.00, 5.00, 3, 9, 1007, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1834, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1835 */ { 1888, -1, 0.00, 0.00, 3, 9, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1836 */ { 1890, -1, 0.00, 0.00, 3, 9, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1837 */ { 1889, -1, 0.00, 0.00, 3, 9, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1838 */ { 1891, -1, 0.00, 0.00, 3, 9, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1835 */ { 1890, -1, 0.00, 0.00, 3, 9, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1836 */ { 1892, -1, 0.00, 0.00, 3, 9, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1837 */ { 1891, -1, 0.00, 0.00, 3, 9, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1838 */ { 1893, -1, 0.00, 0.00, 3, 9, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1839 */ { 346, -1, 0.00, 5.00, 3, 9, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1839, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1840 */ { 346, -1, 0.00, 5.00, 3, 9, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1840, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1841 */ { 346, -1, 0.00, 5.00, 3, 9, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1841, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1842 */ { 346, -1, 0.00, 5.00, 3, 9, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1842, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1843 */ { 1903, -1, 0.00, 0.00, 3, 9, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1843, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1844 */ { 1947, -1, 0.00, 0.00, 3, 9, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1845 */ { 1948, -1, 0.00, 0.00, 3, 9, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1846 */ { 1949, -1, 0.00, 0.00, 3, 9, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1847 */ { 1950, -1, 0.00, 0.00, 3, 9, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1848 */ { 1951, -1, 0.00, 0.00, 3, 9, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1849 */ { 1961, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1849, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1850 */ { 1962, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1850, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1851 */ { 1953, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1851, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1852 */ { 1954, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1852, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1853 */ { 1955, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1853, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1854 */ { 1956, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1854, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1855 */ { 1957, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1855, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1856 */ { 1952, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1856, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1857 */ { 1959, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1857, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1858 */ { 1958, -1, 0.00, 0.00, 5, 2, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 2, children_1858, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1843 */ { 1905, -1, 0.00, 0.00, 3, 9, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1843, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1844 */ { 1949, -1, 0.00, 0.00, 3, 9, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1845 */ { 1950, -1, 0.00, 0.00, 3, 9, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1846 */ { 1951, -1, 0.00, 0.00, 3, 9, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1847 */ { 1952, -1, 0.00, 0.00, 3, 9, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1848 */ { 1953, -1, 0.00, 0.00, 3, 9, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1849 */ { 1963, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1849, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1850 */ { 1964, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1850, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1851 */ { 1955, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1851, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1852 */ { 1956, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1852, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1853 */ { 1957, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1853, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1854 */ { 1958, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1854, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1855 */ { 1959, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 3, children_1855, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1856 */ { 1954, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1856, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1857 */ { 1961, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1857, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1858 */ { 1960, -1, 0.00, 0.00, 5, 2, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 2, children_1858, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1859 */ { -1, -1, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1859 },
-/* Object 1860 */ { 1960, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1860, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1861 */ { 1820, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1861, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1862 */ { 1822, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1862, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1863 */ { 1824, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1863, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1864 */ { 1826, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1864, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1865 */ { 1828, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1865, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1866 */ { 1830, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1866, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1867 */ { 1832, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1867, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1868 */ { 1834, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1868, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1869 */ { 1836, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1869, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1870 */ { 1838, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1870, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1871 */ { 1840, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1871, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1872 */ { 1842, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1872, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1873 */ { 1844, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1873, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1874 */ { 1846, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1874, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1875 */ { 1848, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1875, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1876 */ { 1850, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1876, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1877 */ { 1852, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1877, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1878 */ { 1854, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1878, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1879 */ { 1856, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1879, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1880 */ { 1858, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1880, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1881 */ { 1860, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1881, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1882 */ { 1862, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1882, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1883 */ { 1864, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1883, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1884 */ { 1866, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1884, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1885 */ { 1868, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1885, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1860 */ { 1962, -1, 0.00, 0.00, 5, 2, 1011, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1860, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1861 */ { 1822, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1861, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1862 */ { 1824, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1862, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1863 */ { 1826, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1863, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1864 */ { 1828, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1864, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1865 */ { 1830, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1865, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1866 */ { 1832, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1866, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1867 */ { 1834, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1867, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1868 */ { 1836, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1868, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1869 */ { 1838, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1869, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1870 */ { 1840, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1870, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1871 */ { 1842, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1871, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1872 */ { 1844, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1872, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1873 */ { 1846, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1873, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1874 */ { 1848, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1874, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1875 */ { 1850, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1875, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1876 */ { 1852, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1876, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1877 */ { 1854, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1877, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1878 */ { 1856, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1878, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1879 */ { 1858, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1879, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1880 */ { 1860, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1880, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1881 */ { 1862, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1881, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1882 */ { 1864, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1882, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1883 */ { 1866, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1883, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1884 */ { 1868, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1884, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1885 */ { 1870, -1, 0.00, 0.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1885, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1886 */ { 346, -1, 0.00, 5.00, 1, 9, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1886, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1887 */ { 346, -1, 0.00, 5.00, 1, 9, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1887, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1888 */ { 346, -1, 0.00, 5.00, 1, 9, 1, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 1, children_1888, 0, NULL, 0, NULL, 0, NULL, NULL },

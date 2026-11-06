@@ -67,6 +67,7 @@ typedef struct {
     int ufo;
     int wave;
     int robot;
+    int spider;
 
     Color p1_color;
     Color p2_color;
@@ -150,6 +151,7 @@ typedef struct {
     bool velocity_override;
     bool velocity_uncapped;
     bool holding_jump_cancelled;
+    bool no_auto_jump_exempt;
     bool dashing;
     float dash_slope;
     float dash_angle;
@@ -170,6 +172,10 @@ typedef struct {
     int robot_blend_from_frame;
     float robot_blend_from_timer;
     float robot_landing_blend_timer;
+
+    int spider_anim_id;
+    int spider_anim_frame;
+    float spider_anim_timer;
 
     float coyote_frames;
 
@@ -291,6 +297,7 @@ void draw_hitbox_trail(int player);
 void add_new_hitbox(Player *player);
 
 void set_robot_animation(Player *player, int robot_anim_id);
+void set_spider_animation(Player *player, int spider_anim_id);
 
 void update_p1_trail(Player *player, int player_id);
 void draw_p1_trail(Player *player, int player_id);

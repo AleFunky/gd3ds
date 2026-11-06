@@ -152,7 +152,13 @@ void run_camera() {
 
 void set_hitbox_size(Player *player, int gamemode) {
     float scale = (player->mini) ? 0.6f : 1.f;
-    if (gamemode != GAMEMODE_WAVE) {
+    if (gamemode == GAMEMODE_SPIDER) {
+        player->height = 27 * scale;
+        player->width = 27 * scale;
+
+        player->internal_hitbox.width = 9;
+        player->internal_hitbox.height = 9;
+    } else if (gamemode != GAMEMODE_WAVE) {
         player->height = 30 * scale;
         player->width = 30 * scale;
         
@@ -214,6 +220,7 @@ void init_player(Player *player) {
     player->player_icons.ufo  = selected_ufo;
     player->player_icons.wave = selected_wave;
     player->player_icons.robot = selected_robot;
+    player->player_icons.spider = selected_spider;
     player->player_icons.glow = player_glow_enabled;
 
     player->player_icons.p1_color = p1_color;
@@ -296,6 +303,7 @@ void init_level_bounds() {
         case GAMEMODE_SHIP:
         case GAMEMODE_UFO:
         case GAMEMODE_WAVE:
+        case GAMEMODE_SPIDER:
             state.ceiling_y = state.ground_y + 300;
             set_intended_ceiling();
             break;

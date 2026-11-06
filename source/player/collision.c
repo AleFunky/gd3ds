@@ -4,6 +4,7 @@
 #include "player.h"
 #include "player/trail.h"
 #include "robot_anim_data.h"
+#include "spider_anim_data.h"
 #include <math.h>
 #include "practice.h"
 #include "profiling.h"
@@ -30,54 +31,54 @@ Player *player_2 = &state.player2;
 
 const float jump_heights_table[SPEED_COUNT][JUMP_TYPES_COUNT][GAMEMODE_COUNT][2] = {
     { // SLOW                        CUBE                              SHIP                                BALL                               UFO            WAVE              ROBOT  },
-    /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {573.48,   458.784},  {0, 0},   {864,      691.2} },
-    /* YELLOW ORB */ {{573.48,   458.784},  {573.48,   458.784},  {401.435993,  321.148795},  {573.48,   458.784},  {0, 0},   {516.132,  430.9056} },
-    /* BLUE PAD   */ {{-345.6,   -276.48},  {-229.392, -183.519}, {-160.574397, -128.463298}, {-229.392, -183.519}, {0, 0},   {-345.6,   -276.48} },
-    /* BLUE ORB   */ {{-229.392, -183.519}, {-229.392, -183.519}, {-160.574397, -128.463298}, {-229.392, -183.519}, {0, 0},   {-229.392, -183.519} },
-    /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0},   {561.6,    449.28} },
-    /* PINK ORB   */ {{412.884,  330.318},  {212.166,  169.776},  {309.090595,  247.287596},  {240.84,   192.672},  {0, 0},   {412.884,  330.318} },
-    /* RED ORB    */ {{791.4024, 633.12192},  {573.48, 642.2976},  {537.92423, 430.33939},  {584.9496, 623.94624},  {0, 0},  {660.64896, 551.55917}},
-    /* RED PAD    */ {{1080,     864},      {544.32,   656.64},   {648,         518.4},       {518.4,    677.376},  {0, 0},   {1080,     864} },
+    /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {573.48,   458.784},  {0, 0},   {864,      691.2}, {518.4, 414.72} },
+    /* YELLOW ORB */ {{573.48,   458.784},  {573.48,   458.784},  {401.435993,  321.148795},  {573.48,   458.784},  {0, 0},   {516.132,  430.9056}, {401.436, 321.149} },
+    /* BLUE PAD   */ {{-345.6,   -276.48},  {-229.392, -183.519}, {-160.574397, -128.463298}, {-229.392, -183.519}, {0, 0},   {-345.6,   -276.48}, {-207.36, -165.888} },
+    /* BLUE ORB   */ {{-229.392, -183.519}, {-229.392, -183.519}, {-160.574397, -128.463298}, {-229.392, -183.519}, {0, 0},   {-229.392, -183.519}, {-160.574, -128.463} },
+    /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0},   {561.6,    449.28}, {362.88, 290.304} },
+    /* PINK ORB   */ {{412.884,  330.318},  {212.166,  169.776},  {309.090595,  247.287596},  {240.84,   192.672},  {0, 0},   {412.884,  330.318}, {289.019, 231.223} },
+    /* RED ORB    */ {{791.4024, 633.12192},  {573.48, 642.2976},  {537.92423, 430.33939},  {584.9496, 623.94624},  {0, 0},  {660.64896, 551.55917}, {537.924, 430.339}},
+    /* RED PAD    */ {{1080,     864},      {544.32,   656.64},   {648,         518.4},       {518.4,    677.376},  {0, 0},   {1080,     864}, {648, 518.4} },
     },
     { // NORMAL
-    /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0},   {864,      691.2} },
-    /* YELLOW ORB */ {{603.72,   482.976},  {603.72,   482.976},  {422.60399,   338.08319},   {603.72,   482.976},  {0, 0},   {543.348,  434.6784} },
-    /* BLUE PAD   */ {{-345.6,   -276.48},  {-345.6,   -276.48},  {-207.36001,  -165.88801},  {-345.6,   -276.48},  {0, 0},   {-345.6,   -276.48} },
-    /* BLUE ORB   */ {{-241.488, -193.185}, {-241.488, -193.18},  {-169.04160,  -135.2295},   {-241.488, -193.185}, {0, 0},   {-241.488, -193.185} },
-    /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0},   {561.6,    449.28} },
-    /* PINK ORB   */ {{434.7,    347.76},   {223.398,  178.686},  {325.42019,   260.3286},    {258.984,  207.198},  {0, 0},   {434.7,    347.76} },
-    /* RED ORB    */ {{833.1336, 666.50688},  {603.72, 676.1664},  {566.28935, 453.03147},  {615.7944, 656.84736},  {0, 0},  {695.48544, 556.38835}},
-    /* RED PAD    */ {{1080,     864},      {544.32,   656.64},   {648,         518.4},       {518.4,    677.376},  {0, 0},   {1080,     864} },
+    /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0},   {864,      691.2}, {518.4, 414.72} },
+    /* YELLOW ORB */ {{603.72,   482.976},  {603.72,   482.976},  {422.60399,   338.08319},   {603.72,   482.976},  {0, 0},   {543.348,  434.6784}, {422.604, 338.083} },
+    /* BLUE PAD   */ {{-345.6,   -276.48},  {-345.6,   -276.48},  {-207.36001,  -165.88801},  {-345.6,   -276.48},  {0, 0},   {-345.6,   -276.48}, {-207.36, -165.888} },
+    /* BLUE ORB   */ {{-241.488, -193.185}, {-241.488, -193.18},  {-169.04160,  -135.2295},   {-241.488, -193.185}, {0, 0},   {-241.488, -193.185}, {-169.042, -135.23} },
+    /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0},   {561.6,    449.28}, {362.88, 290.304} },
+    /* PINK ORB   */ {{434.7,    347.76},   {223.398,  178.686},  {325.42019,   260.3286},    {258.984,  207.198},  {0, 0},   {434.7,    347.76}, {304.29, 243.432} },
+    /* RED ORB    */ {{833.1336, 666.50688},  {603.72, 676.1664},  {566.28935, 453.03147},  {615.7944, 656.84736},  {0, 0},  {695.48544, 556.38835}, {566.289, 453.031}},
+    /* RED PAD    */ {{1080,     864},      {544.32,   656.64},   {648,         518.4},       {518.4,    677.376},  {0, 0},   {1080,     864}, {648, 518.4} },
     },
     { // FAST
-    /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0},   {864,      691.2} },
-    /* YELLOW ORB */ {{616.68,   481.734},  {616.68,   481.734},  {431.67599,   345.34079},   {616.68,   481.734},  {0, 0},   {555.012,  433.5687} },
-    /* BLUE PAD   */ {{-345.6,   -276.48},  {-345.6,   -276.48},  {-207.36001,  -165.88801},  {-345.6,   -276.48},  {0, 0},   {-345.6,   -276.48} },
-    /* BLUE ORB   */ {{-246.672, -197.343}, {-246.672, -197.343}, {-172.6704,   -138.1401},   {-246.672, -197.343}, {0, 0},   {-246.672, -197.343} },
-    /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0},   {561.6,    449.28} },
-    /* PINK ORB   */ {{443.988,  355.212},  {228.15,   182.52},   {332.37539,   265.923},     {258.984,  207.198},  {0, 0},   {443.988,  355.212} },
-    /* RED ORB    */ {{851.0184, 664.79292},  {616.68, 674.4276},  {578.44583, 462.75666},  {629.0136, 655.15824},  {0, 0},  {710.41536, 554.96794}},
-    /* RED PAD    */ {{1080,     864},      {544.32,   656.64},   {648,         518.4},       {518.4,    677.376},  {0, 0},   {1080,     864} },
+    /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0},   {864,      691.2}, {518.4, 414.72} },
+    /* YELLOW ORB */ {{616.68,   481.734},  {616.68,   481.734},  {431.67599,   345.34079},   {616.68,   481.734},  {0, 0},   {555.012,  433.5687}, {431.676, 337.214} },
+    /* BLUE PAD   */ {{-345.6,   -276.48},  {-345.6,   -276.48},  {-207.36001,  -165.88801},  {-345.6,   -276.48},  {0, 0},   {-345.6,   -276.48}, {-207.36, -165.888} },
+    /* BLUE ORB   */ {{-246.672, -197.343}, {-246.672, -197.343}, {-172.6704,   -138.1401},   {-246.672, -197.343}, {0, 0},   {-246.672, -197.343}, {-172.67, -138.14} },
+    /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0},   {561.6,    449.28}, {362.88, 290.304} },
+    /* PINK ORB   */ {{443.988,  355.212},  {228.15,   182.52},   {332.37539,   265.923},     {258.984,  207.198},  {0, 0},   {443.988,  355.212}, {310.792, 248.648} },
+    /* RED ORB    */ {{851.0184, 664.79292},  {616.68, 674.4276},  {578.44583, 462.75666},  {629.0136, 655.15824},  {0, 0},  {710.41536, 554.96794}, {578.446, 451.866}},
+    /* RED PAD    */ {{1080,     864},      {544.32,   656.64},   {648,         518.4},       {518.4,    677.376},  {0, 0},   {1080,     864}, {648, 518.4} },
     },
     { // FASTER
-    /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0},   {864,      691.2} },
-    /* YELLOW ORB */ {{606.42,   485.136},  {606.42,   485.136},  {424.493993,  339.59519},   {606.42,   485.136},  {0, 0},   {545.778,  436.6224} },
-    /* BLUE PAD   */ {{-345.6,   -276.48},  {-345.6,   -276.48},  {-207.36001,  -165.88801},  {-345.6,   -276.48},  {0, 0},   {-345.6,   -276.48} },
-    /* BLUE ORB   */ {{-242.568, -194.049}, {-242.568, -194.049}, {-169.7976,   -135.8343},   {-242.568, -194.049}, {0, 0},   {-242.568, -194.049} },
-    /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0},   {561.6,    449.28} },
-    /* PINK ORB   */ {{436.644,  349.272},  {224.37,   179.496},  {326.85659,   261.5004},    {254.718,  203.742},  {0, 0},   {436.644,  349.272} },
-    /* RED ORB    */ {{836.8596, 669.48768},  {606.42, 679.1904},  {568.82195, 455.05755},  {618.5484, 659.78496},  {0, 0},  {698.59584, 558.87667}},
-    /* RED PAD    */ {{1080,     864},      {544.32,   656.64},   {648,         518.4},       {518.4,    677.376},  {0, 0},   {1080,     864} },
+    /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0},   {864,      691.2}, {518.4, 414.72} },
+    /* YELLOW ORB */ {{606.42,   485.136},  {606.42,   485.136},  {424.493993,  339.59519},   {606.42,   485.136},  {0, 0},   {545.778,  436.6224}, {424.494, 339.595} },
+    /* BLUE PAD   */ {{-345.6,   -276.48},  {-345.6,   -276.48},  {-207.36001,  -165.88801},  {-345.6,   -276.48},  {0, 0},   {-345.6,   -276.48}, {-207.36, -165.888} },
+    /* BLUE ORB   */ {{-242.568, -194.049}, {-242.568, -194.049}, {-169.7976,   -135.8343},   {-242.568, -194.049}, {0, 0},   {-242.568, -194.049}, {-169.798, -135.834} },
+    /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0},   {561.6,    449.28}, {362.88, 290.304} },
+    /* PINK ORB   */ {{436.644,  349.272},  {224.37,   179.496},  {326.85659,   261.5004},    {254.718,  203.742},  {0, 0},   {436.644,  349.272}, {305.651, 244.49} },
+    /* RED ORB    */ {{836.8596, 669.48768},  {606.42, 679.1904},  {568.82195, 455.05755},  {618.5484, 659.78496},  {0, 0},  {698.59584, 558.87667}, {568.822, 455.058}},
+    /* RED PAD    */ {{1080,     864},      {544.32,   656.64},   {648,         518.4},       {518.4,    677.376},  {0, 0},   {1080,     864}, {648, 518.4} },
     },
     { // FASTEST
-    /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0},   {864,      691.2} },
-    /* YELLOW ORB */ {{606.42,   485.136},  {606.42,   485.136},  {424.493993,  339.59519},   {606.42,   485.136},  {0, 0},   {545.778,  436.6224} },
-    /* BLUE PAD   */ {{-345.6,   -276.48},  {-345.6,   -276.48},  {-207.36001,  -165.88801},  {-345.6,   -276.48},  {0, 0},   {-345.6,   -276.48} },
-    /* BLUE ORB   */ {{-242.568, -194.049}, {-242.568, -194.049}, {-169.7976,   -135.8343},   {-242.568, -194.049}, {0, 0},   {-242.568, -194.049} },
-    /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0},   {561.6,    449.28} },
-    /* PINK ORB   */ {{436.644,  349.272},  {224.37,   179.496},  {326.85659,   261.5004},    {254.718,  203.742},  {0, 0},   {436.644,  349.272} },
-    /* RED ORB    */ {{836.8596, 669.48768},  {606.42, 679.1904},  {568.82195, 455.05755},  {618.5484, 659.78496},  {0, 0},  {698.59584, 558.87667}},
-    /* RED PAD    */ {{1080,     864},      {544.32,   656.64},   {648,         518.4},       {518.4,    677.376},  {0, 0},   {1080,     864} },
+    /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {432,      691.2},    {0, 0},   {864,      691.2}, {518.4, 414.72} },
+    /* YELLOW ORB */ {{606.42,   485.136},  {606.42,   485.136},  {424.493993,  339.59519},   {606.42,   485.136},  {0, 0},   {545.778,  436.6224}, {424.494, 339.595} },
+    /* BLUE PAD   */ {{-345.6,   -276.48},  {-345.6,   -276.48},  {-207.36001,  -165.88801},  {-345.6,   -276.48},  {0, 0},   {-345.6,   -276.48}, {-207.36, -165.888} },
+    /* BLUE ORB   */ {{-242.568, -194.049}, {-242.568, -194.049}, {-169.7976,   -135.8343},   {-242.568, -194.049}, {0, 0},   {-242.568, -194.049}, {-169.798, -135.834} },
+    /* PINK PAD   */ {{561.6,    449.28},   {302.4,    241.92},   {362.88001,   290.30401},   {345.6,    276.4},    {0, 0},   {561.6,    449.28}, {362.88, 290.304} },
+    /* PINK ORB   */ {{436.644,  349.272},  {224.37,   179.496},  {326.85659,   261.5004},    {254.718,  203.742},  {0, 0},   {436.644,  349.272}, {305.651, 244.49} },
+    /* RED ORB    */ {{836.8596, 669.48768},  {606.42, 679.1904},  {568.82195, 455.05755},  {618.5484, 659.78496},  {0, 0},  {698.59584, 558.87667}, {568.822, 455.058}},
+    /* RED PAD    */ {{1080,     864},      {544.32,   656.64},   {648,         518.4},       {518.4,    677.376},  {0, 0},   {1080,     864}, {648, 518.4} },
     }
 };
 
@@ -87,7 +88,8 @@ const float gamemode_heights[GAMEMODE_COUNT] = {
     240,  // Ball
     300, // Ufo
     300, // Wave
-    999999 // Robot
+    999999, // Robot
+    300 // Spider
 };
 
 const int dual_gamemode_heights[GAMEMODE_COUNT] = {
@@ -96,7 +98,8 @@ const int dual_gamemode_heights[GAMEMODE_COUNT] = {
     9,  // Ball
     10, // Ufo
     10, // Wave
-    9  // Robot
+    9,  // Robot
+    9 // Spider
 };
 
 const Vec2D slowSpeedSnaps[3] = {
@@ -245,12 +248,13 @@ void trySnap(int block, Player *player) {
 
 // Table that says if gravity changes should affect the other gamemode
 static const bool gamemode_linked_gravity[GAMEMODE_COUNT][GAMEMODE_COUNT] = {
-    /* CUBE  */ { Y, N, N, N, Y, N},
-    /* SHIP  */ { N, Y, N, N, N, N},
-    /* BALL  */ { N, N, Y, N, N, N},
-    /* UFO   */ { N, N, N, Y, N, N},
-    /* WAVE  */ { Y, N, N, N, Y, N},
-    /* ROBOT */ { N, N, N, N, N, Y},
+    /* CUBE  */ { Y, N, N, N, Y, N, N},
+    /* SHIP  */ { N, Y, N, N, N, N, N},
+    /* BALL  */ { N, N, Y, N, N, N, N},
+    /* UFO   */ { N, N, N, Y, N, N, N},
+    /* WAVE  */ { Y, N, N, N, Y, N, N},
+    /* ROBOT */ { N, N, N, N, N, Y, N},
+    /* SPIDER */ { N, N, N, N, N, N, Y},
 };
 
 #undef Y
@@ -389,6 +393,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->left_ground = true;
                 player->jumped = true;
                 set_robot_animation(player, ROBOT_ANIM_JUMP_START);
+                if (player->gamemode == GAMEMODE_SPIDER) set_spider_animation(player, SPIDER_ANIM_FALL);
                 SET_ACTIVATED(obj, true);
                 update_rotation_direction(player);
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &pad_use_effect, get_use_effect_array_ptr(GFX_TOP));
@@ -408,6 +413,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->left_ground = true;
                 player->jumped = true;
                 set_robot_animation(player, ROBOT_ANIM_JUMP_START);
+                if (player->gamemode == GAMEMODE_SPIDER) set_spider_animation(player, SPIDER_ANIM_FALL);
                 SET_ACTIVATED(obj, true);
                 update_rotation_direction(player);
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &pad_use_effect, get_use_effect_array_ptr(GFX_TOP));
@@ -428,6 +434,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->jumped = true;
                 player->velocity_uncapped = true;
                 set_robot_animation(player, ROBOT_ANIM_JUMP_START);
+                if (player->gamemode == GAMEMODE_SPIDER) set_spider_animation(player, SPIDER_ANIM_FALL);
                 SET_ACTIVATED(obj, true);
                 update_rotation_direction(player);
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &pad_use_effect, get_use_effect_array_ptr(GFX_TOP));
@@ -494,6 +501,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->jumped = true;
                 update_rotation_direction(player);
                 set_robot_animation(player, ROBOT_ANIM_JUMP_START);
+                if (player->gamemode == GAMEMODE_SPIDER) set_spider_animation(player, SPIDER_ANIM_JUMP);
                 
                 state.current_data.jumps++;
                 
@@ -524,6 +532,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->jumped = true;
                 update_rotation_direction(player);
                 set_robot_animation(player, ROBOT_ANIM_JUMP_START);
+                if (player->gamemode == GAMEMODE_SPIDER) set_spider_animation(player, SPIDER_ANIM_JUMP);
 
                 state.current_data.jumps++;
 
@@ -555,6 +564,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->velocity_uncapped = true;
                 update_rotation_direction(player);
                 set_robot_animation(player, ROBOT_ANIM_JUMP_START);
+                if (player->gamemode == GAMEMODE_SPIDER) set_spider_animation(player, SPIDER_ANIM_JUMP);
                 
                 state.current_data.jumps++;
                 
@@ -698,6 +708,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->buffering_state = BUFFER_END;
                 player->ceiling_inv_time = CEILING_INVUL_TIME;
                 player->jumped = true;
+                if (player->gamemode == GAMEMODE_SPIDER) set_spider_animation(player, SPIDER_ANIM_JUMP);
                 
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, get_use_effect_array_ptr(GFX_TOP));
                 if (effect) {
@@ -731,6 +742,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->ball_rotation_speed = -BALL_SLOW_ROTATION;
                 
                 set_robot_animation(player, ROBOT_ANIM_JUMP_START);
+                if (player->gamemode == GAMEMODE_SPIDER) set_spider_animation(player, SPIDER_ANIM_JUMP);
 
                 player->on_ground = false;
                 player->on_ceiling = false;
@@ -1071,6 +1083,44 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 SET_ACTIVATED(obj, true);
             }
             break;
+        case SPIDER_PORTAL:
+            if (!GET_ACTIVATED(obj)) {
+                state.ground_y = fmaxf(0, ip1_ceilf((objects.original_y[obj] - ((gamemode_heights[GAMEMODE_SPIDER] + 60.f) / 2.f)) / 30.f)) * 30;
+                state.ceiling_y = state.ground_y + gamemode_heights[GAMEMODE_SPIDER];
+                set_intended_ceiling();
+
+                if (player->gamemode != GAMEMODE_SPIDER) {
+                    if (player->gamemode != GAMEMODE_BALL && player->gamemode != GAMEMODE_PLAYER) {
+                        player->vel_y /= 2;
+                    }
+                    if (player->gamemode == GAMEMODE_WAVE) player->vel_y *= 0.9f;
+
+                    player->ceiling_inv_time = GAMEMODE_INVUL_TIME;
+                    player->snap_rotation = true;
+                    player->inverse_rotation = false;
+                    set_gamemode(player, GAMEMODE_SPIDER);
+                    set_checkpoint_timer(0);
+                    pseudo_checkpoint_exists = false;
+                    flip_other_player(state.current_player ^ 1);
+                    update_rotation_direction(player);
+
+                    set_spider_animation(player, SPIDER_ANIM_RUN);
+
+                    UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                    if (effect) {
+                        effect->def.colorR = 255 / 255.f;
+                        effect->def.colorG = 50 / 255.f;
+                        effect->def.colorB = 50 / 255.f;
+                    }
+                }
+
+                if (state.dual) {
+                    set_dual_bounds();
+                }
+
+                SET_ACTIVATED(obj, true);
+            }
+            break;
         case BLUE_TP_PORTAL: {
             if (GET_ACTIVATED(obj)) break;
             int oi = objects.child_object[obj];
@@ -1319,6 +1369,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     switch (state.player.gamemode) {
                         case GAMEMODE_PLAYER:
                         case GAMEMODE_ROBOT:
+                        case GAMEMODE_SPIDER:
                             state.ground_y = 0;
                             state.ceiling_y = 999999;
                             break;
@@ -1436,7 +1487,6 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
 
         case 1329:
-        case 1331:
         case 1816:
             break;
 
@@ -1796,7 +1846,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                     break;
                 }
                 // Behave normally
-                if ((player->gamemode != GAMEMODE_PLAYER && player->gamemode != GAMEMODE_ROBOT) || gravSnap) {
+                if ((player->gamemode != GAMEMODE_PLAYER && player->gamemode != GAMEMODE_ROBOT && player->gamemode != GAMEMODE_SPIDER) || gravSnap) {
                     if (((gravTop(player) - obj_gravBottom(player, obj) <= clip && player->vel_y >= object_raw_vel) || gravSnap)) {
                         if (!gravSnap) player->on_ceiling = true;
                         else player->vel_y = 0;

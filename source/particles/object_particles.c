@@ -73,6 +73,7 @@ static float get_object_particle_depth(int id) {
         case DUAL_PORTAL:
         case DIVORCE_PORTAL:
         case ROBOT_PORTAL:
+        case SPIDER_PORTAL:
         case BLUE_TP_PORTAL:
         case ORANGE_TP_PORTAL:
             return 0.5f;
@@ -449,6 +450,19 @@ void spawn_object_particles(int obj) {
                 index = load_object_particles(obj, &portal_effect_01, false);
                 if (index >= 0) {
                     set_particle_color(&object_particle[index].ps.cfg, 1, 1, 1);
+
+                    object_particle[index].ps.cfg.angle = -(adjust_angle_y(objects.rotation[obj], objects.flippedH[obj]));
+
+                    object_particle[index].ps.emitterX = objects.x[obj];
+                    object_particle[index].ps.emitterY = objects.y[obj];
+                }
+            }
+            break;
+        case SPIDER_PORTAL:
+            if (!is_ps_already_loaded(obj)) {
+                index = load_object_particles(obj, &portal_effect_01, false);
+                if (index >= 0) {
+                    set_particle_color(&object_particle[index].ps.cfg, 0.752941f, 0.133333f, 0.972549f);
 
                     object_particle[index].ps.cfg.angle = -(adjust_angle_y(objects.rotation[obj], objects.flippedH[obj]));
 

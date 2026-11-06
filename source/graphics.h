@@ -115,6 +115,7 @@ extern C2D_SpriteSheet ballSheet;
 extern C2D_SpriteSheet ufoSheet;
 extern C2D_SpriteSheet waveSheet;
 extern C2D_SpriteSheet robotSheet;
+extern C2D_SpriteSheet spiderSheet;
 extern C2D_SpriteSheet trailSheet;
 extern C2D_SpriteSheet particleSheet;
 
@@ -156,6 +157,9 @@ typedef struct {
     int robot_blend_from_frame;
     float robot_blend_from_timer;
     float robot_blend_fraction;
+    int spider_anim_id;
+    int spider_anim_frame;
+    float spider_anim_timer;
 } IconParameters;
 
 void spawn_icon_at(

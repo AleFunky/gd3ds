@@ -1660,6 +1660,9 @@ void game_assets_init() {
     robotSheet = C2D_SpriteSheetLoad("romfs:/gfx/robot.t3x");
     if (!robotSheet) svcBreak(USERBREAK_PANIC);
 
+    spiderSheet = C2D_SpriteSheetLoad("romfs:/gfx/spider.t3x");
+    if (!spiderSheet) svcBreak(USERBREAK_PANIC);
+
     trailSheet = C2D_SpriteSheetLoad("romfs:/gfx/trails.t3x");
     if (!trailSheet) svcBreak(USERBREAK_PANIC);
 
@@ -1858,6 +1861,7 @@ int main(int argc, char* argv[]) {
     C2D_SpriteSheetFree(ufoSheet);
     C2D_SpriteSheetFree(waveSheet);
     C2D_SpriteSheetFree(robotSheet);
+    C2D_SpriteSheetFree(spiderSheet);
     C2D_SpriteSheetFree(trailSheet);
     C2D_SpriteSheetFree(particleSheet);
     C2D_SpriteSheetFree(ui_sheet);

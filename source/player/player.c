@@ -13,6 +13,7 @@
 #include "menus/icon_kit.h"
 #include "collision.h"
 #include "robot_anim_data.h"
+#include "spider_anim_data.h"
 #include "math_helpers.h"
 
 #include "main.h"
@@ -26,6 +27,7 @@
 inline float gravFloor(Player *player) { return player->upside_down ? -state.ceiling_y : state.ground_y; }
 
 void anim_player_to_wall(Player *player);
+float expected_slope_y(int obj, Player *player);
 
 KeyInput curr_input;
 KeyInput curr_old_input;
@@ -117,6 +119,14 @@ void set_robot_animation(Player *player, int robot_anim_id) {
         player->robot_anim_frame = 0;
         player->robot_anim_timer = 0;
         player->robot_landing_blend_timer = 0;
+    }
+}
+
+void set_spider_animation(Player *player, int spider_anim_id) {
+    if (player->spider_anim_id != spider_anim_id) {
+        player->spider_anim_id = spider_anim_id;
+        player->spider_anim_frame = 0;
+        player->spider_anim_timer = 0;
     }
 }
 
@@ -670,7 +680,7 @@ void robot_gamemode(Player *player) {
         set_robot_animation(player, ROBOT_ANIM_FALL_START);
     }
 
-    const RobotAnimation *anim = &robot_animations[player->robot_anim_id];
+    const PlayerAnimation *anim = &robot_animations[player->robot_anim_id];
     float anim_speed = (state.speed == SPEED_SLOW) ? 0.9f
                      : (state.speed == SPEED_FAST) ? 1.15f
                      : (state.speed == SPEED_FASTER) ? 1.3f
@@ -697,6 +707,269 @@ void robot_gamemode(Player *player) {
     player->robot_landing_blend_timer += STEPS_DT;
     if (player->robot_landing_blend_timer > ROBOT_LANDING_BLEND_DURATION) {
         player->robot_landing_blend_timer = ROBOT_LANDING_BLEND_DURATION;
+    }
+}
+
+#define SPIDER_RAY_MAX 256
+
+static int spider_solid_buffer[SPIDER_RAY_MAX];
+static int spider_hazard_buffer[SPIDER_RAY_MAX];
+
+static bool spider_overlap(float player_x, float player_y, float player_width, float player_height, float object_x, float object_y, float object_width, float object_height) {
+    return fabsf(player_x - object_x) < (player_width + object_width) * 0.5f && fabsf(player_y - object_y) < (player_height + object_height) * 0.5f;
+}
+
+static bool spider_rect_hits(int obj, float min_x, float min_y, float max_x, float max_y) {
+    const ObjectHitbox *hitbox = game_objects[objects.id[obj]].hitbox;
+
+    float object_x = objects.x[obj] + hitbox->x * objects.scale_x[obj];
+    float object_y = objects.y[obj] + hitbox->y * objects.scale_y[obj];
+    float half_width = objects.width[obj] * 0.5f;
+    float half_height = objects.height[obj] * 0.5f;
+
+    return min_x < object_x + half_width && max_x > object_x - half_width && min_y < object_y + half_height && max_y > object_y - half_height;
+}
+
+static int spider_collect(float min_x, float min_y, float max_x, float max_y, int *out, int capacity, bool is_hazard) {
+    int count = 0;
+
+    int solid_min_x = (int)floorf(min_x / SECTION_SIZE);
+    int solid_max_x = (int)floorf(max_x / SECTION_SIZE);
+    int solid_min_y = (int)floorf(min_y / SECTION_SIZE);
+    int solid_max_y = (int)floorf(max_y / SECTION_SIZE);
+
+    for (int sy = solid_min_y; sy <= solid_max_y; sy++) {
+        for (int sx = solid_min_x; sx <= solid_max_x; sx++) {
+            Section *sec = get_section(sx, sy);
+
+            for (int i = 0; i < sec->object_count; i++) {
+                int obj = sec->objects[i];
+                int id = objects.id[obj];
+
+                if (!is_valid_object(id)) continue;
+
+                const ObjectHitbox *hitbox = game_objects[id].hitbox;
+
+                if (!hitbox) continue;
+                if (objects.flags[obj] & FLAG_TOGGLED) continue;
+                if (is_hazard) {
+                    if (hitbox->collision_type != HITBOX_HAZARD) continue;
+                } else if (hitbox->collision_type != HITBOX_SOLID) continue;
+
+                if (!spider_rect_hits(obj, min_x, min_y, max_x, max_y)) continue;
+
+                if (count < capacity) out[count++] = obj;
+            }
+        }
+    }
+
+    return count;
+}
+
+static void spider_sort(int *list, int count, bool upside_down) {
+    for (int i = 1; i < count; i++) {
+        int obj = list[i];
+        float key = upside_down ? -obj_getTop(obj) : obj_getBottom(obj);
+        int j = i - 1;
+
+        while (j >= 0) {
+            float prev = upside_down ? -obj_getTop(list[j]) : obj_getBottom(list[j]);
+            if (prev <= key) break;
+            list[j + 1] = list[j];
+            j--;
+        }
+
+        list[j + 1] = obj;
+    }
+}
+
+void spider_test_jump(Player *player, bool is_retry) {
+    if (state.dead) return;
+
+    float player_width = player->width;
+    float player_height = player->height;
+    float player_left = player->x - player_width * 0.5f;
+    float player_bottom = player->y - player_height * 0.5f;
+    float player_top = player->y + player_height * 0.5f;
+
+    float min_teleport = MAX(state.ground_y, player->y - 3000.0f);
+    float max_teleport = MIN(state.ceiling_y, player->y + 3000.0f);
+
+    float tolerance = 2.0f;
+
+    float solid_min_y = !player->upside_down ? (player_top - tolerance) : min_teleport;
+    float solid_max_y = !player->upside_down ? max_teleport : (player_bottom + tolerance);
+
+    bool going_left = state.mirror_mult < 0;
+
+    float solid_min_x = going_left ? (player_left - player_width * 0.5f - 1.0f) : (player_left + player_width * 0.5f);
+    float solid_max_x = solid_min_x + (player_width * 0.5f + 1.0f);
+
+    float hazard_min_x = player_left;
+    float hazard_max_x = player_left + player_width;
+    float extra_min_x = hazard_min_x;
+    float extra_max_x = hazard_max_x + 4.0f;
+
+    float hazard_width = (player->mini ? 0.6f : 1.0f) * 8.0f;
+    float hazard_narrow_min_x = hazard_min_x + (solid_max_x - solid_min_x - hazard_width) * 0.5f;
+    float hazard_narrow_max_x = hazard_narrow_min_x + hazard_width;
+
+    int solid_count = spider_collect(solid_min_x, solid_min_y, solid_max_x, solid_max_y, spider_solid_buffer, SPIDER_RAY_MAX, false);
+    int hazard_count = spider_collect(hazard_narrow_min_x, solid_min_y, hazard_narrow_max_x, solid_max_y, spider_hazard_buffer, SPIDER_RAY_MAX, true);
+
+    bool only_damaging = (solid_count == 0 && hazard_count != 0);
+
+    if (only_damaging || is_retry) {
+        is_retry = true;
+        solid_count = spider_collect(extra_min_x, solid_min_y, extra_max_x, solid_max_y, spider_solid_buffer, SPIDER_RAY_MAX, false);
+    }
+
+    spider_sort(spider_solid_buffer, solid_count, player->upside_down);
+    spider_sort(spider_hazard_buffer, hazard_count, player->upside_down);
+
+    float prev_land_y = 0.0f;
+    float land_y = 0.0f;
+
+    if (only_damaging) {
+        int nearest = spider_hazard_buffer[0];
+        land_y = objects.y[nearest];
+    } else {
+        int i = 0;
+
+        for (i = 0; i < solid_count; i++) {
+            int obj = spider_solid_buffer[i];
+            bool checking_slope = false;
+
+            if (!player->upside_down) {
+                land_y = obj_getBottom(obj) - player_height * 0.5f;
+            } else {
+                land_y = obj_getTop(obj) + player_height * 0.5f;
+            }
+
+            if (game_objects[objects.id[obj]].hitbox->type == COLLISION_SLOPE) {
+                checking_slope = true;
+                land_y = expected_slope_y(obj, player);
+            }
+
+            if ((!player->upside_down && land_y < player->y - 10.0f) ||
+                (player->upside_down && land_y > player->y + 10.0f)) continue;
+
+            if (!going_left) {
+                if (obj_getLeft(obj) <= player->x) break;
+            } else {
+                if (obj_getRight(obj) >= player->x) break;
+            }
+
+            bool hit = false;
+
+            for (int j = 0; j < solid_count; j++) {
+                if (j == i) continue;
+
+                int inner = spider_solid_buffer[j];
+                float object_height = objects.height[inner] - (checking_slope ? 0.0f : 4.0f);
+
+                if (spider_overlap(player->x, land_y, player_width, player_height, objects.x[inner], objects.y[inner], objects.width[inner], object_height)) {
+                    if (checking_slope) {
+                        if (prev_land_y != 0.0f) land_y = !player->upside_down ? MIN(land_y, prev_land_y) : MAX(land_y, prev_land_y);
+                    } else {
+                        land_y = prev_land_y;
+                    }
+
+                    hit = true;
+                    prev_land_y = land_y;
+                    break;
+                }
+            }
+
+            if (!hit) break;
+        }
+
+        if (i >= solid_count) land_y = 0.0f;
+    }
+
+    if (land_y == 0.0f) {
+        land_y = player->upside_down ? (min_teleport + player_height * 0.5f) : (max_teleport - player_height * 0.5f);
+    }
+
+    if (!only_damaging && hazard_count != 0) {
+        float hazard_y = objects.y[spider_hazard_buffer[0]];
+
+        if ((!player->upside_down && hazard_y < land_y) ||
+            (player->upside_down && hazard_y > land_y)) {
+            if (!is_retry) {
+                spider_test_jump(player, true);
+                return;
+            }
+
+            land_y = hazard_y;
+        }
+    }
+
+    player->y = land_y;
+    player->upside_down = !player->upside_down;
+    player->vel_y = player->upside_down ? 1.0f : -1.0f;
+    player->on_ground = false;
+    player->on_ceiling = false;
+    player->left_ground = true;
+    player->inverse_rotation = false;
+    player->snap_rotation = true;
+    player->buffering_state = BUFFER_END;
+
+    update_rotation_direction(player);
+    clear_slope_data(player);
+}
+
+void spider_gamemode(Player *player) {
+    trail->positionR = (Vec2D){player->x, player->y};
+    trail->startingPositionInitialized = true;
+
+    player->min_vel = -810;
+    player->max_vel = 810;
+
+    if (!player->upside_down && player->vel_y < player->min_vel) player->vel_y = player->min_vel;
+    if (player->upside_down && player->vel_y > player->max_vel) player->vel_y = player->max_vel;
+
+    player->gravity = -2794.1082f * 0.6f;
+
+    if (player->y > 2794.f) kill_player(DEATH_FELL_OFF_LEVEL);
+
+    if (player->on_ground) {
+        set_spider_animation(player, (state.speed <= SPEED_NORMAL) ? SPIDER_ANIM_WALK : SPIDER_ANIM_RUN);
+        MotionTrail_StopStroke(trail);
+
+        if (player->slope_data.slope_id < 0 && !player->dashing) player->rotation = roundf(player->rotation / 90.0f) * 90.0f;
+    }
+
+    if ((player->slope_data.slope_id >= 0 || player->on_ground) && (curr_input.holdJump && player->buffering_state == BUFFER_READY) && !player->dashing) {
+        spider_test_jump(player, false);
+        player->buffering_state = BUFFER_END;
+        player->jumped = true;
+    }
+
+    if (!player->on_ground && player->vel_y < 0 && player->spider_anim_id != SPIDER_ANIM_FALL) {
+        set_spider_animation(player, SPIDER_ANIM_FALL);
+    }
+
+    const PlayerAnimation *anim = &spider_animations[player->spider_anim_id];
+
+    float anim_speed = (state.speed == SPEED_SLOW) ? 0.9f
+                     : (state.speed == SPEED_FAST) ? 1.15f
+                     : (state.speed == SPEED_FASTER) ? 1.3f
+                     : (state.speed == SPEED_FASTEST) ? 1.5f : 1.0f;
+
+    if (player->mini) anim_speed /= 0.85f;
+    if (state.speed >= SPEED_FAST) anim_speed /= 1.1f;
+
+    player->spider_anim_timer += STEPS_DT * anim_speed;
+
+    if (player->spider_anim_timer >= anim->frames[player->spider_anim_frame].delay) {
+        player->spider_anim_timer -= anim->frames[player->spider_anim_frame].delay;
+
+        int next = player->spider_anim_frame + 1;
+
+        if (next >= anim->frame_count) next = 0;
+
+        player->spider_anim_frame = next;
     }
 }
 
@@ -826,6 +1099,9 @@ void run_player(Player *player) {
         case GAMEMODE_ROBOT:
             robot_gamemode(player);
             break;
+        case GAMEMODE_SPIDER:
+            spider_gamemode(player);
+            break;
     } 
     
     player->time_since_ground += STEPS_DT;
@@ -921,6 +1197,7 @@ void run_player(Player *player) {
             rotate_fly(player, player->mini ? 0.4f : 0.25f);
             break;
         case GAMEMODE_ROBOT:
+        case GAMEMODE_SPIDER:
             float angle_rad = 0;
             if (player->slope_data.slope_id >= 0) {
                 angle_rad = slope_snap_angle(player->slope_data.slope_id, player);
@@ -937,12 +1214,13 @@ void run_player(Player *player) {
 void handle_player(Player *player) {
     u64 start_player = svcGetSystemTick();
     if (curr_input.holdJump) {
+        if (curr_input.pressedJump) player->holding_jump_cancelled = false;
         if (!player->holding_jump_cancelled && player->buffering_state == BUFFER_NONE) {
             player->buffering_state = BUFFER_READY;
         }
     } else {
         player->buffering_state = BUFFER_NONE;
-        player->holding_jump_cancelled = false;
+        player->holding_jump_cancelled = player->no_auto_jump_exempt = false;
         stop_dashing(player);
     }
     
@@ -996,6 +1274,8 @@ void handle_player(Player *player) {
     u64 end = svcGetSystemTick();
     u64 ticks = end - start;
     snapshot.collision_ms += ticks / CPU_TICKS_PER_MSEC;
+
+    if (player->no_auto_jump_timer > 0 && player->on_ground && curr_input.holdJump && !player->no_auto_jump_exempt && player->buffering_state != BUFFER_READY) player->holding_jump_cancelled = true;
     
     if (state.noclip || state.end_wall_anim_playing) state.dead = false;
     
@@ -1028,6 +1308,8 @@ void handle_player(Player *player) {
     } 
 
     run_player(player);
+
+    if (player->buffering_state == BUFFER_READY) player->no_auto_jump_exempt = true;
 
     if (state.dead) stop_dashing(player);
 
@@ -1106,6 +1388,8 @@ void spawn_p1_trail(Player *player, int player_id) {
             trail_data->upside_down = player->upside_down;
             break;
         case GAMEMODE_ROBOT:
+            return;
+        case GAMEMODE_SPIDER:
             return;
     }
 
@@ -1246,6 +1530,7 @@ void draw_player(Player *player) {
     int selected_ufo =  player->player_icons.ufo;
     int selected_wave = player->player_icons.wave;
     int selected_robot = player->player_icons.robot;
+    int selected_spider = player->player_icons.spider;
 
     bool glow_enabled = (player->player_icons.glow || ((p1_color.r | p1_color.g | p1_color.b) == 0));
 
@@ -1314,6 +1599,19 @@ void draw_player(Player *player) {
                 (IconParameters) { 0 }
             );
             break;
+        case GAMEMODE_SPIDER: {
+            spawn_icon_at(GAMEMODE_SPIDER, selected_spider, glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale,
+                primary_color,
+                secondary_color,
+                C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255),
+                (IconParameters) {
+                    .spider_anim_frame = player->spider_anim_frame,
+                    .spider_anim_id = player->spider_anim_id,
+                    .spider_anim_timer = player->spider_anim_timer
+                 }
+            );
+            break;
+        }
         case GAMEMODE_ROBOT: {
             spawn_icon_at(GAMEMODE_ROBOT, selected_robot, glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale,
                 primary_color,

@@ -8,6 +8,7 @@
 #include "main.h"
 #include "math_helpers.h"
 #include "player/robot_anim_data.h"
+#include "player/spider_anim_data.h"
 #include "triggers.h"
 #include <stdlib.h>
 #include <string.h>
@@ -110,6 +111,7 @@ C2D_SpriteSheet ballSheet;
 C2D_SpriteSheet ufoSheet;
 C2D_SpriteSheet waveSheet;
 C2D_SpriteSheet robotSheet;
+C2D_SpriteSheet spiderSheet;
 C2D_SpriteSheet trailSheet;
 C2D_SpriteSheet particleSheet;
 
@@ -2342,6 +2344,8 @@ C2D_SpriteSheet *get_icon_sheet(const IconPart *part, int gamemode) {
             return &waveSheet;
         case GAMEMODE_ROBOT:
             return &robotSheet;
+        case GAMEMODE_SPIDER:
+            return &spiderSheet;
     }
     return NULL;
 }
@@ -2361,7 +2365,7 @@ static void robot_icon(
     float sin_rot = sinf(C3D_AngleFromDegrees(deg));
 
     for (int i = 0; i < frame->part_count; i++) {
-        const RobotSpritePart *part = &frame->parts[i];
+        const PlayerSpritePart *part = &frame->parts[i];
 
         float part_x = part->px;
         float part_y = part->py * flip_y_mult;
@@ -2446,12 +2450,116 @@ static void spawn_icon_at_internal(
         C2D_PlainImageTint(&tints[ICON_COLOR_GLOW], 0, 1.0f);
     }
 
+    if (gamemode == GAMEMODE_SPIDER) {
+        const PlayerAnimation *anim = &spider_animations[params.spider_anim_id];
+
+        if (params.spider_anim_frame >= anim->frame_count)
+            params.spider_anim_frame = 0;
+
+        const PlayerFrame *frame = &anim->frames[params.spider_anim_frame];
+        const PlayerFrame *next_frame = frame;
+        float anim_fraction = 0.0f;
+
+        if (anim->frame_count > 1) {
+            int next_idx = params.spider_anim_frame + 1;
+
+            if (next_idx >= anim->frame_count) next_idx = 0;
+
+            next_frame = &anim->frames[next_idx];
+            anim_fraction = params.spider_anim_timer / frame->delay;
+        }
+
+        for (int i = 0; i < frame->part_count; i++) {
+            const PlayerSpritePart *animation_part = &frame->parts[i];
+            const PlayerSpritePart *next_part = &next_frame->parts[i];
+
+            float anim_px = animation_part->px + (next_part->px - animation_part->px) * anim_fraction;
+            float anim_py = animation_part->py + (next_part->py - animation_part->py) * anim_fraction;
+            float anim_rot = next_part->rotation - animation_part->rotation;
+
+            if (anim_rot > 180.0f) anim_rot -= 360.0f;
+            if (anim_rot < -180.0f) anim_rot += 360.0f;
+
+            anim_rot = animation_part->rotation + anim_rot * anim_fraction;
+
+            int texture_part = animation_part->texture_idx / 2;
+
+            size_t index;
+
+            for (index = 0; index < count; index++) {
+                const IconPart *part = &parts[index];
+
+                if (part->animation_part - 1 == texture_part) break;
+            }
+
+            if (index == count) continue;
+
+            size_t layer_count = 0;
+
+            while (index + layer_count < count) {
+                const IconPart *test_part = &parts[index + layer_count];
+
+                if (test_part->animation_part - 1 != texture_part) break;
+
+                layer_count++;
+            }
+
+            for (size_t j = 0; j < layer_count; j++) {
+                int real_index = j;
+
+                if (j == 0) real_index = 1;
+                else if (j == 1) real_index = 0;
+
+                const IconPart *part = &parts[index + real_index];
+
+                C2D_SpriteSheet *sheet = get_icon_sheet(part, gamemode);
+
+                if (!sheet) return;
+
+                if (part->texture >= 0) {
+                    float part_rad = rad + C3D_AngleFromDegrees(anim_rot) * flip_x_mult * flip_y_mult;
+                    float part_cos_r = cosf(part_rad);
+                    float part_sin_r = sinf(part_rad);
+
+                    float anim_x = anim_px * 2.0f * flip_x_mult;
+                    float anim_y = anim_py * 2.0f * flip_y_mult;
+
+                    float part_x = part->x * flip_x_mult;
+                    float part_y = part->y * flip_y_mult;
+
+                    float rot_anim_x = anim_x * cos_r + anim_y * sin_r;
+                    float rot_anim_y = anim_x * sin_r - anim_y * cos_r;
+
+                    float rot_part_x = part_x * part_cos_r + part_y * part_sin_r;
+                    float rot_part_y = part_x * part_sin_r - part_y * part_cos_r;
+
+                    float p_x = x + (rot_anim_x + rot_part_x) * scale;
+                    float p_y = y + (rot_anim_y + rot_part_y) * scale;
+
+                    float part_sx = (animation_part->scale_x < 0.0f) ? -sx : sx;
+
+                    C2D_SpriteFromSheet(&spr, *sheet, part->texture);
+                    C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
+                    C3D_TexSetFilter(spr.image.tex, GPU_LINEAR, GPU_LINEAR);
+
+                    C2D_SpriteSetPos(&spr, p_x, p_y);
+                    C2D_SpriteSetScale(&spr, part_sx, sy);
+                    C2D_SpriteSetRotation(&spr, part_rad);
+
+                    C2D_DrawSpriteTinted(&spr, &tints[part->color_type]);
+                }
+            }
+        }
+
+        return;
+    }
+
     if (gamemode == GAMEMODE_ROBOT) {
-        const RobotAnimation *anim = &robot_animations[params.robot_anim_id];
+        const PlayerAnimation *anim = &robot_animations[params.robot_anim_id];
         if (params.robot_anim_frame >= anim->frame_count)
             params.robot_anim_frame = 0;
-        const RobotFrame *frame = &anim->frames[params.robot_anim_frame];
-        const RobotFrame *next_frame = frame;
+        const PlayerFrame *frame = &anim->frames[params.robot_anim_frame];
+        const PlayerFrame *next_frame = frame;
         float anim_fraction = 0.0f;
         if (anim->frame_count > 1) {
             int next_idx = params.robot_anim_frame + 1;
@@ -2464,9 +2572,9 @@ static void spawn_icon_at_internal(
             }
         }
 
-        const RobotAnimation *blend_from_anim = NULL;
-        const RobotFrame *blend_from_frame = NULL;
-        const RobotFrame *blend_from_next_frame = NULL;
+        const PlayerAnimation *blend_from_anim = NULL;
+        const PlayerFrame *blend_from_frame = NULL;
+        const PlayerFrame *blend_from_next_frame = NULL;
         float blend_from_fraction = 0.f;
         if (params.robot_blend_fraction > 0.f && params.robot_blend_from_anim_id >= 0 && params.robot_blend_from_anim_id < ROBOT_ANIM_COUNT) {
             blend_from_anim = &robot_animations[params.robot_blend_from_anim_id];
@@ -2492,8 +2600,8 @@ static void spawn_icon_at_internal(
         }
         
         for (int i = 0; i < frame->part_count; i++) {
-            const RobotSpritePart *animation_part = &frame->parts[i];
-            const RobotSpritePart *next_part = &next_frame->parts[i];
+            const PlayerSpritePart *animation_part = &frame->parts[i];
+            const PlayerSpritePart *next_part = &next_frame->parts[i];
             float anim_px = animation_part->px + (next_part->px - animation_part->px) * anim_fraction;
             float anim_py = animation_part->py + (next_part->py - animation_part->py) * anim_fraction;
             float anim_rot = next_part->rotation - animation_part->rotation;
@@ -2502,8 +2610,8 @@ static void spawn_icon_at_internal(
             anim_rot = animation_part->rotation + anim_rot * anim_fraction;
 
             if (blend_from_frame) {
-                const RobotSpritePart *from_part = &blend_from_frame->parts[i];
-                const RobotSpritePart *from_next_part = &blend_from_next_frame->parts[i];
+                const PlayerSpritePart *from_part = &blend_from_frame->parts[i];
+                const PlayerSpritePart *from_next_part = &blend_from_next_frame->parts[i];
                 float from_px = from_part->px + (from_next_part->px - from_part->px) * blend_from_fraction;
                 float from_py = from_part->py + (from_next_part->py - from_part->py) * blend_from_fraction;
                 float from_rot = from_next_part->rotation - from_part->rotation;

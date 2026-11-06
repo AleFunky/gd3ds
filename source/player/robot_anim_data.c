@@ -1,6 +1,6 @@
 #include "robot_anim_data.h"
 
-static const RobotSpritePart robot_run_f001[] = {
+static const PlayerSpritePart robot_run_f001[] = {
     { 4, -3.7500f, -2.5875f, 100.2628f, 0.9988f, 0.9994f, 0 },
     { 2, -1.8250f, -0.9750f, 26.5609f, 0.9974f, 0.9987f, 1 },
     { 6, -7.2500f, -2.4625f, 114.5518f, 0.9975f, 0.9987f, 2 },
@@ -10,7 +10,7 @@ static const RobotSpritePart robot_run_f001[] = {
     { 6, 3.0500f, -4.0375f, -36.5981f, 0.9968f, 0.9984f, 6 },
 };
 
-static const RobotSpritePart robot_run_f002[] = {
+static const PlayerSpritePart robot_run_f002[] = {
     { 4, -2.3125f, -2.9125f, 89.7456f, 1.0000f, 1.0000f, 0 },
     { 2, -0.9875f, -1.2000f, 4.2568f, 0.9995f, 0.9998f, 1 },
     { 6, -6.1125f, -3.3125f, 108.5283f, 0.9980f, 0.9990f, 2 },
@@ -20,7 +20,7 @@ static const RobotSpritePart robot_run_f002[] = {
     { 6, 2.4750f, -4.8125f, -18.2764f, 0.9980f, 0.9990f, 6 },
 };
 
-static const RobotSpritePart robot_run_f003[] = {
+static const PlayerSpritePart robot_run_f003[] = {
     { 4, -0.8750f, -3.2375f, 78.7356f, 0.9987f, 0.9994f, 0 },
     { 2, -0.1500f, -1.4125f, -17.5347f, 0.9981f, 0.9990f, 1 },
     { 6, -4.9875f, -4.1500f, 102.7622f, 0.9986f, 0.9993f, 2 },
@@ -30,7 +30,7 @@ static const RobotSpritePart robot_run_f003[] = {
     { 6, 1.9250f, -5.6125f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_run_f004[] = {
+static const PlayerSpritePart robot_run_f004[] = {
     { 4, 0.3875f, -2.3250f, 63.4496f, 0.9974f, 0.9987f, 0 },
     { 2, 0.7125f, -0.1375f, -28.0606f, 0.9973f, 0.9986f, 1 },
     { 6, -2.4875f, -4.0875f, 73.4780f, 0.9982f, 0.9991f, 2 },
@@ -40,7 +40,7 @@ static const RobotSpritePart robot_run_f004[] = {
     { 6, -0.9125f, -5.6125f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_run_f005[] = {
+static const PlayerSpritePart robot_run_f005[] = {
     { 4, 1.2125f, -1.0375f, 26.3955f, 0.9967f, 0.9983f, 0 },
     { 2, -0.4500f, 1.6500f, -38.6070f, 0.9968f, 0.9984f, 1 },
     { 6, 0.0250f, -4.0125f, 44.1224f, 0.9967f, 0.9983f, 2 },
@@ -50,7 +50,7 @@ static const RobotSpritePart robot_run_f005[] = {
     { 6, -3.7500f, -5.6125f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_run_f006[] = {
+static const PlayerSpritePart robot_run_f006[] = {
     { 4, 2.3000f, -1.3750f, -4.7581f, 0.9995f, 0.9997f, 0 },
     { 2, -0.5625f, 1.2125f, -40.8589f, 0.9967f, 0.9984f, 1 },
     { 6, 3.0625f, -3.2875f, -2.2536f, 0.9997f, 0.9999f, 2 },
@@ -60,7 +60,7 @@ static const RobotSpritePart robot_run_f006[] = {
     { 6, -6.7625f, -4.3375f, 41.6134f, 0.9968f, 0.9984f, 6 },
 };
 
-static const RobotSpritePart robot_run_f007[] = {
+static const PlayerSpritePart robot_run_f007[] = {
     { 4, 2.9750f, -1.3125f, -58.1830f, 0.9971f, 0.9985f, 0 },
     { 2, -0.9250f, 1.4000f, -42.8697f, 0.9967f, 0.9983f, 1 },
     { 6, 6.1000f, -2.5875f, -48.8875f, 0.9967f, 0.9983f, 2 },
@@ -70,7 +70,7 @@ static const RobotSpritePart robot_run_f007[] = {
     { 6, -9.2250f, -2.2625f, 83.4921f, 0.9992f, 0.9996f, 6 },
 };
 
-static const RobotSpritePart robot_run_f008[] = {
+static const PlayerSpritePart robot_run_f008[] = {
     { 4, 1.6625f, -2.1625f, -57.6788f, 0.9970f, 0.9985f, 0 },
     { 2, -1.0500f, 0.7000f, -8.5065f, 0.9990f, 0.9995f, 1 },
     { 6, 4.9750f, -3.3250f, -42.8659f, 0.9967f, 0.9984f, 2 },
@@ -80,7 +80,7 @@ static const RobotSpritePart robot_run_f008[] = {
     { 6, -9.1000f, -1.9625f, 99.0086f, 0.9989f, 0.9995f, 6 },
 };
 
-static const RobotSpritePart robot_run_f009[] = {
+static const PlayerSpritePart robot_run_f009[] = {
     { 4, 0.3250f, -3.0000f, -56.9297f, 0.9970f, 0.9985f, 0 },
     { 2, -1.4125f, 0.0500f, 14.5510f, 0.9974f, 0.9987f, 1 },
     { 6, 3.8375f, -4.0375f, -36.5981f, 0.9968f, 0.9984f, 2 },
@@ -90,7 +90,7 @@ static const RobotSpritePart robot_run_f009[] = {
     { 6, -8.9375f, -1.6750f, 114.5518f, 0.9975f, 0.9987f, 6 },
 };
 
-static const RobotSpritePart robot_run_f010[] = {
+static const PlayerSpritePart robot_run_f010[] = {
     { 4, -0.6250f, -3.6000f, -52.1597f, 0.9969f, 0.9984f, 0 },
     { 2, -1.5875f, -0.7000f, 36.8435f, 0.9969f, 0.9984f, 1 },
     { 6, 2.4750f, -4.8250f, -18.2764f, 0.9980f, 0.9990f, 2 },
@@ -100,7 +100,7 @@ static const RobotSpritePart robot_run_f010[] = {
     { 6, -8.0875f, -2.8750f, 108.5283f, 0.9980f, 0.9990f, 6 },
 };
 
-static const RobotSpritePart robot_run_f011[] = {
+static const PlayerSpritePart robot_run_f011[] = {
     { 4, -1.5875f, -4.1750f, -47.6303f, 0.9967f, 0.9984f, 0 },
     { 2, -1.9375f, -1.3750f, 48.1437f, 0.9967f, 0.9984f, 1 },
     { 6, 1.1375f, -5.6125f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -110,7 +110,7 @@ static const RobotSpritePart robot_run_f011[] = {
     { 6, -7.2375f, -4.0875f, 102.7622f, 0.9986f, 0.9993f, 6 },
 };
 
-static const RobotSpritePart robot_run_f012[] = {
+static const PlayerSpritePart robot_run_f012[] = {
     { 4, -2.6000f, -3.6375f, -11.0135f, 0.9988f, 0.9994f, 0 },
     { 2, -2.0125f, -0.6375f, 33.8293f, 0.9970f, 0.9985f, 1 },
     { 6, -1.2250f, -5.6125f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -120,7 +120,7 @@ static const RobotSpritePart robot_run_f012[] = {
     { 6, -5.4750f, -4.2750f, 81.7417f, 0.9990f, 0.9995f, 6 },
 };
 
-static const RobotSpritePart robot_run_f013[] = {
+static const PlayerSpritePart robot_run_f013[] = {
     { 4, -3.6000f, -3.0625f, 25.0503f, 0.9975f, 0.9987f, 0 },
     { 2, -2.0500f, 0.1375f, 19.2872f, 0.9980f, 0.9990f, 1 },
     { 6, -3.5875f, -5.6125f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -130,7 +130,7 @@ static const RobotSpritePart robot_run_f013[] = {
     { 6, -3.3875f, -4.7625f, 53.9724f, 0.9971f, 0.9986f, 6 },
 };
 
-static const RobotSpritePart robot_run_f014[] = {
+static const PlayerSpritePart robot_run_f014[] = {
     { 4, -4.8375f, -2.0875f, 47.1364f, 0.9967f, 0.9983f, 0 },
     { 2, -2.4875f, 0.5250f, 36.8419f, 0.9969f, 0.9984f, 1 },
     { 6, -5.8625f, -3.9125f, 41.6134f, 0.9968f, 0.9984f, 2 },
@@ -140,7 +140,7 @@ static const RobotSpritePart robot_run_f014[] = {
     { 6, 0.6125f, -5.1750f, 5.7542f, 0.9994f, 0.9997f, 6 },
 };
 
-static const RobotSpritePart robot_run_f015[] = {
+static const PlayerSpritePart robot_run_f015[] = {
     { 4, -6.0625f, -1.1000f, 69.2098f, 0.9978f, 0.9989f, 0 },
     { 2, -2.9250f, 0.9250f, 54.4157f, 0.9969f, 0.9984f, 1 },
     { 6, -8.1625f, -2.2125f, 83.4921f, 0.9992f, 0.9996f, 2 },
@@ -150,7 +150,7 @@ static const RobotSpritePart robot_run_f015[] = {
     { 6, 4.8625f, -3.0375f, -48.8875f, 0.9967f, 0.9983f, 6 },
 };
 
-static const RobotSpritePart robot_run_f016[] = {
+static const PlayerSpritePart robot_run_f016[] = {
     { 4, -4.9000f, -1.8500f, 84.7482f, 0.9994f, 0.9997f, 0 },
     { 2, -2.3750f, -0.0375f, 40.6064f, 0.9968f, 0.9983f, 1 },
     { 6, -7.7000f, -2.3375f, 99.0086f, 0.9989f, 0.9995f, 2 },
@@ -160,7 +160,7 @@ static const RobotSpritePart robot_run_f016[] = {
     { 6, 3.9625f, -3.5375f, -42.8659f, 0.9967f, 0.9984f, 6 },
 };
 
-static const RobotFrame robot_run_frames[] = {
+static const PlayerFrame robot_run_frames[] = {
     { robot_run_f001, 7, 0.041667f },
     { robot_run_f002, 7, 0.041667f },
     { robot_run_f003, 7, 0.041667f },
@@ -179,7 +179,7 @@ static const RobotFrame robot_run_frames[] = {
     { robot_run_f016, 7, 0.041667f },
 };
 
-static const RobotSpritePart robot_jump_start_f001[] = {
+static const PlayerSpritePart robot_jump_start_f001[] = {
     { 4, -3.4375f, -3.7875f, 28.6307f, 0.9988f, 0.9994f, 0 },
     { 2, -1.7625f, -0.9000f, 26.5609f, 0.9974f, 0.9987f, 1 },
     { 6, -4.7625f, -6.3625f, 48.4160f, 0.9975f, 0.9987f, 2 },
@@ -189,7 +189,7 @@ static const RobotSpritePart robot_jump_start_f001[] = {
     { 6, 2.6750f, -4.3500f, -36.5981f, 0.9968f, 0.9984f, 6 },
 };
 
-static const RobotSpritePart robot_jump_start_f002[] = {
+static const PlayerSpritePart robot_jump_start_f002[] = {
     { 4, -3.3125f, -3.5375f, 18.3961f, 0.9988f, 0.9994f, 0 },
     { 2, -1.8125f, -0.6250f, 26.5609f, 0.9973f, 0.9986f, 1 },
     { 6, -4.2125f, -6.1000f, 42.2372f, 0.9974f, 0.9987f, 2 },
@@ -199,7 +199,7 @@ static const RobotSpritePart robot_jump_start_f002[] = {
     { 6, 1.9125f, -4.4375f, -27.8334f, 0.9968f, 0.9984f, 6 },
 };
 
-static const RobotSpritePart robot_jump_start_f003[] = {
+static const PlayerSpritePart robot_jump_start_f003[] = {
     { 4, -3.0500f, -2.9625f, -4.4385f, 0.9988f, 0.9994f, 0 },
     { 2, -1.9000f, -0.0250f, 26.5609f, 0.9973f, 0.9986f, 1 },
     { 6, -3.0000f, -5.4875f, 28.4479f, 0.9974f, 0.9987f, 2 },
@@ -209,7 +209,7 @@ static const RobotSpritePart robot_jump_start_f003[] = {
     { 6, 0.2375f, -4.6375f, -8.2789f, 0.9968f, 0.9983f, 6 },
 };
 
-static const RobotSpritePart robot_jump_start_f004[] = {
+static const PlayerSpritePart robot_jump_start_f004[] = {
     { 4, -2.7500f, -2.3750f, -27.9372f, 0.9988f, 0.9993f, 0 },
     { 2, -1.9875f, 0.5875f, 26.5609f, 0.9973f, 0.9986f, 1 },
     { 6, -1.7250f, -4.8500f, 14.2582f, 0.9975f, 0.9987f, 2 },
@@ -219,7 +219,7 @@ static const RobotSpritePart robot_jump_start_f004[] = {
     { 6, -1.5125f, -4.8250f, 11.8442f, 0.9968f, 0.9984f, 6 },
 };
 
-static const RobotSpritePart robot_jump_start_f005[] = {
+static const PlayerSpritePart robot_jump_start_f005[] = {
     { 4, -2.6250f, -2.0875f, -39.0474f, 0.9988f, 0.9994f, 0 },
     { 2, -2.0125f, 0.9000f, 26.5609f, 0.9974f, 0.9987f, 1 },
     { 6, -1.1250f, -4.5375f, 7.5507f, 0.9975f, 0.9987f, 2 },
@@ -229,7 +229,7 @@ static const RobotSpritePart robot_jump_start_f005[] = {
     { 6, -2.3250f, -4.9375f, 21.3581f, 0.9968f, 0.9984f, 6 },
 };
 
-static const RobotFrame robot_jump_start_frames[] = {
+static const PlayerFrame robot_jump_start_frames[] = {
     { robot_jump_start_f001, 7, 0.041667f },
     { robot_jump_start_f002, 7, 0.041667f },
     { robot_jump_start_f003, 7, 0.041667f },
@@ -237,7 +237,7 @@ static const RobotFrame robot_jump_start_frames[] = {
     { robot_jump_start_f005, 7, 0.041667f },
 };
 
-static const RobotSpritePart robot_jump_f001[] = {
+static const PlayerSpritePart robot_jump_f001[] = {
     { 4, -2.6250f, -2.0875f, -39.0474f, 0.9988f, 0.9994f, 0 },
     { 2, -2.0125f, 0.9000f, 26.5609f, 0.9974f, 0.9987f, 1 },
     { 6, -1.1250f, -4.5375f, 7.5507f, 0.9975f, 0.9987f, 2 },
@@ -247,7 +247,7 @@ static const RobotSpritePart robot_jump_f001[] = {
     { 6, -2.3250f, -4.9375f, 21.3581f, 0.9968f, 0.9984f, 6 },
 };
 
-static const RobotSpritePart robot_jump_f002[] = {
+static const PlayerSpritePart robot_jump_f002[] = {
     { 4, -2.9375f, -2.1000f, -31.8568f, 0.9988f, 0.9993f, 0 },
     { 2, -2.0125f, 0.9000f, 26.5609f, 0.9974f, 0.9987f, 1 },
     { 6, -1.5500f, -4.6250f, 9.8237f, 0.9975f, 0.9987f, 2 },
@@ -257,7 +257,7 @@ static const RobotSpritePart robot_jump_f002[] = {
     { 6, -2.5500f, -5.1625f, 18.8601f, 0.9968f, 0.9983f, 6 },
 };
 
-static const RobotSpritePart robot_jump_f003[] = {
+static const PlayerSpritePart robot_jump_f003[] = {
     { 4, -3.2625f, -2.1375f, -23.3042f, 0.9988f, 0.9994f, 0 },
     { 2, -2.0125f, 0.9000f, 26.5609f, 0.9974f, 0.9987f, 1 },
     { 6, -2.0125f, -4.7000f, 12.5267f, 0.9975f, 0.9987f, 2 },
@@ -267,7 +267,7 @@ static const RobotSpritePart robot_jump_f003[] = {
     { 6, -2.8250f, -5.4375f, 15.8851f, 0.9968f, 0.9984f, 6 },
 };
 
-static const RobotSpritePart robot_jump_f004[] = {
+static const PlayerSpritePart robot_jump_f004[] = {
     { 4, -3.1500f, -2.1125f, -28.5276f, 0.9982f, 0.9988f, 0 },
     { 2, -2.0250f, 0.9000f, 26.5588f, 0.9969f, 0.9982f, 1 },
     { 6, -1.8000f, -4.6750f, 11.7160f, 0.9973f, 0.9986f, 2 },
@@ -277,7 +277,7 @@ static const RobotSpritePart robot_jump_f004[] = {
     { 6, -2.7125f, -5.3250f, 17.1060f, 0.9964f, 0.9980f, 6 },
 };
 
-static const RobotSpritePart robot_jump_f005[] = {
+static const PlayerSpritePart robot_jump_f005[] = {
     { 4, -2.9250f, -2.0500f, -39.0864f, 0.9972f, 0.9978f, 0 },
     { 2, -2.0125f, 0.9000f, 26.5532f, 0.9960f, 0.9974f, 1 },
     { 6, -1.2750f, -4.6125f, 9.7779f, 0.9970f, 0.9982f, 2 },
@@ -287,7 +287,7 @@ static const RobotSpritePart robot_jump_f005[] = {
     { 6, -2.4625f, -5.0875f, 19.5741f, 0.9958f, 0.9973f, 6 },
 };
 
-static const RobotFrame robot_jump_frames[] = {
+static const PlayerFrame robot_jump_frames[] = {
     { robot_jump_f001, 7, 0.041667f },
     { robot_jump_f002, 7, 0.041667f },
     { robot_jump_f003, 7, 0.041667f },
@@ -295,7 +295,7 @@ static const RobotFrame robot_jump_frames[] = {
     { robot_jump_f005, 7, 0.041667f },
 };
 
-static const RobotSpritePart robot_fall_start_f001[] = {
+static const PlayerSpritePart robot_fall_start_f001[] = {
     { 4, -2.6250f, -2.0875f, -39.0474f, 0.9988f, 0.9994f, 0 },
     { 2, -2.0125f, 0.9000f, 26.5609f, 0.9974f, 0.9987f, 1 },
     { 6, -1.1250f, -4.5375f, 7.5507f, 0.9975f, 0.9987f, 2 },
@@ -305,7 +305,7 @@ static const RobotSpritePart robot_fall_start_f001[] = {
     { 6, -2.3250f, -4.9375f, 21.3581f, 0.9968f, 0.9984f, 6 },
 };
 
-static const RobotSpritePart robot_fall_start_f002[] = {
+static const PlayerSpritePart robot_fall_start_f002[] = {
     { 4, -2.5000f, -2.2250f, -38.6497f, 0.9986f, 0.9993f, 0 },
     { 2, -2.0000f, 0.8125f, 27.2823f, 0.9973f, 0.9986f, 1 },
     { 6, -0.9500f, -4.6250f, 5.4815f, 0.9975f, 0.9987f, 2 },
@@ -315,7 +315,7 @@ static const RobotSpritePart robot_fall_start_f002[] = {
     { 6, -2.3250f, -5.0000f, 18.8319f, 0.9968f, 0.9984f, 6 },
 };
 
-static const RobotSpritePart robot_fall_start_f003[] = {
+static const PlayerSpritePart robot_fall_start_f003[] = {
     { 4, -2.1000f, -2.5500f, -37.6309f, 0.9983f, 0.9991f, 0 },
     { 2, -1.8875f, 0.5500f, 29.1275f, 0.9972f, 0.9986f, 1 },
     { 6, -0.4875f, -4.8250f, 0.1888f, 0.9976f, 0.9988f, 2 },
@@ -325,7 +325,7 @@ static const RobotSpritePart robot_fall_start_f003[] = {
     { 6, -2.2875f, -5.1875f, 12.3641f, 0.9971f, 0.9985f, 6 },
 };
 
-static const RobotSpritePart robot_fall_start_f004[] = {
+static const PlayerSpritePart robot_fall_start_f004[] = {
     { 4, -1.5875f, -3.0125f, -36.2738f, 0.9978f, 0.9989f, 0 },
     { 2, -1.7750f, 0.2125f, 31.5823f, 0.9970f, 0.9985f, 1 },
     { 6, 0.1375f, -5.0750f, -6.8537f, 0.9977f, 0.9988f, 2 },
@@ -335,7 +335,7 @@ static const RobotSpritePart robot_fall_start_f004[] = {
     { 6, -2.2500f, -5.4125f, 3.7618f, 0.9973f, 0.9986f, 6 },
 };
 
-static const RobotSpritePart robot_fall_start_f005[] = {
+static const PlayerSpritePart robot_fall_start_f005[] = {
     { 4, -1.0625f, -3.4875f, -34.8897f, 0.9973f, 0.9987f, 0 },
     { 2, -1.6375f, -0.1250f, 34.0891f, 0.9969f, 0.9984f, 1 },
     { 6, 0.7500f, -5.3500f, -14.0404f, 0.9978f, 0.9989f, 2 },
@@ -345,7 +345,7 @@ static const RobotSpritePart robot_fall_start_f005[] = {
     { 6, -2.2125f, -5.6500f, -5.0168f, 0.9976f, 0.9988f, 6 },
 };
 
-static const RobotSpritePart robot_fall_start_f006[] = {
+static const PlayerSpritePart robot_fall_start_f006[] = {
     { 4, -0.6375f, -3.8375f, -33.8063f, 0.9970f, 0.9984f, 0 },
     { 2, -1.5125f, -0.3875f, 36.0488f, 0.9968f, 0.9984f, 1 },
     { 6, 1.2500f, -5.5625f, -19.6633f, 0.9979f, 0.9990f, 2 },
@@ -355,7 +355,7 @@ static const RobotSpritePart robot_fall_start_f006[] = {
     { 6, -2.1875f, -5.8375f, -11.8869f, 0.9979f, 0.9989f, 6 },
 };
 
-static const RobotSpritePart robot_fall_start_f007[] = {
+static const PlayerSpritePart robot_fall_start_f007[] = {
     { 4, -0.4625f, -4.0000f, -33.3683f, 0.9969f, 0.9984f, 0 },
     { 2, -1.4625f, -0.5125f, 36.8435f, 0.9969f, 0.9984f, 1 },
     { 6, 1.4750f, -5.6250f, -21.9442f, 0.9980f, 0.9990f, 2 },
@@ -365,7 +365,7 @@ static const RobotSpritePart robot_fall_start_f007[] = {
     { 6, -2.1750f, -5.9000f, -14.6689f, 0.9980f, 0.9990f, 6 },
 };
 
-static const RobotFrame robot_fall_start_frames[] = {
+static const PlayerFrame robot_fall_start_frames[] = {
     { robot_fall_start_f001, 7, 0.041667f },
     { robot_fall_start_f002, 7, 0.041667f },
     { robot_fall_start_f003, 7, 0.041667f },
@@ -375,7 +375,7 @@ static const RobotFrame robot_fall_start_frames[] = {
     { robot_fall_start_f007, 7, 0.041667f },
 };
 
-static const RobotSpritePart robot_fall_f001[] = {
+static const PlayerSpritePart robot_fall_f001[] = {
     { 4, -0.4625f, -4.0000f, -33.3683f, 0.9969f, 0.9984f, 0 },
     { 2, -1.4625f, -0.5125f, 36.8435f, 0.9969f, 0.9984f, 1 },
     { 6, 1.4750f, -5.6250f, -21.9442f, 0.9980f, 0.9990f, 2 },
@@ -385,7 +385,7 @@ static const RobotSpritePart robot_fall_f001[] = {
     { 6, -2.1750f, -5.9000f, -14.6689f, 0.9980f, 0.9990f, 6 },
 };
 
-static const RobotSpritePart robot_fall_f002[] = {
+static const PlayerSpritePart robot_fall_f002[] = {
     { 4, -0.5875f, -3.8500f, -35.6403f, 0.9968f, 0.9984f, 0 },
     { 2, -1.4750f, -0.4000f, 39.7231f, 0.9968f, 0.9984f, 1 },
     { 6, 1.4375f, -5.5000f, -26.5343f, 0.9980f, 0.9989f, 2 },
@@ -395,7 +395,7 @@ static const RobotSpritePart robot_fall_f002[] = {
     { 6, -2.1375f, -5.8250f, -18.7512f, 0.9980f, 0.9989f, 6 },
 };
 
-static const RobotSpritePart robot_fall_f003[] = {
+static const PlayerSpritePart robot_fall_f003[] = {
     { 4, -0.7125f, -3.6875f, -38.0632f, 0.9969f, 0.9984f, 0 },
     { 2, -1.4625f, -0.2625f, 42.8006f, 0.9969f, 0.9984f, 1 },
     { 6, 1.4125f, -5.3125f, -31.4380f, 0.9980f, 0.9990f, 2 },
@@ -405,7 +405,7 @@ static const RobotSpritePart robot_fall_f003[] = {
     { 6, -2.1125f, -5.7125f, -23.1100f, 0.9980f, 0.9990f, 6 },
 };
 
-static const RobotSpritePart robot_fall_f004[] = {
+static const PlayerSpritePart robot_fall_f004[] = {
     { 4, -0.6625f, -3.7625f, -36.8799f, 0.9963f, 0.9979f, 0 },
     { 2, -1.4750f, -0.3375f, 41.2892f, 0.9963f, 0.9978f, 1 },
     { 6, 1.4125f, -5.4000f, -29.0807f, 0.9975f, 0.9985f, 2 },
@@ -415,7 +415,7 @@ static const RobotSpritePart robot_fall_f004[] = {
     { 6, -2.1250f, -5.7625f, -20.9612f, 0.9977f, 0.9986f, 6 },
 };
 
-static const RobotSpritePart robot_fall_f005[] = {
+static const PlayerSpritePart robot_fall_f005[] = {
     { 4, -0.5375f, -3.9125f, -34.6004f, 0.9953f, 0.9969f, 0 },
     { 2, -1.4500f, -0.4625f, 38.3788f, 0.9952f, 0.9968f, 1 },
     { 6, 1.4625f, -5.5375f, -24.5452f, 0.9968f, 0.9977f, 2 },
@@ -425,7 +425,7 @@ static const RobotSpritePart robot_fall_f005[] = {
     { 6, -2.1750f, -5.8500f, -16.8236f, 0.9971f, 0.9980f, 6 },
 };
 
-static const RobotFrame robot_fall_frames[] = {
+static const PlayerFrame robot_fall_frames[] = {
     { robot_fall_f001, 7, 0.041667f },
     { robot_fall_f002, 7, 0.041667f },
     { robot_fall_f003, 7, 0.041667f },
@@ -433,7 +433,7 @@ static const RobotFrame robot_fall_frames[] = {
     { robot_fall_f005, 7, 0.041667f },
 };
 
-static const RobotSpritePart robot_skip_f001[] = {
+static const PlayerSpritePart robot_skip_f001[] = {
     { 4, 0.9500f, -2.4125f, -55.2919f, 0.9994f, 0.9997f, 0 },
     { 2, -1.2625f, 0.2000f, -29.7870f, 0.9967f, 0.9983f, 1 },
     { 6, 3.9500f, -3.5250f, -43.2775f, 0.9989f, 0.9995f, 2 },
@@ -443,7 +443,7 @@ static const RobotSpritePart robot_skip_f001[] = {
     { 6, 3.0500f, -4.0375f, -36.5981f, 0.9968f, 0.9984f, 6 },
 };
 
-static const RobotSpritePart robot_skip_f002[] = {
+static const PlayerSpritePart robot_skip_f002[] = {
     { 4, 0.8500f, -3.5625f, -53.7523f, 0.9988f, 0.9994f, 0 },
     { 2, -2.1125f, -0.0375f, -17.9834f, 0.9974f, 0.9987f, 1 },
     { 6, 3.0625f, -4.0375f, -36.0059f, 0.9975f, 0.9987f, 2 },
@@ -453,7 +453,7 @@ static const RobotSpritePart robot_skip_f002[] = {
     { 6, 2.4750f, -4.8125f, -18.2764f, 0.9980f, 0.9990f, 6 },
 };
 
-static const RobotSpritePart robot_skip_f003[] = {
+static const PlayerSpritePart robot_skip_f003[] = {
     { 4, -0.1125f, -3.7625f, -61.7804f, 1.0000f, 1.0000f, 0 },
     { 2, -2.6125f, -1.0125f, 4.2568f, 0.9995f, 0.9998f, 1 },
     { 6, 2.4875f, -4.8125f, -18.8358f, 0.9980f, 0.9990f, 2 },
@@ -463,7 +463,7 @@ static const RobotSpritePart robot_skip_f003[] = {
     { 6, 1.9250f, -5.6125f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_skip_f004[] = {
+static const PlayerSpritePart robot_skip_f004[] = {
     { 4, -0.5000f, -4.4875f, -61.3087f, 0.9987f, 0.9993f, 0 },
     { 2, -2.7750f, -1.3375f, 8.9481f, 0.9981f, 0.9990f, 1 },
     { 6, 1.9000f, -5.5500f, 0.1888f, 0.9986f, 0.9993f, 2 },
@@ -473,7 +473,7 @@ static const RobotSpritePart robot_skip_f004[] = {
     { 6, -0.9125f, -5.6125f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_skip_f005[] = {
+static const PlayerSpritePart robot_skip_f005[] = {
     { 4, -2.4000f, -3.6625f, -37.4556f, 0.9973f, 0.9987f, 0 },
     { 2, -3.5625f, -0.6375f, 29.9448f, 0.9973f, 0.9986f, 1 },
     { 6, -0.9125f, -5.6375f, -0.3112f, 0.9981f, 0.9991f, 2 },
@@ -483,7 +483,7 @@ static const RobotSpritePart robot_skip_f005[] = {
     { 6, -3.7500f, -5.6125f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_skip_f006[] = {
+static const PlayerSpritePart robot_skip_f006[] = {
     { 4, -4.6375f, -2.9500f, -10.5563f, 0.9967f, 0.9983f, 0 },
     { 2, -3.9375f, -0.1375f, 41.7421f, 0.9968f, 0.9984f, 1 },
     { 6, -3.7250f, -5.5750f, 0.1810f, 0.9967f, 0.9983f, 2 },
@@ -493,7 +493,7 @@ static const RobotSpritePart robot_skip_f006[] = {
     { 6, -6.7625f, -4.3375f, 41.6134f, 0.9968f, 0.9984f, 6 },
 };
 
-static const RobotSpritePart robot_skip_f007[] = {
+static const PlayerSpritePart robot_skip_f007[] = {
     { 4, -5.5000f, -1.6250f, 25.7033f, 0.9995f, 0.9997f, 0 },
     { 2, -3.8250f, 0.6375f, 56.0954f, 0.9967f, 0.9984f, 1 },
     { 6, -6.7875f, -4.2875f, 40.4751f, 0.9997f, 0.9999f, 2 },
@@ -503,7 +503,7 @@ static const RobotSpritePart robot_skip_f007[] = {
     { 6, -9.3500f, -2.2625f, 83.4921f, 0.9992f, 0.9996f, 6 },
 };
 
-static const RobotSpritePart robot_skip_f008[] = {
+static const PlayerSpritePart robot_skip_f008[] = {
     { 4, -6.5250f, -0.2625f, 57.1087f, 0.9970f, 0.9985f, 0 },
     { 2, -3.8500f, 1.1250f, 65.9056f, 0.9967f, 0.9983f, 1 },
     { 6, -9.2625f, -2.2750f, 83.3739f, 0.9967f, 0.9983f, 2 },
@@ -513,7 +513,7 @@ static const RobotSpritePart robot_skip_f008[] = {
     { 6, -10.3125f, -0.9375f, 92.2038f, 0.9992f, 0.9996f, 6 },
 };
 
-static const RobotSpritePart robot_skip_f009[] = {
+static const PlayerSpritePart robot_skip_f009[] = {
     { 4, -7.1750f, 0.1000f, 76.8724f, 0.9970f, 0.9985f, 0 },
     { 2, -4.0750f, 1.3625f, 74.9864f, 0.9990f, 0.9995f, 1 },
     { 6, -10.3375f, -0.8875f, 92.1671f, 0.9967f, 0.9983f, 2 },
@@ -523,7 +523,7 @@ static const RobotSpritePart robot_skip_f009[] = {
     { 6, -10.8750f, 0.3250f, 105.9401f, 0.9992f, 0.9996f, 6 },
 };
 
-static const RobotSpritePart robot_skip_f010[] = {
+static const PlayerSpritePart robot_skip_f010[] = {
     { 4, -7.5500f, 1.0375f, 80.7783f, 0.9970f, 0.9985f, 0 },
     { 2, -4.4000f, 1.6375f, 78.9645f, 0.9974f, 0.9987f, 1 },
     { 6, -10.8875f, 0.3375f, 105.1676f, 0.9968f, 0.9984f, 2 },
@@ -533,7 +533,7 @@ static const RobotSpritePart robot_skip_f010[] = {
     { 6, -8.8625f, 0.1375f, 125.9836f, 0.9992f, 0.9996f, 6 },
 };
 
-static const RobotSpritePart robot_skip_f011[] = {
+static const PlayerSpritePart robot_skip_f011[] = {
     { 4, -6.2000f, -0.2875f, 101.6297f, 0.9969f, 0.9984f, 0 },
     { 2, -3.4250f, 1.1125f, 36.8435f, 0.9969f, 0.9984f, 1 },
     { 6, -8.8125f, 0.1500f, 125.0318f, 0.9980f, 0.9990f, 2 },
@@ -543,7 +543,7 @@ static const RobotSpritePart robot_skip_f011[] = {
     { 6, -7.3500f, -1.2000f, 95.5023f, 0.9986f, 0.9993f, 6 },
 };
 
-static const RobotSpritePart robot_skip_f012[] = {
+static const PlayerSpritePart robot_skip_f012[] = {
     { 4, -3.4625f, -0.6000f, 72.4145f, 0.9967f, 0.9984f, 0 },
     { 2, -1.9875f, 1.4375f, 2.7300f, 0.9967f, 0.9983f, 1 },
     { 6, -6.2500f, -1.3875f, 87.0589f, 1.0000f, 1.0000f, 2 },
@@ -553,7 +553,7 @@ static const RobotSpritePart robot_skip_f012[] = {
     { 6, -3.6000f, -2.6625f, 56.1376f, 0.9967f, 0.9975f, 6 },
 };
 
-static const RobotSpritePart robot_skip_f013[] = {
+static const PlayerSpritePart robot_skip_f013[] = {
     { 4, -1.8375f, -1.4125f, 20.2504f, 0.9987f, 0.9994f, 0 },
     { 2, -1.6625f, 0.9625f, -36.5648f, 0.9970f, 0.9984f, 1 },
     { 6, -2.2875f, -3.2250f, 39.0083f, 1.0000f, 1.0000f, 2 },
@@ -563,7 +563,7 @@ static const RobotSpritePart robot_skip_f013[] = {
     { 6, -0.6125f, -3.0875f, 7.0665f, 0.9966f, 0.9977f, 6 },
 };
 
-static const RobotSpritePart robot_skip_f014[] = {
+static const PlayerSpritePart robot_skip_f014[] = {
     { 4, 1.2500f, -1.8875f, -11.8752f, 0.9975f, 0.9987f, 0 },
     { 2, -0.3875f, 0.2750f, -33.6915f, 0.9980f, 0.9990f, 1 },
     { 6, 2.0500f, -3.1125f, -11.9966f, 1.0000f, 1.0000f, 2 },
@@ -573,7 +573,7 @@ static const RobotSpritePart robot_skip_f014[] = {
     { 6, 2.7625f, -3.2375f, -18.4866f, 0.9965f, 0.9978f, 6 },
 };
 
-static const RobotSpritePart robot_skip_f015[] = {
+static const PlayerSpritePart robot_skip_f015[] = {
     { 4, 1.2625f, -1.6250f, -43.8340f, 0.9967f, 0.9983f, 0 },
     { 2, -0.9500f, 0.7750f, -39.3592f, 0.9968f, 0.9984f, 1 },
     { 6, 3.8875f, -2.9125f, -38.0594f, 0.9967f, 0.9983f, 2 },
@@ -583,7 +583,7 @@ static const RobotSpritePart robot_skip_f015[] = {
     { 6, 3.3875f, -3.4750f, -48.8875f, 0.9967f, 0.9983f, 6 },
 };
 
-static const RobotSpritePart robot_skip_f016[] = {
+static const PlayerSpritePart robot_skip_f016[] = {
     { 4, 2.2625f, -2.0750f, -58.5474f, 0.9978f, 0.9989f, 0 },
     { 2, -0.8375f, 0.5875f, -42.3921f, 0.9969f, 0.9984f, 1 },
     { 6, 4.8375f, -3.0375f, -46.5410f, 0.9992f, 0.9996f, 2 },
@@ -593,7 +593,7 @@ static const RobotSpritePart robot_skip_f016[] = {
     { 6, 3.9625f, -3.5375f, -42.8659f, 0.9967f, 0.9984f, 6 },
 };
 
-static const RobotFrame robot_skip_frames[] = {
+static const PlayerFrame robot_skip_frames[] = {
     { robot_skip_f001, 7, 0.041667f },
     { robot_skip_f002, 7, 0.041667f },
     { robot_skip_f003, 7, 0.041667f },
@@ -612,7 +612,7 @@ static const RobotFrame robot_skip_frames[] = {
     { robot_skip_f016, 7, 0.041667f },
 };
 
-static const RobotSpritePart robot_run3_f001[] = {
+static const PlayerSpritePart robot_run3_f001[] = {
     { 4, 0.4500f, -1.6250f, 82.9370f, 0.9953f, 0.9974f, 0 },
     { 2, 1.6500f, 0.6625f, -28.0674f, 0.9943f, 0.9965f, 1 },
     { 6, -2.1750f, -2.4875f, 97.0131f, 0.9939f, 0.9967f, 2 },
@@ -622,7 +622,7 @@ static const RobotSpritePart robot_run3_f001[] = {
     { 6, 3.8750f, -5.6250f, -0.1635f, 0.9968f, 0.9984f, 6 },
 };
 
-static const RobotSpritePart robot_run3_f002[] = {
+static const PlayerSpritePart robot_run3_f002[] = {
     { 4, 1.1000f, -1.6000f, 52.0589f, 0.9950f, 0.6992f, 0 },
     { 2, 1.2750f, 0.8500f, -45.1402f, 0.9946f, 0.9964f, 1 },
     { 6, -0.9875f, -3.2000f, 76.9885f, 0.9952f, 0.9972f, 2 },
@@ -632,7 +632,7 @@ static const RobotSpritePart robot_run3_f002[] = {
     { 6, 2.4750f, -5.6250f, 0.4118f, 0.9980f, 0.9990f, 6 },
 };
 
-static const RobotSpritePart robot_run3_f003[] = {
+static const PlayerSpritePart robot_run3_f003[] = {
     { 4, 1.0750f, -1.8750f, -14.5305f, 0.9944f, 0.6937f, 0 },
     { 2, -0.7625f, 0.1125f, -61.9510f, 0.9934f, 0.9960f, 1 },
     { 6, 2.1625f, -4.2000f, -12.0141f, 0.9978f, 0.9986f, 2 },
@@ -642,7 +642,7 @@ static const RobotSpritePart robot_run3_f003[] = {
     { 6, 1.0500f, -5.6125f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_run3_f004[] = {
+static const PlayerSpritePart robot_run3_f004[] = {
     { 4, 2.6875f, -1.6250f, -62.5061f, 0.9965f, 0.9981f, 0 },
     { 2, -0.3500f, -0.1375f, -66.4676f, 0.9930f, 0.9959f, 1 },
     { 6, 6.5875f, -2.9500f, -54.7315f, 0.9984f, 0.9989f, 2 },
@@ -652,7 +652,7 @@ static const RobotSpritePart robot_run3_f004[] = {
     { 6, -0.9125f, -5.6125f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_run3_f005[] = {
+static const PlayerSpritePart robot_run3_f005[] = {
     { 4, 5.0625f, -0.8250f, -86.7233f, 0.9947f, 0.9972f, 0 },
     { 2, 0.0750f, 0.2750f, -70.6894f, 0.9938f, 0.9963f, 1 },
     { 6, 8.8875f, -0.5250f, -83.7106f, 0.9971f, 0.9985f, 2 },
@@ -662,7 +662,7 @@ static const RobotSpritePart robot_run3_f005[] = {
     { 6, -2.5625f, -5.6125f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_run3_f006[] = {
+static const PlayerSpritePart robot_run3_f006[] = {
     { 4, 4.2625f, -1.2375f, -74.7265f, 0.9954f, 0.9972f, 0 },
     { 2, 0.1125f, 0.5125f, -57.4043f, 0.9921f, 0.9952f, 1 },
     { 6, 8.5250f, -2.0125f, -64.4381f, 0.9947f, 0.9967f, 2 },
@@ -672,7 +672,7 @@ static const RobotSpritePart robot_run3_f006[] = {
     { 6, -4.2750f, -4.8750f, 19.6075f, 0.9967f, 0.9983f, 6 },
 };
 
-static const RobotSpritePart robot_run3_f007[] = {
+static const PlayerSpritePart robot_run3_f007[] = {
     { 4, 2.4000f, -2.1625f, -58.1811f, 0.9934f, 0.9959f, 0 },
     { 2, -0.5625f, 0.6500f, -42.8669f, 0.9919f, 0.9951f, 1 },
     { 6, 6.2000f, -3.9000f, -37.6731f, 0.9943f, 0.9963f, 2 },
@@ -682,7 +682,7 @@ static const RobotSpritePart robot_run3_f007[] = {
     { 6, -5.7750f, -4.0875f, 70.6902f, 0.9992f, 0.9996f, 6 },
 };
 
-static const RobotSpritePart robot_run3_f008[] = {
+static const PlayerSpritePart robot_run3_f008[] = {
     { 4, 1.1500f, -2.4875f, -56.4243f, 0.9948f, 0.9966f, 0 },
     { 2, -1.1125f, 0.3000f, -29.5612f, 0.9925f, 0.9955f, 1 },
     { 6, 4.7750f, -4.5500f, -23.0012f, 0.9940f, 0.9961f, 2 },
@@ -692,7 +692,7 @@ static const RobotSpritePart robot_run3_f008[] = {
     { 6, -5.3000f, -2.7000f, 89.7858f, 0.9989f, 0.9995f, 6 },
 };
 
-static const RobotSpritePart robot_run3_f009[] = {
+static const PlayerSpritePart robot_run3_f009[] = {
     { 4, 0.4250f, -3.3750f, -54.6646f, 0.9941f, 0.9963f, 0 },
     { 2, -2.0750f, -0.0750f, -16.2726f, 0.9946f, 0.9969f, 1 },
     { 6, 3.4625f, -5.6000f, -1.2177f, 0.9936f, 0.9968f, 2 },
@@ -702,7 +702,7 @@ static const RobotSpritePart robot_run3_f009[] = {
     { 6, -4.6000f, -2.6500f, 97.0475f, 0.9975f, 0.9987f, 6 },
 };
 
-static const RobotSpritePart robot_run3_f010[] = {
+static const PlayerSpritePart robot_run3_f010[] = {
     { 4, -0.7250f, -3.6875f, -52.4773f, 0.9956f, 0.9970f, 0 },
     { 2, -2.6000f, -0.9625f, 0.2500f, 0.9994f, 0.9997f, 1 },
     { 6, 2.3500f, -5.6000f, -0.0289f, 0.9950f, 0.9970f, 2 },
@@ -712,7 +712,7 @@ static const RobotSpritePart robot_run3_f010[] = {
     { 6, -3.1500f, -3.6750f, 76.9919f, 0.9980f, 0.9989f, 6 },
 };
 
-static const RobotSpritePart robot_run3_f011[] = {
+static const PlayerSpritePart robot_run3_f011[] = {
     { 4, -1.0125f, -4.5500f, -62.4483f, 0.9947f, 0.9966f, 0 },
     { 2, -3.0000f, -1.2625f, 16.7756f, 0.9954f, 0.9972f, 1 },
     { 6, 0.9500f, -5.6625f, 0.0009f, 0.9986f, 0.9992f, 2 },
@@ -722,7 +722,7 @@ static const RobotSpritePart robot_run3_f011[] = {
     { 6, 1.1375f, -4.6500f, 9.1374f, 0.9984f, 0.9992f, 6 },
 };
 
-static const RobotSpritePart robot_run3_f012[] = {
+static const PlayerSpritePart robot_run3_f012[] = {
     { 4, -2.5875f, -3.7125f, -35.8362f, 0.9926f, 0.9956f, 0 },
     { 2, -3.4500f, -0.7125f, 30.0621f, 0.9929f, 0.9957f, 1 },
     { 6, -0.9375f, -5.5750f, 0.0000f, 0.9981f, 0.9990f, 2 },
@@ -732,7 +732,7 @@ static const RobotSpritePart robot_run3_f012[] = {
     { 6, 5.6250f, -3.4375f, -45.2652f, 0.9990f, 0.9995f, 6 },
 };
 
-static const RobotSpritePart robot_run3_f013[] = {
+static const PlayerSpritePart robot_run3_f013[] = {
     { 4, -4.6750f, -2.8625f, -9.0052f, 0.9958f, 0.9976f, 0 },
     { 2, -3.8125f, 0.0250f, 41.7212f, 0.9934f, 0.9967f, 1 },
     { 6, -3.7875f, -5.5875f, 0.0000f, 0.9966f, 0.9983f, 2 },
@@ -742,7 +742,7 @@ static const RobotSpritePart robot_run3_f013[] = {
     { 6, 8.9250f, -0.4875f, -82.2483f, 0.9971f, 0.9985f, 6 },
 };
 
-static const RobotSpritePart robot_run3_f014[] = {
+static const PlayerSpritePart robot_run3_f014[] = {
     { 4, -4.8125f, -1.8625f, 24.5423f, 0.9957f, 0.9972f, 0 },
     { 2, -3.3125f, 0.6625f, 38.9084f, 0.9920f, 0.9952f, 1 },
     { 6, -5.7250f, -4.2125f, 41.6109f, 0.9949f, 0.9966f, 2 },
@@ -752,7 +752,7 @@ static const RobotSpritePart robot_run3_f014[] = {
     { 6, 8.7000f, -1.7750f, -71.3940f, 0.9993f, 0.9996f, 6 },
 };
 
-static const RobotSpritePart robot_run3_f015[] = {
+static const PlayerSpritePart robot_run3_f015[] = {
     { 4, -3.3625f, -1.6500f, 59.5212f, 0.9934f, 0.9964f, 0 },
     { 2, -1.8250f, 1.3875f, 1.6030f, 0.9929f, 0.9959f, 1 },
     { 6, -4.9125f, -2.9000f, 64.1436f, 0.9950f, 0.9970f, 2 },
@@ -762,7 +762,7 @@ static const RobotSpritePart robot_run3_f015[] = {
     { 6, 6.7625f, -3.6125f, -47.6203f, 0.9967f, 0.9983f, 6 },
 };
 
-static const RobotSpritePart robot_run3_f016[] = {
+static const PlayerSpritePart robot_run3_f016[] = {
     { 4, -1.3875f, -1.7750f, 94.5462f, 0.9956f, 0.9976f, 0 },
     { 2, 0.5500f, 0.2250f, -8.0013f, 0.9957f, 0.9978f, 1 },
     { 6, -3.3250f, -2.1500f, 93.1172f, 0.9944f, 0.9967f, 2 },
@@ -772,7 +772,7 @@ static const RobotSpritePart robot_run3_f016[] = {
     { 6, 4.7875f, -4.7250f, -16.3974f, 0.9967f, 0.9983f, 6 },
 };
 
-static const RobotFrame robot_run3_frames[] = {
+static const PlayerFrame robot_run3_frames[] = {
     { robot_run3_f001, 7, 0.041667f },
     { robot_run3_f002, 7, 0.041667f },
     { robot_run3_f003, 7, 0.041667f },
@@ -791,7 +791,7 @@ static const RobotFrame robot_run3_frames[] = {
     { robot_run3_f016, 7, 0.041667f },
 };
 
-static const RobotSpritePart robot_run2_f001[] = {
+static const PlayerSpritePart robot_run2_f001[] = {
     { 4, -6.5375f, 3.9875f, 132.2870f, 0.9920f, 0.9952f, 0 },
     { 2, -2.7000f, 1.9875f, 130.1355f, 0.9944f, 0.9964f, 1 },
     { 6, -8.6250f, 4.9875f, 129.1137f, 0.9950f, 0.9966f, 2 },
@@ -801,7 +801,7 @@ static const RobotSpritePart robot_run2_f001[] = {
     { 6, 6.2125f, -1.8625f, -65.0316f, 0.9996f, 0.9996f, 6 },
 };
 
-static const RobotSpritePart robot_run2_f002[] = {
+static const PlayerSpritePart robot_run2_f002[] = {
     { 4, -4.7500f, 5.5625f, -25.7310f, 0.9937f, 0.9968f, 0 },
     { 2, -2.4875f, 2.1000f, 155.9435f, 0.9930f, 0.9959f, 1 },
     { 6, -6.3875f, 7.1750f, 149.8888f, 0.9962f, 0.9972f, 2 },
@@ -811,7 +811,7 @@ static const RobotSpritePart robot_run2_f002[] = {
     { 6, 4.7625f, -4.2500f, -44.3025f, 0.9996f, 0.9996f, 6 },
 };
 
-static const RobotSpritePart robot_run2_f003[] = {
+static const PlayerSpritePart robot_run2_f003[] = {
     { 4, -2.5250f, 6.0000f, -8.0013f, 0.9952f, 0.9975f, 0 },
     { 2, -2.1125f, 1.5000f, -170.9641f, 0.9934f, 0.9964f, 1 },
     { 6, -3.4875f, 8.1750f, 172.4673f, 0.9975f, 0.9982f, 2 },
@@ -821,7 +821,7 @@ static const RobotSpritePart robot_run2_f003[] = {
     { 6, 1.9125f, -5.7000f, 0.4424f, 0.9996f, 0.9996f, 6 },
 };
 
-static const RobotSpritePart robot_run2_f004[] = {
+static const PlayerSpritePart robot_run2_f004[] = {
     { 4, -0.4500f, 4.9750f, -170.7289f, 0.9929f, 0.9961f, 0 },
     { 2, -2.1000f, 0.8750f, -142.6437f, 0.9926f, 0.9954f, 1 },
     { 6, -0.6000f, 8.2875f, -176.2217f, 0.9972f, 0.9984f, 2 },
@@ -831,7 +831,7 @@ static const RobotSpritePart robot_run2_f004[] = {
     { 6, -0.9125f, -5.6125f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_run2_f005[] = {
+static const PlayerSpritePart robot_run2_f005[] = {
     { 4, 1.1750f, 4.4375f, -154.6991f, 0.9944f, 0.9965f, 0 },
     { 2, -1.8250f, 0.5875f, -126.6037f, 0.9922f, 0.9952f, 1 },
     { 6, 2.0250f, 7.8500f, -163.6397f, 0.9981f, 0.9984f, 2 },
@@ -841,7 +841,7 @@ static const RobotSpritePart robot_run2_f005[] = {
     { 6, -3.6375f, -5.6125f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_run2_f006[] = {
+static const PlayerSpritePart robot_run2_f006[] = {
     { 4, 2.4250f, 3.4125f, -129.8311f, 0.9926f, 0.9953f, 0 },
     { 2, -1.5500f, 1.2125f, -107.8172f, 0.9927f, 0.9958f, 1 },
     { 6, 4.8000f, 6.4125f, -135.1516f, 0.9959f, 0.9970f, 2 },
@@ -851,7 +851,7 @@ static const RobotSpritePart robot_run2_f006[] = {
     { 6, -7.0625f, -5.6375f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_run2_f007[] = {
+static const PlayerSpritePart robot_run2_f007[] = {
     { 4, 3.6375f, 2.3875f, -113.2946f, 0.9931f, 0.9964f, 0 },
     { 2, -0.8375f, 1.1000f, -94.0507f, 0.9934f, 0.9964f, 1 },
     { 6, 6.8000f, 4.5625f, -117.0969f, 0.9952f, 0.9967f, 2 },
@@ -861,7 +861,7 @@ static const RobotSpritePart robot_run2_f007[] = {
     { 6, -10.0750f, -2.9250f, 70.9725f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_run2_f008[] = {
+static const PlayerSpritePart robot_run2_f008[] = {
     { 4, 4.2750f, 1.3000f, -96.0630f, 0.9933f, 0.9965f, 0 },
     { 2, 0.4500f, 1.7750f, -85.6910f, 0.9957f, 0.9976f, 1 },
     { 6, 7.9000f, 2.4500f, -96.0388f, 0.9971f, 0.9980f, 2 },
@@ -871,7 +871,7 @@ static const RobotSpritePart robot_run2_f008[] = {
     { 6, -11.0500f, 1.3625f, 89.7054f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_run2_f009[] = {
+static const PlayerSpritePart robot_run2_f009[] = {
     { 4, 4.5750f, -1.1375f, -65.4482f, 0.9937f, 0.9966f, 0 },
     { 2, 0.2625f, 0.9000f, -72.6874f, 0.9944f, 0.9966f, 1 },
     { 6, 7.2375f, -2.0250f, -65.1639f, 0.9980f, 0.9981f, 2 },
@@ -881,7 +881,7 @@ static const RobotSpritePart robot_run2_f009[] = {
     { 6, -9.5125f, 5.1375f, 129.1579f, 0.9999f, 0.9999f, 6 },
 };
 
-static const RobotSpritePart robot_run2_f010[] = {
+static const PlayerSpritePart robot_run2_f010[] = {
     { 4, 2.7250f, -2.9000f, -53.2013f, 0.9933f, 0.9965f, 0 },
     { 2, -0.0500f, -0.1000f, -48.1190f, 0.9921f, 0.9951f, 1 },
     { 6, 5.0625f, -4.3875f, -44.3553f, 0.9979f, 0.9979f, 2 },
@@ -891,7 +891,7 @@ static const RobotSpritePart robot_run2_f010[] = {
     { 6, -7.1375f, 7.5500f, 145.2753f, 0.9999f, 0.9999f, 6 },
 };
 
-static const RobotSpritePart robot_run2_f011[] = {
+static const PlayerSpritePart robot_run2_f011[] = {
     { 4, 0.3750f, -3.7500f, -38.4561f, 0.9964f, 0.9980f, 0 },
     { 2, -1.6250f, -0.1875f, -23.2954f, 0.9924f, 0.9954f, 1 },
     { 6, 2.0000f, -5.6750f, 0.2972f, 0.9996f, 0.9996f, 2 },
@@ -901,7 +901,7 @@ static const RobotSpritePart robot_run2_f011[] = {
     { 6, -3.7000f, 8.7750f, 174.0416f, 0.9998f, 0.9998f, 6 },
 };
 
-static const RobotSpritePart robot_run2_f012[] = {
+static const PlayerSpritePart robot_run2_f012[] = {
     { 4, -2.5875f, -3.6625f, -35.8362f, 0.9930f, 0.9957f, 0 },
     { 2, -2.9500f, -0.4750f, 31.8006f, 0.9933f, 0.9959f, 1 },
     { 6, -0.9125f, -5.6125f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -911,7 +911,7 @@ static const RobotSpritePart robot_run2_f012[] = {
     { 6, -0.3750f, 8.7875f, -176.1390f, 0.9998f, 0.9998f, 6 },
 };
 
-static const RobotSpritePart robot_run2_f013[] = {
+static const PlayerSpritePart robot_run2_f013[] = {
     { 4, -4.5875f, -3.6375f, -8.0004f, 0.9939f, 0.9969f, 0 },
     { 2, -3.6250f, -0.6625f, 44.5317f, 0.9927f, 0.9955f, 1 },
     { 6, -3.4125f, -5.6125f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -921,7 +921,7 @@ static const RobotSpritePart robot_run2_f013[] = {
     { 6, 2.2125f, 7.9625f, -160.1384f, 0.9998f, 0.9998f, 6 },
 };
 
-static const RobotSpritePart robot_run2_f014[] = {
+static const PlayerSpritePart robot_run2_f014[] = {
     { 4, -5.5875f, -2.4250f, 29.8896f, 0.9967f, 0.9983f, 0 },
     { 2, -3.2000f, -0.1750f, 57.8408f, 0.9923f, 0.9952f, 1 },
     { 6, -6.5625f, -5.6000f, 0.0000f, 0.9967f, 0.9983f, 2 },
@@ -931,7 +931,7 @@ static const RobotSpritePart robot_run2_f014[] = {
     { 6, 4.9125f, 5.9500f, -132.2564f, 0.9998f, 0.9998f, 6 },
 };
 
-static const RobotSpritePart robot_run2_f015[] = {
+static const PlayerSpritePart robot_run2_f015[] = {
     { 4, -7.2875f, -1.2250f, 50.4594f, 0.9945f, 0.9972f, 0 },
     { 2, -3.3625f, 0.6875f, 75.4294f, 0.9933f, 0.9962f, 1 },
     { 6, -9.4750f, -3.1250f, 70.9733f, 0.9982f, 0.9986f, 2 },
@@ -941,7 +941,7 @@ static const RobotSpritePart robot_run2_f015[] = {
     { 6, 6.1250f, 3.9750f, -117.2305f, 0.9997f, 0.9997f, 6 },
 };
 
-static const RobotSpritePart robot_run2_f016[] = {
+static const PlayerSpritePart robot_run2_f016[] = {
     { 4, -8.0875f, 1.2250f, 103.4117f, 0.9993f, 0.9996f, 0 },
     { 2, -3.8000f, 1.0500f, 80.5774f, 0.9935f, 0.9964f, 1 },
     { 6, -10.0625f, 0.9375f, 99.0069f, 0.9989f, 0.9995f, 2 },
@@ -951,7 +951,7 @@ static const RobotSpritePart robot_run2_f016[] = {
     { 6, 7.0875f, 1.7000f, -97.5739f, 0.9997f, 0.9997f, 6 },
 };
 
-static const RobotFrame robot_run2_frames[] = {
+static const PlayerFrame robot_run2_frames[] = {
     { robot_run2_f001, 7, 0.041667f },
     { robot_run2_f002, 7, 0.041667f },
     { robot_run2_f003, 7, 0.041667f },
@@ -970,7 +970,7 @@ static const RobotFrame robot_run2_frames[] = {
     { robot_run2_f016, 7, 0.041667f },
 };
 
-static const RobotSpritePart robot_idle_f001[] = {
+static const PlayerSpritePart robot_idle_f001[] = {
     { 4, -3.5875f, -3.4375f, -29.6729f, 0.9969f, 0.9984f, 0 },
     { 2, -3.5875f, -0.5125f, 57.9682f, 0.9968f, 0.9984f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -980,11 +980,11 @@ static const RobotSpritePart robot_idle_f001[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotFrame robot_idle_frames[] = {
+static const PlayerFrame robot_idle_frames[] = {
     { robot_idle_f001, 7, 0.041667f },
 };
 
-static const RobotSpritePart robot_dash_loop_f001[] = {
+static const PlayerSpritePart robot_dash_loop_f001[] = {
     { 4, -1.1250f, -3.2875f, 62.7716f, 0.9988f, 0.9994f, 0 },
     { 2, -0.1125f, -0.2875f, -23.0952f, 0.9974f, 0.9987f, 1 },
     { 6, -2.8125f, -4.8250f, 65.1171f, 0.9974f, 0.9987f, 2 },
@@ -994,7 +994,7 @@ static const RobotSpritePart robot_dash_loop_f001[] = {
     { 6, -6.3625f, -4.0375f, 79.9057f, 0.9968f, 0.9984f, 6 },
 };
 
-static const RobotSpritePart robot_dash_loop_f002[] = {
+static const PlayerSpritePart robot_dash_loop_f002[] = {
     { 4, -1.2125f, -3.2875f, 66.1808f, 0.9988f, 0.9993f, 0 },
     { 2, -0.0250f, -0.3750f, -19.6874f, 0.9973f, 0.9986f, 1 },
     { 6, -2.9750f, -4.7000f, 68.5252f, 0.9974f, 0.9987f, 2 },
@@ -1004,7 +1004,7 @@ static const RobotSpritePart robot_dash_loop_f002[] = {
     { 6, -6.5250f, -3.9125f, 82.0501f, 0.9968f, 0.9984f, 6 },
 };
 
-static const RobotSpritePart robot_dash_loop_f003[] = {
+static const PlayerSpritePart robot_dash_loop_f003[] = {
     { 4, -1.2875f, -3.2500f, 70.2204f, 0.9988f, 0.9994f, 0 },
     { 2, 0.1000f, -0.4125f, -15.6487f, 0.9974f, 0.9987f, 1 },
     { 6, -3.1625f, -4.5625f, 72.5648f, 0.9974f, 0.9987f, 2 },
@@ -1014,7 +1014,7 @@ static const RobotSpritePart robot_dash_loop_f003[] = {
     { 6, -6.8375f, -3.6625f, 86.3871f, 0.9968f, 0.9984f, 6 },
 };
 
-static const RobotSpritePart robot_dash_loop_f004[] = {
+static const PlayerSpritePart robot_dash_loop_f004[] = {
     { 4, -1.2375f, -3.2625f, 67.6837f, 0.9982f, 0.9987f, 0 },
     { 2, 0.0125f, -0.3750f, -18.2243f, 0.9968f, 0.9981f, 1 },
     { 6, -3.0250f, -4.6500f, 69.9993f, 0.9969f, 0.9982f, 2 },
@@ -1024,7 +1024,7 @@ static const RobotSpritePart robot_dash_loop_f004[] = {
     { 6, -6.6500f, -3.8375f, 83.8471f, 0.9965f, 0.9981f, 6 },
 };
 
-static const RobotSpritePart robot_dash_loop_f005[] = {
+static const PlayerSpritePart robot_dash_loop_f005[] = {
     { 4, -1.1625f, -3.2625f, 64.6805f, 0.9975f, 0.9981f, 0 },
     { 2, -0.0625f, -0.3125f, -21.2769f, 0.9962f, 0.9976f, 1 },
     { 6, -2.8625f, -4.7625f, 66.9603f, 0.9963f, 0.9976f, 2 },
@@ -1034,7 +1034,7 @@ static const RobotSpritePart robot_dash_loop_f005[] = {
     { 6, -6.4750f, -3.9625f, 81.6852f, 0.9963f, 0.9979f, 6 },
 };
 
-static const RobotFrame robot_dash_loop_frames[] = {
+static const PlayerFrame robot_dash_loop_frames[] = {
     { robot_dash_loop_f001, 7, 0.041667f },
     { robot_dash_loop_f002, 7, 0.041667f },
     { robot_dash_loop_f003, 7, 0.041667f },
@@ -1042,7 +1042,7 @@ static const RobotFrame robot_dash_loop_frames[] = {
     { robot_dash_loop_f005, 7, 0.041667f },
 };
 
-static const RobotSpritePart robot_idle01_f001[] = {
+static const PlayerSpritePart robot_idle01_f001[] = {
     { 4, -3.5875f, -3.4375f, -29.6729f, 0.9969f, 0.9984f, 0 },
     { 2, -3.5875f, -0.5125f, 57.9682f, 0.9968f, 0.9984f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -1052,7 +1052,7 @@ static const RobotSpritePart robot_idle01_f001[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_idle01_f002[] = {
+static const PlayerSpritePart robot_idle01_f002[] = {
     { 4, -3.5750f, -3.4625f, -29.6729f, 0.9968f, 0.9984f, 0 },
     { 2, -3.5750f, -0.5250f, 58.2929f, 0.9968f, 0.9984f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -1062,7 +1062,7 @@ static const RobotSpritePart robot_idle01_f002[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_idle01_f003[] = {
+static const PlayerSpritePart robot_idle01_f003[] = {
     { 4, -3.5375f, -3.4875f, -29.6729f, 0.9968f, 0.9984f, 0 },
     { 2, -3.5250f, -0.5500f, 58.8710f, 0.9968f, 0.9984f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -1072,7 +1072,7 @@ static const RobotSpritePart robot_idle01_f003[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_idle01_f004[] = {
+static const PlayerSpritePart robot_idle01_f004[] = {
     { 4, -3.4875f, -3.5250f, -29.6729f, 0.9968f, 0.9984f, 0 },
     { 2, -3.4875f, -0.5750f, 59.7255f, 0.9968f, 0.9984f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -1082,7 +1082,7 @@ static const RobotSpritePart robot_idle01_f004[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_idle01_f005[] = {
+static const PlayerSpritePart robot_idle01_f005[] = {
     { 4, -3.4250f, -3.5750f, -29.6729f, 0.9968f, 0.9984f, 0 },
     { 2, -3.4000f, -0.6125f, 60.8245f, 0.9968f, 0.9984f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -1092,7 +1092,7 @@ static const RobotSpritePart robot_idle01_f005[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_idle01_f006[] = {
+static const PlayerSpritePart robot_idle01_f006[] = {
     { 4, -3.3500f, -3.6250f, -29.6729f, 0.9968f, 0.9984f, 0 },
     { 2, -3.3375f, -0.6625f, 62.0437f, 0.9968f, 0.9984f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -1102,7 +1102,7 @@ static const RobotSpritePart robot_idle01_f006[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_idle01_f007[] = {
+static const PlayerSpritePart robot_idle01_f007[] = {
     { 4, -3.2875f, -3.6750f, -29.6729f, 0.9968f, 0.9984f, 0 },
     { 2, -3.2500f, -0.7000f, 63.1928f, 0.9968f, 0.9984f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -1112,7 +1112,7 @@ static const RobotSpritePart robot_idle01_f007[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_idle01_f008[] = {
+static const PlayerSpritePart robot_idle01_f008[] = {
     { 4, -3.2375f, -3.7125f, -29.6729f, 0.9968f, 0.9984f, 0 },
     { 2, -3.1875f, -0.7375f, 64.1230f, 0.9968f, 0.9984f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -1122,7 +1122,7 @@ static const RobotSpritePart robot_idle01_f008[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_idle01_f009[] = {
+static const PlayerSpritePart robot_idle01_f009[] = {
     { 4, -3.2000f, -3.7500f, -29.6729f, 0.9968f, 0.9984f, 0 },
     { 2, -3.1500f, -0.7625f, 64.7820f, 0.9968f, 0.9984f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -1132,7 +1132,7 @@ static const RobotSpritePart robot_idle01_f009[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_idle01_f010[] = {
+static const PlayerSpritePart robot_idle01_f010[] = {
     { 4, -3.1750f, -3.7500f, -29.6729f, 0.9969f, 0.9984f, 0 },
     { 2, -3.1250f, -0.7875f, 65.1826f, 0.9968f, 0.9984f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -1142,7 +1142,7 @@ static const RobotSpritePart robot_idle01_f010[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_idle01_f011[] = {
+static const PlayerSpritePart robot_idle01_f011[] = {
     { 4, -3.2000f, -3.7500f, -29.6690f, 0.9967f, 0.9983f, 0 },
     { 2, -3.1750f, -0.7750f, 64.7484f, 0.9967f, 0.9983f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -1152,7 +1152,7 @@ static const RobotSpritePart robot_idle01_f011[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_idle01_f012[] = {
+static const PlayerSpritePart robot_idle01_f012[] = {
     { 4, -3.2500f, -3.7125f, -29.6577f, 0.9966f, 0.9981f, 0 },
     { 2, -3.2375f, -0.7375f, 63.9069f, 0.9965f, 0.9981f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -1162,7 +1162,7 @@ static const RobotSpritePart robot_idle01_f012[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_idle01_f013[] = {
+static const PlayerSpritePart robot_idle01_f013[] = {
     { 4, -3.3375f, -3.6500f, -29.6412f, 0.9963f, 0.9979f, 0 },
     { 2, -3.3000f, -0.6750f, 62.6563f, 0.9963f, 0.9979f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -1172,7 +1172,7 @@ static const RobotSpritePart robot_idle01_f013[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_idle01_f014[] = {
+static const PlayerSpritePart robot_idle01_f014[] = {
     { 4, -3.4250f, -3.5875f, -29.6234f, 0.9960f, 0.9976f, 0 },
     { 2, -3.4000f, -0.6375f, 61.1897f, 0.9959f, 0.9975f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -1182,7 +1182,7 @@ static const RobotSpritePart robot_idle01_f014[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_idle01_f015[] = {
+static const PlayerSpritePart robot_idle01_f015[] = {
     { 4, -3.5000f, -3.5375f, -29.6082f, 0.9957f, 0.9973f, 0 },
     { 2, -3.4875f, -0.5875f, 59.8679f, 0.9957f, 0.9973f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -1192,7 +1192,7 @@ static const RobotSpritePart robot_idle01_f015[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_idle01_f016[] = {
+static const PlayerSpritePart robot_idle01_f016[] = {
     { 4, -3.5625f, -3.5000f, -29.5963f, 0.9955f, 0.9971f, 0 },
     { 2, -3.5500f, -0.5500f, 58.9294f, 0.9955f, 0.9970f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -1202,7 +1202,7 @@ static const RobotSpritePart robot_idle01_f016[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_idle01_f017[] = {
+static const PlayerSpritePart robot_idle01_f017[] = {
     { 4, -3.5750f, -3.4625f, -29.5884f, 0.9954f, 0.9970f, 0 },
     { 2, -3.5750f, -0.5250f, 58.4038f, 0.9954f, 0.9970f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -1212,7 +1212,7 @@ static const RobotSpritePart robot_idle01_f017[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotFrame robot_idle01_frames[] = {
+static const PlayerFrame robot_idle01_frames[] = {
     { robot_idle01_f001, 7, 0.041667f },
     { robot_idle01_f002, 7, 0.041667f },
     { robot_idle01_f003, 7, 0.041667f },
@@ -1232,7 +1232,7 @@ static const RobotFrame robot_idle01_frames[] = {
     { robot_idle01_f017, 7, 0.041667f },
 };
 
-static const RobotSpritePart robot_idle02_f001[] = {
+static const PlayerSpritePart robot_idle02_f001[] = {
     { 4, -3.5875f, -3.4375f, -29.6729f, 0.9969f, 0.9984f, 0 },
     { 2, -3.5875f, -0.5125f, 57.9682f, 0.9968f, 0.9984f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -1242,7 +1242,7 @@ static const RobotSpritePart robot_idle02_f001[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f002[] = {
+static const PlayerSpritePart robot_idle02_f002[] = {
     { 4, -3.3500f, -3.4500f, -29.6729f, 0.9968f, 0.9984f, 0 },
     { 2, -3.1625f, -0.7125f, 90.4660f, 0.9968f, 0.9984f, 1 },
     { 6, -1.3375f, -5.5375f, 0.0000f, 1.0000f, 0.9534f, 2 },
@@ -1252,7 +1252,7 @@ static const RobotSpritePart robot_idle02_f002[] = {
     { 6, 1.0500f, -5.5375f, 0.0000f, 1.0000f, 0.9534f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f003[] = {
+static const PlayerSpritePart robot_idle02_f003[] = {
     { 4, -3.0875f, -3.4375f, -29.6729f, 0.9969f, 0.9984f, 0 },
     { 2, -2.7125f, -0.9500f, 125.6801f, 0.9968f, 0.9984f, 1 },
     { 6, -1.3375f, -5.6375f, 0.0000f, 1.0000f, 0.9029f, 2 },
@@ -1262,7 +1262,7 @@ static const RobotSpritePart robot_idle02_f003[] = {
     { 6, 0.9500f, -5.6375f, 0.0000f, 1.0000f, 0.9029f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f004[] = {
+static const PlayerSpritePart robot_idle02_f004[] = {
     { 4, -3.0875f, -3.7875f, -27.3120f, 0.9755f, 0.9299f, 0 },
     { 2, -2.7125f, -1.5000f, 128.4433f, 0.9375f, 0.9685f, 1 },
     { 6, -1.3375f, -5.6500f, 0.0000f, 1.0000f, 0.8746f, 2 },
@@ -1272,7 +1272,7 @@ static const RobotSpritePart robot_idle02_f004[] = {
     { 6, 0.8375f, -5.6500f, 0.0000f, 1.0000f, 0.8746f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f005[] = {
+static const PlayerSpritePart robot_idle02_f005[] = {
     { 4, -3.0875f, -3.9375f, -26.1100f, 0.9646f, 0.8951f, 0 },
     { 2, -2.7125f, -1.7875f, 129.8527f, 0.9073f, 0.9533f, 1 },
     { 6, -1.3375f, -5.6625f, 0.0000f, 1.0000f, 0.8602f, 2 },
@@ -1282,7 +1282,7 @@ static const RobotSpritePart robot_idle02_f005[] = {
     { 6, 0.7750f, -5.6625f, 0.0000f, 1.0000f, 0.8602f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f006[] = {
+static const PlayerSpritePart robot_idle02_f006[] = {
     { 4, 0.7625f, -2.6625f, -16.3233f, 0.9968f, 0.9984f, 0 },
     { 2, -0.5000f, 1.9500f, -27.8231f, 0.9968f, 0.9984f, 1 },
     { 6, 1.9500f, -5.1125f, -1.0945f, 1.0000f, 1.0000f, 2 },
@@ -1292,7 +1292,7 @@ static const RobotSpritePart robot_idle02_f006[] = {
     { 6, -0.0250f, -5.3250f, 0.1040f, 1.0077f, 0.9741f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f007[] = {
+static const PlayerSpritePart robot_idle02_f007[] = {
     { 4, -0.0375f, 0.1375f, -24.6096f, 0.9968f, 0.9984f, 0 },
     { 2, -0.8875f, 3.3125f, 23.3293f, 0.9968f, 0.9984f, 1 },
     { 6, 1.2875f, -2.8250f, 6.9657f, 1.0000f, 1.0000f, 2 },
@@ -1302,7 +1302,7 @@ static const RobotSpritePart robot_idle02_f007[] = {
     { 6, -1.2500f, -3.7125f, 10.1960f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f008[] = {
+static const PlayerSpritePart robot_idle02_f008[] = {
     { 4, 1.0375f, 2.3625f, -70.0325f, 0.9968f, 0.9984f, 0 },
     { 2, -0.7125f, 4.9625f, 11.3467f, 0.9968f, 0.9984f, 1 },
     { 6, 3.5750f, 1.5875f, -35.1594f, 1.0000f, 1.0000f, 2 },
@@ -1312,7 +1312,7 @@ static const RobotSpritePart robot_idle02_f008[] = {
     { 6, 1.9750f, 0.5875f, -39.7123f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f009[] = {
+static const PlayerSpritePart robot_idle02_f009[] = {
     { 4, 0.8625f, 3.0750f, -85.5181f, 0.9968f, 0.9984f, 0 },
     { 2, -0.7250f, 5.6875f, 11.0927f, 0.9968f, 0.9984f, 1 },
     { 6, 3.5125f, 3.0000f, -50.6429f, 1.0000f, 1.0000f, 2 },
@@ -1322,7 +1322,7 @@ static const RobotSpritePart robot_idle02_f009[] = {
     { 6, 2.5375f, 2.4875f, -63.4440f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f010[] = {
+static const PlayerSpritePart robot_idle02_f010[] = {
     { 4, 1.4875f, 2.1625f, -99.5009f, 0.9968f, 0.9984f, 0 },
     { 2, -0.6875f, 4.3000f, -2.8905f, 0.9968f, 0.9984f, 1 },
     { 6, 4.0750f, 2.7250f, -64.6255f, 1.0000f, 1.0000f, 2 },
@@ -1332,7 +1332,7 @@ static const RobotSpritePart robot_idle02_f010[] = {
     { 6, 2.5875f, 2.2875f, -68.4639f, 1.0000f, 1.0000f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f011[] = {
+static const PlayerSpritePart robot_idle02_f011[] = {
     { 4, 1.5875f, 1.5625f, -99.1919f, 0.9968f, 0.9983f, 0 },
     { 2, -0.7250f, 3.5500f, -5.4200f, 0.9965f, 0.9981f, 1 },
     { 6, 4.0000f, 2.1875f, -69.3566f, 0.9982f, 0.9984f, 2 },
@@ -1342,7 +1342,7 @@ static const RobotSpritePart robot_idle02_f011[] = {
     { 6, 2.2875f, 1.4375f, -70.9100f, 0.9982f, 0.9983f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f012[] = {
+static const PlayerSpritePart robot_idle02_f012[] = {
     { 4, -0.4250f, -0.5750f, -58.6850f, 0.9954f, 0.9970f, 0 },
     { 2, -1.3500f, 2.1625f, 28.5458f, 0.9953f, 0.9969f, 1 },
     { 6, 1.5500f, -1.4000f, -40.6225f, 0.9965f, 0.9971f, 2 },
@@ -1352,7 +1352,7 @@ static const RobotSpritePart robot_idle02_f012[] = {
     { 6, 0.9875f, -1.4875f, -58.1962f, 0.9967f, 0.9972f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f013[] = {
+static const PlayerSpritePart robot_idle02_f013[] = {
     { 4, -2.3125f, -2.6375f, -19.6075f, 0.9969f, 0.9984f, 0 },
     { 2, -1.9500f, 0.8500f, 61.2576f, 0.9968f, 0.9984f, 1 },
     { 6, -0.8250f, -4.8500f, -12.9808f, 0.9980f, 0.9990f, 2 },
@@ -1362,7 +1362,7 @@ static const RobotSpritePart robot_idle02_f013[] = {
     { 6, -0.2500f, -4.3125f, -46.0249f, 0.9980f, 0.9989f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f014[] = {
+static const PlayerSpritePart robot_idle02_f014[] = {
     { 4, -3.2375f, -4.0500f, -25.8210f, 0.9780f, 0.9420f, 0 },
     { 2, -3.1625f, -1.2375f, 56.6457f, 0.9431f, 0.9768f, 1 },
     { 6, -1.3375f, -5.5750f, 0.0000f, 1.0000f, 0.9264f, 2 },
@@ -1372,7 +1372,7 @@ static const RobotSpritePart robot_idle02_f014[] = {
     { 6, 0.9625f, -5.5750f, 0.0000f, 1.0000f, 0.9264f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f015[] = {
+static const PlayerSpritePart robot_idle02_f015[] = {
     { 4, -3.4375f, -4.4000f, -27.0435f, 0.9725f, 0.9211f, 0 },
     { 2, -3.1875f, -1.9250f, 55.0733f, 0.9235f, 0.9703f, 1 },
     { 6, -1.3375f, -5.6250f, 0.0000f, 1.0000f, 0.8960f, 2 },
@@ -1382,7 +1382,7 @@ static const RobotSpritePart robot_idle02_f015[] = {
     { 6, 1.1375f, -5.6250f, 0.0000f, 1.0000f, 0.8960f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f016[] = {
+static const PlayerSpritePart robot_idle02_f016[] = {
     { 4, -3.4625f, -4.3375f, -27.2090f, 0.9739f, 0.9260f, 0 },
     { 2, -3.2000f, -1.8375f, 54.4620f, 0.9281f, 0.9720f, 1 },
     { 6, -1.3375f, -5.6125f, 0.0000f, 1.0000f, 0.9027f, 2 },
@@ -1392,7 +1392,7 @@ static const RobotSpritePart robot_idle02_f016[] = {
     { 6, 1.1375f, -5.6125f, 0.0000f, 1.0000f, 0.9027f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f017[] = {
+static const PlayerSpritePart robot_idle02_f017[] = {
     { 4, -3.4875f, -4.2125f, -27.5166f, 0.9767f, 0.9351f, 0 },
     { 2, -3.2750f, -1.6625f, 53.3259f, 0.9368f, 0.9752f, 1 },
     { 6, -1.3375f, -5.5875f, 0.0000f, 1.0000f, 0.9154f, 2 },
@@ -1402,7 +1402,7 @@ static const RobotSpritePart robot_idle02_f017[] = {
     { 6, 1.1375f, -5.5875f, 0.0000f, 1.0000f, 0.9154f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f018[] = {
+static const PlayerSpritePart robot_idle02_f018[] = {
     { 4, -3.5250f, -4.0250f, -27.9467f, 0.9805f, 0.9479f, 0 },
     { 2, -3.3500f, -1.4125f, 51.7417f, 0.9489f, 0.9796f, 1 },
     { 6, -1.3375f, -5.5625f, 0.0000f, 1.0000f, 0.9330f, 2 },
@@ -1412,7 +1412,7 @@ static const RobotSpritePart robot_idle02_f018[] = {
     { 6, 1.1375f, -5.5625f, 0.0000f, 1.0000f, 0.9330f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f019[] = {
+static const PlayerSpritePart robot_idle02_f019[] = {
     { 4, -3.5625f, -3.8250f, -28.4296f, 0.9847f, 0.9623f, 0 },
     { 2, -3.4250f, -1.1250f, 49.9577f, 0.9625f, 0.9846f, 1 },
     { 6, -1.3375f, -5.5250f, 0.0000f, 1.0000f, 0.9529f, 2 },
@@ -1422,7 +1422,7 @@ static const RobotSpritePart robot_idle02_f019[] = {
     { 6, 1.1375f, -5.5250f, 0.0000f, 1.0000f, 0.9529f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f020[] = {
+static const PlayerSpritePart robot_idle02_f020[] = {
     { 4, -3.5875f, -3.6625f, -28.8317f, 0.9883f, 0.9744f, 0 },
     { 2, -3.5000f, -0.8875f, 48.4644f, 0.9739f, 0.9888f, 1 },
     { 6, -1.3375f, -5.5000f, 0.0000f, 1.0000f, 0.9695f, 2 },
@@ -1432,7 +1432,7 @@ static const RobotSpritePart robot_idle02_f020[] = {
     { 6, 1.1375f, -5.5000f, 0.0000f, 1.0000f, 0.9695f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f021[] = {
+static const PlayerSpritePart robot_idle02_f021[] = {
     { 4, -3.6000f, -3.6500f, -28.8156f, 0.9870f, 0.9730f, 0 },
     { 2, -3.5000f, -0.8875f, 49.3916f, 0.9723f, 0.9872f, 1 },
     { 6, -1.3375f, -5.5000f, 0.0000f, 1.0000f, 0.9695f, 2 },
@@ -1442,7 +1442,7 @@ static const RobotSpritePart robot_idle02_f021[] = {
     { 6, 1.1375f, -5.5000f, 0.0000f, 1.0000f, 0.9695f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f022[] = {
+static const PlayerSpritePart robot_idle02_f022[] = {
     { 4, -3.6000f, -3.6875f, -28.8177f, 0.9871f, 0.9731f, 0 },
     { 2, -3.5125f, -0.9500f, 49.7411f, 0.9725f, 0.9873f, 1 },
     { 6, -1.3375f, -5.5000f, 0.0000f, 1.0000f, 0.9695f, 2 },
@@ -1452,7 +1452,7 @@ static const RobotSpritePart robot_idle02_f022[] = {
     { 6, 1.1375f, -5.5000f, 0.0000f, 1.0000f, 0.9695f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f023[] = {
+static const PlayerSpritePart robot_idle02_f023[] = {
     { 4, -3.5875f, -3.7000f, -28.8203f, 0.9874f, 0.9734f, 0 },
     { 2, -3.5125f, -1.0375f, 50.2510f, 0.9728f, 0.9877f, 1 },
     { 6, -1.3375f, -5.5000f, 0.0000f, 1.0000f, 0.9695f, 2 },
@@ -1462,7 +1462,7 @@ static const RobotSpritePart robot_idle02_f023[] = {
     { 6, 1.1375f, -5.5000f, 0.0000f, 1.0000f, 0.9695f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f024[] = {
+static const PlayerSpritePart robot_idle02_f024[] = {
     { 4, -3.5625f, -3.7000f, -28.8250f, 0.9877f, 0.9738f, 0 },
     { 2, -3.5125f, -1.1500f, 50.8768f, 0.9732f, 0.9880f, 1 },
     { 6, -1.3375f, -5.5000f, 0.0000f, 1.0000f, 0.9695f, 2 },
@@ -1472,7 +1472,7 @@ static const RobotSpritePart robot_idle02_f024[] = {
     { 6, 1.1375f, -5.5000f, 0.0000f, 1.0000f, 0.9695f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f025[] = {
+static const PlayerSpritePart robot_idle02_f025[] = {
     { 4, -3.5500f, -3.7125f, -28.8277f, 0.9881f, 0.9741f, 0 },
     { 2, -3.5125f, -1.2500f, 51.4780f, 0.9736f, 0.9884f, 1 },
     { 6, -1.3375f, -5.5000f, 0.0000f, 1.0000f, 0.9695f, 2 },
@@ -1482,7 +1482,7 @@ static const RobotSpritePart robot_idle02_f025[] = {
     { 6, 1.1375f, -5.5000f, 0.0000f, 1.0000f, 0.9695f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f026[] = {
+static const PlayerSpritePart robot_idle02_f026[] = {
     { 4, -3.5375f, -3.7125f, -28.8317f, 0.9883f, 0.9744f, 0 },
     { 2, -3.5000f, -1.3375f, 51.9417f, 0.9739f, 0.9888f, 1 },
     { 6, -1.3375f, -5.5000f, 0.0000f, 1.0000f, 0.9695f, 2 },
@@ -1492,7 +1492,7 @@ static const RobotSpritePart robot_idle02_f026[] = {
     { 6, 1.1375f, -5.5000f, 0.0000f, 1.0000f, 0.9695f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f027[] = {
+static const PlayerSpritePart robot_idle02_f027[] = {
     { 4, -3.5375f, -3.7000f, -28.9035f, 0.9888f, 0.9761f, 0 },
     { 2, -3.5375f, -1.2500f, 52.6421f, 0.9760f, 0.9895f, 1 },
     { 6, -1.3375f, -5.5000f, 0.0000f, 1.0000f, 0.9720f, 2 },
@@ -1502,7 +1502,7 @@ static const RobotSpritePart robot_idle02_f027[] = {
     { 6, 1.1375f, -5.5000f, 0.0000f, 1.0000f, 0.9720f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f028[] = {
+static const PlayerSpritePart robot_idle02_f028[] = {
     { 4, -3.5375f, -3.6375f, -29.0847f, 0.9900f, 0.9805f, 0 },
     { 2, -3.5375f, -1.1125f, 53.5894f, 0.9790f, 0.9905f, 1 },
     { 6, -1.3375f, -5.4625f, 0.0000f, 1.0000f, 0.9783f, 2 },
@@ -1512,7 +1512,7 @@ static const RobotSpritePart robot_idle02_f028[] = {
     { 6, 1.1375f, -5.4625f, 0.0000f, 1.0000f, 0.9783f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f029[] = {
+static const PlayerSpritePart robot_idle02_f029[] = {
     { 4, -3.5500f, -3.5625f, -29.3020f, 0.9915f, 0.9858f, 0 },
     { 2, -3.5750f, -0.9625f, 54.7222f, 0.9826f, 0.9918f, 1 },
     { 6, -1.3375f, -5.4625f, 0.0000f, 1.0000f, 0.9858f, 2 },
@@ -1522,7 +1522,7 @@ static const RobotSpritePart robot_idle02_f029[] = {
     { 6, 1.1375f, -5.4625f, 0.0000f, 1.0000f, 0.9858f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f030[] = {
+static const PlayerSpritePart robot_idle02_f030[] = {
     { 4, -3.5750f, -3.4875f, -29.5520f, 0.9933f, 0.9920f, 0 },
     { 2, -3.5750f, -0.8000f, 55.9229f, 0.9863f, 0.9931f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 0.9944f, 2 },
@@ -1532,7 +1532,7 @@ static const RobotSpritePart robot_idle02_f030[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 0.9944f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f031[] = {
+static const PlayerSpritePart robot_idle02_f031[] = {
     { 4, -3.6000f, -3.4750f, -29.5659f, 0.9937f, 0.9933f, 0 },
     { 2, -3.6000f, -0.6500f, 57.0422f, 0.9899f, 0.9943f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 0.9963f, 2 },
@@ -1542,7 +1542,7 @@ static const RobotSpritePart robot_idle02_f031[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 0.9963f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f032[] = {
+static const PlayerSpritePart robot_idle02_f032[] = {
     { 4, -3.6000f, -3.4625f, -29.5758f, 0.9940f, 0.9944f, 0 },
     { 2, -3.6000f, -0.5500f, 57.9336f, 0.9927f, 0.9953f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 0.9977f, 2 },
@@ -1552,7 +1552,7 @@ static const RobotSpritePart robot_idle02_f032[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 0.9977f, 6 },
 };
 
-static const RobotSpritePart robot_idle02_f033[] = {
+static const PlayerSpritePart robot_idle02_f033[] = {
     { 4, -3.5875f, -3.4500f, -29.5778f, 0.9941f, 0.9952f, 0 },
     { 2, -3.6125f, -0.5125f, 57.9343f, 0.9935f, 0.9956f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 0.9990f, 2 },
@@ -1562,7 +1562,7 @@ static const RobotSpritePart robot_idle02_f033[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 0.9990f, 6 },
 };
 
-static const RobotFrame robot_idle02_frames[] = {
+static const PlayerFrame robot_idle02_frames[] = {
     { robot_idle02_f001, 7, 0.041667f },
     { robot_idle02_f002, 7, 0.041667f },
     { robot_idle02_f003, 7, 0.041667f },
@@ -1598,7 +1598,7 @@ static const RobotFrame robot_idle02_frames[] = {
     { robot_idle02_f033, 7, 0.041667f },
 };
 
-const RobotAnimation robot_animations[ROBOT_ANIM_COUNT] = {
+const PlayerAnimation robot_animations[ROBOT_ANIM_COUNT] = {
     { robot_run_frames, 16 },  // ROBOT_ANIM_RUN
     { robot_jump_start_frames, 5 },  // ROBOT_ANIM_JUMP_START
     { robot_jump_frames, 5 },  // ROBOT_ANIM_JUMP

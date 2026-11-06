@@ -9159,6 +9159,27 @@ const Icon icons_robot[69] = {
     { 13, robot_68 },
 };
 
+static const IconPart spider_1[] = {
+  { 0, 0, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0.00, ICON_COLOR_P1, 1.00, 1 },
+  { 0, 1, 5.00, 1.00, 1.00, 1.00, 0, 0, 1, 0.00, ICON_COLOR_P2, 1.00, 1 },
+  { 0, 2, 6.00, 1.00, 1.00, 1.00, 0, 0, 1, 0.00, ICON_COLOR_WHITE, 1.00, 1 },
+  { 0, 3, 0.00, 0.00, 1.00, 1.00, 0, 0, 1, 0.00, ICON_COLOR_GLOW, 1.00, 1 },
+  { 0, 4, 0.00, 0.00, 1.00, 1.00, 0, 0, 2, 0.00, ICON_COLOR_P1, 1.00, 2 },
+  { 0, 5, 0.00, 0.00, 1.00, 1.00, 0, 0, 2, 0.00, ICON_COLOR_P2, 1.00, 2 },
+  { 0, 6, 0.00, 0.00, 1.00, 1.00, 0, 0, 2, 0.00, ICON_COLOR_GLOW, 1.00, 2 },
+  { 0, 7, 0.00, 0.00, 1.00, 1.00, 0, 0, 3, 0.00, ICON_COLOR_P1, 1.00, 3 },
+  { 0, 8, 0.00, 0.00, 1.00, 1.00, 0, 0, 3, 0.00, ICON_COLOR_P2, 1.00, 3 },
+  { 0, 9, 0.00, 0.00, 1.00, 1.00, 0, 0, 3, 0.00, ICON_COLOR_GLOW, 1.00, 3 },
+  { 0, 10, 0.00, 0.00, 1.00, 1.00, 0, 0, 4, 0.00, ICON_COLOR_P1, 1.00, 4 },
+  { 0, 11, 0.00, 0.00, 1.00, 1.00, 0, 0, 4, 0.00, ICON_COLOR_P2, 1.00, 4 },
+  { 0, 12, 0.00, 0.00, 1.00, 1.00, 0, 0, 4, 0.00, ICON_COLOR_GLOW, 1.00, 4 },
+};
+
+const Icon icons_spider[2] = {
+    { 0, NULL },
+    { 13, spider_1 },
+};
+
 const Icon* icons[ICON_GAMEMODE_COUNT] = {
     icons_player,
     icons_ship,
@@ -9166,4 +9187,5 @@ const Icon* icons[ICON_GAMEMODE_COUNT] = {
     icons_bird,
     icons_dart,
     icons_robot,
+    icons_spider,
 };

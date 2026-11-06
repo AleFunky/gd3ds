@@ -1,4 +1,4 @@
---atlas --border transparent -f rgba8888 -z auto
+--atlas --border transparent -f auto-l8 -z auto
 robot_01_01_001.png
 robot_01_01_2_001.png
 robot_01_01_glow_001.png
