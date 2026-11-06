@@ -949,7 +949,7 @@ void exit_practice_mode() {
 
 void update_checkpoint_with_p2() {
     // Exit if not in practice mode with autocheckpoints enabled
-    if (!(state.practice_mode && settingsState.autoCheckpoints) || state.end_wall_anim_playing) return;
+    if (!state.practice_mode || state.end_wall_anim_playing) return;
 
     if (placed_checkpoint) {
         placed_checkpoint->p2 = state.player2;
