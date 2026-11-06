@@ -9,6 +9,7 @@
 #include "main.h"
 #include "triggers.h"
 #include "graphics.h"
+#include "utils/gfx.h"
 
 static UIProgressBar *progressbar;
 static UILabel *splashtext;

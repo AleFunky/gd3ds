@@ -58,6 +58,7 @@
 #include "math_helpers.h"
 #include "profiling.h"
 
+#include "utils/gfx.h"
 #include "utils/utils.h"
 #include "utils/precise_input.h"
 #include "utils/server_utils.h"

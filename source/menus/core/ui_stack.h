@@ -1,4 +1,5 @@
 #pragma once
+#include "main.h"
 #include "ui_screen.h"
 #include "graphics.h"
 

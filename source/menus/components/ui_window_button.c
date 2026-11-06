@@ -1,22 +1,13 @@
 #include "menus/components/ui_button.h"
 
 #include <citro2d.h>
-#include "ui_image.h"
-#include "text.h"
-#include "fonts/bigFont.h"
-#include "fonts/chatFont.h"
-#include "fonts/goldFont.h"
 #include "ui_window_button.h"
-#include "easing.h"
 #include "math_helpers.h"
 #include "menus/core/ui_screen.h"
-#include "menus/settings_hub/settings.h"
-#include "menus/gameplay.h"
-#include "state.h"
 #include "menus/core/ui_props.h"
 
 #include "main.h"
-#include "ui_slider.h"
+#include "utils/gfx.h"
 
 //if a button has been pressed with a keybind, no other button should be pressed after
 static int pressedKey;

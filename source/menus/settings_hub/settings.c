@@ -20,7 +20,6 @@
 #include "menus/components/ui_list.h"
 #include "menus/core/ui_screen.h"
 
-#include "menus/main_menu.h"
 #include "menus/settings_hub/settings.h"
 
 #include "menus/settings_hub/info_card.h"
@@ -295,6 +294,16 @@ Setting settings[] = {
         .key = CONFIG_GAMEPLAY_PATH "ultraDecimalPercent"
     },
     {
+        .id = "goldenBest",
+        .label = "Golden best",
+        .additionalInfo = "Changes the percentage counter to\nbe gold when you pass\nyour previous best.",
+        .page = PAGE_GAMEPLAY, 
+
+        .defaultValue = false,
+        .var = &settingsState.goldenBest,
+        .key = CONFIG_GAMEPLAY_PATH "goldenBest"
+    },
+    {
         .id = "quickRetry",
         .label = "Quick retry",
         .additionalInfo = "Restarts in 0.5 seconds instead of 1.",
@@ -373,18 +382,7 @@ Setting settings[] = {
         .defaultValue = false,
         .var = &settingsState.noPlayerTrail,
         .key = CONFIG_COSMETIC_PATH "noPlayerTrail"
-    },
-    {
-        .id = "noWaveTrailBehind",
-        .label = "No wave trail behind",
-        .additionalInfo = "Disables player trail for the wave.",
-        .page = PAGE_COSMETIC, 
-
-        .defaultValue = false,
-        .var = &settingsState.noWaveTrailBehind,
-        .key = CONFIG_COSMETIC_PATH "noWaveTrailBehind"
-    },
-    
+    },    
 };
 
 typedef struct CheckboxData {

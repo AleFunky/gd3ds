@@ -1,9 +1,8 @@
 #include <3ds.h>
 #include <citro2d.h>
 
+#include "main.h"
 #include "menus/core/ui_screen.h"
-#include "menus/components/ui_label.h"
-#include "save/saving.h"
 #include "search_filters.h"
 
 void action_clear_search_filters(UIElement* e, const UIPropertyList *args) {

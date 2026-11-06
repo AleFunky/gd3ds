@@ -2,12 +2,10 @@
 
 #include <3ds.h>
 #include "main.h"
-#include "graphics.h"
 
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "utils/gfx.h"
 #include "menus/icon_kit.h"
 #include "menus/settings_hub/settings.h"
 #include "menus/creator_menu/soggy.h"

@@ -811,7 +811,7 @@ int parse_releases_data(char *jsonString, bool useNightly) {
             curr_object = json_object_array_get_idx(jsonObject, i);
 
             bool isPrerelease = json_object_object_get_ex(curr_object, "prerelease", &prerelease) && json_object_get_boolean(prerelease);
-            bool idGreaterThanCurrent = (json_object_object_get_ex(curr_object, "id", &id) && json_object_get_int(id) > CURRENT_RELEASE_ID);
+            bool idGreaterThanCurrent = (json_object_object_get_ex(curr_object, "id", &id) && json_object_get_int(id) > CURRENT_LATEST_RELEASE_ID);
 
             if (!isPrerelease && idGreaterThanCurrent) {
                 targetRelease = curr_object;

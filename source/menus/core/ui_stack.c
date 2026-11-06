@@ -4,8 +4,8 @@
 #include "menus/core/ui_element.h"
 #include "ui_screen.h"
 #include "screen_definitions.h"
-#include "mp3_player.h"
 #include "fonts/bigFont.h"
+#include "utils/gfx.h"
 #include <string.h>
 
 static UIStack *stack = NULL;
@@ -508,7 +508,7 @@ void draw_stack_debug(){
     char capacitySlop[] = "Capacity:....";
     snprintf(capacitySlop, sizeof(capacitySlop), "Capacity: %d", stack->stack_capacity);
 
-    draw_text(&bigFont_fontCharset, &bigFont_sheet, SCREEN_BOT_WIDTH / 2, SCREEN_HEIGHT / 2, 0.5f, 0.5f, 0, true, debug);
+    draw_text(&bigFont_fontCharset, &bigFont_sheet, SCREEN_BOT_WIDTH / 2.f, SCREEN_HEIGHT / 2.f, 0.5f, 0.5f, 0, true, debug);
     draw_text(&bigFont_fontCharset, &bigFont_sheet, 10, 10, 0.5f, 0.5f, 0, true, rootSlop);
     draw_text(&bigFont_fontCharset, &bigFont_sheet, 10, 25, 0.5f, 0.5f, 0, true, activeSlop);
     draw_text(&bigFont_fontCharset, &bigFont_sheet, 10, 40, 0.5f, 0.5f, 0, true, capacitySlop);

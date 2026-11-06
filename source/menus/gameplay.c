@@ -1,8 +1,10 @@
 #include <3ds.h>
 #include <citro2d.h>
+#include <math.h>
 #include "c2d/base.h"
 #include "menus/core/ui_element.h"
 #include "menus/core/ui_screen.h"
+#include "menus/core/ui_stack.h"
 #include "utils/precise_input.h"
 
 #include "main.h"
@@ -365,8 +367,19 @@ void gameplay_update_top(UIScreen *s, UIInput *touch) {
     fps = delta * 1000.f;
     if (settingsState.decimalPercent) decimal = 2;
     if (settingsState.ultraDecimalPercent) decimal = MAX_DECIMAL_PERCENT;
-
-    snprintf(fps_label->text, 32, "<#FFFFFF55>FPS: %.*f</>", 0, fps > 0 ? 1000.f / fps : 0.f);
+    if (settingsState.goldenBest && (state.current_data.max_normal > 1.f ? state.current_data.max_normal : 1.f) < ceilf(state.level_progress) && !state.practice_mode) {
+        percent->font = 2;
+        percent->base.y = 7.f;
+        percent->base.scaleX = 0.57f;
+        percent->base.scaleY = 0.57f;
+    } else {
+        percent->font = 0;
+        percent->base.y = 8.f;
+        percent->base.scaleX = 0.45f;
+        percent->base.scaleY = 0.45f;
+    };
+    // update fps counter but only when game isnt paused cuz otherwise it shows like a bajillion frame per sec ond
+    if(!game_paused) snprintf(fps_label->text, 32, "<#FFFFFF55>FPS: %.*f</>", 0, fps > 0 ? 1000.f / fps : 0.f);
 
     progress_bar->value = state.level_progress;
     snprintf(percent->text, 32, "%.*f%%", decimal, state.level_progress);
@@ -374,12 +387,12 @@ void gameplay_update_top(UIScreen *s, UIInput *touch) {
     ui_run_func_on_tag(s, "progressalert", ui_disable_element);
     ui_run_func_on_tag(s, "percent", ui_disable_element);
     ui_run_func_on_tag(s, "fps", ui_disable_element);
-    ui_set_pos_on_tag(s, 200, 8, "percent");
+    percent->base.x = 200.f;
     percent->alignment = 0.5;
 
     if (settingsState.showProgressBar) {
         ui_run_func_on_tag(s, "progressalert", ui_enable_element);
-        ui_set_pos_on_tag(s, 282, 8, "percent");
+        percent->base.x = 282.f;
         percent->alignment = 0;
     }
 

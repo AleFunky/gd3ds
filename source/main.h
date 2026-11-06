@@ -41,12 +41,6 @@
 // When making a release, uncomment this please thanks
 // #define IS_RELEASE
 
-// you'll have to curl the current release id from the github api sorry
-// this is the command btw
-// curl -L \ -H "Accept: application/vnd.github+json" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/alefunky/gd3ds/releases
-
-#define CURRENT_RELEASE_ID 371103258
-
 // Increment this every time new properties are added to the server entries
 #define SAVED_LEVELS_VERSION 2
 

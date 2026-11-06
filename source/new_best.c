@@ -2,10 +2,8 @@
 #include "math_helpers.h"
 #include "main.h"
 #include "state.h"
-#include "utils/gfx.h"
 #include "easing.h"
 #include "graphics.h"
-#include "save/config.h"
 
 #include "menus/core/ui_screen.h"
 #include "menus/settings_hub/settings.h"

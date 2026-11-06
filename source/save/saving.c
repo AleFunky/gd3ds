@@ -1150,7 +1150,6 @@ SavingError save_save_file(const char *path, const ServerFile *save_data) {
 
     json_object_object_add(root, SAVE_SAVED_LEVEL_KEY, saved_levels);
 
-    const char *json = json_object_to_json_string_ext(root, JSON_C_TO_STRING_PLAIN);
 
     SaveType type = (save_data == &gdps_file ? SAVE_1P9_GDPS : SAVE_ROBTOP);
 
@@ -1164,7 +1163,6 @@ SavingError save_save_file(const char *path, const ServerFile *save_data) {
     snprintf(task->tmp_file, sizeof(task->tmp_file), "%s.tmp", tmp_path);
 
     task->root = root;
-    task->data = strdup(json);
     
     begin_saving(type);
 
@@ -1185,8 +1183,6 @@ SavingError save_external_file(const char *path, const ExternalLevelFile *save_d
 
     json_object_object_add(root, SAVE_EXTERNAL_KEY, external);
 
-    const char *json = json_object_to_json_string_ext(root, JSON_C_TO_STRING_PLAIN);
-
     SavingTask *task = &tasks[SAVE_EXTERNAL];
 
     char tmp_path[250];
@@ -1197,7 +1193,6 @@ SavingError save_external_file(const char *path, const ExternalLevelFile *save_d
     snprintf(task->tmp_file, sizeof(task->tmp_file), "%s.tmp", tmp_path);
 
     task->root = root;
-    task->data = strdup(json);
     
     begin_saving(SAVE_EXTERNAL);
 
@@ -1429,11 +1424,11 @@ bool migrate_old_data() {
 }
 
 static SavingError threaded_save(SavingTask *task) {
-    if (!task->data) {
-        return SAVE_ERROR_DATA;
+    const char *json = json_object_to_json_string_ext(task->root, JSON_C_TO_STRING_PLAIN);
+    if (!json) {
+        return SAVE_ERROR_OUTOFMEM;
     }
 
-    const char *json = task->data;
     size_t out_len;
     int out_code;
     unsigned char *compressed = compress_data((const unsigned char *) json, strlen(json), &out_len, &out_code);
@@ -1511,8 +1506,6 @@ static void saving_thread(void *arg) {
     if (error) {
         output_log("An error has occured while saving: %d\n", error);
     }
-
-    free((void *) task->data);
     task->running = false;
 }
 

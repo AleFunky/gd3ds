@@ -1,5 +1,6 @@
 
 #include <citro2d.h>
+#include "main.h"
 #include "menus/core/ui_screen.h"
 #include "graphics.h"
 #include "particles/circles.h"
