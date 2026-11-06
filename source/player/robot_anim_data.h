@@ -22,14 +22,8 @@ typedef enum {
     ROBOT_ANIM_JUMP       = 2,
     ROBOT_ANIM_FALL_START = 3,
     ROBOT_ANIM_FALL       = 4,
-    ROBOT_ANIM_SKIP       = 5,
-    ROBOT_ANIM_RUN3       = 6,
-    ROBOT_ANIM_RUN2       = 7,
-    ROBOT_ANIM_IDLE       = 8,
-    ROBOT_ANIM_DASH_LOOP  = 9,
-    ROBOT_ANIM_IDLE01     = 10,
-    ROBOT_ANIM_IDLE02     = 11,
-    ROBOT_ANIM_COUNT      = 12,
+    ROBOT_ANIM_IDLE       = 5,
+    ROBOT_ANIM_COUNT      = 6,
 } RobotAnimId;
 
 extern const PlayerAnimation robot_animations[ROBOT_ANIM_COUNT];
