@@ -70,6 +70,7 @@ static float get_object_particle_depth(int id) {
         case NORMAL_SPEED_PORTAL:
         case FAST_SPEED_PORTAL:
         case FASTER_SPEED_PORTAL:
+        case FASTEST_SPEED_PORTAL:
         case DUAL_PORTAL:
         case DIVORCE_PORTAL:
         case ROBOT_PORTAL:
@@ -649,6 +650,19 @@ void spawn_object_particles(int obj) {
                 if (index >= 0)
                 {
                     set_particle_color(&object_particle[index].ps.cfg, 0.9f, 0.25f, 1);
+                    object_particle[index].ps.cfg.angle = -(adjust_angle_y(objects.rotation[obj], objects.flippedH[obj]));
+                    object_particle[index].ps.emitterX = objects.x[obj];
+                    object_particle[index].ps.emitterY = objects.y[obj];
+                }
+            }
+            break;
+        case FASTEST_SPEED_PORTAL:
+            if (!is_ps_already_loaded(obj))
+            {
+                index = load_object_particles(obj, &boost_04_effect, false);
+                if (index >= 0)
+                {
+                    set_particle_color(&object_particle[index].ps.cfg, 1.f, 0.f, 0);
                     object_particle[index].ps.cfg.angle = -(adjust_angle_y(objects.rotation[obj], objects.flippedH[obj]));
                     object_particle[index].ps.emitterX = objects.x[obj];
                     object_particle[index].ps.emitterY = objects.y[obj];
