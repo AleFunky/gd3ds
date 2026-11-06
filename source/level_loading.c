@@ -157,7 +157,11 @@ Section *get_or_create_section(int x, int y) {
         sec = sec->next;
     }
     sec = malloc(sizeof(Section));
+    if (!sec) return NULL;
+
     sec->objects = malloc(sizeof(int) * 8);
+    if (!sec->objects) return NULL;
+
     sec->object_count = 0;
     sec->object_capacity = 8;
     sec->triggers = NULL;
@@ -186,9 +190,12 @@ void assign_object_to_section(int obj) {
     int sx = (int)(objects.x[obj] / SECTION_SIZE);
     int sy = (int)(objects.y[obj] / SECTION_SIZE);
     Section *sec = get_or_create_section(sx, sy);
+    if (!sec) return;
+
     if (sec->object_count >= sec->object_capacity) {
         sec->object_capacity *= 2;
         sec->objects = realloc(sec->objects, sizeof(int) * sec->object_capacity);
+        if (!sec->objects) return;
     }
     sec->objects[sec->object_count++] = obj;
     append_section_trigger(sec, sec->object_count - 1);
@@ -226,11 +233,15 @@ void update_object_section(int obj) {
 char *read_file(const char *filepath, size_t *out_size) {
     FILE *f = fopen(filepath, "rb");
     if (!f) {
-        output_log("Failed to open file: %s (%x)\n", filepath, errno);
+        output_log("Failed to open file: %s (%d)\n", filepath, errno);
         return NULL;
     }
     fseek(f, 0, SEEK_END);
-    size_t size = ftell(f);
+    long size = ftell(f);
+    if (size < 0) {
+        output_log("Failed to ftell file: %s (%d)\n", filepath, errno);
+        return NULL;
+    }
     rewind(f);
 
     char *buffer = malloc(size + 1);
@@ -474,10 +485,11 @@ char **split_string_str_del(const char *str, const char *delimiter, int *outCoun
 
             if (len > (ignoreZeroLength ? -1 : 0)) {
                 char *token = malloc(len + 1);
+                if (!token) return NULL;
                 strncpy(token, start, len);
                 token[len] = '\0';
                 result = (char **)realloc(result, sizeof(char *) * (count + 1));
-                if (result == NULL) return NULL;
+                if (!result) return NULL;
                 result[count++] = token;
             }
 
@@ -492,10 +504,11 @@ char **split_string_str_del(const char *str, const char *delimiter, int *outCoun
         int len = ptr - start;
         if (len > (ignoreZeroLength ? -1 : 0)) {
             char *token = malloc(len + 1);
+            if (!token) return NULL;
             strncpy(token, start, len);
             token[len] = '\0';
             result = realloc(result, sizeof(char *) * (count + 1));
-            if (result == NULL) return NULL;
+            if (!result) return NULL;
             result[count++] = token;
         }
     }
@@ -515,11 +528,14 @@ char **split_string(const char *str, char delimiter, int *outCount, bool ignoreZ
             int len = ptr - start;
             if (len > (ignoreZeroLength ? -1 : 0)) {
                 char *token = malloc(len + 1);
+                if (!token) return NULL;
+
                 strncpy(token, start, len);
                 token[len] = '\0';
 
                 result = (char **)realloc(result, sizeof(char*) * (count + 1));
-                if (result == NULL) return NULL;
+                if (!result) return NULL;
+
                 result[count++] = token;
             }
             start = ptr + 1;
@@ -530,10 +546,14 @@ char **split_string(const char *str, char delimiter, int *outCount, bool ignoreZ
         int len = ptr - start;
         if (len > (ignoreZeroLength ? -1 : 0)) {
             char *token = malloc(len + 1);
+            if (!token) return NULL;
+
             strncpy(token, start, len);
             token[len] = '\0';
+
             result = realloc(result, sizeof(char*) * (count + 1));
-            if (result == NULL) return NULL;
+            if (!result) return NULL;
+
             result[count++] = token;
         }
     }
@@ -640,6 +660,10 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
         char *line = get_metadata_value(level_string, "kS31");
         if (line) {
             channels = realloc(channels, sizeof(GDColorChannel) * (i + 1));
+            if (!channels) {
+                *out_code = LOAD_OUT_OF_MEMORY;
+                return 0;
+            }
             parse_color_channel(channels, i, line);
             channels[i].channelID = CHANNEL_LINE;
             i++;
@@ -649,6 +673,10 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
         char *obj = get_metadata_value(level_string, "kS32");
         if (obj) {
             channels = realloc(channels, sizeof(GDColorChannel) * (i + 1));
+            if (!channels) {
+                *out_code = LOAD_OUT_OF_MEMORY;
+                return 0;
+            }
             parse_color_channel(channels, i, obj);
             channels[i].channelID = CHANNEL_OBJ;
             i++;
@@ -658,6 +686,10 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
         char *col1 = get_metadata_value(level_string, "kS33");
         if (col1) {
             channels = realloc(channels, sizeof(GDColorChannel) * (i + 1));
+            if (!channels) {
+                *out_code = LOAD_OUT_OF_MEMORY;
+                return 0;
+            }
             parse_color_channel(channels, i, col1);
             channels[i].channelID = 1;
             i++;
@@ -667,6 +699,10 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
         char *col2 = get_metadata_value(level_string, "kS34");
         if (col2) {
             channels = realloc(channels, sizeof(GDColorChannel) * (i + 1));
+            if (!channels) {
+                *out_code = LOAD_OUT_OF_MEMORY;
+                return 0;
+            }
             parse_color_channel(channels, i, col2);
             channels[i].channelID = 2;
             i++;
@@ -676,6 +712,10 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
         char *col3 = get_metadata_value(level_string, "kS35");
         if (col3) {
             channels = realloc(channels, sizeof(GDColorChannel) * (i + 1));
+            if (!channels) {
+                *out_code = LOAD_OUT_OF_MEMORY;
+                return 0;
+            }
             parse_color_channel(channels, i, col3);
             channels[i].channelID = 3;
             i++;
@@ -685,6 +725,10 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
         char *col4 = get_metadata_value(level_string, "kS36");
         if (col4) {
             channels = realloc(channels, sizeof(GDColorChannel) * (i + 1));
+            if (!channels) {
+                *out_code = LOAD_OUT_OF_MEMORY;
+                return 0;
+            }
             parse_color_channel(channels, i, col4);
             channels[i].channelID = 4;
             i++;
@@ -694,6 +738,10 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
         char *dl3 = get_metadata_value(level_string, "kS37");
         if (dl3) {
             channels = realloc(channels, sizeof(GDColorChannel) * (i + 1));
+            if (!channels) {
+                *out_code = LOAD_OUT_OF_MEMORY;
+                return 0;
+            }
             parse_color_channel(channels, i, dl3);
             channels[i].channelID = CHANNEL_3DL;
             i++;
@@ -709,51 +757,53 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
     char *bg_r = get_metadata_value(level_string, "kS1");
     char *bg_g = get_metadata_value(level_string, "kS2");
     char *bg_b = get_metadata_value(level_string, "kS3");
+    
+    if (bg_r && bg_g && bg_b) {
+        GDColorChannel bg_channel = {0};
+        bg_channel.fromOpacity = 1.0f;
+        bg_channel.channelID = CHANNEL_BG;
+        bg_channel.fromRed = atoi(bg_r);
+        bg_channel.fromGreen = atoi(bg_g);
+        bg_channel.fromBlue = atoi(bg_b);
 
-    GDColorChannel bg_channel = {0};
-    bg_channel.fromOpacity = 1.0f;
-    bg_channel.channelID = CHANNEL_BG;
-    bg_channel.fromRed = atoi(bg_r);
-    bg_channel.fromGreen = atoi(bg_g);
-    bg_channel.fromBlue = atoi(bg_b);
+        char *bg_player_color = get_metadata_value(level_string, "kS16");
+        if (bg_player_color) {
+            bg_channel.playerColor = atoi(bg_player_color);
+            free(bg_player_color);
+        }
 
-    char *bg_player_color = get_metadata_value(level_string, "kS16");
-    if (bg_player_color) {
-        bg_channel.playerColor = atoi(bg_player_color);
-        free(bg_player_color);
+        channels[i] = bg_channel;
+        i++;
     }
 
     free(bg_r);
     free(bg_g);
     free(bg_b);
 
-    channels[i] = bg_channel;
-
-    i++;
-
     char *g_r = get_metadata_value(level_string, "kS4");
     char *g_g = get_metadata_value(level_string, "kS5");
     char *g_b = get_metadata_value(level_string, "kS6");
 
-    GDColorChannel g_channel = {0};
-    g_channel.fromOpacity = 1.0f;
-    g_channel.channelID = CHANNEL_GROUND;
-    g_channel.fromRed = atoi(g_r);
-    g_channel.fromGreen = atoi(g_g);
-    g_channel.fromBlue = atoi(g_b);
+    if (g_r && g_g && g_b) {
+        GDColorChannel g_channel = {0};
+        g_channel.fromOpacity = 1.0f;
+        g_channel.channelID = CHANNEL_GROUND;
+        g_channel.fromRed = atoi(g_r);
+        g_channel.fromGreen = atoi(g_g);
+        g_channel.fromBlue = atoi(g_b);
 
-    char *g_player_color = get_metadata_value(level_string, "kS17");
-    if (g_player_color) {
-        g_channel.playerColor = atoi(g_player_color);
-        free(g_player_color);
+        char *g_player_color = get_metadata_value(level_string, "kS17");
+        if (g_player_color) {
+            g_channel.playerColor = atoi(g_player_color);
+            free(g_player_color);
+        }
+        channels[i] = g_channel;
+        i++;
     }
 
     free(g_r);
     free(g_g);
     free(g_b);
-    
-    channels[i] = g_channel;
-    i++;
 
     char *line_r = get_metadata_value(level_string, "kS7");
     char *line_g = get_metadata_value(level_string, "kS8");
@@ -774,6 +824,10 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
         }
 
         channels = realloc(channels, sizeof(GDColorChannel) * (i + 1));
+        if (!channels) {
+            *out_code = LOAD_OUT_OF_MEMORY;
+            return 0;
+        }
         channels[i] = line_channel;
         i++;
     }
@@ -801,6 +855,10 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
         }
         
         channels = realloc(channels, sizeof(GDColorChannel) * (i + 1));
+        if (!channels) {
+            *out_code = LOAD_OUT_OF_MEMORY;
+            return 0;
+        }
         channels[i] = obj_channel;
         i++;
     }
@@ -834,6 +892,10 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
         }
 
         channels = realloc(channels, sizeof(GDColorChannel) * (i + 1));
+        if (!channels) {
+            *out_code = LOAD_OUT_OF_MEMORY;
+            return 0;
+        }
         channels[i] = obj_2_channel;
         i++;
     }
@@ -1120,6 +1182,10 @@ int allocate_trigger_component(int obj) {
 }
 
 void init_default_variables(int object) {
+    if (!is_valid_object(objects.id[object])) {
+        return;
+    }
+    
     const GameObject *game_obj = &game_objects[objects.id[object]];
 
     objects.zlayer[object] = game_obj->z_layer;
