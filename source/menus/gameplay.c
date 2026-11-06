@@ -367,7 +367,9 @@ void gameplay_update_top(UIScreen *s, UIInput *touch) {
     fps = delta * 1000.f;
     if (settingsState.decimalPercent) decimal = 2;
     if (settingsState.ultraDecimalPercent) decimal = MAX_DECIMAL_PERCENT;
-    if (settingsState.goldenBest && (state.current_data.max_normal > 1.f ? state.current_data.max_normal : 1.f) < ceilf(state.level_progress) && !state.practice_mode) {
+
+    bool is_golden = (int)state.level_progress > state.current_data.max_normal;
+    if (settingsState.goldenBest && is_golden && !state.practice_mode) {
         percent->font = 2;
         percent->base.y = 7.f;
         percent->base.scaleX = 0.57f;

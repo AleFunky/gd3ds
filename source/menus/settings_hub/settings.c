@@ -382,7 +382,17 @@ Setting settings[] = {
         .defaultValue = false,
         .var = &settingsState.noPlayerTrail,
         .key = CONFIG_COSMETIC_PATH "noPlayerTrail"
-    },    
+    },
+    {
+        .id = "noWaveTrailBehind",
+        .label = "No wave trail behind",
+        .additionalInfo = "Disables player trail for the wave.",
+        .page = PAGE_COSMETIC, 
+
+        .defaultValue = false,
+        .var = &settingsState.noWaveTrailBehind,
+        .key = CONFIG_COSMETIC_PATH "noWaveTrailBehind"
+    },
 };
 
 typedef struct CheckboxData {
