@@ -602,9 +602,10 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, get_use_effect_array_ptr(GFX_TOP));
                 if (effect) {
-                    effect->def.colorR = 255 / 255.f;
-                    effect->def.colorG = 255 / 255.f;
-                    effect->def.colorB = 255 / 255.f;
+                    Color color = channels[CHANNEL_LBG].color;
+                    effect->def.colorR = color.r / 255.f;
+                    effect->def.colorG = color.g / 255.f;
+                    effect->def.colorB = color.b / 255.f;
                 }
                 
                 if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_timer > 0) { player->holding_jump_cancelled = true; }
