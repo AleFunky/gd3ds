@@ -2,6 +2,7 @@
 #include <citro2d.h>
 #include <stdlib.h>
 
+#include "github_info.h"
 #include "main.h"
 #include "menus/core/ui_screen.h"
 #include "text.h"
@@ -9,8 +10,6 @@
 #include "menus/components/ui_rectangle.h"
 #include "menus/components/ui_list.h"
 #include "menus/components/ui_label.h"
-#include "menus/components/ui_spinner.h"
-#include "menus/components/ui_window_button.h"
 #include "menus/settings_hub/info_card.h"
 #include "menus/updater.h"
 #include "menus/updater_pop_up.h"
@@ -18,7 +17,6 @@
 #include "fonts/chatFont.h"
 
 #include "utils/server_utils.h"
-#include "utils/string_helpers.h"
 #include "utils/utils.h"
 #include "utils/folders.h"
 
@@ -233,6 +231,7 @@ static void updater_init(UIScreen *s) {
         // ui_label_set_text(error_label, update_data->releaseTitle);
         populate_info();
     } else {
+        output_log("Current branch: %s\n", REPO_BRANCH);
         ui_disable_element((UIElement *) updater_button);
         ui_enable_element((UIElement *) spinner);
         if (!updater_task.running) updater_thread = create_generic_thread(&updater_task);
