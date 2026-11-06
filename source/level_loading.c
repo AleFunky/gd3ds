@@ -112,7 +112,7 @@ Section *get_section(int x, int y) {
 static SectionTriggers uncached_section_triggers = { .count = -1 };
 
 static void append_section_trigger(Section *sec, int object_index) {
-    if (!is_position_trigger(objects.id[sec->objects[object_index]])) return;
+    if (!is_trigger_object(objects.id[sec->objects[object_index]])) return;
     SectionTriggers *list = sec->triggers;
     if (list && list->count < 0) return;
     if (!list || list->count == list->capacity) {
@@ -939,129 +939,14 @@ GDValueType get_value_type_for_key(int key) {
     }
 }
 
-// Convert some 2.1 objects into the 1.9 ones, blame robtop for making GD convert those to 2.1
 int convert_object(int id) {
     switch (id) {
         case V2_0_LINE_TRIGGER:
             return LINE_TRIGGER;
-        // Saws
-        case 1734:
-            return 675;
-        case 1735:
-            return 676;
-        case 1736:
-            return 677;
-        case 1705:
-            return 88;
-        case 1706:
-            return 89;
-        case 1707:
-            return 98;
-        case 1708:
-            return 397;
-        case 1709:
-            return 398;
-        case 1710:
-            return 399;
 
         // User coin
         case 1329:
             return SECRET_COIN;
-
-        // Slopes
-        case 1743:
-            return 289;
-        case 1744:
-            return 291;
-
-        case 1745:
-            return 299;
-        case 1746:
-            return 301;
-
-        case 1747:
-            return 309;
-        case 1748:
-            return 311;
-
-        case 1749:
-            return 315;
-        case 1750:
-            return 317;
-        
-        case 1338:
-            return 665;
-        case 1339:
-            return 666;
-
-        // Ground spikes
-
-        case 1715:
-            return 9;
-
-        case 1719:
-            return 61;
-
-        case 1720:
-            return 243;
-        case 1721:
-            return 244;
-        
-        case 1716:
-            return 365;
-        case 1717:
-            return 363;
-        case 1718:
-            return 364;
-
-        case 1722:
-            return 368;
-        case 1723:
-            return 366;
-        case 1724:
-            return 367;
-
-        case 1725:
-            return 421;
-        case 1726:
-            return 422;
-        
-        case 1728:
-            return 446;
-        case 1729:
-            return 447;
-        
-        case 1730:
-            return 667;
-        case 1731:
-            return 720;
-
-        // Fake spikes
-        case 1889:
-            return 191;
-        case 1890:
-            return 198;
-        case 1891:
-            return 199;
-        case 1892:
-            return 393;
-
-        // Default slabs
-        case 1903:
-            return 40;
-
-        case 1904:
-            return 369;
-
-        case 1905:
-            return 370;
-
-        case 1910:
-            return 195;
-
-        case 1911:
-            return 196;
-        
     }
     return id;
 }
@@ -1141,7 +1026,7 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                 objects.id[object] = convert_object(val.i);
 
                 init_default_variables(object);
-                if (is_trigger_object(val.i) || val.i == 1594) {
+                if (is_complex_trigger_object(val.i) || val.i == 1594) {
                     // Allocate its data
                     trigger_index = allocate_trigger_component(object);
                     if (trigger_index < 0) {
@@ -1576,13 +1461,27 @@ bool is_color_trigger(int id) {
         || id == GROUND_2_TRIGGER;
 }
 
-bool is_trigger_object(int id) {
+bool is_complex_trigger_object(int id) {
     return is_color_trigger(id)
         || id == MOVE_TRIGGER
         || id == ALPHA_TRIGGER
         || id == TOGGLE_TRIGGER
         || id == PULSE_TRIGGER
         || id == SPAWN_TRIGGER;
+}
+bool is_trigger_object(int id) {
+    if (is_complex_trigger_object(id)) return true;
+    switch (id) {
+        case ENABLE_TRAIL: case DISABLE_TRAIL:
+        case TRIGGER_FADE_SIMPLE: case TRIGGER_FADE_UP: case TRIGGER_FADE_DOWN:
+        case TRIGGER_FADE_RIGHT: case TRIGGER_FADE_LEFT:
+        case TRIGGER_FADE_SCALE_IN: case TRIGGER_FADE_SCALE_OUT:
+        case TRIGGER_FADE_INWARDS: case TRIGGER_FADE_OUTWARDS:
+        case TRIGGER_FADE_LEFT_SEMICIRCLE: case TRIGGER_FADE_RIGHT_SEMICIRCLE:
+        case HIDE_PLAYER_TRIGGER: case SHOW_PLAYER_TRIGGER:
+            return true;
+        default: return false;
+    }
 }
 
 bool trigger_is_spawn_triggered(int id, int obj) {
@@ -2145,6 +2044,7 @@ int parse_string(char *levelString, int extra_slots, int *out_object_count) {
                 if (sectionIndex > 0) {
                     // Parse
                     if (!parse_gd_object(sectionStart, objectIndex)) {
+                        output_log("what %s\n", sectionStart);
                         output_log("Failed to parse object %d\n", objectIndex);
                         free_arrays();
                         return LOAD_COULDNT_PARSE_OBJECTS;

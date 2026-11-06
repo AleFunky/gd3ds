@@ -178,6 +178,8 @@ typedef struct {
     bool hitbox_enabled_when_dead;
     bool just_placed_auto_checkpoint;
 
+    bool show_player;
+
     bool online_level;
 
     bool custom_level;

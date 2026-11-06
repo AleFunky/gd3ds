@@ -3,10 +3,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define SPRITESHEET2_START 767
+#define SPRITESHEET2_START 766
 #define SPRITESHEET3_START (SPRITESHEET2_START + 72)
-#define ANIMATEDSHEET_START (SPRITESHEET3_START + 600)
-#define SPRITESHEET4_START (ANIMATEDSHEET_START + 138)
+#define SPRITESHEET4_START (SPRITESHEET3_START + 601)
+#define ANIMATEDSHEET_START (SPRITESHEET4_START + 670)
 
 typedef enum {
    COLLISION_NONE = 0,
@@ -21,8 +21,7 @@ typedef enum {
    COLOR_TYPE_BLACK,
    COLOR_TYPE_WHITE,
    COLOR_TYPE_GLOW,
-   COLOR_TYPE_ONLY_DETAIL,
-} ColorType;
+   COLOR_TYPE_ONLY_DETAIL,} ColorType;
 
 typedef enum {
    HITBOX_SPECIAL = 0,
@@ -95,7 +94,7 @@ typedef struct {
     const ObjectHitbox* hitbox;
 } GameObject;
 
-#define TEXTURE_COUNT 1568
+#define TEXTURE_COUNT 2472
 #define GAME_OBJECT_COUNT 1912
 
 extern const GameObject game_objects[GAME_OBJECT_COUNT];

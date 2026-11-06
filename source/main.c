@@ -1279,10 +1279,13 @@ void game_loop() {
                     // When mirror transition ends, put a wave trail point
                     if (state.player.gamemode == GAMEMODE_WAVE) {
                         wave_trail_p1.positionR = (Vec2D){ state.player.x, state.player.y };
+                        MotionTrail_ResumeStroke(&wave_trail_p1);
                         MotionTrail_AddWavePoint(&wave_trail_p1);
                     }
                     if (state.dual && state.player2.gamemode == GAMEMODE_WAVE) {
                         wave_trail_p2.positionR = (Vec2D){ state.player2.x, state.player2.y };
+                        
+                        MotionTrail_ResumeStroke(&wave_trail_p2);
                         MotionTrail_AddWavePoint(&wave_trail_p2);
                     }
                 }

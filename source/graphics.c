@@ -145,20 +145,21 @@ static C2D_SpriteSheet get_sprite_sheet(int index, int *rel_index) {
         return spriteSheet2;
     }
 
-    if (index < ANIMATEDSHEET_START) {
+    if (index < SPRITESHEET4_START) {
         // Return spritesheet 3 (2.0 objects)
         *rel_index = index - SPRITESHEET3_START;
         return spriteSheet3;
     }
 
-    if (index < SPRITESHEET4_START) {
-        // Return spritesheet 4 (animated objects)
-        *rel_index = index - ANIMATEDSHEET_START;
-        return animatedSheet;
+    if (index < ANIMATEDSHEET_START) {
+        // Return spritesheet 4 (2.1 objects)
+        *rel_index = index - SPRITESHEET4_START;
+        return spriteSheet4;
     }
 
-    *rel_index = index - SPRITESHEET4_START;
-    return spriteSheet4;
+    // Return spritesheet 5 (animated objects)
+    *rel_index = index - ANIMATEDSHEET_START;
+    return animatedSheet;
 }
 
 C2D_SpriteSheet get_sprite_sheet_ex(int index, int *rel_index) {
@@ -273,6 +274,13 @@ void cache_all_sprites() {
     for (int id = 0; id < GAME_OBJECT_COUNT; id++) {
         const GameObject* obj = &game_objects[id];
 
+        // Get glow frame
+        if (obj->glow_frame >= 0) {
+            C2D_SpriteFromSheet(&sprite_templates[id].glow_template, glowSheet, obj->glow_frame);
+            C3D_TexSetFilter(sprite_templates[id].glow_template.image.tex, GPU_LINEAR, GPU_LINEAR);
+            C2D_SpriteSetCenter(&sprite_templates[id].glow_template, 0.5f, 0.5f);
+        }
+
         // Skip if object has no texture
         if (obj->texture < 0 && obj->child_count == 0) continue;
 
@@ -284,13 +292,6 @@ void cache_all_sprites() {
             C2D_SpriteFromSheet(&sprite_templates[id].parent_template, sheet, tex);
             C3D_TexSetFilter(sprite_templates[id].parent_template.image.tex, GPU_LINEAR, GPU_LINEAR);
             C2D_SpriteSetCenter(&sprite_templates[id].parent_template, 0.5f, 0.5f);
-        }
-
-        // Get glow frame
-        if (obj->glow_frame >= 0) {
-            C2D_SpriteFromSheet(&sprite_templates[id].glow_template, glowSheet, obj->glow_frame);
-            C3D_TexSetFilter(sprite_templates[id].glow_template.image.tex, GPU_LINEAR, GPU_LINEAR);
-            C2D_SpriteSetCenter(&sprite_templates[id].glow_template, 0.5f, 0.5f);
         }
 
         // Children
@@ -585,6 +586,16 @@ float get_rotation_speed(int obj) {
         case 740:
         case 741:
         case 742:
+        case 1705:
+        case 1706:
+        case 1707:
+        case 1708:
+        case 1709:
+        case 1710:
+        case 1734:
+        case 1735:
+        case 1736:
+        case 1752:
             return 360.f;
         
         case 85:
@@ -619,7 +630,19 @@ float get_rotation_speed(int obj) {
         case 1057:
         case GREEN_ORB:
         case BLACK_ORB:
+        case 1521:
+        case 1525:
+        case 1582:
             return 180.f;
+        case 1522:
+        case 1526:
+            return 150.f;
+        case 1523:
+        case 1527:
+            return 120.f;
+        case 1524:
+        case 1528:
+            return 80.f;
         case 1019:
             return 180.f + map_range(objects.random[obj] & 0xff, 0, 255, -10, 10);
         case 1020:
@@ -630,7 +653,14 @@ float get_rotation_speed(int obj) {
         case 1059:
         case 1060:
         case 1061:
+        case 1831:
+        case 1832:
+        case 1833:
+        case 1834:
             return 300.f;
+        case 1619:
+        case 1620:
+            return 720;
     }
     return 0.f;
 }
@@ -2102,16 +2132,18 @@ void draw_dash_booms(void) {
 
 void draw_player_effects() {
     change_blending(true);
-    for (int i = 0; i < 2; i++) {
-        drawParticleSystem(&drag_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&ship_fire_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&ship_secondary_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&secondary_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&burst_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&robot_fire_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&robot_fire_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&land_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&explosion_particles[i], 0, 0, 1.f);
+    if (state.show_player) {
+        for (int i = 0; i < 2; i++) {
+            drawParticleSystem(&drag_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&ship_fire_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&ship_secondary_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&secondary_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&burst_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&robot_fire_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&robot_fire_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&land_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&explosion_particles[i], 0, 0, 1.f);
+        }
     }
     drawParticleSystem(&brick_destroy_particles, 0, 0, 1.f);
     drawParticleSystem(&coin_pickup_particles, 0, 0, 1.f);
@@ -2152,21 +2184,25 @@ void draw_player_graphics() {
     change_blending(false);
     state.current_player = 0;
 
-    change_blending(true);
-    draw_dash_booms();
-    change_blending(false);
+    if (state.show_player) {
+        change_blending(true);
+        draw_dash_booms();
+        change_blending(false);
+    }
 
     draw_checkpoints();
-    draw_dash_fire(&state.player);
-    draw_player(&state.player);
-    
-    if (state.dual) {
-        state.current_player = 1;
-        draw_dash_fire(&state.player2);
-        draw_player(&state.player2);
-    }  
+    if (state.show_player) {
+        draw_dash_fire(&state.player);
+        draw_player(&state.player);
+        
+        if (state.dual) {
+            state.current_player = 1;
+            draw_dash_fire(&state.player2);
+            draw_player(&state.player2);
+        }  
+    }
 
-    draw_post_player_effects();
+    if (state.show_player) draw_post_player_effects();
 }
 
 void draw_objects() {

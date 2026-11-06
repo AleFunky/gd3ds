@@ -226,7 +226,7 @@ void MotionTrail_Update(MotionTrail* trail, float delta) {
     if (trail->alwaysOn) {
         Player *player = (trail->player ? &state.player2 : &state.player);
 
-        if (state.mirroring || (player->gamemode == GAMEMODE_WAVE && settingsState.noWaveTrailBehind)) {
+        if (state.mirroring || (player->gamemode == GAMEMODE_WAVE && settingsState.noWaveTrailBehind) || !state.show_player) {
             MotionTrail_StopStroke(trail);
         } else {
             MotionTrail_ResumeStroke(trail);
@@ -353,6 +353,12 @@ void MotionTrail_UpdateWaveTrail(MotionTrail* trail, float delta) {
     if (!trail->waveTrail) return;
     if (!trail->startingPositionInitialized) return;
 
+    if (state.mirroring || !state.show_player) {
+        MotionTrail_StopStroke(trail);
+    } else {
+        MotionTrail_ResumeStroke(trail);
+    }
+
     unsigned int mov = 0;
     unsigned int startIdx = 0;
     trail->offscreenCount = 0;
@@ -402,6 +408,7 @@ void MotionTrail_UpdateWaveTrail(MotionTrail* trail, float delta) {
 void MotionTrail_AddWavePoint(MotionTrail* trail) {
     if (!trail->waveTrail) return;
     if (trail->actualNuPoints >= trail->maxPoints) return;
+    if (!trail->appendNewPoints) return;
 
     unsigned int idx = trail->nuPoints;
 

@@ -1070,7 +1070,7 @@ void run_player(Player *player) {
             glitter_particles.emitterX = state.camera_x_middle;
             glitter_particles.emitterY = state.camera_y_middle;
             glitter_particles.emitting = true;
-            if (!state.mirroring) MotionTrail_ResumeStroke(trail);
+            if (!state.mirroring && state.show_player) MotionTrail_ResumeStroke(trail);
             ship_gamemode(player);
             break;
         case GAMEMODE_BALL:
@@ -1080,14 +1080,14 @@ void run_player(Player *player) {
             glitter_particles.emitterX = state.camera_x_middle;
             glitter_particles.emitterY = state.camera_y_middle;
             glitter_particles.emitting = true;
-            if (!state.mirroring) MotionTrail_ResumeStroke(trail);
+            if (!state.mirroring && state.show_player) MotionTrail_ResumeStroke(trail);
             ufo_gamemode(player);
             break;
         case GAMEMODE_WAVE:
             glitter_particles.emitterX = state.camera_x_middle;
             glitter_particles.emitterY = state.camera_y_middle;
             glitter_particles.emitting = true;
-            if (!state.mirroring) {
+            if (!state.mirroring && state.show_player) {
                 if (settingsState.noWaveTrailBehind) {
                     MotionTrail_StopStroke(trail);
                 } else {

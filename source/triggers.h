@@ -167,6 +167,8 @@ extern float trigger_dt;
 #define TOGGLE_TRIGGER 1049
 #define PULSE_TRIGGER 1006
 #define SPAWN_TRIGGER 1268
+#define HIDE_PLAYER_TRIGGER 1612
+#define SHOW_PLAYER_TRIGGER 1613
 
 #define TRIGGER_FADE_SIMPLE 22
 #define TRIGGER_FADE_UP 23
@@ -201,7 +203,6 @@ void init_col_channels();
 void handle_col_channel(int chan);
 void handle_col_triggers(void);
 void handle_copy_channels();
-bool is_position_trigger(int id);
 void handle_triggers(void);
 void upload_to_alpha_buffer(int obj);
 void handle_alpha_triggers(void);

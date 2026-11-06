@@ -339,6 +339,7 @@ bool obj_has_detail(const GameObject *obj);
 
 bool is_valid_object(int id);
 bool is_trigger_object(int id);
+bool is_complex_trigger_object(int id);
 bool is_color_trigger(int id);
 int get_level_coin_count(void);
 

@@ -63,6 +63,8 @@ typedef struct CheckpointData {
     
     bool dual;
     
+    bool show_player;
+    
     float dual_portal_y;
     unsigned char speed;
 
@@ -469,6 +471,8 @@ void new_checkpoint() {
     check->dual = state.dual;
     check->dual_portal_y = state.dual_portal_y;
 
+    check->show_player = state.show_player;
+
     check->speed = state.speed;
 
     check->current_fading_effect = current_fading_effect;
@@ -658,6 +662,8 @@ void restore_checkpoint() {
     
     state.dual = check->dual;
     state.dual_portal_y = check->dual_portal_y;
+    
+    state.show_player = check->show_player;
 
     state.speed = check->speed;
 
