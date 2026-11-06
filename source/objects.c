@@ -4098,19 +4098,11 @@ const ChildSprite children_1515[] = {
 };
 
 const ChildSprite children_1516[] = {
- { 2523, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
- { 2533, 0.00, -6.00, 2.00, 2.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2531, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
+ { 2541, 0.00, -6.00, 2.00, 2.00, 0, 0, 0, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1516[] = {
-    { 2523, 0, 0 },
-    { 2524, 0, 0 },
-    { 2525, 0, 0 },
-    { 2526, 0, 0 },
-    { 2527, 0, 0 },
-    { 2528, 0, 0 },
-    { 2529, 0, 0 },
-    { 2530, 0, 0 },
     { 2531, 0, 0 },
     { 2532, 0, 0 },
     { 2533, 0, 0 },
@@ -4123,6 +4115,14 @@ const SwapFrame swap_frames_1516[] = {
     { 2540, 0, 0 },
     { 2541, 0, 0 },
     { 2542, 0, 0 },
+    { 2543, 0, 0 },
+    { 2544, 0, 0 },
+    { 2545, 0, 0 },
+    { 2546, 0, 0 },
+    { 2547, 0, 0 },
+    { 2548, 0, 0 },
+    { 2549, 0, 0 },
+    { 2550, 0, 0 },
 };
 
 const SlotFrames slot_frames_1516[] = {
@@ -4131,26 +4131,26 @@ const SlotFrames slot_frames_1516[] = {
 };
 
 const ChildSprite children_1517[] = {
- { 2539, 0.00, 3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2547, 0.00, 3.00, 1.00, 1.00, 0, 0, 100, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1518[] = {
- { 2517, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2525, 0.00, 0.00, 2.00, 2.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const SwapFrame swap_frames_1518[] = {
-    { 2517, 0, 0 },
-    { 2518, 0, 0 },
-    { 2519, 0, 0 },
-    { 2520, 0, 0 },
-    { 2521, 0, 0 },
-    { 2522, 0, 0 },
-    { 2517, 0, 0 },
-    { 2518, 0, 0 },
-    { 2519, 0, 0 },
-    { 2520, 0, 0 },
-    { 2521, 0, 0 },
-    { 2522, 0, 0 },
+    { 2525, 0, 0 },
+    { 2526, 0, 0 },
+    { 2527, 0, 0 },
+    { 2528, 0, 0 },
+    { 2529, 0, 0 },
+    { 2530, 0, 0 },
+    { 2525, 0, 0 },
+    { 2526, 0, 0 },
+    { 2527, 0, 0 },
+    { 2528, 0, 0 },
+    { 2529, 0, 0 },
+    { 2530, 0, 0 },
 };
 
 const SlotFrames slot_frames_1518[] = {
@@ -4159,17 +4159,17 @@ const SlotFrames slot_frames_1518[] = {
 };
 
 const SwapFrame swap_frames_1519[] = {
-    { 2509, 0, 0 },
-    { 2510, 0, 0 },
-    { 2511, 0, 0 },
-    { 2512, 0, 0 },
-    { 2513, 0, 0 },
+    { 2517, 0, 0 },
+    { 2518, 0, 0 },
+    { 2519, 0, 0 },
+    { 2520, 0, 0 },
+    { 2521, 0, 0 },
+    { 2522, 0, 0 },
+    { 2523, 0, 0 },
+    { 2524, 0, 0 },
     { 2514, 0, 0 },
     { 2515, 0, 0 },
     { 2516, 0, 0 },
-    { 2506, 0, 0 },
-    { 2507, 0, 0 },
-    { 2508, 0, 0 },
 };
 
 const SlotFrames slot_frames_1519[] = {
@@ -4378,10 +4378,25 @@ const SwapFrame swap_frames_1614[] = {
     { 2503, 0, 0 },
     { 2504, 0, 0 },
     { 2505, 0, 0 },
+    { 2506, 0, 0 },
+    { 2508, 0, 0 },
+    { 2510, 0, 0 },
+    { 2512, 0, 0 },
+    { 2507, 0, 0 },
+    { 2509, 0, 0 },
+    { 2511, 0, 0 },
+    { 2513, 0, 0 },
 };
 
 const SlotFrames slot_frames_1614[] = {
     { 0, 12, 0, 4 },
+    { 1, 12, 4, 4 },
+    { 2, 12, 8, 4 },
+};
+
+const ChildSprite children_1614[] = {
+ { 2506, 0.00, 0.00, 1.00, 1.00, 0, 0, 2, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 2507, 0.00, 0.00, 1.00, 1.00, 0, 0, 10, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
 
 const ChildSprite children_1617[] = {
@@ -6904,9 +6919,9 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1514 */ { 1584, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1514, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1515 */ { 1586, -1, 0.00, 0.00, 1, -9, 2, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1515, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1516 */ { -1, -1, 0.00, 5.00, 3, 9, 1, 1012, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 2, children_1516, 0, NULL, 10, swap_frames_1516, 2, slot_frames_1516, NULL },
-/* Object 1517 */ { 2529, -1, 0.00, 0.00, 3, 9, 1, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1517, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1518 */ { 2517, -1, 0.00, 0.00, 5, 2, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_FRAME_SWAP, 1.00, 1, children_1518, 0, NULL, 6, swap_frames_1518, 2, slot_frames_1518, NULL },
-/* Object 1519 */ { 2509, -1, 0.00, 0.00, 5, 2, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_FRAME_SWAP, 1.00, 0, NULL, 0, NULL, 11, swap_frames_1519, 1, slot_frames_1519, NULL },
+/* Object 1517 */ { 2537, -1, 0.00, 0.00, 3, 9, 1, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1517, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1518 */ { 2525, -1, 0.00, 0.00, 5, 2, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_FRAME_SWAP, 1.00, 1, children_1518, 0, NULL, 6, swap_frames_1518, 2, slot_frames_1518, NULL },
+/* Object 1519 */ { 2517, -1, 0.00, 0.00, 5, 2, 1011, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_FRAME_SWAP, 1.00, 0, NULL, 0, NULL, 11, swap_frames_1519, 1, slot_frames_1519, NULL },
 /* Object 1520 */ { -1, -1, 0.00, 1.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1521 */ { 1768, -1, 0.00, 28.00, 3, 9, 1005, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1522 */ { 1769, -1, 0.00, 22.00, 3, 9, 1006, 0, COLOR_TYPE_DETAIL, 1, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
@@ -7001,7 +7016,7 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1611 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1612 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1613 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1614 */ { 2502, -1, 0.00, 0.00, 5, 9, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_FRAME_SWAP, 1.00, 0, NULL, 0, NULL, 4, swap_frames_1614, 1, slot_frames_1614, NULL },
+/* Object 1614 */ { 2502, -1, 0.00, 0.00, 5, 9, 1, 1010, COLOR_TYPE_BASE, 0, ANIMATION_FRAME_SWAP, 1.00, 2, children_1614, 0, NULL, 4, swap_frames_1614, 3, slot_frames_1614, NULL },
 /* Object 1615 */ { -1, -1, 0.00, 0.00, 5, 1, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1616 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1617 */ { 1606, -1, 0.00, 0.00, 1, -7, 1004, 1012, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1617, 0, NULL, 0, NULL, 0, NULL, NULL },
