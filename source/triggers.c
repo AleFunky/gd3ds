@@ -43,6 +43,10 @@ SpawnTriggerBuffer *spawn_trigger_buffer = NULL;
 int spawn_trigger_count = 0;
 int spawn_trigger_capacity = 0;
 
+RotateTriggerBuffer *rotate_trigger_buffer = NULL;
+int rotate_trigger_count = 0;
+int rotate_trigger_capacity = 0;
+
 PulseTriggerBuffer *pulse_trigger_buffer = NULL;
 int pulse_trigger_count = 0;
 int pulse_trigger_capacity = 0;
@@ -99,6 +103,24 @@ SpawnTriggerBuffer *get_new_spawn_trigger() {
     return buffer;
 }
 
+RotateTriggerBuffer *get_new_rotate_trigger() {
+    if (rotate_trigger_count >= rotate_trigger_capacity) {
+        size_t new_capacity = rotate_trigger_capacity == 0 ? 32 : rotate_trigger_capacity + 32;
+
+        RotateTriggerBuffer *new_list = realloc(rotate_trigger_buffer, new_capacity * sizeof(RotateTriggerBuffer));
+        if (!new_list) {
+            return NULL;
+        }
+
+        rotate_trigger_buffer = new_list;
+        rotate_trigger_capacity = new_capacity;
+    }
+
+    RotateTriggerBuffer *buffer = &rotate_trigger_buffer[rotate_trigger_count++];
+    memset(buffer, 0, sizeof(RotateTriggerBuffer));
+    return buffer;
+}
+
 PulseTriggerBuffer *get_new_pulse_trigger() {
     if (pulse_trigger_count >= pulse_trigger_capacity) {
         size_t new_capacity = pulse_trigger_capacity == 0 ? 32 : pulse_trigger_capacity + 32;
@@ -116,10 +138,60 @@ PulseTriggerBuffer *get_new_pulse_trigger() {
     return buffer;
 }
 
+typedef struct {
+    bool saved;
+    float rotation;
+    float visual_rotation;
+} RotateInitialRotation;
+
+static RotateInitialRotation *rotate_initial_rotations = NULL;
+static int rotate_initial_rotations_capacity = 0;
+
+static void remember_rotate_initial_rotation(int obj) {
+    if (obj < 0) return;
+    if (obj >= rotate_initial_rotations_capacity) {
+        int new_capacity = rotate_initial_rotations_capacity ? rotate_initial_rotations_capacity : 64;
+        while (new_capacity <= obj) new_capacity *= 2;
+        RotateInitialRotation *new_list = realloc(rotate_initial_rotations, sizeof(RotateInitialRotation) * new_capacity);
+        if (!new_list) return;
+        memset(new_list + rotate_initial_rotations_capacity, 0, sizeof(RotateInitialRotation) * (new_capacity - rotate_initial_rotations_capacity));
+        rotate_initial_rotations = new_list;
+        rotate_initial_rotations_capacity = new_capacity;
+    }
+    if (rotate_initial_rotations[obj].saved) return;
+    rotate_initial_rotations[obj].saved = true;
+    rotate_initial_rotations[obj].rotation = objects.rotation[obj];
+    rotate_initial_rotations[obj].visual_rotation = objects.visual_rotation[obj];
+}
+
+static void restore_rotate_initial_rotations(void) {
+    if (!rotate_initial_rotations) return;
+    if (!objects.rotation || !objects.visual_rotation) {
+        free(rotate_initial_rotations);
+        rotate_initial_rotations = NULL;
+        rotate_initial_rotations_capacity = 0;
+        return;
+    }
+    int limit = objects.count < rotate_initial_rotations_capacity ? objects.count : rotate_initial_rotations_capacity;
+    for (int i = 0; i < limit; i++) {
+        if (!rotate_initial_rotations[i].saved) continue;
+        objects.rotation[i] = rotate_initial_rotations[i].rotation;
+        objects.visual_rotation[i] = rotate_initial_rotations[i].visual_rotation;
+    }
+}
+
 void free_trigger_buffers() {
+    restore_rotate_initial_rotations();
     free(alpha_trigger_buffer);
     free(move_trigger_buffer);
     free(spawn_trigger_buffer);
+
+    if (rotate_trigger_buffer) {
+        for (int i = 0; i < rotate_trigger_count; i++) {
+            if (rotate_trigger_buffer[i].targets) { free(rotate_trigger_buffer[i].targets); rotate_trigger_buffer[i].targets = NULL; }
+        }
+    }
+    free(rotate_trigger_buffer);
 
     if (pulse_trigger_buffer) {
         for (int i = 0; i < pulse_trigger_count; i++) {
@@ -132,6 +204,7 @@ void free_trigger_buffers() {
     alpha_trigger_buffer = NULL;
     move_trigger_buffer = NULL;
     spawn_trigger_buffer = NULL;
+    rotate_trigger_buffer = NULL;
     pulse_trigger_buffer = NULL;
 
     alpha_trigger_count = 0;
@@ -143,6 +216,9 @@ void free_trigger_buffers() {
 
     spawn_trigger_count = 0;
     spawn_trigger_capacity = 0;
+
+    rotate_trigger_count = 0;
+    rotate_trigger_capacity = 0;
 
     pulse_trigger_count = 0;
     pulse_trigger_capacity = 0;
@@ -663,6 +739,147 @@ void handle_move_triggers(void) {
     }
 
     apply_group_combination_move();
+}
+
+void upload_to_rotate_buffer(int obj) {
+    RotateTrigger *trigger = get_rotate_trigger(obj);
+    GroupNode *group = get_group(trigger->target_group);
+    if (!group || group->count <= 0) return;
+
+    for (int i = 0; i < rotate_trigger_count; i++) {
+        if (rotate_trigger_buffer[i].active &&
+            rotate_trigger_buffer[i].source_obj == obj &&
+            rotate_trigger_buffer[i].restored_from_checkpoint) {
+            rotate_trigger_buffer[i].restored_from_checkpoint = false;
+            return;
+        }
+    }
+
+    for (int i = 0; i < rotate_trigger_count; i++) {
+        RotateTriggerBuffer *old = &rotate_trigger_buffer[i];
+        if (!old->active) continue;
+        bool overlap = false;
+        for (int a = 0; a < group->count && !overlap; a++) {
+            for (int b = 0; b < old->target_count; b++) {
+                if (group->objects[a] == old->targets[b].obj) {
+                    overlap = true;
+                    break;
+                }
+            }
+        }
+        if (overlap) old->active = false;
+    }
+
+    RotateTriggerBuffer *buffer = get_new_rotate_trigger();
+    if (!buffer) return;
+
+    buffer->center_obj = -1;
+    buffer->use_center = trigger->center_group != 0;
+    buffer->source_obj = obj;
+    buffer->total_degrees = trigger->degrees + (float)trigger->times360 * 360.f;
+    buffer->lock_object_rotation = trigger->lock_object_rotation;
+    buffer->easing_type = convert_ease(trigger->rotate_easing);
+    buffer->easing_rate = trigger->easing_rate > 0.f ? trigger->easing_rate : 2.f;
+    buffer->seconds = trigger->trig_duration;
+    buffer->time_run = 0.f;
+
+    buffer->target_count = group->count;
+    buffer->targets = malloc(sizeof(RotateTargetState) * group->count);
+    if (!buffer->targets) {
+        buffer->target_count = 0;
+        buffer->active = false;
+        return;
+    }
+    for (int i = 0; i < group->count; i++) {
+        int target = group->objects[i];
+        remember_rotate_initial_rotation(target);
+        buffer->targets[i].obj = target;
+        buffer->targets[i].rotation = objects.rotation[target];
+    }
+
+    if (buffer->use_center) {
+        GroupNode *center = get_group(trigger->center_group);
+        if (center && center->count > 0 && trigger->center_group != trigger->target_group) {
+            buffer->center_obj = center->objects[0];
+        } else {
+            buffer->use_center = false;
+        }
+    }
+    buffer->active = true;
+}
+
+static void compact_rotate_triggers(void) {
+    int count = 0;
+    for (int i = 0; i < rotate_trigger_count; i++) {
+        RotateTriggerBuffer *buffer = &rotate_trigger_buffer[i];
+        if (!buffer->active) {
+            free(buffer->targets);
+            buffer->targets = NULL;
+            continue;
+        }
+        if (count != i) {
+            rotate_trigger_buffer[count] = *buffer;
+            buffer->targets = NULL;
+        }
+        count++;
+    }
+    rotate_trigger_count = count;
+}
+
+static bool rotate_target_is_solid(int obj) {
+    int id = objects.id[obj];
+    if (id <= 0 || id >= GAME_OBJECT_COUNT) return false;
+    const ObjectHitbox *hitbox = game_objects[id].hitbox;
+    return hitbox && hitbox->collision_type == HITBOX_SOLID;
+}
+
+void handle_rotate_triggers(void) {
+    if (trigger_dt <= 0.f) return;
+
+    for (int slot = 0; slot < rotate_trigger_count; slot++) {
+        RotateTriggerBuffer *buffer = &rotate_trigger_buffer[slot];
+        if (!buffer->active) continue;
+        buffer->time_run += trigger_dt;
+        float prev_time = buffer->time_run - trigger_dt;
+        if (prev_time < 0.f) prev_time = 0.f;
+        float t = buffer->seconds > 0.f ? easeTime(buffer->easing_type,
+            buffer->time_run, buffer->seconds, buffer->easing_rate) : 1.f;
+        float prev_t = buffer->seconds > 0.f ? easeTime(buffer->easing_type,
+            prev_time, buffer->seconds, buffer->easing_rate) : 0.f;
+        float angle = buffer->total_degrees * t;
+        float prev_angle = buffer->total_degrees * prev_t;
+        float cos_a = 1.f;
+        float sin_a = 0.f;
+        float pivot_x = 0.f;
+        float pivot_y = 0.f;
+        if (buffer->use_center) {
+            pivot_x = objects.x[buffer->center_obj];
+            pivot_y = objects.y[buffer->center_obj];
+            float rad = -(angle - prev_angle) * (float)(M_PI / 180.0);
+            cos_a = cosf(rad);
+            sin_a = sinf(rad);
+        }
+
+        for (int i = 0; i < buffer->target_count; i++) {
+            RotateTargetState *target = &buffer->targets[i];
+            int obj = target->obj;
+            objects.last_y[obj] = objects.y[obj];
+            if (buffer->use_center) {
+                float dx = objects.x[obj] - pivot_x;
+                float dy = objects.y[obj] - pivot_y;
+                objects.x[obj] = pivot_x + dx * cos_a - dy * sin_a;
+                objects.y[obj] = pivot_y + dx * sin_a + dy * cos_a;
+                update_object_section(obj);
+            }
+            if (!buffer->lock_object_rotation && !rotate_target_is_solid(obj)) {
+                objects.rotation[obj] = target->rotation + angle;
+                objects.visual_rotation[obj] = objects.rotation[obj];
+            }
+        }
+        if (buffer->time_run >= buffer->seconds) buffer->active = false;
+    }
+
+    compact_rotate_triggers();
 }
 
 void upload_to_spawn_buffer(int obj, bool from_spawn) {
@@ -1231,6 +1448,9 @@ void run_trigger(int obj, bool from_spawn) {
         case MOVE_TRIGGER:
             upload_to_move_buffer(obj);
             break;
+        case ROTATE_TRIGGER:
+            upload_to_rotate_buffer(obj);
+            break;
         case SPAWN_TRIGGER:
             upload_to_spawn_buffer(obj, from_spawn);
             break;
@@ -1356,6 +1576,7 @@ void handle_step_triggers(void) {
     handle_triggers();
     handle_spawn_triggers();
     handle_move_triggers();
+    handle_rotate_triggers();
 }
 
 // https://github.com/gd-programming/gd.docs/issues/87

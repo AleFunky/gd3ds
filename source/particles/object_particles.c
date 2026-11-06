@@ -98,6 +98,7 @@ int load_object_particles(int id, const ParticleDefinition *cfg, bool stationary
         if (!object_particle[i].occupied) {
             object_particle[i].occupied = true;
             object_particle[i].id = id;
+            object_particle[i].rotation_base_set = false;
             object_particle[i].ps.stationary = stationary;
             initParticleSystem(&object_particle[i].ps, cfg);
 
@@ -142,12 +143,54 @@ static void remove_offscreen_object_particles() {
     }
 }
 
+static void rotate_object_particles(ParticleSystem *particle_system, float delta_degrees, float emitter_x, float emitter_y) {
+    ParticleData *data = &particle_system->data;
+    if (!data->couldLoad || data->count <= 0) return;
+    float rotation_radians = -delta_degrees * (float)(M_PI / 180.0);
+    if (particle_system->cfg.emitterType != 0) {
+        for (int particle_index = 0; particle_index < data->count; particle_index++)
+            data->angle[particle_index] += rotation_radians;
+        return;
+    }
+    float cos_angle = cosf(rotation_radians);
+    float sin_angle = sinf(rotation_radians);
+    for (int particle_index = 0; particle_index < data->count; particle_index++) {
+        float offset_x = data->posx[particle_index] - particle_system->emitterX;
+        float offset_y = data->posy[particle_index] - particle_system->emitterY;
+        data->posx[particle_index] = emitter_x + offset_x * cos_angle - offset_y * sin_angle;
+        data->posy[particle_index] = emitter_y + offset_x * sin_angle + offset_y * cos_angle;
+        float relative_x = data->relx[particle_index];
+        float relative_y = data->rely[particle_index];
+        data->relx[particle_index] = relative_x * cos_angle - relative_y * sin_angle;
+        data->rely[particle_index] = relative_x * sin_angle + relative_y * cos_angle;
+        float velocity_x = data->dirX[particle_index];
+        float velocity_y = data->dirY[particle_index];
+        data->dirX[particle_index] = velocity_x * cos_angle - velocity_y * sin_angle;
+        data->dirY[particle_index] = velocity_x * sin_angle + velocity_y * cos_angle;
+    }
+}
+
 void update_object_particles(float dt) {
     remove_offscreen_object_particles();
     for (size_t i = 0; i < MAX_OBJECT_PS; i++) {
         if (object_particle[i].occupied) {
             
             int obj = object_particle[i].id;
+            float emitter_x = objects.x[obj];
+            float emitter_y = objects.y[obj];
+            if (!object_particle[i].rotation_base_set) {
+                object_particle[i].rotation_base = objects.rotation[obj];
+                object_particle[i].angle_base = object_particle[i].ps.cfg.angle;
+                object_particle[i].last_rotation = objects.rotation[obj];
+                object_particle[i].rotation_base_set = true;
+            } else if (objects.rotation[obj] != object_particle[i].last_rotation) {
+                float rotation_delta = objects.rotation[obj] - object_particle[i].last_rotation;
+                object_particle[i].last_rotation = objects.rotation[obj];
+                rotate_object_particles(&object_particle[i].ps, rotation_delta, emitter_x, emitter_y);
+                object_particle[i].ps.cfg.angle = object_particle[i].angle_base - (objects.rotation[obj] - object_particle[i].rotation_base);
+            }
+            object_particle[i].ps.emitterX = emitter_x;
+            object_particle[i].ps.emitterY = emitter_y;
             bool toggled = (objects.flags[obj] & FLAG_TOGGLED) != 0;
             if (objects.id[obj] == KEY_OBJ) {
                 object_particle[i].ps.emitting = !toggled;
@@ -157,9 +200,6 @@ void update_object_particles(float dt) {
                 object_particle[i].ps.cfg.startColorGreen = objects.main_color[obj].g / 255.f;
                 object_particle[i].ps.cfg.startColorBlue = objects.main_color[obj].b / 255.f;
             } else if (toggled) object_particle[i].ps.emitting = false;
-
-            object_particle[i].ps.emitterX = objects.x[obj];
-            object_particle[i].ps.emitterY = objects.y[obj];
 
             updateParticleSystem(&object_particle[i].ps, dt);
         }

@@ -40,6 +40,8 @@ extern int alpha_trigger_count;
 extern int move_trigger_count;
 extern int spawn_trigger_count;
 extern int pulse_trigger_count;
+extern int rotate_trigger_count;
+extern int rotate_trigger_capacity;
 
 typedef struct {
     Color color;
@@ -131,6 +133,40 @@ typedef struct {
     bool restored_from_checkpoint;
 } PulseTriggerBuffer;
 
+typedef struct {
+    bool spawn_triggered;
+    bool multi_triggered;
+    float trig_duration;
+    int target_group;
+    int center_group;
+    float degrees;
+    int times360;
+    bool lock_object_rotation;
+    int rotate_easing;
+    float easing_rate;
+} RotateTrigger;
+
+typedef struct {
+    int obj;
+    float rotation;
+} RotateTargetState;
+
+typedef struct {
+    bool active;
+    bool restored_from_checkpoint;
+    bool use_center;
+    int center_obj;
+    int source_obj;
+    float total_degrees;
+    bool lock_object_rotation;
+    int easing_type;
+    float easing_rate;
+    float seconds;
+    float time_run;
+    int target_count;
+    RotateTargetState *targets;
+} RotateTriggerBuffer;
+
 void free_trigger_buffers();
 void restore_pulse_trigger(int obj, float time_run, unsigned int activation_order, bool started_fade_out);
 
@@ -140,6 +176,8 @@ extern AlphaTriggerBuffer *alpha_trigger_buffer;
 extern MoveTriggerBuffer *move_trigger_buffer;
 extern SpawnTriggerBuffer *spawn_trigger_buffer;
 extern PulseTriggerBuffer *pulse_trigger_buffer;
+extern RotateTriggerBuffer *rotate_trigger_buffer;
+RotateTrigger *get_rotate_trigger(int obj);
 extern float move_lock_player_x_delta;
 extern float move_lock_player_y_delta;
 extern float move_step_dt;
@@ -167,6 +205,7 @@ extern float trigger_dt;
 #define TOGGLE_TRIGGER 1049
 #define PULSE_TRIGGER 1006
 #define SPAWN_TRIGGER 1268
+#define ROTATE_TRIGGER 1346
 #define HIDE_PLAYER_TRIGGER 1612
 #define SHOW_PLAYER_TRIGGER 1613
 

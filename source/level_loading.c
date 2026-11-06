@@ -49,6 +49,7 @@ TriggerPool alpha_pool;
 TriggerPool pulse_pool;
 TriggerPool toggle_pool;
 TriggerPool spawn_pool;
+TriggerPool rotate_pool;
 static TriggerPool text_pool;
 static TextObject empty_text_object;
 
@@ -66,6 +67,10 @@ AlphaTrigger *get_alpha_trigger(int obj) {
 
 MoveTrigger *get_move_trigger(int obj) {
     return TRIGGER_AT(move_pool, MoveTrigger, objects.trigger_index[obj]);
+}
+
+RotateTrigger *get_rotate_trigger(int obj) {
+    return TRIGGER_AT(rotate_pool, RotateTrigger, objects.trigger_index[obj]);
 }
 
 ToggleTrigger *get_toggle_trigger(int obj) {
@@ -926,6 +931,11 @@ GDValueType get_value_type_for_key(int key) {
         case 65: return GD_VAL_BOOL;   // pulse main_only
         case 66: return GD_VAL_BOOL;   // pulse detail_only
         case 67: return GD_VAL_BOOL;   // dont enter
+        case 68: return GD_VAL_FLOAT;  // rotate degrees
+        case 69: return GD_VAL_INT;    // rotate times360
+        case 70: return GD_VAL_BOOL;   // rotate lock object rotation
+        case 71: return GD_VAL_INT;    // rotate center group
+        case 85: return GD_VAL_FLOAT;  // easing rate
         case 87: return GD_VAL_BOOL;   // multi_triggered
         case 128: return GD_VAL_FLOAT; // scale X
         case 129: return GD_VAL_FLOAT; // scale Y
@@ -998,6 +1008,12 @@ int allocate_trigger_component(int obj) {
             break;
         case SPAWN_TRIGGER:
             index = trigger_pool_add(&spawn_pool, sizeof(SpawnTrigger));
+            if (index >= 0) {
+                objects.trigger_index[obj] = index;
+            }
+            break;
+        case ROTATE_TRIGGER:
+            index = trigger_pool_add(&rotate_pool, sizeof(RotateTrigger));
             if (index >= 0) {
                 objects.trigger_index[obj] = index;
             }
@@ -1107,6 +1123,9 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                         case SPAWN_TRIGGER:
                             get_spawn_trigger(object)->trig_duration = val.f;
                             break;
+                        case ROTATE_TRIGGER:
+                            get_rotate_trigger(object)->trig_duration = val.f;
+                            break;
                     }
                 }
             }
@@ -1169,8 +1188,12 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
             }
             break;
         case 30: // Move easing
-            if (type == GD_VAL_INT && objects.id[object] == MOVE_TRIGGER) {
-                get_move_trigger(object)->move_easing = val.i;
+            if (type == GD_VAL_INT) {
+                if (objects.id[object] == MOVE_TRIGGER) {
+                    get_move_trigger(object)->move_easing = val.i;
+                } else if (objects.id[object] == ROTATE_TRIGGER) {
+                    get_rotate_trigger(object)->rotate_easing = val.i;
+                }
             }
             break;
         case 31: // Text
@@ -1284,6 +1307,9 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                         case SPAWN_TRIGGER:
                             get_spawn_trigger(object)->target_group = val.i;
                             break;
+                        case ROTATE_TRIGGER:
+                            get_rotate_trigger(object)->target_group = val.i;
+                            break;
                     }
                 }
             }
@@ -1332,6 +1358,9 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                         case SPAWN_TRIGGER:
                             get_spawn_trigger(object)->spawn_triggered = val.b;
                             break;
+                        case ROTATE_TRIGGER:
+                            get_rotate_trigger(object)->spawn_triggered = val.b;
+                            break;
                     }
                 }
             }
@@ -1361,6 +1390,31 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                 objects.flags[object] |= val.b ? FLAG_DONT_ENTER : 0;
             }
             break;
+        case 68:
+            if (type == GD_VAL_FLOAT && objects.id[object] == ROTATE_TRIGGER) {
+                get_rotate_trigger(object)->degrees = val.f;
+            }
+            break;
+        case 69:
+            if (type == GD_VAL_INT && objects.id[object] == ROTATE_TRIGGER) {
+                get_rotate_trigger(object)->times360 = val.i;
+            }
+            break;
+        case 70:
+            if (type == GD_VAL_BOOL && objects.id[object] == ROTATE_TRIGGER) {
+                get_rotate_trigger(object)->lock_object_rotation = val.b;
+            }
+            break;
+        case 71:
+            if (type == GD_VAL_INT && objects.id[object] == ROTATE_TRIGGER) {
+                get_rotate_trigger(object)->center_group = val.i;
+            }
+            break;
+        case 85:
+            if (type == GD_VAL_FLOAT && objects.id[object] == ROTATE_TRIGGER) {
+                get_rotate_trigger(object)->easing_rate = val.f;
+            }
+            break;
         case 87: // multi_triggered
             if (type == GD_VAL_BOOL) {
                 if (is_color_trigger(objects.id[object])) {
@@ -1381,6 +1435,9 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                             break;
                         case SPAWN_TRIGGER:
                             get_spawn_trigger(object)->multi_triggered = val.b;
+                            break;
+                        case ROTATE_TRIGGER:
+                            get_rotate_trigger(object)->multi_triggered = val.b;
                             break;
                     }
                 }
@@ -1464,7 +1521,8 @@ bool is_complex_trigger_object(int id) {
         || id == ALPHA_TRIGGER
         || id == TOGGLE_TRIGGER
         || id == PULSE_TRIGGER
-        || id == SPAWN_TRIGGER;
+        || id == SPAWN_TRIGGER
+        || id == ROTATE_TRIGGER;
 }
 bool is_trigger_object(int id) {
     if (is_complex_trigger_object(id)) return true;
@@ -1489,6 +1547,7 @@ bool trigger_is_spawn_triggered(int id, int obj) {
         case PULSE_TRIGGER:  return get_pulse_trigger(obj)->spawn_triggered;
         case TOGGLE_TRIGGER: return get_toggle_trigger(obj)->spawn_triggered;
         case SPAWN_TRIGGER:  return get_spawn_trigger(obj)->spawn_triggered;
+        case ROTATE_TRIGGER: return get_rotate_trigger(obj)->spawn_triggered;
     }
     return false;
 }
@@ -1501,6 +1560,7 @@ bool trigger_is_multi_triggered(int id, int obj) {
         case PULSE_TRIGGER:  return get_pulse_trigger(obj)->multi_triggered;
         case TOGGLE_TRIGGER: return get_toggle_trigger(obj)->multi_triggered;
         case SPAWN_TRIGGER:  return get_spawn_trigger(obj)->multi_triggered;
+        case ROTATE_TRIGGER: return get_rotate_trigger(obj)->multi_triggered;
     }
     return false;
 }
@@ -1662,6 +1722,7 @@ void free_arrays() {
     free(pulse_pool.data);
     free(toggle_pool.data);
     free(spawn_pool.data);
+    free(rotate_pool.data);
     free(text_pool.data);
     col_pool = (TriggerPool){0};
     move_pool = (TriggerPool){0};
@@ -1669,6 +1730,7 @@ void free_arrays() {
     pulse_pool = (TriggerPool){0};
     toggle_pool = (TriggerPool){0};
     spawn_pool = (TriggerPool){0};
+    rotate_pool = (TriggerPool){0};
     text_pool = (TriggerPool){0};
 
     if (objects.random)             { free(objects.random);             objects.random = NULL; }

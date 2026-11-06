@@ -9,6 +9,10 @@ typedef struct {
     int id;
     bool occupied;
     bool color_applied;
+    bool rotation_base_set;
+    float rotation_base;
+    float angle_base;
+    float last_rotation;
 } ObjectParticles;
 
 extern ObjectParticles object_particle[MAX_OBJECT_PS];

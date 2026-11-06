@@ -36,6 +36,11 @@ typedef struct {
     bool started_fade_out;
 } PulseSnapshot;
 
+typedef struct {
+    int obj;
+    float rotation, visual_rotation;
+} RotateObjectSnapshot;
+
 typedef struct CheckpointData {
     Player p1;
     Player p2;
@@ -80,9 +85,16 @@ typedef struct CheckpointData {
     MoveTriggerBuffer *move_triggers;
     AlphaTriggerBuffer *alpha_triggers;
     SpawnTriggerBuffer *spawn_triggers;
+    RotateTriggerBuffer *rotate_triggers;
+    RotateTargetState *rotate_targets;
+    int *rotate_target_offsets;
+    RotateObjectSnapshot *rotate_obj_snapshot;
     int move_triggers_count;
     int alpha_triggers_count;
     int spawn_triggers_count;
+    int rotate_triggers_count;
+    int rotate_targets_count;
+    int rotate_obj_count;
 
     // per-object state for triggers that were active at checkpoint time, so they
     // can continue from the exact point instead of restarting. bounded by the
@@ -368,7 +380,7 @@ void new_checkpoint() {
     int fired_cap = 0;
     int key_cap = 0;
     for (int i = 0; i < objects.count; i++) {
-        if (objects.id[i] == MOVE_TRIGGER && GET_ACTIVATED(i))
+        if ((objects.id[i] == MOVE_TRIGGER || objects.id[i] == ROTATE_TRIGGER) && GET_ACTIVATED(i))
             fired_cap++;
         else if (objects.id[i] == KEY_OBJ && (objects.flags[i] & FLAG_TOGGLED)
                  && (objects.activated[i] & 3))
@@ -391,8 +403,22 @@ void new_checkpoint() {
     for (int i = 0; i < pulse_trigger_count; i++)
         if (pulse_trigger_buffer[i].active) pulse_cap++;
 
-    void *ck_ptr[16];
-    size_t ck_size[16];
+    int rotate_targets_total = 0;
+    for (int i = 0; i < rotate_trigger_count; i++)
+        rotate_targets_total += rotate_trigger_buffer[i].target_count;
+
+    int rotate_obj_cap = 0;
+    for (int i = 0; i < objects.count; i++) {
+        if (objects.id[i] != ROTATE_TRIGGER) continue;
+        RotateTrigger *rt = get_rotate_trigger(i);
+        GroupNode *target_group = get_group(rt->target_group);
+        GroupNode *center_group = get_group(rt->center_group);
+        if (target_group) rotate_obj_cap += target_group->count;
+        if (center_group) rotate_obj_cap += center_group->count;
+    }
+
+    void *ck_ptr[24];
+    size_t ck_size[24];
     int ck_n = 0;
     size_t total = 0;
     void *base = NULL;
@@ -411,6 +437,10 @@ void new_checkpoint() {
     CK_ADD(check->move_triggers,     MoveTriggerBuffer,  move_trigger_count);
     CK_ADD(check->alpha_triggers,    AlphaTriggerBuffer, alpha_trigger_count);
     CK_ADD(check->spawn_triggers,    SpawnTriggerBuffer, spawn_trigger_count);
+    CK_ADD(check->rotate_triggers,   RotateTriggerBuffer, rotate_trigger_count);
+    CK_ADD(check->rotate_targets,    RotateTargetState,   rotate_targets_total);
+    CK_ADD(check->rotate_target_offsets, int,            rotate_trigger_count);
+    CK_ADD(check->rotate_obj_snapshot, RotateObjectSnapshot, rotate_obj_cap);
     CK_ADD(check->channel_snapshot,  ColorChannel,       used_count);
     CK_ADD(check->trigger_snapshot,  ColTriggerBuffer,   used_count);
     CK_ADD(check->move_idx_stream,   uint8_t,            move_idx_bytes);
@@ -447,6 +477,9 @@ void new_checkpoint() {
     check->move_triggers_count  = move_trigger_count;
     check->alpha_triggers_count = alpha_trigger_count;
     check->spawn_triggers_count = spawn_trigger_count;
+    check->rotate_triggers_count = rotate_trigger_count;
+    check->rotate_targets_count = rotate_targets_total;
+    check->rotate_obj_count = 0;
     check->channel_snapshot_count = used_count;
 
     check->camera_x = state.camera_x;
@@ -492,6 +525,48 @@ void new_checkpoint() {
     if (check->move_triggers)  memcpy(check->move_triggers,  move_trigger_buffer,  sizeof(MoveTriggerBuffer)  * move_trigger_count);
     if (check->alpha_triggers) memcpy(check->alpha_triggers, alpha_trigger_buffer, sizeof(AlphaTriggerBuffer) * alpha_trigger_count);
     if (check->spawn_triggers) memcpy(check->spawn_triggers, spawn_trigger_buffer, sizeof(SpawnTriggerBuffer) * spawn_trigger_count);
+    if (check->rotate_triggers) memcpy(check->rotate_triggers, rotate_trigger_buffer, sizeof(RotateTriggerBuffer) * rotate_trigger_count);
+
+    if (check->rotate_triggers) {
+        int offset = 0;
+        for (int i = 0; i < rotate_trigger_count; i++) {
+            check->rotate_target_offsets[i] = offset;
+            int count = rotate_trigger_buffer[i].target_count;
+            if (count > 0 && rotate_trigger_buffer[i].targets) {
+                memcpy(check->rotate_targets + offset, rotate_trigger_buffer[i].targets, sizeof(RotateTargetState) * count);
+            }
+            offset += count;
+        }
+    }
+
+    if (check->rotate_obj_snapshot) {
+        int n = 0;
+        for (int i = 0; i < objects.count && n < rotate_obj_cap; i++) {
+            if (objects.id[i] != ROTATE_TRIGGER) continue;
+            RotateTrigger *rt = get_rotate_trigger(i);
+            GroupNode *target_group = get_group(rt->target_group);
+            GroupNode *center_group = get_group(rt->center_group);
+            if (target_group) {
+                for (int j = 0; j < target_group->count && n < rotate_obj_cap; j++) {
+                    int obj = target_group->objects[j];
+                    check->rotate_obj_snapshot[n].obj = obj;
+                    check->rotate_obj_snapshot[n].rotation = objects.rotation[obj];
+                    check->rotate_obj_snapshot[n].visual_rotation = objects.visual_rotation[obj];
+                    n++;
+                }
+            }
+            if (center_group) {
+                for (int j = 0; j < center_group->count && n < rotate_obj_cap; j++) {
+                    int obj = center_group->objects[j];
+                    check->rotate_obj_snapshot[n].obj = obj;
+                    check->rotate_obj_snapshot[n].rotation = objects.rotation[obj];
+                    check->rotate_obj_snapshot[n].visual_rotation = objects.visual_rotation[obj];
+                    n++;
+                }
+            }
+        }
+        check->rotate_obj_count = n;
+    }
 
     check->move_obj_count = 0;
     check->move_idx_bytes = 0;
@@ -568,7 +643,7 @@ void new_checkpoint() {
         int n = 0;
         for (int i = 0; i < objects.count; i++) {
             if (n >= fired_cap) break;
-            if (objects.id[i] == MOVE_TRIGGER && GET_ACTIVATED(i))
+            if ((objects.id[i] == MOVE_TRIGGER || objects.id[i] == ROTATE_TRIGGER) && GET_ACTIVATED(i))
                 check->fired_move_index[n++] = i;
         }
         check->fired_move_count = n;
@@ -708,12 +783,46 @@ void restore_checkpoint() {
         }
     }
 
+    for (int i = 0; i < rotate_trigger_count; i++) {
+        free(rotate_trigger_buffer[i].targets);
+        rotate_trigger_buffer[i].targets = NULL;
+    }
+    rotate_trigger_count = 0;
+    if (check->rotate_triggers && check->rotate_triggers_count > 0) {
+        RotateTriggerBuffer *buf = realloc(rotate_trigger_buffer, sizeof(RotateTriggerBuffer) * check->rotate_triggers_count);
+        if (buf) {
+            rotate_trigger_buffer = buf;
+            rotate_trigger_capacity = check->rotate_triggers_count;
+            rotate_trigger_count = check->rotate_triggers_count;
+            memcpy(rotate_trigger_buffer, check->rotate_triggers, sizeof(RotateTriggerBuffer) * check->rotate_triggers_count);
+            for (int i = 0; i < rotate_trigger_count; i++) {
+                RotateTriggerBuffer *rb = &rotate_trigger_buffer[i];
+                int count = rb->target_count;
+                int offset = check->rotate_target_offsets[i];
+                rb->targets = NULL;
+                if (count > 0 && offset >= 0 && offset + count <= check->rotate_targets_count) {
+                    rb->targets = malloc(sizeof(RotateTargetState) * count);
+                    if (rb->targets) {
+                        memcpy(rb->targets, check->rotate_targets + offset, sizeof(RotateTargetState) * count);
+                    } else {
+                        rb->target_count = 0;
+                        rb->active = false;
+                    }
+                } else {
+                    rb->target_count = 0;
+                }
+            }
+        }
+    }
+
     for (int i = 0; i < move_trigger_count; i++)
         move_trigger_buffer[i].restored_from_checkpoint = move_trigger_buffer[i].active;
     for (int i = 0; i < alpha_trigger_count; i++)
         alpha_trigger_buffer[i].restored_from_checkpoint = alpha_trigger_buffer[i].active;
     for (int i = 0; i < spawn_trigger_count; i++)
         spawn_trigger_buffer[i].restored_from_checkpoint = spawn_trigger_buffer[i].active;
+    for (int i = 0; i < rotate_trigger_count; i++)
+        rotate_trigger_buffer[i].restored_from_checkpoint = rotate_trigger_buffer[i].active;
 
     {
         int kx = 0, ky = 0, oi = 0;
@@ -735,6 +844,12 @@ void restore_checkpoint() {
             }
             update_object_section(oi);
         }
+    }
+    for (int i = 0; i < check->rotate_obj_count && check->rotate_obj_snapshot; i++) {
+        RotateObjectSnapshot *rs = &check->rotate_obj_snapshot[i];
+        objects.last_y[rs->obj] = objects.y[rs->obj];
+        objects.rotation[rs->obj] = rs->rotation;
+        objects.visual_rotation[rs->obj] = rs->visual_rotation;
     }
     for (int i = 0; i < check->alpha_group_count; i++) {
         GroupNode *p = get_group(check->alpha_group_id[i]);
