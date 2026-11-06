@@ -83,7 +83,7 @@ jobs:
         with:
           name: gd3ds-cia-zip
           path: out/cia/zip
-          archive: false
+          archive: true
       - name: Publish debug info to GH Actions
         uses: actions/upload-artifact@main
         with:
