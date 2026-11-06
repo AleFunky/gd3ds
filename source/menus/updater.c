@@ -226,12 +226,12 @@ static void updater_init(UIScreen *s) {
     updater_button = (UIButton *)ui_get_element_by_tag(s, "updatebutton");
     spinner = (UISpinner *)ui_get_element_by_tag(s, "spinner");
     error_label = (UILabel *)ui_get_element_by_tag(s, "errorlabel");
+    if (REPO_BRANCH) output_log("Current branch: %s\n", REPO_BRANCH); else output_log("no branch defined??? \n");
     if (checkedForUpdate && update_data->isAvailable) {
         ui_disable_element((UIElement *) spinner);
         // ui_label_set_text(error_label, update_data->releaseTitle);
         populate_info();
     } else {
-        output_log("Current branch: %s\n", REPO_BRANCH);
         ui_disable_element((UIElement *) updater_button);
         ui_enable_element((UIElement *) spinner);
         if (!updater_task.running) updater_thread = create_generic_thread(&updater_task);
