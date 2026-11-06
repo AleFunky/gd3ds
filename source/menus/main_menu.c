@@ -6,6 +6,7 @@
 #include "math_helpers.h"
 #include "main.h"
 #include "graphics.h"
+#include "utils/gfx.h"
 #include "state.h"
 #include "triggers.h"
 #include "utils/utils.h"

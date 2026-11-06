@@ -1,4 +1,5 @@
 #include <3ds.h>
+#include "level_loading.h"
 #include "menus/core/ui_screen.h"
 #include "menus/components/ui_label.h"
 #include "save/saving.h"

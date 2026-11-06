@@ -1,3 +1,4 @@
+#include "main.h"
 #include "menus/core/ui_screen.h"
 #include "mp3_player.h"
 #include "save/config.h"

@@ -1,5 +1,6 @@
 
 #include <citro2d.h>
+#include "main.h"
 #include "menus/core/ui_screen.h"
 #include "menus/core/ui_props.h"
 
@@ -68,7 +69,7 @@ static void ui_darken_draw(UIElement* e, UITransform *transform) {
     }
 
     if (darken->fullScreen) {
-        C2D_SpriteSetPos(&darken->image.sprite, SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+        C2D_SpriteSetPos(&darken->image.sprite, SCREEN_WIDTH/2.f, SCREEN_HEIGHT/2.f);
         C2D_SpriteSetScale(&darken->image.sprite, SCREEN_WIDTH/16.f, SCREEN_HEIGHT/16.f);
     } else {
         C2D_SpriteSetPos(&darken->image.sprite, transform->x, transform->y);

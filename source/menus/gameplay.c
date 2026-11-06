@@ -367,7 +367,7 @@ void gameplay_update_top(UIScreen *s, UIInput *touch) {
     fps = delta * 1000.f;
     if (settingsState.decimalPercent) decimal = 2;
     if (settingsState.ultraDecimalPercent) decimal = MAX_DECIMAL_PERCENT;
-    if (settingsState.goldenBest && state.current_data.max_normal < ceilf(state.level_progress) && !state.practice_mode) {
+    if (settingsState.goldenBest && (state.current_data.max_normal > 1.f ? state.current_data.max_normal : 1.f) < ceilf(state.level_progress) && !state.practice_mode) {
         percent->font = 2;
         percent->base.y = 7.f;
         percent->base.scaleX = 0.57f;
@@ -378,8 +378,8 @@ void gameplay_update_top(UIScreen *s, UIInput *touch) {
         percent->base.scaleX = 0.45f;
         percent->base.scaleY = 0.45f;
     };
-
-    snprintf(fps_label->text, 32, "<#FFFFFF55>FPS: %.*f</>", 0, fps > 0 ? 1000.f / fps : 0.f);
+    // update fps counter but only when game isnt paused cuz otherwise it shows like a bajillion frame per sec ond
+    if(!game_paused) snprintf(fps_label->text, 32, "<#FFFFFF55>FPS: %.*f</>", 0, fps > 0 ? 1000.f / fps : 0.f);
 
     progress_bar->value = state.level_progress;
     snprintf(percent->text, 32, "%.*f%%", decimal, state.level_progress);

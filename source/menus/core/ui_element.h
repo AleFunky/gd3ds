@@ -2,10 +2,10 @@
 #include <stdbool.h>
 #include <3ds.h>
 #include <citro2d.h>
-#include "utils/gfx.h"
 #include "particles/circles.h"
 #include <malloc.h>
 
+#include "particles/particles.h"
 #include "ui_props.h"
 
 #define TAGS_PER_ELEMENT 5

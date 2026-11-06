@@ -3,6 +3,7 @@
 #include "menus/core/ui_screen.h"
 #include "menus/core/ui_props.h"
 #include "math_helpers.h"
+#include "utils/gfx.h"
 
 static void draw_frame(UIProgressBar *e, UITransform *transform) {
     C2D_SpriteSetCenter(&e->frame.sprite, 0.5f, 0.5f);
