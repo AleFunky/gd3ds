@@ -36,7 +36,7 @@
 #define GAME_TITLE_ID 0x000400000BB41C00
 
 // leave empty for main
-#define REPO_BRANCH "2.0"
+#define REPO_BRANCH ""
 
 // When making a release, uncomment this please thanks
 // #define IS_RELEASE
