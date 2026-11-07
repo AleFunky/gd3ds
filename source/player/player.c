@@ -990,10 +990,13 @@ void spider_gamemode(Player *player) {
 
     drag_particles[state.current_player].cfg.sourcePositionVariancey = 0;
 
-    if ((player->slope_data.slope_id >= 0 || player->on_ground) && (curr_input.holdJump && player->buffering_state == BUFFER_READY) && !player->dashing) {
+    bool came_from_black_orb = (player->last_orb_pressed >= 0 && objects.id[player->last_orb_pressed] == BLACK_ORB);
+
+    if ((player->slope_data.slope_id >= 0 || player->on_ground) && (curr_input.holdJump && (player->buffering_state == BUFFER_READY || came_from_black_orb)) && !player->dashing) {
         spider_test_jump(player, false);
         player->buffering_state = BUFFER_END;
         player->jumped = true;
+        player->last_orb_pressed = -1;
     }
 
     if (!player->on_ground && player->vel_y < 0 && player->anim_id != SPIDER_ANIM_FALL) {
@@ -1038,7 +1041,7 @@ void clamp_player_ground(Player *player) {
         
         if (player->gamemode != GAMEMODE_WAVE && grav(player, player->vel_y) <= 0) set_p_velocity(player, 0, player->gamemode == GAMEMODE_BALL);
         player->y = state.ground_y + (player->height / 2) + ((player->gamemode == GAMEMODE_WAVE) ? (player->mini ? 3 : 5) : 0);;
-        player->snap_data.player_frame = 0;
+        player->snap_data.player_frame = 0;    
     }
 
     // Check for ceiling collision
@@ -1052,7 +1055,8 @@ void clamp_player_ground(Player *player) {
         }
         
         if (player->gamemode != GAMEMODE_WAVE && grav(player, player->vel_y) >= 0) set_p_velocity(player, 0, player->gamemode == GAMEMODE_BALL);
-        player->y = state.ceiling_y - (player->height / 2) - ((player->gamemode == GAMEMODE_WAVE) ? (player->mini ? 3 : 5) : 0);
+        player->y = state.ceiling_y - (player->height / 2) - ((player->gamemode == GAMEMODE_WAVE) ? (player->mini ? 3 : 5) : 0);    
+        
     } 
 }
 void run_player(Player *player) {
@@ -1067,8 +1071,7 @@ void run_player(Player *player) {
                 player->on_ceiling = true;
                 player->inverse_rotation = false;
             } else {
-                player->on_ground = true;          
-                player->came_from_orb = false;
+                player->on_ground = true;      
                 player->inverse_rotation = false;
                 player_non_flying_landing(player);
             }
@@ -1079,7 +1082,6 @@ void run_player(Player *player) {
         if (getGroundTop(player) >= state.ceiling_y) {
             if (player->upside_down) {
                 player->on_ground = true;
-                player->came_from_orb = false;
                 player->inverse_rotation = false;
                 player_non_flying_landing(player);
             } else {
@@ -1263,6 +1265,8 @@ void run_player(Player *player) {
     player->snap_rotation = false;
 
     player->buffer_ufo = false;
+
+    if (player->on_ground) player->last_orb_pressed = -1;
 }
 
 void handle_player(Player *player) {

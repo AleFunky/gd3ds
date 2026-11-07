@@ -512,7 +512,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 0;
                 }
                 
-                player->came_from_orb = true;
+                player->last_orb_pressed = obj;
 
                 SET_ACTIVATED(obj, true);
             } 
@@ -544,7 +544,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 255 / 255.f;
                 }
 
-                player->came_from_orb = true;
+                player->last_orb_pressed = obj;
                 
                 SET_ACTIVATED(obj, true);
             } 
@@ -577,7 +577,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 0;
                 }
                 
-                player->came_from_orb = true;
+                player->last_orb_pressed = obj;
 
                 SET_ACTIVATED(obj, true);
             } 
@@ -611,7 +611,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = color.b / 255.f;
                 }
 
-                player->came_from_orb = true;
+                player->last_orb_pressed = obj;
 
                 SET_ACTIVATED(obj, true);
             } 
@@ -643,7 +643,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 0;
                 }
 
-                player->came_from_orb = true;
+                player->last_orb_pressed = obj;
 
                 SET_ACTIVATED(obj, true);
             } 
@@ -687,7 +687,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 255 / 255.f;
                 }
 
-                player->came_from_orb = true;
+                player->last_orb_pressed = obj;
 
                 SET_ACTIVATED(obj, true);
             } 
@@ -726,7 +726,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 255 / 255.f;
                 }
 
-                player->came_from_orb = true;
+                player->last_orb_pressed = obj;
 
                 SET_ACTIVATED(obj, true);
             } 
@@ -769,12 +769,12 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 0;
                 }
 
-                player->came_from_orb = true;
+                player->last_orb_pressed = obj;
 
                 SET_ACTIVATED(obj, true);
             } 
             break;
-        case 1594:
+        case TOGGLE_ORB:
             if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
             if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && (player->buffering_state == BUFFER_READY || curr_input.pressedJump)) {
                 ToggleTrigger *trigger = get_toggle_trigger(obj);
@@ -1495,7 +1495,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
 
         case J_MODIFIERBLOCK:
-            if (player->came_from_orb) player->holding_jump_cancelled = true;
+            if (player->last_orb_pressed >= 0) player->holding_jump_cancelled = true;
             break;
 
         case H_MODIFIERBLOCK:
@@ -1830,7 +1830,6 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
 
                 player->collided_block = obj;
                 player->platform_velocity = grav(player, fmaxf(0.f, object_raw_vel) * .9f);
-                player->came_from_orb = false;
                 if (object_raw_vel > MINIMUM_OBJECT_SPEED)
                     player->vel_y = fmaxf(player->vel_y, object_raw_vel * .9f);
 

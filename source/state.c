@@ -249,7 +249,7 @@ void init_player(Player *player) {
 
     player->allow_dart_slide = false;
     player->allow_head_hit = false;
-    player->came_from_orb = false;
+    player->last_orb_pressed = -1;
     clear_slope_data(player);
     clear_snap_data(player);
 }

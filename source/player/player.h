@@ -158,7 +158,7 @@ typedef struct {
     bool jumped;
     bool landed_from_jump;
 
-    bool came_from_orb;
+    int last_orb_pressed;
 
     bool buffer_ufo;
 

@@ -680,7 +680,7 @@ float get_object_pulse(float amplitude, int id, int layer) {
         case RED_ORB:
         case DASH_ORB:
         case GRAVITY_DASH_ORB:
-        case 1594:
+        case TOGGLE_ORB:
             return map_range(amplitude, 0.f, 1.f, 0.3f, 1.2f);
         case 15:
         case 16:

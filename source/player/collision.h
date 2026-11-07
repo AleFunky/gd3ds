@@ -55,6 +55,7 @@ enum JumpType {
 #define GREEN_ORB 1022
 #define BLACK_ORB 1330
 #define RED_ORB 1333
+#define TOGGLE_ORB 1594
 #define DASH_ORB 1704
 #define GRAVITY_DASH_ORB 1751
 

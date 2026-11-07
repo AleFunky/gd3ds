@@ -87,7 +87,7 @@ static float get_object_particle_depth(int id) {
         case BLACK_ORB:
         case DASH_ORB:
         case GRAVITY_DASH_ORB:
-        case 1594:
+        case TOGGLE_ORB:
         case SECRET_COIN:
             return 0.7f;
     }
@@ -330,7 +330,7 @@ void spawn_object_particles(int obj) {
                 }
             }
             break;
-        case 1594:
+        case TOGGLE_ORB:
             index = -1;
             for (size_t i = 0; i < MAX_OBJECT_PS; i++) {
                 if (object_particle[i].occupied && object_particle[i].id == obj) { index = (int)i; break; }
