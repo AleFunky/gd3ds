@@ -95,4 +95,20 @@ jobs:
             out/cia/rom/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            
+      - name: Update nightly 2.1 release
+        if: github.ref == 'refs/heads/2.1'
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: nightly-2.1
+          name: Nightly 2.1
+          body: |
+            Latest 2.1 test build from commit ${{ github.sha }}
+            This is a dev build, therefore bugs and crashes are expected.
+            Enjoy!
+          prerelease: true
+          make_latest: false
+          files: |
+            out/3dsx/rom/*
+            out/cia/rom/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
