@@ -153,9 +153,14 @@ void pause_game() {
     update_progress_bars();
     game_paused = true;
     if (song_loaded || state.practice_mode) pause_playback_mp3();
-    ui_run_func_on_tag(screen_top, "coin_1", ui_enable_element);
-    ui_run_func_on_tag(screen_top, "coin_2", ui_enable_element);
-    ui_run_func_on_tag(screen_top, "coin_3", ui_enable_element);
+    int coin_count = get_level_coin_count();
+    if (coin_count > 3) coin_count = 3;
+
+    UIImage *coin_top_slots[3] = { coin_1_top, coin_2_top, coin_3_top };
+    for (int i = 0; i < 3; i++) {
+        coin_top_slots[i]->base.x = (i - (coin_count - 1) / 2.f) * 50.f;
+        coin_top_slots[i]->base.enabled = (i < coin_count);
+    }
     ui_run_func_on_tag(screen, "coin_1", ui_disable_element);
     ui_run_func_on_tag(screen, "coin_2", ui_disable_element);
     ui_run_func_on_tag(screen, "coin_3", ui_disable_element);
