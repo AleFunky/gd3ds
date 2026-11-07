@@ -158,8 +158,10 @@ Thread create_generic_thread(GenericTask *task) {
         priority,
         (is_N3DS ? 2 : 0),
         true
-    );
+   );
 }
+
+// adapted from https://stackoverflow.com/questions/10440113/simple-way-to-unzip-a-zip-file-using-zlib
 
 // extracts zip file at input_path to folder destination_path
 int extract_zip(const char *input_path, const char *destination_dir) {
@@ -171,7 +173,7 @@ int extract_zip(const char *input_path, const char *destination_dir) {
     }
     // get zip file metadata
     unz_global_info global_info;
-     if (unzGetGlobalInfo(zipFile, &global_info) != UNZ_OK){
+    if (unzGetGlobalInfo(zipFile, &global_info) != UNZ_OK){
         output_log("failed to get zip file metadata\n");
         return 1;
     }
@@ -200,44 +202,44 @@ int extract_zip(const char *input_path, const char *destination_dir) {
             mkdir(path, 0777);
         } else {
             // entry is a file, so extract it
-            if ( unzOpenCurrentFile( zipFile ) != UNZ_OK ) {
-                output_log( "could not open file\n" );
-                unzClose( zipFile );
+            if (unzOpenCurrentFile(zipFile) != UNZ_OK) {
+                output_log("could not open file\n");
+                unzClose(zipFile);
                 return 1;
             }
 
             // open a file to write out the data
-            FILE *out = fopen( path, "wb" );
-            if ( out == NULL ) {
-                output_log( "could not open destination file\n" );
-                unzCloseCurrentFile( zipFile );
-                unzClose( zipFile );
+            FILE *out = fopen(path, "wb");
+            if (!out) {
+                output_log("could not open destination file\n");
+                unzCloseCurrentFile(zipFile);
+                unzClose(zipFile);
                 return 1;
             }
 
             int error = UNZ_OK;
             do {
-                error = unzReadCurrentFile( zipFile, read_buffer, sizeof(read_buffer) );
-                if ( error < 0 ) {
-                    output_log( "error %d\n", error );
-                    unzCloseCurrentFile( zipFile );
-                    unzClose( zipFile );
+                error = unzReadCurrentFile(zipFile, read_buffer, sizeof(read_buffer));
+                if (error < 0) {
+                    output_log("error %d\n", error);
+                    unzCloseCurrentFile(zipFile);
+                    unzClose(zipFile);
                     return 1;
                 }
 
                 // write data to file
-                if ( error > 0 ) {
-                    fwrite( read_buffer, sizeof(read_buffer), 1, out );
+                if (error > 0) {
+                    fwrite(read_buffer, sizeof(read_buffer), 1, out);
                 }
             } while (error > 0);
 
             fclose(out);
 
         }
-        unzCloseCurrentFile( zipFile );
+        unzCloseCurrentFile(zipFile);
 
         // go the the next entry listed in the zip file
-        if (( i+1 ) < global_info.number_entry) {
+        if ((i+1) < global_info.number_entry) {
             if (unzGoToNextFile(zipFile) != UNZ_OK)
             {
                 output_log("could not read next file\n");
