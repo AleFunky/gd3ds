@@ -1,4 +1,6 @@
+#include "sounds.h"
 #include "ui_element.h"
+#include "wav_player.h"
 #include "ui_actions.h"
 
 const UIIntEnumEntry anim_enum[] = {

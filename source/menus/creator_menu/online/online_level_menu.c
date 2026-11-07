@@ -9,6 +9,7 @@
 #include "menus/core/ui_element.h"
 #include "mp3_player.h"
 #include "save/saving.h"
+#include "sounds.h"
 #include "state.h"
 #include "utils/folders.h"
 #include "utils/server_utils.h"
@@ -34,6 +35,7 @@
 #include "fonts/chatFont.h"
 #include "fonts/goldFont.h"
 #include "utils/utils.h"
+#include "wav_player.h"
 
 #define EASY_DEMON_FACE_1 259
 #define MEDIUM_DEMON_FACE_1 261

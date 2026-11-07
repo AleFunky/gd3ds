@@ -76,4 +76,6 @@ int get_commits(GenericTask *task, char **out_data, char *repoOwner, char *repoN
 
 int get_releases(GenericTask *task, char **out_data, char *repoOwner, char *repoName);
 
+int get_actions(GenericTask *task, char **out_data, char *repoOwner, char *repoName, char *actionName);
+
 void soc_exit();

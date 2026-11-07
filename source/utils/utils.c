@@ -1,10 +1,14 @@
 #include "utils.h"
 #include "level_loading.h"
 #include "main.h"
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <zlib.h>
 #include <malloc.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <minizip/unzip.h>
 
 u8 get_model() {
     u8 model;
@@ -156,3 +160,93 @@ Thread create_generic_thread(GenericTask *task) {
         true
     );
 }
+
+// extracts zip file at input_path to folder destination_path
+int extract_zip(const char *input_path, const char *destination_dir) {
+    // open file at input path
+    unzFile *zipFile = unzOpen(input_path);
+    if (!zipFile) {
+        output_log("failed to open zip file\n");
+        return 1;
+    }
+    // get zip file metadata
+    unz_global_info global_info;
+     if (unzGetGlobalInfo(zipFile, &global_info) != UNZ_OK){
+        output_log("failed to get zip file metadata\n");
+        return 1;
+    }
+
+    // buffer to hold data read from the zip file.
+    char read_buffer[8192];
+
+    for (int i = 0; i < global_info.number_entry; i++) {
+        // get current file metadata
+        unz_file_info file_info;
+        char filename[256];
+        char path[256 + sizeof(filename)];
+
+        if (unzGetCurrentFileInfo(zipFile, &file_info, filename, sizeof(filename), NULL, 0, NULL, 0) != UNZ_OK) {
+          output_log("could not read file metadata\n");
+          unzClose(zipFile);
+          return 1;
+        }
+
+        const size_t filename_length = strlen(filename);
+
+        snprintf(path, sizeof(path), "%s%s", destination_dir, filename);
+
+        if (filename[ filename_length-1 ] == '/') {
+            // entry is a directory, so create it
+            mkdir(path, 0777);
+        } else {
+            // entry is a file, so extract it
+            if ( unzOpenCurrentFile( zipFile ) != UNZ_OK ) {
+                output_log( "could not open file\n" );
+                unzClose( zipFile );
+                return 1;
+            }
+
+            // open a file to write out the data
+            FILE *out = fopen( path, "wb" );
+            if ( out == NULL ) {
+                output_log( "could not open destination file\n" );
+                unzCloseCurrentFile( zipFile );
+                unzClose( zipFile );
+                return 1;
+            }
+
+            int error = UNZ_OK;
+            do {
+                error = unzReadCurrentFile( zipFile, read_buffer, sizeof(read_buffer) );
+                if ( error < 0 ) {
+                    output_log( "error %d\n", error );
+                    unzCloseCurrentFile( zipFile );
+                    unzClose( zipFile );
+                    return 1;
+                }
+
+                // write data to file
+                if ( error > 0 ) {
+                    fwrite( read_buffer, sizeof(read_buffer), 1, out );
+                }
+            } while (error > 0);
+
+            fclose(out);
+
+        }
+        unzCloseCurrentFile( zipFile );
+
+        // go the the next entry listed in the zip file
+        if (( i+1 ) < global_info.number_entry) {
+            if (unzGoToNextFile(zipFile) != UNZ_OK)
+            {
+                output_log("could not read next file\n");
+                unzClose(zipFile);
+                return 1;
+            }
+        }
+    }
+
+    unzClose(zipFile);
+    return 0;
+};

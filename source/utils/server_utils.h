@@ -85,6 +85,7 @@ typedef struct CommentAuthorEntry {
 
 typedef struct UpdateData {
     bool isAvailable;
+    char latestCommit[41];
     char releaseTitle[64];
     char *releaseBody;
     char releaseDownloadUrl[128];
@@ -97,6 +98,7 @@ int get_comments(GenericTask *task);
 int get_song_data(GenericTask *task);
 int check_for_updates(GenericTask *task);
 int install_update();
+int extract_update();
 
 float derive_gj_version(int version);
 

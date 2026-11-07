@@ -1,6 +1,7 @@
 #include <3ds.h>
 #include <citro2d.h>
 
+#include "mp3_player.h"
 #include "save/saving.h"
 
 #include "menus/core/ui_screen.h"

@@ -1,12 +1,9 @@
 #include "menus/core/ui_stack.h"
 #include "menus/components/ui_progress_bar.h"
 #include "menus/components/ui_label.h"
-#include "menus/components/ui_spinner.h"
-#include "menus/components/ui_window_button.h"
 #include "menus/components/ui_image.h"
 
-#include "menus/updater.h"
-
+#include "mp3_player.h"
 #include "utils/server_utils.h"
 #include "utils/utils.h"
 #include "utils/json_config.h"
@@ -34,6 +31,13 @@ static Thread install_thread;
 static GenericTask install_task = {
     .func = install_update
 };
+
+static Thread extract_thread;
+
+static GenericTask extract_task = {
+    .func = extract_update
+};
+
 
 char downloadSpeed[16];
 char downloadedUpdateFilePath[256];
@@ -113,7 +117,7 @@ static void updater_pop_up_init(UIScreen *s) {
     ui_disable_element((UIElement *) finish_update_button);
     ui_disable_element((UIElement*) home_image);
     download_task.url = update_data->releaseDownloadUrl;
-    snprintf(download_task.extension, sizeof(download_task.extension), is_3DSX ? "3dsx" : "cia");
+    snprintf(download_task.extension, sizeof(download_task.extension), "zip");
     download_progress_bar->value = 0;
     ui_progress_bar_set_tint(download_progress_bar, C2D_Color32(50, 190, 240, 255));
     canExit = true;
@@ -141,6 +145,7 @@ static void updater_pop_up_update(UIScreen *s, UIInput *i) {
     }
     // Run when finished
     if (download_task.finished) {
+        download_task.finished = false;
         ui_disable_element((UIElement *) download_progress_bar);
         ui_disable_element((UIElement *) speed_label);
 
@@ -158,20 +163,43 @@ static void updater_pop_up_update(UIScreen *s, UIInput *i) {
 
         canExit = false;
 
-        // disable home button for the duration of the install
+        // disable home button for the rest of the process
         aptSetHomeAllowed(false);
 
+
+        ui_enable_element((UIElement *) install_spinner);
+        ui_disable_element((UIElement *) exit_button);
+        ui_label_set_text(status_label, "Extracting...");
+        status_label->base.y = 45;
+        snprintf(downloadedUpdateFilePath, sizeof(downloadedUpdateFilePath), "%s%s.%s", download_task.path, download_task.file_name, download_task.extension);
+        extract_thread = create_generic_thread(&extract_task);
+    }
+
+    if (extract_task.finished) {
+        extract_task.finished = false;
+
+        // Handle result
+        if (extract_task.result != 0) {
+            status_label->base.y = 10;
+            aptSetSleepAllowed(true);
+            canExit = false;
+            output_log("failed to extract rom\n");
+            ui_label_set_text(status_label, "Failed to extract update!");
+            status_label->base.y = 10;
+            ui_enable_element((UIElement *) exit_button);
+            return;
+        }
 
         ui_enable_element((UIElement *) install_spinner);
         ui_disable_element((UIElement *) exit_button);
         ui_label_set_text(status_label, "Installing...");
         status_label->base.y = 45;
         download_task.finished = false;
-        snprintf(downloadedUpdateFilePath, sizeof(downloadedUpdateFilePath), "%s%s.%s", download_task.path, download_task.file_name, download_task.extension);
         install_thread = create_generic_thread(&install_task);
     }
 
     if (install_task.finished) {
+        install_task.finished = false;
         ui_disable_element((UIElement *) install_spinner);
         // reenable home button and sleep, exit exclusive mode
         aptSetHomeAllowed(true);
@@ -184,11 +212,11 @@ static void updater_pop_up_update(UIScreen *s, UIInput *i) {
             ui_label_set_text(status_label, handle_install_error_codes(install_task.result));
             canExit = true;
             ui_enable_element((UIElement *) exit_button);
+
             return;
         }
         queued_restart = !is_3DSX;
         status_label->base.y = -5;
-        install_task.finished = false;
         ui_label_set_text(status_label, is_3DSX ? "Update successful!\nPress OK to quit." : "Update successful!\nPress OK to restart.");
         ui_enable_element((UIElement *) finish_update_button);
     }

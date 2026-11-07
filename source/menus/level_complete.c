@@ -9,6 +9,7 @@
 #include "main.h"
 #include "easing.h"
 #include "mp3_player.h"
+#include "sounds.h"
 #include "state.h"
 #include "level_loading.h"
 #include "particles/circles.h"
@@ -24,6 +25,7 @@
 #include "utils/string_helpers.h"
 
 #include "save/saving.h"
+#include "wav_player.h"
 
 #define ANIM_DURATION 1.f
 #define RESTART_ANIM_DURATION 0.5f

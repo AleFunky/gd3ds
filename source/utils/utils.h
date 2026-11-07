@@ -1,5 +1,8 @@
 #pragma once
 #include <3ds.h>
+
+#define ZLIB_CHUNK_SIZE 4096
+
 u8 get_model();
 
 size_t get_uncompressed_size(unsigned char *data, int data_len);
@@ -21,3 +24,5 @@ typedef struct GenericTask {
 } GenericTask;
 
 Thread create_generic_thread(GenericTask *task);
+
+int extract_zip(const char *input_path, const char *destination_path);

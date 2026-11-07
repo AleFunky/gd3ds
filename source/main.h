@@ -1,14 +1,10 @@
 #pragma once
 #include <citro2d.h>
 #include "level_loading.h"
-#include "sounds.h"
 
 #include "particles/particles.h"
-#include "triggers.h"
 
 #include "save/saving.h"
-
-#include "github_info.h"
 
 #define CAM_SPEED 5.19300155f
 

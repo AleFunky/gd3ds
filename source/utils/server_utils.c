@@ -1,8 +1,11 @@
 #include <3ds.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <citro2d.h>
 #include <string.h>
+#include <sys/_intsup.h>
 
+#include "github_info.h"
 #include "json-c/json_object.h"
 #include "json-c/json_tokener.h"
 #include "json-c/json_types.h"
@@ -13,6 +16,7 @@
 #include "utils/folders.h"
 #include "utils/server_utils.h"
 #include "network.h"
+#include "utils/json_config.h"
 #include "utils/string_helpers.h"
 
 #include "menus/components/ui_list.h"
@@ -22,6 +26,7 @@
 #include "menus/creator_menu/online/online_menu.h"
 #include "menus/creator_menu/online/online_level_menu.h"
 #include "menus/creator_menu/online/online_level_comments.h"
+#include "utils/utils.h"
 
 SearchEntry *search_entries = NULL;
 CreatorEntry *creator_entries = NULL;
@@ -666,6 +671,7 @@ int parse_latest_commit(char *jsonString) {
     json_object *jsonObject = json_tokener_parse(jsonString);
     json_object *commitObject = NULL;
     json_object *hashObject = NULL;
+    json_object *status = NULL;
 
     // check if we didnt get served garbage data
     if (!jsonObject) {
@@ -673,27 +679,24 @@ int parse_latest_commit(char *jsonString) {
         return -1;
     }
 
-    size_t objCount = json_object_object_length(jsonObject);
-    
-    if (objCount == 2) {
-        // uh oh we might have gotten rate limited
-        json_object *message = NULL;
-        if(json_object_object_get_ex(jsonObject, "message", &message)) {
-            // we got ratelimited.
-            json_object_put(jsonObject);
-            return -4;
-        } 
+
+    if (json_object_object_get_ex(jsonObject, "status", &status)) {
+      // check what github wants to tell us
+      output_log("status code: %d\n%s\n", json_object_get_int(status), jsonString);
+      json_object_put(jsonObject);
+      return -4;
     }
-        
+
     // first array entry is always the latest commit
     commitObject = json_object_array_get_idx(jsonObject, 0); 
 
     // attempt to populate latest commit hash, ofc gotta check if it actually exists first cuz who knows 
     if (json_object_object_get_ex(commitObject, "sha", &hashObject)) {
-        update_data->isAvailable = (strcmp(CURRENT_COMMIT_HASH, json_object_get_string(hashObject)) != 0); 
+        snprintf(update_data->latestCommit, sizeof(update_data->latestCommit), "%s", json_object_get_string(hashObject));
+
+        update_data->isAvailable = (strcmp(CURRENT_COMMIT_HASH, update_data->latestCommit) != 0); 
 
         json_object_put(jsonObject);
-
         if (!update_data->isAvailable) return -3;
     } else {
         json_object_put(jsonObject);
@@ -705,6 +708,7 @@ int parse_latest_commit(char *jsonString) {
 int parse_commits_data(char *jsonString) {
     // parse response from github as json object 
     json_object *jsonObject = json_tokener_parse(jsonString);
+    json_object *status = NULL;
 
     // check if we didnt get served garbage data
     if (!jsonObject) {
@@ -712,16 +716,11 @@ int parse_commits_data(char *jsonString) {
         return -1;
     }
 
-    size_t objCount = json_object_object_length(jsonObject);
-
-    if (objCount == 2) {
-        // uh oh we might have gotten rate limited
-        json_object *message = NULL;
-        if(json_object_object_get_ex(jsonObject, "message", &message)) {
-            // we got ratelimited.
-            json_object_put(jsonObject);
-            return -4;
-        } 
+    if (json_object_object_get_ex(jsonObject, "status", &status)) {
+      // check what github wants to tell us
+      output_log("status code: %d\n%s\n", json_object_get_int(status), jsonString);
+      json_object_put(jsonObject);
+      return -4;
     }
 
     // iterate every commit in the response
@@ -765,44 +764,26 @@ int parse_commits_data(char *jsonString) {
     return 0;
 }
 
-int parse_releases_data(char *jsonString, bool useNightly) {
+int parse_releases_data(char *jsonString) {
     // parse response as json string string
     json_object *jsonObject = json_tokener_parse(jsonString);
     json_object *targetRelease = NULL; 
     json_object *url = NULL;
     json_object *size = NULL;
+    json_object *status = NULL;
 
     // check for garbage data
     if (!jsonObject) return -1;
 
     size_t count = json_object_object_length(jsonObject);
 
-    if (count == 2) {
-        // uh oh we might have gotten rate limited
-        json_object *message = NULL;
-        if(json_object_object_get_ex(jsonObject, "message", &message)) {
-            // we got ratelimited.
-            json_object_put(jsonObject);
-            return -4;
-        } 
+    if (json_object_object_get_ex(jsonObject, "status", &status)) {
+      // check what github wants to tell us
+      output_log("status code: %d\n%s\n", json_object_get_int(status), jsonString);
+      json_object_put(jsonObject);
+      return -4;
     }
 
-    // if getting nightly build, iterate array looking for a prerelease tag instead of release tags
-    if (useNightly) {
-        for (int i = 0; i < count; i++) {
-            json_object *curr_object;
-            json_object *prerelease = NULL;
-
-            curr_object = json_object_array_get_idx(jsonObject, i);
-
-            bool isPrerelease = (json_object_object_get_ex(curr_object, "prerelease", &prerelease) && json_object_get_boolean(prerelease));
-
-            if (isPrerelease) {
-                targetRelease = curr_object;
-                break;
-            }
-        }
-    } else {
         for (int i = 0; i < count; i++) {
             json_object *curr_object;
             json_object *prerelease = NULL;
@@ -819,7 +800,6 @@ int parse_releases_data(char *jsonString, bool useNightly) {
                 break;
             }
         }
-    }
 
     // if a release is found:
     if (targetRelease) {
@@ -867,6 +847,53 @@ int parse_releases_data(char *jsonString, bool useNightly) {
     } 
     json_object_put(jsonObject);
     return -3;
+}
+
+int parse_actions_data(char *jsonString) {
+    // parse response as json string string
+    json_object *jsonObject = json_tokener_parse(jsonString);
+    json_object *artifacts = NULL;
+    json_object *curr_object = NULL;
+    json_object *workflow_data_object = NULL;
+    json_object *id_object = NULL;
+    json_object *status = NULL;
+    // check for garbage data
+    if (!jsonObject) return -1;
+    
+    if (json_object_object_get_ex(jsonObject, "status", &status)) {
+      // check what github wants to tell us
+      output_log("status code: %d\n%s\n", json_object_get_int(status), jsonString);
+      json_object_put(jsonObject);
+      return -4;
+    }
+
+    if (!json_object_object_get_ex(jsonObject, "artifacts", &artifacts)) return -1; 
+
+    size_t count = json_object_object_length(artifacts); 
+    
+    for (int i = 0; i < count; i++) {
+        curr_object = json_object_array_get_idx(artifacts, i);
+        
+        if (!json_object_object_get_ex(curr_object, "workflow_run", &workflow_data_object)) continue;
+        if (!json_object_object_get_ex(workflow_data_object, "head_sha", &id_object)) continue;
+        
+        const char *tmpString = json_object_get_string(id_object);
+
+        if (strcmp(tmpString, update_data->latestCommit) != 0) continue;
+        
+        json_object *artifact_id_object = NULL;
+        json_object *expired_object = NULL;
+
+        if(!json_object_object_get_ex(curr_object, "expired", &expired_object) && json_object_get_boolean(expired_object)) return -1;
+        
+        if(!json_object_object_get_ex(curr_object, "id", &artifact_id_object)) return -1;
+        
+        snprintf(update_data->releaseDownloadUrl, sizeof(update_data->releaseDownloadUrl), "https://nightly.link/%s/%s/actions/artifacts/%s.zip", REPO_AUTHOR, REPO_NAME, json_object_get_string(artifact_id_object));
+        json_object_put(jsonObject);
+        return 0;
+    }
+    json_object_put(jsonObject);
+    return -2;
 }
 
 int search_levels_internal(GenericTask *task, bool useGdps) {
@@ -1088,13 +1115,11 @@ int get_song_data_internal(GenericTask *task, int songId, SongEntry *targetSongE
     return 0;
 }
 
-int get_commits_internal(GenericTask *task, char *repoAuthor, char *repoName, char *repoBranch) {
+int get_latest_nightly_internal(GenericTask *task, char *repoAuthor, char *repoName, char *repoBranch) {
     char *outdata;
     latestCommitCount = 0;
     int result = get_commits(task, &outdata, repoAuthor, repoName, repoBranch);
     if (result != 0) return result;
-
-
 
     // check for updates
     int parserResult = parse_latest_commit(outdata);
@@ -1108,17 +1133,27 @@ int get_commits_internal(GenericTask *task, char *repoAuthor, char *repoName, ch
         free(outdata);
         return parserResult;
     }
+    // get repo actions
+    result = get_actions(task, &outdata, repoAuthor, repoName, is_3DSX ? "gd3ds-3dsx-zip" : "gd3ds-cia-zip");
+    if (result != 0) return result;
+
+    // parse actions and get download link
+    parserResult = parse_actions_data(outdata);
+    if (parserResult != 0) {
+        free(outdata);
+        return parserResult;
+    }
 
     free(outdata);
     return 0;
 }
 
-int get_latest_build_internal(GenericTask *task, char *repoAuthor, char *repoName, bool useNightly) {
+int get_latest_release_internal(GenericTask *task, char *repoAuthor, char *repoName) {
     char *outdata;
     int result = get_releases(task, &outdata, repoAuthor, repoName);
     if (result != 0) return result;
 
-    int parserResult = parse_releases_data(outdata, useNightly);
+    int parserResult = parse_releases_data(outdata);
     if (parserResult != 0) return parserResult;
 
     free(outdata);
@@ -1132,26 +1167,34 @@ int check_for_updates_internal(GenericTask *task, char *repoAuthor, char *repoNa
     // Initialize
     memset(update_data, 0, sizeof(UpdateData));
 
-    // if checking for nightly updates, get latest commit hash and compare it against the embedded one to see if an update is available
+    int result;
+
+    // nightly updates and regular updates behave very differently so we handle both in separate functions
     if (useNightly) {
-        int result = get_commits_internal(task, repoAuthor, repoName, repoBranch);
+        result = get_latest_nightly_internal(task, repoAuthor, repoName, repoBranch);
+        if (result != 0) return result;
+    } else {
+        result = get_latest_release_internal(task, repoAuthor, repoName);
         if (result != 0) return result;
     }
-
-    // get and parse releases 
-    int result = get_latest_build_internal(task, repoAuthor, repoName, useNightly);
 
     if (result != 0) return result; 
 
     return 0;
 }
 
-int install_update_internal(char *target_path) {
+int extract_update_internal(char *target_path) {
+    int result = extract_zip(target_path, CONFIG_ROOT);
+    //clean up regardless of result
+    remove(target_path);
+    return result;
+}
+
+int install_update_internal(const char *updatePath) {
     // 3dsx and cia rom installs are handled very differently 
     
     if (is_3DSX) {
         // ensure 3dsx path is present
-        output_log("3dsx path: %s\n", _3dsx_path);
         if (!_3dsx_path) return -1;
         
         Result res = 0;
@@ -1168,15 +1211,13 @@ int install_update_internal(char *target_path) {
             output_log("failed to remove current .3dsx\n");
             return -1;
         }
-        if (rename(target_path, _3dsx_path) != 0) {
+        if (rename(updatePath, _3dsx_path) != 0) {
             output_log("failed to move target .3dsx.\n");
             return -1;
         }
         // success
         return 0;
     }
-
-    output_log("cia path: %s", target_path);
     
     Result res = 0;
     FILE *cia = NULL;
@@ -1190,7 +1231,7 @@ int install_update_internal(char *target_path) {
     }
     
     // open target .cia
-    cia = fopen(target_path, "rb");
+    cia = fopen(updatePath, "rb");
     if (!cia) {
         amExit();
         output_log("failed to open target .cia\n");
@@ -1234,8 +1275,7 @@ int install_update_internal(char *target_path) {
     free(buffer);
     fclose(cia);
     amExit();
-    remove(target_path);
-    output_log("cia installation successful\n");
+    remove(updatePath);
     return 0;
 }
 
@@ -1267,6 +1307,13 @@ int check_for_updates(GenericTask *task) {
 }
 
 int install_update(){
-    int result = install_update_internal(downloadedUpdateFilePath);
+    char updatePath[512];
+    snprintf(updatePath, sizeof(updatePath), "%sGeometryDash3DS.%s", CONFIG_ROOT, is_3DSX ? "3dsx" : "cia");
+    int result = install_update_internal(updatePath);
+    return result;
+}
+
+int extract_update(){
+    int result = extract_update_internal(downloadedUpdateFilePath);
     return result;
 }

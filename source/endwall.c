@@ -1,5 +1,6 @@
 #include "level_loading.h"
 #include "main.h"
+#include "sounds.h"
 #include "state.h"
 #include "math_helpers.h"
 #include "mp3_player.h"
@@ -13,6 +14,7 @@
 #include "menus/level_complete.h"
 #include "practice.h"
 #include "menus/level_select.h"
+#include "wav_player.h"
 
 static int fireworks_spawned = 0;
 static int circunferences_spawned = 0;

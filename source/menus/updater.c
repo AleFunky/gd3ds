@@ -2,7 +2,6 @@
 #include <citro2d.h>
 #include <stdlib.h>
 
-#include "github_info.h"
 #include "main.h"
 #include "menus/core/ui_screen.h"
 #include "text.h"
