@@ -57,6 +57,7 @@ typedef struct {
     bool doNot;
     bool practiceMusicSync;
     bool menuMusic;
+    bool fastMenu;
     bool autoCheckpoints;
     bool quickCheckpoints;
     bool hidePracticeButtons;
@@ -69,7 +70,7 @@ typedef struct {
     bool swapGameplayScreens;
 } SettingState;
 
-extern Setting settings[37];
+extern Setting settings[38];
 extern SettingState settingsState;
 
 extern const UIScreenDefPair settings_def;

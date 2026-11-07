@@ -247,6 +247,16 @@ Setting settings[] = {
         .onChanged = menuMusic_setting
     },
     {
+        .id = "fastMenu",
+        .label = "Fast Menu",
+        .additionalInfo = "Makes transitions between\nmenu pages faster.",
+        .page = PAGE_MISC, 
+
+        .defaultValue = false,
+        .var = &settingsState.fastMenu,
+        .key = CONFIG_MISC_PATH "fastMenu"
+    },
+    {
         .id = "skipHighObjWarning",
         .label = "Disable object alert",
         .additionalInfo = "Disables the high object alert for\ncustom levels.",
