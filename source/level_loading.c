@@ -50,6 +50,7 @@ TriggerPool pulse_pool;
 TriggerPool toggle_pool;
 TriggerPool spawn_pool;
 TriggerPool rotate_pool;
+TriggerPool simple_pool;
 static TriggerPool text_pool;
 static TextObject empty_text_object;
 
@@ -79,6 +80,10 @@ ToggleTrigger *get_toggle_trigger(int obj) {
 
 SpawnTrigger *get_spawn_trigger(int obj) {
     return TRIGGER_AT(spawn_pool, SpawnTrigger, objects.trigger_index[obj]);
+}
+
+SimpleTrigger *get_simple_trigger(int obj) {
+    return TRIGGER_AT(simple_pool, SimpleTrigger, objects.trigger_index[obj]);
 }
 
 TextObject *get_text_object(int obj) {
@@ -1061,6 +1066,15 @@ int allocate_trigger_component(int obj) {
                 get_pulse_trigger(obj)->opacity = 1.0f;
             }
             break;
+        case ENABLE_TRAIL: 
+        case DISABLE_TRAIL:
+        case HIDE_PLAYER_TRIGGER:
+        case SHOW_PLAYER_TRIGGER:
+            index = trigger_pool_add(&simple_pool, sizeof(SimpleTrigger));
+            if (index >= 0) {
+                objects.trigger_index[obj] = index;
+            }
+            break;
         case TOGGLE_TRIGGER:
         case 1594:
             index = trigger_pool_add(&toggle_pool, sizeof(ToggleTrigger));
@@ -1105,7 +1119,7 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                 objects.id[object] = convert_object(val.i);
 
                 init_default_variables(object);
-                if (is_complex_trigger_object(val.i) || val.i == 1594) {
+                if (is_complex_trigger_object(val.i) || is_simple_trigger_object(val.i) || val.i == 1594) {
                     // Allocate its data
                     trigger_index = allocate_trigger_component(object);
                     if (trigger_index < 0) {
@@ -1407,6 +1421,8 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
             if (type == GD_VAL_BOOL) {
                 if (is_color_trigger(objects.id[object])) {
                     get_color_trigger(object)->spawn_triggered = val.b;
+                } else if (is_simple_trigger_object(objects.id[object])) {
+                    get_simple_trigger(object)->spawn_triggered = val.b;
                 } else {
                     switch (objects.id[object]) {
                         case MOVE_TRIGGER:
@@ -1485,6 +1501,8 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
             if (type == GD_VAL_BOOL) {
                 if (is_color_trigger(objects.id[object])) {
                     get_color_trigger(object)->multi_triggered = val.b;
+                } else if (is_simple_trigger_object(objects.id[object])) {
+                    get_simple_trigger(object)->multi_triggered = val.b;
                 } else {
                     switch (objects.id[object]) {
                         case MOVE_TRIGGER:
@@ -1590,16 +1608,28 @@ bool is_complex_trigger_object(int id) {
         || id == SPAWN_TRIGGER
         || id == ROTATE_TRIGGER;
 }
-bool is_trigger_object(int id) {
-    if (is_complex_trigger_object(id)) return true;
+
+// Triggers that aren't configurable but have spawn triggered option
+bool is_simple_trigger_object(int id) {
     switch (id) {
-        case ENABLE_TRAIL: case DISABLE_TRAIL:
+        case HIDE_PLAYER_TRIGGER: 
+        case SHOW_PLAYER_TRIGGER:
+        case ENABLE_TRAIL: 
+        case DISABLE_TRAIL:
+            return true;
+        default:
+            return false;
+    }
+}
+
+bool is_trigger_object(int id) {
+    if (is_complex_trigger_object(id) || is_simple_trigger_object(id)) return true;
+    switch (id) {
         case TRIGGER_FADE_SIMPLE: case TRIGGER_FADE_UP: case TRIGGER_FADE_DOWN:
         case TRIGGER_FADE_RIGHT: case TRIGGER_FADE_LEFT:
         case TRIGGER_FADE_SCALE_IN: case TRIGGER_FADE_SCALE_OUT:
         case TRIGGER_FADE_INWARDS: case TRIGGER_FADE_OUTWARDS:
         case TRIGGER_FADE_LEFT_SEMICIRCLE: case TRIGGER_FADE_RIGHT_SEMICIRCLE:
-        case HIDE_PLAYER_TRIGGER: case SHOW_PLAYER_TRIGGER:
             return true;
         default: return false;
     }
@@ -1607,6 +1637,7 @@ bool is_trigger_object(int id) {
 
 bool trigger_is_spawn_triggered(int id, int obj) {
     if (is_color_trigger(id)) return get_color_trigger(obj)->spawn_triggered;
+    if (is_simple_trigger_object(id)) return get_simple_trigger(obj)->spawn_triggered;
     switch (id) {
         case MOVE_TRIGGER:   return get_move_trigger(obj)->spawn_triggered;
         case ALPHA_TRIGGER:  return get_alpha_trigger(obj)->spawn_triggered;
@@ -1620,6 +1651,7 @@ bool trigger_is_spawn_triggered(int id, int obj) {
 
 bool trigger_is_multi_triggered(int id, int obj) {
     if (is_color_trigger(id)) return get_color_trigger(obj)->multi_triggered;
+    if (is_simple_trigger_object(id)) return get_simple_trigger(obj)->multi_triggered;
     switch (id) {
         case MOVE_TRIGGER:   return get_move_trigger(obj)->multi_triggered;
         case ALPHA_TRIGGER:  return get_alpha_trigger(obj)->multi_triggered;
@@ -1789,6 +1821,7 @@ void free_arrays() {
     free(toggle_pool.data);
     free(spawn_pool.data);
     free(rotate_pool.data);
+    free(simple_pool.data);
     free(text_pool.data);
     col_pool = (TriggerPool){0};
     move_pool = (TriggerPool){0};
@@ -1797,6 +1830,7 @@ void free_arrays() {
     toggle_pool = (TriggerPool){0};
     spawn_pool = (TriggerPool){0};
     rotate_pool = (TriggerPool){0};
+    simple_pool = (TriggerPool){0};
     text_pool = (TriggerPool){0};
 
     if (objects.random)             { free(objects.random);             objects.random = NULL; }

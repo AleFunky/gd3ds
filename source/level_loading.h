@@ -118,6 +118,11 @@ typedef struct {
 } SpawnTrigger;
 
 typedef struct {
+    bool spawn_triggered;
+    bool multi_triggered;
+} SimpleTrigger;
+
+typedef struct {
     char text[MAX_TEXT_LEN + 1];
     unsigned char len;
     unsigned char layout_done;
@@ -297,6 +302,8 @@ MoveTrigger *get_move_trigger(int obj);
 ToggleTrigger *get_toggle_trigger(int obj);
 SpawnTrigger *get_spawn_trigger(int obj);
 TextObject *get_text_object(int obj);
+
+bool is_simple_trigger_object(int id);
 
 bool trigger_is_spawn_triggered(int id, int obj);
 bool trigger_is_multi_triggered(int id, int obj);
