@@ -1400,6 +1400,10 @@ const ObjectHitbox hitbox_1910[] = {
     { HITBOX_SOLID, 0.00, 0.00, 15.00, 15.00, COLLISION_BOX }
 };
 
+const ObjectHitbox hitbox_1911[] = {
+    { HITBOX_SOLID, 0.00, 0.00, 15.00, 8.00, COLLISION_BOX }
+};
+
 const ChildSprite children_10[] = {
  { 773, -10.00, 0.00, 1.00, 1.00, 0, 0, -1, -1, 0.00, COLOR_TYPE_WHITE, 1.00 },
 };
@@ -7313,5 +7317,5 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1908 */ { 624, 123, 0.00, 0.00, 5, 2, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1908, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1909 */ { 626, 124, -1.00, 0.00, 5, 2, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1909, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1910 */ { 650, 39, 0.00, 0.00, 5, 2, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1910, 0, NULL, 0, NULL, 0, NULL, hitbox_1910 },
-/* Object 1911 */ { 622, 59, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1911 */ { 622, 59, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1911 },
 };
