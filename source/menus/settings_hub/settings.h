@@ -25,6 +25,10 @@ typedef struct {
 
     bool disabledForceValue; // Value that will be forced upon the condition failing
     bool (*condition)();
+
+    int buttonIcon;
+    int buttonSheet;
+    char *buttonActions;
 } Setting;
 
 typedef struct {
@@ -34,6 +38,7 @@ typedef struct {
     bool glowEnabled;
     bool yJump;
     bool touchEffectEverywhere;
+    bool gameplayTapEffect;
     bool enableDebugBindings;
     bool hitboxesEnabled;
     bool hitboxTrail;
@@ -51,17 +56,20 @@ typedef struct {
     bool noWaveTrailBehind;
     bool doNot;
     bool practiceMusicSync;
+    bool menuMusic;
     bool autoCheckpoints;
     bool quickCheckpoints;
+    bool hidePracticeButtons;
     bool skipHighObjWarning;
     bool skipVersionWarning;
     bool skipSongWarning;
     bool vsync;
     bool showFpsCounter;
     bool goldenBest;
+    bool swapGameplayScreens;
 } SettingState;
 
-extern Setting settings[32];
+extern Setting settings[37];
 extern SettingState settingsState;
 
 extern const UIScreenDefPair settings_def;

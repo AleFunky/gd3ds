@@ -74,6 +74,7 @@ extern char *_3dsx_path;
 extern float global_volume;
 extern float music_volume;
 extern float sound_volume;
+extern float dim_secondary_screen;
 
 extern ParticleSystem touch_drag_particles;
 extern ParticleSystem touch_explosion_particles;
@@ -97,6 +98,7 @@ extern float fastest_speed_particles_timer;
 #define SCREEN_WIDTH  400
 #define SCREEN_BOT_WIDTH  320
 #define SCREEN_HEIGHT 240
+#define SWAP_SIDE_OFFSET_X ((SCREEN_WIDTH - SCREEN_BOT_WIDTH) / 2.f)
 
 enum GameState {
     STATE_MENU,

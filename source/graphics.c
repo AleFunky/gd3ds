@@ -2276,7 +2276,9 @@ void update_touch_effect(float delta) {
 
     touch_drag_particles.emitting = false;
 
-    if ((settingsState.touchEffectEverywhere || (game_state == STATE_GAME && !game_paused)) && (kHeld & KEY_TOUCH)) {
+    bool tap_effect_enabled = (game_state == STATE_GAME && !game_paused) ? settingsState.gameplayTapEffect : settingsState.touchEffectEverywhere;
+
+    if (tap_effect_enabled && (kHeld & KEY_TOUCH)) {
         // Flipped for particles
         float flipped_y = SCREEN_HEIGHT - pos.py;
 

@@ -27,6 +27,7 @@
 #include "menus/creator_menu/search_menu.h"
 #include "menus/settings_hub/settings_hub.h"
 #include "menus/settings_hub/settings.h"
+#include "menus/settings_hub/dim_screen.h"
 #include "menus/creator_menu/soggy.h"
 #include "menus/creator_menu/search/song_filter.h"
 #include "menus/settings_hub/songs.h"
@@ -52,6 +53,7 @@ const UIScreenDefPair *defs[] = {
     &how_to_play_def,
     &settings_def,
     &info_card_def,
+    &dim_screen_def,
     &online_def,
     &saved_levels_def,
     &song_filter_def,

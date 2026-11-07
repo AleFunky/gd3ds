@@ -276,9 +276,13 @@ float get_depth_shift(float depth) {
 
 // Sets the top screen up for one eye, returns false once every eye has been drawn
 bool begin_top_eye(int eye) {
+    return begin_top_eye_target(eye, top);
+}
+
+bool begin_top_eye_target(int eye, C3D_RenderTarget *primary) {
     // The slider only gets read once per frame so both eyes agree on the depth
     if (eye == EYE_LEFT) {
-        stereo_strength = top_right ? get_stereo_slider() : 0.f;
+        stereo_strength = (primary == top && top_right) ? get_stereo_slider() : 0.f;
     }
 
     // One eye is enough with the slider down
@@ -291,7 +295,7 @@ bool begin_top_eye(int eye) {
     current_eye = eye;
     drawing_top_eye = true;
 
-    C3D_RenderTarget *target = (eye == EYE_RIGHT ? top_right : top);
+    C3D_RenderTarget *target = (eye == EYE_RIGHT ? top_right : primary);
     
     C2D_SceneBegin(target);
     C2D_TargetClear(target, C2D_Color32(0, 0, 0, 255));

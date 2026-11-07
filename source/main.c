@@ -89,6 +89,7 @@ bool cheated = false;
 float global_volume;
 float music_volume;
 float sound_volume;
+float dim_secondary_screen;
 
 int steps = 0;
 int last_steps = 0;
@@ -649,7 +650,7 @@ void init_particles(Color p1_color, Color p2_color) {
 
 static bool touch_jump_filter(u16 px, u16 py) {
     bool on_pause_button = px > 300-32/2 && py < 20+32/2;
-    bool on_practice_ui = state.practice_mode && (px > 92 && px < 222 && py > 175 && py < 222);
+    bool on_practice_ui = state.practice_mode && !settingsState.hidePracticeButtons && (px > 92 && px < 222 && py > 175 && py < 222);
     return !(on_pause_button || on_practice_ui);
 }
 
@@ -743,7 +744,8 @@ void sync_precise_input(bool suppress_held) {
 
 void ui_loop(){
     playing_menu_loop = false;
-    play_menu_song();
+    if (settingsState.menuMusic) play_menu_song();
+    else stop_mp3();
     
     u64 lastTime = svcGetSystemTick();
 
@@ -858,6 +860,63 @@ void ui_loop(){
         }
     }
     C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
+}
+
+#define SWAP_CENTER_SHIFT (SWAP_SIDE_OFFSET_X / SCALE)
+
+typedef struct {
+    UIElement *element;
+    bool enabled;
+} SwapElement;
+
+static SwapElement swap_hide_tag(UIScreen *screen, const char *tag) {
+    SwapElement state = { screen ? ui_get_element_by_tag(screen, tag) : NULL, false };
+
+    if (state.element) {
+        state.enabled = state.element->enabled;
+        state.element->enabled = false;
+    }
+
+    return state;
+}
+
+static void swap_restore_element(SwapElement state) {
+    if (state.element) state.element->enabled = state.enabled;
+}
+
+static void swap_draw_identity(UIElement *e) {
+    UITransform root = { 0.f, 0.f, 1.f, 1.f };
+
+    ui_draw_tree(e, &root);
+}
+
+static void swap_draw_hud(UIScreen *screen) {
+    if (!screen) return;
+
+    SwapElement pause_menu = swap_hide_tag(screen, "pause_menu");
+    SwapElement fps = swap_hide_tag(screen, "fps");
+
+    C2D_ViewTranslate(-SWAP_SIDE_OFFSET_X, 0);
+    ui_screen_draw(screen);
+    C2D_ViewTranslate(SWAP_SIDE_OFFSET_X, 0);
+
+    swap_restore_element(fps);
+
+    if (fps.element && fps.element->enabled) swap_draw_identity(fps.element);
+
+    swap_restore_element(pause_menu);
+}
+
+static void swap_draw_pause_window(UIScreen *screen) {
+    SwapElement bar = swap_hide_tag(screen, "progressalert");
+    SwapElement percent = swap_hide_tag(screen, "percent");
+    SwapElement fps = swap_hide_tag(screen, "fps");
+
+    ui_stack_draw(SCREEN_TOP);
+
+    swap_restore_element(fps);
+    swap_restore_element(percent);
+    swap_restore_element(bar);
 }
 
 void game_loop() {
@@ -1453,11 +1512,18 @@ void game_loop() {
         update_bottom_particles(delta);
         update_touch_effect(delta);
 
+        bool swap_screens = settingsState.swapGameplayScreens && !in_level_complete;
+        C3D_RenderTarget *play_screen = swap_screens ? bot : top;
+        C3D_RenderTarget *side_screen = swap_screens ? top : bot;
+        UIScreen *swap_gameplay_screen = swap_screens ? ui_stack_get_screen("gameplay", SCREEN_BTM) : NULL;
+        UIScreen *swap_gameplay_top = swap_screens ? ui_stack_get_screen("gameplay", SCREEN_TOP) : NULL;
+        int world_width = swap_screens ? SCREEN_BOT_WIDTH : SCREEN_WIDTH;
+
         if(C3D_FrameBegin(settingsState.vsync ? C3D_FRAME_SYNCDRAW : C3D_FRAME_NONBLOCK)){
             C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ZERO);
 
             // Top screen, drawn once per eye when 3D is on
-            for (int eye = 0; begin_top_eye(eye); eye++) {
+            for (int eye = 0; begin_top_eye_target(eye, play_screen); eye++) {
                 begin_eye_layer(DEPTH_BACKGROUND);
                 draw_background(state.background_x / 8, -(state.camera_y / 8) + 200);
                 end_eye_layer();
@@ -1474,11 +1540,11 @@ void game_loop() {
 
                 draw_attempt_text();
 
-                draw_ground(state.ground_x, state.camera_y, 0, false, SCREEN_WIDTH);
+                draw_ground(state.ground_x, state.camera_y, 0, false, world_width);
 
                 if (state.ground_y_gfx > 2) {
-                    if (state.camera_y - LEVEL_Y_OFFSET + state.ground_y_gfx > 0) draw_ground(state.ground_x, state.camera_y, state.camera_y + state.ground_y_gfx - LEVEL_Y_OFFSET, false, SCREEN_WIDTH);
-                    draw_ground(state.ground_x, state.camera_y, state.camera_y - LEVEL_Y_OFFSET + SCREEN_HEIGHT_AREA - state.ground_y_gfx, true, SCREEN_WIDTH);
+                    if (state.camera_y - LEVEL_Y_OFFSET + state.ground_y_gfx > 0) draw_ground(state.ground_x, state.camera_y, state.camera_y + state.ground_y_gfx - LEVEL_Y_OFFSET, false, world_width);
+                    draw_ground(state.ground_x, state.camera_y, state.camera_y - LEVEL_Y_OFFSET + SCREEN_HEIGHT_AREA - state.ground_y_gfx, true, world_width);
                 }
 
                 change_blending(true);
@@ -1494,6 +1560,8 @@ void game_loop() {
 
                 change_blending(false);
 
+                if (swap_screens) C2D_ViewTranslate(-SWAP_CENTER_SHIFT, 0);
+
                 if (level_info.wall_y > 0) {
                     begin_eye_layer(DEPTH_POPUP);
                     draw_level_complete_popup();
@@ -1504,12 +1572,29 @@ void game_loop() {
                 draw_new_best_popup();
                 end_eye_layer();
 
+                if (swap_screens) C2D_ViewTranslate(SWAP_CENTER_SHIFT, 0);
+
                 C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
                 C2D_ViewScale(1/SCALE, 1/SCALE);
 
                 begin_eye_layer(DEPTH_POPUP);
                 //gameplay_screen_top_loop();
-                ui_stack_draw(SCREEN_TOP);
+                if (swap_screens) {
+                    swap_draw_hud(swap_gameplay_top);
+
+                    if (game_paused) {
+                        ui_stack_draw(SCREEN_BTM);
+                    } else if (swap_gameplay_screen) {
+                        ui_run_func_on_tag(swap_gameplay_screen, "pause_btn", swap_draw_identity);
+                        ui_run_func_on_tag(swap_gameplay_screen, "practice_buttons", swap_draw_identity);
+                    }
+
+                    change_blending(true);
+                    draw_touch_effect();
+                    change_blending(false);
+                } else {
+                    ui_stack_draw(SCREEN_TOP);
+                }
                 draw_level_complete_top();
                 draw_stack_fade();
                 //draw_stack_debug();
@@ -1517,46 +1602,79 @@ void game_loop() {
             }
 
             // Bottom screen
-            C2D_SceneBegin(bot);
-            C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
+            for (int eye = 0; begin_top_eye_target(eye, side_screen); eye++) {
+                float dim = dim_secondary_screen;
+                float side_width = swap_screens ? SCREEN_WIDTH : SCREEN_BOT_WIDTH;
 
-            draw_background((state.background_x / 8) + 40, 200);
+                if (dim < 1.f) {
+                    draw_background((state.background_x / 8) + 40, 200);
 
-            C2D_ViewScale(SCALE, SCALE);
-            C2D_ViewTranslate(0, CAM_Y_MTX_OFFSET);
-            
-            change_blending(true);
-            draw_bottom_particles();
-            change_blending(false);
+                    C2D_ViewScale(SCALE, SCALE);
+                    C2D_ViewTranslate(0, CAM_Y_MTX_OFFSET);
 
-            draw_ground(state.ground_x + 52.5f, 0.f, -71.f, false, SCREEN_BOT_WIDTH);
-            draw_ground(state.ground_x + 52.5f, 0.f, 210.f, true, SCREEN_BOT_WIDTH);
+                    change_blending(true);
+                    draw_bottom_particles();
+                    change_blending(false);
 
-            C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
-            C2D_ViewScale(1/SCALE, 1/SCALE);
+                    draw_ground(state.ground_x + 52.5f, 0.f, -71.f, false, side_width);
+                    draw_ground(state.ground_x + 52.5f, 0.f, 210.f, true, side_width);
 
-            //gameplay_screen_bot_loop();
-            ui_stack_draw(SCREEN_BTM);
-            draw_level_complete();
-            
-            change_blending(true);
-            draw_touch_effect();
-            change_blending(false);
+                    C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
+                    C2D_ViewScale(1/SCALE, 1/SCALE);
+                }
 
-            if (state.profiling) {
-                float processingTime = ticks / CPU_TICKS_PER_MSEC;
-                ProfilerUpdateData data = {
-                    .processingTime = processingTime,
-                    .touchPos = touchPos,
-                    .kDown = touch.down,
-                    .steps = steps
-                };
+                if (dim > 0.f) {
+                    change_blending(false);
 
-                profiler_update(data);
-                profiler_draw();
+                    if (dim < 1.f) C2D_DrawRectSolid(0.f, 0.f, 0.f, side_width, SCREEN_HEIGHT, C2D_Color32(0, 0, 0, (int)(dim * 255.f)));
+                }
+
+                //gameplay_screen_bot_loop();
+                if (swap_screens) {
+                    if (game_paused) {
+                        swap_draw_pause_window(swap_gameplay_top);
+                    } else {
+                        SwapElement pause_btn = swap_hide_tag(swap_gameplay_screen, "pause_btn");
+                        SwapElement add_check = swap_hide_tag(swap_gameplay_screen, "add_checkpoint");
+                        SwapElement remove_check = swap_hide_tag(swap_gameplay_screen, "remove_checkpoint");
+
+                        C2D_ViewTranslate(SWAP_SIDE_OFFSET_X, 0);
+                        ui_stack_draw(SCREEN_BTM);
+                        C2D_ViewTranslate(-SWAP_SIDE_OFFSET_X, 0);
+
+                        swap_restore_element(remove_check);
+                        swap_restore_element(add_check);
+                        swap_restore_element(pause_btn);
+                    }
+                } else {
+                    ui_stack_draw(SCREEN_BTM);
+                }
+
+                draw_level_complete();
+
+                if (!swap_screens) {
+                    change_blending(true);
+                    draw_touch_effect();
+                    change_blending(false);
+                }
+
+                if (state.profiling && eye == EYE_LEFT) {
+                    float processingTime = ticks / CPU_TICKS_PER_MSEC;
+                    ProfilerUpdateData data = {
+                        .processingTime = processingTime,
+                        .touchPos = touchPos,
+                        .kDown = touch.down,
+                        .steps = steps
+                    };
+
+                    profiler_update(data);
+                    if (swap_screens) C2D_ViewTranslate(SWAP_SIDE_OFFSET_X, 0);
+                    profiler_draw();
+                    if (swap_screens) C2D_ViewTranslate(-SWAP_SIDE_OFFSET_X, 0);
+                }
+
+                draw_stack_fade();
             }
-
-            draw_stack_fade();
 
             if (state.noclip) {
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 234, 0.5f, 0.5f, 0, true, "Noclip Activated");

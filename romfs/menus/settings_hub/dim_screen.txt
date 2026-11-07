@@ -1,0 +1,9 @@
+darken x=0 y=0 opacity=0.4 tag="darken"
+
+window x=160 y=120 w=260 h=120 style=6
+{
+    label x=0 y=-40 text="Dim secondary screen" scale=0.55 align=CENTER
+    slider x=0 y=10 max_value=1 scale=1 tag="dim_slider"
+}
+
+button x=24 y=28 id=8 actions=close_menu keyBinds="B"

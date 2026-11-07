@@ -545,6 +545,8 @@ void play_practice_song() {
 }
 
 void play_menu_song() {
+    if (!settingsState.menuMusic) return;
+
     if (!playing_menu_loop) {
         size_t out_size;
         void *buf = read_file(menu_loop_path, &out_size);
