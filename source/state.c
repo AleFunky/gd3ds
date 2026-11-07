@@ -22,6 +22,8 @@
 #include "endwall.h"
 
 #define FIRST_ATTEMPT_CAMERA_OFFSET 15
+#define PLAYER_CAMERA_X_OFFSET 125.0f
+#define PLAYER_CAMERA_X_OFFSET_BOT (PLAYER_CAMERA_X_OFFSET * (SCREEN_BOT_WIDTH / (float)SCREEN_WIDTH))
 
 GameState state;
 
@@ -58,6 +60,7 @@ void set_camera_y(float y) {
 
 void run_camera() {
     Player *player = &state.player;
+    float player_camera_x_offset = settingsState.swapGameplayScreens ? PLAYER_CAMERA_X_OFFSET_BOT : PLAYER_CAMERA_X_OFFSET;
     state.old_camera_x = state.camera_x;
     state.old_camera_y = state.camera_y;
 
@@ -133,7 +136,7 @@ void run_camera() {
 
         set_camera_y(cam_y);
 
-        set_camera_x(player->x - 125.0f/SCALE);
+        set_camera_x(player->x - player_camera_x_offset/SCALE);
         
         if (state.current_data.attempts == 1) {
             if (state.camera_x < FIRST_ATTEMPT_CAMERA_OFFSET) {
@@ -141,7 +144,7 @@ void run_camera() {
             }
         }
 
-        if (state.current_data.attempts > 1 || player->x - 125.0f/SCALE >= FIRST_ATTEMPT_CAMERA_OFFSET) {
+        if (state.current_data.attempts > 1 || player->x - player_camera_x_offset/SCALE >= FIRST_ATTEMPT_CAMERA_OFFSET) {
             state.ground_x += player->vel_x * STEPS_DT * state.mirror_speed_factor;
             state.background_x += player->vel_x * STEPS_DT * state.mirror_speed_factor;
         }

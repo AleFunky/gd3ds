@@ -43,6 +43,7 @@ const Color white = { 255, 255, 255 };
 
 #define KEY_FLOAT_AMP 1.5f
 #define KEY_FLOAT_PERIOD 0.8f
+#define GAMEPLAY_SCREEN_WIDTH_AREA SCREEN_WIDTH_AREA_GAMEPLAY(settingsState.swapGameplayScreens && !in_level_complete)
 #define KEY_FLOAT_BASE 0.0f
 
 static inline float key_float_offset(int obj) {
@@ -398,13 +399,14 @@ inline int get_color_channel(int col_type, int obj, const GameObject *game_obj) 
 
 // Baby's first reverse engineered function
 
-const float leftFadeBound = (SCREEN_WIDTH_AREA/2) - 75.f;
-const float leftFadeWidth = leftFadeBound - 30;
-const float rightFadeBound = leftFadeBound + 110;
-const float rightFadeWidth = (SCREEN_WIDTH_AREA) - (leftFadeBound + 190);
-
 float get_fading_obj_fade(int obj, float right_edge, float *glow_out) {
     if (!state.dead) {
+        float camera_width = GAMEPLAY_SCREEN_WIDTH_AREA;
+        float leftFadeBound = (camera_width / 2) - 75.f;
+        float leftFadeWidth = leftFadeBound - 30;
+        float rightFadeBound = leftFadeBound + 110;
+        float rightFadeWidth = camera_width - (leftFadeBound + 190);
+
         // Offset fade checks slightly so invisible blocks
         // begin fading before reaching the actual boundary
         float objX = objects.x[obj];
@@ -416,7 +418,7 @@ float get_fading_obj_fade(int obj, float right_edge, float *glow_out) {
         }
         objX = marginX;
 
-        float halfCameraWidth = (SCREEN_WIDTH_AREA / 2);
+        float halfCameraWidth = (camera_width / 2);
         float camX = state.camera_x;
         
         // Additional screen-edge fade so objects near the
@@ -1175,7 +1177,7 @@ float get_out_scale_fade(float x, int right_edge) {
 int get_obj_opacity(int obj, float x) {
     if ((objects.flags[obj] & FLAG_DONT_FADE) && objects.transition_applied[obj] == FADE_SIMPLE) return 255;
 
-    float opacity = obj_edge_fade(x, SCREEN_WIDTH / SCALE);
+    float opacity = obj_edge_fade(x, GAMEPLAY_SCREEN_WIDTH_AREA);
     bool blending;
 
     switch (objects.id[obj]) {
@@ -1233,7 +1235,7 @@ void handle_special_fading(int obj, float calc_x, float calc_y) {
             }
             break;
         case FADE_CIRCLE_LEFT:
-            if (calc_x > (SCREEN_WIDTH / SCALE / 2)) {
+            if (calc_x > (GAMEPLAY_SCREEN_WIDTH_AREA / 2)) {
                 if (calc_y > (SCREEN_HEIGHT / SCALE / 2)) {
                     objects.transition_applied[obj] = FADE_UP_STATIONARY;
                 } else {
@@ -1248,7 +1250,7 @@ void handle_special_fading(int obj, float calc_x, float calc_y) {
             }
             break;
         case FADE_CIRCLE_RIGHT:
-            if (calc_x > (SCREEN_WIDTH / SCALE / 2)) {
+            if (calc_x > (GAMEPLAY_SCREEN_WIDTH_AREA / 2)) {
                 if (calc_y > (SCREEN_HEIGHT / SCALE / 2)) {
                     objects.transition_applied[obj] = FADE_UP_SLOW_RIGHT;
                 } else {
@@ -1274,44 +1276,44 @@ void get_fade_vars(int obj, float x, float *fade_x, float *fade_y, float *fade_s
         case FADE_SIMPLE:
             break;
         case FADE_UP:
-            *fade_y = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
+            *fade_y = get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
             break;
         case FADE_DOWN:
-            *fade_y = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
+            *fade_y = -get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
             break;
         case FADE_RIGHT:
-            *fade_x = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
+            *fade_x = get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
             break;
         case FADE_LEFT:
-            *fade_x = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
+            *fade_x = -get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
             break;
         case FADE_SCALE_IN:
-            *fade_scale = get_in_scale_fade(x, SCREEN_WIDTH / SCALE);
+            *fade_scale = get_in_scale_fade(x, GAMEPLAY_SCREEN_WIDTH_AREA);
             break;
         case FADE_SCALE_OUT:
-            *fade_scale = get_out_scale_fade(x, SCREEN_WIDTH / SCALE);
+            *fade_scale = get_out_scale_fade(x, GAMEPLAY_SCREEN_WIDTH_AREA);
             break;
         case FADE_UP_SLOW_LEFT:
-            *fade_x = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
-            *fade_y = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            *fade_x = -get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
+            *fade_y = get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA) / 3;
             break;
         case FADE_UP_SLOW_RIGHT:
-            *fade_x = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
-            *fade_y = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            *fade_x = get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
+            *fade_y = get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA) / 3;
             break;
         case FADE_UP_STATIONARY:
-            *fade_y = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            *fade_y = get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA) / 3;
             break;
         case FADE_DOWN_SLOW_LEFT:
-            *fade_x = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
-            *fade_y = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            *fade_x = -get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
+            *fade_y = -get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA) / 3;
             break;
         case FADE_DOWN_SLOW_RIGHT:
-            *fade_x = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
-            *fade_y = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            *fade_x = get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
+            *fade_y = -get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA) / 3;
             break;
         case FADE_DOWN_STATIONARY:
-            *fade_y = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            *fade_y = -get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA) / 3;
             break;
     }
 }
@@ -1322,8 +1324,8 @@ float get_special_fading_vars(int obj, float fade_val) {
     if (objects.transition_applied[obj] == FADE_DOWN_STATIONARY || objects.transition_applied[obj] == FADE_UP_STATIONARY) {
         if (fade_val < 255) {
             float calc_x = objects.x[obj] - state.camera_x;
-            if (calc_x > (SCREEN_WIDTH / SCALE) / 2) {
-                return (SCREEN_WIDTH / SCALE - FADE_WIDTH) - calc_x;
+            if (calc_x > (GAMEPLAY_SCREEN_WIDTH_AREA) / 2) {
+                return (GAMEPLAY_SCREEN_WIDTH_AREA - FADE_WIDTH) - calc_x;
             } else {
                 return FADE_WIDTH - calc_x;
             }
@@ -1614,7 +1616,7 @@ static void update_current_objects(void) {
         float calc_x = objects.x[obj] - state.camera_x;
         float calc_y = SCREEN_HEIGHT - (objects.y[obj] - state.camera_y);
 
-        float fade_val = obj_edge_fade(calc_x, SCREEN_WIDTH / SCALE);
+        float fade_val = obj_edge_fade(calc_x, GAMEPLAY_SCREEN_WIDTH_AREA);
         if (fade_val == 255) {
             objects.transition_applied[obj] = FADE_NONE;
         } else if (objects.transition_applied[obj] == FADE_NONE) {
@@ -1782,7 +1784,7 @@ void update_tints() {
             // Handle invisible object opacity
             if (object_fades(game_object)) {
                 float glow_out = 1.f;
-                float fading_opacity = get_fading_obj_fade(game_object, SCREEN_WIDTH / SCALE, &glow_out);
+                float fading_opacity = get_fading_obj_fade(game_object, GAMEPLAY_SCREEN_WIDTH_AREA, &glow_out);
                 
                 // Check if layer is glow
                 if (obj->layer == 1) opacity *= glow_out;
