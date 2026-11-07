@@ -137,9 +137,8 @@ typedef struct {
     float cutscene_initial_player_y;
 
     int slope_slide_coyote_time;
-    int allow_dart_slide_timer;
-    int allow_head_hit_timer;
-    int no_auto_jump_timer;
+    int allow_dart_slide;
+    int allow_head_hit;
 
     int frame;
 
@@ -151,7 +150,6 @@ typedef struct {
     bool velocity_override;
     bool velocity_uncapped;
     bool holding_jump_cancelled;
-    bool no_auto_jump_exempt;
     bool dashing;
     float dash_slope;
     float dash_angle;
@@ -159,6 +157,8 @@ typedef struct {
 
     bool jumped;
     bool landed_from_jump;
+
+    bool came_from_orb;
 
     bool buffer_ufo;
 

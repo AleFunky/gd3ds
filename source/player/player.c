@@ -230,10 +230,15 @@ void cube_gamemode(Player *player) {
 
     drag_particles[state.current_player].cfg.sourcePositionVariancey = (player->mini ? 4.f : 2.f);
 
-    if (curr_input.holdJump && !player->dashing && !player->holding_jump_cancelled) {
+    if (curr_input.holdJump && !player->dashing) {
         jump = true;
     } else if (player->on_ground) {
         player->consecutive_jumps = 0;
+    }
+
+    // J block
+    if (player->holding_jump_cancelled && player->buffering_state == BUFFER_END) {
+        jump = false;
     }
 
     if (player->on_ground) {
@@ -1023,7 +1028,7 @@ void clamp_player_ground(Player *player) {
 
     // Check for ground collision
     if (getGroundBottom(player) < state.ground_y && !player->just_teleported) {
-        if (player->ceiling_inv_time <= 0 && player->allow_head_hit_timer <= 0 && (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_ROBOT) && player->upside_down) {
+        if (player->ceiling_inv_time <= 0 && (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_ROBOT) && player->upside_down) {
             kill_player(DEATH_CEILING);
         }
 
@@ -1038,7 +1043,7 @@ void clamp_player_ground(Player *player) {
 
     // Check for ceiling collision
     if (getGroundTop(player) > state.ceiling_y && !player->just_teleported) {
-        if (player->ceiling_inv_time <= 0 && player->allow_head_hit_timer <= 0 && (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_ROBOT) && !player->upside_down) {
+        if (player->ceiling_inv_time <= 0 && (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_ROBOT) && !player->upside_down) {
             kill_player(DEATH_CEILING);
         }
 
@@ -1063,6 +1068,7 @@ void run_player(Player *player) {
                 player->inverse_rotation = false;
             } else {
                 player->on_ground = true;          
+                player->came_from_orb = false;
                 player->inverse_rotation = false;
                 player_non_flying_landing(player);
             }
@@ -1073,6 +1079,7 @@ void run_player(Player *player) {
         if (getGroundTop(player) >= state.ceiling_y) {
             if (player->upside_down) {
                 player->on_ground = true;
+                player->came_from_orb = false;
                 player->inverse_rotation = false;
                 player_non_flying_landing(player);
             } else {
@@ -1208,10 +1215,6 @@ void run_player(Player *player) {
         }
     }
 
-    if (player->allow_dart_slide_timer) player->allow_dart_slide_timer--;
-    if (player->allow_head_hit_timer) player->allow_head_hit_timer--;
-    if (player->no_auto_jump_timer && player->on_ground) player->no_auto_jump_timer--;
-
     // If player is on slope, do slope stuff
     if (player->slope_data.slope_id >= 0) {
         slope_calc(player->slope_data.slope_id, player);
@@ -1264,20 +1267,23 @@ void run_player(Player *player) {
 
 void handle_player(Player *player) {
     u64 start_player = svcGetSystemTick();
-    if (curr_input.holdJump) {
-        if (curr_input.pressedJump) player->holding_jump_cancelled = false;
-        if (!player->holding_jump_cancelled && player->buffering_state == BUFFER_NONE) {
+
+    if (curr_input.holdJump) {    
+        if (player->buffering_state == BUFFER_NONE) {
             player->buffering_state = BUFFER_READY;
         }
     } else {
+        player->holding_jump_cancelled = false;
         player->buffering_state = BUFFER_NONE;
-        player->holding_jump_cancelled = player->no_auto_jump_exempt = false;
         stop_dashing(player);
     }
     
     player->on_ground = false;
     player->on_ceiling = false;
     player->landed_from_jump = false;
+    
+    player->allow_dart_slide = false;
+    player->allow_head_hit = false;
 
     player->velocity_override = false;
 
@@ -1325,8 +1331,6 @@ void handle_player(Player *player) {
     u64 end = svcGetSystemTick();
     u64 ticks = end - start;
     snapshot.collision_ms += ticks / CPU_TICKS_PER_MSEC;
-
-    if (player->no_auto_jump_timer > 0 && player->on_ground && curr_input.holdJump && !player->no_auto_jump_exempt && player->buffering_state != BUFFER_READY) player->holding_jump_cancelled = true;
     
     if (state.noclip || state.end_wall_anim_playing) state.dead = false;
     
@@ -1359,8 +1363,6 @@ void handle_player(Player *player) {
     } 
 
     run_player(player);
-
-    if (player->buffering_state == BUFFER_READY) player->no_auto_jump_exempt = true;
 
     if (state.dead) stop_dashing(player);
 

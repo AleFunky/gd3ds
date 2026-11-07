@@ -512,7 +512,8 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 0;
                 }
                 
-                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_timer > 0) { player->holding_jump_cancelled = true; }
+                player->came_from_orb = true;
+
                 SET_ACTIVATED(obj, true);
             } 
             break;
@@ -542,8 +543,9 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorG = 50 / 255.f;
                     effect->def.colorB = 255 / 255.f;
                 }
+
+                player->came_from_orb = true;
                 
-                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_timer > 0) { player->holding_jump_cancelled = true; }
                 SET_ACTIVATED(obj, true);
             } 
             break;
@@ -575,7 +577,8 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 0;
                 }
                 
-                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_timer > 0) { player->holding_jump_cancelled = true; }
+                player->came_from_orb = true;
+
                 SET_ACTIVATED(obj, true);
             } 
             break;
@@ -607,8 +610,9 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorG = color.g / 255.f;
                     effect->def.colorB = color.b / 255.f;
                 }
-                
-                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_timer > 0) { player->holding_jump_cancelled = true; }
+
+                player->came_from_orb = true;
+
                 SET_ACTIVATED(obj, true);
             } 
             break;
@@ -638,6 +642,8 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorG = 255 / 255.f;
                     effect->def.colorB = 0;
                 }
+
+                player->came_from_orb = true;
 
                 SET_ACTIVATED(obj, true);
             } 
@@ -681,6 +687,8 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 255 / 255.f;
                 }
 
+                player->came_from_orb = true;
+
                 SET_ACTIVATED(obj, true);
             } 
             break;
@@ -718,7 +726,8 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 255 / 255.f;
                 }
 
-                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_timer > 0) { player->holding_jump_cancelled = true; }
+                player->came_from_orb = true;
+
                 SET_ACTIVATED(obj, true);
             } 
             break;
@@ -760,7 +769,8 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = 0;
                 }
 
-                if (player->gamemode == GAMEMODE_PLAYER && player->no_auto_jump_timer > 0) { player->holding_jump_cancelled = true; }
+                player->came_from_orb = true;
+
                 SET_ACTIVATED(obj, true);
             } 
             break;
@@ -1481,15 +1491,15 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
 
         case D_MODIFIERBLOCK:
-            player->allow_dart_slide_timer = 2;
+            player->allow_dart_slide = true;
             break;
 
         case J_MODIFIERBLOCK:
-            player->no_auto_jump_timer = 2;
+            if (player->came_from_orb) player->holding_jump_cancelled = true;
             break;
 
         case H_MODIFIERBLOCK:
-            player->allow_head_hit_timer = 2;
+            player->allow_head_hit = true;
             break;
 
         case 1329:
@@ -1728,8 +1738,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
             // This is equal to using the old player y position (a frame of snap leeway)
             clip += fabsf(player->vel_y) * STEPS_DT;
 
-            bool mode_snap = state.old_player.gamemode != player->gamemode &&
-                state.old_player.gamemode == GAMEMODE_WAVE && player->allow_dart_slide_timer;
+            bool mode_snap = state.old_player.gamemode != player->gamemode && state.old_player.gamemode == GAMEMODE_WAVE && player->allow_dart_slide;
 
             if (mode_snap) clip += (player->height - state.old_player.height) / 2;
             
@@ -1747,7 +1756,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
 
             bool safeZone = player->mini && ((obj_gravTop(player, obj) - gravBottom(player) <= clip) || (gravTop(player) - obj_gravBottom(player, obj) <= clip));
             
-            bool dart_slide = player->gamemode == GAMEMODE_WAVE && player->allow_dart_slide_timer &&
+            bool dart_slide = player->gamemode == GAMEMODE_WAVE && player->allow_dart_slide &&
                 objects.id[obj] != BREAKABLE_BLOCK &&
                 ((((obj_gravTop(player, obj) - gravBottom(player) <= clip) || moving_support) && player->vel_y <= fmaxf(object_raw_vel, 0)) ||
                 ((gravTop(player) - obj_gravBottom(player, obj) <= clip) && player->vel_y >= object_raw_vel));
@@ -1768,15 +1777,6 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                     brick_destroy_particles.emitterY = y;
                     spawnMultipleParticles(&brick_destroy_particles, 25);
                     objects.flags[obj] |= FLAG_TOGGLED;
-                } else if (player->allow_head_hit_timer > 0 && player->vel_y >= object_raw_vel &&
-                           (gravInternalBottom(player) <= obj_gravBottom(player, obj) ||
-                            (player->x >= obj_getLeft(obj) && player->x <= obj_getRight(obj))) &&
-                           (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_ROBOT)) {
-                    player->on_ceiling = true;
-                    player->inverse_rotation = false;
-                    player->time_since_ground = 0;
-                    player->y = grav(player, obj_gravBottom(player, obj)) - grav(player, player->height / 2);
-                    if (player->vel_y >= 0) player->vel_y = 0;
                 } else {
                     // Not a brick, die
                     kill_player(DEATH_BLOCK);
@@ -1820,7 +1820,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
             }
 
             // Check snap for player bottom
-            if ((obj_gravTop(player, obj) - bottom <= clip || moving_support) && player->vel_y <= fmaxf(object_raw_vel, 0) && (player->gamemode != GAMEMODE_WAVE || player->allow_dart_slide_timer)) {
+            if ((obj_gravTop(player, obj) - bottom <= clip || moving_support) && player->vel_y <= fmaxf(object_raw_vel, 0) && (player->gamemode != GAMEMODE_WAVE || player->allow_dart_slide)) {
                 player->y = grav(player, obj_gravTop(player, obj)) + grav(player, player->height / 2);
                 if (player->vel_y <= 0) player->vel_y = 0;
                 player->on_ground = true;
@@ -1830,6 +1830,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
 
                 player->collided_block = obj;
                 player->platform_velocity = grav(player, fmaxf(0.f, object_raw_vel) * .9f);
+                player->came_from_orb = false;
                 if (object_raw_vel > MINIMUM_OBJECT_SPEED)
                     player->vel_y = fmaxf(player->vel_y, object_raw_vel * .9f);
 
@@ -1846,13 +1847,13 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                     player->snap_data.player_snap_diff = player->x - x;
                 }
             // Check snap for player top
-            } else if (player->gamemode != GAMEMODE_WAVE || player->allow_dart_slide_timer) {
+            } else if (player->gamemode != GAMEMODE_WAVE || player->allow_dart_slide) {
                 // Ufo can break breakable blocks from above, so dont use as a ceiling
                 if (player->gamemode == GAMEMODE_UFO && objects.id[obj] == BREAKABLE_BLOCK) {
                     break;
                 }
                 // Behave normally
-                if ((player->gamemode != GAMEMODE_PLAYER && player->gamemode != GAMEMODE_ROBOT && player->gamemode != GAMEMODE_SPIDER) || gravSnap) {
+                if ((player->gamemode != GAMEMODE_PLAYER && player->gamemode != GAMEMODE_ROBOT && player->gamemode != GAMEMODE_SPIDER) || gravSnap || player->allow_head_hit) {
                     if (((gravTop(player) - obj_gravBottom(player, obj) <= clip && player->vel_y >= object_raw_vel) || gravSnap)) {
                         if (!gravSnap) player->on_ceiling = true;
                         else player->vel_y = 0;
