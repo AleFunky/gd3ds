@@ -10,6 +10,9 @@
 #define STEPS_HZ 240
 #define STEPS_DT (1.f / STEPS_HZ) // 1/240 seconds per physics step
 
+#define FOLLOW_Y_SAMPLES 200
+#define FOLLOW_Y_INTERVAL 0.01f
+
 #define P1_TRAIL_LENGTH 10
 #define P1_TRAIL_DURATION 0.45f
 #define P1_TRAIL_END_SCALE 0.8f
@@ -174,6 +177,10 @@ typedef struct {
     float blend_timer;
 
     float coyote_frames;
+
+    float follow_y[FOLLOW_Y_SAMPLES];
+    int follow_y_index;
+    float follow_y_timer;
 
     IconsDrawing player_icons;
 

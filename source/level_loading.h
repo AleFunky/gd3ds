@@ -75,6 +75,16 @@ typedef struct {
 typedef struct {
     bool spawn_triggered;
     bool multi_triggered;
+    int target_group;
+    float follow_speed;
+    float follow_delay;
+    float follow_offset;
+    float follow_max_speed;
+} FollowPlayerYTrigger;
+
+typedef struct {
+    bool spawn_triggered;
+    bool multi_triggered;
     float trig_duration;
     int target_group;
     float trigger_opacity;
@@ -295,11 +305,13 @@ extern TriggerPool alpha_pool;
 extern TriggerPool pulse_pool;
 extern TriggerPool toggle_pool;
 extern TriggerPool spawn_pool;
+extern bool has_follow_player_y;
 
 ColorTrigger *get_color_trigger(int obj);
 PulseTrigger *get_pulse_trigger(int obj);
 AlphaTrigger *get_alpha_trigger(int obj);
 MoveTrigger *get_move_trigger(int obj);
+FollowPlayerYTrigger *get_follow_player_y_trigger(int obj);
 ToggleTrigger *get_toggle_trigger(int obj);
 SpawnTrigger *get_spawn_trigger(int obj);
 TextObject *get_text_object(int obj);

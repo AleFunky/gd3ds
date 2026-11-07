@@ -41,6 +41,7 @@ extern int move_trigger_count;
 extern int spawn_trigger_count;
 extern int pulse_trigger_count;
 extern int rotate_trigger_count;
+extern int follow_player_y_trigger_count;
 extern int rotate_trigger_capacity;
 
 typedef struct {
@@ -91,6 +92,18 @@ typedef struct {
     float seconds;
     float time_run;
 } MoveTriggerBuffer;
+
+typedef struct {
+    bool active;
+    bool restored_from_checkpoint;
+    int target_group;
+    int source_obj;
+    float speed;
+    float delay;
+    float offset;
+    float max_speed;
+    float group_y;
+} FollowPlayerYTriggerBuffer;
 
 typedef struct {
     bool active;
@@ -177,6 +190,7 @@ extern MoveTriggerBuffer *move_trigger_buffer;
 extern SpawnTriggerBuffer *spawn_trigger_buffer;
 extern PulseTriggerBuffer *pulse_trigger_buffer;
 extern RotateTriggerBuffer *rotate_trigger_buffer;
+extern FollowPlayerYTriggerBuffer *follow_player_y_trigger_buffer;
 RotateTrigger *get_rotate_trigger(int obj);
 extern float move_lock_player_x_delta;
 extern float move_lock_player_y_delta;
@@ -206,6 +220,7 @@ extern float trigger_dt;
 #define PULSE_TRIGGER 1006
 #define SPAWN_TRIGGER 1268
 #define ROTATE_TRIGGER 1346
+#define FOLLOW_PLAYER_Y_TRIGGER 1814
 #define HIDE_PLAYER_TRIGGER 1612
 #define SHOW_PLAYER_TRIGGER 1613
 
@@ -247,6 +262,8 @@ void upload_to_alpha_buffer(int obj);
 void handle_alpha_triggers(void);
 void upload_to_move_buffer(int obj);
 void handle_move_triggers(void);
+void upload_to_follow_player_y_buffer(int obj);
+void handle_follow_player_y_triggers(void);
 void handle_step_triggers(void);
 void upload_to_spawn_buffer(int obj, bool from_spawn);
 void handle_spawn_triggers(void);

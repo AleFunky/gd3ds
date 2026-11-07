@@ -46,6 +46,9 @@ int spawn_trigger_capacity = 0;
 RotateTriggerBuffer *rotate_trigger_buffer = NULL;
 int rotate_trigger_count = 0;
 int rotate_trigger_capacity = 0;
+FollowPlayerYTriggerBuffer *follow_player_y_trigger_buffer = NULL;
+int follow_player_y_trigger_count = 0;
+int follow_player_y_trigger_capacity = 0;
 
 PulseTriggerBuffer *pulse_trigger_buffer = NULL;
 int pulse_trigger_count = 0;
@@ -83,6 +86,23 @@ MoveTriggerBuffer *get_new_move_trigger() {
     }
     MoveTriggerBuffer *buffer = &move_trigger_buffer[move_trigger_count++];
     memset(buffer, 0, sizeof(MoveTriggerBuffer));
+    return buffer;
+}
+
+FollowPlayerYTriggerBuffer *get_new_follow_player_y_trigger() {
+    if (follow_player_y_trigger_count >= follow_player_y_trigger_capacity) {
+        size_t new_capacity = follow_player_y_trigger_capacity == 0 ? 32 : follow_player_y_trigger_capacity + 32;
+
+        FollowPlayerYTriggerBuffer *new_list = realloc(follow_player_y_trigger_buffer, new_capacity * sizeof(FollowPlayerYTriggerBuffer));
+        if (!new_list) {
+            return NULL;
+        }
+
+        follow_player_y_trigger_buffer = new_list;
+        follow_player_y_trigger_capacity = new_capacity;
+    }
+    FollowPlayerYTriggerBuffer *buffer = &follow_player_y_trigger_buffer[follow_player_y_trigger_count++];
+    memset(buffer, 0, sizeof(FollowPlayerYTriggerBuffer));
     return buffer;
 }
 
@@ -185,6 +205,7 @@ void free_trigger_buffers() {
     free(alpha_trigger_buffer);
     free(move_trigger_buffer);
     free(spawn_trigger_buffer);
+    free(follow_player_y_trigger_buffer);
 
     if (rotate_trigger_buffer) {
         for (int i = 0; i < rotate_trigger_count; i++) {
@@ -204,6 +225,7 @@ void free_trigger_buffers() {
     alpha_trigger_buffer = NULL;
     move_trigger_buffer = NULL;
     spawn_trigger_buffer = NULL;
+    follow_player_y_trigger_buffer = NULL;
     rotate_trigger_buffer = NULL;
     pulse_trigger_buffer = NULL;
 
@@ -213,6 +235,9 @@ void free_trigger_buffers() {
     move_trigger_count = 0;
     move_step_dt = 0.f;
     move_trigger_capacity = 0;
+
+    follow_player_y_trigger_count = 0;
+    follow_player_y_trigger_capacity = 0;
 
     spawn_trigger_count = 0;
     spawn_trigger_capacity = 0;
@@ -228,6 +253,27 @@ static unsigned int pulse_activation_counter = 0;
 float move_lock_player_x_delta = 0.0f;
 float move_lock_player_y_delta = 0.0f;
 float move_step_dt = 0.0f;
+
+static void player_follow_y_step(Player *player, float dt) {
+    if (player->follow_y_index == 0 && player->follow_y_timer == 0.f) {
+        for (int i = 0; i < FOLLOW_Y_SAMPLES; i++) player->follow_y[i] = player->y;
+    }
+    player->follow_y_timer += dt;
+    if (player->follow_y_timer >= FOLLOW_Y_INTERVAL) {
+        player->follow_y_timer -= FOLLOW_Y_INTERVAL;
+        player->follow_y_index++;
+    }
+    player->follow_y[player->follow_y_index % FOLLOW_Y_SAMPLES] = player->y;
+}
+
+static float player_follow_y_old(Player *player, float time_ago) {
+    if (time_ago <= 0.f) return player->y;
+    int index = (int)floorf(time_ago / FOLLOW_Y_INTERVAL);
+    if (index > FOLLOW_Y_SAMPLES - 1) index = FOLLOW_Y_SAMPLES - 1;
+    int i = (player->follow_y_index - index) % FOLLOW_Y_SAMPLES;
+    if (i < 0) i += FOLLOW_Y_SAMPLES;
+    return player->follow_y[i];
+}
 
 static int toggle_spawn_buffer[8];
 static int toggle_spawn_count = 0;
@@ -698,6 +744,33 @@ void upload_to_move_buffer(int obj) {
     buffer->active = true;
 }
 
+void upload_to_follow_player_y_buffer(int obj) {
+    FollowPlayerYTrigger *trigger = get_follow_player_y_trigger(obj);
+    GroupNode *group = get_group(trigger->target_group);
+    if (!group || group->count <= 0) return;
+
+    for (int i = 0; i < follow_player_y_trigger_count; i++) {
+        if (follow_player_y_trigger_buffer[i].active &&
+            follow_player_y_trigger_buffer[i].source_obj == obj &&
+            follow_player_y_trigger_buffer[i].restored_from_checkpoint) {
+            follow_player_y_trigger_buffer[i].restored_from_checkpoint = false;
+            return;
+        }
+    }
+
+    FollowPlayerYTriggerBuffer *buffer = get_new_follow_player_y_trigger();
+    if (!buffer) return;
+
+    buffer->target_group = trigger->target_group;
+    buffer->source_obj = obj;
+    buffer->speed = trigger->follow_speed > 0.f ? trigger->follow_speed : 1.f;
+    buffer->delay = trigger->follow_delay;
+    buffer->offset = trigger->follow_offset;
+    buffer->max_speed = trigger->follow_max_speed;
+    buffer->group_y = objects.y[group->objects[0]];
+    buffer->active = true;
+}
+
 void handle_move_triggers(void) {
     if (trigger_dt <= 0.f) return;
     move_step_dt = trigger_dt;
@@ -736,6 +809,28 @@ void handle_move_triggers(void) {
         }
         add_move_to_group_combinations(buffer->target_group, delta_x, delta_y);
         if (buffer->time_run >= buffer->seconds) buffer->active = false;
+    }
+
+    apply_group_combination_move();
+}
+
+void handle_follow_player_y_triggers(void) {
+    if (trigger_dt <= 0.f) return;
+    if (follow_player_y_trigger_count == 0) return;
+
+    begin_group_combination_move_step();
+
+    for (int slot = 0; slot < follow_player_y_trigger_count; slot++) {
+        FollowPlayerYTriggerBuffer *buffer = &follow_player_y_trigger_buffer[slot];
+        float target = player_follow_y_old(&state.player, buffer->delay) + buffer->offset;
+        float delta = (target - buffer->group_y) * buffer->speed;
+        if (buffer->max_speed > 0.f) {
+            float max_delta = buffer->max_speed * trigger_dt;
+            if (delta > max_delta) delta = max_delta;
+            else if (delta < -max_delta) delta = -max_delta;
+        }
+        buffer->group_y += delta;
+        add_move_to_group_combinations(buffer->target_group, 0.f, delta);
     }
 
     apply_group_combination_move();
@@ -1448,6 +1543,9 @@ void run_trigger(int obj, bool from_spawn) {
         case MOVE_TRIGGER:
             upload_to_move_buffer(obj);
             break;
+        case FOLLOW_PLAYER_Y_TRIGGER:
+            upload_to_follow_player_y_buffer(obj);
+            break;
         case ROTATE_TRIGGER:
             upload_to_rotate_buffer(obj);
             break;
@@ -1573,9 +1671,14 @@ void handle_triggers(void) {
 }
 
 void handle_step_triggers(void) {
+    if (has_follow_player_y) {
+        player_follow_y_step(&state.player, trigger_dt);
+        if (state.dual) player_follow_y_step(&state.player2, trigger_dt);
+    }
     handle_triggers();
     handle_spawn_triggers();
     handle_move_triggers();
+    handle_follow_player_y_triggers();
     handle_rotate_triggers();
 }
 

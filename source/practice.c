@@ -20,6 +20,7 @@
 extern int alpha_trigger_capacity;
 extern int move_trigger_capacity;
 extern int spawn_trigger_capacity;
+extern int follow_player_y_trigger_capacity;
 
 bool restored_checkpoint = false;
 
@@ -85,6 +86,7 @@ typedef struct CheckpointData {
     MoveTriggerBuffer *move_triggers;
     AlphaTriggerBuffer *alpha_triggers;
     SpawnTriggerBuffer *spawn_triggers;
+    FollowPlayerYTriggerBuffer *follow_triggers;
     RotateTriggerBuffer *rotate_triggers;
     RotateTargetState *rotate_targets;
     int *rotate_target_offsets;
@@ -92,6 +94,7 @@ typedef struct CheckpointData {
     int move_triggers_count;
     int alpha_triggers_count;
     int spawn_triggers_count;
+    int follow_triggers_count;
     int rotate_triggers_count;
     int rotate_targets_count;
     int rotate_obj_count;
@@ -437,6 +440,7 @@ void new_checkpoint() {
     CK_ADD(check->move_triggers,     MoveTriggerBuffer,  move_trigger_count);
     CK_ADD(check->alpha_triggers,    AlphaTriggerBuffer, alpha_trigger_count);
     CK_ADD(check->spawn_triggers,    SpawnTriggerBuffer, spawn_trigger_count);
+    CK_ADD(check->follow_triggers,   FollowPlayerYTriggerBuffer, follow_player_y_trigger_count);
     CK_ADD(check->rotate_triggers,   RotateTriggerBuffer, rotate_trigger_count);
     CK_ADD(check->rotate_targets,    RotateTargetState,   rotate_targets_total);
     CK_ADD(check->rotate_target_offsets, int,            rotate_trigger_count);
@@ -477,6 +481,7 @@ void new_checkpoint() {
     check->move_triggers_count  = move_trigger_count;
     check->alpha_triggers_count = alpha_trigger_count;
     check->spawn_triggers_count = spawn_trigger_count;
+    check->follow_triggers_count = follow_player_y_trigger_count;
     check->rotate_triggers_count = rotate_trigger_count;
     check->rotate_targets_count = rotate_targets_total;
     check->rotate_obj_count = 0;
@@ -525,6 +530,7 @@ void new_checkpoint() {
     if (check->move_triggers)  memcpy(check->move_triggers,  move_trigger_buffer,  sizeof(MoveTriggerBuffer)  * move_trigger_count);
     if (check->alpha_triggers) memcpy(check->alpha_triggers, alpha_trigger_buffer, sizeof(AlphaTriggerBuffer) * alpha_trigger_count);
     if (check->spawn_triggers) memcpy(check->spawn_triggers, spawn_trigger_buffer, sizeof(SpawnTriggerBuffer) * spawn_trigger_count);
+    if (check->follow_triggers) memcpy(check->follow_triggers, follow_player_y_trigger_buffer, sizeof(FollowPlayerYTriggerBuffer) * follow_player_y_trigger_count);
     if (check->rotate_triggers) memcpy(check->rotate_triggers, rotate_trigger_buffer, sizeof(RotateTriggerBuffer) * rotate_trigger_count);
 
     if (check->rotate_triggers) {
@@ -783,6 +789,16 @@ void restore_checkpoint() {
         }
     }
 
+    if (check->follow_triggers && check->follow_triggers_count > 0) {
+        FollowPlayerYTriggerBuffer *buf = realloc(follow_player_y_trigger_buffer, sizeof(FollowPlayerYTriggerBuffer) * check->follow_triggers_count);
+        if (buf) {
+            follow_player_y_trigger_buffer = buf;
+            follow_player_y_trigger_capacity = check->follow_triggers_count;
+            follow_player_y_trigger_count = check->follow_triggers_count;
+            memcpy(follow_player_y_trigger_buffer, check->follow_triggers, sizeof(FollowPlayerYTriggerBuffer) * check->follow_triggers_count);
+        }
+    }
+
     for (int i = 0; i < rotate_trigger_count; i++) {
         free(rotate_trigger_buffer[i].targets);
         rotate_trigger_buffer[i].targets = NULL;
@@ -821,6 +837,8 @@ void restore_checkpoint() {
         alpha_trigger_buffer[i].restored_from_checkpoint = alpha_trigger_buffer[i].active;
     for (int i = 0; i < spawn_trigger_count; i++)
         spawn_trigger_buffer[i].restored_from_checkpoint = spawn_trigger_buffer[i].active;
+    for (int i = 0; i < follow_player_y_trigger_count; i++)
+        follow_player_y_trigger_buffer[i].restored_from_checkpoint = follow_player_y_trigger_buffer[i].active;
     for (int i = 0; i < rotate_trigger_count; i++)
         rotate_trigger_buffer[i].restored_from_checkpoint = rotate_trigger_buffer[i].active;
 
