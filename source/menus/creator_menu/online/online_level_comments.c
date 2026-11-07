@@ -19,10 +19,8 @@
 #include "menus/creator_menu/external/external_popup.h"
 #include "menus/icon_kit.h"
 #include "menus/creator_menu/search_menu.h"
-#include "menus/creator_menu/online/online_menu.h"
 #include "menus/palette_kit.h"
 
-#include "state.h"
 #include "utils/utils.h"
 
 bool comments_need_refresh = true;

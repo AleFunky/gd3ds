@@ -238,7 +238,7 @@ static void main_menu_init(UIScreen *s){
     old_wide = settingsState.wideEnabled;
     old_stereo = settingsState.stereoEnabled;
 
-    if (!is_N3DS && is_3DSX && !is_citra()) {
+    if (!is_N3DS && is_3DSX) {
       InfoCardData *warning_data = malloc(sizeof(InfoCardData));
       if (!warning_data)
         return;

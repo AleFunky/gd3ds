@@ -1,14 +1,10 @@
 #pragma once
 #include <citro2d.h>
 #include "level_loading.h"
-#include "sounds.h"
 
 #include "particles/particles.h"
-#include "triggers.h"
 
 #include "save/saving.h"
-
-#include "github_info.h"
 
 #define CAM_SPEED 5.19300155f
 
@@ -34,9 +30,6 @@
 #define LAST_GD_VERSION_ID 97454394  // Last 2.1 id (skibidi level)
 
 #define GAME_TITLE_ID 0x000400000BB41C00
-
-// leave empty for main
-#define REPO_BRANCH "2.1"
 
 // When making a release, uncomment this please thanks
 // #define IS_RELEASE

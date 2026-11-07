@@ -555,6 +555,56 @@ int get_releases(GenericTask *task, char **out_data, char *repoOwner, char *repo
     return 2;
 }
 
+int get_actions(GenericTask *task, char **out_data, char *repoOwner, char *repoName, char *actionName) {
+    // Init
+    CURL *curl = curl_easy_init();
+    struct curl_slist *headers = NULL;
+
+    if (curl) {
+        struct MemoryStruct chunk;
+        chunk.memory = malloc(1);
+        chunk.size = 0;
+        headers = curl_slist_append(headers, "Accept: application/vnd.github+json");
+        headers = curl_slist_append(headers, "X-GitHub-Api_Version: 2026-03-10");
+
+        // github actually requires a useragent Whoops
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, "curl/8.4.0");
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
+        curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
+        curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
+        curl_easy_setopt(curl, CURLOPT_PROXY, "");
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+
+        char url[128];
+        snprintf(url, sizeof(url) - 1, "https://api.github.com/repos/%s/%s/actions/artifacts?name=%s", repoOwner, repoName, actionName);
+        curl_easy_setopt(curl, CURLOPT_URL, url);
+        
+        CURLcode code = curl_easy_perform(curl);
+        
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+
+        if (code) {
+            return code;
+        }
+
+        printf("(code %d) Response (%d): %s\n", code, chunk.size, chunk.memory);
+
+        if (chunk.memory[0] == '-') {
+            return atoi(chunk.memory);
+        }
+        
+        *out_data = chunk.memory;
+
+        return 0;
+    }
+    return 2;
+}
+
 Thread create_file_download_thread(DownloadTask *task) {
     int32_t priority = 0x30;
     svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);

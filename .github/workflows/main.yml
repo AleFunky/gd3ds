@@ -17,12 +17,16 @@ jobs:
         uses: actions/checkout@v7
         with:
           submodules: recursive
+      - name: Extract branch name
+        id: extract_branch
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
       - name: Get releases info
         id: releaseinfo
         uses: pozetroninc/github-action-get-latest-release@master
         with:
           repository: ${{ github.repository }}
-          excludes: prerelease, draft
+          excludes: prerelease
       - name: Generate github_info header file
         run: |
           cat > source/github_info.h <<EOF
@@ -31,6 +35,7 @@ jobs:
           #define CURRENT_COMMIT_HASH "${{ github.sha }}"
           #define REPO_AUTHOR "${{ github.repository_owner }}"
           #define REPO_NAME "${{ github.event.repository.name }}"
+          #define REPO_BRANCH "${{ steps.extract_branch.outputs.branch }}"
           #define CURRENT_LATEST_RELEASE_ID ${{ steps.releaseinfo.outputs.id }}
           EOF
       - name: Make application
@@ -51,12 +56,24 @@ jobs:
           name: gd3ds-3dsx
           path: out/3dsx/rom
           archive: false
+      - name: Publish 3dsx zip to GH Actions
+        uses: actions/upload-artifact@main
+        with:
+          name: gd3ds-3dsx-zip
+          path: out/3dsx/rom
+          archive: true
       - name: Publish cia to GH Actions
         uses: actions/upload-artifact@main
         with:
           name: gd3ds-cia
           path: out/cia/rom
           archive: false
+      - name: Publish cia zip to GH Actions
+        uses: actions/upload-artifact@main
+        with:
+          name: gd3ds-cia-zip
+          path: out/cia/rom
+          archive: true
       - name: Publish debug info to GH Actions
         uses: actions/upload-artifact@main
         with:
@@ -73,23 +90,6 @@ jobs:
             Latest nightly build from commit ${{ github.sha }}
           prerelease: true
           make_latest: true
-          files: |
-            out/3dsx/rom/*
-            out/cia/rom/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Create or update 2.0 nightly release
-        if: github.ref == 'refs/heads/2.0'
-        uses: softprops/action-gh-release@v3
-        with:
-          tag_name: nightly-2.0
-          name: Nightly 2.0
-          body: |
-            Latest 2.0 test build from commit ${{ github.sha }}
-            This is a dev build, therefore bugs and crashes are expected.
-            Enjoy!
-          prerelease: true
-          make_latest: false
           files: |
             out/3dsx/rom/*
             out/cia/rom/*

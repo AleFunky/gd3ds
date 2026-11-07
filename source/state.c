@@ -12,6 +12,7 @@
 #include "menus/settings_hub/settings.h"
 #include "menus/icon_kit.h"
 #include "practice.h"
+#include "sounds.h"
 #include "utils/json_config.h"
 #include "level/main_levels.h"
 #include "level_loading.h"
@@ -20,6 +21,7 @@
 
 #include "new_best.h"
 #include "endwall.h"
+#include "wav_player.h"
 
 #define FIRST_ATTEMPT_CAMERA_OFFSET 15
 #define PLAYER_CAMERA_X_OFFSET 125.0f

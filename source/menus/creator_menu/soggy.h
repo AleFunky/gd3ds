@@ -1,5 +1,5 @@
 #pragma once
-#include "menus/core/ui_stack.h"
+#include "menus/core/ui_screen.h"
 
 extern bool gotSogged;
 

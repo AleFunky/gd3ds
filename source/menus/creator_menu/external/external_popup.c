@@ -6,6 +6,7 @@
 #include "main.h"
 #include "menus/core/ui_element.h"
 #include "menus/settings_hub/info_card.h"
+#include "mp3_player.h"
 #include "state.h"
 #include "save/saving.h"
 #include "utils/string_helpers.h"

@@ -9,8 +9,6 @@
 #include "menus/components/ui_rectangle.h"
 #include "menus/components/ui_list.h"
 #include "menus/components/ui_label.h"
-#include "menus/components/ui_spinner.h"
-#include "menus/components/ui_window_button.h"
 #include "menus/settings_hub/info_card.h"
 #include "menus/updater.h"
 #include "menus/updater_pop_up.h"
@@ -18,7 +16,6 @@
 #include "fonts/chatFont.h"
 
 #include "utils/server_utils.h"
-#include "utils/string_helpers.h"
 #include "utils/utils.h"
 #include "utils/folders.h"
 
@@ -230,7 +227,6 @@ static void updater_init(UIScreen *s) {
     error_label = (UILabel *)ui_get_element_by_tag(s, "errorlabel");
     if (checkedForUpdate && update_data->isAvailable) {
         ui_disable_element((UIElement *) spinner);
-        // ui_label_set_text(error_label, update_data->releaseTitle);
         populate_info();
     } else {
         ui_disable_element((UIElement *) updater_button);
@@ -247,10 +243,9 @@ static void updater_update(UIScreen *s, UIInput *i) {
         if (updater_task.result == 0) {
             if (update_data->isAvailable) {
                 ui_enable_element((UIElement *) updater_button);
-                // ui_label_set_text(error_label, update_data->releaseTitle);
                 populate_info();
                 checkedForUpdate = true;
-            } else output_log("no updates found");
+            }
         } else {
             output_log(handle_updater_error_codes(updater_task.result));
             ui_label_set_text(error_label, handle_updater_error_codes(updater_task.result));

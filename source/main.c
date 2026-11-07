@@ -9,11 +9,13 @@
 #include <3ds.h>
 #include "3ds/svc.h"
 #include "c3d/renderqueue.h"
+#include <archive.h>
 #include "groups.h"
 #include "level_loading.h"
 #include "main.h"
 #include "graphics.h"
 #include "particles/rays.h"
+#include "sounds.h"
 #include "triggers.h"
 #include "menus/core/ui_element.h"
 #include "mp3_player.h"
