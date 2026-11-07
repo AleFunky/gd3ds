@@ -385,7 +385,7 @@ static float dash_orb_angle(int obj) {
 void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
     switch (objects.id[obj]) {
         case YELLOW_PAD:
-            if (!GET_ACTIVATED(obj)) {
+            if (!GET_ACTIVATED(obj) || ((objects.flags[obj] & FLAG_MULTI_ACTIVATE) && !GET_COLLIDED(obj))) {
                 if (state.show_player) MotionTrail_ResumeStroke(trail);
                 player->vel_y = jump_heights_table[state.speed][JUMP_YELLOW_PAD][player->gamemode][player->mini];
                 player->on_ground = false;
@@ -405,7 +405,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             }
             break;
         case PINK_PAD:
-            if (!GET_ACTIVATED(obj)) {
+            if (!GET_ACTIVATED(obj) || ((objects.flags[obj] & FLAG_MULTI_ACTIVATE) && !GET_COLLIDED(obj))) {
                 if (state.show_player) MotionTrail_ResumeStroke(trail);
                 player->vel_y = jump_heights_table[state.speed][JUMP_PINK_PAD][player->gamemode][player->mini];
                 player->on_ground = false;
@@ -425,7 +425,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             }
             break;
         case RED_PAD:
-            if (!GET_ACTIVATED(obj)) {
+            if (!GET_ACTIVATED(obj) || ((objects.flags[obj] & FLAG_MULTI_ACTIVATE) && !GET_COLLIDED(obj))) {
                 if (state.show_player) MotionTrail_ResumeStroke(trail);
                 player->vel_y = jump_heights_table[state.speed][JUMP_RED_PAD][player->gamemode][player->mini];
                 player->on_ground = false;
@@ -447,7 +447,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case BLUE_PAD:
             if (GET_ACTIVATED(obj)) player->gravObj_id = obj;
-            else {
+            if (!GET_ACTIVATED(obj) || ((objects.flags[obj] & FLAG_MULTI_ACTIVATE) && !GET_COLLIDED(obj))) {
                 float rotation = adjust_angle(objects.rotation[obj], objects.flippedV[obj], objects.flippedH[obj]);
                 if ((rotation < 90 || rotation > 270) && player->upside_down)
                     break;
@@ -487,7 +487,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case YELLOW_ORB:
             if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
                 if (state.show_player) MotionTrail_ResumeStroke(trail);
                 player->vel_y = jump_heights_table[state.speed][JUMP_YELLOW_ORB][player->gamemode][player->mini];
                 
@@ -519,7 +519,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case PINK_ORB:
             if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
                 if (state.show_player) MotionTrail_ResumeStroke(trail);
                 player->vel_y = jump_heights_table[state.speed][JUMP_PINK_ORB][player->gamemode][player->mini];
                 
@@ -551,7 +551,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case RED_ORB:
             if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
                 if (state.show_player) MotionTrail_ResumeStroke(trail);
                 player->vel_y = jump_heights_table[state.speed][JUMP_RED_ORB][player->gamemode][player->mini];
                 
@@ -584,7 +584,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case BLACK_ORB:
             if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
                 if (state.show_player) MotionTrail_ResumeStroke(trail);
                 float black_vel = (player->gamemode == GAMEMODE_UFO) ? -604.8f : (player_gamemode_is_flying(player) ? -756.f : -810.f);
                 player->vel_y = black_vel;
@@ -618,7 +618,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case DASH_ORB:
             if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY && !player->dashing) {
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY && !player->dashing) {
                 if (player->gamemode != GAMEMODE_WAVE) MotionTrail_StopStroke(trail);
 
                 player->on_ground = false;
@@ -650,7 +650,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case GRAVITY_DASH_ORB:
             if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY && !player->dashing) {
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY && !player->dashing) {
                 player->ceiling_inv_time = CEILING_INVUL_TIME;
                 if (player->gamemode != GAMEMODE_BALL && state.show_player) MotionTrail_ResumeStroke(trail);
                 if (player->gamemode == GAMEMODE_WAVE) MotionTrail_AddWavePoint(wave_trail);
@@ -695,7 +695,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         case BLUE_ORB:
             if (GET_ACTIVATED(obj)) player->gravObj_id = obj;
             if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {    
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {    
                 if (state.show_player) MotionTrail_ResumeStroke(trail);
                 if (player->gamemode == GAMEMODE_WAVE) MotionTrail_AddWavePoint(wave_trail);
                 player->gravObj_id = obj;
@@ -734,7 +734,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         case GREEN_ORB:
             if (GET_ACTIVATED(obj)) player->gravObj_id = obj;
             if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
                 if (state.show_player) MotionTrail_ResumeStroke(trail);
                 player->gravObj_id = obj;
 

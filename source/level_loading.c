@@ -1008,6 +1008,7 @@ GDValueType get_value_type_for_key(int key) {
         case 129: return GD_VAL_FLOAT; // scale Y
         case 57: return GD_VAL_INT_ARRAY; // groups
         case 504: return GD_VAL_BOOL;   // spawn only (toggle orb)
+        case 99: return GD_VAL_BOOL;   // multi activate
         default:
             return GD_VAL_INT; // Default fallback
     }
@@ -1552,6 +1553,11 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
         case 504:
             if (type == GD_VAL_BOOL && objects.id[object] == TOGGLE_ORB) {
                 get_toggle_trigger(object)->spawn_only = val.b;
+            }
+            break;
+        case 99:
+            if (type == GD_VAL_BOOL) {
+                objects.flags[object] |= val.b ? FLAG_MULTI_ACTIVATE : 0;
             }
             break;
     }

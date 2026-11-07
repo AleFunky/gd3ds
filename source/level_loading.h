@@ -140,7 +140,8 @@ typedef enum {
     FLAG_TOGGLED    = (1 << 0),
     FLAG_DONT_FADE  = (1 << 1),
     FLAG_DONT_ENTER = (1 << 2),
-    FLAG_CAN_BE_X_MOVED = (1 << 3)
+    FLAG_CAN_BE_X_MOVED = (1 << 3),
+    FLAG_MULTI_ACTIVATE = (1 << 4)
 } ObjectFlags;
 
 typedef struct {
