@@ -766,7 +766,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         case 1594:
             if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
+            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && (player->buffering_state == BUFFER_READY || curr_input.pressedJump)) {
                 ToggleTrigger *trigger = get_toggle_trigger(obj);
 
                 if (trigger->spawn_only) spawn_group(trigger->target_group);
