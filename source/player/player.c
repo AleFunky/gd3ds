@@ -401,7 +401,25 @@ void ship_gamemode(Player *player) {
     drag_particles_2[state.current_player].gravityFlipped = !player->upside_down;
     drag_particles_2[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
 
-    if (state.dual) {
+    player->min_vel = player->mini ? -406.566f : -345.6f;
+    player->max_vel = player->mini ? 508.248f : 432.0f;
+
+    if (player->velocity_uncapped) {
+        if ((player->vel_y >= 0.f && player->vel_y < player->max_vel) ||
+            (player->vel_y <= 0.f && player->vel_y > player->min_vel)) {
+            player->velocity_uncapped = false;
+        }
+    }
+
+    if (player->velocity_uncapped) {
+        float threshold = state.dual ? -velocity_thresholds[state.speed] : grav(player, velocity_thresholds[state.speed]);
+        bool legacy_falling = player->vel_y <= threshold;
+        float ship_mod = (player->vel_y < 0.f) ? -1.f : 0.8f;
+        if (!curr_input.holdJump && !legacy_falling) ship_mod = 1.2f;
+        float boost = (curr_input.holdJump && legacy_falling) ? 0.5f : 0.4f;
+        player->gravity = -ship_mod * boost * (player->mini ? 3287.186216f : 2794.108284f);
+        if (curr_input.holdJump) player->buffering_state = BUFFER_END;
+    } else if (state.dual) {
         // Make both dual players symmetric by using inverted ship gravity
         if (curr_input.holdJump) {
             player->buffering_state = BUFFER_END;
@@ -429,9 +447,6 @@ void ship_gamemode(Player *player) {
                 player->gravity = player->mini ? -1051.8984f : -894.11464f;
         }
     }
-    
-    player->min_vel = player->mini ? -406.566f : -345.6f;
-    player->max_vel = player->mini ? 508.248f : 432.0f;
 
     if (!player->velocity_uncapped) {
         if (player->gravity < 0 && player->vel_y < player->min_vel) {
