@@ -48,6 +48,7 @@ TriggerPool move_pool;
 static TriggerPool count_pool;
 static TriggerPool instant_count_pool;
 TriggerPool follow_player_y_pool;
+static TriggerPool follow_pool;
 static TriggerPool counter_label_pool;
 static TriggerPool pickup_pool;
 bool has_follow_player_y = false;
@@ -108,6 +109,10 @@ static PickupItem *ensure_pickup_item(int obj) {
 
 FollowPlayerYTrigger *get_follow_player_y_trigger(int obj) {
     return TRIGGER_AT(follow_player_y_pool, FollowPlayerYTrigger, objects.trigger_index[obj]);
+}
+
+FollowTrigger *get_follow_trigger(int obj) {
+    return TRIGGER_AT(follow_pool, FollowTrigger, objects.trigger_index[obj]);
 }
 
 RotateTrigger *get_rotate_trigger(int obj) {
@@ -1042,6 +1047,8 @@ GDValueType get_value_type_for_key(int key) {
         case 69: return GD_VAL_INT;    // rotate times360
         case 70: return GD_VAL_BOOL;   // rotate lock object rotation
         case 71: return GD_VAL_INT;    // rotate center group
+        case 72: return GD_VAL_FLOAT;  // follow x mod
+        case 73: return GD_VAL_FLOAT;  // follow y mod
         case 77: return GD_VAL_INT;    // target count (count/instant count)
         case 78: return GD_VAL_BOOL;   // sub count (collectible, 2.1)
         case 79: return GD_VAL_BOOL;   // pickup item (2.1)
@@ -1119,6 +1126,12 @@ int allocate_trigger_component(int obj) {
         case FOLLOW_PLAYER_Y_TRIGGER:
             has_follow_player_y = true;
             index = trigger_pool_add(&follow_player_y_pool, sizeof(FollowPlayerYTrigger));
+            if (index >= 0) {
+                objects.trigger_index[obj] = index;
+            }
+            break;
+        case FOLLOW_TRIGGER:
+            index = trigger_pool_add(&follow_pool, sizeof(FollowTrigger));
             if (index >= 0) {
                 objects.trigger_index[obj] = index;
             }
@@ -1281,6 +1294,9 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                             break;
                         case ROTATE_TRIGGER:
                             get_rotate_trigger(object)->trig_duration = val.f;
+                            break;
+                        case FOLLOW_TRIGGER:
+                            get_follow_trigger(object)->trig_duration = val.f;
                             break;
                     }
                 }
@@ -1457,6 +1473,9 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                         case FOLLOW_PLAYER_Y_TRIGGER:
                             get_follow_player_y_trigger(object)->target_group = val.i;
                             break;
+                        case FOLLOW_TRIGGER:
+                            get_follow_trigger(object)->target_group = val.i;
+                            break;
                         case ALPHA_TRIGGER:
                             get_alpha_trigger(object)->target_group = val.i;
                             break;
@@ -1521,6 +1540,9 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                             break;
                         case FOLLOW_PLAYER_Y_TRIGGER:
                             get_follow_player_y_trigger(object)->spawn_triggered = val.b;
+                            break;
+                        case FOLLOW_TRIGGER:
+                            get_follow_trigger(object)->spawn_triggered = val.b;
                             break;
                         case ALPHA_TRIGGER:
                             get_alpha_trigger(object)->spawn_triggered = val.b;
@@ -1590,6 +1612,18 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
         case 71:
             if (type == GD_VAL_INT && objects.id[object] == ROTATE_TRIGGER) {
                 get_rotate_trigger(object)->center_group = val.i;
+            } else if (type == GD_VAL_INT && objects.id[object] == FOLLOW_TRIGGER) {
+                get_follow_trigger(object)->follow_group = val.i;
+            }
+            break;
+        case 72:
+            if (type == GD_VAL_FLOAT && objects.id[object] == FOLLOW_TRIGGER) {
+                get_follow_trigger(object)->x_mod = val.f;
+            }
+            break;
+        case 73:
+            if (type == GD_VAL_FLOAT && objects.id[object] == FOLLOW_TRIGGER) {
+                get_follow_trigger(object)->y_mod = val.f;
             }
             break;
         case 85:
@@ -1610,6 +1644,9 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                             break;
                         case FOLLOW_PLAYER_Y_TRIGGER:
                             get_follow_player_y_trigger(object)->multi_triggered = val.b;
+                            break;
+                        case FOLLOW_TRIGGER:
+                            get_follow_trigger(object)->multi_triggered = val.b;
                             break;
                         case ALPHA_TRIGGER:
                             get_alpha_trigger(object)->multi_triggered = val.b;
@@ -1799,7 +1836,8 @@ bool is_complex_trigger_object(int id) {
         || id == ROTATE_TRIGGER
         || id == COUNT_TRIGGER
         || id == INSTANT_COUNT_TRIGGER
-        || id == FOLLOW_PLAYER_Y_TRIGGER;
+        || id == FOLLOW_PLAYER_Y_TRIGGER
+        || id == FOLLOW_TRIGGER;
 }
 
 // Triggers that aren't configurable but have spawn triggered option
@@ -1836,6 +1874,7 @@ bool trigger_is_spawn_triggered(int id, int obj) {
         case COUNT_TRIGGER:  return get_count_trigger(obj)->spawn_triggered;
         case INSTANT_COUNT_TRIGGER: return get_instant_count_trigger(obj)->spawn_triggered;
         case FOLLOW_PLAYER_Y_TRIGGER: return get_follow_player_y_trigger(obj)->spawn_triggered;
+        case FOLLOW_TRIGGER: return get_follow_trigger(obj)->spawn_triggered;
         case ALPHA_TRIGGER:  return get_alpha_trigger(obj)->spawn_triggered;
         case PULSE_TRIGGER:  return get_pulse_trigger(obj)->spawn_triggered;
         case TOGGLE_TRIGGER: return get_toggle_trigger(obj)->spawn_triggered;
@@ -1853,6 +1892,7 @@ bool trigger_is_multi_triggered(int id, int obj) {
         case COUNT_TRIGGER:  return get_count_trigger(obj)->multi_triggered;
         case INSTANT_COUNT_TRIGGER: return get_instant_count_trigger(obj)->multi_triggered;
         case FOLLOW_PLAYER_Y_TRIGGER: return get_follow_player_y_trigger(obj)->multi_triggered;
+        case FOLLOW_TRIGGER: return get_follow_trigger(obj)->multi_triggered;
         case ALPHA_TRIGGER:  return get_alpha_trigger(obj)->multi_triggered;
         case PULSE_TRIGGER:  return get_pulse_trigger(obj)->multi_triggered;
         case TOGGLE_TRIGGER: return get_toggle_trigger(obj)->multi_triggered;
@@ -2021,6 +2061,7 @@ void free_arrays() {
     free(counter_label_pool.data);
     free(pickup_pool.data);
     free(follow_player_y_pool.data);
+    free(follow_pool.data);
     free(alpha_pool.data);
     free(pulse_pool.data);
     free(toggle_pool.data);
@@ -2035,6 +2076,7 @@ void free_arrays() {
     counter_label_pool = (TriggerPool){0};
     pickup_pool = (TriggerPool){0};
     follow_player_y_pool = (TriggerPool){0};
+    follow_pool = (TriggerPool){0};
     alpha_pool = (TriggerPool){0};
     pulse_pool = (TriggerPool){0};
     toggle_pool = (TriggerPool){0};

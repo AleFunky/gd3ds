@@ -123,6 +123,16 @@ typedef struct {
 typedef struct {
     bool spawn_triggered;
     bool multi_triggered;
+    int target_group;
+    int follow_group;
+    float x_mod;
+    float y_mod;
+    float trig_duration;
+} FollowTrigger;
+
+typedef struct {
+    bool spawn_triggered;
+    bool multi_triggered;
     float trig_duration;
     int target_group;
     float trigger_opacity;
@@ -355,6 +365,7 @@ InstantCountTrigger *get_instant_count_trigger(int obj);
 CounterLabel *get_counter_label(int obj);
 PickupItem *get_pickup_item(int obj);
 FollowPlayerYTrigger *get_follow_player_y_trigger(int obj);
+FollowTrigger *get_follow_trigger(int obj);
 ToggleTrigger *get_toggle_trigger(int obj);
 SpawnTrigger *get_spawn_trigger(int obj);
 TextObject *get_text_object(int obj);

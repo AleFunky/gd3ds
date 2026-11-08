@@ -33,8 +33,6 @@ int channels_used[COL_CHANNEL_NUM];
 typedef struct {
     int source_obj;
     float time_run;
-    unsigned int activation_order;
-    bool started_fade_out;
 } PulseSnapshot;
 
 typedef struct {
@@ -87,6 +85,7 @@ typedef struct CheckpointData {
     AlphaTriggerBuffer *alpha_triggers;
     SpawnTriggerBuffer *spawn_triggers;
     FollowPlayerYTriggerBuffer *follow_triggers;
+    FollowTriggerBuffer *follow_trigger_buffers;
     RotateTriggerBuffer *rotate_triggers;
     RotateTargetState *rotate_targets;
     int *rotate_target_offsets;
@@ -101,6 +100,7 @@ typedef struct CheckpointData {
     int alpha_triggers_count;
     int spawn_triggers_count;
     int follow_triggers_count;
+    int follow_trigger_buffers_count;
     int rotate_triggers_count;
     int rotate_targets_count;
     int rotate_obj_count;
@@ -462,6 +462,7 @@ void new_checkpoint() {
     CK_ADD(check->alpha_triggers,    AlphaTriggerBuffer, alpha_trigger_count);
     CK_ADD(check->spawn_triggers,    SpawnTriggerBuffer, spawn_trigger_count);
     CK_ADD(check->follow_triggers,   FollowPlayerYTriggerBuffer, follow_player_y_trigger_count);
+    CK_ADD(check->follow_trigger_buffers, FollowTriggerBuffer, follow_trigger_count);
     CK_ADD(check->rotate_triggers,   RotateTriggerBuffer, rotate_trigger_count);
     CK_ADD(check->rotate_targets,    RotateTargetState,   rotate_targets_total);
     CK_ADD(check->rotate_target_offsets, int,            rotate_trigger_count);
@@ -506,6 +507,7 @@ void new_checkpoint() {
     check->alpha_triggers_count = alpha_trigger_count;
     check->spawn_triggers_count = spawn_trigger_count;
     check->follow_triggers_count = follow_player_y_trigger_count;
+    check->follow_trigger_buffers_count = follow_trigger_count;
     check->rotate_triggers_count = rotate_trigger_count;
     check->rotate_targets_count = rotate_targets_total;
     check->rotate_obj_count = 0;
@@ -558,6 +560,7 @@ void new_checkpoint() {
     if (check->alpha_triggers) memcpy(check->alpha_triggers, alpha_trigger_buffer, sizeof(AlphaTriggerBuffer) * alpha_trigger_count);
     if (check->spawn_triggers) memcpy(check->spawn_triggers, spawn_trigger_buffer, sizeof(SpawnTriggerBuffer) * spawn_trigger_count);
     if (check->follow_triggers) memcpy(check->follow_triggers, follow_player_y_trigger_buffer, sizeof(FollowPlayerYTriggerBuffer) * follow_player_y_trigger_count);
+    if (check->follow_trigger_buffers) memcpy(check->follow_trigger_buffers, follow_trigger_buffer, sizeof(FollowTriggerBuffer) * follow_trigger_count);
     if (check->rotate_triggers) memcpy(check->rotate_triggers, rotate_trigger_buffer, sizeof(RotateTriggerBuffer) * rotate_trigger_count);
     if (check->count_items) memcpy(check->count_items, item_counter_buffer, sizeof(ItemCount) * item_counter_count);
     if (check->count_triggers) memcpy(check->count_triggers, count_trigger_buffer, sizeof(CountTriggerBuffer) * count_trigger_count);
@@ -734,8 +737,6 @@ void new_checkpoint() {
             if (!pb->active) continue;
             check->pulse_snap[n].source_obj = pb->source_obj;
             check->pulse_snap[n].time_run = pb->time_run;
-            check->pulse_snap[n].activation_order = pb->activation_order;
-            check->pulse_snap[n].started_fade_out = pb->started_fade_out;
             n++;
         }
         check->pulse_snap_count = n;
@@ -834,6 +835,17 @@ void restore_checkpoint() {
         }
     }
 
+    follow_trigger_count = 0;
+    if (check->follow_trigger_buffers && check->follow_trigger_buffers_count > 0) {
+        FollowTriggerBuffer *buf = realloc(follow_trigger_buffer, sizeof(FollowTriggerBuffer) * check->follow_trigger_buffers_count);
+        if (buf) {
+            follow_trigger_buffer = buf;
+            follow_trigger_capacity = check->follow_trigger_buffers_count;
+            follow_trigger_count = check->follow_trigger_buffers_count;
+            memcpy(follow_trigger_buffer, check->follow_trigger_buffers, sizeof(FollowTriggerBuffer) * check->follow_trigger_buffers_count);
+        }
+    }
+
     for (int i = 0; i < rotate_trigger_count; i++) {
         free(rotate_trigger_buffer[i].targets);
         rotate_trigger_buffer[i].targets = NULL;
@@ -915,6 +927,8 @@ void restore_checkpoint() {
         spawn_trigger_buffer[i].restored_from_checkpoint = spawn_trigger_buffer[i].active;
     for (int i = 0; i < follow_player_y_trigger_count; i++)
         follow_player_y_trigger_buffer[i].restored_from_checkpoint = follow_player_y_trigger_buffer[i].active;
+    for (int i = 0; i < follow_trigger_count; i++)
+        follow_trigger_buffer[i].restored_from_checkpoint = follow_trigger_buffer[i].active;
     for (int i = 0; i < rotate_trigger_count; i++)
         rotate_trigger_buffer[i].restored_from_checkpoint = rotate_trigger_buffer[i].active;
 
@@ -976,14 +990,20 @@ void restore_checkpoint() {
         objects.flags[check->key_index[i]] |= FLAG_TOGGLED;
     }
 
-    for (int i = 0; i < check->pulse_snap_count; i++) {
-        PulseTrigger *pt = get_pulse_trigger(check->pulse_snap[i].source_obj);
-        if (pt->pulse_target_type == PULSE_TARGET_CHANNEL)
-            channels[get_col_channel_index(pt->target_group)].num_pulses = 0;
+    pulse_trigger_count = 0;
+    for (int i = 0; i < objects.count; i++) {
+        objects.num_main_pulses[i] = 0;
+        objects.num_detail_pulses[i] = 0;
+        objects.main_being_pulsed[i] = false;
+        objects.detail_being_pulsed[i] = false;
     }
+    for (int i = 0; i < COL_CHANNEL_NUM; i++) {
+        channels[i].num_pulses = 0;
+    }
+
     for (int i = 0; i < check->pulse_snap_count; i++) {
         PulseSnapshot *ps = &check->pulse_snap[i];
-        restore_pulse_trigger(ps->source_obj, ps->time_run, ps->activation_order, ps->started_fade_out);
+        restore_pulse_trigger(ps->source_obj, ps->time_run);
     }
 
     update_attempt_text_pos();

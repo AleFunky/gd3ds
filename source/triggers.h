@@ -131,6 +131,21 @@ typedef struct {
 
 typedef struct {
     bool active;
+    bool restored_from_checkpoint;
+    int target_group;
+    int follow_group;
+    int source_obj;
+    int ref_obj;
+    float x_mod;
+    float y_mod;
+    float seconds;
+    float time_run;
+    float last_x;
+    float last_y;
+} FollowTriggerBuffer;
+
+typedef struct {
+    bool active;
     bool queued;
     bool restored_from_checkpoint;
     int target_group;
@@ -161,13 +176,9 @@ typedef struct {
     int pulse_target_type;
     bool main_only;
     bool detail_only;
-    bool started_fade_out;
     int pulse_index;
-    int *main_pulse_index;
-    int *detail_pulse_index;
     float seconds;
     float time_run;
-    unsigned int activation_order;
 
     int source_obj;
     bool restored_from_checkpoint;
@@ -208,7 +219,7 @@ typedef struct {
 } RotateTriggerBuffer;
 
 void free_trigger_buffers();
-void restore_pulse_trigger(int obj, float time_run, unsigned int activation_order, bool started_fade_out);
+void restore_pulse_trigger(int obj, float time_run);
 
 extern ColorChannel channels[COL_CHANNEL_NUM];
 extern ColTriggerBuffer col_trigger_buffer[COL_CHANNEL_NUM];
@@ -218,6 +229,9 @@ extern SpawnTriggerBuffer *spawn_trigger_buffer;
 extern PulseTriggerBuffer *pulse_trigger_buffer;
 extern RotateTriggerBuffer *rotate_trigger_buffer;
 extern FollowPlayerYTriggerBuffer *follow_player_y_trigger_buffer;
+extern FollowTriggerBuffer *follow_trigger_buffer;
+extern int follow_trigger_count;
+extern int follow_trigger_capacity;
 RotateTrigger *get_rotate_trigger(int obj);
 extern float move_lock_player_x_delta;
 extern float move_lock_player_y_delta;
@@ -249,6 +263,7 @@ extern float trigger_dt;
 #define PULSE_TRIGGER 1006
 #define SPAWN_TRIGGER 1268
 #define ROTATE_TRIGGER 1346
+#define FOLLOW_TRIGGER 1347
 #define FOLLOW_PLAYER_Y_TRIGGER 1814
 #define HIDE_PLAYER_TRIGGER 1612
 #define SHOW_PLAYER_TRIGGER 1613
@@ -297,6 +312,8 @@ void upload_to_count_buffer(int obj);
 void handle_count_triggers(void);
 void upload_to_follow_player_y_buffer(int obj);
 void handle_follow_player_y_triggers(void);
+void upload_to_follow_buffer(int obj);
+void handle_follow_triggers(void);
 void handle_step_triggers(void);
 void upload_to_spawn_buffer(int obj, bool from_spawn);
 void handle_spawn_triggers(void);

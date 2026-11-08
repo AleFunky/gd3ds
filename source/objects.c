@@ -6765,7 +6765,7 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
 /* Object 1344 */ { 1739, 43, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1344, 0, NULL, 0, NULL, 0, NULL, hitbox_1344 },
 /* Object 1345 */ { 1741, 45, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1345, 0, NULL, 0, NULL, 0, NULL, hitbox_1345 },
 /* Object 1346 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
-/* Object 1347 */ { -1, -1, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
+/* Object 1347 */ { -1, -1, 0.00, 5.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1348 */ { 1450, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1348, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1349 */ { 1452, -1, 1.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1349, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 1350 */ { 1454, -1, 0.00, -2.00, 1, -7, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children_1350, 0, NULL, 0, NULL, 0, NULL, NULL },
