@@ -2,6 +2,7 @@
 #include <citro2d.h>
 #include <math.h>
 #include "c2d/base.h"
+#include "math_helpers.h"
 #include "menus/core/ui_element.h"
 #include "menus/core/ui_screen.h"
 #include "menus/core/ui_stack.h"
@@ -425,7 +426,10 @@ void gameplay_init(UIScreen *s) {
 
 void gameplay_update_top(UIScreen *s, UIInput *touch) { 
     decimal = 0;
-    fps = delta * 1000.f;
+    float cpu_fps = 1000.f / (delta * 1000);
+    float gpu_fps = (16.667f / C3D_GetDrawingTime()) * 60;
+    // float gpu_fps = 351.f;
+    fps = settingsState.vsync ? cpu_fps : MIN(cpu_fps, gpu_fps);
     if (settingsState.decimalPercent) decimal = 2;
     if (settingsState.ultraDecimalPercent) decimal = MAX_DECIMAL_PERCENT;
 
@@ -442,7 +446,7 @@ void gameplay_update_top(UIScreen *s, UIInput *touch) {
         percent->base.scaleY = 0.45f;
     };
     // update fps counter but only when game isnt paused cuz otherwise it shows like a bajillion frame per sec ond
-    if(!game_paused) snprintf(fps_label->text, 32, "<#FFFFFF55>FPS: %.*f</>", 0, fps > 0 ? 1000.f / fps : 0.f);
+    if(!game_paused) snprintf(fps_label->text, 32, "<#FFFFFF55>FPS: %.*f</>", 0, fps);
 
     progress_bar->value = state.level_progress;
     snprintf(percent->text, 32, "%.*f%%", decimal, state.level_progress);
