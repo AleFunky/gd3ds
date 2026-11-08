@@ -123,6 +123,10 @@ bool is_spike_slope(int obj) {
         case 364:
         case 366:
         case 367:
+        case 1717:
+        case 1718:
+        case 1723:
+        case 1724:
             return true;
     }
     return false;

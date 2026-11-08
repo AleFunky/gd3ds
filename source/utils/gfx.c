@@ -538,7 +538,7 @@ void compute_mitered_offsets(Vec2D *poly, Vec2D *offsets, int n, float thickness
     }
 }
 
-void draw_polygon_inward_mitered(Vec2D *poly, int n, float thickness, u32 color) {
+void draw_polygon_inward_mitered(Vec2D *poly, int n, float thickness, u32 *color) {
     bool ccw = is_ccw(poly, n);
 
     Vec2D offsets[n];
@@ -559,17 +559,17 @@ void draw_polygon_inward_mitered(Vec2D *poly, int n, float thickness, u32 color)
 
         // Triangle 1
         C2D_DrawTriangle(
-            x1, y1, color,
-            x2, y2, color,
-            ox2, oy2, color,
+            x1, y1, color[i],
+            x2, y2, color[i],
+            ox2, oy2, color[i],
             0.0f
         );
 
         // Triangle 2
         C2D_DrawTriangle(
-            ox2, oy2, color,
-            ox1, oy1, color,
-            x1, y1, color,
+            ox2, oy2, color[i],
+            ox1, oy1, color[i],
+            x1, y1, color[i],
             0.0f
         );
     }
