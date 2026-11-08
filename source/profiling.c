@@ -6,6 +6,7 @@
 #include "main.h"
 #include "math_helpers.h"
 #include "menus/core/ui_screen.h"
+#include "menus/settings_hub/settings.h"
 #include "state.h"
 
 ProfilerSnapshot snapshot;
@@ -338,7 +339,7 @@ static void draw_memory_page() {
 }
 
 void profiler_update(ProfilerUpdateData data) {
-    snapshot.frame_ms = delta * 1000.f;
+    snapshot.frame_ms = settingsState.vsync ? delta * 1000.f : MAX(delta * 1000.f, C3D_GetDrawingTime());
     snapshot.cpu_ms = data.processingTime + C3D_GetProcessingTime();
     snapshot.gpu_ms = C3D_GetDrawingTime();
 
