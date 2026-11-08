@@ -381,12 +381,11 @@ static float dash_orb_angle(int obj) {
     return angle;
 }
 
-static bool collect_pickup_item(int obj) {
+static void collect_pickup_item(int obj) {
     PickupItem *pickup = get_pickup_item(obj);
-    if (!pickup || !pickup->is_pickup || (objects.flags[obj] & FLAG_TOGGLED) || (objects.activated[obj] & 3)) return false;
-    add_item_count(pickup->item_id, 1);
-    objects.activated[obj] = 3;
-    return true;
+    output_log("pickup %d is_pickup %d toggled %d\n", pickup, (pickup ? pickup->is_pickup : -1), objects.flags[obj] & FLAG_TOGGLED);
+    if (!pickup || !pickup->is_pickup || (objects.flags[obj] & FLAG_TOGGLED)) return;
+    add_item_count(pickup->item_id, (pickup->sub_count ? -1 : 1));
 }
 
 static void spawn_collectable_fx(int obj) {
@@ -430,7 +429,11 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             }
             break;
         case SMALL_COIN:
-            if (collect_pickup_item(obj)) objects.flags[obj] |= FLAG_TOGGLED;
+            if (!GET_ACTIVATED(obj)) {
+                collect_pickup_item(obj);
+                SET_ACTIVATED(obj, true);
+                objects.flags[obj] |= FLAG_TOGGLED;
+            }
             break;
         case YELLOW_PAD:
             if (!GET_ACTIVATED(obj) || ((objects.flags[obj] & FLAG_MULTI_ACTIVATE) && !GET_COLLIDED(obj))) {

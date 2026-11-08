@@ -323,7 +323,7 @@ void set_checkpoint_timer(float timer) {
 
 static bool is_checkpoint_pickup(int obj) {
     PickupItem *pickup = get_pickup_item(obj);
-    return pickup && pickup->is_pickup && objects.id[obj] != KEY_OBJ;
+    return pickup && objects.id[obj] != KEY_OBJ;
 }
 
 static bool is_collected_pickup(int obj) {
@@ -868,7 +868,7 @@ void restore_checkpoint() {
 
     for (int i = 0; i < objects.count; i++) {
         PickupItem *pickup = get_pickup_item(i);
-        if (pickup && pickup->is_pickup) {
+        if (pickup) {
             objects.flags[i] &= ~FLAG_TOGGLED;
             objects.activated[i] = 0;
         }

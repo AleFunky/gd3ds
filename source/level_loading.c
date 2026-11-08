@@ -1043,6 +1043,7 @@ GDValueType get_value_type_for_key(int key) {
         case 70: return GD_VAL_BOOL;   // rotate lock object rotation
         case 71: return GD_VAL_INT;    // rotate center group
         case 77: return GD_VAL_INT;    // target count (count/instant count)
+        case 78: return GD_VAL_BOOL;   // sub count (collectible, 2.1)
         case 79: return GD_VAL_BOOL;   // pickup item (2.1)
         case 80: return GD_VAL_INT;    // item ID (pickup/count/counter label)
         case 85: return GD_VAL_FLOAT;  // easing rate
@@ -1647,6 +1648,12 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                 } else if (objects.id[object] == INSTANT_COUNT_TRIGGER) {
                     get_instant_count_trigger(object)->target_count = val.i;
                 }
+            }
+            break;
+        case 78:
+            if (type == GD_VAL_BOOL && val.b) {
+                PickupItem *pickup = ensure_pickup_item(object);
+                if (pickup) pickup->sub_count = true;
             }
             break;
         case 80:

@@ -107,6 +107,7 @@ typedef struct {
 typedef struct {
     int item_id;
     bool is_pickup;
+    bool sub_count;
 } PickupItem;
 
 typedef struct {

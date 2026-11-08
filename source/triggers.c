@@ -141,8 +141,6 @@ void add_item_count(int id, int delta) {
     if (slot) slot->value += delta;
 }
 
-
-
 FollowPlayerYTriggerBuffer *get_new_follow_player_y_trigger() {
     if (follow_player_y_trigger_count >= follow_player_y_trigger_capacity) {
         size_t new_capacity = follow_player_y_trigger_capacity == 0 ? 32 : follow_player_y_trigger_capacity + 32;
