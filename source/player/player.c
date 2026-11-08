@@ -1697,13 +1697,13 @@ void draw_player(Player *player) {
 extern void get_corners(float cx, float cy, float w, float h, float angle, Vec2D out[4]);
 
 
-void draw_triangle_from_rect(Vec2D rect[4], int skip_index, uint32_t color, uint32_t hypo_color) {
+void draw_triangle_from_rect(Vec2D rect[4], int skip_index, uint32_t color, uint32_t hypo_color, float depth) {
     Vec2D tri[3];
     u32 col[3];
     int ti = 0;
 
     int hypo_id = skip_index - 1;
-    if (hypo_id < 0) hypo_id = 4;
+    if (hypo_id < 0) hypo_id = 3;
 
     // Collect 3 points that are not the skipped one
     for (int i = 0; i < 4; ++i) {
@@ -1715,10 +1715,10 @@ void draw_triangle_from_rect(Vec2D rect[4], int skip_index, uint32_t color, uint
         else col[ti++] = color;
     }
 
-    draw_polygon_inward_mitered(tri, 3, 2.f, col);
+    draw_polygon_inward_mitered(tri, 3, 2.f, col, depth);
 }
 
-void draw_square(Vec2D rect[4], uint32_t color) {
+void draw_square(Vec2D rect[4], uint32_t color, float depth) {
     Vec2D center = {
         (rect[0].x + rect[1].x + rect[2].x + rect[3].x) / 4.f,
         (rect[0].y + rect[1].y + rect[2].y + rect[3].y) / 4.f
@@ -1730,17 +1730,18 @@ void draw_square(Vec2D rect[4], uint32_t color) {
         draw_hitbox_line_inward(rect,
             mirror_x_on_screen(rect[i].x), calc_y_on_screen(rect[i].y),
             mirror_x_on_screen(rect[j].x), calc_y_on_screen(rect[j].y),
-            1.5f, center.x, center.y, color
+            1.5f, center.x, center.y, color, depth
         );
     }
 }
 
-static u32 get_id_color(int id) {
+static u32 get_id_color(int id, float *out_depth) {
     switch (id) {
         case J_MODIFIERBLOCK:
         case D_MODIFIERBLOCK:
         case S_MODIFIERBLOCK:
         case H_MODIFIERBLOCK:
+            *out_depth = 0.75f;
             return C2D_Color32(0xff, 0xff, 0x00, 0xff);
     }
     return 0;
@@ -1753,13 +1754,15 @@ void draw_hitbox(int obj) {
     Vec2D rect[4];
     if (is_trigger_object(id) && objects.touch_triggered[obj]) {
         get_corners(objects.x[obj], objects.y[obj], objects.width[obj], objects.height[obj], objects.rotation[obj], rect);
-        draw_square(rect, C2D_Color32(0x00, 0xff, 0xff, 0xff));
+        draw_square(rect, C2D_Color32(0x00, 0xff, 0xff, 0xff), 3.f);
         return;
     }
 
     const ObjectHitbox *hitbox = game_objects[id].hitbox;
 
     if (!hitbox) return;
+
+    float depth = 0.f;
 
     float angle = -objects.rotation[obj];
     float rot_rad = C3D_AngleFromDegrees(adjust_angle_y(angle, objects.flippedH[obj]));
@@ -1784,11 +1787,20 @@ void draw_hitbox(int obj) {
     unsigned int color = C2D_Color32(0x00, 0xff, 0xff, 0xff);
 
     int hitbox_type = hitbox->collision_type;
-    if (hitbox_type == HITBOX_HAZARD) color = C2D_Color32(0xff, 0x00, 0x00, 0xff);
-    if (hitbox_type == HITBOX_SOLID) color = C2D_Color32(0x00, 0x00, 0xff, 0xff);
-    if (hitbox_type == HITBOX_SPECIAL) color = C2D_Color32(0x00, 0xff, 0x00, 0xff);
+    if (hitbox_type == HITBOX_HAZARD) {
+        color = C2D_Color32(0xff, 0x00, 0x00, 0xff);
+        depth = 0.5f;
+    }
+    if (hitbox_type == HITBOX_SOLID) {
+        color = C2D_Color32(0x00, 0x00, 0xff, 0xff);
+        depth = 0.f;
+    }
+    if (hitbox_type == HITBOX_SPECIAL) {
+        color = C2D_Color32(0x00, 0xff, 0x00, 0xff);
+        depth = 1.f;
+    }
 
-    u32 id_color = get_id_color(id);
+    u32 id_color = get_id_color(id, &depth);
     if (id_color) color = id_color;
 
     // Current slope and x snapped obj gets its own colors
@@ -1800,11 +1812,13 @@ void draw_hitbox(int obj) {
         h = objects.height[obj];
         get_corners(x, y, w, h, 0, rect);
 
+        depth = 0.f;
 
         if (is_spike_slope(obj)) {
-            draw_triangle_from_rect(rect, 3 - objects.orientation[obj], color, C2D_Color32(0xff, 0x00, 0x00, 0xff));
+            depth += 0.5f;
+            draw_triangle_from_rect(rect, 3 - objects.orientation[obj], color, C2D_Color32(0xff, 0x00, 0x00, 0xff), depth);
         } else {
-            draw_triangle_from_rect(rect, 3 - objects.orientation[obj], color, color);
+            draw_triangle_from_rect(rect, 3 - objects.orientation[obj], color, color, depth);
         }
     } else if (hitbox->type == COLLISION_CIRCLE) {
         float calc_radius = objects.width[obj];
@@ -1812,7 +1826,7 @@ void draw_hitbox(int obj) {
         custom_circunference(mirror_x_on_screen(x), calc_y_on_screen(y), calc_radius, color, 2.f);
     } else if (w != 0 && h != 0) {
         get_corners(x, y, w, h, rot, rect);
-        draw_square(rect, color);
+        draw_square(rect, color, depth);
     }
 }
 
@@ -1822,7 +1836,7 @@ void draw_player_hitbox(Player *player) {
     // Unrotated hitbox
     get_corners(player->x, player->y, player->width, player->height, 0, rect);
 
-    draw_square(rect, C2D_Color32(0xff, 0x00, 0x00, 0xff));
+    draw_square(rect, C2D_Color32(0xff, 0x00, 0x00, 0xff), 0.f);
 }
 
 void draw_internal_hitbox(Player *player) {
@@ -1831,7 +1845,7 @@ void draw_internal_hitbox(Player *player) {
     // Internal hitbox
     get_corners(player->x, player->y, internal.width, internal.height, 0, rect);
 
-    draw_square(rect, C2D_Color32(0x00, 0x00, 0xff, 0xff));
+    draw_square(rect, C2D_Color32(0x00, 0x00, 0xff, 0xff), 0.f);
 }
 
 void draw_rotated_hitbox(Player *player) {
@@ -1839,7 +1853,7 @@ void draw_rotated_hitbox(Player *player) {
     // Rotated hitbox
     get_corners(player->x, player->y, player->width, player->height, player->rotation, rect);
 
-    draw_square(rect, C2D_Color32(0x7f, 0x00, 0x00, 0xff));
+    draw_square(rect, C2D_Color32(0x7f, 0x00, 0x00, 0xff), 0.f);
 }
 
 

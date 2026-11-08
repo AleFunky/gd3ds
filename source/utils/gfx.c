@@ -538,7 +538,7 @@ void compute_mitered_offsets(Vec2D *poly, Vec2D *offsets, int n, float thickness
     }
 }
 
-void draw_polygon_inward_mitered(Vec2D *poly, int n, float thickness, u32 *color) {
+void draw_polygon_inward_mitered(Vec2D *poly, int n, float thickness, u32 *color, float depth) {
     bool ccw = is_ccw(poly, n);
 
     Vec2D offsets[n];
@@ -562,7 +562,7 @@ void draw_polygon_inward_mitered(Vec2D *poly, int n, float thickness, u32 *color
             x1, y1, color[i],
             x2, y2, color[i],
             ox2, oy2, color[i],
-            0.0f
+            depth
         );
 
         // Triangle 2
@@ -570,7 +570,7 @@ void draw_polygon_inward_mitered(Vec2D *poly, int n, float thickness, u32 *color
             ox2, oy2, color[i],
             ox1, oy1, color[i],
             x1, y1, color[i],
-            0.0f
+            depth
         );
     }
 }
@@ -580,7 +580,7 @@ void draw_hitbox_line_inward(Vec2D rect[4],
                              const float x2, const float y2,
                              const float thickness,
                              const float cx, const float cy,
-                             const u32 color) {
+                             const u32 color, const float depth) {
 
     float ex = x2 - x1;
     float ey = y2 - y1;
@@ -622,7 +622,7 @@ void draw_hitbox_line_inward(Vec2D rect[4],
         x1a, y1a, color,
         x2a, y2a, color,
         x2b, y2b, color,
-        0.0f
+        depth
     );
 
     // Second triangle
@@ -630,7 +630,7 @@ void draw_hitbox_line_inward(Vec2D rect[4],
         x2b, y2b, color,
         x1b, y1b, color,
         x1a, y1a, color,
-        0.0f
+        depth
     );
 }
 
