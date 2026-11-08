@@ -36,7 +36,7 @@ void draw_hitbox_line_inward(Vec2D rect[4],
                              const float cx, const float cy,
                              const u32 color);
 
-void draw_polygon_inward_mitered(Vec2D *poly, int n, float thickness, u32 color); 
+void draw_polygon_inward_mitered(Vec2D *poly, int n, float thickness, u32 *color); 
 
 float calc_x_on_screen(float val);
 float mirror_x_on_screen(float val);

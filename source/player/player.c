@@ -25,6 +25,7 @@
 #include "utils/gfx.h"
 
 #include "easing.h"
+#include <stdint.h>
 
 inline float gravFloor(Player *player) { return player->upside_down ? -state.ceiling_y : state.ground_y; }
 
@@ -1696,18 +1697,25 @@ void draw_player(Player *player) {
 extern void get_corners(float cx, float cy, float w, float h, float angle, Vec2D out[4]);
 
 
-void draw_triangle_from_rect(Vec2D rect[4], int skip_index, uint32_t color) {
+void draw_triangle_from_rect(Vec2D rect[4], int skip_index, uint32_t color, uint32_t hypo_color) {
     Vec2D tri[3];
+    u32 col[3];
     int ti = 0;
+
+    int hypo_id = skip_index - 1;
+    if (hypo_id < 0) hypo_id = 4;
 
     // Collect 3 points that are not the skipped one
     for (int i = 0; i < 4; ++i) {
         if (i == skip_index) continue;
         tri[ti].x = mirror_x_on_screen(rect[i].x);
-        tri[ti++].y = calc_y_on_screen(rect[i].y);
+        tri[ti].y = calc_y_on_screen(rect[i].y);
+        
+        if (i == hypo_id) col[ti++] = hypo_color;
+        else col[ti++] = color;
     }
 
-    draw_polygon_inward_mitered(tri, 3, 2.f, color);
+    draw_polygon_inward_mitered(tri, 3, 2.f, col);
 }
 
 void draw_square(Vec2D rect[4], uint32_t color) {
@@ -1727,17 +1735,29 @@ void draw_square(Vec2D rect[4], uint32_t color) {
     }
 }
 
+static u32 get_id_color(int id) {
+    switch (id) {
+        case J_MODIFIERBLOCK:
+        case D_MODIFIERBLOCK:
+        case S_MODIFIERBLOCK:
+        case H_MODIFIERBLOCK:
+            return C2D_Color32(0xff, 0xff, 0x00, 0xff);
+    }
+    return 0;
+}
+
 void draw_hitbox(int obj) {
-    if (!is_valid_object(objects.id[obj])) return;
+    int id = objects.id[obj];
+    if (!is_valid_object(id)) return;
 
     Vec2D rect[4];
-    if (is_trigger_object(objects.id[obj]) && objects.touch_triggered[obj]) {
+    if (is_trigger_object(id) && objects.touch_triggered[obj]) {
         get_corners(objects.x[obj], objects.y[obj], objects.width[obj], objects.height[obj], objects.rotation[obj], rect);
         draw_square(rect, C2D_Color32(0x00, 0xff, 0xff, 0xff));
         return;
     }
 
-    const ObjectHitbox *hitbox = game_objects[objects.id[obj]].hitbox;
+    const ObjectHitbox *hitbox = game_objects[id].hitbox;
 
     if (!hitbox) return;
 
@@ -1767,7 +1787,10 @@ void draw_hitbox(int obj) {
     if (hitbox_type == HITBOX_HAZARD) color = C2D_Color32(0xff, 0x00, 0x00, 0xff);
     if (hitbox_type == HITBOX_SOLID) color = C2D_Color32(0x00, 0x00, 0xff, 0xff);
     if (hitbox_type == HITBOX_SPECIAL) color = C2D_Color32(0x00, 0xff, 0x00, 0xff);
-    
+
+    u32 id_color = get_id_color(id);
+    if (id_color) color = id_color;
+
     // Current slope and x snapped obj gets its own colors
     if (obj == state.player.slope_data.slope_id || obj == state.player2.slope_data.slope_id) color = C2D_Color32(0x00, 0xff, 0x00, 0xff);
     if (obj == state.player.snap_data.snapped_obj || obj == state.player2.snap_data.snapped_obj) color = C2D_Color32(0xff, 0xff, 0x00, 0xff);
@@ -1777,7 +1800,12 @@ void draw_hitbox(int obj) {
         h = objects.height[obj];
         get_corners(x, y, w, h, 0, rect);
 
-        draw_triangle_from_rect(rect, 3 - objects.orientation[obj], color);
+
+        if (is_spike_slope(obj)) {
+            draw_triangle_from_rect(rect, 3 - objects.orientation[obj], color, C2D_Color32(0xff, 0x00, 0x00, 0xff));
+        } else {
+            draw_triangle_from_rect(rect, 3 - objects.orientation[obj], color, color);
+        }
     } else if (hitbox->type == COLLISION_CIRCLE) {
         float calc_radius = objects.width[obj];
 
