@@ -22,7 +22,7 @@
 #include "particles/object_particles.h"
 #include "particles/circles.h"
 #include "particles/coin_effect.h"
-#include "particles/key_effect.h"
+#include "particles/collectable_effect.h"
 #include "save/saving.h"
 #include "menus/level_select.h"
 
@@ -381,9 +381,57 @@ static float dash_orb_angle(int obj) {
     return angle;
 }
 
+static bool collect_pickup_item(int obj) {
+    PickupItem *pickup = get_pickup_item(obj);
+    if (!pickup || !pickup->is_pickup || (objects.flags[obj] & FLAG_TOGGLED) || (objects.activated[obj] & 3)) return false;
+    add_item_count(pickup->item_id, 1);
+    objects.activated[obj] = 3;
+    return true;
+}
+
+static void spawn_collectable_fx(int obj) {
+    const GameObject *game_obj = &game_objects[objects.id[obj]];
+    int detail_tex = game_obj->child_count > 0 ? game_obj->children[0].texture : -1;
+    float detail_x = game_obj->child_count > 0 ? game_obj->children[0].x : 0.0f;
+    float detail_y = game_obj->child_count > 0 ? game_obj->children[0].y : 0.0f;
+    if (objects.id[obj] == KEY_OBJ) detail_y = 4.0f / 3.0f;
+
+    collectable_effect_spawn(objects.x[obj], objects.y[obj],
+                             game_obj->texture, detail_tex,
+                             objects.col_channel[obj],
+                             objects.detail_col_channel[obj],
+                             detail_x, detail_y,
+                             objects.scale_x[obj], objects.scale_y[obj],
+                             objects.flippedH[obj], objects.flippedV[obj]);
+
+    ParticleDefinition prev_cfg = brick_destroy_particles.cfg;
+    brick_destroy_particles.cfg.startColorRed = objects.main_color[obj].r / 255.f;
+    brick_destroy_particles.cfg.startColorGreen = objects.main_color[obj].g / 255.f;
+    brick_destroy_particles.cfg.startColorBlue = objects.main_color[obj].b / 255.f;
+    brick_destroy_particles.cfg.startColorAlpha = 127.0f / 255.0f;
+    brick_destroy_particles.emitterX = objects.x[obj];
+    brick_destroy_particles.emitterY = objects.y[obj];
+    spawnMultipleParticles(&brick_destroy_particles, 10);
+    brick_destroy_particles.cfg = prev_cfg;
+}
+
 // Handle collision with special objects (orbs, pads, portals)
 void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
     switch (objects.id[obj]) {
+        case HEART_COLLECTABLE:
+        case POTION_COLLECTABLE:
+        case SKULL_COLLECTABLE:
+        case KEY_OBJ:
+            if (!GET_ACTIVATED(obj)) {
+                collect_pickup_item(obj);
+                SET_ACTIVATED(obj, true);
+                spawn_collectable_fx(obj);
+                objects.flags[obj] |= FLAG_TOGGLED;
+            }
+            break;
+        case SMALL_COIN:
+            if (collect_pickup_item(obj)) objects.flags[obj] |= FLAG_TOGGLED;
+            break;
         case YELLOW_PAD:
             if (!GET_ACTIVATED(obj) || ((objects.flags[obj] & FLAG_MULTI_ACTIVATE) && !GET_COLLIDED(obj))) {
                 if (state.show_player) MotionTrail_ResumeStroke(trail);
@@ -1452,32 +1500,6 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                         state.current_data.coin3 = true;
                         break;
                 }
-
-                objects.flags[obj] |= FLAG_TOGGLED;
-            }
-            break;
-
-        case KEY_OBJ:
-            if (!GET_ACTIVATED(obj)) {
-                SET_ACTIVATED(obj, true);
-
-                key_effect_spawn(objects.x[obj], objects.y[obj],
-                                 game_objects[KEY_OBJ].texture,
-                                 game_objects[KEY_OBJ].children[0].texture,
-                                 objects.col_channel[obj],
-                                 objects.detail_col_channel[obj],
-                                 objects.scale_x[obj], objects.scale_y[obj],
-                                 objects.flippedH[obj], objects.flippedV[obj]);
-
-                ParticleDefinition prev_cfg = brick_destroy_particles.cfg;
-                brick_destroy_particles.cfg.startColorRed = objects.main_color[obj].r / 255.f;
-                brick_destroy_particles.cfg.startColorGreen = objects.main_color[obj].g / 255.f;
-                brick_destroy_particles.cfg.startColorBlue = objects.main_color[obj].b / 255.f;
-                brick_destroy_particles.cfg.startColorAlpha = 127.0f / 255.0f;
-                brick_destroy_particles.emitterX = objects.x[obj];
-                brick_destroy_particles.emitterY = objects.y[obj];
-                spawnMultipleParticles(&brick_destroy_particles, 10);
-                brick_destroy_particles.cfg = prev_cfg;
 
                 objects.flags[obj] |= FLAG_TOGGLED;
             }

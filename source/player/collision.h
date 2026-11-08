@@ -83,6 +83,14 @@ enum JumpType {
 
 #define SECRET_COIN 142
 #define KEY_OBJ 1275
+#define HEART_COLLECTABLE 1587
+#define POTION_COLLECTABLE 1589
+#define SKULL_COLLECTABLE 1598
+#define SMALL_COIN 1614
+
+static inline bool is_collectable_object(int id) {
+    return id == KEY_OBJ || id == HEART_COLLECTABLE || id == POTION_COLLECTABLE || id == SKULL_COLLECTABLE;
+}
 
 #define SLOW_SPEED_PORTAL 200
 #define NORMAL_SPEED_PORTAL 201

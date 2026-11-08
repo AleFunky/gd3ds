@@ -45,7 +45,11 @@ char *curr_level_string = NULL;
 
 TriggerPool col_pool;
 TriggerPool move_pool;
+static TriggerPool count_pool;
+static TriggerPool instant_count_pool;
 TriggerPool follow_player_y_pool;
+static TriggerPool counter_label_pool;
+static TriggerPool pickup_pool;
 bool has_follow_player_y = false;
 TriggerPool alpha_pool;
 TriggerPool pulse_pool;
@@ -70,6 +74,36 @@ AlphaTrigger *get_alpha_trigger(int obj) {
 
 MoveTrigger *get_move_trigger(int obj) {
     return TRIGGER_AT(move_pool, MoveTrigger, objects.trigger_index[obj]);
+}
+
+CountTrigger *get_count_trigger(int obj) {
+    return TRIGGER_AT(count_pool, CountTrigger, objects.trigger_index[obj]);
+}
+
+InstantCountTrigger *get_instant_count_trigger(int obj) {
+    return TRIGGER_AT(instant_count_pool, InstantCountTrigger, objects.trigger_index[obj]);
+}
+
+CounterLabel *get_counter_label(int obj) {
+    int index = objects.trigger_index[obj];
+    if (index < 0 || !counter_label_pool.data || (size_t)index >= counter_label_pool.count) return NULL;
+    return TRIGGER_AT(counter_label_pool, CounterLabel, index);
+}
+
+PickupItem *get_pickup_item(int obj) {
+    if (!(objects.flags[obj] & FLAG_PICKUP)) return NULL;
+    int index = objects.trigger_index[obj];
+    if (index < 0 || !pickup_pool.data || (size_t)index >= pickup_pool.count) return NULL;
+    return TRIGGER_AT(pickup_pool, PickupItem, index);
+}
+
+static PickupItem *ensure_pickup_item(int obj) {
+    if (objects.flags[obj] & FLAG_PICKUP) return get_pickup_item(obj);
+    int index = trigger_pool_add(&pickup_pool, sizeof(PickupItem));
+    if (index < 0) return NULL;
+    objects.trigger_index[obj] = index;
+    objects.flags[obj] |= FLAG_PICKUP;
+    return TRIGGER_AT(pickup_pool, PickupItem, index);
 }
 
 FollowPlayerYTrigger *get_follow_player_y_trigger(int obj) {
@@ -1008,8 +1042,14 @@ GDValueType get_value_type_for_key(int key) {
         case 69: return GD_VAL_INT;    // rotate times360
         case 70: return GD_VAL_BOOL;   // rotate lock object rotation
         case 71: return GD_VAL_INT;    // rotate center group
+        case 77: return GD_VAL_INT;    // target count (count/instant count)
+        case 79: return GD_VAL_BOOL;   // pickup item (2.1)
+        case 80: return GD_VAL_INT;    // item ID (pickup/count/counter label)
         case 85: return GD_VAL_FLOAT;  // easing rate
         case 87: return GD_VAL_BOOL;   // multi_triggered
+        case 88: return GD_VAL_INT;    // instant count mode (equals/larger/smaller)
+        case 104: return GD_VAL_BOOL;  // multi activate (count trigger)
+        case 381: return GD_VAL_BOOL;  // pickup item (2.2, robtop changed the pickup_item id to 381 for some reason but 2.1 levels like fingerdash use 79)
         case 90: return GD_VAL_FLOAT;  // follow speed (follow player Y trigger)
         case 91: return GD_VAL_FLOAT;  // follow delay (follow player Y trigger)
         case 92: return GD_VAL_FLOAT;  // follow offset (follow player Y trigger)
@@ -1018,7 +1058,7 @@ GDValueType get_value_type_for_key(int key) {
         case 129: return GD_VAL_FLOAT; // scale Y
         case 57: return GD_VAL_INT_ARRAY; // groups
         case 504: return GD_VAL_BOOL;   // spawn only (toggle orb)
-        case 99: return GD_VAL_BOOL;   // multi activate
+        case 99: return GD_VAL_BOOL;   // multi activate (orbs / pads)
         default:
             return GD_VAL_INT; // Default fallback
     }
@@ -1059,6 +1099,18 @@ int allocate_trigger_component(int obj) {
             break;
         case MOVE_TRIGGER:
             index = trigger_pool_add(&move_pool, sizeof(MoveTrigger));
+            if (index >= 0) {
+                objects.trigger_index[obj] = index;
+            }
+            break;
+        case COUNT_TRIGGER:
+            index = trigger_pool_add(&count_pool, sizeof(CountTrigger));
+            if (index >= 0) {
+                objects.trigger_index[obj] = index;
+            }
+            break;
+        case INSTANT_COUNT_TRIGGER:
+            index = trigger_pool_add(&instant_count_pool, sizeof(InstantCountTrigger));
             if (index >= 0) {
                 objects.trigger_index[obj] = index;
             }
@@ -1149,6 +1201,11 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                     int text_index = trigger_pool_add(&text_pool, sizeof(TextObject));
                     objects.trigger_index[object] = (text_index < 0) ? -1 : text_index;
                 }
+                if (objects.id[object] == COUNTER_LABEL) {
+                    int counter_label_index = trigger_pool_add(&counter_label_pool, sizeof(CounterLabel));
+                    objects.trigger_index[object] = (counter_label_index < 0) ? -1 : counter_label_index;
+                }
+
             }
             break;
         case 2:  // X
@@ -1390,6 +1447,12 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                         case MOVE_TRIGGER:
                             get_move_trigger(object)->target_group = val.i;
                             break;
+                        case COUNT_TRIGGER:
+                            get_count_trigger(object)->target_group = val.i;
+                            break;
+                        case INSTANT_COUNT_TRIGGER:
+                            get_instant_count_trigger(object)->target_group = val.i;
+                            break;
                         case FOLLOW_PLAYER_Y_TRIGGER:
                             get_follow_player_y_trigger(object)->target_group = val.i;
                             break;
@@ -1424,8 +1487,14 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
             if (type == GD_VAL_FLOAT) objects.tp_y_offset[object] = val.f;
             break;
         case 56: // Activate group
-            if (type == GD_VAL_BOOL && (objects.id[object] == TOGGLE_TRIGGER || objects.id[object] == TOGGLE_ORB)) {
-                get_toggle_trigger(object)->activate_group = val.b;
+            if (type == GD_VAL_BOOL) {
+                if (objects.id[object] == TOGGLE_TRIGGER || objects.id[object] == TOGGLE_ORB) {
+                    get_toggle_trigger(object)->activate_group = val.b;
+                } else if (objects.id[object] == COUNT_TRIGGER) {
+                    get_count_trigger(object)->activate_group = val.b;
+                } else if (objects.id[object] == INSTANT_COUNT_TRIGGER) {
+                    get_instant_count_trigger(object)->activate_group = val.b;
+                }
             }
             break;
         case 58: // Lock to player X
@@ -1466,6 +1535,12 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                             break;
                         case ROTATE_TRIGGER:
                             get_rotate_trigger(object)->spawn_triggered = val.b;
+                            break;
+                        case COUNT_TRIGGER:
+                            get_count_trigger(object)->spawn_triggered = val.b;
+                            break;
+                        case INSTANT_COUNT_TRIGGER:
+                            get_instant_count_trigger(object)->spawn_triggered = val.b;
                             break;
                     }
                 }
@@ -1550,8 +1625,64 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                         case ROTATE_TRIGGER:
                             get_rotate_trigger(object)->multi_triggered = val.b;
                             break;
+                        case COUNT_TRIGGER:
+                            get_count_trigger(object)->multi_triggered = val.b;
+                            break;
+                        case INSTANT_COUNT_TRIGGER:
+                            get_instant_count_trigger(object)->multi_triggered = val.b;
+                            break;
                     }
                 }
+            }
+            break;
+        case 88:
+            if (type == GD_VAL_INT && objects.id[object] == INSTANT_COUNT_TRIGGER) {
+                get_instant_count_trigger(object)->instant_count_mode = val.i;
+            }
+            break;
+        case 77:
+            if (type == GD_VAL_INT) {
+                if (objects.id[object] == COUNT_TRIGGER) {
+                    get_count_trigger(object)->target_count = val.i;
+                } else if (objects.id[object] == INSTANT_COUNT_TRIGGER) {
+                    get_instant_count_trigger(object)->target_count = val.i;
+                }
+            }
+            break;
+        case 80:
+            if (type == GD_VAL_INT) {
+                switch (objects.id[object]) {
+                    case COUNT_TRIGGER:
+                        get_count_trigger(object)->item_id = val.i;
+                        break;
+                    case INSTANT_COUNT_TRIGGER:
+                        get_instant_count_trigger(object)->item_id = val.i;
+                        break;
+                    case COUNTER_LABEL:
+                    {
+                        CounterLabel *label = get_counter_label(object);
+                        if (label) label->item_id = val.i;
+                        break;
+                    }
+                    default:
+                    {
+                        PickupItem *pickup = ensure_pickup_item(object);
+                        if (pickup) pickup->item_id = val.i;
+                        break;
+                    }
+                }
+            }
+            break;
+        case 104:
+            if (type == GD_VAL_BOOL && objects.id[object] == COUNT_TRIGGER) {
+                get_count_trigger(object)->multi_activate = val.b;
+            }
+            break;
+        case 79:
+        case 381:
+            if (type == GD_VAL_BOOL && val.b) {
+                PickupItem *pickup = ensure_pickup_item(object);
+                if (pickup) pickup->is_pickup = true;
             }
             break;
         case 90:
@@ -1659,6 +1790,8 @@ bool is_complex_trigger_object(int id) {
         || id == PULSE_TRIGGER
         || id == SPAWN_TRIGGER
         || id == ROTATE_TRIGGER
+        || id == COUNT_TRIGGER
+        || id == INSTANT_COUNT_TRIGGER
         || id == FOLLOW_PLAYER_Y_TRIGGER;
 }
 
@@ -1693,6 +1826,8 @@ bool trigger_is_spawn_triggered(int id, int obj) {
     if (is_simple_trigger_object(id)) return get_simple_trigger(obj)->spawn_triggered;
     switch (id) {
         case MOVE_TRIGGER:   return get_move_trigger(obj)->spawn_triggered;
+        case COUNT_TRIGGER:  return get_count_trigger(obj)->spawn_triggered;
+        case INSTANT_COUNT_TRIGGER: return get_instant_count_trigger(obj)->spawn_triggered;
         case FOLLOW_PLAYER_Y_TRIGGER: return get_follow_player_y_trigger(obj)->spawn_triggered;
         case ALPHA_TRIGGER:  return get_alpha_trigger(obj)->spawn_triggered;
         case PULSE_TRIGGER:  return get_pulse_trigger(obj)->spawn_triggered;
@@ -1708,6 +1843,8 @@ bool trigger_is_multi_triggered(int id, int obj) {
     if (is_simple_trigger_object(id)) return get_simple_trigger(obj)->multi_triggered;
     switch (id) {
         case MOVE_TRIGGER:   return get_move_trigger(obj)->multi_triggered;
+        case COUNT_TRIGGER:  return get_count_trigger(obj)->multi_triggered;
+        case INSTANT_COUNT_TRIGGER: return get_instant_count_trigger(obj)->multi_triggered;
         case FOLLOW_PLAYER_Y_TRIGGER: return get_follow_player_y_trigger(obj)->multi_triggered;
         case ALPHA_TRIGGER:  return get_alpha_trigger(obj)->multi_triggered;
         case PULSE_TRIGGER:  return get_pulse_trigger(obj)->multi_triggered;
@@ -1872,6 +2009,10 @@ void free_arrays() {
     has_follow_player_y = false;
     free(col_pool.data);
     free(move_pool.data);
+    free(count_pool.data);
+    free(instant_count_pool.data);
+    free(counter_label_pool.data);
+    free(pickup_pool.data);
     free(follow_player_y_pool.data);
     free(alpha_pool.data);
     free(pulse_pool.data);
@@ -1882,6 +2023,10 @@ void free_arrays() {
     free(text_pool.data);
     col_pool = (TriggerPool){0};
     move_pool = (TriggerPool){0};
+    count_pool = (TriggerPool){0};
+    instant_count_pool = (TriggerPool){0};
+    counter_label_pool = (TriggerPool){0};
+    pickup_pool = (TriggerPool){0};
     follow_player_y_pool = (TriggerPool){0};
     alpha_pool = (TriggerPool){0};
     pulse_pool = (TriggerPool){0};

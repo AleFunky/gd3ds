@@ -75,6 +75,43 @@ typedef struct {
 typedef struct {
     bool spawn_triggered;
     bool multi_triggered;
+    bool activate_group;
+    bool multi_activate;
+    int target_group;
+    int item_id;
+    int target_count;
+} CountTrigger;
+
+typedef struct {
+    bool spawn_triggered;
+    bool multi_triggered;
+    bool activate_group;
+    int target_group;
+    int item_id;
+    int target_count;
+    int instant_count_mode;
+} InstantCountTrigger;
+
+#define COUNTER_LABEL 1615
+#define MAX_COUNTER_TEXT 12
+
+typedef struct {
+    int item_id;
+    int last_value;
+    char text[MAX_COUNTER_TEXT + 1];
+    unsigned char layout_done;
+    unsigned char glyph_count;
+    TextGlyphPlacement glyphs[MAX_COUNTER_TEXT];
+} CounterLabel;
+
+typedef struct {
+    int item_id;
+    bool is_pickup;
+} PickupItem;
+
+typedef struct {
+    bool spawn_triggered;
+    bool multi_triggered;
     int target_group;
     float follow_speed;
     float follow_delay;
@@ -151,7 +188,8 @@ typedef enum {
     FLAG_DONT_FADE  = (1 << 1),
     FLAG_DONT_ENTER = (1 << 2),
     FLAG_CAN_BE_X_MOVED = (1 << 3),
-    FLAG_MULTI_ACTIVATE = (1 << 4)
+    FLAG_MULTI_ACTIVATE = (1 << 4),
+    FLAG_PICKUP = (1 << 5)
 } ObjectFlags;
 
 typedef struct {
@@ -311,6 +349,10 @@ ColorTrigger *get_color_trigger(int obj);
 PulseTrigger *get_pulse_trigger(int obj);
 AlphaTrigger *get_alpha_trigger(int obj);
 MoveTrigger *get_move_trigger(int obj);
+CountTrigger *get_count_trigger(int obj);
+InstantCountTrigger *get_instant_count_trigger(int obj);
+CounterLabel *get_counter_label(int obj);
+PickupItem *get_pickup_item(int obj);
 FollowPlayerYTrigger *get_follow_player_y_trigger(int obj);
 ToggleTrigger *get_toggle_trigger(int obj);
 SpawnTrigger *get_spawn_trigger(int obj);

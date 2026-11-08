@@ -38,6 +38,12 @@ int alpha_trigger_capacity = 0;
 MoveTriggerBuffer *move_trigger_buffer = NULL;
 int move_trigger_count = 0;
 int move_trigger_capacity = 0;
+CountTriggerBuffer *count_trigger_buffer = NULL;
+int count_trigger_count = 0;
+int count_trigger_capacity = 0;
+ItemCount *item_counter_buffer = NULL;
+int item_counter_count = 0;
+int item_counter_capacity = 0;
 
 SpawnTriggerBuffer *spawn_trigger_buffer = NULL;
 int spawn_trigger_count = 0;
@@ -88,6 +94,54 @@ MoveTriggerBuffer *get_new_move_trigger() {
     memset(buffer, 0, sizeof(MoveTriggerBuffer));
     return buffer;
 }
+
+static CountTriggerBuffer *get_new_count_trigger(void) {
+    if (count_trigger_count >= count_trigger_capacity) {
+        size_t new_capacity = count_trigger_capacity == 0 ? 32 : count_trigger_capacity + 32;
+        CountTriggerBuffer *new_list = realloc(count_trigger_buffer, new_capacity * sizeof(CountTriggerBuffer));
+        if (!new_list) return NULL;
+        count_trigger_buffer = new_list;
+        count_trigger_capacity = new_capacity;
+    }
+    CountTriggerBuffer *buffer = &count_trigger_buffer[count_trigger_count++];
+    memset(buffer, 0, sizeof(CountTriggerBuffer));
+    return buffer;
+}
+
+static ItemCount *find_item_count(int id) {
+    for (int i = 0; i < item_counter_count; i++) {
+        if (item_counter_buffer[i].id == id) return &item_counter_buffer[i];
+    }
+    return NULL;
+}
+
+static ItemCount *get_new_item_count(int id) {
+    if (item_counter_count >= item_counter_capacity) {
+        size_t new_capacity = item_counter_capacity == 0 ? 16 : item_counter_capacity + 16;
+        ItemCount *new_list = realloc(item_counter_buffer, new_capacity * sizeof(ItemCount));
+        if (!new_list) return NULL;
+        item_counter_buffer = new_list;
+        item_counter_capacity = new_capacity;
+    }
+    ItemCount *slot = &item_counter_buffer[item_counter_count++];
+    slot->id = id;
+    slot->value = 0;
+    return slot;
+}
+
+int get_item_count(int id) {
+    ItemCount *slot = find_item_count(id);
+    return slot ? slot->value : 0;
+}
+
+void add_item_count(int id, int delta) {
+    if (id < 0 || id > 9999) return;
+    ItemCount *slot = find_item_count(id);
+    if (!slot) slot = get_new_item_count(id);
+    if (slot) slot->value += delta;
+}
+
+
 
 FollowPlayerYTriggerBuffer *get_new_follow_player_y_trigger() {
     if (follow_player_y_trigger_count >= follow_player_y_trigger_capacity) {
@@ -204,6 +258,8 @@ void free_trigger_buffers() {
     restore_rotate_initial_rotations();
     free(alpha_trigger_buffer);
     free(move_trigger_buffer);
+    free(count_trigger_buffer);
+    free(item_counter_buffer);
     free(spawn_trigger_buffer);
     free(follow_player_y_trigger_buffer);
 
@@ -224,6 +280,8 @@ void free_trigger_buffers() {
 
     alpha_trigger_buffer = NULL;
     move_trigger_buffer = NULL;
+    count_trigger_buffer = NULL;
+    item_counter_buffer = NULL;
     spawn_trigger_buffer = NULL;
     follow_player_y_trigger_buffer = NULL;
     rotate_trigger_buffer = NULL;
@@ -235,6 +293,11 @@ void free_trigger_buffers() {
     move_trigger_count = 0;
     move_step_dt = 0.f;
     move_trigger_capacity = 0;
+
+    count_trigger_count = 0;
+    count_trigger_capacity = 0;
+    item_counter_count = 0;
+    item_counter_capacity = 0;
 
     follow_player_y_trigger_count = 0;
     follow_player_y_trigger_capacity = 0;
@@ -812,6 +875,62 @@ void handle_move_triggers(void) {
     }
 
     apply_group_combination_move();
+}
+
+void upload_to_count_buffer(int obj) {
+    CountTrigger *trigger = get_count_trigger(obj);
+    for (int i = 0; i < count_trigger_count; i++) {
+        if (count_trigger_buffer[i].active &&
+            count_trigger_buffer[i].source_obj == obj &&
+            count_trigger_buffer[i].restored_from_checkpoint) {
+            count_trigger_buffer[i].restored_from_checkpoint = false;
+            return;
+        }
+    }
+
+    CountTriggerBuffer *buffer = get_new_count_trigger();
+    if (!buffer) return;
+
+    buffer->target_group = trigger->target_group;
+    buffer->source_obj = obj;
+    buffer->item_id = trigger->item_id;
+    buffer->target_count = trigger->target_count;
+    buffer->activate_group = trigger->activate_group;
+    buffer->multi_activate = trigger->multi_activate;
+    buffer->previous_value = get_item_count(trigger->item_id);
+    buffer->active = true;
+}
+
+void handle_count_triggers(void) {
+    if (count_trigger_count == 0) return;
+
+    int total = count_trigger_count;
+    bool compact = false;
+    for (int i = 0; i < total; i++) {
+        CountTriggerBuffer buffer = count_trigger_buffer[i];
+        if (!buffer.active) {
+            compact = true;
+            continue;
+        }
+        int value = get_item_count(buffer.item_id);
+        bool fire = value == buffer.target_count && value != buffer.previous_value;
+        count_trigger_buffer[i].previous_value = value;
+        if (fire) {
+            if (!buffer.multi_activate) {
+                count_trigger_buffer[i].active = false;
+                compact = true;
+            }
+            toggle_group(buffer.target_group, buffer.activate_group);
+        }
+    }
+
+    if (compact) {
+        int count = 0;
+        for (int i = 0; i < count_trigger_count; i++) {
+            if (count_trigger_buffer[i].active) count_trigger_buffer[count++] = count_trigger_buffer[i];
+        }
+        count_trigger_count = count;
+    }
 }
 
 void handle_follow_player_y_triggers(void) {
@@ -1543,6 +1662,22 @@ void run_trigger(int obj, bool from_spawn) {
         case MOVE_TRIGGER:
             upload_to_move_buffer(obj);
             break;
+        case COUNT_TRIGGER:
+            upload_to_count_buffer(obj);
+            break;
+        case INSTANT_COUNT_TRIGGER:
+        {
+            InstantCountTrigger *trigger = get_instant_count_trigger(obj);
+            int value = get_item_count(trigger->item_id);
+            bool pass = false;
+            switch (trigger->instant_count_mode) {
+                case INSTANT_COUNT_MODE_EQUALS: pass = value == trigger->target_count; break;
+                case INSTANT_COUNT_MODE_LARGER: pass = value > trigger->target_count; break;
+                case INSTANT_COUNT_MODE_SMALLER: pass = value < trigger->target_count; break;
+            }
+            if (pass) toggle_group(trigger->target_group, trigger->activate_group);
+            break;
+        }
         case FOLLOW_PLAYER_Y_TRIGGER:
             upload_to_follow_player_y_buffer(obj);
             break;
@@ -1676,6 +1811,7 @@ void handle_step_triggers(void) {
         if (state.dual) player_follow_y_step(&state.player2, trigger_dt);
     }
     handle_triggers();
+    handle_count_triggers();
     handle_spawn_triggers();
     handle_move_triggers();
     handle_follow_player_y_triggers();

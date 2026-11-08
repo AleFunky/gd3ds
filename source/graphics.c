@@ -12,6 +12,7 @@
 #include "player/spider_anim_data.h"
 #include "triggers.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include "mp3_player.h"
 #include "icons.h"
@@ -28,7 +29,7 @@
 #include "particles/object_particles.h"
 #include "particles/circles.h"
 #include "particles/coin_effect.h"
-#include "particles/key_effect.h"
+#include "particles/collectable_effect.h"
 
 #include "menus/settings_hub/settings.h"
 
@@ -41,14 +42,13 @@
 
 const Color white = { 255, 255, 255 };
 
-#define KEY_FLOAT_AMP 1.5f
-#define KEY_FLOAT_PERIOD 0.8f
+#define COLLECTABLE_FLOAT_AMP 1.5f
+#define COLLECTABLE_FLOAT_PERIOD 0.8f
 #define GAMEPLAY_SCREEN_WIDTH_AREA SCREEN_WIDTH_AREA_GAMEPLAY(settingsState.swapGameplayScreens && !in_level_complete)
-#define KEY_FLOAT_BASE 0.0f
+#define COLLECTABLE_FLOAT_BASE 0.0f
 
-static inline float key_float_offset(int obj) {
-    float phase = objects.x[obj] * 0.05f;
-    return KEY_FLOAT_BASE + KEY_FLOAT_AMP * lut_sin(6.2831853f * (frame_timer / KEY_FLOAT_PERIOD) + phase);
+static inline float collectable_float_offset(void) {
+    return COLLECTABLE_FLOAT_BASE + COLLECTABLE_FLOAT_AMP * lut_sin(6.2831853f * (frame_timer / COLLECTABLE_FLOAT_PERIOD));
 }
 
 static const HSV lighter_hsv = {
@@ -772,45 +772,67 @@ void spawn_object_at(
 
     if (sprite_count >= MAX_SPRITES - 1) return;
 
-    if (id == TEXT_OBJECT) {
-        TextObject *text_obj = get_text_object(obj_game);
-        if (text_obj->len > 0) {
-            if (!text_obj->layout_done) {
-                text_obj->glyph_count = text_object_layout(level_font, text_obj->text, text_obj->glyphs, MAX_TEXT_LEN);
-                text_obj->layout_done = 1;
+    if (id == COUNTER_LABEL || id == TEXT_OBJECT) {
+        const TextGlyphPlacement *glyphs = NULL;
+        int glyph_count = 0;
+
+        if (id == COUNTER_LABEL) {
+            CounterLabel *label = get_counter_label(obj_game);
+            if (!label) return;
+            int value = get_item_count(label->item_id);
+            if (label->text[0] == 0 || value != label->last_value) {
+                snprintf(label->text, sizeof(label->text), "%d", value);
+                label->last_value = value;
+                label->layout_done = 0;
             }
-
-            for (int i = 0; i < text_obj->glyph_count; i++) {
-                if (sprite_count >= MAX_SPRITES - 1) break;
-
-                const TextGlyphPlacement *place = &text_obj->glyphs[i];
-                SpriteObject *vo = &viewable_objects[sprite_count];
-
-                vo->hidden = false;
-
-                float local_x = place->x * flip_x_mult;
-                float local_y = place->y * flip_y_mult;
-
-                float rot_x = local_x * cos_r - local_y * sin_r;
-                float rot_y = local_x * sin_r + local_y * cos_r;
-
-                C2D_SpriteFromSheet(&vo->spr, level_font_sheet ? level_font_sheet : bigFont_sheet, place->sprite);
-                C3D_TexSetFilter(vo->spr.image.tex, GPU_LINEAR, GPU_LINEAR);
-                C2D_SpriteSetCenter(&vo->spr, 0.5f, 0.5f);
-                C2D_SpriteSetPos(&vo->spr, x + rot_x * scale * obj_scale_x, y + rot_y * scale * obj_scale_y);
-                C2D_SpriteSetScale(&vo->spr, TEXT_OBJECT_SCALE * sx, TEXT_OBJECT_SCALE * sy);
-                C2D_SpriteSetRotation(&vo->spr, rad);
-
-                vo->obj = obj_game;
-                vo->layer = 0;
-                vo->col_type = get_color_type(obj, obj_game, obj->color_type);
-                vo->opacity = obj->opacity;
-                vo->col_channel = get_color_channel(obj->color_type, obj_game, obj);
-                calc_quad_params(vo);
-                viewable_objects_ptr[sprite_count] = vo;
-
-                sprite_count++;
+            if (!label->layout_done) {
+                label->glyph_count = text_object_layout(level_font, label->text, label->glyphs, MAX_COUNTER_TEXT);
+                label->layout_done = 1;
             }
+            glyphs = label->glyphs;
+            glyph_count = label->glyph_count;
+        } else {
+            TextObject *text_obj = get_text_object(obj_game);
+            if (text_obj->len > 0) {
+                if (!text_obj->layout_done) {
+                    text_obj->glyph_count = text_object_layout(level_font, text_obj->text, text_obj->glyphs, MAX_TEXT_LEN);
+                    text_obj->layout_done = 1;
+                }
+                glyphs = text_obj->glyphs;
+                glyph_count = text_obj->glyph_count;
+            }
+        }
+
+        for (int i = 0; i < glyph_count; i++) {
+            if (sprite_count >= MAX_SPRITES - 1) break;
+
+            const TextGlyphPlacement *place = &glyphs[i];
+            SpriteObject *vo = &viewable_objects[sprite_count];
+
+            vo->hidden = false;
+
+            float local_x = place->x * flip_x_mult;
+            float local_y = place->y * flip_y_mult;
+
+            float rot_x = local_x * cos_r - local_y * sin_r;
+            float rot_y = local_x * sin_r + local_y * cos_r;
+
+            C2D_SpriteFromSheet(&vo->spr, level_font_sheet ? level_font_sheet : bigFont_sheet, place->sprite);
+            C3D_TexSetFilter(vo->spr.image.tex, GPU_LINEAR, GPU_LINEAR);
+            C2D_SpriteSetCenter(&vo->spr, 0.5f, 0.5f);
+            C2D_SpriteSetPos(&vo->spr, x + rot_x * scale * obj_scale_x, y + rot_y * scale * obj_scale_y);
+            C2D_SpriteSetScale(&vo->spr, TEXT_OBJECT_SCALE * sx, TEXT_OBJECT_SCALE * sy);
+            C2D_SpriteSetRotation(&vo->spr, rad);
+
+            vo->obj = obj_game;
+            vo->layer = 0;
+            vo->col_type = get_color_type(obj, obj_game, obj->color_type);
+            vo->opacity = obj->opacity;
+            vo->col_channel = get_color_channel(obj->color_type, obj_game, obj);
+            calc_quad_params(vo);
+            viewable_objects_ptr[sprite_count] = vo;
+
+            sprite_count++;
         }
         return;
     }
@@ -2168,7 +2190,7 @@ void draw_player_graphics() {
     change_blending(false);
     
     draw_collect_effect();
-    draw_key_effect();
+    draw_collectable_effect();
 
     change_blending(true);
     draw_use_effects(get_use_effect_array_ptr(GFX_TOP));
@@ -2220,9 +2242,9 @@ void draw_objects() {
 
             change_blending(obj->blending);
 
-            if (objects.id[obj->obj] == KEY_OBJ) {
+            if (is_collectable_object(objects.id[obj->obj])) {
                 QuadParams key_params = obj->params;
-                float off = key_float_offset(obj->obj);
+                float off = collectable_float_offset();
                 key_params.quadr.topLeft[1]  += off;
                 key_params.quadr.topRight[1] += off;
                 key_params.quadr.botLeft[1]  += off;

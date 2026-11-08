@@ -96,6 +96,30 @@ typedef struct {
 typedef struct {
     bool active;
     bool restored_from_checkpoint;
+    bool activate_group;
+    bool multi_activate;
+    int target_group;
+    int item_id;
+    int target_count;
+    int previous_value;
+    int source_obj;
+} CountTriggerBuffer;
+
+typedef struct {
+    int id;
+    int value;
+} ItemCount;
+
+extern CountTriggerBuffer *count_trigger_buffer;
+extern int count_trigger_count;
+extern int count_trigger_capacity;
+extern ItemCount *item_counter_buffer;
+extern int item_counter_count;
+extern int item_counter_capacity;
+
+typedef struct {
+    bool active;
+    bool restored_from_checkpoint;
     int target_group;
     int source_obj;
     float speed;
@@ -119,6 +143,9 @@ typedef struct {
 #define PULSE_TARGET_GROUP 1
 #define PULSE_MODE_COLOR 0
 #define PULSE_MODE_HSV 1
+#define INSTANT_COUNT_MODE_EQUALS 0
+#define INSTANT_COUNT_MODE_LARGER 1
+#define INSTANT_COUNT_MODE_SMALLER 2
 
 typedef struct {
     bool active;
@@ -215,6 +242,8 @@ extern float trigger_dt;
 #define COL_TRIGGER 899
 #define GROUND_2_TRIGGER 900
 #define MOVE_TRIGGER 901
+#define COUNT_TRIGGER 1611
+#define INSTANT_COUNT_TRIGGER 1811
 #define ALPHA_TRIGGER 1007
 #define TOGGLE_TRIGGER 1049
 #define PULSE_TRIGGER 1006
@@ -262,6 +291,10 @@ void upload_to_alpha_buffer(int obj);
 void handle_alpha_triggers(void);
 void upload_to_move_buffer(int obj);
 void handle_move_triggers(void);
+int get_item_count(int id);
+void add_item_count(int id, int delta);
+void upload_to_count_buffer(int obj);
+void handle_count_triggers(void);
 void upload_to_follow_player_y_buffer(int obj);
 void handle_follow_player_y_triggers(void);
 void handle_step_triggers(void);

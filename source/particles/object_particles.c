@@ -13,7 +13,7 @@ ObjectParticles object_particle[MAX_OBJECT_PS];
 ParticleSystem brick_destroy_particles;
 
 // probably inaccurate, especially the alpha, but it's osmething lmao
-static const ParticleDefinition key_particles = {
+static const ParticleDefinition collectable_particles = {
     .angleVariance = 180.0f,
     .duration = -1.0f,
     .maxParticles = 36.0f,
@@ -193,7 +193,7 @@ void update_object_particles(float dt) {
             object_particle[i].ps.emitterX = emitter_x;
             object_particle[i].ps.emitterY = emitter_y;
             bool toggled = (objects.flags[obj] & FLAG_TOGGLED) != 0;
-            if (objects.id[obj] == KEY_OBJ) {
+            if (is_collectable_object(objects.id[obj])) {
                 object_particle[i].ps.emitting = !toggled;
                 if (toggled) object_particle[i].ps.data.count = 0;
                 object_particle[i].ps.scale = fmaxf(fabsf(objects.scale_x[obj]), fabsf(objects.scale_y[obj]));
@@ -685,8 +685,11 @@ void spawn_object_particles(int obj) {
             }
             break;
         case KEY_OBJ:
+        case HEART_COLLECTABLE:
+        case POTION_COLLECTABLE:
+        case SKULL_COLLECTABLE:
             if (!is_ps_already_loaded(obj)) {
-                index = load_object_particles(obj, &key_particles, false);
+                index = load_object_particles(obj, &collectable_particles, false);
                 if (index >= 0) {
                     object_particle[index].ps.emitterX = objects.x[obj];
                     object_particle[index].ps.emitterY = objects.y[obj];
