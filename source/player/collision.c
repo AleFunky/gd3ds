@@ -383,7 +383,6 @@ static float dash_orb_angle(int obj) {
 
 static void collect_pickup_item(int obj) {
     PickupItem *pickup = get_pickup_item(obj);
-    output_log("pickup %d is_pickup %d toggled %d\n", pickup, (pickup ? pickup->is_pickup : -1), objects.flags[obj] & FLAG_TOGGLED);
     if (!pickup || !pickup->is_pickup || (objects.flags[obj] & FLAG_TOGGLED)) return;
     add_item_count(pickup->item_id, (pickup->sub_count ? -1 : 1));
 }
