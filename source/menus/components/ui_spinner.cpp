@@ -20,20 +20,19 @@ static void ui_spinner_draw(UIElement* e, UITransform *transform) {
 
 void ui_spinner_destroy(UIElement *e) {
     if (e) {
-        free(e);
+        delete (UISpinner *)e;
         e = NULL;
     }
 }
 
 
 UISpinner *ui_create_spinner(UIScreen *s) {
-    UISpinner *e = (UISpinner *)malloc(sizeof(UISpinner));
+    UISpinner *e = new UISpinner{};
 
     if (!e) return NULL;
 
     UIImage *image = (UIImage *) e;
 
-    memset(e, 0, sizeof(UIImage));
     image->base.type = UI_IMAGE;
     image->base.enabled = true;
 

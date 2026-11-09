@@ -15,7 +15,7 @@ void ui_image_draw(UIElement* e, UITransform *transform) {
 
 static void ui_image_destroy(UIElement* e) {
     if (e) {
-        free(e);
+        delete (UIImage *)e;
         e = NULL;
     }
 }
@@ -43,11 +43,10 @@ void ui_image_set_image(UIImage *e, int sprite_index, int sheet) {
 }
 
 UIImage *ui_create_image(UIScreen *screen) {
-    UIImage *e = (UIImage *)malloc(sizeof(UIImage));
+    UIImage *e = new UIImage{};
 
     if (!e) return NULL;
 
-    memset(e, 0, sizeof(UIImage));
     e->base.type = UI_IMAGE;
     e->base.enabled = true;
 

@@ -32,17 +32,16 @@ static void ui_window_draw(UIElement* e, UITransform *transform) {
 
 static void ui_window_destroy(UIElement *e) {
     if (e) {
-        free(e);
+        delete (UIWindow *)e;
         e = NULL;
     }
 }
 
 UIWindow *ui_create_window(UIScreen *screen) {
-    UIWindow *e = (UIWindow *)malloc(sizeof(UIWindow));
+    UIWindow *e = new UIWindow{};
 
     if (!e) return NULL;
 
-    memset(e, 0, sizeof(UIWindow));
     e->base.type = UI_WINDOW;
     e->base.enabled = true;
 

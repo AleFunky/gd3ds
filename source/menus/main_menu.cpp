@@ -369,17 +369,21 @@ static void main_menu_draw(UIScreen *s, UIDrawPhase phase){
     if(phase == UI_DRAW_AFTER) return;
 
     draw_background(bg_scroll / 8, SCREEN_HEIGHT);
+
     C2D_ViewScale(SCALE, SCALE);
     state.camera_x = 0;
     state.camera_y = 0;
+
     draw_player_effects();
+
     change_blending(true);
+
     draw_use_effects(get_use_effect_array_ptr(GFX_TOP));
 
     change_blending(false);
     draw_player(&title_screen_player);
-    
     draw_post_player_effects();
+
     draw_ground(bg_scroll, 0, 0, false, 320);
 
     C2D_ViewScale(1/SCALE, 1/SCALE);

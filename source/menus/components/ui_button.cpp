@@ -189,7 +189,7 @@ static void ui_button_draw(UIElement* e, UITransform *transform) {
 
 static void ui_button_destroy(UIElement *e) {
     if (e) {
-        free(e);
+        delete (UIButton *)e;
         e = NULL;
     }
 }
@@ -218,11 +218,9 @@ void ui_button_set_image(UIButton *e, int sprite_index, int sheet) {
 }
 
 UIButton *ui_create_button(UIScreen *screen) {
-    UIButton *e = (UIButton *)malloc(sizeof(UIButton));
+    UIButton *e = new UIButton{};
 
     if (!e) return NULL;
-
-    memset(e, 0, sizeof(UIButton));
 
     e->base.type = UI_BUTTON;
     e->base.enabled = true;

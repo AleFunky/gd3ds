@@ -45,7 +45,7 @@ static void ui_checkbox_draw(UIElement* e, UITransform *transform) {
 
 static void ui_checkbox_destroy(UIElement *e) {
     if (e) {
-        free(e);
+        delete (UICheckBox *)e;
         e = NULL;
     }
 }
@@ -65,13 +65,12 @@ static void ui_checkbox_on_disable(UIElement *e) {
 }
 
 UICheckBox *ui_create_checkbox(UIScreen *screen) {
-    UICheckBox *e = (UICheckBox *)malloc(sizeof(UICheckBox));
+    UICheckBox *e = new UICheckBox{};
 
     if (!e) return NULL;
 
     UIButton *button = (UIButton* ) e;
     
-    memset(e, 0, sizeof(UICheckBox));
     button->base.type = UI_CHECKBOX;
     button->base.enabled = true;
     button->base.update = ui_checkbox_update;

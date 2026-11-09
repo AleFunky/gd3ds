@@ -1,6 +1,11 @@
 #include "ui_element.hpp"
 #include "ui_screen.hpp"
 
+static_assert(
+    offsetof(UIElement, update) == 0xFC,
+    "Unexpected UIElement layout!"
+);
+
 void ui_element_set_userdata(UIElement *element, void *userdata) {
     element->userdata = userdata;
 }
@@ -57,7 +62,7 @@ void ui_draw_tree(UIElement *e, UITransform *parent) {
     if (e->modify_transform)
         e->modify_transform(e, &world);
 
-    e->draw(e, &world);
+    if(e->draw) e->draw(e, &world);
 
     if (!e->draws_children) {
         for (UIElement *child = e->first_child; child; child = child->next_sibling) {
@@ -165,8 +170,8 @@ void ui_element_apply_properties(UIElement *e, UIScreen *screen, const UIPropert
     if (!e || !screen || !props) return;
 
     ui_element_set_position(e, 
-        ui_prop_int(props, "x", e->x), 
-        ui_prop_int(props, "y", e->y));
+        ui_prop_float(props, "x", e->x), 
+        ui_prop_float(props, "y", e->y));
 
     ui_element_set_size(e, 
         ui_prop_int(props, "w", e->w), 

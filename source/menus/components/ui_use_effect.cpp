@@ -66,17 +66,16 @@ static void ui_use_effect_destroy(UIElement *e) {
             free(useEffect->useEffects.pool);
         }
 
-        free(e);
+        delete useEffect;
         e = NULL;
     }
 }
 
 UIUseEffect *ui_create_use_effect(UIScreen *screen) {
-    UIUseEffect *e = (UIUseEffect *)malloc(sizeof(UIUseEffect));
+    UIUseEffect *e = new UIUseEffect{};
 
     if (!e) return NULL;
 
-    memset(e, 0, sizeof(UIUseEffect));
     UseEffectPool *pool = &(e->useEffects);
     init_use_effect_pool(pool, MAX_UI_USE_EFFECTS);
     pool->stationary = true;

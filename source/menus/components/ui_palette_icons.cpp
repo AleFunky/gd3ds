@@ -31,17 +31,16 @@ static void ui_palette_icons_draw(UIElement* e, UITransform *transform) {
 
 static void ui_palette_icons(UIElement *e) {
     if (e) {
-        free(e);
+        delete (UIPaletteIcons *)e;
         e = NULL;
     }
 }
 
 UIPaletteIcons *ui_create_palette_icons(UIScreen *screen) {
-    UIPaletteIcons *e = (UIPaletteIcons *)malloc(sizeof(UIPaletteIcons));
+    UIPaletteIcons *e = new UIPaletteIcons{};
 
     if (!e) return NULL;
 
-    memset(e, 0, sizeof(UIElement));
     e->base.type = UI_PALETTE_ICONS;
     e->base.enabled = true;
 

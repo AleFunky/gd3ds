@@ -146,7 +146,7 @@ static void ui_slider_draw(UIElement* e, UITransform *transform) {
 
 static void ui_slider_destroy(UIElement *e) {
     if (e) {
-        free(e);
+        delete (UISlider *)e;
         e = NULL;
     }
 }
@@ -166,11 +166,10 @@ static void ui_slider_init_graphics(UISlider *e) {
 }
 
 UISlider *ui_create_slider(UIScreen *screen) {
-    UISlider *e = (UISlider *)malloc(sizeof(UISlider));
+    UISlider *e = new UISlider{};
 
     if (!e) return NULL;
 
-    memset(e, 0, sizeof(UISlider));
     e->base.type = UI_SLIDER;
     e->base.enabled = true;
     

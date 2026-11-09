@@ -306,7 +306,7 @@ void ui_screen_update(UIScreen* s, UIInput* touch) {
         .scaleY = 1.f
     };
 
-    for (size_t i = s->count - 1; i >= 0; i--) {
+    for (int i = (int)s->count - 1; i >= 0; i--) {
         UIElement *e = s->elements[i];
         ui_update_tree(e, touch, &identity);
     }

@@ -146,8 +146,8 @@ bool _3dWarningPassed;
 
 char *_3dsx_path;
 
-UIStack menu_stack = { 0 };
-UIStack gameplay_stack = { 0 };
+UIStack menu_stack = {};
+UIStack gameplay_stack = {};
 
 ExternalLevelFile external_file;
 ServerFile gd_server_file;
@@ -764,7 +764,6 @@ void ui_loop(){
         ui_stack_update(&touch);
 
         // autoupdater pop up stuff
-
         if (updater_task.finished && !checkedForUpdate && ui_stack_get_fade_status() == FADE_STATUS_NONE && strcmp("updater", ui_stack_get_current_screen_name()) != 0 && strcmp("3d_warning_pop_up", ui_stack_get_current_screen_name()) != 0 && strcmp("info_card", ui_stack_get_current_screen_name()) != 0 && strcmp("updater_settings", ui_stack_get_current_screen_name()) != 0)
         {
             // Handle result
@@ -807,14 +806,13 @@ void ui_loop(){
             _3dWarningPassed = true;
         }
 
-
         // Frees a render target, so keep it out of the frame below
         update_stereo_target();
 
         update_touch_effect(DT);
-        
+
         C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-        
+
         // Bottom screen
         C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
         C2D_SceneBegin(bot);

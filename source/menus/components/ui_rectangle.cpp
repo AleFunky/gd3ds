@@ -27,17 +27,16 @@ static void ui_rectangle_draw(UIElement* e, UITransform *transform) {
 
 static void ui_rectangle_destroy(UIElement *e) {
     if (e) {
-        free(e);
+        delete (UIRectangle *)e;
         e = NULL;
     }
 }
 
 UIRectangle *ui_create_rectangle(UIScreen *screen) {
-    UIRectangle *e = (UIRectangle *)malloc(sizeof(UIRectangle));
+    UIRectangle *e = new UIRectangle{};
 
     if (!e) return NULL;
 
-    memset(e, 0, sizeof(UIRectangle));
     e->base.type = UI_RECTANGLE;
     e->base.enabled = true;
     

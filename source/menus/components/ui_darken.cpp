@@ -80,17 +80,16 @@ static void ui_darken_draw(UIElement* e, UITransform *transform) {
 
 static void ui_darken_destroy(UIElement *e) {
     if (e) {
-        free(e);
+        delete (UIDarken *)e;
         e = NULL;
     }
 }
 
 UIDarken *ui_create_darken(UIScreen *screen) {
-    UIDarken *e = (UIDarken*)malloc(sizeof(UIDarken));
+    UIDarken *e = new UIDarken{};
 
     if (!e) return NULL;
 
-    memset(e, 0, sizeof(UIDarken));
     e->base.type = UI_DARKEN;
     e->base.enabled = true;
     e->base.opacity = 0.0f;

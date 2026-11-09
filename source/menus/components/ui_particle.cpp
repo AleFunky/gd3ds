@@ -40,7 +40,7 @@ static void ui_particle_destroy(UIElement *e) {
     if (e) {
         UIParticle *particle = (UIParticle *) e;
         freeParticleData(&particle->particle.data);
-        free(e);
+        delete (UIParticle *)e;
 
         particle = NULL;
         e = NULL;
@@ -57,11 +57,9 @@ void ui_init_particle_definition(UIParticle *e, const ParticleDefinition *def) {
 }
 
 UIParticle *ui_create_particle(UIScreen *screen) {
-    UIParticle *e = (UIParticle *)malloc(sizeof(UIParticle));
+    UIParticle *e = new UIParticle{};
 
     if (!e) return NULL;
-
-    memset(e, 0, sizeof(UIParticle));
 
     e->base.type = UI_PARTICLE;
     e->base.enabled = true;

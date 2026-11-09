@@ -424,16 +424,16 @@ void MotionTrail_Draw(MotionTrail* trail) {
     
     C2D_Image image = trail->image;
 
-    unsigned int count = trail->nuPoints * 2;
+    int count = (int)trail->nuPoints * 2;
 
     Color color = trail->color;
 
     bool rotated = Tex3DS_SubTextureRotated(trail->image.subtex);
 
-    for (unsigned int i = 0; i < count - 2; i++) {
-        unsigned int i0 = i;
-        unsigned int i1 = i + 1;
-        unsigned int i2 = i + 2;
+    for (int i = 0; i < count - 2; i++) {
+        int i0 = i;
+        int i1 = i + 1;
+        int i2 = i + 2;
 
         Vec2D p0 = trail->vertices[i0];
         Vec2D p1 = trail->vertices[i1];
@@ -493,15 +493,15 @@ void MotionTrail_Draw(MotionTrail* trail) {
 void MotionTrail_DrawWaveTrail(MotionTrail *trail) {
     change_blending(trail->blending);
 
-    unsigned int count = trail->actualNuPoints * 2;
+    int count = (int)trail->actualNuPoints * 2;
 
     Color color = trail->color;
     int opacity = 255 * trail->opacity;
 
-    for (unsigned int i = 0; i < count - 2; i++) {
-        unsigned int i0 = i;
-        unsigned int i1 = i + 1;
-        unsigned int i2 = i + 2;
+    for (int i = 0; i < count - 2; i++) {
+        int i0 = i;
+        int i1 = i + 1;
+        int i2 = i + 2;
 
         Vec2D p0 = trail->vertices[i0];
         Vec2D p1 = trail->vertices[i1];
@@ -527,10 +527,10 @@ void MotionTrail_DrawWaveTrail(MotionTrail *trail) {
     if (!trail->blending) return;
 
     // Draw center
-    for (unsigned int i = 0; i < count - 2; i++) {
-        unsigned int i0 = i;
-        unsigned int i1 = i + 1;
-        unsigned int i2 = i + 2;
+    for (int i = 0; i < count - 2; i++) {
+        int i0 = i;
+        int i1 = i + 1;
+        int i2 = i + 2;
 
         Vec2D p0 = trail->centerVertices[i0];
         Vec2D p1 = trail->centerVertices[i1];

@@ -20,17 +20,16 @@ static void ui_bg_gradient_draw(UIElement* e, UITransform *transform) {
 
 static void ui_bg_gradient_destroy(UIElement *e) {
     if (e) {
-        free(e);
+        delete (UIImage *)e;
         e = NULL;
     }
 }
 
 UIImage *ui_create_bg_gradient(UIScreen *screen) {
-    UIImage *e = (UIImage *)malloc(sizeof(UIImage));
+    UIImage *e = new UIImage{};
 
     if (!e) return NULL;
 
-    memset(e, 0, sizeof(UIImage));
     e->base.type = UI_IMAGE;
     e->base.x = 0;
     e->base.y = 0;

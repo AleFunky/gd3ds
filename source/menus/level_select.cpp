@@ -38,7 +38,7 @@ const char *error_strings[LOAD_ERROR_COUNT - 1] = {
 
 static bool start_level = false;
 
-size_t curr_level_id = 0;
+int curr_level_id = 0;
 
 s8 scroll_dir = 0;
 
@@ -347,7 +347,7 @@ void action_move_right(UIElement* e, const UIPropertyList *args) {
     anim_time = 0;
     anim_duration = 1.f;
     
-    if (curr_level_id >= current_main_level_pack->count) curr_level_id = 0;
+    if (curr_level_id >= (int)current_main_level_pack->count) curr_level_id = 0;
     
     ui_set_pos_on_tag(btm_screen, 160, LEVEL_CARD_Y_POS, "level_card");
     ui_run_func_on_tag(btm_screen, "level_card_2", enable_card_2);

@@ -32,7 +32,7 @@ static void ui_window_button_draw(UIElement* e, UITransform *transform) {
 
 static void ui_window_button_destroy(UIElement *e) {
     if (e) {
-        free(e);
+        delete (UIWindowButton *)e;
         e = NULL;
     }
 }
@@ -53,12 +53,10 @@ void ui_window_button_set_style(UIWindowButton *e, int style) {
 }
 
 UIWindowButton *ui_create_window_button(UIScreen *screen) {
-    UIWindowButton *e = (UIWindowButton *)malloc(sizeof(UIWindowButton));
+    UIWindowButton *e = new UIWindowButton{};
 
     if (!e) return NULL;
     UIButton *button = (UIButton *) e;
-
-    memset(e, 0, sizeof(UIWindowButton));
 
     button->base.type = UI_WINDOW_BUTTON;
     button->base.enabled = true;

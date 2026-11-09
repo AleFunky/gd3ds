@@ -9,6 +9,6 @@
 
 extern const size_t NUM_MENU_COLORS;
 extern const u32 default_lvl_colors[];
-extern size_t curr_level_id;
+extern int curr_level_id;
 
 extern const UIScreenDefPair level_select_def;

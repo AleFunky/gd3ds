@@ -66,7 +66,7 @@ static void ui_progress_bar_draw(UIElement* e, UITransform *transform) {
 
 static void ui_progress_bar_destroy(UIElement *e) {
     if (e) {
-        free(e);
+        delete (UIProgressBar *)e;
         e = NULL;
     }
 }
@@ -130,11 +130,10 @@ void ui_progress_bar_set_images(UIProgressBar *e, int style) {
 }
 
 UIProgressBar *ui_create_progress_bar(UIScreen *screen) {
-    UIProgressBar *e = (UIProgressBar *)malloc(sizeof(UIProgressBar));
+    UIProgressBar *e = new UIProgressBar{};
 
     if (!e) return NULL;
 
-    memset(e, 0, sizeof(UIProgressBar));
     e->base.type = UI_PROGRESS_BAR;
     e->base.enabled = true;
     e->useTint = false;

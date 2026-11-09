@@ -61,7 +61,7 @@ static void ui_icon_draw(UIElement* e, UITransform *transform) {
 
 static void ui_icon_destroy(UIElement *e) {
     if (e) {
-        free(e);
+        delete (UIIcon *)e;
         e = NULL;
     }
 }
@@ -98,13 +98,12 @@ void ui_icon_set_glow(UIIcon *e, u32 color) {
 }
 
 UIIcon *ui_create_icon(UIScreen *screen) {
-    UIIcon *e = (UIIcon *)malloc(sizeof(UIIcon));
+    UIIcon *e = new UIIcon{};
 
     if (!e) return NULL;
 
     UIButton *button = (UIButton *) e;
 
-    memset(e, 0, sizeof(UIIcon));
     button->base.type = UI_ICON;
     button->base.enabled = true;
 

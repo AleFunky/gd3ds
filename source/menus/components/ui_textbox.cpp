@@ -49,17 +49,16 @@ static void ui_textbox_draw(UIElement* e, UITransform *transform) {
 
 static void ui_textbox_destroy(UIElement *e) {
     if (e) {
-        free(e);
+        delete (UITextbox *)e;
         e = NULL;
     }
 }
 
 UITextbox *ui_create_textbox(UIScreen *screen) {
-    UITextbox *e = (UITextbox *)malloc(sizeof(UITextbox));
+    UITextbox *e = new UITextbox{};
 
     if (!e) return NULL;
 
-    memset(e, 0, sizeof(UITextbox));
     e->base.type = UI_TEXTBOX;
     e->base.enabled = true;
     e->base.update = ui_textbox_update;

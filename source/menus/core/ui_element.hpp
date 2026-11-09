@@ -12,6 +12,7 @@
 #define TAG_LENGTH 32
 
 typedef enum {
+    UI_ELEMENT,
     UI_BUTTON,
     UI_IMAGE,
     UI_LABEL,
@@ -101,52 +102,52 @@ typedef struct UIInput {
 } UIInput;
 
 struct UIElement {
-    UIElementType type;
+    UIElementType type = UI_ELEMENT;
 
-    float x, y;
-    int w, h;
+    float x = 0.0f, y = 0.0f;
+    int w = 0, h = 0;
 
-    float scaleX, scaleY;
+    float scaleX = 0.0f, scaleY = 1.0f;
 
-    float opacity;
+    float opacity = 1.0f;
 
-    bool enabled;
+    bool enabled = true;
 
-    bool draws_children;
+    bool draws_children = false;
 
     //array of actions to call
-    UIAction *actions;
-    size_t action_count;
+    UIAction *actions = nullptr;
+    size_t action_count = 0;
 
     //old version (not as cool)
-    UIActionFn action;
+    UIActionFn action = nullptr;
 
-    UIScreen *screen;
+    UIScreen *screen = nullptr;
 
-    UIPropertyList custom_properties;
+    UIPropertyList custom_properties = UIPropertyList{};
 
     // Useful for storing data inside an element
-    void *userdata;
-    void (*userdata_destroy)(void *);
+    void *userdata = nullptr;
+    void (*userdata_destroy)(void *) = nullptr;
     
-    struct UIElement *parent;
+    struct UIElement *parent = nullptr;
 
-    struct UIElement *first_child;
-    struct UIElement *last_child;
+    struct UIElement *first_child = nullptr;
+    struct UIElement *last_child = nullptr;
 
-    struct UIElement *next_sibling;
-    struct UIElement *prev_sibling;
+    struct UIElement *next_sibling = nullptr;
+    struct UIElement *prev_sibling = nullptr;
 
-    char tag[TAGS_PER_ELEMENT][TAG_LENGTH];
+    char tag[TAGS_PER_ELEMENT][TAG_LENGTH] = {};
 
-    void (*update)(UIElement*, UIInput*, UITransform *);
-    void (*draw)(UIElement*, UITransform *);
-    void (*destroy)(UIElement*);
+    void (*update)(UIElement*, UIInput*, UITransform *) = nullptr;
+    void (*draw)(UIElement*, UITransform *) = nullptr;
+    void (*destroy)(UIElement*) = nullptr;
 
-    void (*modify_transform)(UIElement *, UITransform *);
+    void (*modify_transform)(UIElement *, UITransform *) = nullptr;
     
-    void (*on_enable)(UIElement*);
-    void (*on_disable)(UIElement*);
+    void (*on_enable)(UIElement*) = nullptr;
+    void (*on_disable)(UIElement*) = nullptr;
 };
 
 typedef struct {

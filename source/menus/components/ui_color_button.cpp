@@ -49,19 +49,18 @@ void ui_color_button_set_index(UIColor *e, int index, int color_index) {
 
 static void ui_color_button_destroy(UIElement *e) {
     if (e) {
-        free(e);
+        delete (UIColor *)e;
         e = NULL;
     }
 }
 
 UIColor *ui_create_color_button(UIScreen *screen) {
-    UIColor *e = (UIColor *)malloc(sizeof(UIColor));
+    UIColor *e = new UIColor{};
 
     if (!e) return NULL;
     
     UIButton *button = (UIButton *) e;
 
-    memset(e, 0, sizeof(UIColor));
     button->base.type = UI_COLOR_BUTTON;
     button->base.enabled = true;
 

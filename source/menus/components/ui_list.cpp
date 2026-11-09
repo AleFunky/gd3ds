@@ -171,17 +171,16 @@ static void ui_list_draw(UIElement* e, UITransform *transform) {
 
 static void ui_list_destroy(UIElement *e) {
     if (e) {
-        free(e);
+        delete (UIList *)e;
         e = NULL;
     }
 }
 
 UIList *ui_create_list(UIScreen *screen) {
-    UIList *e = (UIList *)malloc(sizeof(UIList));
+    UIList *e = new UIList{};
 
     if (!e) return NULL;
 
-    memset(e, 0, sizeof(UIList));
     e->base.type = UI_LIST;
     e->base.enabled = true;
 

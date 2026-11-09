@@ -36,7 +36,7 @@ static void ui_label_draw(UIElement* e, UITransform *transform) {
 
 static void ui_label_destroy(UIElement* e) {
     if (e) {
-        free(e);
+        delete (UILabel *)e;
         e = NULL;
     }
 }
@@ -48,11 +48,10 @@ void ui_label_set_text(UILabel *e, const char *text) {
 }
 
 UILabel *ui_create_label(UIScreen *screen) {
-    UILabel *e = (UILabel *)malloc(sizeof(UILabel));
+    UILabel *e = new UILabel{};
 
     if (!e) return NULL;
 
-    memset(e, 0, sizeof(UILabel));
     e->base.type = UI_LABEL;
     e->base.enabled = true;
     
