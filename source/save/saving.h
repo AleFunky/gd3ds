@@ -32,6 +32,7 @@ typedef struct LevelData {
     bool coin1;
     bool coin2;
     bool coin3;
+    bool low_detail;
 } LevelData;
 
 bool level_has_rate(const LevelData *data);
@@ -133,6 +134,7 @@ LevelDataEntry *get_or_add_level_to_external_file(ExternalLevelFile *save_data, 
 LevelDataEntry *get_or_add_level_to_server_file(ServerFile *save_data, const char *key, LevelListType type);
 
 extern LevelDataEntry *current_level_entry;
+extern LevelListType current_level_list;
 
 bool migrate_old_data();
 

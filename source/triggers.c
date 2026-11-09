@@ -482,11 +482,17 @@ Color HSV_combine(Color base, HSV hsv) {
 
 int trigger_pool_add(TriggerPool *pool, size_t element_size) {
     if (pool->count >= pool->capacity) {
-        int new_capacity = pool->capacity ? pool->capacity + 8 : 8;
+        size_t new_capacity = pool->capacity ? pool->capacity * 2 : 8;
+        void *new_data = realloc(pool->data, new_capacity * element_size);
 
-        pool->data = realloc(pool->data, new_capacity * element_size);
-        if (!pool->data) return -1;
+        if (!new_data) {
+            new_capacity = pool->capacity + 8;
+            new_data = realloc(pool->data, new_capacity * element_size);
+        }
 
+        if (!new_data) return -1;
+
+        pool->data = new_data;
         pool->capacity = new_capacity;
     }
     

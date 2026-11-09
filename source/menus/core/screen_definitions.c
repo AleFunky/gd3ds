@@ -66,6 +66,7 @@ const UIScreenDefPair *defs[] = {
     &clear_filters_def,
     &online_infobox_def,
     &online_level_menu_def,
+    &online_level_options_def,
     &online_level_comments_def,
     &external_popup_def,
     &external_infobox_def,

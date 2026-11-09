@@ -28,6 +28,7 @@
 #include "utils/utils.h"
 
 LevelDataEntry *current_level_entry;
+LevelListType current_level_list = LEVEL_LIST_MAIN_LEVELS;
 
 static CreatorEntry empty_creator = (CreatorEntry) {
     .creatorName = "-",
@@ -245,6 +246,10 @@ static struct json_object *make_level_data_list_json(const LevelDataList *level_
 
         json_object_object_add(data, "coin3",
             json_object_new_boolean(entry->data.coin3)
+        );
+
+        json_object_object_add(data, "low_detail",
+            json_object_new_boolean(entry->data.low_detail)
         );
 
         json_object_object_add(object, entry->key, data);
@@ -516,6 +521,7 @@ static bool parse_level_data_list(LevelDataList *level_data, struct json_object 
         struct json_object *coin1 = NULL;
         struct json_object *coin2 = NULL;
         struct json_object *coin3 = NULL;
+        struct json_object *low_detail = NULL;
 
         LevelDataEntry *entry = &level_data->list[level_data->count];
 
@@ -534,6 +540,7 @@ static bool parse_level_data_list(LevelDataList *level_data, struct json_object 
         entry->data.coin1 = false;
         entry->data.coin2 = false;
         entry->data.coin3 = false;
+        entry->data.low_detail = false;
 
 
         if (json_object_object_get_ex(value, "level_id", &level_id))
@@ -562,6 +569,9 @@ static bool parse_level_data_list(LevelDataList *level_data, struct json_object 
 
         if (json_object_object_get_ex(value, "coin3", &coin3))
             entry->data.coin3 = json_object_get_boolean(coin3);
+
+        if (json_object_object_get_ex(value, "low_detail", &low_detail))
+            entry->data.low_detail = json_object_get_boolean(low_detail);
 
         level_data->count++;
 
@@ -915,7 +925,8 @@ static LevelDataEntry *level_data_list_get_or_add(LevelDataList *level_data, con
         .stars = false,
         .coin1 = false,
         .coin2 = false,
-        .coin3 = false
+        .coin3 = false,
+        .low_detail = false
     };
 
     if (!level_data_list_add(level_data, key, data)) {
@@ -1264,6 +1275,7 @@ static bool load_old_level_file(const char *path, LevelData *data) {
     data->coin1 = json_object_get_boolean(coin1);
     data->coin2 = json_object_get_boolean(coin2);
     data->coin3 = json_object_get_boolean(coin3);
+    data->low_detail = false;
 
     json_object_put(root);
 

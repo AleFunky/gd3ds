@@ -1,0 +1,12 @@
+darken opacity=0.4
+
+window x=160 y=120 w=200 h=120 style=6
+{
+    checkbox x=-65 y=-15 tag="chk_ldm" scale=0.75 action="ldm"
+    label x=-49 y=-15 text="Low Detail Mode" font=0 scale=0.45 align=LEFT
+
+    checkbox x=-65 y=15 tag="chk_shake" scale=0.75
+    label x=-49 y=15 text="Disable Shake" font=0 scale=0.45 align=LEFT
+}
+
+button x=64 y=65 id=31 actions=close_menu keyBinds="B"

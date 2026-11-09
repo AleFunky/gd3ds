@@ -25,6 +25,7 @@ button x=295 y=75 id=202 sheet=0 scale=1 action="reload"
 button x=295 y=125 id=24 sheet=0 scale=1 actions=open_menu[screen="online_level_comments" btm_anim="zoom_subtle" top_anim="zoom_subtle"]
 
 button x=25 y=215 id=90 sheet=0 scale=1 actions=open_menu[screen="online_infobox" btm_anim="zoom" top_anim="zoom"]
+button x=25 y=175 id=127 sheet=0 scale=0.7 actions=open_menu[screen="online_level_options" btm_anim="zoom"]
 
 #Song download
 

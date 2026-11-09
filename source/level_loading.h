@@ -331,6 +331,7 @@ typedef struct {
     bool initial_upsidedown;
 
     bool two_player_mode;
+    bool low_detail;
 
     char level_name[256];
     char creator_name[256];

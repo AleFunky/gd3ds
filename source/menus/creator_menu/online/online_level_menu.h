@@ -1,5 +1,6 @@
 #pragma once
 #include "menus/core/ui_stack.h"
+#include "menus/level_options.h"
 #include "utils/server_utils.h"
 
 void delete_level();

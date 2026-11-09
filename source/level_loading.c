@@ -26,6 +26,7 @@
 #include "utils/utils.h"
 
 #include "menus/creator_menu/online/online_level_menu.h"
+#include "save/saving.h"
 
 ObjectsArray objects = { 0 };
 
@@ -1902,7 +1903,45 @@ bool trigger_is_multi_triggered(int id, int obj) {
     return false;
 }
 
-int parse_gd_object(const char *objStr, int obj) {
+static bool is_high_detail_object(const char *section, const char *end, float *out_x) {
+    if (!level_info.low_detail) return false;
+
+    if (!end) end = section + strlen(section);
+
+    bool high_detail = false;
+    const char *p = section;
+
+    while (p < end) {
+        char *key_end;
+        long key = strtol(p, &key_end, 10);
+        if (key_end == p || key_end >= end || *key_end != ',') break;
+
+        const char *value = key_end + 1;
+        const char *value_end = value;
+        while (value_end < end && *value_end != ',') value_end++;
+
+        if (key == 103) {
+            high_detail = (value_end - value == 1 && value[0] == '1');
+        } else if (key == 2 && out_x) {
+            *out_x = atof(value);
+        }
+
+        p = (value_end < end) ? value_end + 1 : end;
+    }
+
+    return high_detail;
+}
+
+int parse_gd_object(const char *objStr, const char *objEnd, int obj, int capacity) {
+    float high_detail_x = 0.f;
+
+    if (is_high_detail_object(objStr, objEnd, &high_detail_x)) {
+        if (high_detail_x > level_info.last_obj_x) level_info.last_obj_x = high_detail_x;
+        return -1;
+    }
+
+    if (obj >= capacity) return -2;
+
     int count = 0;
     // Split object into each key
     char **tokens = split_string(objStr, ',', &count, false);
@@ -2052,6 +2091,16 @@ int parse_gd_object(const char *objStr, int obj) {
     return 1;
 }
 
+static int *objects_int_block = NULL;
+static float *objects_float_block = NULL;
+static unsigned short *objects_ushort_block = NULL;
+static unsigned char *objects_uchar_block = NULL;
+static bool *objects_bool_block = NULL;
+static short (*objects_groups_block)[MAX_GROUPS_PER_OBJECT] = NULL;
+static u8 *objects_u8_block = NULL;
+static Color *objects_color_block = NULL;
+static HSV *objects_hsv_block = NULL;
+
 void free_arrays() {
     has_follow_player_y = false;
     free(col_pool.data);
@@ -2085,237 +2134,169 @@ void free_arrays() {
     simple_pool = (TriggerPool){0};
     text_pool = (TriggerPool){0};
 
-    if (objects.random)             { free(objects.random);             objects.random = NULL; }
-    if (objects.id)                 { free(objects.id);                 objects.id = NULL; }
-    if (objects.x)                  { free(objects.x);                  objects.x = NULL; }
-    if (objects.y)                  { free(objects.y);                  objects.y = NULL; }
-    if (objects.last_y)             { free(objects.last_y);             objects.last_y = NULL; }
-    if (objects.rotation)           { free(objects.rotation);           objects.rotation = NULL; }
-    if (objects.visual_rotation)    { free(objects.visual_rotation);    objects.visual_rotation = NULL; }
-    if (objects.zlayer)             { free(objects.zlayer);             objects.zlayer = NULL; }
-    if (objects.zorder)             { free(objects.zorder);             objects.zorder = NULL; }
-    if (objects.opacity)            { free(objects.opacity);            objects.opacity = NULL; }
-    if (objects.alpha_trigger_opacity) { free(objects.alpha_trigger_opacity); objects.alpha_trigger_opacity = NULL; }
-    if (objects.width)              { free(objects.width);              objects.width = NULL; }
-    if (objects.height)             { free(objects.height);             objects.height = NULL; }
-    if (objects.v1p9_col_channel)   { free(objects.v1p9_col_channel);   objects.v1p9_col_channel = NULL; }
-    if (objects.col_channel)        { free(objects.col_channel);        objects.col_channel = NULL; }
-    if (objects.detail_col_channel) { free(objects.detail_col_channel); objects.detail_col_channel = NULL; }
-    if (objects.trigger_index)      { free(objects.trigger_index);      objects.trigger_index = NULL; }
-    if (objects.hitbox_counter)     { free(objects.hitbox_counter);     objects.hitbox_counter = NULL; }
-    if (objects.transition_applied) { free(objects.transition_applied); objects.transition_applied = NULL; }
-    if (objects.orientation)        { free(objects.orientation);        objects.orientation = NULL; }
-    if (objects.touch_triggered)    { free(objects.touch_triggered);    objects.touch_triggered = NULL; }
-    if (objects.flippedH)           { free(objects.flippedH);           objects.flippedH = NULL; }
-    if (objects.flippedV)           { free(objects.flippedV);           objects.flippedV = NULL; }
-    if (objects.flags)            { free(objects.flags);            objects.flags = NULL; }
-    if (objects.groups)             { free(objects.groups);             objects.groups = NULL; }
-    if (objects.group_count)        { free(objects.group_count);        objects.group_count = NULL; }
-    if (objects.original_x)             { free(objects.original_x);             objects.original_x = NULL; }
-    if (objects.original_y)             { free(objects.original_y);             objects.original_y = NULL; }
-    if (objects.num_main_pulses)        { free(objects.num_main_pulses);        objects.num_main_pulses = NULL; }
-    if (objects.num_detail_pulses)      { free(objects.num_detail_pulses);      objects.num_detail_pulses = NULL; }
-    if (objects.main_being_pulsed)      { free(objects.main_being_pulsed);      objects.main_being_pulsed = NULL; }
-    if (objects.detail_being_pulsed)    { free(objects.detail_being_pulsed);    objects.detail_being_pulsed = NULL; }
-    if (objects.main_non_pulse_color)   { free(objects.main_non_pulse_color);   objects.main_non_pulse_color = NULL; }
-    if (objects.detail_non_pulse_color) { free(objects.detail_non_pulse_color); objects.detail_non_pulse_color = NULL; }
-    if (objects.main_color)             { free(objects.main_color);             objects.main_color = NULL; }
-    if (objects.detail_color)           { free(objects.detail_color);           objects.detail_color = NULL; }
-    if (objects.main_col_HSV_enabled)   { free(objects.main_col_HSV_enabled);   objects.main_col_HSV_enabled = NULL; }
-    if (objects.detail_col_HSV_enabled) { free(objects.detail_col_HSV_enabled); objects.detail_col_HSV_enabled = NULL; }
-    if (objects.main_col_HSV)           { free(objects.main_col_HSV);           objects.main_col_HSV = NULL; }
-    if (objects.detail_col_HSV)         { free(objects.detail_col_HSV);         objects.detail_col_HSV = NULL; }
-    if (objects.cached_main_hsv_src_color)   { free(objects.cached_main_hsv_src_color);   objects.cached_main_hsv_src_color = NULL; }
-    if (objects.cached_detail_hsv_src_color) { free(objects.cached_detail_hsv_src_color); objects.cached_detail_hsv_src_color = NULL; }
-    if (objects.cached_main_hsv_color)       { free(objects.cached_main_hsv_color);       objects.cached_main_hsv_color = NULL; }
-    if (objects.cached_detail_hsv_color)     { free(objects.cached_detail_hsv_color);     objects.cached_detail_hsv_color = NULL; }
-    if (objects.cached_main_hsv_valid)       { free(objects.cached_main_hsv_valid);       objects.cached_main_hsv_valid = NULL; }
-    if (objects.cached_detail_hsv_valid)     { free(objects.cached_detail_hsv_valid);     objects.cached_detail_hsv_valid = NULL; }
-    if (objects.scale_x)                { free(objects.scale_x);                objects.scale_x = NULL; }
-    if (objects.scale_y)                { free(objects.scale_y);                objects.scale_y = NULL; }
-    if (objects.original_scale_x)       { free(objects.original_scale_x);       objects.original_scale_x = NULL; }
-    if (objects.original_scale_y)       { free(objects.original_scale_y);       objects.original_scale_y = NULL; }
-    if (objects.child_object)           { free(objects.child_object);           objects.child_object = NULL; }
-    if (objects.tp_y_offset)            { free(objects.tp_y_offset);            objects.tp_y_offset = NULL; }
-    if (objects.section_x)              { free(objects.section_x);              objects.section_x = NULL; }
-    if (objects.section_y)              { free(objects.section_y);              objects.section_y = NULL; }
-    if (objects.activated)          { free(objects.activated);          objects.activated = NULL; }
-    if (objects.collided)           { free(objects.collided);           objects.collided = NULL; }
-    if (objects.group_combination_index) { free(objects.group_combination_index); objects.group_combination_index = NULL;}
+    free(objects_int_block);        objects_int_block = NULL;
+    free(objects_float_block);      objects_float_block = NULL;
+    free(objects_ushort_block);     objects_ushort_block = NULL;
+    free(objects_uchar_block);      objects_uchar_block = NULL;
+    free(objects_bool_block);       objects_bool_block = NULL;
+    free(objects_groups_block);     objects_groups_block = NULL;
+    free(objects_u8_block);         objects_u8_block = NULL;
+    free(objects_color_block);      objects_color_block = NULL;
+    free(objects_hsv_block);        objects_hsv_block = NULL;
+
+    objects.random = NULL;
+    objects.id = NULL;
+    objects.x = NULL;
+    objects.y = NULL;
+    objects.last_y = NULL;
+    objects.rotation = NULL;
+    objects.visual_rotation = NULL;
+    objects.zlayer = NULL;
+    objects.zorder = NULL;
+    objects.opacity = NULL;
+    objects.alpha_trigger_opacity = NULL;
+    objects.width = NULL;
+    objects.height = NULL;
+    objects.v1p9_col_channel = NULL;
+    objects.col_channel = NULL;
+    objects.detail_col_channel = NULL;
+    objects.trigger_index = NULL;
+    objects.hitbox_counter = NULL;
+    objects.transition_applied = NULL;
+    objects.orientation = NULL;
+    objects.touch_triggered = NULL;
+    objects.flippedH = NULL;
+    objects.flippedV = NULL;
+    objects.groups = NULL;
+    objects.group_count = NULL;
+    objects.flags = NULL;
+    objects.activated = NULL;
+    objects.collided = NULL;
+    objects.original_x = NULL;
+    objects.original_y = NULL;
+    objects.num_main_pulses = NULL;
+    objects.num_detail_pulses = NULL;
+    objects.main_being_pulsed = NULL;
+    objects.detail_being_pulsed = NULL;
+    objects.main_non_pulse_color = NULL;
+    objects.detail_non_pulse_color = NULL;
+    objects.main_color = NULL;
+    objects.detail_color = NULL;
+    objects.main_col_HSV_enabled = NULL;
+    objects.detail_col_HSV_enabled = NULL;
+    objects.main_col_HSV = NULL;
+    objects.detail_col_HSV = NULL;
+    objects.cached_main_hsv_src_color = NULL;
+    objects.cached_detail_hsv_src_color = NULL;
+    objects.cached_main_hsv_color = NULL;
+    objects.cached_detail_hsv_color = NULL;
+    objects.cached_main_hsv_valid = NULL;
+    objects.cached_detail_hsv_valid = NULL;
+    objects.scale_x = NULL;
+    objects.scale_y = NULL;
+    objects.original_scale_x = NULL;
+    objects.original_scale_y = NULL;
+    objects.child_object = NULL;
+    objects.tp_y_offset = NULL;
+    objects.section_x = NULL;
+    objects.section_y = NULL;
+    objects.group_combination_index = NULL;
 }
 
 bool init_arrays(size_t count) {
     has_follow_player_y = false;
-    objects.random = malloc(sizeof(int) * count);
-    if (!objects.random) return false;
+    objects_int_block = malloc(sizeof(int) * count * 9);
+    if (!objects_int_block) return false;
 
-    objects.id = malloc(sizeof(int) * count);
-    if (!objects.id) return false;
-    
-    objects.x = malloc(sizeof(float) * count);
-    if (!objects.x) return false;
-    
-    objects.y = malloc(sizeof(float) * count);
-    if (!objects.y) return false;
-    
-    objects.last_y = malloc(sizeof(float) * count);
-    if (!objects.last_y) return false;
+    objects_float_block = malloc(sizeof(float) * count * 16);
+    if (!objects_float_block) return false;
 
-    objects.rotation = malloc(sizeof(float) * count);
-    if (!objects.rotation) return false;
+    objects_ushort_block = malloc(sizeof(unsigned short) * count * 4);
+    if (!objects_ushort_block) return false;
 
-    objects.visual_rotation = malloc(sizeof(float) * count);
-    if (!objects.visual_rotation) return false;
+    objects_uchar_block = malloc(sizeof(unsigned char) * count * 2);
+    if (!objects_uchar_block) return false;
 
-    objects.zlayer = malloc(sizeof(int) * count);
-    if (!objects.zlayer) return false;
-    
-    objects.zorder = malloc(sizeof(int) * count);
-    if (!objects.zorder) return false;
-    
-    objects.opacity = malloc(sizeof(float) * count);
-    if (!objects.opacity) return false;
+    objects_bool_block = malloc(sizeof(bool) * count * 9);
+    if (!objects_bool_block) return false;
 
-    objects.alpha_trigger_opacity = malloc(sizeof(float) * count);
-    if (!objects.alpha_trigger_opacity) return false;
-    
-    objects.width = malloc(sizeof(float) * count);
-    if (!objects.width) return false;
-    
-    objects.height = malloc(sizeof(float) * count);
-    if (!objects.height) return false;
+    objects_groups_block = malloc(sizeof(short[MAX_GROUPS_PER_OBJECT]) * count);
+    if (!objects_groups_block) return false;
 
-    objects.v1p9_col_channel = malloc(sizeof(unsigned short) * count);
-    if (!objects.v1p9_col_channel) return false;
-    
-    objects.col_channel = malloc(sizeof(unsigned short) * count);
-    if (!objects.col_channel) return false;
-    
-    objects.detail_col_channel = malloc(sizeof(unsigned short) * count);
-    if (!objects.detail_col_channel) return false;
-    
-    objects.trigger_index = malloc(sizeof(int) * count);
-    if (!objects.trigger_index) return false;
-    
-    objects.hitbox_counter = malloc(sizeof(unsigned short) * count);
-    if (!objects.hitbox_counter) return false;
+    objects_u8_block = malloc(sizeof(u8) * count * 6);
+    if (!objects_u8_block) return false;
 
-    objects.transition_applied = malloc(sizeof(unsigned char) * count);
-    if (!objects.transition_applied) return false;
-    
-    objects.orientation = malloc(sizeof(unsigned char) * count);
-    if (!objects.orientation) return false;
-    
-    objects.touch_triggered = malloc(sizeof(bool) * count);
-    if (!objects.touch_triggered) return false;
-    
-    objects.flippedH = malloc(sizeof(bool) * count);
-    if (!objects.flippedH) return false;
-    
-    objects.flippedV = malloc(sizeof(bool) * count);
-    if (!objects.flippedV) return false;
+    objects_color_block = malloc(sizeof(Color) * count * 8);
+    if (!objects_color_block) return false;
 
-    objects.groups = malloc(sizeof(short[MAX_GROUPS_PER_OBJECT]) * count);
-    if (!objects.groups) return false;
+    objects_hsv_block = malloc(sizeof(HSV) * count * 2);
+    if (!objects_hsv_block) return false;
 
-    objects.group_count = malloc(sizeof(u8) * count);
-    if (!objects.group_count) return false;
+    objects.random = objects_int_block + 0 * count;
+    objects.id = objects_int_block + 1 * count;
+    objects.zlayer = objects_int_block + 2 * count;
+    objects.zorder = objects_int_block + 3 * count;
+    objects.trigger_index = objects_int_block + 4 * count;
+    objects.child_object = objects_int_block + 5 * count;
+    objects.section_x = objects_int_block + 6 * count;
+    objects.section_y = objects_int_block + 7 * count;
+    objects.group_combination_index = objects_int_block + 8 * count;
 
-    objects.flags = malloc(sizeof(u8) * count);
-    if (!objects.flags) return false;
-    
-    objects.activated = malloc(sizeof(u8) * count);
-    if (!objects.activated) return false;
-    
-    objects.collided = malloc(sizeof(u8) * count);
-    if (!objects.collided) return false;
+    objects.x = objects_float_block + 0 * count;
+    objects.y = objects_float_block + 1 * count;
+    objects.last_y = objects_float_block + 2 * count;
+    objects.rotation = objects_float_block + 3 * count;
+    objects.visual_rotation = objects_float_block + 4 * count;
+    objects.opacity = objects_float_block + 5 * count;
+    objects.alpha_trigger_opacity = objects_float_block + 6 * count;
+    objects.width = objects_float_block + 7 * count;
+    objects.height = objects_float_block + 8 * count;
+    objects.original_x = objects_float_block + 9 * count;
+    objects.original_y = objects_float_block + 10 * count;
+    objects.scale_x = objects_float_block + 11 * count;
+    objects.scale_y = objects_float_block + 12 * count;
+    objects.original_scale_x = objects_float_block + 13 * count;
+    objects.original_scale_y = objects_float_block + 14 * count;
+    objects.tp_y_offset = objects_float_block + 15 * count;
 
-    objects.original_x = malloc(sizeof(float) * count);
-    if (!objects.original_x) return false;
+    objects.v1p9_col_channel = objects_ushort_block + 0 * count;
+    objects.col_channel = objects_ushort_block + 1 * count;
+    objects.detail_col_channel = objects_ushort_block + 2 * count;
+    objects.hitbox_counter = (unsigned char *)(objects_ushort_block + 3 * count);
 
-    objects.original_y = malloc(sizeof(float) * count);
-    if (!objects.original_y) return false;
+    objects.transition_applied = objects_uchar_block + 0 * count;
+    objects.orientation = objects_uchar_block + 1 * count;
 
-    objects.num_main_pulses = malloc(sizeof(u8) * count);
-    if (!objects.num_main_pulses) return false;
+    objects.touch_triggered = objects_bool_block + 0 * count;
+    objects.flippedH = objects_bool_block + 1 * count;
+    objects.flippedV = objects_bool_block + 2 * count;
+    objects.main_being_pulsed = objects_bool_block + 3 * count;
+    objects.detail_being_pulsed = objects_bool_block + 4 * count;
+    objects.main_col_HSV_enabled = objects_bool_block + 5 * count;
+    objects.detail_col_HSV_enabled = objects_bool_block + 6 * count;
+    objects.cached_main_hsv_valid = objects_bool_block + 7 * count;
+    objects.cached_detail_hsv_valid = objects_bool_block + 8 * count;
 
-    objects.num_detail_pulses = malloc(sizeof(u8) * count);
-    if (!objects.num_detail_pulses) return false;
+    objects.groups = objects_groups_block;
 
-    objects.main_being_pulsed = malloc(sizeof(bool) * count);
-    if (!objects.main_being_pulsed) return false;
+    objects.group_count = objects_u8_block + 0 * count;
+    objects.flags = objects_u8_block + 1 * count;
+    objects.activated = objects_u8_block + 2 * count;
+    objects.collided = objects_u8_block + 3 * count;
+    objects.num_main_pulses = objects_u8_block + 4 * count;
+    objects.num_detail_pulses = objects_u8_block + 5 * count;
 
-    objects.detail_being_pulsed = malloc(sizeof(bool) * count);
-    if (!objects.detail_being_pulsed) return false;
+    objects.main_non_pulse_color = objects_color_block + 0 * count;
+    objects.detail_non_pulse_color = objects_color_block + 1 * count;
+    objects.main_color = objects_color_block + 2 * count;
+    objects.detail_color = objects_color_block + 3 * count;
+    objects.cached_main_hsv_src_color = objects_color_block + 4 * count;
+    objects.cached_detail_hsv_src_color = objects_color_block + 5 * count;
+    objects.cached_main_hsv_color = objects_color_block + 6 * count;
+    objects.cached_detail_hsv_color = objects_color_block + 7 * count;
 
-    objects.main_non_pulse_color = malloc(sizeof(Color) * count);
-    if (!objects.main_non_pulse_color) return false;
-
-    objects.detail_non_pulse_color = malloc(sizeof(Color) * count);
-    if (!objects.detail_non_pulse_color) return false;
-
-    objects.main_color = malloc(sizeof(Color) * count);
-    if (!objects.main_color) return false;
-
-    objects.detail_color = malloc(sizeof(Color) * count);
-    if (!objects.detail_color) return false;
-
-    objects.main_col_HSV_enabled = malloc(sizeof(bool) * count);
-    if (!objects.main_col_HSV_enabled) return false;
-
-    objects.detail_col_HSV_enabled = malloc(sizeof(bool) * count);
-    if (!objects.detail_col_HSV_enabled) return false;
-
-    objects.main_col_HSV = malloc(sizeof(HSV) * count);
-    if (!objects.main_col_HSV) return false;
-
-    objects.detail_col_HSV = malloc(sizeof(HSV) * count);
-    if (!objects.detail_col_HSV) return false;
-
-    objects.cached_main_hsv_src_color = malloc(sizeof(Color) * count);
-    if (!objects.cached_main_hsv_src_color) return false;
-
-    objects.cached_detail_hsv_src_color = malloc(sizeof(Color) * count);
-    if (!objects.cached_detail_hsv_src_color) return false;
-
-    objects.cached_main_hsv_color = malloc(sizeof(Color) * count);
-    if (!objects.cached_main_hsv_color) return false;
-
-    objects.cached_detail_hsv_color = malloc(sizeof(Color) * count);
-    if (!objects.cached_detail_hsv_color) return false;
-
-    objects.cached_main_hsv_valid = malloc(sizeof(bool) * count);
-    if (!objects.cached_main_hsv_valid) return false;
-
-    objects.cached_detail_hsv_valid = malloc(sizeof(bool) * count);
-    if (!objects.cached_detail_hsv_valid) return false;
-
-    objects.scale_x = malloc(sizeof(float) * count);
-    if (!objects.scale_x) return false;
-
-    objects.scale_y = malloc(sizeof(float) * count);
-    if (!objects.scale_y) return false;
-
-    objects.original_scale_x = malloc(sizeof(float) * count);
-    if (!objects.original_scale_x) return false;
-
-    objects.original_scale_y = malloc(sizeof(float) * count);
-    if (!objects.original_scale_y) return false;
-
-    objects.child_object = malloc(sizeof(int) * count);
-    if (!objects.child_object) return false;
-
-    objects.tp_y_offset = malloc(sizeof(float) * count);
-    if (!objects.tp_y_offset) return false;
-
-    objects.section_x = malloc(sizeof(int) * count);
-    if (!objects.section_x) return false;
-
-    objects.section_y = malloc(sizeof(int) * count);
-    if (!objects.section_y) return false;
-
-    objects.group_combination_index = malloc(sizeof(int) * count);
-    if (!objects.group_combination_index) return false;
+    objects.main_col_HSV = objects_hsv_block + 0 * count;
+    objects.detail_col_HSV = objects_hsv_block + 1 * count;
 
     // Initialize the values
     memset(objects.random,             0, sizeof(int) * count);
@@ -2404,15 +2385,55 @@ int compare_coins(const void *a, const void *b) {
     return objects.x[*c1] - objects.x[*c2];
 }
 
+static void shrink_trigger_pools(void) {
+    TriggerPool *pools[] = {
+        &col_pool, &move_pool, &count_pool, &instant_count_pool,
+        &follow_player_y_pool, &follow_pool, &counter_label_pool,
+        &pickup_pool, &alpha_pool, &pulse_pool, &toggle_pool,
+        &spawn_pool, &rotate_pool, &simple_pool, &text_pool
+    };
+    size_t sizes[] = {
+        sizeof(ColorTrigger), sizeof(MoveTrigger), sizeof(CountTrigger),
+        sizeof(InstantCountTrigger), sizeof(FollowPlayerYTrigger),
+        sizeof(FollowTrigger), sizeof(CounterLabel), sizeof(PickupItem),
+        sizeof(AlphaTrigger), sizeof(PulseTrigger), sizeof(ToggleTrigger),
+        sizeof(SpawnTrigger), sizeof(RotateTrigger), sizeof(SimpleTrigger),
+        sizeof(TextObject)
+    };
+
+    for (size_t i = 0; i < ARRAY_LEN(pools); i++) {
+        if (pools[i]->count >= pools[i]->capacity) continue;
+
+        if (pools[i]->count == 0) {
+            free(pools[i]->data);
+            pools[i]->data = NULL;
+            pools[i]->capacity = 0;
+            continue;
+        }
+
+        void *new_data = realloc(pools[i]->data, pools[i]->count * sizes[i]);
+        if (!new_data) continue;
+
+        pools[i]->data = new_data;
+        pools[i]->capacity = pools[i]->count;
+    }
+}
+
 int parse_string(char *levelString, int extra_slots, int *out_object_count) {
     int sectionCount = 0;
 
     // Count sections
     const char *sectionStart = levelString;
     char *cursor = levelString;
+    int high_detail_count = 0;
     while(true) {
         if (*cursor == ';' || *cursor == '\0') {
-            if (cursor > sectionStart) sectionCount++;
+            if (cursor > sectionStart) {
+                if (sectionCount > 0 && is_high_detail_object(sectionStart, cursor, NULL)) {
+                    high_detail_count++;
+                }
+                sectionCount++;
+            }
             if (*cursor == '\0') break;
             sectionStart = cursor + 1;
         }
@@ -2425,21 +2446,19 @@ int parse_string(char *levelString, int extra_slots, int *out_object_count) {
     }
     
     int objectCount = sectionCount - 1;
+    int parse_capacity = objectCount - high_detail_count;
+    int alloc_count = parse_capacity + extra_slots;
 
-    printf("%d\n", objectCount);
-    
-    if (!init_arrays(objectCount + extra_slots)) {
+    if (!init_arrays(alloc_count)) {
         free_arrays();
         output_log("Failed to allocate object array\n");
         return LOAD_OUT_OF_MEMORY;
     }
 
-    objects.count = objectCount + extra_slots;
-
-    if (out_object_count) *out_object_count = objectCount;
+    objects.count = alloc_count;
 
     printf("Parsing string and converting objects...\n");
-    printf("Aproximately %d bytes of pure objects\n", sizeof(ObjectsArray) * objectCount);
+    printf("Aproximately %d bytes of pure objects\n", sizeof(ObjectsArray) * alloc_count);
     
     coin_count = 0;
 
@@ -2455,14 +2474,21 @@ int parse_string(char *levelString, int extra_slots, int *out_object_count) {
                 if (!at_end) *cursor = '\0';
                 if (sectionIndex > 0) {
                     // Parse
-                    if (!parse_gd_object(sectionStart, objectIndex)) {
+                    int parsed = parse_gd_object(sectionStart, cursor, objectIndex, parse_capacity);
+                    if (parsed == -2) {
+                        output_log("Object capacity exceeded\n");
+                        free_arrays();
+                        return LOAD_OUT_OF_MEMORY;
+                    }
+                    if (parsed > 0) {
+                        assign_object_to_section(objectIndex);
+                        objectIndex++;
+                    } else if (!parsed) {
                         output_log("what %s\n", sectionStart);
                         output_log("Failed to parse object %d\n", objectIndex);
                         free_arrays();
                         return LOAD_COULDNT_PARSE_OBJECTS;
                     }
-                    assign_object_to_section(objectIndex);
-                    objectIndex++;
                 }
                 sectionIndex++;
             }
@@ -2472,7 +2498,11 @@ int parse_string(char *levelString, int extra_slots, int *out_object_count) {
         cursor++;
     }
 
-    for (int i = 0; i < objectCount; i++) {
+    objects.count = objectIndex + extra_slots;
+
+    if (out_object_count) *out_object_count = objectIndex;
+
+    for (int i = 0; i < objectIndex; i++) {
         for (int g = 0; g < objects.group_count[i]; g++) {
             int group_id = objects.groups[i][g];
             if (group_id > 0) {
@@ -2494,6 +2524,8 @@ int parse_string(char *levelString, int extra_slots, int *out_object_count) {
     for (int i = 1; i < MAX_GROUPS; i++) {
         sort_group(i);
     }
+
+    shrink_trigger_pools();
 
     return LOAD_NO_ERROR;
 }
@@ -2583,6 +2615,8 @@ C2D_SpriteSheet level_font_sheet = NULL;
 const Charset *level_font = &bigFont_fontCharset;
 
 void load_level_string_info(char *level_string) {
+    level_info.low_detail = false;
+
     char *gmd_song_offset = get_metadata_value(level_string, "kA13");
     if (gmd_song_offset) {
         level_info.song_offset = atof(gmd_song_offset);
@@ -2692,7 +2726,9 @@ const char *default_name = "Unknown";
 
 void load_online_level_info(char *level_string) {
     load_level_string_info(level_string);
-    
+
+    level_info.low_detail = current_level_entry ? current_level_entry->data.low_detail : false;
+
     level_info.song_id = current_search_entry->mainSongId;
     level_info.custom_song_id = current_search_entry->songId;
     snprintf(level_info.level_name, sizeof(level_info.level_name), "%s", current_search_entry->name);
@@ -2826,6 +2862,8 @@ int load_online_level(char *level_string) {
 void load_level_info(char *data, char *level_string) {
     load_level_string_info(level_string);
 
+    level_info.low_detail = current_level_entry ? current_level_entry->data.low_detail : false;
+
     char *gmd_song_id = extract_gmd_key((const char *) data, "k8", "i");
     if (!gmd_song_id) {
         level_info.song_id = 0; // Stereo Madness
@@ -2899,6 +2937,7 @@ int load_level(char *path) {
     }
 
     load_level_info(level, data);
+    free(level);
 
     // Minimum size
     level_info.last_obj_x = 570.f;
@@ -2916,7 +2955,6 @@ int load_level(char *path) {
 
     free(data);
     free(metaStr);
-    free(level);
 
     if (returned) return returned;
 
