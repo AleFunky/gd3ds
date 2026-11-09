@@ -27,6 +27,10 @@
 #include "easing.h"
 #include <stdint.h>
 
+#define SPIDER_DASH_SCALE_DURATION 0.45f
+#define SPIDER_DASH_SCALE_START 0.4f
+#define SPIDER_DASH_ELASTIC_PERIOD 0.35f
+
 inline float gravFloor(Player *player) { return player->upside_down ? -state.ceiling_y : state.ground_y; }
 
 void anim_player_to_wall(Player *player);
@@ -947,6 +951,17 @@ void spider_test_jump(Player *player, bool is_retry) {
     player->snap_rotation = true;
     player->buffering_state = BUFFER_END;
 
+    Color dash_color = get_white_if_black(state.current_player == 1 ? p1_color : p2_color);
+    add_spider_dash_effect(player->x, old_y, land_y, player->upside_down, dash_color);
+
+    player->flash_active = true;
+    player->flash_timer = 0.f;
+    player->flash_duration = 0.3f;
+    player->flash_delay = 0.05f;
+
+    player->spider_scale_active = true;
+    player->spider_scale_timer = 0.f;
+
     UseEffect *effect = add_use_effect(player->x, land_y, USE_EFFECT_OBJ_NOTHING, &spider_in_effect, get_use_effect_array_ptr(SCREEN_TOP));
     if (effect) {
         Color p2_not_white = get_white_if_black(p2_color);
@@ -1174,6 +1189,15 @@ void run_player(Player *player) {
             break;
     } 
     
+    if (player->flash_active) {
+        player->flash_timer += STEPS_DT;
+        if (player->flash_timer >= player->flash_delay + player->flash_duration) player->flash_active = false;
+    }
+
+    if (player->spider_scale_active) {
+        player->spider_scale_timer += STEPS_DT;
+        if (player->spider_scale_timer >= SPIDER_DASH_SCALE_DURATION) player->spider_scale_active = false;
+    }
 
     player->blend_timer += STEPS_DT;
     if (player->blend_timer > get_blend_duration(player)) {
@@ -1561,6 +1585,19 @@ void draw_player(Player *player) {
     Color p2_color = player->player_icons.p2_color;
     Color glow_color = player->player_icons.glow_color;
 
+    if (player->flash_active) {
+        float flash_t = player->flash_timer - player->flash_delay;
+        float flash_k = (flash_t <= 0.f) ? 0.f : CLAMP(flash_t / player->flash_duration, 0.f, 1.f);
+
+        p1_color.r = (unsigned char)(255.f + ((float)p1_color.r - 255.f) * flash_k);
+        p1_color.g = (unsigned char)(255.f + ((float)p1_color.g - 255.f) * flash_k);
+        p1_color.b = (unsigned char)(255.f + ((float)p1_color.b - 255.f) * flash_k);
+
+        p2_color.r = (unsigned char)(255.f + ((float)p2_color.r - 255.f) * flash_k);
+        p2_color.g = (unsigned char)(255.f + ((float)p2_color.g - 255.f) * flash_k);
+        p2_color.b = (unsigned char)(255.f + ((float)p2_color.b - 255.f) * flash_k);
+    }
+
     u32 primary_color = C2D_Color32(p1_color.r, p1_color.g, p1_color.b, 255);
     u32 secondary_color = C2D_Color32(p2_color.r, p2_color.g, p2_color.b, 255);
 
@@ -1571,6 +1608,11 @@ void draw_player(Player *player) {
     }
 
     float scale = (player->mini) ? 0.6f : 1.f;
+
+    if (player->gamemode == GAMEMODE_SPIDER && player->spider_scale_active) {
+        float scale_t = CLAMP(player->spider_scale_timer / SPIDER_DASH_SCALE_DURATION, 0.f, 1.f);
+        scale *= SPIDER_DASH_SCALE_START + (1.f - SPIDER_DASH_SCALE_START) * elasticEaseOut(scale_t, SPIDER_DASH_ELASTIC_PERIOD);
+    }
 
     // All of this is just for calculating the cube position in ufo and ship
     float rad = C3D_AngleFromDegrees(player->rotation);
@@ -1605,7 +1647,7 @@ void draw_player(Player *player) {
     int selected_robot = player->player_icons.robot;
     int selected_spider = player->player_icons.spider;
 
-    bool glow_enabled = (player->player_icons.glow || ((p1_color.r | p1_color.g | p1_color.b) == 0));
+    bool glow_enabled = (player->player_icons.glow || ((player->player_icons.p1_color.r | player->player_icons.p1_color.g | player->player_icons.p1_color.b) == 0));
 
     switch (player->gamemode) {
         case GAMEMODE_PLAYER:

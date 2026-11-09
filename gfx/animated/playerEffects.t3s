@@ -1,4 +1,4 @@
---atlas --border edge -f rgba8888 -z auto
+--atlas --border edge -f rgba4444 -z auto
 playerDash2_001.png
 playerDash2_002.png
 playerDash2_003.png
@@ -32,3 +32,11 @@ playerDash2_outline_009.png
 playerDash2_outline_010.png
 playerDash2_outline_011.png
 playerDash2_outline_012.png
+spiderDash_001.png
+spiderDash_002.png
+spiderDash_003.png
+spiderDash_004.png
+spiderDash_005.png
+spiderDash_006.png
+spiderDash_007.png
+spiderDash_008.png

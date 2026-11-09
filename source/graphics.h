@@ -104,7 +104,7 @@ extern C2D_SpriteSheet spriteSheet2;
 extern C2D_SpriteSheet spriteSheet3;
 extern C2D_SpriteSheet spriteSheet4;
 extern C2D_SpriteSheet animatedSheet;
-extern C2D_SpriteSheet playerDashSheet;
+extern C2D_SpriteSheet playerEffectsSheet;
 extern C2D_SpriteSheet glowSheet;
 extern C2D_SpriteSheet bgSheet;
 extern int loaded_bg_sheet;
@@ -120,9 +120,10 @@ extern C2D_SpriteSheet spiderSheet;
 extern C2D_SpriteSheet trailSheet;
 extern C2D_SpriteSheet particleSheet;
 
-#define PLAYER_DASH_FIRE_START 0
-#define PLAYER_DASH_BOOM_START 12
-#define PLAYER_DASH_OUTLINE_START 21
+#define PLAYER_EFFECTS_FIRE_START 0
+#define PLAYER_EFFECTS_BOOM_START 12
+#define PLAYER_EFFECTS_OUTLINE_START 21
+#define PLAYER_EFFECTS_SPIDER_START 33
 
 extern SpriteTemplate sprite_templates[GAME_OBJECT_COUNT];
 
@@ -215,6 +216,7 @@ void draw_player_graphics();
 
 void add_dash_boom(float x, float y, float rotation);
 void add_gravity_dash_boom(float x, float y, float rotation);
+void add_spider_dash_effect(float x, float from_y, float to_y, bool upside_down, Color color);
 void update_dash_booms(float delta);
 void draw_dash_booms(void);
 int get_coin_texture(int tex, int ticks);

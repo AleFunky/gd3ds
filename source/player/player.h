@@ -158,6 +158,14 @@ typedef struct {
     float dash_angle;
     float dash_fire_timer;
 
+    bool flash_active;
+    float flash_timer;
+    float flash_duration;
+    float flash_delay;
+
+    bool spider_scale_active;
+    float spider_scale_timer;
+
     bool jumped;
     bool landed_from_jump;
 

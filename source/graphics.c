@@ -101,7 +101,7 @@ C2D_SpriteSheet spriteSheet2;
 C2D_SpriteSheet spriteSheet3;
 C2D_SpriteSheet spriteSheet4;
 C2D_SpriteSheet animatedSheet;
-C2D_SpriteSheet playerDashSheet;
+C2D_SpriteSheet playerEffectsSheet;
 C2D_SpriteSheet glowSheet;
 C2D_SpriteSheet bgSheet;
 int loaded_bg_sheet = 0;
@@ -1947,7 +1947,7 @@ static void dash_fire_state(const Player *player, float *local_x, float *local_y
 }
 
 void draw_dash_fire(Player *player) {
-    if (!player->dashing || state.dead || !playerDashSheet) return;
+    if (!player->dashing || state.dead || !playerEffectsSheet) return;
 
     float local_x, local_y, sx, sy;
     Color color;
@@ -1977,7 +1977,7 @@ void draw_dash_fire(Player *player) {
     change_blending(true);
 
     C2D_Sprite spr = { 0 };
-    C2D_SpriteFromSheet(&spr, playerDashSheet, PLAYER_DASH_FIRE_START + frame);
+    C2D_SpriteFromSheet(&spr, playerEffectsSheet, PLAYER_EFFECTS_FIRE_START + frame);
     C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
     dash_sprite_pos(base_x, base_y, rotation, dash_fire_off_x[frame], dash_fire_off_y[frame], &px, &py);
     C2D_SpriteSetPos(&spr, (int)px, (int)py);
@@ -1987,7 +1987,7 @@ void draw_dash_fire(Player *player) {
 
     change_blending(false);
 
-    C2D_SpriteFromSheet(&spr, playerDashSheet, PLAYER_DASH_OUTLINE_START + frame);
+    C2D_SpriteFromSheet(&spr, playerEffectsSheet, PLAYER_EFFECTS_OUTLINE_START + frame);
     C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
     dash_sprite_pos(base_x, base_y, rotation, dash_outline_off_x[frame], 0.f, &px, &py);
     C2D_SpriteSetPos(&spr, (int)px, (int)py);
@@ -2070,7 +2070,7 @@ void update_dash_booms(float delta) {
 void draw_dash_booms(void) {
     static unsigned int last_frame = 0;
 
-    if (!playerDashSheet) return;
+    if (!playerEffectsSheet) return;
 
     if (frame_counter != last_frame) {
         update_dash_booms(1.f / 60.f);
@@ -2107,7 +2107,7 @@ void draw_dash_booms(void) {
             C2D_Sprite spr = { 0 };
             float px, py;
 
-            C2D_SpriteFromSheet(&spr, playerDashSheet, PLAYER_DASH_FIRE_START + frame);
+            C2D_SpriteFromSheet(&spr, playerEffectsSheet, PLAYER_EFFECTS_FIRE_START + frame);
             C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
             dash_sprite_pos(x, y, fx->rotation, dash_fire_off_x[frame], dash_fire_off_y[frame], &px, &py);
             C2D_SpriteSetPos(&spr, (int)px, (int)py);
@@ -2117,7 +2117,7 @@ void draw_dash_booms(void) {
 
             change_blending(false);
 
-            C2D_SpriteFromSheet(&spr, playerDashSheet, PLAYER_DASH_OUTLINE_START + frame);
+            C2D_SpriteFromSheet(&spr, playerEffectsSheet, PLAYER_EFFECTS_OUTLINE_START + frame);
             C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
             dash_sprite_pos(x, y, fx->rotation, dash_outline_off_x[frame], 0.f, &px, &py);
             C2D_SpriteSetPos(&spr, (int)px, (int)py);
@@ -2144,7 +2144,7 @@ void draw_dash_booms(void) {
             C2D_Sprite spr = { 0 };
             float px, py;
 
-            C2D_SpriteFromSheet(&spr, playerDashSheet, PLAYER_DASH_BOOM_START + frame);
+            C2D_SpriteFromSheet(&spr, playerEffectsSheet, PLAYER_EFFECTS_BOOM_START + frame);
             C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
             dash_sprite_pos(x, y, fx->rotation, dash_boom_off_x[frame], dash_boom_off_y[frame], &px, &py);
             C2D_SpriteSetPos(&spr, (int)px, (int)py);
@@ -2152,6 +2152,96 @@ void draw_dash_booms(void) {
             C2D_SpriteSetRotationDegrees(&spr, fx->rotation);
             C2D_DrawSpriteTinted(&spr, &tint);
         }
+    }
+}
+
+#define MAX_SPIDER_DASH_FX 4
+#define SPIDER_DASH_FRAME_TIME 0.04f
+#define SPIDER_DASH_FRAME_COUNT 8
+#define SPIDER_DASH_LIFETIME (SPIDER_DASH_FRAME_TIME * SPIDER_DASH_FRAME_COUNT)
+#define SPIDER_DASH_WIDTH 221.f
+
+typedef struct {
+    bool active;
+    float x, y;
+    float rotation;
+    float scale_x;
+    float elapsed;
+    Color color;
+    int start_frame;
+} SpiderDashEffect;
+
+static SpiderDashEffect spider_dash_effects[MAX_SPIDER_DASH_FX];
+
+static const signed char spider_dash_off_x[SPIDER_DASH_FRAME_COUNT] = { 2, -4, -31, -47, -55, -72, -79, -98 };
+static const signed char spider_dash_off_y[SPIDER_DASH_FRAME_COUNT] = { 0, 0, 0, 1, 1, 1, 1, 2 };
+
+void add_spider_dash_effect(float x, float from_y, float to_y, bool upside_down, Color color) {
+    SpiderDashEffect *fx = NULL;
+
+    for (int i = 0; i < MAX_SPIDER_DASH_FX; i++) {
+        if (!spider_dash_effects[i].active) {
+            fx = &spider_dash_effects[i];
+            break;
+        }
+    }
+
+    if (!fx) return;
+
+    fx->active = true;
+    fx->x = x;
+    fx->y = from_y + (to_y - from_y) * 0.5f;
+    fx->rotation = upside_down ? 90.f : -90.f;
+    fx->scale_x = (fabsf(from_y - to_y) + 30.f) / SPIDER_DASH_WIDTH;
+    fx->elapsed = 0.f;
+    fx->color = color;
+    fx->start_frame = state.player.frame;
+}
+
+static void draw_spider_dash_effects(void) {
+    static unsigned int last_frame = 0;
+
+    if (!playerEffectsSheet) return;
+
+    if (frame_counter != last_frame) {
+        for (int i = 0; i < MAX_SPIDER_DASH_FX; i++) {
+            SpiderDashEffect *fx = &spider_dash_effects[i];
+            if (!fx->active) continue;
+
+            fx->elapsed += 1.f / 60.f;
+            if (fx->elapsed >= SPIDER_DASH_LIFETIME) fx->active = false;
+        }
+        last_frame = frame_counter;
+    }
+
+    for (int i = 0; i < MAX_SPIDER_DASH_FX; i++) {
+        SpiderDashEffect *fx = &spider_dash_effects[i];
+        if (!fx->active) continue;
+
+        if (state.player.frame < fx->start_frame) {
+            fx->active = false;
+            continue;
+        }
+
+        float x = get_mirror_x(fx->x - state.camera_x, state.mirror_factor);
+        float y = SCREEN_HEIGHT - (fx->y - state.camera_y);
+
+        int frame = (int)(fx->elapsed / SPIDER_DASH_FRAME_TIME);
+        if (frame >= SPIDER_DASH_FRAME_COUNT) frame = SPIDER_DASH_FRAME_COUNT - 1;
+
+        float px, py;
+        dash_sprite_pos(x, y, fx->rotation, spider_dash_off_x[frame] * fx->scale_x, spider_dash_off_y[frame], &px, &py);
+
+        C2D_ImageTint tint = { 0 };
+        C2D_PlainImageTint(&tint, C2D_Color32(fx->color.r, fx->color.g, fx->color.b, 255), 1.f);
+
+        C2D_Sprite spr = { 0 };
+        C2D_SpriteFromSheet(&spr, playerEffectsSheet, PLAYER_EFFECTS_SPIDER_START + frame);
+        C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
+        C2D_SpriteSetPos(&spr, (int)px, (int)py);
+        C2D_SpriteSetScale(&spr, fx->scale_x, 1.f);
+        C2D_SpriteSetRotationDegrees(&spr, fx->rotation);
+        C2D_DrawSpriteTinted(&spr, &tint);
     }
 }
 
@@ -2212,6 +2302,7 @@ void draw_player_graphics() {
     if (state.show_player) {
         change_blending(true);
         draw_dash_booms();
+        draw_spider_dash_effects();
         change_blending(false);
     }
 
