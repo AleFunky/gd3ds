@@ -72,6 +72,7 @@ const UIScreenDefPair *defs[] = {
     &updater_pop_up_def,
     &quit_pop_up_def,
     &autoupdate_pop_up_def,
+    &online_level_options_def
 };
 
 extern const UIScreenDefPair *ui_get_screen_def(const char* name){
