@@ -1,0 +1,73 @@
+#include "ui_spinner.hpp"
+#include <citro3d.h>
+#include "graphics.hpp"
+
+#include "menus/core/ui_props.hpp"
+#include "menus/core/ui_screen.hpp"
+#include "ui_image.hpp"
+#include "math_helpers.hpp"
+
+static void ui_spinner_draw(UIElement* e, UITransform *transform) {
+    UIImage *image = (UIImage *) e;
+    UISpinner *spinner = (UISpinner *) image;
+    
+    C2D_SpriteRotate(&image->image.sprite, C3D_AngleFromDegrees(spinner->rotation_speed * DT)); // Cloud pls save us all and do screen rewrite //Why would that help this
+    
+    change_blending(spinner->blending);
+    ui_image_draw(e, transform);
+    change_blending(false);
+}
+
+void ui_spinner_destroy(UIElement *e) {
+    if (e) {
+        free(e);
+        e = NULL;
+    }
+}
+
+
+UISpinner *ui_create_spinner(UIScreen *s) {
+    UISpinner *e = (UISpinner *)malloc(sizeof(UISpinner));
+
+    if (!e) return NULL;
+
+    UIImage *image = (UIImage *) e;
+
+    memset(e, 0, sizeof(UIImage));
+    image->base.type = UI_IMAGE;
+    image->base.enabled = true;
+
+    ui_element_apply_default_properties(&image->base, s);
+
+    ui_image_clear_tint(image);
+    ui_image_set_image(image, 53, 1);
+
+    e->blending = true;
+
+    image->base.draw = ui_spinner_draw;
+    image->base.destroy = ui_spinner_destroy;
+
+    return e;
+}
+
+UIElement *ui_create_spinner_from_props(UIScreen *s, const UIPropertyList *props) {
+    UISpinner *spinner = ui_create_spinner(s);
+    
+    if (!spinner) return NULL;
+
+    UIImage *image = (UIImage *) spinner;
+
+    ui_element_apply_properties(&image->base, s, props);
+
+    ui_image_set_image(image, 
+        ui_prop_int(props, "id", 53),
+        ui_prop_int(props, "sheet", 1)
+    );
+    
+    ui_image_set_tint(image, ui_prop_color(props, "color", ABGR8(255, 255, 255, 200)));
+
+    spinner->rotation_speed = ui_prop_float(props, "speed", 360);
+    spinner->blending = ui_prop_bool(props, "blending", true);
+
+    return &image->base;
+}

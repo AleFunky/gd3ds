@@ -57,7 +57,7 @@ ifeq ($(ENABLE_DEBUG_LEAKS),1)
 endif
 
 CFLAGS := $(COMMON_FLAGS) -std=gnu11
-CXXFLAGS := $(COMMON_FLAGS) -std=gnu++11
+CXXFLAGS := $(COMMON_FLAGS) -std=gnu++17
 ifeq ($(ENABLE_EXCEPTIONS),)
 	CXXFLAGS += -fno-rtti -fno-exceptions
 endif

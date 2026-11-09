@@ -1,0 +1,268 @@
+#include <3ds.h>
+#include <citro2d.h>
+#include <stdlib.h>
+
+#include "main.hpp"
+#include "menus/core/ui_screen.hpp"
+#include "text.hpp"
+
+#include "menus/components/ui_rectangle.hpp"
+#include "menus/components/ui_list.hpp"
+#include "menus/components/ui_label.hpp"
+#include "menus/settings_hub/info_card.hpp"
+#include "menus/updater.hpp"
+#include "menus/updater_pop_up.hpp"
+#include "menus/updater_settings.hpp"
+#include "fonts/chatFont.hpp"
+
+#include "utils/server_utils.hpp"
+#include "utils/utils.hpp"
+#include "utils/folders.hpp"
+
+static UIScreen *screen;
+
+static UIList *list;
+static UILabel *error_label;
+static UIButton *updater_button;
+static UISpinner *spinner;
+
+GenericTask updater_task = {
+    .func = check_for_updates
+};
+
+Thread updater_thread;
+bool checkedForUpdate = false;
+
+static void action_update(UIElement *e, const UIPropertyList *p) {
+    if (is_3DSX && is_citra() && !_3dsx_path) {
+        InfoCardData *data = (InfoCardData *)malloc(sizeof(InfoCardData));
+        if (!data) return;
+
+        data->text = strdup(".3dsx updates aren't supported on\nemulators! Please update the game\nmanually.");
+        data->title = strdup("Error");
+        data->customTitle = true;
+        data->copied = true;
+
+        ui_stack_push(&info_card_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+        ui_stack_push_data(data);
+        return;
+    }
+    if (update_data->isAvailable && checkedForUpdate) ui_stack_push(&updater_pop_up_def, ANIM_NONE, ANIM_ZOOM, PUSH_NEXT); 
+}
+
+static void action_refresh_updates(UIElement *e, const UIPropertyList *p) {
+    if (updater_task.running) return;
+    ui_label_set_text(error_label, "");
+    ui_list_reset(list);
+    ui_enable_element((UIElement *) spinner);
+    ui_disable_element((UIElement *) updater_button);
+    checkedForUpdate = false;
+    updater_thread = create_generic_thread(&updater_task);
+}
+
+const char *handle_updater_error_codes(int code) {
+    switch (code) {
+        case -4:
+            return "Too many requests!\nPlease try again later.";
+            break;
+        case -3:
+            return "No updates found.";
+            break;
+        case -2:
+            return "Failed to find a release!";
+            break;
+        case -1:
+            return "Failed to parse response!";
+            break;
+        case 6:
+        case 7:
+            return "No internet connection!";
+            break;
+        case 28:
+            return "Connection timed out.";
+            break;
+        case 56: 
+            return "Connection interrupted.";
+            break;
+        case 42:
+            break;
+        default:
+            return "Unknown error.";
+            break;
+    }
+    return "";
+}
+
+static UIActionDef updater_actions[] = {
+    {"update", action_update },
+    {"refresh", action_refresh_updates }
+};
+
+static void populate_info() {
+    int list_width = list->base.w / 2;
+    int textMarginX = 0;
+    int textMarginY = 3;
+    float textScale = 0.75;
+    int lineHeight = 10;
+
+    // list commits for nightly
+    if (useNightlyBranch && latestCommits) {
+
+        // description card
+        UIElement *info = (UIElement *)ui_create_rectangle(screen);
+        if (info) {
+            ui_rectangle_set_color((UIRectangle *)info, C2D_Color32(194, 114, 62, 0));
+            ui_element_set_size(info, list->base.w, lineHeight + textMarginY * 2);
+            // label
+            UILabel *label = ui_create_label(screen);
+            if (label) {
+                ui_label_set_text(label, "<#ffff00>Changes since last update:</>");
+                ui_element_set_scale((UIElement *)label, textScale);
+                ui_element_set_position((UIElement *)label, -list_width + textMarginX, 0);
+                label->font = 1;
+                ui_element_add_child(info, (UIElement *)label);
+            }
+            ui_list_add(list, info);
+        }
+
+        for (int i = 0; i < latestCommitCount; i++) {
+            float commit_scale = textScale * 0.9f;
+            char *buf = wrap_text(&chatFont_fontCharset, commit_scale, latestCommits[i], list->base.w - 2 * textMarginX);
+            float textHeight = get_text_height(&chatFont_fontCharset, &chatFont_sheet, commit_scale, true, buf);
+
+            UIElement *card = (UIElement *)ui_create_rectangle(screen);
+            if (card && i < 30 - 1) {
+                ui_rectangle_set_color((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 0) : C2D_Color32(194, 114, 62, 63)));
+                ui_element_set_size(card, list->base.w, textHeight + textMarginY * 2);
+                
+                // commit title
+                UILabel *title = ui_create_label(screen);
+                if (title) {
+                    ui_label_set_text(title, buf);
+
+                    ui_element_set_position((UIElement *)title, -list_width + textMarginX, 0);
+                    ui_element_set_scale((UIElement *)title, commit_scale );
+
+                    title->font = 1;
+
+                    ui_element_add_child(card, (UIElement *)title);
+                }
+
+                ui_list_add(list, card);
+            } else if (card) {
+                ui_rectangle_set_color((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 0) : C2D_Color32(194, 114, 62, 63)));
+                ui_element_set_size(card, list->base.w, lineHeight + textMarginY * 2);
+                
+                // ... and more
+                UILabel *title = ui_create_label(screen);
+                if (title) {
+                    ui_label_set_text(title, "<#27ff00>... and more!</>");
+
+                    ui_element_set_position((UIElement *)title, -list_width + textMarginX, 0);
+                    ui_element_set_scale((UIElement *)title, textScale);
+
+                    title->font = 1;
+
+                    ui_element_add_child(card, (UIElement *)title);
+                }
+
+                ui_list_add(list, card);
+            }
+        }
+    } else if (update_data->releaseBody) {
+        int baseLineCount = 0;
+        char **infoText = split_string(update_data->releaseBody, '\n', &baseLineCount, true);
+        // description card
+        UIElement *info = (UIElement *)ui_create_rectangle(screen);
+        if (info) {
+            ui_rectangle_set_color((UIRectangle *)info, C2D_Color32(194, 114, 62, 0));
+            ui_element_set_size(info, list->base.w, lineHeight + textMarginY * 2);
+            // label
+            UILabel *label = ui_create_label(screen);
+            if (label) {
+                ui_label_set_text(label, update_data->releaseTitle);
+                ui_element_set_scale((UIElement *)label, textScale * 1.2);
+                ui_element_set_position((UIElement *)label, -list_width + textMarginX, 0);
+                label->font = 1;
+                ui_element_add_child(info, (UIElement *)label);
+            }
+            ui_list_add(list, info);
+        }
+        // body 
+        for (int i = 0; i < baseLineCount; i++) {
+            char *buf = wrap_text(&chatFont_fontCharset, textScale, infoText[i], list->base.w - 2 * textMarginX);
+            float textHeight = get_text_height(&chatFont_fontCharset, &chatFont_sheet, textScale, true, buf);
+
+            UIElement *card = (UIElement *)ui_create_rectangle(screen);
+            if (card) {
+                ui_rectangle_set_color((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 0) : C2D_Color32(161, 88, 48, 0)));
+                ui_element_set_size(card, list->base.w, textHeight + textMarginY * 2);
+                
+                // commit title
+                UILabel *title = ui_create_label(screen);
+                if (title) {
+                    title->base.w = list->base.w - 2 * textMarginX; 
+                    ui_label_set_text(title, buf);
+
+                    ui_element_set_position((UIElement *)title, -list_width + textMarginX, 0);
+                    ui_element_set_scale((UIElement *)title, textScale);
+
+                    title->font = 1;
+
+                    ui_element_add_child(card, (UIElement *)title);
+                }
+
+                ui_list_add(list, card);
+            }   
+        }
+        free_string_array(infoText, baseLineCount);
+    }
+}
+
+static void updater_init(UIScreen *s) {
+    screen = s;
+    list = (UIList *)ui_get_element_by_tag(s, "list");
+    updater_button = (UIButton *)ui_get_element_by_tag(s, "updatebutton");
+    spinner = (UISpinner *)ui_get_element_by_tag(s, "spinner");
+    error_label = (UILabel *)ui_get_element_by_tag(s, "errorlabel");
+    if (checkedForUpdate && update_data->isAvailable) {
+        ui_disable_element((UIElement *) spinner);
+        populate_info();
+    } else {
+        ui_disable_element((UIElement *) updater_button);
+        ui_enable_element((UIElement *) spinner);
+        if (!updater_task.running) updater_thread = create_generic_thread(&updater_task);
+    }
+}
+
+static void updater_update(UIScreen *s, UIInput *i) {
+    // Run when finished
+    if (updater_task.finished) {
+        ui_disable_element((UIElement *) spinner);
+        // Handle result
+        if (updater_task.result == 0) {
+            if (update_data->isAvailable) {
+                ui_enable_element((UIElement *) updater_button);
+                populate_info();
+                checkedForUpdate = true;
+            }
+        } else {
+            output_log(handle_updater_error_codes(updater_task.result));
+            ui_label_set_text(error_label, handle_updater_error_codes(updater_task.result));
+        }
+        updater_task.finished = false;
+    }
+}
+
+extern const UIScreenDefPair updater_def = {
+    .name = "updater",
+    .btm = {
+        .path = "romfs:/menus/updater.txt",
+        .init = updater_init,
+        .update = updater_update,
+        .action_list = {
+            .actions = updater_actions,
+            .action_count = ARRAY_LEN(updater_actions)
+        }
+    },
+};

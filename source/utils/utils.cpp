@@ -1,0 +1,254 @@
+#include "utils.hpp"
+#include "level_loading.hpp"
+#include "main.hpp"
+#include <assert.h>
+#include <stdio.h>
+#include <string.h>
+#include <zlib.h>
+#include <malloc.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <minizip/unzip.h>
+
+u8 get_model() {
+    u8 model;
+    CFGU_GetSystemModel(&model);
+    return model;
+}
+
+size_t get_uncompressed_size(unsigned char *data, int data_len) {
+    z_stream strm;
+    memset(&strm, 0, sizeof(strm));
+    strm.next_in = data;
+    strm.avail_in = data_len;
+
+    if (inflateInit2(&strm, 15 | 32) != Z_OK) {  // auto-detect gzip/zlib
+        return 0;
+    }
+
+    size_t total_out = 0;
+    unsigned char buf[4096];
+
+    do {
+        strm.next_out = buf;
+        strm.avail_out = sizeof(buf);
+        int ret = inflate(&strm, Z_NO_FLUSH);
+        if (ret == Z_STREAM_ERROR || ret == Z_DATA_ERROR || ret == Z_MEM_ERROR) {
+            inflateEnd(&strm);
+            return 0;
+        }
+        total_out += sizeof(buf) - strm.avail_out;
+        if (ret == Z_STREAM_END) break;
+    } while (strm.avail_in > 0);
+
+    inflateEnd(&strm);
+    return total_out;
+}
+
+
+unsigned char *compress_data(const unsigned char *data, size_t data_len, size_t *out_len, int *out_code) {
+    z_stream strm = {0};
+
+    if (deflateInit2(&strm, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 15, 8, Z_DEFAULT_STRATEGY) != Z_OK) {
+        return NULL;
+    }
+
+    uLong bound = deflateBound(&strm, data_len);
+
+    unsigned char *out = (unsigned char *)malloc(bound);
+    if (!out) {
+        deflateEnd(&strm);
+        return NULL;
+    }
+
+    strm.next_in = (Bytef *)data;
+    strm.avail_in = data_len;
+
+    strm.next_out = out;
+    strm.avail_out = bound;
+
+    int ret = deflate(&strm, Z_FINISH);
+
+    if (ret != Z_STREAM_END) {
+        free(out);
+        deflateEnd(&strm);
+        *out_code = LOAD_INVALID_COMPRESSED_DATA;
+        return NULL;
+    }
+
+    *out_len = strm.total_out;
+
+    deflateEnd(&strm);
+
+    *out_code = LOAD_NO_ERROR;
+
+    return out;
+}
+
+
+char *decompress_data(unsigned char *data, size_t data_len, size_t *out_len, int *out_code) {
+    uLongf final_size = get_uncompressed_size(data, data_len);
+
+    z_stream strm = {0};
+    strm.next_in = data;
+    strm.avail_in = data_len;
+
+    if (inflateInit2(&strm, 15 | 32) != Z_OK) {   // auto-detect gzip/zlib
+        printf("Failed to initialize zlib stream for GZIP\n");
+        *out_code = LOAD_INVALID_COMPRESSED_DATA;
+        return NULL;
+    }
+
+    // Allocate exactly enough memory
+    char *out = (char *)malloc(final_size + 1);
+    if (!out) {
+        printf("malloc failed for %lu bytes\n", (unsigned long)final_size);
+        inflateEnd(&strm);
+        *out_code = LOAD_OUT_OF_MEMORY;
+        return NULL;
+    }
+
+    strm.next_out = (Bytef *)out;
+    strm.avail_out = final_size;
+
+    int ret = inflate(&strm, Z_FINISH);
+    if (ret != Z_STREAM_END) {
+        printf("inflate failed with code %d\n", ret);
+        free(out);
+        inflateEnd(&strm);
+        *out_code = LOAD_INVALID_COMPRESSED_DATA;
+        return NULL;
+    }
+
+    *out_len = strm.total_out;
+    out[*out_len] = '\0'; // Null-terminate if treating as string
+
+    inflateEnd(&strm);
+
+    printf("Decompressed %lu bytes successfully\n", (unsigned long)*out_len);
+
+    *out_code = LOAD_NO_ERROR;
+    return out;
+}
+
+static void generic_thread(void *arg) {
+    GenericTask *task = (GenericTask *)arg;
+
+    task->result = task->func(task);
+
+    task->running = false;
+    task->finished = true;
+}
+
+Thread create_generic_thread(GenericTask *task) {
+    int32_t priority = 0x30;
+    svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
+    priority += 1;
+    priority = priority < 0x18 ? 0x18 : priority;
+    priority = priority > 0x3F ? 0x3F : priority;
+
+    task->finished = false;
+    task->running = true;
+    task->cancelled = false;
+    
+    return threadCreate(
+        generic_thread,
+        task,
+        32 * 1024,
+        priority,
+        (is_N3DS ? 2 : 0),
+        true
+   );
+}
+
+// adapted from https://stackoverflow.com/questions/10440113/simple-way-to-unzip-a-zip-file-using-zlib
+
+// extracts zip file at input_path to folder destination_path
+int extract_zip(const char *input_path, const char *destination_dir) {
+    // open file at input path
+    unzFile *zipFile = (unzFile *)unzOpen(input_path);
+    if (!zipFile) {
+        output_log("failed to open zip file\n");
+        return 1;
+    }
+    // get zip file metadata
+    unz_global_info global_info;
+    if (unzGetGlobalInfo(zipFile, &global_info) != UNZ_OK){
+        output_log("failed to get zip file metadata\n");
+        return 1;
+    }
+
+    // buffer to hold data read from the zip file.
+    char read_buffer[8192];
+
+    for (uLong i = 0; i < global_info.number_entry; i++) {
+        // get current file metadata
+        unz_file_info file_info;
+        char filename[256];
+        char path[256 + sizeof(filename)];
+
+        if (unzGetCurrentFileInfo(zipFile, &file_info, filename, sizeof(filename), NULL, 0, NULL, 0) != UNZ_OK) {
+          output_log("could not read file metadata\n");
+          unzClose(zipFile);
+          return 1;
+        }
+
+        const size_t filename_length = strlen(filename);
+
+        snprintf(path, sizeof(path), "%s%s", destination_dir, filename);
+
+        if (filename[ filename_length-1 ] == '/') {
+            // entry is a directory, so create it
+            mkdir(path, 0777);
+        } else {
+            // entry is a file, so extract it
+            if (unzOpenCurrentFile(zipFile) != UNZ_OK) {
+                output_log("could not open file\n");
+                unzClose(zipFile);
+                return 1;
+            }
+
+            // open a file to write out the data
+            FILE *out = fopen(path, "wb");
+            if (!out) {
+                output_log("could not open destination file\n");
+                unzCloseCurrentFile(zipFile);
+                unzClose(zipFile);
+                return 1;
+            }
+
+            int error = UNZ_OK;
+            do {
+                error = unzReadCurrentFile(zipFile, read_buffer, sizeof(read_buffer));
+                if (error < 0) {
+                    output_log("error %d\n", error);
+                    unzCloseCurrentFile(zipFile);
+                    unzClose(zipFile);
+                    return 1;
+                }
+
+                // write data to file
+                if (error > 0) {
+                    fwrite(read_buffer, sizeof(read_buffer), 1, out);
+                }
+            } while (error > 0);
+
+            fclose(out);
+
+        }
+        unzCloseCurrentFile(zipFile);
+
+        // go the the next entry listed in the zip file
+        if ((i+1) < global_info.number_entry) {
+            if (unzGoToNextFile(zipFile) != UNZ_OK)
+            {
+                output_log("could not read next file\n");
+                unzClose(zipFile);
+                return 1;
+            }
+        }
+    }
+
+    unzClose(zipFile);
+    return 0;
+};
