@@ -46,7 +46,7 @@ static void ui_icon_draw(UIElement* e, UITransform *transform) {
             icon->p2_color,
             icon->glow_color,
             (IconParameters) { 
-                .anim_id = (icon->gamemode == GAMEMODE_ROBOT ? ROBOT_ANIM_IDLE : SPIDER_ANIM_IDLE),
+                .anim_id = (icon->gamemode == (int)GAMEMODE_ROBOT ? (int)ROBOT_ANIM_IDLE : (int)SPIDER_ANIM_IDLE),
                 .anim_frame = 0
             }
         );

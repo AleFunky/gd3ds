@@ -206,7 +206,7 @@ void spawn_glow_layer_at(
 Color get_color_abgr8(u32 color);
 
 const SlotFrames* find_slot_frames(const GameObject* obj, int slot);
-size_t get_child_group(const GameObject* obj, size_t child_index);
+int get_child_group(const GameObject* obj, int child_index);
 const Animation* get_animation_for_object(int id);
 
 void handle_mirror_transition();

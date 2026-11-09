@@ -20,7 +20,7 @@
 Config cfg;
 
 void init_user_config(Config *cfg) {
-    for (int i = 0; i < ARRAY_LEN(settings); i++) {
+    for (size_t i = 0; i < ARRAY_LEN(settings); i++) {
         if (!settings[i].var) continue;
 
         config_init_bool(cfg,

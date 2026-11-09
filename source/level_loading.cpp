@@ -329,7 +329,7 @@ char *read_file_arena(Arena *arena, const char *filepath, size_t *out_size) {
     }
     rewind(f);
 
-    char *buffer = arena_alloc(arena, size + 1);
+    char *buffer = (char *)arena_alloc(arena, size + 1);
     if (!buffer) {
         output_log("Failed to allocate file\n");
         fclose(f);
@@ -1811,7 +1811,7 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
 bool obj_has_main(const GameObject *obj) {
     if (obj->color_type != COLOR_TYPE_DETAIL) return true;
     
-    for (size_t i = 0; i < obj->child_count; i++) {
+    for (int i = 0; i < obj->child_count; i++) {
         if (obj->children[i].color_type != COLOR_TYPE_DETAIL) return true;
     }
     return false;
@@ -1820,7 +1820,7 @@ bool obj_has_main(const GameObject *obj) {
 bool obj_has_detail(const GameObject *obj) {
     if (obj->color_type == COLOR_TYPE_DETAIL) return true;
     
-    for (size_t i = 0; i < obj->child_count; i++) {
+    for (int i = 0; i < obj->child_count; i++) {
         if (obj->children[i].color_type == COLOR_TYPE_DETAIL) return true;
     }
     return false;
@@ -2217,7 +2217,7 @@ bool init_arrays(size_t count) {
     objects_bool_block = (bool *)arena_alloc(&level_arena, sizeof(bool) * count * 9);
     if (!objects_bool_block) return false;
 
-    objects_groups_block = (short[MAX_GROUPS_PER_OBJECT] *)arena_alloc(&level_arena, sizeof(short[MAX_GROUPS_PER_OBJECT]) * count);
+    objects_groups_block = (short (*)[MAX_GROUPS_PER_OBJECT])arena_alloc(&level_arena, sizeof(short[MAX_GROUPS_PER_OBJECT]) * count);
     if (!objects_groups_block) return false;
 
     objects_u8_block = (u8 *)arena_alloc(&level_arena, sizeof(u8) * count * 6);

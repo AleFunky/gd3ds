@@ -164,15 +164,15 @@ C2D_SpriteSheet get_sprite_sheet_ex(int index, int *rel_index) {
 }
 
 const SlotFrames* find_slot_frames(const GameObject* obj, int slot) {
-    for (size_t i = 0; i < obj->slot_count; i++) {
+    for (int i = 0; i < obj->slot_count; i++) {
         if (obj->slot_frames[i].slot == slot) return &obj->slot_frames[i];
     }
     return NULL;
 }
 
-size_t get_child_group(const GameObject* obj, size_t child_index) {
-    for (size_t g = 0; g < obj->group_count; g++) {
-        size_t end = obj->groups[g].start + obj->groups[g].count;
+int get_child_group(const GameObject* obj, int child_index) {
+    for (int g = 0; g < obj->group_count; g++) {
+        int end = obj->groups[g].start + obj->groups[g].count;
         if (child_index >= obj->groups[g].start && child_index < end)
             return g;
     }
@@ -295,7 +295,7 @@ void cache_all_sprites() {
         sprite_templates[id].child_count = obj->child_count;
         if (obj->child_count > 0) {
             sprite_templates[id].child_templates = (C2D_Sprite *)malloc(sizeof(C2D_Sprite) * obj->child_count);
-            for (size_t i = 0; i < obj->child_count; i++) {
+            for (int i = 0; i < obj->child_count; i++) {
                 const ChildSprite* c = &obj->children[i];
                 if (c->texture < 0) continue;
 
@@ -933,7 +933,7 @@ void spawn_object_at(
     }
 
     // Spawn children
-    for (size_t i = 0; i < obj->child_count; i++) {
+    for (int i = 0; i < obj->child_count; i++) {
         const ChildSprite* c = &obj->children[i];
         
         if (sprite_count >= MAX_SPRITES - 1) return;
@@ -964,11 +964,11 @@ void spawn_object_at(
 
             // handle movement anims
             if (anim_keyframe) {
-                size_t group = get_child_group(obj, i);
+                int group = get_child_group(obj, i);
                 if (group >= 0) {
                     const AnimSprite* anim_sprite = NULL;
                     for (size_t k = 0; k < anim_keyframe->sprite_count; k++) {
-                        if (anim_keyframe->sprites[k].child_slot == group) {
+                        if (anim_keyframe->sprites[k].child_slot == (size_t)group) {
                             anim_sprite = &anim_keyframe->sprites[k];
                             break;
                         }
@@ -1168,7 +1168,7 @@ int get_object_layers(int id) {
     const GameObject *obj = (const GameObject*)&game_objects[id];
     if (obj->texture >= 0) count++;
     
-    for (size_t c = 0; c < obj->child_count; c++) {
+    for (int c = 0; c < obj->child_count; c++) {
         if (obj->children[c].texture >= 0) count++;
     }
     return count;

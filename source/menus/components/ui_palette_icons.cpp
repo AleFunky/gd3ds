@@ -27,7 +27,7 @@ static void ui_palette_icons_draw(UIElement* e, UITransform *transform) {
             C2D_Color32(p2_color.r, p2_color.g, p2_color.b, 255),
             C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255),
             (IconParameters) { 
-                .anim_id = (g == GAMEMODE_ROBOT ? ROBOT_ANIM_IDLE : SPIDER_ANIM_IDLE),
+                .anim_id = (g == (int)GAMEMODE_ROBOT ? (int)ROBOT_ANIM_IDLE : (int)SPIDER_ANIM_IDLE),
                 .anim_frame = 0
             }
         );

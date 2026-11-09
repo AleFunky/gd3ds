@@ -1,12 +1,12 @@
-#include "collectable_effect.h"
+#include "collectable_effect.hpp"
 
 #include <math.h>
-#include "math_helpers.h"
-#include "main.h"
-#include "state.h"
-#include "graphics.h"
-#include "utils/gfx.h"
-#include "easing.h"
+#include "math_helpers.hpp"
+#include "main.hpp"
+#include "state.hpp"
+#include "graphics.hpp"
+#include "utils/gfx.hpp"
+#include "easing.hpp"
 
 typedef struct {
     float x, y;

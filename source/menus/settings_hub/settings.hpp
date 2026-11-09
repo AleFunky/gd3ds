@@ -28,7 +28,7 @@ typedef struct {
 
     int buttonIcon;
     int buttonSheet;
-    char *buttonActions;
+    const char *buttonActions;
 } Setting;
 
 typedef struct {
