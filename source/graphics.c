@@ -376,7 +376,7 @@ inline int get_color_channel(int col_type, int obj, const GameObject *game_obj) 
             if (col_type == COLOR_TYPE_DETAIL) col_channel = objects.v1p9_col_channel[obj];
         }
     } else {
-        // 2.0 color channels, here for 1.9 levels that got updated in 2.0 (and for making 1.9 levels in 2.2)
+        // 2.0 color channels
         if (objects.col_channel[obj]) {
             if (col_type != COLOR_TYPE_DETAIL) {
                 col_channel = objects.col_channel[obj];
@@ -390,6 +390,14 @@ inline int get_color_channel(int col_type, int obj, const GameObject *game_obj) 
                 if (obj_has_main(game_obj)) {
                     col_channel = objects.detail_col_channel[obj];
                 }
+            }
+        }
+
+        
+        // Pulserods can have obj channel but be p1
+        if (obj_id >= 15 && obj_id <= 17) {
+            if (col_type == COLOR_TYPE_BASE && col_channel == CHANNEL_OBJ) {
+                col_channel = CHANNEL_P1;
             }
         }
     }
