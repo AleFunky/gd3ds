@@ -1,11 +1,11 @@
 #include <3ds.h>
 #include <citro2d.h>
 
-#include "main.h"
-#include "menus/core/ui_screen.h"
-#include "menus/components/ui_slider.h"
+#include "main.hpp"
+#include "menus/core/ui_screen.hpp"
+#include "menus/components/ui_slider.hpp"
 
-#include "menus/settings_hub/dim_screen.h"
+#include "menus/settings_hub/dim_screen.hpp"
 
 static UISlider *dim_slider;
 
@@ -18,7 +18,7 @@ static void dim_screen_update(UIScreen *s, UIInput *i) {
     if (dim_slider) dim_secondary_screen = dim_slider->value;
 }
 
-const UIScreenDefPair dim_screen_def = {
+extern const UIScreenDefPair dim_screen_def = {
     .name = "dim_screen",
     .btm = {
         .path = "romfs:/menus/settings_hub/dim_screen.txt",

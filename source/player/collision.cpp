@@ -22,7 +22,6 @@
 #include "particles/object_particles.hpp"
 #include "particles/circles.hpp"
 #include "particles/coin_effect.hpp"
-#include "particles/key_effect.hpp"
 #include "particles/collectable_effect.hpp"
 #include "save/saving.hpp"
 #include "menus/level_select.hpp"
@@ -1538,7 +1537,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 objects.flags[obj] |= FLAG_TOGGLED;
             }
             break;
-
+        }
         case S_MODIFIERBLOCK:
             if (player->dashing) {
                 stop_dashing(player);

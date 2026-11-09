@@ -5,6 +5,7 @@
 #include "main.hpp"
 #include "math_helpers.hpp"
 #include "player/robot_anim_data.hpp"
+#include "player/spider_anim_data.hpp"
 #include "triggers.hpp"
 #include <stdlib.h>
 #include <stdio.h>
@@ -24,7 +25,6 @@
 #include "particles/object_particles.hpp"
 #include "particles/circles.hpp"
 #include "particles/coin_effect.hpp"
-#include "particles/key_effect.hpp"
 
 #include "menus/settings_hub/settings.hpp"
 
@@ -2285,7 +2285,6 @@ void draw_player_graphics() {
     change_blending(false);
     
     draw_collect_effect();
-    draw_collectable_effect();
 
     change_blending(true);
     draw_use_effects(get_use_effect_array_ptr(GFX_TOP));

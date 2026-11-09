@@ -1,6 +1,6 @@
 #pragma once
 
-#include "player_anim_data.h"
+#include "player_anim_data.hpp"
 
 #define SPIDER_SPRITE_COUNT 13
 

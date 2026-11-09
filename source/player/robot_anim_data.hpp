@@ -1,6 +1,6 @@
 #pragma once
 
-#include "player_anim_data.h"
+#include "player_anim_data.hpp"
 
 #define ROBOT_SPRITE_COUNT 8
 #define ROBOT_BLEND_DURATION 0.05f

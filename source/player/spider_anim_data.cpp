@@ -1,4 +1,4 @@
-#include "spider_anim_data.h"
+#include "spider_anim_data.hpp"
 
 static const PlayerSpritePart spider_run_f001[] = {
     { 2, 6.1875f, -0.1125f, -335.9836f, -0.8837f, 0.8837f, 0 },

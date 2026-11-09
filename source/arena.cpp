@@ -1,10 +1,10 @@
 #include <stdlib.h>
 
-#include "arena.h"
-#include "math_helpers.h"
+#include "arena.hpp"
+#include "math_helpers.hpp"
 
 bool arena_init(Arena *a, size_t capacity) {
-    a->buffer = malloc(capacity);
+    a->buffer = (uint8_t *)malloc(capacity);
     if (!a->buffer) return false;
     a->capacity = capacity;
     a->offset = 0;

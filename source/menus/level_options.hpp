@@ -1,4 +1,4 @@
 #pragma once
-#include "menus/core/ui_stack.h"
+#include "menus/core/ui_stack.hpp"
 
 extern const UIScreenDefPair online_level_options_def;

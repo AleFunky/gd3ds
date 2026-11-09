@@ -826,7 +826,7 @@ void restore_checkpoint() {
     }
 
     if (check->follow_triggers && check->follow_triggers_count > 0) {
-        FollowPlayerYTriggerBuffer *buf = realloc(follow_player_y_trigger_buffer, sizeof(FollowPlayerYTriggerBuffer) * check->follow_triggers_count);
+        FollowPlayerYTriggerBuffer *buf = (FollowPlayerYTriggerBuffer *)realloc(follow_player_y_trigger_buffer, sizeof(FollowPlayerYTriggerBuffer) * check->follow_triggers_count);
         if (buf) {
             follow_player_y_trigger_buffer = buf;
             follow_player_y_trigger_capacity = check->follow_triggers_count;
@@ -837,7 +837,7 @@ void restore_checkpoint() {
 
     follow_trigger_count = 0;
     if (check->follow_trigger_buffers && check->follow_trigger_buffers_count > 0) {
-        FollowTriggerBuffer *buf = realloc(follow_trigger_buffer, sizeof(FollowTriggerBuffer) * check->follow_trigger_buffers_count);
+        FollowTriggerBuffer *buf = (FollowTriggerBuffer *)realloc(follow_trigger_buffer, sizeof(FollowTriggerBuffer) * check->follow_trigger_buffers_count);
         if (buf) {
             follow_trigger_buffer = buf;
             follow_trigger_capacity = check->follow_trigger_buffers_count;
@@ -852,7 +852,7 @@ void restore_checkpoint() {
     }
     rotate_trigger_count = 0;
     if (check->rotate_triggers && check->rotate_triggers_count > 0) {
-        RotateTriggerBuffer *buf = realloc(rotate_trigger_buffer, sizeof(RotateTriggerBuffer) * check->rotate_triggers_count);
+        RotateTriggerBuffer *buf = (RotateTriggerBuffer *)realloc(rotate_trigger_buffer, sizeof(RotateTriggerBuffer) * check->rotate_triggers_count);
         if (buf) {
             rotate_trigger_buffer = buf;
             rotate_trigger_capacity = check->rotate_triggers_count;
@@ -864,7 +864,7 @@ void restore_checkpoint() {
                 int offset = check->rotate_target_offsets[i];
                 rb->targets = NULL;
                 if (count > 0 && offset >= 0 && offset + count <= check->rotate_targets_count) {
-                    rb->targets = malloc(sizeof(RotateTargetState) * count);
+                    rb->targets = (RotateTargetState *)malloc(sizeof(RotateTargetState) * count);
                     if (rb->targets) {
                         memcpy(rb->targets, check->rotate_targets + offset, sizeof(RotateTargetState) * count);
                     } else {
@@ -894,7 +894,7 @@ void restore_checkpoint() {
     }
 
     if (check->count_items_count > 0) {
-        ItemCount *buf = realloc(item_counter_buffer, sizeof(ItemCount) * check->count_items_count);
+        ItemCount *buf = (ItemCount *)realloc(item_counter_buffer, sizeof(ItemCount) * check->count_items_count);
         if (buf) {
             item_counter_buffer = buf;
             item_counter_capacity = check->count_items_count;
@@ -905,7 +905,7 @@ void restore_checkpoint() {
         item_counter_count = 0;
     }
     if (check->count_triggers_count > 0) {
-        CountTriggerBuffer *buf = realloc(count_trigger_buffer, sizeof(CountTriggerBuffer) * check->count_triggers_count);
+        CountTriggerBuffer *buf = (CountTriggerBuffer *)realloc(count_trigger_buffer, sizeof(CountTriggerBuffer) * check->count_triggers_count);
         if (buf) {
             count_trigger_buffer = buf;
             count_trigger_capacity = check->count_triggers_count;
