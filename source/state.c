@@ -528,7 +528,7 @@ void play_level_song(float seek) {
         size_t sz = 0;
         void *buf = load_user_song(level_info.custom_song_id, &sz);
         if (buf) {
-            song_loaded = play_mp3_buf(buf, sz, false, seek);
+            song_loaded = play_mp3_buf(buf, sz, false, seek, false);
         } else {
             song_loaded = false;
         }
@@ -556,7 +556,7 @@ void play_menu_song() {
         size_t out_size;
         void *buf = read_file_arena(&level_arena, menu_loop_path, &out_size);
         if (buf) {
-            play_mp3_buf(buf, out_size, true, 0);
+            play_mp3_buf(buf, out_size, true, 0, false);
             playing_menu_loop = true;
         }
     }

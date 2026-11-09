@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "arena.h"
 #include "level_loading.h"
 #include "main.h"
 #include <assert.h>
@@ -145,7 +146,7 @@ char *decompress_data_level(unsigned char *data, size_t data_len, size_t *out_le
     }
 
     // Allocate exactly enough memory
-    char *out = malloc(final_size + 1);
+    char *out = arena_alloc(&level_arena, final_size + 1);
     if (!out) {
         printf("malloc failed for %lu bytes\n", (unsigned long)final_size);
         inflateEnd(&strm);
