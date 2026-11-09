@@ -685,6 +685,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->vel_y = 0;
 
                 add_dash_boom(objects.x[obj], objects.y[obj], -player->dash_angle);
+                player_flash(player, 0.2f, 0.1f);
 
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, get_use_effect_array_ptr(GFX_TOP));
                 if (effect) {
@@ -729,6 +730,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->vel_y = 0;
 
                 add_gravity_dash_boom(objects.x[obj], objects.y[obj], -player->dash_angle);
+                player_flash(player, 0.2f, 0.1f);
 
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, get_use_effect_array_ptr(GFX_TOP));
                 if (effect) {

@@ -177,6 +177,13 @@ void stop_dashing(Player *player) {
     player->dash_fire_timer = 0.f;
 }
 
+void player_flash(Player *player, float duration, float delay) {
+    player->flash_active = true;
+    player->flash_timer = 0.f;
+    player->flash_duration = duration;
+    player->flash_delay = delay;
+}
+
 float convert_to_closest_rotation(float rotation, float angle) {
     float rot = (int)rotation % 360;
 
@@ -954,10 +961,7 @@ void spider_test_jump(Player *player, bool is_retry) {
     Color dash_color = get_white_if_black(state.current_player == 1 ? p1_color : p2_color);
     add_spider_dash_effect(player->x, old_y, land_y, player->upside_down, dash_color);
 
-    player->flash_active = true;
-    player->flash_timer = 0.f;
-    player->flash_duration = 0.3f;
-    player->flash_delay = 0.05f;
+    player_flash(player, 0.3f, 0.05f);
 
     player->spider_scale_active = true;
     player->spider_scale_timer = 0.f;

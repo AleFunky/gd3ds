@@ -297,6 +297,8 @@ void handle_player(Player *player);
 void draw_player(Player *player);
 void run_player(Player *player);
 
+void player_flash(Player *player, float duration, float delay);
+
 void draw_dash_fire(Player *player);
 void add_dash_exit(Player *player);
 
