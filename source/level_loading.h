@@ -1,4 +1,5 @@
 #pragma once
+#include "arena.h"
 #include "objects.h"
 #include "text.h"
 #include "utils/server_utils.h"
@@ -395,6 +396,7 @@ extern int channelCount;
 extern GDColorChannel *colorChannels;
 
 char *read_file(const char *filepath, size_t *out_size);
+char *read_file_arena(Arena *arena, const char *filepath, size_t *out_size);
 char *decompress_level(char *data, int *out_code);
 
 int load_level(char *path);

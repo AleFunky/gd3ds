@@ -6,6 +6,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdio.h>
+#include "arena.h"
 #include "practice.h"
 #include "triggers.h"
 #include "main.h"
@@ -314,6 +315,34 @@ char *read_file(const char *filepath, size_t *out_size) {
     return buffer;
 }
 
+char *read_file_arena(Arena *arena, const char *filepath, size_t *out_size) {
+    FILE *f = fopen(filepath, "rb");
+    if (!f) {
+        output_log("Failed to open file: %s (%d)\n", filepath, errno);
+        return NULL;
+    }
+    fseek(f, 0, SEEK_END);
+    long size = ftell(f);
+    if (size < 0) {
+        output_log("Failed to ftell file: %s (%d)\n", filepath, errno);
+        return NULL;
+    }
+    rewind(f);
+
+    char *buffer = arena_alloc(arena, size + 1);
+    if (!buffer) {
+        output_log("Failed to allocate file\n");
+        fclose(f);
+        return NULL;
+    }
+    fread(buffer, 1, size, f);
+    buffer[size] = '\0'; // Null-terminate for text files
+    fclose(f);
+
+    if (out_size) *out_size = size;
+    return buffer;
+}
+
 char *extract_gmd_key(const char *data, const char *key, const char *type) {
     char key_tag[32];
     snprintf(key_tag, sizeof(key_tag), "<k>%s</k>", key);
@@ -453,7 +482,7 @@ char *decompress_online_level(char *data, int *out_code) {
 
     //output_log("BRO len %d lol %s\n", strlen(data), data);
 
-    unsigned char *decoded = malloc(strlen(data));
+    unsigned char *decoded = arena_alloc(&level_arena, strlen(data));
 
     if (!decoded) {
         *out_code = LOAD_OUT_OF_MEMORY;
@@ -463,20 +492,16 @@ char *decompress_online_level(char *data, int *out_code) {
     int decoded_len = base64_decode(data, decoded);
     if (decoded_len <= 0) {
         output_log("Failed to decode base64\n");
-        free(decoded);
         *out_code = LOAD_INVALID_BASE64;
         return NULL;
     }
 
     size_t decompressed_len;
-    char *decompressed = decompress_data(decoded, decoded_len, &decompressed_len, out_code);
+    char *decompressed = decompress_data_level(decoded, decoded_len, &decompressed_len, out_code);
     if (!decompressed) {
         output_log("Decompression failed (check zlib error above)\n");
-        free(decoded);
         return NULL;
     }
-
-    free(decoded);
     
     return decompressed;
 }
@@ -499,7 +524,7 @@ char *decompress_level(char *data, int *out_code) {
 
     fix_base64_url(b64);
 
-    unsigned char *decoded = malloc(strlen(b64));
+    unsigned char *decoded = arena_alloc(&level_arena, strlen(b64));
     if (!decoded) {
         *out_code = LOAD_OUT_OF_MEMORY;
         return NULL;
@@ -508,21 +533,18 @@ char *decompress_level(char *data, int *out_code) {
     if (decoded_len <= 0) {
         output_log("Failed to decode base64\n");
         free(b64);
-        free(decoded);
         *out_code = LOAD_OUT_OF_MEMORY;
         return NULL;
     }
 
     size_t decompressed_len;
-    char *decompressed = decompress_data(decoded, decoded_len, &decompressed_len, out_code);
+    char *decompressed = decompress_data_level(decoded, decoded_len, &decompressed_len, out_code);
     if (!decompressed) {
         output_log("Decompression failed (check zlib error above)\n");
-        free(decoded);
         free(b64);
         return NULL;
     }
 
-    free(decoded);
     free(b64);
     
     return decompressed;
@@ -2103,21 +2125,6 @@ static HSV *objects_hsv_block = NULL;
 
 void free_arrays() {
     has_follow_player_y = false;
-    free(col_pool.data);
-    free(move_pool.data);
-    free(count_pool.data);
-    free(instant_count_pool.data);
-    free(counter_label_pool.data);
-    free(pickup_pool.data);
-    free(follow_player_y_pool.data);
-    free(follow_pool.data);
-    free(alpha_pool.data);
-    free(pulse_pool.data);
-    free(toggle_pool.data);
-    free(spawn_pool.data);
-    free(rotate_pool.data);
-    free(simple_pool.data);
-    free(text_pool.data);
     col_pool = (TriggerPool){0};
     move_pool = (TriggerPool){0};
     count_pool = (TriggerPool){0};
@@ -2133,16 +2140,6 @@ void free_arrays() {
     rotate_pool = (TriggerPool){0};
     simple_pool = (TriggerPool){0};
     text_pool = (TriggerPool){0};
-
-    free(objects_int_block);        objects_int_block = NULL;
-    free(objects_float_block);      objects_float_block = NULL;
-    free(objects_ushort_block);     objects_ushort_block = NULL;
-    free(objects_uchar_block);      objects_uchar_block = NULL;
-    free(objects_bool_block);       objects_bool_block = NULL;
-    free(objects_groups_block);     objects_groups_block = NULL;
-    free(objects_u8_block);         objects_u8_block = NULL;
-    free(objects_color_block);      objects_color_block = NULL;
-    free(objects_hsv_block);        objects_hsv_block = NULL;
 
     objects.random = NULL;
     objects.id = NULL;
@@ -2205,31 +2202,31 @@ void free_arrays() {
 
 bool init_arrays(size_t count) {
     has_follow_player_y = false;
-    objects_int_block = malloc(sizeof(int) * count * 9);
+    objects_int_block = arena_alloc(&level_arena, sizeof(int) * count * 9);
     if (!objects_int_block) return false;
 
-    objects_float_block = malloc(sizeof(float) * count * 16);
+    objects_float_block = arena_alloc(&level_arena, sizeof(float) * count * 16);
     if (!objects_float_block) return false;
 
-    objects_ushort_block = malloc(sizeof(unsigned short) * count * 4);
+    objects_ushort_block = arena_alloc(&level_arena, sizeof(unsigned short) * count * 4);
     if (!objects_ushort_block) return false;
 
-    objects_uchar_block = malloc(sizeof(unsigned char) * count * 2);
+    objects_uchar_block = arena_alloc(&level_arena, sizeof(unsigned char) * count * 2);
     if (!objects_uchar_block) return false;
 
-    objects_bool_block = malloc(sizeof(bool) * count * 9);
+    objects_bool_block = arena_alloc(&level_arena, sizeof(bool) * count * 9);
     if (!objects_bool_block) return false;
 
-    objects_groups_block = malloc(sizeof(short[MAX_GROUPS_PER_OBJECT]) * count);
+    objects_groups_block = arena_alloc(&level_arena, sizeof(short[MAX_GROUPS_PER_OBJECT]) * count);
     if (!objects_groups_block) return false;
 
-    objects_u8_block = malloc(sizeof(u8) * count * 6);
+    objects_u8_block = arena_alloc(&level_arena, sizeof(u8) * count * 6);
     if (!objects_u8_block) return false;
 
-    objects_color_block = malloc(sizeof(Color) * count * 8);
+    objects_color_block = arena_alloc(&level_arena, sizeof(Color) * count * 8);
     if (!objects_color_block) return false;
 
-    objects_hsv_block = malloc(sizeof(HSV) * count * 2);
+    objects_hsv_block = arena_alloc(&level_arena, sizeof(HSV) * count * 2);
     if (!objects_hsv_block) return false;
 
     objects.random = objects_int_block + 0 * count;
@@ -2385,40 +2382,6 @@ int compare_coins(const void *a, const void *b) {
     return objects.x[*c1] - objects.x[*c2];
 }
 
-static void shrink_trigger_pools(void) {
-    TriggerPool *pools[] = {
-        &col_pool, &move_pool, &count_pool, &instant_count_pool,
-        &follow_player_y_pool, &follow_pool, &counter_label_pool,
-        &pickup_pool, &alpha_pool, &pulse_pool, &toggle_pool,
-        &spawn_pool, &rotate_pool, &simple_pool, &text_pool
-    };
-    size_t sizes[] = {
-        sizeof(ColorTrigger), sizeof(MoveTrigger), sizeof(CountTrigger),
-        sizeof(InstantCountTrigger), sizeof(FollowPlayerYTrigger),
-        sizeof(FollowTrigger), sizeof(CounterLabel), sizeof(PickupItem),
-        sizeof(AlphaTrigger), sizeof(PulseTrigger), sizeof(ToggleTrigger),
-        sizeof(SpawnTrigger), sizeof(RotateTrigger), sizeof(SimpleTrigger),
-        sizeof(TextObject)
-    };
-
-    for (size_t i = 0; i < ARRAY_LEN(pools); i++) {
-        if (pools[i]->count >= pools[i]->capacity) continue;
-
-        if (pools[i]->count == 0) {
-            free(pools[i]->data);
-            pools[i]->data = NULL;
-            pools[i]->capacity = 0;
-            continue;
-        }
-
-        void *new_data = realloc(pools[i]->data, pools[i]->count * sizes[i]);
-        if (!new_data) continue;
-
-        pools[i]->data = new_data;
-        pools[i]->capacity = pools[i]->count;
-    }
-}
-
 int parse_string(char *levelString, int extra_slots, int *out_object_count) {
     int sectionCount = 0;
 
@@ -2524,8 +2487,6 @@ int parse_string(char *levelString, int extra_slots, int *out_object_count) {
     for (int i = 1; i < MAX_GROUPS; i++) {
         sort_group(i);
     }
-
-    shrink_trigger_pools();
 
     return LOAD_NO_ERROR;
 }
@@ -2781,6 +2742,8 @@ static void generate_orange_portals(int orange_start) {
 int load_online_level(char *level_string) {
     bool compressed = true;
     int out_code = LOAD_NO_ERROR;
+    
+    arena_reset(&level_arena);
 
     // Base64 doesn't allow semicolons, so if theres one, its not compressed
     if (strchr(level_string, ';')) compressed = false;
@@ -2789,8 +2752,7 @@ int load_online_level(char *level_string) {
         data = decompress_online_level(level_string, &out_code);
         if (!data) return out_code;
     } else {
-        data = strdup(level_string);
-        if (!data) return LOAD_OUT_OF_MEMORY;
+        data = level_string;
     }
 
     // Get level starting colors
@@ -2828,7 +2790,6 @@ int load_online_level(char *level_string) {
 
     int returned = parse_string(data, extra_slots, &orange_start);
 
-    free(data);
     free(metaStr);
 
     if (returned) return returned;
@@ -2900,6 +2861,8 @@ void load_level_info(char *data, char *level_string) {
 int load_level(char *path) {
     int out_code = LOAD_NO_ERROR;
 
+    arena_reset(&level_arena);
+
     size_t out;
     char *level = read_file(path, &out);
     if (!level) return 1;
@@ -2920,7 +2883,6 @@ int load_level(char *path) {
     if (metaStr) {
         channelCount = parse_color_channels(metaStr, &colorChannels, &out_code);
         if (out_code) {
-            free(data);
             free(level);
             free(metaStr);
             return out_code;
@@ -2930,7 +2892,6 @@ int load_level(char *path) {
     else {
         channelCount = parse_old_channels(data, &colorChannels, &out_code);
         if (out_code) {
-            free(data);
             free(level);
             return out_code;
         }
@@ -2953,7 +2914,6 @@ int load_level(char *path) {
 
     int returned = parse_string(data, extra_slots, &orange_start);
 
-    free(data);
     free(metaStr);
 
     if (returned) return returned;
@@ -3049,6 +3009,8 @@ void unload_level() {
     free_sections();
     free_object_particles();
     init_col_channels();
+
+    arena_reset(&level_arena);
     
     channelCount = 0;
     free(colorChannels);
@@ -3071,7 +3033,7 @@ char *get_level_name(char *data_ptr) {
 char *load_user_song(int id, size_t *out_size) {
     char full_path[273];
     snprintf(full_path, sizeof(full_path), "%s%d.mp3", USER_SONGS_DIR, id);
-    return read_file(full_path, out_size);
+    return read_file_arena(&level_arena, full_path, out_size);
 }
 
 bool check_song(int id) {

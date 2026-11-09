@@ -8,6 +8,7 @@
 #include <time.h>
 #include <3ds.h>
 #include "3ds/svc.h"
+#include "arena.h"
 #include "c3d/renderqueue.h"
 #include <archive.h>
 #include "groups.h"
@@ -71,6 +72,8 @@
 
 #define CITRA_TYPE 0x20000
 #define CITRA_VERSION 11
+
+Arena level_arena;
 
 u32 __ctru_linear_heap_size = 44 << 20;
 
@@ -1819,6 +1822,13 @@ void game_assets_init() {
     fastest_speed_particles_bottom.relativeStationary = true;
 }
 
+static void init_level_arena() {
+    struct mallinfo mi = mallinfo();
+    size_t free = envGetHeapSize() - mi.uordblks;
+    bool could = arena_init(&level_arena, (size_t) (free * 0.68f));
+    if (!could) output_log("Couldn't allocate level arena\n");
+}
+
 int main(int argc, char* argv[]) {
     // Init libs
     init_trig_table();
@@ -1908,6 +1918,8 @@ int main(int argc, char* argv[]) {
     loading_screen_update(75, 0);
 
     load_sfx();
+
+    init_level_arena();
 
     memset(&level_info, 0, sizeof(LoadedLevelInfo));
 

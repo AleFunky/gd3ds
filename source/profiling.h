@@ -58,6 +58,10 @@ typedef struct {
     u32 heap_used;
     u32 heap_free;
     u32 heap_total;
+
+    u32 level_arena_used;
+    u32 level_arena_free;
+    u32 level_arena_total;
 } ProfilerSnapshot;
 
 extern ProfilerSnapshot snapshot;

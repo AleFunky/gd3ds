@@ -1,5 +1,6 @@
 #include <citro2d.h>
 #include "triggers.h"
+#include "arena.h"
 #include "color.h"
 #include "icons.h"
 #include "math_helpers.h"
@@ -483,11 +484,11 @@ Color HSV_combine(Color base, HSV hsv) {
 int trigger_pool_add(TriggerPool *pool, size_t element_size) {
     if (pool->count >= pool->capacity) {
         size_t new_capacity = pool->capacity ? pool->capacity * 2 : 8;
-        void *new_data = realloc(pool->data, new_capacity * element_size);
+        void *new_data = arena_realloc(&level_arena, pool->data, pool->capacity * element_size, new_capacity * element_size);
 
         if (!new_data) {
             new_capacity = pool->capacity + 8;
-            new_data = realloc(pool->data, new_capacity * element_size);
+            new_data = arena_realloc(&level_arena, pool->data, pool->capacity * element_size, new_capacity * element_size);
         }
 
         if (!new_data) return -1;

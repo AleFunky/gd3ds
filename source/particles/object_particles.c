@@ -120,6 +120,7 @@ void free_object_particles() {
     for (size_t i = 0; i < MAX_OBJECT_PS; i++) {
         if (object_particle[i].occupied) {
             freeParticleData(&object_particle[i].ps.data);
+            object_particle[i].occupied = false;
         }
     }
 }

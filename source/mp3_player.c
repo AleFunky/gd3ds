@@ -470,11 +470,6 @@ void stop_mp3() {
         threadId = NULL;
         audio_exit();
     }
-
-    if (song_buf) {
-        free(song_buf);
-        song_buf = NULL;
-    }
     song_sz = 0;
     song_pos = 0;
 }

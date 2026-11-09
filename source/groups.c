@@ -1,7 +1,9 @@
 #include "groups.h"
+#include "arena.h"
 #include "graphics.h"
 #include "level_loading.h"
 #include <stdlib.h>
+#include "main.h"
 #include "triggers.h"
 
 typedef struct GroupCombination {
@@ -40,14 +42,7 @@ static int deferred_combination_count = 0;
 // Group combinations
 
 static void clear_group_combinations(void) {
-    if (group_combinations) {
-        for (int i = 0; i < group_combination_count; i++) {
-            free(group_combinations[i].objects);
-        }
-    }
-    free(group_combinations);
-    free(touched_combinations);
-    free(deferred_combinations);
+
     group_combinations = NULL;
     touched_combinations = NULL;
     deferred_combinations = NULL;
@@ -56,7 +51,6 @@ static void clear_group_combinations(void) {
     deferred_combination_count = 0;
 
     for (int i = 0; i < MAX_GROUPS; i++) {
-        free(groups[i].combinations);
         groups[i].combinations = NULL;  
         groups[i].combination_count = 0;  
         groups[i].combination_capacity = 0;  
@@ -98,17 +92,11 @@ bool build_group_combinations(void) {
     for (int i = 0; i < objects.count; i++)
         objects.group_combination_index[i] = -1;
 
-    GroupCombination *new_combinations = calloc(objects.count, sizeof(GroupCombination));
-    int *new_touched_combinations = malloc(objects.count * sizeof(int));
-    int *new_deferred_combinations = malloc(objects.count * sizeof(int));
+    GroupCombination *new_combinations = arena_calloc(&level_arena, objects.count, sizeof(GroupCombination));
+    int *new_touched_combinations = arena_alloc(&level_arena, objects.count * sizeof(int));
+    int *new_deferred_combinations = arena_alloc(&level_arena, objects.count * sizeof(int));
 
     if (!new_combinations || !new_touched_combinations || !new_deferred_combinations) {
-        free(new_combinations);
-        free(new_touched_combinations);
-        free(new_deferred_combinations);
-        new_combinations = NULL;
-        new_touched_combinations = NULL;
-        new_deferred_combinations = NULL;
         return false;
     }
 
@@ -159,7 +147,7 @@ bool build_group_combinations(void) {
     for (int i = 0; i < group_combination_count; i++) {
         GroupCombination *combination = &group_combinations[i];
 
-        combination->objects = malloc(combination->object_count * sizeof(int));
+        combination->objects = arena_alloc(&level_arena, combination->object_count * sizeof(int));
 
         if (!combination->objects) {
             clear_group_combinations();
@@ -178,7 +166,7 @@ bool build_group_combinations(void) {
 
         if (node->combination_count == 0) continue;
 
-        node->combinations = malloc(node->combination_count * sizeof(int));
+        node->combinations = arena_alloc(&level_arena, node->combination_count * sizeof(int));
 
         if (!node->combinations) {
             clear_group_combinations();

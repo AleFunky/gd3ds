@@ -554,7 +554,7 @@ void play_menu_song() {
 
     if (!playing_menu_loop) {
         size_t out_size;
-        void *buf = read_file(menu_loop_path, &out_size);
+        void *buf = read_file_arena(&level_arena, menu_loop_path, &out_size);
         if (buf) {
             play_mp3_buf(buf, out_size, true, 0);
             playing_menu_loop = true;

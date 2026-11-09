@@ -1,5 +1,6 @@
 #pragma once
 #include <citro2d.h>
+#include "arena.h"
 #include "level_loading.h"
 
 #include "particles/particles.h"
@@ -87,6 +88,8 @@ extern float normal_speed_particles_timer;
 extern float fast_speed_particles_timer;
 extern float faster_speed_particles_timer;
 extern float fastest_speed_particles_timer;
+
+extern Arena level_arena;
 
 #define SCREEN_WIDTH  400
 #define SCREEN_BOT_WIDTH  320
