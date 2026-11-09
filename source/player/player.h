@@ -21,6 +21,10 @@
 
 #define DRAG_PARTICLES_FLOOR_DURATION 0.1f
 
+#define ROBOT_FIRE_MAX_AIR_TIME 1.23f
+#define ROBOT_FIRE_OUT_TIME 0.15f
+#define ROBOT_FIRE_MIN_SCALE 0.05f
+
 #define BALL_SLOW_ROTATION 0.7f
 
 #define MAX_ACTIONS 64
@@ -176,6 +180,11 @@ typedef struct {
     bool just_teleported;
 
     float robot_air_time;
+    bool robot_fire_visible;
+    bool robot_fire_out;
+    float robot_fire_timer;
+    float robot_fire_scale;
+    float robot_fire_exit_scale;
     int anim_id;
     int anim_frame;
     float anim_timer;

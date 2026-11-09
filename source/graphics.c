@@ -2759,6 +2759,15 @@ static void spawn_icon_at_internal(
                     float part_sx = (animation_part->scale_x < 0.0f) ? -sx : sx;
                     float part_sy = (animation_part->scale_y < 0.0f) ? -sy : sy;
 
+                    if (i == 6 && j == 0 && draw_white && params.robot_fire_scale > 0.f && playerEffectsSheet) {
+                        C2D_SpriteFromSheet(&spr, playerEffectsSheet, PLAYER_EFFECTS_FIRE_BOOST);
+                        C2D_SpriteSetCenter(&spr, 0.5f, 0.0f);
+                        C2D_SpriteSetPos(&spr, p_x, p_y);
+                        C2D_SpriteSetScale(&spr, sx * params.robot_fire_scale, sy * params.robot_fire_scale);
+                        C2D_SpriteSetRotation(&spr, part_rad);
+                        C2D_DrawSpriteTinted(&spr, &tints[ICON_COLOR_WHITE]);
+                    }
+
                     C2D_SpriteFromSheet(&spr, *sheet, part->texture);
                     C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
                     C3D_TexSetFilter(spr.image.tex, GPU_LINEAR, GPU_LINEAR);

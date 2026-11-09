@@ -656,6 +656,46 @@ void wave_gamemode(Player *player) {
     player->vel_y = (input * 2 - 1) * player_speeds[state.speed] * (player->mini ? 2 : 1);
 }
 
+static float robot_fire_in_scale(float timer) {
+    if (timer < 0.05f) return 0.1f + (1.44f - 0.1f) * (timer / 0.05f);
+    if (timer < 0.1f) return 1.44f + (0.72f - 1.44f) * ((timer - 0.05f) / 0.05f);
+    if (timer < 0.15f) return 0.72f + (1.8f - 0.72f) * ((timer - 0.1f) / 0.05f);
+    if (timer < 0.2f) return 1.8f + (0.9f - 1.8f) * ((timer - 0.15f) / 0.05f);
+    if (timer < 0.25f) return 0.9f + (1.8f - 0.9f) * ((timer - 0.2f) / 0.05f);
+    return 1.8f;
+}
+
+static void update_robot_fire(Player *player) {
+    bool show = player->gamemode == GAMEMODE_ROBOT
+             && !player->on_ground
+             && player->gravity == 0.f
+             && player->robot_air_time > 0.f
+             && player->robot_air_time < ROBOT_FIRE_MAX_AIR_TIME;
+
+    if (show) {
+        if (!player->robot_fire_visible || player->robot_fire_out) {
+            player->robot_fire_visible = true;
+            player->robot_fire_out = false;
+            player->robot_fire_timer = 0.f;
+            player->robot_fire_scale = 0.1f;
+        } else {
+            player->robot_fire_timer += STEPS_DT;
+            player->robot_fire_scale = robot_fire_in_scale(player->robot_fire_timer);
+        }
+    } else if (player->robot_fire_visible) {
+        if (!player->robot_fire_out) {
+            player->robot_fire_out = true;
+            player->robot_fire_timer = 0.f;
+            player->robot_fire_exit_scale = player->robot_fire_scale;
+        } else {
+            player->robot_fire_timer += STEPS_DT;
+            float progress = CLAMP(player->robot_fire_timer / ROBOT_FIRE_OUT_TIME, 0.f, 1.f);
+            player->robot_fire_scale = player->robot_fire_exit_scale + (ROBOT_FIRE_MIN_SCALE - player->robot_fire_exit_scale) * progress;
+            if (player->robot_fire_timer >= ROBOT_FIRE_OUT_TIME) player->robot_fire_visible = false;
+        }
+    }
+}
+
 void robot_gamemode(Player *player) {
     trail->positionR = (Vec2D){player->x, player->y};
     trail->startingPositionInitialized = true;
@@ -714,12 +754,13 @@ void robot_gamemode(Player *player) {
     } else {
         player->robot_air_time += 5.4f * STEPS_DT;
     }
-    
-    robot_fire_particles[state.current_player].emitterX = player->x - 4;
-    robot_fire_particles[state.current_player].emitterY = fabsf(gravBottom(player));
+
+    float scale = (player->mini) ? 0.6f : 1.f;
+    robot_fire_particles[state.current_player].emitterX = player->x - 4.f * scale;
+    robot_fire_particles[state.current_player].emitterY = player->y - grav(player, 10.f) * scale;
     robot_fire_particles[state.current_player].emitting = player->gravity == 0;
 
-    robot_fire_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
+    robot_fire_particles[state.current_player].scale = scale;
 
     if (!player->on_ground && player->vel_y < 0
         && player->anim_id != ROBOT_ANIM_FALL_START
@@ -1202,6 +1243,8 @@ void run_player(Player *player) {
         player->spider_scale_timer += STEPS_DT;
         if (player->spider_scale_timer >= SPIDER_DASH_SCALE_DURATION) player->spider_scale_active = false;
     }
+
+    update_robot_fire(player);
 
     player->blend_timer += STEPS_DT;
     if (player->blend_timer > get_blend_duration(player)) {
@@ -1730,7 +1773,8 @@ void draw_player(Player *player) {
                     .blend_from_anim_id = player->blend_from_anim_id,
                     .blend_from_frame = player->blend_from_frame,
                     .blend_from_timer = player->blend_from_timer,
-                    .blend_fraction = player->blend_timer / get_blend_duration(player)
+                    .blend_fraction = player->blend_timer / get_blend_duration(player),
+                    .robot_fire_scale = player->robot_fire_visible ? player->robot_fire_scale : 0.f
                  }
             );
             break;

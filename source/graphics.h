@@ -124,6 +124,7 @@ extern C2D_SpriteSheet particleSheet;
 #define PLAYER_EFFECTS_BOOM_START 12
 #define PLAYER_EFFECTS_OUTLINE_START 21
 #define PLAYER_EFFECTS_SPIDER_START 33
+#define PLAYER_EFFECTS_FIRE_BOOST 41
 
 extern SpriteTemplate sprite_templates[GAME_OBJECT_COUNT];
 
@@ -159,6 +160,7 @@ typedef struct {
     int blend_from_frame;
     float blend_from_timer;
     float blend_fraction;
+    float robot_fire_scale;
 } IconParameters;
 
 void spawn_icon_at(
