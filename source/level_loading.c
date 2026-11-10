@@ -57,6 +57,7 @@ bool has_follow_player_y = false;
 TriggerPool alpha_pool;
 TriggerPool pulse_pool;
 TriggerPool toggle_pool;
+TriggerPool touch_pool;
 TriggerPool spawn_pool;
 TriggerPool rotate_pool;
 TriggerPool simple_pool;
@@ -123,6 +124,10 @@ RotateTrigger *get_rotate_trigger(int obj) {
 
 ToggleTrigger *get_toggle_trigger(int obj) {
     return TRIGGER_AT(toggle_pool, ToggleTrigger, objects.trigger_index[obj]);
+}
+
+TouchTrigger *get_touch_trigger(int obj) {
+    return TRIGGER_AT(touch_pool, TouchTrigger, objects.trigger_index[obj]);
 }
 
 SpawnTrigger *get_spawn_trigger(int obj) {
@@ -1076,7 +1081,10 @@ GDValueType get_value_type_for_key(int key) {
         case 78: return GD_VAL_BOOL;   // sub count (collectible, 2.1)
         case 79: return GD_VAL_BOOL;   // pickup item (2.1)
         case 80: return GD_VAL_INT;    // item ID (pickup/count/counter label)
+        case 81: return GD_VAL_INT;    // hold mode (touch trigger)
+        case 82: return GD_VAL_INT;    // on/off (touch trigger)
         case 85: return GD_VAL_FLOAT;  // easing rate
+        case 89: return GD_VAL_INT;    // dual mode (touch trigger)
         case 87: return GD_VAL_BOOL;   // multi_triggered
         case 88: return GD_VAL_INT;    // instant count mode (equals/larger/smaller)
         case 104: return GD_VAL_BOOL;  // multi activate (count trigger)
@@ -1185,6 +1193,12 @@ int allocate_trigger_component(int obj) {
         case TOGGLE_TRIGGER:
         case TOGGLE_ORB:
             index = trigger_pool_add(&toggle_pool, sizeof(ToggleTrigger));
+            if (index >= 0) {
+                objects.trigger_index[obj] = index;
+            }
+            break;
+        case TOUCH_TRIGGER:
+            index = trigger_pool_add(&touch_pool, sizeof(TouchTrigger));
             if (index >= 0) {
                 objects.trigger_index[obj] = index;
             }
@@ -1511,6 +1525,9 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                         case TOGGLE_ORB:
                             get_toggle_trigger(object)->target_group = val.i;
                             break;
+                        case TOUCH_TRIGGER:
+                            get_touch_trigger(object)->target_group = val.i;
+                            break;
                         case SPAWN_TRIGGER:
                             get_spawn_trigger(object)->target_group = val.i;
                             break;
@@ -1575,6 +1592,9 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                             break;
                         case TOGGLE_TRIGGER:
                             get_toggle_trigger(object)->spawn_triggered = val.b;
+                            break;
+                        case TOUCH_TRIGGER:
+                            get_touch_trigger(object)->spawn_triggered = val.b;
                             break;
                         case SPAWN_TRIGGER:
                             get_spawn_trigger(object)->spawn_triggered = val.b;
@@ -1654,6 +1674,18 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                 get_rotate_trigger(object)->easing_rate = val.f;
             }
             break;
+        case 81:
+            if (type == GD_VAL_INT && objects.id[object] == TOUCH_TRIGGER) {
+                get_touch_trigger(object)->hold_mode = val.i != 0;
+            }
+            break;
+        case 82:
+            if (type == GD_VAL_INT && objects.id[object] == TOUCH_TRIGGER) {
+                get_touch_trigger(object)->toggle_mode = (unsigned char)val.i;
+            }
+            break;
+        case 89:
+            break;
         case 87: // multi_triggered
             if (type == GD_VAL_BOOL) {
                 if (is_color_trigger(objects.id[object])) {
@@ -1679,6 +1711,9 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                             break;
                         case TOGGLE_TRIGGER:
                             get_toggle_trigger(object)->multi_triggered = val.b;
+                            break;
+                        case TOUCH_TRIGGER:
+                            get_touch_trigger(object)->multi_triggered = val.b;
                             break;
                         case SPAWN_TRIGGER:
                             get_spawn_trigger(object)->multi_triggered = val.b;
@@ -1854,6 +1889,7 @@ bool is_complex_trigger_object(int id) {
         || id == MOVE_TRIGGER
         || id == ALPHA_TRIGGER
         || id == TOGGLE_TRIGGER
+        || id == TOUCH_TRIGGER
         || id == PULSE_TRIGGER
         || id == SPAWN_TRIGGER
         || id == ROTATE_TRIGGER
@@ -1901,6 +1937,7 @@ bool trigger_is_spawn_triggered(int id, int obj) {
         case ALPHA_TRIGGER:  return get_alpha_trigger(obj)->spawn_triggered;
         case PULSE_TRIGGER:  return get_pulse_trigger(obj)->spawn_triggered;
         case TOGGLE_TRIGGER: return get_toggle_trigger(obj)->spawn_triggered;
+        case TOUCH_TRIGGER:  return get_touch_trigger(obj)->spawn_triggered;
         case SPAWN_TRIGGER:  return get_spawn_trigger(obj)->spawn_triggered;
         case ROTATE_TRIGGER: return get_rotate_trigger(obj)->spawn_triggered;
     }
@@ -1919,6 +1956,7 @@ bool trigger_is_multi_triggered(int id, int obj) {
         case ALPHA_TRIGGER:  return get_alpha_trigger(obj)->multi_triggered;
         case PULSE_TRIGGER:  return get_pulse_trigger(obj)->multi_triggered;
         case TOGGLE_TRIGGER: return get_toggle_trigger(obj)->multi_triggered;
+        case TOUCH_TRIGGER:  return get_touch_trigger(obj)->multi_triggered;
         case SPAWN_TRIGGER:  return get_spawn_trigger(obj)->multi_triggered;
         case ROTATE_TRIGGER: return get_rotate_trigger(obj)->multi_triggered;
     }
@@ -2136,6 +2174,7 @@ void free_arrays() {
     alpha_pool = (TriggerPool){0};
     pulse_pool = (TriggerPool){0};
     toggle_pool = (TriggerPool){0};
+    touch_pool = (TriggerPool){0};
     spawn_pool = (TriggerPool){0};
     rotate_pool = (TriggerPool){0};
     simple_pool = (TriggerPool){0};

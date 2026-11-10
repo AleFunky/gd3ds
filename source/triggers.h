@@ -106,6 +106,12 @@ typedef struct {
 } CountTriggerBuffer;
 
 typedef struct {
+    bool applied;
+    unsigned char held_mask;
+    int source_obj;
+} TouchTriggerBuffer;
+
+typedef struct {
     int id;
     int value;
 } ItemCount;
@@ -113,6 +119,9 @@ typedef struct {
 extern CountTriggerBuffer *count_trigger_buffer;
 extern int count_trigger_count;
 extern int count_trigger_capacity;
+extern TouchTriggerBuffer *touch_trigger_buffer;
+extern int touch_trigger_count;
+extern int touch_trigger_capacity;
 extern ItemCount *item_counter_buffer;
 extern int item_counter_count;
 extern int item_counter_capacity;
@@ -260,6 +269,7 @@ extern float trigger_dt;
 #define INSTANT_COUNT_TRIGGER 1811
 #define ALPHA_TRIGGER 1007
 #define TOGGLE_TRIGGER 1049
+#define TOUCH_TRIGGER 1595
 #define PULSE_TRIGGER 1006
 #define SPAWN_TRIGGER 1268
 #define ROTATE_TRIGGER 1346
@@ -310,6 +320,8 @@ int get_item_count(int id);
 void add_item_count(int id, int delta);
 void upload_to_count_buffer(int obj);
 void handle_count_triggers(void);
+void upload_to_touch_buffer(int obj);
+void handle_touch_triggers(void);
 void upload_to_follow_player_y_buffer(int obj);
 void handle_follow_player_y_triggers(void);
 void upload_to_follow_buffer(int obj);

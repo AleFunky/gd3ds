@@ -20,6 +20,7 @@
 extern int alpha_trigger_capacity;
 extern int move_trigger_capacity;
 extern int spawn_trigger_capacity;
+extern int touch_trigger_capacity;
 extern int follow_player_y_trigger_capacity;
 
 bool restored_checkpoint = false;
@@ -92,9 +93,11 @@ typedef struct CheckpointData {
     RotateObjectSnapshot *rotate_obj_snapshot;
     ItemCount *count_items;
     CountTriggerBuffer *count_triggers;
+    TouchTriggerBuffer *touch_triggers;
     int *collected_pickups;
     int count_items_count;
     int count_triggers_count;
+    int touch_triggers_count;
     int collected_pickups_count;
     int move_triggers_count;
     int alpha_triggers_count;
@@ -469,6 +472,7 @@ void new_checkpoint() {
     CK_ADD(check->rotate_obj_snapshot, RotateObjectSnapshot, rotate_obj_cap);
     CK_ADD(check->count_items,       ItemCount,           item_counter_count);
     CK_ADD(check->count_triggers,    CountTriggerBuffer,  count_trigger_count);
+    CK_ADD(check->touch_triggers,    TouchTriggerBuffer,  touch_trigger_count);
     CK_ADD(check->collected_pickups, int,                 pickup_cap);
     CK_ADD(check->channel_snapshot,  ColorChannel,       used_count);
     CK_ADD(check->trigger_snapshot,  ColTriggerBuffer,   used_count);
@@ -513,6 +517,7 @@ void new_checkpoint() {
     check->rotate_obj_count = 0;
     check->count_items_count = item_counter_count;
     check->count_triggers_count = count_trigger_count;
+    check->touch_triggers_count = touch_trigger_count;
     check->collected_pickups_count = pickup_cap;
     check->channel_snapshot_count = used_count;
 
@@ -564,6 +569,7 @@ void new_checkpoint() {
     if (check->rotate_triggers) memcpy(check->rotate_triggers, rotate_trigger_buffer, sizeof(RotateTriggerBuffer) * rotate_trigger_count);
     if (check->count_items) memcpy(check->count_items, item_counter_buffer, sizeof(ItemCount) * item_counter_count);
     if (check->count_triggers) memcpy(check->count_triggers, count_trigger_buffer, sizeof(CountTriggerBuffer) * count_trigger_count);
+    if (check->touch_triggers) memcpy(check->touch_triggers, touch_trigger_buffer, sizeof(TouchTriggerBuffer) * touch_trigger_count);
     if (check->collected_pickups) {
         int n = 0;
         for (int i = 0; i < objects.count && n < check->collected_pickups_count; i++) {
@@ -914,6 +920,17 @@ void restore_checkpoint() {
         }
     } else {
         count_trigger_count = 0;
+    }
+    if (check->touch_triggers_count > 0) {
+        TouchTriggerBuffer *buf = realloc(touch_trigger_buffer, sizeof(TouchTriggerBuffer) * check->touch_triggers_count);
+        if (buf) {
+            touch_trigger_buffer = buf;
+            touch_trigger_capacity = check->touch_triggers_count;
+            touch_trigger_count = check->touch_triggers_count;
+            memcpy(touch_trigger_buffer, check->touch_triggers, sizeof(TouchTriggerBuffer) * check->touch_triggers_count);
+        }
+    } else {
+        touch_trigger_count = 0;
     }
 
     for (int i = 0; i < count_trigger_count; i++)

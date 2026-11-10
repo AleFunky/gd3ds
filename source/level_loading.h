@@ -171,6 +171,14 @@ typedef struct {
 typedef struct {
     bool spawn_triggered;
     bool multi_triggered;
+    bool hold_mode;
+    unsigned char toggle_mode;
+    int target_group;
+} TouchTrigger;
+
+typedef struct {
+    bool spawn_triggered;
+    bool multi_triggered;
     int target_group;
     float spawn_delay;
     float trig_duration;
@@ -355,6 +363,7 @@ extern TriggerPool move_pool;
 extern TriggerPool alpha_pool;
 extern TriggerPool pulse_pool;
 extern TriggerPool toggle_pool;
+extern TriggerPool touch_pool;
 extern TriggerPool spawn_pool;
 extern bool has_follow_player_y;
 
@@ -369,6 +378,7 @@ PickupItem *get_pickup_item(int obj);
 FollowPlayerYTrigger *get_follow_player_y_trigger(int obj);
 FollowTrigger *get_follow_trigger(int obj);
 ToggleTrigger *get_toggle_trigger(int obj);
+TouchTrigger *get_touch_trigger(int obj);
 SpawnTrigger *get_spawn_trigger(int obj);
 TextObject *get_text_object(int obj);
 
