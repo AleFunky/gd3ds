@@ -12,8 +12,8 @@
 #include <minizip/unzip.h>
 
 u8 get_model() {
-    u8 model;
-    CFGU_GetSystemModel(&model);
+    u8 model = 0;
+    if (R_FAILED(CFGU_GetSystemModel(&model))) return CFG_MODEL_3DS;
     return model;
 }
 

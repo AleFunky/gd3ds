@@ -1840,7 +1840,6 @@ int main(int argc, char* argv[]) {
     C2D_Prepare();
     osSetSpeedupEnable(1);
     soc_init();
-    check_system_model();
     check_rom_type();
     // output_log("argc: %d\n", argc);
     if (argc > 0) { 
@@ -1855,6 +1854,7 @@ int main(int argc, char* argv[]) {
 
     cfg_init();
     cfguInit();
+    check_system_model();
 
     // Sort out wide / 3D before making the targets, they need different sizes
     apply_screen_modes();
