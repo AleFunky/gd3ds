@@ -922,7 +922,7 @@ void restore_checkpoint() {
         count_trigger_count = 0;
     }
     if (check->touch_triggers_count > 0) {
-        TouchTriggerBuffer *buf = realloc(touch_trigger_buffer, sizeof(TouchTriggerBuffer) * check->touch_triggers_count);
+        TouchTriggerBuffer *buf = (TouchTriggerBuffer *)realloc(touch_trigger_buffer, sizeof(TouchTriggerBuffer) * check->touch_triggers_count);
         if (buf) {
             touch_trigger_buffer = buf;
             touch_trigger_capacity = check->touch_triggers_count;

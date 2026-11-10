@@ -119,7 +119,7 @@ static CountTriggerBuffer *get_new_count_trigger(void) {
 static TouchTriggerBuffer *get_new_touch_trigger(void) {
     if (touch_trigger_count >= touch_trigger_capacity) {
         size_t new_capacity = touch_trigger_capacity == 0 ? 32 : touch_trigger_capacity + 32;
-        TouchTriggerBuffer *new_list = realloc(touch_trigger_buffer, new_capacity * sizeof(TouchTriggerBuffer));
+        TouchTriggerBuffer *new_list = (TouchTriggerBuffer *)realloc(touch_trigger_buffer, new_capacity * sizeof(TouchTriggerBuffer));
         if (!new_list) return NULL;
         touch_trigger_buffer = new_list;
         touch_trigger_capacity = new_capacity;
