@@ -6,11 +6,10 @@
 #include "menus/core/common_setters.hpp"
 
 #include "math_helpers.hpp"
-#include "fonts/bigFont.hpp"
 #include "main.hpp"
 #include "easing.hpp"
 #include "mp3_player.hpp"
-#include "level_select.hpp"
+#include "sounds.hpp"
 #include "state.hpp"
 #include "level_loading.hpp"
 #include "particles/circles.hpp"
@@ -91,7 +90,7 @@ const char *do_not_completion_texts[] = {
     "Auto Safe Mode cheat detected:\nNoclipped through the end wall",
     "I lied, you got 99%",
     "I have no words.... oh wait",
-    "we really doing anything now"
+    "we really doing anything now",
     "+100 dollars",
     "360 FPS detected",
     "A swing and a hit!",
