@@ -24,6 +24,7 @@
 #include "particles/circles.hpp"
 #include "particles/coin_effect.hpp"
 #include "particles/key_effect.hpp"
+#include "particles/lightning.hpp"
 
 #include "menus/settings_hub/settings.hpp"
 
@@ -32,7 +33,6 @@
 #include "fonts/level_fonts.hpp"
 #include "particles/rays.hpp"
 #include "practice.hpp"
-
 
 extern const Color white = { 255, 255, 255 };
 
@@ -1800,6 +1800,7 @@ void create_objects() {
 
 void draw_player_effects() {
     change_blending(true);
+
     for (int i = 0; i < 2; i++) {
         drawParticleSystem(&drag_particles[i], 0, 0, 1.f);
         drawParticleSystem(&ship_fire_particles[i], 0, 0, 1.f);
@@ -1841,12 +1842,16 @@ void draw_player_graphics() {
         draw_rays();
     }
     draw_object_particles();
+
     draw_player_effects();
 
     draw_p1_trail(&state.player2, 1);
     
     if (!settingsState.noPlayerTrail) MotionTrail_Draw(&trail_p2);
     MotionTrail_DrawWaveTrail(&wave_trail_p2);
+
+    draw_all_lightning();
+
     change_blending(false);
     state.current_player = 0;
     draw_checkpoints();
