@@ -30,6 +30,8 @@
 
 #include "menus/core/ui_screen.hpp"
 
+#include "particles/lightning.hpp"
+
 #include "fonts/level_fonts.hpp"
 #include "particles/rays.hpp"
 #include "practice.hpp"
@@ -294,7 +296,7 @@ void cache_all_sprites() {
         sprite_templates[id].child_count = obj->child_count;
         if (obj->child_count > 0) {
             sprite_templates[id].child_templates = (C2D_Sprite *)malloc(sizeof(C2D_Sprite) * obj->child_count);
-            for (int i = 0; i < obj->child_count; i++) {
+            for (size_t i = 0; i < obj->child_count; i++) {
                 const ChildSprite* c = &obj->children[i];
                 if (c->texture < 0) continue;
 
@@ -1167,7 +1169,7 @@ int get_object_layers(int id) {
     const GameObject *obj = (const GameObject*)&game_objects[id];
     if (obj->texture >= 0) count++;
     
-    for (int c = 0; c < obj->child_count; c++) {
+    for (size_t c = 0; c < obj->child_count; c++) {
         if (obj->children[c].texture >= 0) count++;
     }
     return count;
