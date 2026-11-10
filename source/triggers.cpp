@@ -964,7 +964,7 @@ void handle_count_triggers(void) {
                 count_trigger_buffer[i].active = false;
                 compact = true;
             }
-            toggle_group(buffer.target_group, buffer.activate_group);
+            toggle_group(buffer.target_group, buffer.activate_group, true);
         }
     }
 
@@ -1047,9 +1047,9 @@ void handle_touch_triggers(void) {
         if (pressed) {
             bool applied = touch_toggle_value(trigger);
             touch_trigger_buffer[i].applied = applied;
-            toggle_group(trigger->target_group, applied);
+            toggle_group(trigger->target_group, applied, true);
         } else if (released && trigger->hold_mode) {
-            toggle_group(trigger->target_group, !buffer.applied);
+            toggle_group(trigger->target_group, !buffer.applied, true);
         }
     }
 }
@@ -1706,7 +1706,7 @@ void upload_color_to_buffer(int channel, u32 color, float seconds) {
     buffer->active = true;
 }
 
-void toggle_group(int group, bool activate) {
+void toggle_group(int group, bool activate, bool spawn) {
     GroupNode *p = get_group(group);
     if (p) {
         p->toggled = !activate;
@@ -1716,7 +1716,7 @@ void toggle_group(int group, bool activate) {
             objects.flags[object] |= get_group_toggles(object) ? FLAG_TOGGLED : 0;
         }
 
-        if (activate) {
+        if (activate && spawn) {
             if (toggle_spawn_count < 8) toggle_spawn_buffer[toggle_spawn_count++] = group;
             if (toggle_spawn_active) return;
 
@@ -1869,7 +1869,7 @@ void run_trigger(int obj, bool from_spawn) {
                 case INSTANT_COUNT_MODE_LARGER: pass = value > trigger->target_count; break;
                 case INSTANT_COUNT_MODE_SMALLER: pass = value < trigger->target_count; break;
             }
-            if (pass) toggle_group(trigger->target_group, trigger->activate_group);
+            if (pass) toggle_group(trigger->target_group, trigger->activate_group, true);
             break;
         }
         case FOLLOW_PLAYER_Y_TRIGGER:
@@ -1892,7 +1892,7 @@ void run_trigger(int obj, bool from_spawn) {
         case TOGGLE_TRIGGER:
         {
             ToggleTrigger *trigger = get_toggle_trigger(obj);
-            toggle_group(trigger->target_group, trigger->activate_group);
+            toggle_group(trigger->target_group, trigger->activate_group, false);
             break;
         }
         case TOUCH_TRIGGER:

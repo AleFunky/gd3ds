@@ -846,7 +846,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 ToggleTrigger *trigger = get_toggle_trigger(obj);
 
                 if (trigger->spawn_only) spawn_group(trigger->target_group);
-                else toggle_group(trigger->target_group, trigger->activate_group);
+                else toggle_group(trigger->target_group, trigger->activate_group, true);
 
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, get_use_effect_array_ptr(GFX_TOP));
                 if (effect) {

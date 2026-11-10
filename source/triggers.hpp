@@ -329,7 +329,7 @@ void handle_follow_triggers(void);
 void handle_step_triggers(void);
 void upload_to_spawn_buffer(int obj, bool from_spawn);
 void handle_spawn_triggers(void);
-void toggle_group(int group, bool activate);
+void toggle_group(int group, bool activate, bool spawn);
 void spawn_group(int group);
 void upload_to_pulse_buffer(int obj);
 void handle_pulse_triggers(void);

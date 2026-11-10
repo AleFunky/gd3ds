@@ -2759,8 +2759,8 @@ static void spawn_icon_at_internal(
                         C2D_SpriteFromSheet(&spr, playerEffectsSheet, PLAYER_EFFECTS_FIRE_BOOST);
                         C2D_SpriteSetCenter(&spr, 0.5f, 0.0f);
                         C2D_SpriteSetPos(&spr, p_x, p_y);
-                        C2D_SpriteSetScale(&spr, sx * params.robot_fire_scale, sy * params.robot_fire_scale);
-                        C2D_SpriteSetRotation(&spr, part_rad);
+                        C2D_SpriteSetScale(&spr, sx * params.robot_fire_scale, scale * params.robot_fire_scale);
+                        C2D_SpriteSetRotation(&spr, part_rad + C3D_AngleFromDegrees(180.0f * flip_y));
                         C2D_DrawSpriteTinted(&spr, &tints[ICON_COLOR_WHITE]);
                     }
 
