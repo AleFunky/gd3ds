@@ -35,7 +35,7 @@ std::vector<LightningSegment> Lightning::generate_lighting_recursive(
 
     //???
     static std::mt19937 gen(std::random_device{}());
-    std::uniform_real_distribution<float> rand_offset(-segment_length * 0.3, segment_length * 0.3); 
+    std::uniform_real_distribution<float> rand_offset(-segment_length * 0.5, segment_length * 0.5); 
 
     unsigned int i = 0;
     for(; i < points.size() - 1; i++){
@@ -71,7 +71,7 @@ std::vector<LightningSegment> Lightning::generate_lighting_recursive(
                     color = lightning_size_normal_col;
                     break;
                 case LightningType::TELEPORT:
-                    color = color_lerp_u32(lightning_tele_in_col, lightning_tele_out_col, i / (float)segment_count);
+                    color = p1_color.to_color32();
                     break;
                 default:
                     break;
