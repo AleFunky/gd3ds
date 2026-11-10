@@ -25,6 +25,7 @@
 #include "particles/collectable_effect.hpp"
 #include "save/saving.hpp"
 #include "menus/level_select.hpp"
+#include "particles/lightning.hpp"
 
 Player *player_1 = &state.player;
 Player *player_2 = &state.player2;
@@ -965,6 +966,15 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             if (!GET_ACTIVATED(obj)) {
                 if (player->mini) {
                     start_bg_flash();
+
+                    lightning_bolts.push_back(
+                        Lightning(
+                            objects.x[obj] + random_int(-25.0f, 25.0f) + 25.0f, state.camera_y + 50.0f + SCREEN_HEIGHT, 
+                            objects.x[obj], objects.y[obj], 
+                            LightningType::SIZE_NORMAL
+                        )
+                    );
+
                     set_mini(player, false);
                     UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
                     if (effect) {
@@ -993,6 +1003,15 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             if (!GET_ACTIVATED(obj)) {
                 if (!player->mini){
                     start_bg_flash();
+
+                    lightning_bolts.push_back(
+                        Lightning(
+                            objects.x[obj] + random_int(-25.0f, 25.0f) + 25.0f, state.camera_y + 50.0f + SCREEN_HEIGHT, 
+                            objects.x[obj], objects.y[obj], 
+                            LightningType::SIZE_MINI
+                        )
+                    );
+
                     set_mini(player, true);
                     UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
                     if (effect) {
@@ -1213,6 +1232,14 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             if (GET_ACTIVATED(obj)) break;
             int oi = objects.child_object[obj];
             if (oi >= 0) {
+                lightning_bolts.push_back(
+                    Lightning(
+                        objects.x[obj], objects.y[obj],
+                        objects.x[oi], objects.y[oi], 
+                        LightningType::TELEPORT
+                    )
+                );
+
                 player->y = objects.y[oi];
                 state.old_player.y = player->y;
 

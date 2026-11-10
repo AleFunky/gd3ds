@@ -37,6 +37,7 @@
 
 #include "player/player.hpp"
 #include "particles/circles.hpp"
+#include "particles/lightning.hpp"
 
 #include "level/main_levels.hpp"
 #include "menus/main_menu.hpp"
@@ -103,7 +104,6 @@ const char *cheat_names[CHEAT_COUNT] = {
     "Noclip",
     "Hitboxes"
 };
-
 
 float accumulator = 0.f;
 bool fixed_dt = true;
@@ -1978,6 +1978,9 @@ int main(int argc, char* argv[]) {
     close_log_file();
 
     free_cached_sprites();
+    
+    lightning_bolts.clear();
+    lightning_bolts.shrink_to_fit();
 
     // Delete graphics
     C2D_SpriteSheetFree(spriteSheet);

@@ -34,7 +34,6 @@
 #include "particles/rays.hpp"
 #include "practice.hpp"
 
-
 extern const Color white = { 255, 255, 255 };
 
 #define COLLECTABLE_FLOAT_AMP 1.5f
@@ -2294,12 +2293,16 @@ void draw_player_graphics() {
         draw_rays();
     }
     draw_object_particles();
+
     draw_player_effects();
 
     draw_p1_trail(&state.player2, 1);
     
     if (!settingsState.noPlayerTrail) MotionTrail_Draw(&trail_p2);
     MotionTrail_DrawWaveTrail(&wave_trail_p2);
+
+    draw_all_lightning();
+
     change_blending(false);
     state.current_player = 0;
 
