@@ -607,20 +607,12 @@ void create_setting(Setting *setting, int id, UIScreen *s) {
             ui_rectangle_set_color((UIRectangle *) card, (id & 1 ? C2D_Color32(194,114,62,255) :  C2D_Color32(161,88,48,255)));
             ui_element_set_size(card, 0, 28);
 
-<<<<<<< HEAD
             if (setting->buttonActions) {
                 UIButton *set_button = ui_create_button(s);
                 if (set_button) {
                     ui_button_set_image(set_button, setting->buttonIcon, setting->buttonSheet);
                     ui_element_set_position((UIElement *) set_button, -list_width + 13, 0);
                     ui_element_set_scale((UIElement *) set_button, (32.f * 0.6f) / set_button->base.w);
-=======
-            UICheckBox *checkbox = ui_create_checkbox(s);
-            if (checkbox) {
-                // Store in the user data
-                CheckboxData *data = (CheckboxData *)malloc(sizeof(*data));
-                data->setting = setting;
->>>>>>> master
 
                     UIElement *set_element = (UIElement *) set_button;
                     set_element->actions = parse_actions(setting->buttonActions, settings_actions, ARRAY_LEN(settings_actions), &set_element->action_count);

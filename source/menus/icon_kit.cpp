@@ -1,9 +1,6 @@
 #include <3ds.h>
 #include <citro2d.h>
-<<<<<<< HEAD
 #include "icons.hpp"
-=======
->>>>>>> master
 #include "menus/core/ui_screen.hpp"
 #include "math_helpers.hpp"
 #include "menus/components/ui_list.hpp"
