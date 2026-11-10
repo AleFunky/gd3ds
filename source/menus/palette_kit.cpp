@@ -1,0 +1,473 @@
+#include <3ds.h>
+#include <citro2d.h>
+#include "main.hpp"
+
+#include "menus/core/ui_screen.hpp"
+#include "math_helpers.hpp"
+#include "menus/components/ui_list.hpp"
+#include "menus/components/ui_window.hpp"
+#include "menus/components/ui_color_button.hpp"
+#include "menus/components/ui_window_button.hpp"
+#include "graphics.hpp"
+#include "palette_kit.hpp"
+#include "menus/components/ui_checkbox.hpp"
+
+extern const u32 colors[] = {
+    // Reds
+    ABGR8(253, 212, 206, 255),
+    ABGR8(255, 125, 125, 255),
+    ABGR8(255, 58, 58, 255),
+    ABGR8(255, 0, 0, 255),
+
+    ABGR8(150, 0, 0, 255),
+    ABGR8(112, 0, 0, 255),
+    ABGR8(82, 2, 0, 255),
+    ABGR8(56, 1, 6, 255),
+
+    ABGR8(175, 0, 75, 255),
+    ABGR8(128, 79, 79, 255),
+    ABGR8(122, 53, 53, 255),
+    ABGR8(81, 36, 36, 255),
+
+    // Oranges
+    ABGR8(255, 185, 114, 255),
+    ABGR8(255, 160, 64, 255),
+    ABGR8(255, 125, 0, 255),
+    ABGR8(255, 75, 0, 255),
+
+    ABGR8(175, 75, 0, 255),
+    ABGR8(163, 98, 70, 255),
+    ABGR8(117, 73, 54, 255),
+    ABGR8(86, 53, 40, 255),
+
+    ABGR8(150, 50, 0, 255),
+    ABGR8(102, 49, 30, 255),
+    ABGR8(91, 39, 0, 255),
+    ABGR8(71, 32, 0, 255),
+
+    // Yellows
+    ABGR8(255, 255, 192, 255),
+    ABGR8(255, 250, 127, 255),
+    ABGR8(255, 255, 0, 255),
+    ABGR8(125, 125, 0, 255),
+
+    ABGR8(253, 224, 160, 255),
+    ABGR8(255, 185, 0, 255),
+    ABGR8(150, 100, 0, 255),
+    ABGR8(80, 50, 14, 255),
+
+    ABGR8(205, 165, 118, 255),
+    ABGR8(167, 123, 77, 255),
+    ABGR8(109, 83, 57, 255),
+    ABGR8(81, 62, 42, 255),
+
+    // Greens
+    ABGR8(192, 255, 160, 255),
+    ABGR8(177, 255, 109, 255),
+    ABGR8(125, 255, 0, 255),
+    ABGR8(0, 255, 0, 255), // Default p1
+
+    ABGR8(210, 255, 50, 255),
+    ABGR8(75, 175, 0, 255),
+    ABGR8(100, 150, 0, 255),
+    ABGR8(0, 192, 55, 255),
+
+    ABGR8(0, 255, 125, 255),
+    ABGR8(0, 150, 0, 255),
+    ABGR8(0, 96, 0, 255),
+    ABGR8(0, 64, 0, 255),
+
+    // Cyans
+    ABGR8(192, 255, 224, 255),
+    ABGR8(148, 255, 228, 255),
+    ABGR8(0, 255, 192, 255),
+    ABGR8(0, 255, 255, 255), // Default P2, glow
+
+    ABGR8(125, 255, 175, 255),
+    ABGR8(67, 161, 138, 255),
+    ABGR8(49, 109, 95, 255),
+    ABGR8(38, 84, 73, 255),
+    
+    ABGR8(0, 150, 100, 255),
+    ABGR8(0, 125, 125, 255),
+    ABGR8(0, 96, 96, 255),
+    ABGR8(0, 64, 64, 255),
+
+    // Blues
+    ABGR8(160, 255, 255, 255),
+    ABGR8(0, 200, 255, 255),
+    ABGR8(0, 125, 255, 255),
+    ABGR8(0, 0, 255, 255),
+
+    ABGR8(0, 75, 175, 255),
+    ABGR8(0, 0, 150, 255),
+    ABGR8(1, 7, 112, 255),
+    ABGR8(0, 10, 76, 255),
+
+    ABGR8(0, 100, 150, 255),
+    ABGR8(0, 73, 109, 255),
+    ABGR8(0, 50, 76, 255),
+    ABGR8(0, 38, 56, 255),
+
+    ABGR8(118, 189, 255, 255),
+    ABGR8(80, 128, 173, 255),
+    ABGR8(51, 83, 117, 255),
+    ABGR8(35, 60, 86, 255),
+
+    // Purples
+    ABGR8(190, 181, 255, 255),
+    ABGR8(125, 125, 255, 255),
+    ABGR8(125, 0, 255, 255),
+    ABGR8(100, 0, 150, 255),
+
+    ABGR8(182, 128, 255, 255),
+    ABGR8(75, 0, 175, 255),
+    ABGR8(61, 6, 140, 255),
+    ABGR8(55, 8, 96, 255),
+
+    ABGR8(77, 77, 143, 255),
+    ABGR8(111, 73, 164, 255),
+    ABGR8(84, 54, 127, 255),
+    ABGR8(66, 42, 99, 255),
+
+    // Magentas
+    ABGR8(252, 181, 255, 255),
+    ABGR8(255, 0, 125, 255),
+    ABGR8(150, 0, 100, 255),
+    ABGR8(102, 3, 62, 255),
+
+    ABGR8(255, 0, 255, 255),
+    ABGR8(185, 0, 255, 255),
+    ABGR8(125, 0, 125, 255),
+    ABGR8(71, 1, 52, 255),
+
+    ABGR8(250, 127, 255, 255),
+    ABGR8(175, 87, 175, 255),
+    ABGR8(130, 67, 130, 255),
+    ABGR8(94, 49, 94, 255),
+
+    // Gray scale
+    ABGR8(255, 255, 255, 255),
+    ABGR8(224, 224, 224, 255),
+    ABGR8(175, 175, 175, 255),
+    ABGR8(128, 128, 128, 255),
+    ABGR8(90, 90, 90, 255),
+    ABGR8(64, 64, 64, 255),
+    ABGR8(0, 0, 0, 255)
+};
+
+extern const int gd_to_gd3ds_color_table[] = {
+    38,
+    39,
+    44,
+    51,
+    62,
+    63,
+    78,
+    92,
+    89,
+    3,
+    14,
+    26,
+    100,
+    93,
+    29,
+    106,
+    61,
+    102,
+    104,
+    1,
+    43,
+    57,
+    64,
+    81,
+    94,
+    8,
+    16,
+    27,
+    41,
+    15,
+    20,
+    30,
+    42,
+    56,
+    68,
+    79,
+    90,
+    4,
+    45,
+    65,
+    52,
+    77,
+    25,
+    96,
+    50,
+    31,
+    32,
+    80,
+    2,
+    84,
+    67,
+    0,
+    76,
+    5,
+    6,
+    7,
+    9,
+    10,
+    11,
+    17,
+    18,
+    19,
+    12,
+    13,
+    21,
+    22,
+    23,
+    33,
+    34,
+    35,
+    24,
+    28,
+    36,
+    37,
+    48,
+    49,
+    53,
+    54,
+    55,
+    46,
+    47,
+    58,
+    59,
+    60,
+    66,
+    69,
+    70,
+    71,
+    73,
+    74,
+    75,
+    101,
+    82,
+    83,
+    105,
+    85,
+    86,
+    87,
+    88,
+    97,
+    98,
+    95,
+    103,
+    91,
+    99,
+    40,
+    72
+};
+
+extern const size_t NUM_COLORS = ARRAY_LEN(colors);
+
+/*
+Categories:
+
+Red,
+Orange,
+Yellow,
+Green,
+Cyan,
+Blue,
+Purple,
+Magenta,
+Gray
+*/
+static int category_colors[] = {
+    3,
+    15,
+    26,
+    39,
+    51,
+    63,
+    78,
+    89,
+    103
+};
+
+//amount of colors in each category
+static int category_counts[] = {
+    12,
+    12,
+    12,
+    12,
+    12,
+    16,
+    12,
+    12,
+    7
+};
+
+static int selected_category;
+
+//the first color index in the selected category
+static int starting_color_index;
+
+//used to increment category color buttons during setup
+static int category_counter = 0;
+
+//used to increment color buttons during setup
+static int color_counter = 0;
+
+//color 1, 2, or glow
+static int color_page = 0;
+
+static void disable_glow_setting(UIElement *e) {
+    e->enabled = false;
+
+    show_glow = (player_glow_enabled || ((p1_color.r | p1_color.g | p1_color.b) == 0));
+}
+
+static void enable_glow_setting(UIElement *e) {
+    e->enabled = true;
+}
+
+static void set_color_index(UIElement *e) {
+    UIColor *color = (UIColor *) e;
+
+    int color_index = starting_color_index + color_counter;
+
+    ui_color_button_set_index(color, color_page, color_index);
+
+    color->isSelected = *current_colors[color_page] == color_index;
+
+    e->enabled = color_counter < category_counts[selected_category];
+
+    color_counter++;
+}
+
+static void set_category_index(UIElement *e) {
+    UIColor *color = (UIColor *) e;
+    //rather than using the color index as col1/col2/glow, it's used as a category index for the button
+    ui_color_button_set_index(color, category_counter, category_colors[category_counter]);
+    
+    color->isSelected = selected_category == category_counter;
+    
+    category_counter++;
+}
+
+static void reset_indices(UIScreen *s){
+    category_counter = 0;
+    color_counter = 0;
+
+    //find first color index
+    starting_color_index = 0;
+    for(int i = 0; i < selected_category; i++){
+        starting_color_index += category_counts[i];
+    }
+
+    ui_run_func_on_tag(s, "category", set_category_index);
+    ui_run_func_on_tag(s, "color", set_color_index);
+}
+
+static void action_category_selected(UIElement *e, const UIPropertyList *args){
+    UIColor *color = (UIColor *) e;
+
+    selected_category = color->index;
+
+    reset_indices(e->screen);
+}
+
+static void action_color_selected(UIElement *e, const UIPropertyList *args) {
+    UIColor *color = (UIColor *) e;
+
+    *current_colors[color_page] = color->color_index;
+    update_player_colors();
+
+    show_glow = (player_glow_enabled || ((p1_color.r | p1_color.g | p1_color.b) == 0));
+
+    reset_indices(e->screen);
+}
+
+static void disable_all_color_buttons(UIElement *e) {
+    ui_window_button_set_style((UIWindowButton *) e, 4);
+}
+
+static void reset_selected_category(){
+    //get selected category from selected color index
+    int current_index = *current_colors[color_page];
+
+    //9 is the number of categories
+    for(int i = 0; i < 9; i++){
+        if(current_index < category_counts[i]){
+            selected_category = i;
+            break;
+        }
+        current_index -= category_counts[i];
+    }
+}
+
+static void set_p1_page(UIElement *e, const UIPropertyList *args) {    
+    ui_run_func_on_tag(e->screen, "color_buttons", disable_all_color_buttons);
+    ui_window_button_set_style((UIWindowButton *) e, 5);
+    color_page = 0;
+    ui_run_func_on_tag(e->screen, "glow_option", disable_glow_setting);
+    reset_selected_category();
+    reset_indices(e->screen);
+}
+
+static void set_p2_page(UIElement *e, const UIPropertyList *args) {
+    ui_run_func_on_tag(e->screen, "color_buttons", disable_all_color_buttons);
+    ui_window_button_set_style((UIWindowButton *) e, 5);
+    color_page = 1;
+    ui_run_func_on_tag(e->screen, "glow_option", disable_glow_setting);
+    reset_selected_category();
+    reset_indices(e->screen);
+}
+
+static void set_glow_page(UIElement *e, const UIPropertyList *args) {
+    ui_run_func_on_tag(e->screen, "color_buttons", disable_all_color_buttons);
+    ui_window_button_set_style((UIWindowButton *) e, 5);
+    color_page = 2;
+    ui_run_func_on_tag(e->screen, "glow_option", enable_glow_setting);
+    reset_selected_category();
+    reset_indices(e->screen);
+}
+
+void player_glow_settings(UIElement* e, const UIPropertyList *args) {
+    UICheckBox *checkbox = (UICheckBox *) e;
+    player_glow_enabled = checkbox->checked;
+    show_glow = (player_glow_enabled || ((p1_color.r | p1_color.g | p1_color.b) == 0));
+}
+
+static void palette_kit_init(UIScreen *s) {
+    color_page = 0;
+
+    reset_selected_category();
+    reset_indices(s);
+
+    ui_set_checkbox_checked((UICheckBox *) ui_get_element_by_tag(s, "check_glow"), player_glow_enabled);
+    ui_run_func_on_tag(s, "glow_option", disable_glow_setting);
+}
+
+static const UIActionDef palette_kit_actions[] = {
+    {"color_selected", action_color_selected},
+    {"action_p1", set_p1_page},
+    {"action_p2", set_p2_page},
+    {"action_glow", set_glow_page},
+    {"glow", player_glow_settings},
+    {"category_selected", action_category_selected}
+};
+
+extern const UIScreenDefPair palette_kit_def = {
+    .name = "palette_kit",
+    .top = {
+        0
+    },
+    .btm = {
+        .path = "romfs:/menus/palette_kit.txt",
+        .init = palette_kit_init,
+        .action_list = {
+            .actions = palette_kit_actions,
+            .action_count = ARRAY_LEN(palette_kit_actions)
+        }
+    }
+};
