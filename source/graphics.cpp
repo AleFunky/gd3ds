@@ -164,15 +164,15 @@ C2D_SpriteSheet get_sprite_sheet_ex(int index, int *rel_index) {
 }
 
 const SlotFrames* find_slot_frames(const GameObject* obj, int slot) {
-    for (int i = 0; i < obj->slot_count; i++) {
+    for (size_t i = 0; i < obj->slot_count; i++) {
         if (obj->slot_frames[i].slot == slot) return &obj->slot_frames[i];
     }
     return NULL;
 }
 
-int get_child_group(const GameObject* obj, int child_index) {
-    for (int g = 0; g < obj->group_count; g++) {
-        int end = obj->groups[g].start + obj->groups[g].count;
+size_t get_child_group(const GameObject* obj, size_t child_index) {
+    for (size_t g = 0; g < obj->group_count; g++) {
+        size_t end = obj->groups[g].start + obj->groups[g].count;
         if (child_index >= obj->groups[g].start && child_index < end)
             return g;
     }
@@ -933,7 +933,7 @@ void spawn_object_at(
     }
 
     // Spawn children
-    for (int i = 0; i < obj->child_count; i++) {
+    for (size_t i = 0; i < obj->child_count; i++) {
         const ChildSprite* c = &obj->children[i];
         
         if (sprite_count >= MAX_SPRITES - 1) return;
@@ -964,7 +964,7 @@ void spawn_object_at(
 
             // handle movement anims
             if (anim_keyframe) {
-                int group = get_child_group(obj, i);
+                size_t group = get_child_group(obj, i);
                 if (group >= 0) {
                     const AnimSprite* anim_sprite = NULL;
                     for (size_t k = 0; k < anim_keyframe->sprite_count; k++) {

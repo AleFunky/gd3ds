@@ -496,7 +496,6 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorG = 200 / 255.f;
                     effect->def.colorB = 0;
                 }
-            }
             break;
         }
         case BLUE_PAD: {

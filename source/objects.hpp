@@ -48,8 +48,8 @@ typedef struct {
 } ChildSprite;
 
 typedef struct {
-    int start;
-    int count;
+    size_t start;
+    size_t count;
 } ChildGroup;
 
 typedef struct {
@@ -60,8 +60,8 @@ typedef struct {
 typedef struct {
     int slot;
     float fps;
-    int start;
-    int count;
+    size_t start;
+    size_t count;
 } SlotFrames;
 
 typedef struct {
@@ -83,13 +83,13 @@ typedef struct {
     int swap_base_detail;
     int animation_type;
     float opacity;
-    int child_count;
+    size_t child_count;
     const ChildSprite* children;
-    int group_count;
+    size_t group_count;
     const ChildGroup* groups;
-    int frame_count;
+    size_t frame_count;
     const SwapFrame*  swap_frames;
-    int slot_count;
+    size_t slot_count;
     const SlotFrames* slot_frames;
     const ObjectHitbox* hitbox;
 } GameObject;

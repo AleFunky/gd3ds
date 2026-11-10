@@ -3849,6 +3849,7 @@ const ChildGroup groups_1328[] = {
     { 2, 1 },
 };
 
+<<<<<<< HEAD
 const ChildSprite children_1341[] = {
  { 1846, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_BASE, 1.00 },
 };
@@ -5418,6 +5419,9 @@ const ChildSprite children_1910[] = {
 };
 
 const GameObject game_objects[GAME_OBJECT_COUNT] = {
+=======
+extern const GameObject game_objects[GAME_OBJECT_COUNT] = {
+>>>>>>> master
 /* Object 0000 */ { -1, -1, 0.00, 0.00, 0, 0, 0, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, NULL },
 /* Object 0001 */ { 649, 138, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_1 },
 /* Object 0002 */ { 652, 140, 0.00, 0.00, 5, 2, 1004, 0, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox_2 },

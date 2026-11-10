@@ -1,6 +1,9 @@
 #pragma once
 #include "menus/core/ui_stack.hpp"
+<<<<<<< HEAD
 #include "menus/level_options.hpp"
+=======
+>>>>>>> master
 #include "utils/server_utils.hpp"
 
 void delete_level();

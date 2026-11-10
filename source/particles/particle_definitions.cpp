@@ -789,6 +789,7 @@ extern const ParticleDefinition speed_effect_vfast = {
     .textureFileName = TEXTURE_SQUARE_PNG,
 };
 
+<<<<<<< HEAD
 const ParticleDefinition speed_effect_fastest = {
     .angle = 180.0f,
     .angleVariance = 0.0f,
@@ -844,6 +845,9 @@ const ParticleDefinition speed_effect_fastest = {
 };
 
 const ParticleDefinition firework = {
+=======
+extern const ParticleDefinition firework = {
+>>>>>>> master
     .angle = 0.0f,
     .angleVariance = 180.0f,
     .blendFuncDestination = 1,

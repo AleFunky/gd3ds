@@ -1847,7 +1847,7 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
 bool obj_has_main(const GameObject *obj) {
     if (obj->color_type != COLOR_TYPE_DETAIL) return true;
     
-    for (int i = 0; i < obj->child_count; i++) {
+    for (size_t i = 0; i < obj->child_count; i++) {
         if (obj->children[i].color_type != COLOR_TYPE_DETAIL) return true;
     }
     return false;
@@ -1856,7 +1856,7 @@ bool obj_has_main(const GameObject *obj) {
 bool obj_has_detail(const GameObject *obj) {
     if (obj->color_type == COLOR_TYPE_DETAIL) return true;
     
-    for (int i = 0; i < obj->child_count; i++) {
+    for (size_t i = 0; i < obj->child_count; i++) {
         if (obj->children[i].color_type == COLOR_TYPE_DETAIL) return true;
     }
     return false;

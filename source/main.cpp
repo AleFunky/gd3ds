@@ -1623,8 +1623,19 @@ void game_loop() {
                     C2D_ViewScale(1/SCALE, 1/SCALE);
                 }
 
+<<<<<<< HEAD
                 if (dim > 0.f) {
                     change_blending(false);
+=======
+            if (state.profiling) {
+                float processingTime = ticks / CPU_TICKS_PER_MSEC;
+                ProfilerUpdateData data = {
+                    .touchPos = touchPos,
+                    .kDown = touch.down,
+                    .steps = steps,
+                    .processingTime = processingTime,
+                };
+>>>>>>> master
 
                     if (dim < 1.f) C2D_DrawRectSolid(0.f, 0.f, 0.f, side_width, SCREEN_HEIGHT, C2D_Color32(0, 0, 0, (int)(dim * 255.f)));
                 }
