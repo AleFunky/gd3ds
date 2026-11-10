@@ -866,6 +866,12 @@ static void spider_sort(int *list, int count, bool upside_down) {
     }
 }
 
+static float spider_slope_y(Player *player, int obj) {
+    float ydist = (player->upside_down ^ (grav_slope_orient(obj, player) >= ORIENT_UD_DOWN) ? -1.f : 1.f)
+                * (player->height / 2) / cosf(slope_angle(obj, player));
+    return expected_slope_y(obj, player) - ydist - grav(player, player->height / 2);
+}
+
 void spider_test_jump(Player *player, bool is_retry) {
     if (state.dead) return;
 
@@ -931,7 +937,7 @@ void spider_test_jump(Player *player, bool is_retry) {
 
             if (game_objects[objects.id[obj]].hitbox->type == COLLISION_SLOPE) {
                 checking_slope = true;
-                land_y = expected_slope_y(obj, player);
+                land_y = spider_slope_y(player, obj);
             }
 
             if ((!player->upside_down && land_y < player->y - 10.0f) ||
