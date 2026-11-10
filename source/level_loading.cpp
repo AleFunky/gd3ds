@@ -2600,7 +2600,7 @@ static bool reserve_char_buffer(char **buffer, size_t *capacity, size_t needed) 
         new_capacity = needed;
     }
 
-    char *section = realloc(*buffer, new_capacity);
+    char *section = (char *)realloc(*buffer, new_capacity);
     if (!section) return false;
 
     *buffer = section;
@@ -2614,7 +2614,7 @@ static int finish_level_scan_section(LevelStreamScan *scan, bool terminated) {
             // Handle metadata
             size_t metadata_len = scan->section_len + (terminated ? 1 : 0);
 
-            scan->metadata = malloc(metadata_len + 1);
+            scan->metadata = (char *)malloc(metadata_len + 1);
             if (!scan->metadata) return LOAD_OUT_OF_MEMORY;
 
             memcpy(scan->metadata, scan->section, scan->section_len);
@@ -2633,7 +2633,7 @@ static int finish_level_scan_section(LevelStreamScan *scan, bool terminated) {
 
 static int scan_level_chunk(const unsigned char *data, size_t len, void *context) {
     static const char portal_pattern[] = "1,747,";
-    LevelStreamScan *scan = context;
+    LevelStreamScan *scan = (LevelStreamScan *)context;
 
     for (size_t i = 0; i < len; i++) {
         char ch = (char)data[i];
@@ -2699,7 +2699,7 @@ static int parse_stream_section(LevelStreamParser *parser) {
 }
 
 static int parse_level_chunk(const unsigned char *data, size_t len, void *context) {
-    LevelStreamParser *parser = context;
+    LevelStreamParser *parser = (LevelStreamParser *)context;
 
     for (size_t i = 0; i < len; i++) {
         if (data[i] == ';') {
@@ -3123,7 +3123,7 @@ int load_online_level(char *level_string) {
         remove_char(level_string, ',');
 
         size_t encoded_len = strlen(level_string);
-        decoded = malloc(encoded_len);
+        decoded = (unsigned char *)malloc(encoded_len);
         if (!decoded) return LOAD_OUT_OF_MEMORY;
 
         int decoded_len = base64_decode(level_string, decoded);
@@ -3204,7 +3204,7 @@ int load_level(const char *path) {
         } else {
             fix_base64_url(b64);
             size_t encoded_len = strlen(b64);
-            decoded = malloc(encoded_len);
+            decoded = (unsigned char *)malloc(encoded_len);
             if (!decoded) {
                 free(b64);
                 free(level);
