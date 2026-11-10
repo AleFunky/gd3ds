@@ -6,13 +6,15 @@
 #include "menus/core/common_setters.hpp"
 
 #include "math_helpers.hpp"
+#include "fonts/bigFont.hpp"
 #include "main.hpp"
 #include "easing.hpp"
 #include "mp3_player.hpp"
-#include "sounds.hpp"
+#include "level_select.hpp"
 #include "state.hpp"
 #include "level_loading.hpp"
 #include "particles/circles.hpp"
+#include "practice.hpp"
 
 #include "menus/components/ui_darken.hpp"
 #include "menus/components/ui_list.hpp"
@@ -39,6 +41,7 @@
 static bool yes_exit = false;
 static bool restart = false;
 static bool init = false;
+static bool checkpoint_restart_flag = false;
 
 static bool animating_down = false;
 static bool animating_reward = false;
@@ -88,7 +91,7 @@ const char *do_not_completion_texts[] = {
     "Auto Safe Mode cheat detected:\nNoclipped through the end wall",
     "I lied, you got 99%",
     "I have no words.... oh wait",
-    "we really doing anything now",
+    "we really doing anything now"
     "+100 dollars",
     "360 FPS detected",
     "A swing and a hit!",
@@ -124,7 +127,7 @@ const char *do_not_completion_texts[] = {
     "Goop job!",
     "Have a cookie",
     "hi you did it bye",
-    "HOLY SHIT YOU JUST VERIFIED... oh wait.",
+    "HOLY CRAP YOU JUST VERIFIED... oh wait.",
     "horse",
     "How",
     "I could do this in half the attempts",
@@ -180,7 +183,8 @@ const char *do_not_completion_texts[] = {
     "YOU WIN!",
     "You've just beaten Stereo Madness",
     "Your dids it!",
-    "your winner!"
+    "your winner!",
+    "You can now play as Luigi!"
 };
 
 const char *completion_texts[] = {
@@ -223,6 +227,19 @@ static void restart_level(UIElement* e, const UIPropertyList *args) {
     }
 }
 
+static void checkpoint_restart(UIElement* e, const UIPropertyList *args) {
+    if (!state.practice_mode) return;
+
+    if (!animating_up) {
+        play_sfx(&play_sound, 1);
+        animating_up = true;
+        animating_down = false;
+        anim_time = 0;
+        pause_playback_mp3();
+        checkpoint_restart_flag = true;
+    }
+}
+
 static void scale_bottom_buttons_anim(UIElement* e){
     UIButton *button = (UIButton *) e;
 
@@ -234,6 +251,7 @@ static void scale_bottom_buttons_anim(UIElement* e){
 static UIActionDef actions[] = {
     { "restart", restart_level },
     { "exit", exit_level_complete },
+    { "checkpointRestart", checkpoint_restart },
 };
 
 // This runs the initial animation of the menu coming off screen
@@ -248,8 +266,8 @@ static void run_start_animation(float delta) {
 
     ui_run_func_on_tag(&screen, "bottomWindow", scale_bottom_buttons_anim);
     
-    ui_set_pos_on_tag(&screen, (float)SCREEN_BOT_WIDTH / 2, window_y_pos, "window");
-    ui_set_pos_on_tag(&screen_top, (float)SCREEN_WIDTH / 2, window_y_pos, "window");
+    ui_set_pos_on_tag(&screen, SCREEN_BOT_WIDTH / 2, window_y_pos, "window");
+    ui_set_pos_on_tag(&screen_top, SCREEN_WIDTH / 2, window_y_pos, "window");
 
     if(anim_time > 0.6f){
         animating_reward = true;
@@ -364,13 +382,15 @@ static void run_end_animation(float delta) {
     float fade_value = easeValue(QUAD_IN, up_y_start, 0, anim_time, RESTART_ANIM_DURATION, 1.f);
     window_y_pos = -120 + fade_value;
 
-    ui_set_pos_on_tag(&screen, (float)SCREEN_BOT_WIDTH / 2.f, window_y_pos, "window");
-    ui_set_pos_on_tag(&screen_top, (float)SCREEN_WIDTH / 2.f, window_y_pos, "window");
+    ui_set_pos_on_tag(&screen, SCREEN_BOT_WIDTH / 2, window_y_pos, "window");
+    ui_set_pos_on_tag(&screen_top, SCREEN_WIDTH / 2, window_y_pos, "window");
     
     // Animation end
     if (anim_time >= RESTART_ANIM_DURATION) {
         animating_up = false;
-        restart = true;
+        if (!checkpoint_restart_flag) {
+            restart = true;
+        }
         anim_time = 0;
     }
     anim_time += delta;
@@ -419,6 +439,11 @@ void level_complete_init() {
     ui_load_screen_old(&screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/level_complete_top.txt");
     ui_load_screen_old(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/level_complete.txt");
 
+    if (!state.practice_mode) {
+        UIElement *checkpoint_button = ui_get_element_by_tag(&screen, "checkpointRestartButton");
+        if (checkpoint_button) ui_disable_element(checkpoint_button);
+    }
+
     state.current_data.time_end = svcGetSystemTick() / (CPU_TICKS_PER_MSEC * 1000);
 
     char attempts[64];
@@ -451,6 +476,7 @@ void level_complete_init() {
 
     yes_exit = false;
     restart = false;
+    checkpoint_restart_flag = false;
     animating_down = true;
     animating_reward = false;
     animating_up = false;
@@ -557,7 +583,7 @@ void level_complete_init() {
             }
         }
 
-        const char *text = (settingsState.doNot ? do_not_completion_texts[text_index] : completion_texts[text_index]);
+       const char *text = (settingsState.doNot ? do_not_completion_texts[text_index] : completion_texts[text_index]);
 
         char tmp[512];
 
@@ -646,6 +672,10 @@ int level_complete_loop(UIInput *touch) {
 
     if (restart) {
         return 2;
+    }
+
+    if (checkpoint_restart_flag && !animating_up) {
+        return 3;
     }
 
     ui_screen_update(&screen, touch);
