@@ -128,7 +128,7 @@ void Lightning::render_lightning(){
         );
     }
 
-    this->pulseTime += delta;
+    if(!game_paused) this->pulseTime += delta;
 }
 
 bool Lightning::done(){
