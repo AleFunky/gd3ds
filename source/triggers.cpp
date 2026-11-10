@@ -42,6 +42,9 @@ int move_trigger_capacity = 0;
 CountTriggerBuffer *count_trigger_buffer = NULL;
 int count_trigger_count = 0;
 int count_trigger_capacity = 0;
+TouchTriggerBuffer *touch_trigger_buffer = NULL;
+int touch_trigger_count = 0;
+int touch_trigger_capacity = 0;
 ItemCount *item_counter_buffer = NULL;
 int item_counter_count = 0;
 int item_counter_capacity = 0;
@@ -110,6 +113,19 @@ static CountTriggerBuffer *get_new_count_trigger(void) {
     }
     CountTriggerBuffer *buffer = &count_trigger_buffer[count_trigger_count++];
     memset(buffer, 0, sizeof(CountTriggerBuffer));
+    return buffer;
+}
+
+static TouchTriggerBuffer *get_new_touch_trigger(void) {
+    if (touch_trigger_count >= touch_trigger_capacity) {
+        size_t new_capacity = touch_trigger_capacity == 0 ? 32 : touch_trigger_capacity + 32;
+        TouchTriggerBuffer *new_list = realloc(touch_trigger_buffer, new_capacity * sizeof(TouchTriggerBuffer));
+        if (!new_list) return NULL;
+        touch_trigger_buffer = new_list;
+        touch_trigger_capacity = new_capacity;
+    }
+    TouchTriggerBuffer *buffer = &touch_trigger_buffer[touch_trigger_count++];
+    memset(buffer, 0, sizeof(TouchTriggerBuffer));
     return buffer;
 }
 
@@ -279,6 +295,7 @@ void free_trigger_buffers() {
     free(alpha_trigger_buffer);
     free(move_trigger_buffer);
     free(count_trigger_buffer);
+    free(touch_trigger_buffer);
     free(item_counter_buffer);
     free(spawn_trigger_buffer);
     free(follow_player_y_trigger_buffer);
@@ -296,6 +313,7 @@ void free_trigger_buffers() {
     alpha_trigger_buffer = NULL;
     move_trigger_buffer = NULL;
     count_trigger_buffer = NULL;
+    touch_trigger_buffer = NULL;
     item_counter_buffer = NULL;
     spawn_trigger_buffer = NULL;
     follow_player_y_trigger_buffer = NULL;
@@ -312,6 +330,8 @@ void free_trigger_buffers() {
 
     count_trigger_count = 0;
     count_trigger_capacity = 0;
+    touch_trigger_count = 0;
+    touch_trigger_capacity = 0;
     item_counter_count = 0;
     item_counter_capacity = 0;
 
@@ -954,6 +974,83 @@ void handle_count_triggers(void) {
             if (count_trigger_buffer[i].active) count_trigger_buffer[count++] = count_trigger_buffer[i];
         }
         count_trigger_count = count;
+    }
+}
+
+void upload_to_touch_buffer(int obj) {
+    for (int i = 0; i < touch_trigger_count; i++) {
+        if (touch_trigger_buffer[i].source_obj == obj) {
+            return;
+        }
+    }
+
+    TouchTriggerBuffer *buffer = get_new_touch_trigger();
+    if (!buffer) return;
+
+    buffer->source_obj = obj;
+}
+
+static bool touch_toggle_value(TouchTrigger *trigger) {
+    switch (trigger->toggle_mode) {
+        case 1: return true;
+        case 2: return false;
+        default: {
+            GroupNode *group = get_group(trigger->target_group);
+            return group && group->toggled;
+        }
+    }
+}
+
+void handle_touch_triggers(void) {
+    if (state.dead) return;
+    if (touch_trigger_count == 0) return;
+
+    bool p1_pressed = state.input.pressedJump || (!state.old_input.holdJump && state.input.holdJump);
+    bool p1_released = state.old_input.holdJump && !state.input.holdJump;
+    bool p2_pressed = false;
+    bool p2_released = false;
+
+    if (state.dual) {
+        p2_pressed = state.input_p2.pressedJump || (!state.old_input_p2.holdJump && state.input_p2.holdJump);
+        p2_released = state.old_input_p2.holdJump && !state.input_p2.holdJump;
+    }
+
+    int total = touch_trigger_count;
+    for (int i = 0; i < total; i++) {
+        TouchTriggerBuffer buffer = touch_trigger_buffer[i];
+
+        TouchTrigger *trigger = get_touch_trigger(buffer.source_obj);
+        if (!trigger) continue;
+
+        unsigned char held = buffer.held_mask;
+        unsigned char next_held = held;
+
+        if (state.dual) {
+            if (p1_pressed && !(held & 1)) next_held |= 1;
+            if (p1_released && (held & 1)) next_held &= ~1;
+            if (p2_pressed && !(held & 2)) next_held |= 2;
+            if (p2_released && (held & 2)) next_held &= ~2;
+        } else {
+            if (p1_pressed && !(held & 1)) next_held |= 1;
+            if (p1_released && (held & 1)) next_held &= ~1;
+        }
+
+        if (trigger->hold_mode && held == 0) {
+            if (state.input.holdJump) next_held |= 1;
+            if (state.dual && state.input_p2.holdJump) next_held |= 2;
+        }
+
+        bool pressed = held == 0 && next_held != 0;
+        bool released = held != 0 && next_held == 0;
+        touch_trigger_buffer[i].held_mask = next_held;
+
+        if (pressed) {
+            bool applied = touch_toggle_value(trigger);
+            touch_trigger_buffer[i].applied = applied;
+            toggle_group(trigger->target_group, applied);
+        } else if (released && trigger->hold_mode) {
+            toggle_group(trigger->target_group, !buffer.applied);
+        }
     }
 }
 
@@ -1798,6 +1895,9 @@ void run_trigger(int obj, bool from_spawn) {
             toggle_group(trigger->target_group, trigger->activate_group);
             break;
         }
+        case TOUCH_TRIGGER:
+            upload_to_touch_buffer(obj);
+            break;
         case HIDE_PLAYER_TRIGGER:
             MotionTrail_StopStroke(&trail_p1);
             MotionTrail_StopStroke(&trail_p2);
@@ -1911,6 +2011,7 @@ void handle_step_triggers(void) {
         if (state.dual) player_follow_y_step(&state.player2, trigger_dt);
     }
     handle_triggers();
+    handle_touch_triggers();
     handle_count_triggers();
     handle_spawn_triggers();
     handle_move_triggers();
