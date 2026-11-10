@@ -347,6 +347,35 @@ typedef struct {
 } LoadedLevelInfo;
 
 
+
+typedef struct {
+    unsigned char *compressed_data;
+    size_t compressed_len;
+    const char *raw_data;
+} LevelStreamInput;
+
+typedef int (*LevelStreamCallback)(const unsigned char *data, size_t len, void *context);
+
+typedef struct {
+    char *section;
+    size_t section_len;
+    size_t section_capacity;
+    char *metadata;
+    int section_count;
+    int high_detail_count;
+    int extra_slots;
+    int portal_match;
+} LevelStreamScan;
+
+typedef struct {
+    char *section;
+    size_t section_len;
+    size_t section_capacity;
+    int section_count;
+    int object_index;
+    int parse_capacity;
+} LevelStreamParser;
+
 typedef enum {
     LOAD_NO_ERROR,
     LOAD_INVALID_GMD,

@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include "level_loading.h"
@@ -2486,7 +2487,6 @@ int parse_string(char *levelString, int extra_slots, int *out_object_count) {
                         assign_object_to_section(objectIndex);
                         objectIndex++;
                     } else if (!parsed) {
-                        output_log("what %s\n", sectionStart);
                         output_log("Failed to parse object %d\n", objectIndex);
                         free_arrays();
                         return LOAD_COULDNT_PARSE_OBJECTS;
@@ -2526,6 +2526,338 @@ int parse_string(char *levelString, int extra_slots, int *out_object_count) {
     for (int i = 1; i < MAX_GROUPS; i++) {
         sort_group(i);
     }
+
+    return LOAD_NO_ERROR;
+}
+
+static int stream_level_input(const LevelStreamInput *input, LevelStreamCallback callback, void *context) {
+    // Check if uncompressed
+    if (input->raw_data) {
+        return callback((const unsigned char *)input->raw_data, strlen(input->raw_data), context);
+    }
+
+    z_stream stream = {0};
+    stream.next_in = Z_NULL;
+    stream.avail_in = 0;
+    if (inflateInit2(&stream, 15 | 32) != Z_OK) {
+        return LOAD_INVALID_COMPRESSED_DATA;
+    }
+
+    unsigned char buffer[4096];
+    size_t input_offset = 0;
+    int result = LOAD_INVALID_COMPRESSED_DATA;
+    bool complete = false;
+
+    while (!complete) {
+        if (stream.avail_in == 0 && input_offset < input->compressed_len) {
+            // Give more data to zlib
+            size_t chunk_len = input->compressed_len - input_offset;
+            stream.next_in = input->compressed_data + input_offset;
+            stream.avail_in = chunk_len;
+            input_offset += chunk_len;
+        }
+
+        // Decompress it
+        stream.next_out = buffer;
+        stream.avail_out = sizeof(buffer);
+
+        uInt before_in = stream.avail_in;
+        int ret = inflate(&stream, input_offset == input->compressed_len ? Z_FINISH : Z_NO_FLUSH);
+
+        // Send to callback
+        size_t produced = sizeof(buffer) - stream.avail_out;
+        if (produced) {
+            result = callback(buffer, produced, context);
+            if (result != LOAD_NO_ERROR) break;
+        }
+
+        if (ret == Z_STREAM_END) {
+            // Success! yay
+            complete = true;
+            result = LOAD_NO_ERROR;
+        } else if (ret != Z_OK && ret != Z_BUF_ERROR) {
+            // Fail :(
+            result = LOAD_INVALID_COMPRESSED_DATA;
+            break;
+        } else if (before_in == stream.avail_in && produced == 0 && 
+                (stream.avail_in > 0 ||
+                (stream.avail_in == 0 && input_offset == input->compressed_len))) {
+            // Avoid decompression loop
+            result = LOAD_INVALID_COMPRESSED_DATA;
+            break;
+        }
+    }
+
+    inflateEnd(&stream);
+    return result;
+}
+
+static bool reserve_char_buffer(char **buffer, size_t *capacity, size_t needed) {
+    if (needed <= *capacity) return true;
+
+    size_t new_capacity = *capacity ? *capacity : 256;
+    if (new_capacity < needed) {
+        new_capacity = needed;
+    }
+
+    char *section = realloc(*buffer, new_capacity);
+    if (!section) return false;
+
+    *buffer = section;
+    *capacity = new_capacity;
+    return true;
+}
+
+static int finish_level_scan_section(LevelStreamScan *scan, bool terminated) {
+    if (scan->section_len > 0) {
+        if (scan->section_count == 0) {
+            // Handle metadata
+            size_t metadata_len = scan->section_len + (terminated ? 1 : 0);
+
+            scan->metadata = malloc(metadata_len + 1);
+            if (!scan->metadata) return LOAD_OUT_OF_MEMORY;
+
+            memcpy(scan->metadata, scan->section, scan->section_len);
+
+            if (terminated) scan->metadata[scan->section_len] = ';';
+            scan->metadata[metadata_len] = '\0';
+        // Count high detail objects
+        } else if (is_high_detail_object(scan->section, scan->section + scan->section_len, NULL)) {
+            scan->high_detail_count++;
+        }
+        scan->section_count++;
+    }
+    scan->section_len = 0;
+    return LOAD_NO_ERROR;
+}
+
+static int scan_level_chunk(const unsigned char *data, size_t len, void *context) {
+    static const char portal_pattern[] = "1,747,";
+    LevelStreamScan *scan = context;
+
+    for (size_t i = 0; i < len; i++) {
+        char ch = (char)data[i];
+
+        if (ch == ';') {
+            // Section end
+            int result = finish_level_scan_section(scan, true);
+            if (result != LOAD_NO_ERROR) return result;
+        } else {
+            if (!reserve_char_buffer(&scan->section, &scan->section_capacity, scan->section_len + 1)) 
+                return LOAD_OUT_OF_MEMORY;
+
+            scan->section[scan->section_len++] = ch;
+        }
+
+        // Additional slots for tp portal
+        if (ch == portal_pattern[scan->portal_match]) {
+            scan->portal_match++;
+            if (portal_pattern[scan->portal_match] == '\0') {
+                scan->extra_slots++;
+                scan->portal_match = 0;
+            }
+        } else {
+            scan->portal_match = ch == portal_pattern[0] ? 1 : 0;
+        }
+    }
+
+    return LOAD_NO_ERROR;
+}
+
+static void free_level_stream_scan(LevelStreamScan *scan) {
+    free(scan->section);
+    free(scan->metadata);
+}
+
+static int parse_stream_section(LevelStreamParser *parser) {
+    // Check for nothing
+    if (!parser->section_len) return LOAD_NO_ERROR;
+
+    parser->section[parser->section_len] = '\0';
+
+    if (parser->section_count > 0) {
+        int parsed = parse_gd_object(parser->section, parser->section + parser->section_len, parser->object_index, parser->parse_capacity);
+        if (parsed == -2) {
+            output_log("Object capacity exceeded\n");
+            return LOAD_OUT_OF_MEMORY;
+        }
+        
+        if (parsed == 0) {
+            output_log("Failed to parse object %d\n", parser->object_index);
+            return LOAD_COULDNT_PARSE_OBJECTS;
+        }
+
+        if (parsed > 0) {
+            assign_object_to_section(parser->object_index);
+            parser->object_index++;
+        }
+    }
+
+    parser->section_count++;
+    parser->section_len = 0;
+    return LOAD_NO_ERROR;
+}
+
+static int parse_level_chunk(const unsigned char *data, size_t len, void *context) {
+    LevelStreamParser *parser = context;
+
+    for (size_t i = 0; i < len; i++) {
+        if (data[i] == ';') {
+            // Section end
+            int result = parse_stream_section(parser);
+            if (result != LOAD_NO_ERROR) return result;
+        } else {
+            // Reserve enough capacity
+            if (!reserve_char_buffer(&parser->section, &parser->section_capacity, parser->section_len + 2)) {
+                return LOAD_OUT_OF_MEMORY;
+            }
+
+            // Append
+            parser->section[parser->section_len++] = (char)data[i];
+        }
+    }
+
+    return LOAD_NO_ERROR;
+}
+
+static int parse_level_stream(const LevelStreamInput *input, const LevelStreamScan *scan, int *out_object_count) {
+    if (scan->section_count < 1) {
+        output_log("Level string missing sections!\n");
+        return LOAD_LEVEL_STRING_MISSING_SECTIONS;
+    }
+
+    int object_count = scan->section_count - 1;
+    int parse_capacity = object_count - scan->high_detail_count;
+
+    int alloc_count = parse_capacity + scan->extra_slots;
+    if (alloc_count < 0 || !init_arrays((size_t)alloc_count)) {
+        free_arrays();
+        output_log("Failed to allocate object array\n");
+        return LOAD_OUT_OF_MEMORY;
+    }
+
+    objects.count = alloc_count;
+    coin_count = 0;
+
+    // Initialize parser
+    LevelStreamParser parser = {0};
+    parser.parse_capacity = parse_capacity;
+
+    int result = stream_level_input(input, parse_level_chunk, &parser);
+
+    // Parse last section, because we check for ; to mark the end of a section
+    if (result == LOAD_NO_ERROR) result = parse_stream_section(&parser);
+
+    free(parser.section);
+
+    if (result != LOAD_NO_ERROR) {
+        free_arrays();
+        return result;
+    }
+
+    // Update object count
+    objects.count = parser.object_index + scan->extra_slots;
+    if (out_object_count) *out_object_count = parser.object_index;
+
+    // Add groupma
+    for (int i = 0; i < parser.object_index; i++) {
+        for (int g = 0; g < objects.group_count[i]; g++) {
+            int group_id = objects.groups[i][g];
+            if (group_id > 0) {
+                add_to_group(i, group_id);
+            }
+        }
+    }
+
+    qsort(coin_ids, coin_count, sizeof(int), compare_coins);
+
+    for (int i = 0; i < coin_count; i++) {
+        objects.coin_id[coin_ids[i]] = i;
+        //output_log("Le coin %d on objeto %d\n", i, coin_ids[i]);
+    }
+    level_info.last_obj_x += (11 * 30.f);
+
+    for (int i = 1; i < MAX_GROUPS; i++) {
+        sort_group(i);
+    }
+    return LOAD_NO_ERROR;
+}
+
+static void generate_orange_portals(int orange_start);
+void set_color_channels(void);
+void load_online_level_info(char *level_string);
+void load_level_info(char *data, char *level_string);
+
+static int load_level_stream(const LevelStreamInput *input, char *gmd_data, bool online) {
+    LevelStreamScan scan = {0};
+    level_info.low_detail = current_level_entry ? current_level_entry->data.low_detail : false;
+
+    // Scan the level, we need to know how many objects to parse
+    int result = stream_level_input(input, scan_level_chunk, &scan);
+    if (result == LOAD_NO_ERROR) {
+        result = finish_level_scan_section(&scan, false);
+    } else {
+        free_level_stream_scan(&scan);
+        return result;
+    }
+
+    free(scan.section);
+    scan.section = NULL;
+    scan.section_capacity = 0;
+    scan.section_len = 0;
+    if (scan.section_count < 1) {
+        free_level_stream_scan(&scan);
+        output_log("Level string missing sections!\n");
+        return LOAD_LEVEL_STRING_MISSING_SECTIONS;
+    }
+
+    char *meta_str = get_metadata_value(scan.metadata, "kS38");
+
+    int out_code = LOAD_NO_ERROR;
+    if (meta_str) {
+        channelCount = parse_color_channels(meta_str, &colorChannels, &out_code);
+    } else {
+        channelCount = parse_old_channels(scan.metadata, &colorChannels, &out_code);
+    }
+
+    if (out_code) {
+        free(meta_str);
+        free_level_stream_scan(&scan);
+        return out_code;
+    }
+
+    if (online) load_online_level_info(scan.metadata);
+    else load_level_info(gmd_data, scan.metadata);
+
+    level_info.last_obj_x = 570.f;
+
+    // Start parsing
+    int orange_start = 0;
+    result = parse_level_stream(input, &scan, &orange_start);
+
+    free(meta_str);
+    free_level_stream_scan(&scan);
+
+    if (result != LOAD_NO_ERROR) return result;
+
+    generate_orange_portals(orange_start);
+
+    if (!build_group_combinations()) {
+        output_log("Failed to build group combinations\n");
+        return LOAD_OUT_OF_MEMORY;
+    }
+
+    init_col_channels();
+    set_color_channels();
+
+    current_pulserod_ball_image = game_objects[15].children[0].texture + (rand() % 3);
+
+    C2D_SpriteFromSheet(&sprite_templates[15].child_templates[0], spriteSheet, current_pulserod_ball_image);
+    C2D_SpriteSetCenter(&sprite_templates[15].child_templates[0], 0.5f, 0.5f);
+    C2D_SpriteFromSheet(&sprite_templates[16].child_templates[0], spriteSheet, current_pulserod_ball_image);
+    C2D_SpriteSetCenter(&sprite_templates[16].child_templates[0], 0.5f, 0.5f);
+    C2D_SpriteFromSheet(&sprite_templates[17].child_templates[0], spriteSheet, current_pulserod_ball_image);
+    C2D_SpriteSetCenter(&sprite_templates[17].child_templates[0], 0.5f, 0.5f);
 
     return LOAD_NO_ERROR;
 }
@@ -2779,84 +3111,34 @@ static void generate_orange_portals(int orange_start) {
 }
 
 int load_online_level(char *level_string) {
-    bool compressed = true;
-    int out_code = LOAD_NO_ERROR;
-    
     arena_reset(&level_arena);
 
-    // Base64 doesn't allow semicolons, so if theres one, its not compressed
-    if (strchr(level_string, ';')) compressed = false;
-    char *data;
-    if (compressed) {
-        data = decompress_online_level(level_string, &out_code);
-        if (!data) return out_code;
+    LevelStreamInput input = {0};
+    unsigned char *decoded = NULL;
+    if (strchr(level_string, ';')) {
+        // String is not even compressed
+        input.raw_data = level_string;
     } else {
-        data = level_string;
-    }
+        fix_base64_url(level_string);
+        remove_char(level_string, ',');
 
-    // Get level starting colors
-    char *metaStr = get_metadata_value(data, "kS38");
-    if (metaStr) {
-        channelCount = parse_color_channels(metaStr, &colorChannels, &out_code);
-        if (out_code) {
-            free(data);
-            free(metaStr);
-            return out_code;
+        size_t encoded_len = strlen(level_string);
+        decoded = malloc(encoded_len);
+        if (!decoded) return LOAD_OUT_OF_MEMORY;
+
+        int decoded_len = base64_decode(level_string, decoded);
+        if (decoded_len <= 0) {
+            output_log("Failed to decode base64\n");
+            free(decoded);
+            return LOAD_INVALID_BASE64;
         }
-    }
-    // Fallback to pre 2.0 color keys
-    else {
-        channelCount = parse_old_channels(data, &colorChannels, &out_code);
-        if (out_code) {
-            free(data);
-            return out_code;
-        }
+        input.compressed_data = decoded;
+        input.compressed_len = (size_t)decoded_len;
     }
 
-    load_online_level_info(data);
-
-    // Minimum size
-    level_info.last_obj_x = 570.f;
-
-    // Count blue teleport portals to reserve extra object slots
-    int extra_slots = 0;
-    const char *scan = data;
-    while ((scan = strstr(scan, "1,747,")) != NULL) {
-        extra_slots++;
-        scan++;
-    }
-    int orange_start = 0;
-
-    int returned = parse_string(data, extra_slots, &orange_start);
-
-    free(metaStr);
-
-    if (returned) return returned;
-
-    generate_orange_portals(orange_start);
-    
-    if (!build_group_combinations()) {
-        output_log("Failed to build group combinations\n");
-        return LOAD_OUT_OF_MEMORY;
-    }
-
-    init_col_channels();
-    set_color_channels();
-
-    // Set pulserod pulse ball image
-    current_pulserod_ball_image = game_objects[15].children[0].texture + (rand() % 3);
-
-    C2D_SpriteFromSheet(&sprite_templates[15].child_templates[0], spriteSheet, current_pulserod_ball_image);
-    C2D_SpriteSetCenter(&sprite_templates[15].child_templates[0], 0.5f, 0.5f);
-    
-    C2D_SpriteFromSheet(&sprite_templates[16].child_templates[0], spriteSheet, current_pulserod_ball_image);
-    C2D_SpriteSetCenter(&sprite_templates[16].child_templates[0], 0.5f, 0.5f);
-
-    C2D_SpriteFromSheet(&sprite_templates[17].child_templates[0], spriteSheet, current_pulserod_ball_image);
-    C2D_SpriteSetCenter(&sprite_templates[17].child_templates[0], 0.5f, 0.5f);
-
-
-    return LOAD_NO_ERROR;
+    int result = load_level_stream(&input, NULL, true);
+    free(decoded);
+    return result;
 }
 
 void load_level_info(char *data, char *level_string) {
@@ -2910,6 +3192,45 @@ int load_level(char *path) {
     if (!level) {
         return LOAD_OUT_OF_MEMORY;
     }
+
+    char *b64 = extract_gmd_key((const char *)level, "k4", "s");
+    if (b64) {
+        LevelStreamInput input = {0};
+        unsigned char *decoded = NULL;
+
+        if (strchr(b64, ';')) {
+            // Not even compressed
+            input.raw_data = b64;
+        } else {
+            fix_base64_url(b64);
+            size_t encoded_len = strlen(b64);
+            decoded = malloc(encoded_len);
+            if (!decoded) {
+                free(b64);
+                free(level);
+                return LOAD_OUT_OF_MEMORY;
+            }
+
+            int decoded_len = base64_decode(b64, decoded);
+            if (decoded_len <= 0) {
+                output_log("Failed to decode base64\n");
+                free(decoded);
+                free(b64);
+                free(level);
+                return LOAD_INVALID_BASE64;
+            }
+            input.compressed_data = decoded;
+            input.compressed_len = (size_t)decoded_len;
+        }
+
+        int result = load_level_stream(&input, level, false);
+        free(decoded);
+        free(b64);
+        free(level);
+        return result;
+    }
+
+    // Empty level
 
     char *data = decompress_level(level, &out_code);
     if (!data) {
