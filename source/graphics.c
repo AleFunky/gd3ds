@@ -731,7 +731,7 @@ int get_color_type(const GameObject *game_obj, int obj, int col_type) {
     } else {
         if (col_type == COLOR_TYPE_DETAIL) {
             if (!obj_has_main(game_obj)) {
-                col_type = COLOR_TYPE_ONLY_DETAIL;
+                col_type = game_obj->swap_base_detail ? COLOR_TYPE_BASE : COLOR_TYPE_ONLY_DETAIL;
             }
         }
     }
