@@ -1825,7 +1825,10 @@ void game_assets_init() {
 static void init_level_arena() {
     struct mallinfo mi = mallinfo();
     size_t free = envGetHeapSize() - mi.uordblks;
-    bool could = arena_init(&level_arena, (size_t) (free * 0.68f));
+
+    size_t capacity = (size_t) (is_N3DS ? free * 0.8f : free * 0.68f);
+
+    bool could = arena_init(&level_arena, capacity);
     if (!could) output_log("Couldn't allocate level arena\n");
 }
 
