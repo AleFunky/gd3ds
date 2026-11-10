@@ -83,6 +83,8 @@ extern const UseEffectDefinition end_wall_filled_title;
 extern const UseEffectDefinition end_wall_firework_circle;
 extern const UseEffectDefinition end_wall_circunference;
 extern const UseEffectDefinition respawn_effect;
+extern const UseEffectDefinition spider_in_effect;
+extern const UseEffectDefinition spider_out_effect;
 
 
 void init_default_use_effect_pools();

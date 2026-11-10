@@ -37,6 +37,7 @@ bool request_list_reload = false;
 void wide_setting(bool checked);
 void stereo_setting(bool checked);
 void practiceMusicSync_setting(bool checked);
+void menuMusic_setting(bool checked);
 
 const char *category_names[] = {
     "Graphics",
@@ -152,6 +153,16 @@ Setting settings[] = {
         .key = CONFIG_INPUT_PATH "touchEffectEverywhere"
     },
     {
+        .id = "gameplayTapEffect",
+        .label = "Gameplay tap effect",
+        .additionalInfo = "Plays the tap effect in gameplay.",
+        .page = PAGE_INPUT, 
+
+        .defaultValue = true,
+        .var = &settingsState.gameplayTapEffect,
+        .key = CONFIG_INPUT_PATH "gameplayTapEffect"
+    },
+    {
         .id = "enableDebugBindings",
         .label = "Enable debug keys",
         .additionalInfo = "Enables debug key shortcuts.\n(B + L, B + R, X)",
@@ -222,6 +233,28 @@ Setting settings[] = {
         .key = CONFIG_MISC_PATH "practiceMusicSync",
 
         .onChanged = practiceMusicSync_setting
+    },
+    {
+        .id = "menuMusic",
+        .label = "Menu Music",
+        .additionalInfo = "Toggles the Main Menu Music.",
+        .page = PAGE_MISC, 
+
+        .defaultValue = true,
+        .var = &settingsState.menuMusic,
+        .key = CONFIG_MISC_PATH "menuMusic",
+
+        .onChanged = menuMusic_setting
+    },
+    {
+        .id = "fastMenu",
+        .label = "Fast Menu",
+        .additionalInfo = "Makes transitions between\nmenu pages faster.",
+        .page = PAGE_MISC, 
+
+        .defaultValue = false,
+        .var = &settingsState.fastMenu,
+        .key = CONFIG_MISC_PATH "fastMenu"
     },
     {
         .id = "skipHighObjWarning",
@@ -334,6 +367,26 @@ Setting settings[] = {
         .key = CONFIG_GAMEPLAY_PATH "quickCheckpoints"
     },
     {
+        .id = "hidePracticeButtons",
+        .label = "Hide Practice Buttons",
+        .additionalInfo = "Hides the checkpoint buttons\nshown in practice mode.",
+        .page = PAGE_GAMEPLAY, 
+
+        .defaultValue = false,
+        .var = &settingsState.hidePracticeButtons,
+        .key = CONFIG_GAMEPLAY_PATH "hidePracticeButtons"
+    },
+    {
+        .id = "swapGameplayScreens",
+        .label = "Switch gameplay\nto bottom screen",
+        .additionalInfo = "bullshit nobody will use. (experimental)",
+        .page = PAGE_GAMEPLAY, 
+
+        .defaultValue = false,
+        .var = &settingsState.swapGameplayScreens,
+        .key = CONFIG_GAMEPLAY_PATH "swapGameplayScreens"
+    },
+    {
         .id = "defaultMiniIcon",
         .label = "Default mini icon",
         .additionalInfo = "Uses default player icon in\nmini mode.",
@@ -392,6 +445,20 @@ Setting settings[] = {
         .defaultValue = false,
         .var = &settingsState.noWaveTrailBehind,
         .key = CONFIG_COSMETIC_PATH "noWaveTrailBehind"
+    },
+    {
+        .id = "dimSecondaryScreen",
+        .label = "Dim secondary screen",
+        .additionalInfo = NULL,
+        .page = PAGE_COSMETIC, 
+
+        .defaultValue = false,
+        .var = NULL,
+        .key = NULL,
+
+        .buttonIcon = 425,
+        .buttonSheet = 0,
+        .buttonActions = "open_menu[screen=\"dim_screen\" btm_anim=\"zoom\"]"
     },
 };
 
@@ -475,6 +542,19 @@ void practiceMusicSync_setting(bool checked) {
     }
 }
 
+void menuMusic_setting(bool checked) {
+    if (game_state != STATE_MENU) return;
+
+    if (!checked) {
+        if (playing_menu_loop) {
+            stop_mp3();
+            playing_menu_loop = false;
+        }
+    } else if (!playing_menu_loop) {
+        play_menu_song();
+    }
+}
+
 static void checkbox_action(UIElement *e, const UIPropertyList* args) {
     CheckboxData *data = (CheckboxData *)e->userdata;
     bool checked = ((UICheckBox *)e)->checked;
@@ -527,20 +607,34 @@ void create_setting(Setting *setting, int id, UIScreen *s) {
             ui_rectangle_set_color((UIRectangle *) card, (id & 1 ? C2D_Color32(194,114,62,255) :  C2D_Color32(161,88,48,255)));
             ui_element_set_size(card, 0, 28);
 
-            UICheckBox *checkbox = ui_create_checkbox(s);
-            if (checkbox) {
-                // Store in the user data
-                CheckboxData *data = (CheckboxData *)malloc(sizeof(*data));
-                data->setting = setting;
+            if (setting->buttonActions) {
+                UIButton *set_button = ui_create_button(s);
+                if (set_button) {
+                    ui_button_set_image(set_button, setting->buttonIcon, setting->buttonSheet);
+                    ui_element_set_position((UIElement *) set_button, -list_width + 13, 0);
+                    ui_element_set_scale((UIElement *) set_button, (32.f * 0.6f) / set_button->base.w);
 
-                ui_element_set_userdata((UIElement *) checkbox, data);
+                    UIElement *set_element = (UIElement *) set_button;
+                    set_element->actions = parse_actions(setting->buttonActions, settings_actions, ARRAY_LEN(settings_actions), &set_element->action_count);
 
-                ui_element_set_position((UIElement *) checkbox, -list_width + 13, 0);
-                ui_element_set_scale((UIElement *) checkbox, 0.6f);
-                ui_element_set_action((UIElement *) checkbox, checkbox_action);
+                    ui_element_add_child(card, (UIElement *) set_button);
+                }
+            } else {
+                UICheckBox *checkbox = ui_create_checkbox(s);
+                if (checkbox) {
+                    // Store in the user data
+                    CheckboxData *data = (CheckboxData *)malloc(sizeof(*data));
+                    data->setting = setting;
 
-                ui_set_checkbox_checked(checkbox, *setting->var);
-                ui_element_add_child(card, (UIElement *) checkbox);
+                    ui_element_set_userdata((UIElement *) checkbox, data);
+
+                    ui_element_set_position((UIElement *) checkbox, -list_width + 13, 0);
+                    ui_element_set_scale((UIElement *) checkbox, 0.6f);
+                    ui_element_set_action((UIElement *) checkbox, checkbox_action);
+
+                    ui_set_checkbox_checked(checkbox, *setting->var);
+                    ui_element_add_child(card, (UIElement *) checkbox);
+                }
             }
 
             UILabel *name = ui_create_label(s);

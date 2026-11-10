@@ -189,10 +189,10 @@ float adjust_angle(float angle, int flipX, int flipY) {
     return angle;
 }
 
-float adjust_angle_y(float angle, int flipY) {
+float adjust_angle_y(float angle, int flipX) {
     angle = positive_fmodf(angle, 360);
 
-    if (flipY) {
+    if (flipX) {
         angle = angle + 180;
     }
 

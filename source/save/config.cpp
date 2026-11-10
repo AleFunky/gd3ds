@@ -21,6 +21,8 @@ Config cfg;
 
 void init_user_config(Config *cfg) {
     for (size_t i = 0; i < ARRAY_LEN(settings); i++) {
+        if (!settings[i].var) continue;
+
         config_init_bool(cfg,
             settings[i].key,
             settings[i].defaultValue
@@ -31,6 +33,8 @@ void init_user_config(Config *cfg) {
 void load_user_config(Config *cfg) {
     for (size_t i = 0; i < ARRAY_LEN(settings); i++) {
         Setting *setting = &settings[i];
+
+        if (!setting->var) continue;
 
         // Ensure the default value if the condition is false
         if (setting->condition && !setting->condition()) {
@@ -48,6 +52,8 @@ void load_user_config(Config *cfg) {
 void save_user_config(Config *cfg) {
     for (size_t i = 0; i < ARRAY_LEN(settings); i++) {
         Setting *setting = &settings[i];
+
+        if (!setting->var) continue;
         
         // Ensure the default value if the condition is false
         if (setting->condition && !setting->condition()) {
@@ -76,6 +82,7 @@ void init_values() {
     config_init_int(&cfg, CONFIG_VALUES "playersDestroyed", 0);
     config_init_float(&cfg, CONFIG_VALUES "music_volume", 1);
     config_init_float(&cfg, CONFIG_VALUES "sound_volume", 1);
+    config_init_float(&cfg, CONFIG_COSMETIC_PATH "dimSecondaryScreen", 0);
 
     init_user_config(&cfg);
 
@@ -130,6 +137,7 @@ void cfg_init() {
     sound_volume = config_get_float(&cfg, CONFIG_VALUES "sound_volume", 1);
 
     load_user_config(&cfg);
+    dim_secondary_screen = config_get_float(&cfg, CONFIG_COSMETIC_PATH "dimSecondaryScreen", 0);
     
     selected_cube = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "cube", 1);
     selected_ship = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ship", 1);
@@ -138,6 +146,8 @@ void cfg_init() {
     selected_wave = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "wave", 1);
     selected_robot = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "robot", 1);
     if (selected_robot < 1 || selected_robot >= ICON_COUNT_ROBOT) selected_robot = 1;
+    selected_spider = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "spider", 1);
+    if (selected_spider < 1 || selected_spider >= ICON_COUNT_SPIDER) selected_spider = 1;
     selected_trail = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "trail", 0);
     selected_p1   = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "p1",   DEFAULT_P1);
     selected_p2   = config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "p2",   DEFAULT_P2);
@@ -181,6 +191,7 @@ void cfg_save() {
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "ufo",  selected_ufo );
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "wave", selected_wave);
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "robot", selected_robot);
+    config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "spider", selected_spider);
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "trail", selected_trail);
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "p1",   selected_p1  );
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "p2",   selected_p2  );
@@ -188,6 +199,7 @@ void cfg_save() {
     config_set_bool(&cfg, CONFIG_CUSTOMIZATION_PATH "playerGlowEnabled", player_glow_enabled);
 
     save_user_config(&cfg);
+    config_set_float(&cfg, CONFIG_COSMETIC_PATH "dimSecondaryScreen", dim_secondary_screen);
 
     config_set_bool(&cfg, CONFIG_FILTERS_PATH "na", filters.isNA);
     config_set_bool(&cfg, CONFIG_FILTERS_PATH "auto", filters.isAuto);

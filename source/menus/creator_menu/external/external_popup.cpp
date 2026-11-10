@@ -118,6 +118,7 @@ static void set_name_creator(char *gmd) {
     snprintf(file, sizeof(file), "ext_%s_%s", level_info.level_name, level_info.creator_name);
     
     current_level_entry = get_or_add_level_to_external_file(&external_file, file);
+    current_level_list = LEVEL_LIST_EXTERNAL;
     
     set_progress();
 }

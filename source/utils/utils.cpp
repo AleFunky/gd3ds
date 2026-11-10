@@ -1,7 +1,7 @@
 #include "utils.hpp"
 #include "level_loading.hpp"
 #include "main.hpp"
-#include <assert.h>
+#include "arena.hpp"
 #include <stdio.h>
 #include <string.h>
 #include <zlib.h>
@@ -11,8 +11,8 @@
 #include <minizip/unzip.h>
 
 u8 get_model() {
-    u8 model;
-    CFGU_GetSystemModel(&model);
+    u8 model = 0;
+    if (R_FAILED(CFGU_GetSystemModel(&model))) return CFG_MODEL_3DS;
     return model;
 }
 
@@ -101,6 +101,51 @@ char *decompress_data(unsigned char *data, size_t data_len, size_t *out_len, int
 
     // Allocate exactly enough memory
     char *out = (char *)malloc(final_size + 1);
+    if (!out) {
+        printf("malloc failed for %lu bytes\n", (unsigned long)final_size);
+        inflateEnd(&strm);
+        *out_code = LOAD_OUT_OF_MEMORY;
+        return NULL;
+    }
+
+    strm.next_out = (Bytef *)out;
+    strm.avail_out = final_size;
+
+    int ret = inflate(&strm, Z_FINISH);
+    if (ret != Z_STREAM_END) {
+        printf("inflate failed with code %d\n", ret);
+        free(out);
+        inflateEnd(&strm);
+        *out_code = LOAD_INVALID_COMPRESSED_DATA;
+        return NULL;
+    }
+
+    *out_len = strm.total_out;
+    out[*out_len] = '\0'; // Null-terminate if treating as string
+
+    inflateEnd(&strm);
+
+    printf("Decompressed %lu bytes successfully\n", (unsigned long)*out_len);
+
+    *out_code = LOAD_NO_ERROR;
+    return out;
+}
+
+char *decompress_data_level(unsigned char *data, size_t data_len, size_t *out_len, int *out_code) {
+    uLongf final_size = get_uncompressed_size(data, data_len);
+
+    z_stream strm = {0};
+    strm.next_in = data;
+    strm.avail_in = data_len;
+
+    if (inflateInit2(&strm, 15 | 32) != Z_OK) {   // auto-detect gzip/zlib
+        printf("Failed to initialize zlib stream for GZIP\n");
+        *out_code = LOAD_INVALID_COMPRESSED_DATA;
+        return NULL;
+    }
+
+    // Allocate exactly enough memory
+    char *out = (char *)arena_alloc(&level_arena, final_size + 1);
     if (!out) {
         printf("malloc failed for %lu bytes\n", (unsigned long)final_size);
         inflateEnd(&strm);

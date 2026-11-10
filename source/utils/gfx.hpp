@@ -34,9 +34,9 @@ void draw_hitbox_line_inward(Vec2D rect[4],
                              const float x2, const float y2,
                              const float thickness,
                              const float cx, const float cy,
-                             const u32 color);
+                             const u32 color, const float depth);
 
-void draw_polygon_inward_mitered(Vec2D *poly, int n, float thickness, u32 color); 
+void draw_polygon_inward_mitered(Vec2D *poly, int n, float thickness, u32 *color, float depth); 
 
 float calc_x_on_screen(float val);
 float mirror_x_on_screen(float val);
@@ -53,6 +53,7 @@ void set_stereo(bool stereo);
 void apply_screen_modes();
 void update_stereo_target();
 bool begin_top_eye(int eye);
+bool begin_top_eye_target(int eye, C3D_RenderTarget *primary);
 bool is_extra_eye();
 bool is_stereo_active();
 void begin_eye_layer(float depth);

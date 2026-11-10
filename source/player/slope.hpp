@@ -20,5 +20,6 @@ void clear_coyote_slope_data(Player *player);
 void slope_calc(int obj, Player *player);
 bool slope_touching(int obj, Player *player);
 float slope_snap_angle(int obj, Player *player);
+bool is_spike_slope(int obj);
 
 int get_player_touching_slopes(Player *player);

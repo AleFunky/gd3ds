@@ -189,6 +189,15 @@ static void action_go_back(UIElement *e, const UIPropertyList *args) {
     }
 }
 
+static void action_refresh(UIElement *e, const UIPropertyList *args) {
+    if (task.running) {
+        task.cancelled = true;
+        threadJoin(thread, U64_MAX);
+    }
+    reload_pending = true;
+    strcpy(reload_path, current_path);
+}
+
 // Go my warning suppresion gadget
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-truncation"
@@ -215,12 +224,18 @@ static void open_folder(UIElement *e, const UIPropertyList* args) {
 
 static UIActionDef external_actions[] = {
     {"go_back", action_go_back },
+    {"refresh", action_refresh },
 };
 
 static void external_levels_init(UIScreen *s) {
     list = (UIList *) ui_get_element_by_tag(s, "list");
     spinner = (UISpinner *) ui_get_element_by_tag(s, "spinner");
     path_label = (UILabel *) ui_get_element_by_tag(s, "path");
+
+    if (!is_citra()) {
+        UIElement *refresh_button = ui_get_element_by_tag(s, "refresh");
+        if (refresh_button) ui_disable_element(refresh_button);
+    }
 
     start_load(current_path, s);
 

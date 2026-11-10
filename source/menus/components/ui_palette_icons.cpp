@@ -5,6 +5,8 @@
 #include "menus/core/ui_props.hpp"
 #include "menus/palette_kit.hpp"
 #include "graphics.hpp"
+#include "player/robot_anim_data.hpp"
+#include "player/spider_anim_data.hpp"
 
 #define ICON_WIDTH 30
 
@@ -24,7 +26,10 @@ static void ui_palette_icons_draw(UIElement* e, UITransform *transform) {
             C2D_Color32(p1_color.r, p1_color.g, p1_color.b, 255),
             C2D_Color32(p2_color.r, p2_color.g, p2_color.b, 255),
             C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255),
-            (IconParameters) { 0 }
+            (IconParameters) { 
+                .anim_id = (g == (int)GAMEMODE_ROBOT ? (int)ROBOT_ANIM_IDLE : (int)SPIDER_ANIM_IDLE),
+                .anim_frame = 0
+            }
         );
     }
 }

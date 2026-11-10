@@ -1,5 +1,6 @@
 #include "state.hpp"
 #include <string.h>
+#include "player/player.hpp"
 #include "player/robot_anim_data.hpp"
 #include "main.hpp"
 #include "math_helpers.hpp"
@@ -23,6 +24,8 @@
 #include "wav_player.hpp"
 
 #define FIRST_ATTEMPT_CAMERA_OFFSET 15
+#define PLAYER_CAMERA_X_OFFSET 125.0f
+#define PLAYER_CAMERA_X_OFFSET_BOT (PLAYER_CAMERA_X_OFFSET * (SCREEN_BOT_WIDTH / (float)SCREEN_WIDTH))
 
 GamePlayState state;
 
@@ -59,6 +62,7 @@ void set_camera_y(float y) {
 
 void run_camera() {
     Player *player = &state.player;
+    float player_camera_x_offset = settingsState.swapGameplayScreens ? PLAYER_CAMERA_X_OFFSET_BOT : PLAYER_CAMERA_X_OFFSET;
     state.old_camera_x = state.camera_x;
     state.old_camera_y = state.camera_y;
 
@@ -134,7 +138,7 @@ void run_camera() {
 
         set_camera_y(cam_y);
 
-        set_camera_x(player->x - 125.0f/SCALE);
+        set_camera_x(player->x - player_camera_x_offset/SCALE);
         
         if (state.current_data.attempts == 1) {
             if (state.camera_x < FIRST_ATTEMPT_CAMERA_OFFSET) {
@@ -142,7 +146,7 @@ void run_camera() {
             }
         }
 
-        if (state.current_data.attempts > 1 || player->x - 125.0f/SCALE >= FIRST_ATTEMPT_CAMERA_OFFSET) {
+        if (state.current_data.attempts > 1 || player->x - player_camera_x_offset/SCALE >= FIRST_ATTEMPT_CAMERA_OFFSET) {
             state.ground_x += player->vel_x * STEPS_DT * state.mirror_speed_factor;
             state.background_x += player->vel_x * STEPS_DT * state.mirror_speed_factor;
         }
@@ -154,7 +158,13 @@ void run_camera() {
 
 void set_hitbox_size(Player *player, int gamemode) {
     float scale = (player->mini) ? 0.6f : 1.f;
-    if (gamemode != GAMEMODE_WAVE) {
+    if (gamemode == GAMEMODE_SPIDER) {
+        player->height = 27 * scale;
+        player->width = 27 * scale;
+
+        player->internal_hitbox.width = 9;
+        player->internal_hitbox.height = 9;
+    } else if (gamemode != GAMEMODE_WAVE) {
         player->height = 30 * scale;
         player->width = 30 * scale;
         
@@ -205,10 +215,11 @@ void clear_snap_data(Player *player) {
 
 void init_player(Player *player) {
     memset(player, 0, sizeof(Player));
-    player->robot_landing_blend_timer = ROBOT_LANDING_BLEND_DURATION;
     
     set_gamemode(player, level_info.initial_gamemode);
     set_mini(player, level_info.initial_mini);
+
+    set_blend_timer(player, get_blend_duration(player));
 
     player->player_icons.cube = selected_cube;
     player->player_icons.ship = selected_ship;
@@ -216,6 +227,7 @@ void init_player(Player *player) {
     player->player_icons.ufo  = selected_ufo;
     player->player_icons.wave = selected_wave;
     player->player_icons.robot = selected_robot;
+    player->player_icons.spider = selected_spider;
     player->player_icons.glow = player_glow_enabled;
 
     player->player_icons.p1_color = p1_color;
@@ -240,6 +252,9 @@ void init_player(Player *player) {
     player->cutscene_initial_player_x = 0;
     player->cutscene_initial_player_y = 0;
 
+    player->allow_dart_slide = false;
+    player->allow_head_hit = false;
+    player->last_orb_pressed = -1;
     clear_slope_data(player);
     clear_snap_data(player);
 }
@@ -282,6 +297,8 @@ void init_state() {
     state.current_data.coin3 = false;
     state.last_hitbox_trail = 0;
 
+    state.show_player = true;
+
     in_level_complete = false;
 
     cheated = false;
@@ -292,14 +309,8 @@ void init_state() {
 
 void init_level_bounds() {
     switch (level_info.initial_gamemode) {
-        case GAMEMODE_SHIP:
-        case GAMEMODE_UFO:
-        case GAMEMODE_WAVE:
-            state.ceiling_y = state.ground_y + 300;
-            set_intended_ceiling();
-            break;
-        case GAMEMODE_BALL:
-            state.ceiling_y = state.ground_y + 240;
+        default:
+            state.ceiling_y = state.ground_y + gamemode_heights[level_info.initial_gamemode];
             set_intended_ceiling();
             break;
         case GAMEMODE_PLAYER:
@@ -349,6 +360,7 @@ void first_load_init_variables() {
     normal_speed_particles_timer = 0;
     fast_speed_particles_timer = 0;
     faster_speed_particles_timer = 0;
+    fastest_speed_particles_timer = 0;
 
     clear_new_best_popup();
     init_variables();
@@ -431,23 +443,25 @@ void handle_death(Player *player, bool pause_song) {
         }
     }
 
-    // Spawn death particles
-    UseEffect *effect = add_use_effect(player->x, player->y, USE_EFFECT_OBJ_NOTHING, &death_effect, get_use_effect_array_ptr(GFX_TOP));
-    if (effect) {
-        Color color_not_white = get_white_if_black((state.current_player == 1 ? p2_color : p1_color));
+    if (state.show_player) {
+        // Spawn death particles
+        UseEffect *effect = add_use_effect(player->x, player->y, USE_EFFECT_OBJ_NOTHING, &death_effect, get_use_effect_array_ptr(GFX_TOP));
+        if (effect) {
+            Color color_not_white = get_white_if_black((state.current_player == 1 ? p2_color : p1_color));
 
-        effect->def.colorR = color_not_white.r / 255.f;
-        effect->def.colorG = color_not_white.g / 255.f;
-        effect->def.colorB = color_not_white.b / 255.f;
+            effect->def.colorR = color_not_white.r / 255.f;
+            effect->def.colorG = color_not_white.g / 255.f;
+            effect->def.colorB = color_not_white.b / 255.f;
 
-        effect->def.end_rad *= (player->mini ? 0.6 : 1.0f);
-        effect->def.start_rad *= (player->mini ? 0.6 : 1.0f);
+            effect->def.end_rad *= (player->mini ? 0.6 : 1.0f);
+            effect->def.start_rad *= (player->mini ? 0.6 : 1.0f);
+        }
+
+        explosion_particles[state.current_player].emitterX = player->x;
+        explosion_particles[state.current_player].emitterY = player->y;
+        explosion_particles[state.current_player].scale = (player->mini ? 0.6 : 1.0f);
+        spawnMultipleParticles(&explosion_particles[state.current_player], 90);
     }
-
-    explosion_particles[state.current_player].emitterX = player->x;
-    explosion_particles[state.current_player].emitterY = player->y;
-    explosion_particles[state.current_player].scale = (player->mini ? 0.6 : 1.0f);
-    spawnMultipleParticles(&explosion_particles[state.current_player], 90);
 
     if (!state.practice_mode) start_shake(0.15f, 1.f);
     
@@ -514,7 +528,7 @@ void play_level_song(float seek) {
         size_t sz = 0;
         void *buf = load_user_song(level_info.custom_song_id, &sz);
         if (buf) {
-            song_loaded = play_mp3_buf(buf, sz, false, seek);
+            song_loaded = play_mp3_buf(buf, sz, false, seek, false);
         } else {
             song_loaded = false;
         }
@@ -536,11 +550,13 @@ void play_practice_song() {
 }
 
 void play_menu_song() {
+    if (!settingsState.menuMusic) return;
+
     if (!playing_menu_loop) {
         size_t out_size;
-        void *buf = read_file(menu_loop_path, &out_size);
+        void *buf = read_file_arena(&level_arena, menu_loop_path, &out_size);
         if (buf) {
-            play_mp3_buf(buf, out_size, true, 0);
+            play_mp3_buf(buf, out_size, true, 0, false);
             playing_menu_loop = true;
         }
     }

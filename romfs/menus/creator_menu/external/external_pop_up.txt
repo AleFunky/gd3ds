@@ -8,6 +8,8 @@ button x=160 y=80 id=139 sheet=0 scale=1 tag="info" actions=play,play_sound[soun
 
 button x=295 y=25 id=90 sheet=0 scale=1 tag="info" actions=open_menu[screen="external_infobox" btm_anim="zoom"]
 
+button x=24 y=215 id=127 sheet=0 scale=0.7 tag="info" actions=open_menu[screen="online_level_options" btm_anim="zoom"]
+
 label x=160 y=139 text="Normal mode" scale=0.45 align=CENTER tag="info,level_card"
 progressbar x=160 y=152 max_value=100 style=0 scale=0.65 tag="info,level_card,normalprogress"
 

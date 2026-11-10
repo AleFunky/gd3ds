@@ -2,6 +2,7 @@
 #include "main.hpp"
 #include "math_helpers.hpp"
 #include "menus/core/ui_element.hpp"
+#include "menus/settings_hub/settings.hpp"
 #include "ui_screen.hpp"
 #include "screen_definitions.hpp"
 #include "fonts/bigFont.hpp"
@@ -325,6 +326,11 @@ static void update_opening(){
 
         ui_screen_open(top, push->top_anim);
         ui_screen_open(btm, push->btm_anim);
+
+        if (settingsState.fastMenu) {
+            finish_animation(top);
+            finish_animation(btm);
+        }
     }
 }
 
@@ -353,6 +359,8 @@ static void update_closing(){
 }
 
 static void handle_stack_fading(){
+    if (settingsState.fastMenu) stack->fade_time = 255.f;
+
     //root transition open/close slop
     //instant if the active count is 0 (main menu doesn't fade in)
     bool transition_switch = false;
@@ -515,6 +523,8 @@ void draw_stack_debug(){
 }
 
 void draw_stack_fade(){
+    if (settingsState.fastMenu) return;
+
     float fade = 0;
     if(stack->fade == FADE_STATUS_IN){
         fade = CLAMP(stack->fade_time, 0, 255);

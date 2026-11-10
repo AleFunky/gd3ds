@@ -1,5 +1,7 @@
 #include "player.hpp"
 #include "level_loading.hpp"
+#include "particles/circles.hpp"
+#include "player/trail.hpp"
 #include "practice.hpp"
 #include "profiling.hpp"
 #include "state.hpp"
@@ -13,6 +15,7 @@
 #include "menus/icon_kit.hpp"
 #include "collision.hpp"
 #include "robot_anim_data.hpp"
+#include "spider_anim_data.hpp"
 #include "math_helpers.hpp"
 
 #include "main.hpp"
@@ -22,10 +25,16 @@
 #include "utils/gfx.hpp"
 
 #include "easing.hpp"
+#include <stdint.h>
+
+#define SPIDER_DASH_SCALE_DURATION 0.45f
+#define SPIDER_DASH_SCALE_START 0.4f
+#define SPIDER_DASH_ELASTIC_PERIOD 0.35f
 
 inline float gravFloor(Player *player) { return player->upside_down ? -state.ceiling_y : state.ground_y; }
 
 void anim_player_to_wall(Player *player);
+float expected_slope_y(int obj, Player *player);
 
 KeyInput curr_input;
 KeyInput curr_old_input;
@@ -52,6 +61,7 @@ ParticleSystem slow_speed_particles;
 ParticleSystem normal_speed_particles;
 ParticleSystem fast_speed_particles;
 ParticleSystem faster_speed_particles;
+ParticleSystem fastest_speed_particles;
 ParticleSystem coin_pickup_particles;
 
 PlayerAction player_actions[2][MAX_ACTIONS];
@@ -61,6 +71,7 @@ const float velocity_thresholds[SPEED_COUNT] = {
 	101.541492,
 	103.485494592,
 	103.377492,
+	103.809492,
 	103.809492
 };
 
@@ -68,7 +79,8 @@ extern const float player_speeds[SPEED_COUNT] = {
 	251.16007972276924,
 	311.580093712804,
 	387.42014039710523,
-	468.0001388338566
+	468.0001388338566,
+	576.000192
 };
 
 const float cube_jump_heights[SPEED_COUNT] = {
@@ -76,20 +88,31 @@ const float cube_jump_heights[SPEED_COUNT] = {
     603.7217172,
     616.681728,
     606.421728,
+    606.421728,
 };
 
-const float cube_accelerations[] = {
+const float cube_accelerations[SPEED_COUNT] = {
     -2747.52,
     -2794.1082,
     -2786.4,
     -2799.36,
+    -2799.36,
+};
+
+const float robot_accelerations[SPEED_COUNT] = {
+    -2467.4583,
+    -2514.6975,
+    -2512.0731,
+    -2522.5707,
+    -2522.5707,
 };
 
 const float player_speed_mults[SPEED_COUNT] = {
 	0.7f,
 	0.9f,
 	1.1f,
-	1.3f	
+	1.3f,
+	1.6f
 };
 
 const float cube_rotation_speed[2] = {
@@ -101,17 +124,30 @@ bool player_gamemode_is_flying(Player *player) {
     return player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_UFO || player->gamemode == GAMEMODE_WAVE;
 }
 
-void set_robot_animation(Player *player, int robot_anim_id) {
-    if (player->robot_anim_id != robot_anim_id) {
-        player->robot_blend_from_anim_id = player->robot_anim_id;
-        player->robot_blend_from_frame = player->robot_anim_frame;
-        player->robot_blend_from_timer = player->robot_anim_timer;
+void set_animation(Player *player, int anim_id) {
+    if (player->anim_id != anim_id) {
+        player->blend_from_anim_id = player->anim_id;
+        player->blend_from_frame = player->anim_frame;
+        player->blend_from_timer = player->anim_timer;
 
-        player->robot_anim_id = robot_anim_id;
-        player->robot_anim_frame = 0;
-        player->robot_anim_timer = 0;
-        player->robot_landing_blend_timer = 0;
+        player->anim_id = anim_id;
+        player->anim_frame = 0;
+        player->anim_timer = 0;
+        player->blend_timer = 0;
     }
+}
+
+float get_blend_duration(Player *player) {
+    if (player->gamemode == GAMEMODE_ROBOT) {
+        return ROBOT_BLEND_DURATION;
+    } else if (player->gamemode == GAMEMODE_SPIDER) {
+        return SPIDER_BLEND_DURATION;
+    }
+    return 0.1f;
+}
+
+void set_blend_timer(Player *player, float timer) {
+    player->blend_timer = timer;
 }
 
 void player_non_flying_landing(Player *player) {
@@ -132,6 +168,20 @@ void set_p_velocity(Player *player, float vel, bool override) {
 
 void update_rotation_direction(Player *player) {
     player->rotation_direction = (player->upside_down ? -1 : 1);
+}
+
+void stop_dashing(Player *player) {
+    if (!player->dashing) return;
+    add_dash_exit(player);
+    player->dashing = false;
+    player->dash_fire_timer = 0.f;
+}
+
+void player_flash(Player *player, float duration, float delay) {
+    player->flash_active = true;
+    player->flash_timer = 0.f;
+    player->flash_duration = duration;
+    player->flash_delay = delay;
 }
 
 float convert_to_closest_rotation(float rotation, float angle) {
@@ -173,7 +223,7 @@ void cube_gamemode(Player *player) {
     }
 
     // Do cube rotation
-    if (player->slope_data.slope_id < 0 && !player->on_ground) {
+    if (player->slope_data.slope_id < 0 && !player->on_ground && !player->dashing) {
         if (player->inverse_rotation) {
             player->cube_target_rotation -= (cube_rotation_speed[player->mini] / 2) * STEPS_DT * mult;
         } else {
@@ -192,10 +242,15 @@ void cube_gamemode(Player *player) {
 
     drag_particles[state.current_player].cfg.sourcePositionVariancey = (player->mini ? 4.f : 2.f);
 
-    if (curr_input.holdJump) {
+    if (curr_input.holdJump && !player->dashing) {
         jump = true;
     } else if (player->on_ground) {
         player->consecutive_jumps = 0;
+    }
+
+    // J block
+    if (player->holding_jump_cancelled && player->buffering_state == BUFFER_END) {
+        jump = false;
     }
 
     if (player->on_ground) {
@@ -357,7 +412,25 @@ void ship_gamemode(Player *player) {
     drag_particles_2[state.current_player].gravityFlipped = !player->upside_down;
     drag_particles_2[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
 
-    if (state.dual) {
+    player->min_vel = player->mini ? -406.566f : -345.6f;
+    player->max_vel = player->mini ? 508.248f : 432.0f;
+
+    if (player->velocity_uncapped) {
+        if ((player->vel_y >= 0.f && player->vel_y < player->max_vel) ||
+            (player->vel_y <= 0.f && player->vel_y > player->min_vel)) {
+            player->velocity_uncapped = false;
+        }
+    }
+
+    if (player->velocity_uncapped) {
+        float threshold = state.dual ? -velocity_thresholds[state.speed] : grav(player, velocity_thresholds[state.speed]);
+        bool legacy_falling = player->vel_y <= threshold;
+        float ship_mod = (player->vel_y < 0.f) ? -1.f : 0.8f;
+        if (!curr_input.holdJump && !legacy_falling) ship_mod = 1.2f;
+        float boost = (curr_input.holdJump && legacy_falling) ? 0.5f : 0.4f;
+        player->gravity = -ship_mod * boost * (player->mini ? 3287.186216f : 2794.108284f);
+        if (curr_input.holdJump) player->buffering_state = BUFFER_END;
+    } else if (state.dual) {
         // Make both dual players symmetric by using inverted ship gravity
         if (curr_input.holdJump) {
             player->buffering_state = BUFFER_END;
@@ -385,14 +458,13 @@ void ship_gamemode(Player *player) {
                 player->gravity = player->mini ? -1051.8984f : -894.11464f;
         }
     }
-    
-    player->min_vel = player->mini ? -406.566f : -345.6f;
-    player->max_vel = player->mini ? 508.248f : 432.0f;
 
-    if (player->gravity < 0 && player->vel_y < player->min_vel) {
-        player->vel_y = player->min_vel;
-    } else if (player->gravity > 0 && player->vel_y > player->max_vel) {
-        player->vel_y = player->max_vel;
+    if (!player->velocity_uncapped) {
+        if (player->gravity < 0 && player->vel_y < player->min_vel) {
+            player->vel_y = player->min_vel;
+        } else if (player->gravity > 0 && player->vel_y > player->max_vel) {
+            player->vel_y = player->max_vel;
+        }
     }
 }
 
@@ -401,6 +473,7 @@ static float ballJumpHeights[SPEED_COUNT] = {
     -172.044007,
     -181.11601,
     -185.00401,
+    -181.92601,
     -181.92601
 };
 
@@ -430,7 +503,7 @@ void ball_gamemode(Player *player) {
 
     bool should_coyote = (state.dual || player->upside_down) && player->coyote_frames < 16;
     // If on ground (block or slope) and its buffering, do a jump
-    if ((player->slope_data.slope_id >= 0 || player->on_ground || player->on_ceiling || should_coyote) && player->buffering_state == BUFFER_READY) {        
+    if ((player->slope_data.slope_id >= 0 || player->on_ground || player->on_ceiling || should_coyote) && player->buffering_state == BUFFER_READY && !player->dashing) {        
         player->upside_down ^= 1;
 
         set_p_velocity(player, ballJumpHeights[state.speed], state.old_player.buffering_state == BUFFER_READY);
@@ -448,7 +521,7 @@ void ball_gamemode(Player *player) {
         player->jumped = true;
     }
     
-    player->rotation += player->ball_rotation_speed * get_ball_rotation_speed(player) * mult * STEPS_DT;
+    if (!player->dashing) player->rotation += player->ball_rotation_speed * get_ball_rotation_speed(player) * mult * STEPS_DT;
 
     player->min_vel = -810;
     player->max_vel = 810;
@@ -504,11 +577,12 @@ void ufo_gamemode(Player *player) {
 
     bool buffering_check = ((state.old_player.gamemode == GAMEMODE_PLAYER || state.old_player.gamemode == GAMEMODE_SHIP || state.old_player.gamemode == GAMEMODE_WAVE || player->buffer_ufo) && (curr_input.holdJump));
     // If buffering, jump
-    if (player->buffering_state == BUFFER_READY && (curr_input.pressedJump || buffering_check)) {
+    if (player->buffering_state == BUFFER_READY && (curr_input.pressedJump || buffering_check) && !player->dashing) {
         player->vel_y = fmaxf(player->vel_y, player->mini ? 358.992 : 371.034);
         player->buffering_state = BUFFER_END;
         player->velocity_override = true;
         player->burst_particle_timer = BURST_PARTICLES_DURATION;
+        player->velocity_uncapped = false;
     } else {
         // Same as ship
         if (!state.dual) {
@@ -540,10 +614,12 @@ void ufo_gamemode(Player *player) {
     player->min_vel = player->mini ? -406.566f : -345.6f;
     player->max_vel = player->mini ? 508.248f : 432.0f;
 
-    if (player->vel_y < player->min_vel) {
-        player->vel_y = player->min_vel;
-    } else if (player->vel_y > player->max_vel) {
-        player->vel_y = player->max_vel;
+    if (!player->velocity_uncapped) {
+        if (player->vel_y < player->min_vel) {
+            player->vel_y = player->min_vel;
+        } else if (player->vel_y > player->max_vel) {
+            player->vel_y = player->max_vel;
+        }
     }
 }
 
@@ -580,6 +656,46 @@ void wave_gamemode(Player *player) {
     player->vel_y = (input * 2 - 1) * player_speeds[state.speed] * (player->mini ? 2 : 1);
 }
 
+static float robot_fire_in_scale(float timer) {
+    if (timer < 0.05f) return 0.1f + (1.44f - 0.1f) * (timer / 0.05f);
+    if (timer < 0.1f) return 1.44f + (0.72f - 1.44f) * ((timer - 0.05f) / 0.05f);
+    if (timer < 0.15f) return 0.72f + (1.8f - 0.72f) * ((timer - 0.1f) / 0.05f);
+    if (timer < 0.2f) return 1.8f + (0.9f - 1.8f) * ((timer - 0.15f) / 0.05f);
+    if (timer < 0.25f) return 0.9f + (1.8f - 0.9f) * ((timer - 0.2f) / 0.05f);
+    return 1.8f;
+}
+
+static void update_robot_fire(Player *player) {
+    bool show = player->gamemode == GAMEMODE_ROBOT
+             && !player->on_ground
+             && player->gravity == 0.f
+             && player->robot_air_time > 0.f
+             && player->robot_air_time < ROBOT_FIRE_MAX_AIR_TIME;
+
+    if (show) {
+        if (!player->robot_fire_visible || player->robot_fire_out) {
+            player->robot_fire_visible = true;
+            player->robot_fire_out = false;
+            player->robot_fire_timer = 0.f;
+            player->robot_fire_scale = 0.1f;
+        } else {
+            player->robot_fire_timer += STEPS_DT;
+            player->robot_fire_scale = robot_fire_in_scale(player->robot_fire_timer);
+        }
+    } else if (player->robot_fire_visible) {
+        if (!player->robot_fire_out) {
+            player->robot_fire_out = true;
+            player->robot_fire_timer = 0.f;
+            player->robot_fire_exit_scale = player->robot_fire_scale;
+        } else {
+            player->robot_fire_timer += STEPS_DT;
+            float progress = CLAMP(player->robot_fire_timer / ROBOT_FIRE_OUT_TIME, 0.f, 1.f);
+            player->robot_fire_scale = player->robot_fire_exit_scale + (ROBOT_FIRE_MIN_SCALE - player->robot_fire_exit_scale) * progress;
+            if (player->robot_fire_timer >= ROBOT_FIRE_OUT_TIME) player->robot_fire_visible = false;
+        }
+    }
+}
+
 void robot_gamemode(Player *player) {
     trail->positionR = (Vec2D){player->x, player->y};
     trail->startingPositionInitialized = true;
@@ -593,9 +709,9 @@ void robot_gamemode(Player *player) {
     if (player->y > 2794.f) kill_player(DEATH_FELL_OFF_LEVEL);
 
     if (player->on_ground) {
-        set_robot_animation(player, ROBOT_ANIM_RUN);
+        set_animation(player, ROBOT_ANIM_RUN);
         MotionTrail_StopStroke(trail);
-        if (player->slope_data.slope_id < 0) player->rotation = roundf(player->rotation / 90.0f) * 90.0f;
+        if (player->slope_data.slope_id < 0 && !player->dashing) player->rotation = roundf(player->rotation / 90.0f) * 90.0f;
     }
     
     drag_particles[state.current_player].emitterX = player->x;
@@ -619,11 +735,11 @@ void robot_gamemode(Player *player) {
         player->rotation = 0;
     }
 
-    if ((slope_data.slope_id >= 0 || player->on_ground || should_coyote) && (curr_input.holdJump && player->buffering_state == BUFFER_READY)) {
+    if ((slope_data.slope_id >= 0 || player->on_ground || should_coyote) && (curr_input.holdJump && player->buffering_state == BUFFER_READY) && !player->dashing) {
         set_p_velocity(player, cube_jump_heights[state.speed] / 2, false);
         player->inverse_rotation = false;
         player->on_ground = false;
-        set_robot_animation(player, ROBOT_ANIM_JUMP_START);
+        set_animation(player, ROBOT_ANIM_JUMP_START);
         player->buffering_state = BUFFER_END;
         player->robot_air_time = 0.f;
         player->gravity = 0;
@@ -631,52 +747,364 @@ void robot_gamemode(Player *player) {
     }
 
     if (player->robot_air_time >= 1.5f || (!curr_input.holdJump)) {
-        player->gravity = -2794.1082f * 0.9f;
-        if (player->robot_anim_id == ROBOT_ANIM_JUMP) {
-            set_robot_animation(player, ROBOT_ANIM_FALL_START);
+        player->gravity = robot_accelerations[state.speed];
+        if (player->anim_id == ROBOT_ANIM_JUMP) {
+            set_animation(player, ROBOT_ANIM_FALL_START);
         }
     } else {
         player->robot_air_time += 5.4f * STEPS_DT;
     }
-    
-    robot_fire_particles[state.current_player].emitterX = player->x - 4;
-    robot_fire_particles[state.current_player].emitterY = fabsf(gravBottom(player));
+
+    float scale = (player->mini) ? 0.6f : 1.f;
+    robot_fire_particles[state.current_player].emitterX = player->x - 4.f * scale;
+    robot_fire_particles[state.current_player].emitterY = player->y - grav(player, 10.f) * scale;
     robot_fire_particles[state.current_player].emitting = player->gravity == 0;
 
-    robot_fire_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
+    robot_fire_particles[state.current_player].scale = scale;
 
     if (!player->on_ground && player->vel_y < 0
-        && player->robot_anim_id != ROBOT_ANIM_FALL_START
-        && player->robot_anim_id != ROBOT_ANIM_FALL) {
-        set_robot_animation(player, ROBOT_ANIM_FALL_START);
+        && player->anim_id != ROBOT_ANIM_FALL_START
+        && player->anim_id != ROBOT_ANIM_FALL) {
+        set_animation(player, ROBOT_ANIM_FALL_START);
     }
 
-    const RobotAnimation *anim = &robot_animations[player->robot_anim_id];
+    const PlayerAnimation *anim = &robot_animations[player->anim_id];
     float anim_speed = (state.speed == SPEED_SLOW) ? 0.9f
                      : (state.speed == SPEED_FAST) ? 1.15f
-                     : (state.speed == SPEED_FASTER) ? 1.3f : 1.0f;
+                     : (state.speed == SPEED_FASTER) ? 1.3f
+                     : (state.speed == SPEED_FASTEST) ? 1.5f : 1.0f;
     if (player->mini) anim_speed /= 0.85f;
     
     anim_speed *= 35.0f / 24.0f;
-    player->robot_anim_timer += STEPS_DT * anim_speed;
+    player->anim_timer += STEPS_DT * anim_speed;
 
-    if (player->robot_anim_timer >= anim->frames[player->robot_anim_frame].delay) {
-        player->robot_anim_timer -= anim->frames[player->robot_anim_frame].delay;
-        int next = player->robot_anim_frame + 1;
+    if (player->anim_timer >= anim->frames[player->anim_frame].delay) {
+        player->anim_timer -= anim->frames[player->anim_frame].delay;
+        int next = player->anim_frame + 1;
         if (next >= anim->frame_count) {
-            if (player->robot_anim_id == ROBOT_ANIM_JUMP_START) {
-                set_robot_animation(player, ROBOT_ANIM_JUMP);
-            } else if (player->robot_anim_id == ROBOT_ANIM_FALL_START) {
-                set_robot_animation(player, ROBOT_ANIM_FALL);
+            if (player->anim_id == ROBOT_ANIM_JUMP_START) {
+                set_animation(player, ROBOT_ANIM_JUMP);
+            } else if (player->anim_id == ROBOT_ANIM_FALL_START) {
+                set_animation(player, ROBOT_ANIM_FALL);
             }
             next = 0;
         }
-        player->robot_anim_frame = next;
+        player->anim_frame = next;
+    }
+}
+
+#define SPIDER_RAY_MAX 256
+
+static int spider_solid_buffer[SPIDER_RAY_MAX];
+static int spider_hazard_buffer[SPIDER_RAY_MAX];
+
+static bool spider_overlap(float player_x, float player_y, float player_width, float player_height, float object_x, float object_y, float object_width, float object_height) {
+    return fabsf(player_x - object_x) < (player_width + object_width) * 0.5f && fabsf(player_y - object_y) < (player_height + object_height) * 0.5f;
+}
+
+static bool spider_rect_hits(int obj, float min_x, float min_y, float max_x, float max_y) {
+    const ObjectHitbox *hitbox = game_objects[objects.id[obj]].hitbox;
+
+    float object_x = objects.x[obj] + hitbox->x * objects.scale_x[obj];
+    float object_y = objects.y[obj] + hitbox->y * objects.scale_y[obj];
+    float half_width = objects.width[obj] * 0.5f;
+    float half_height = objects.height[obj] * 0.5f;
+
+    return min_x < object_x + half_width && max_x > object_x - half_width && min_y < object_y + half_height && max_y > object_y - half_height;
+}
+
+static int spider_collect(float min_x, float min_y, float max_x, float max_y, int *out, int capacity, bool is_hazard) {
+    int count = 0;
+
+    int solid_min_x = (int)floorf(min_x / SECTION_SIZE);
+    int solid_max_x = (int)floorf(max_x / SECTION_SIZE);
+    int solid_min_y = (int)floorf(min_y / SECTION_SIZE);
+    int solid_max_y = (int)floorf(max_y / SECTION_SIZE);
+
+    for (int sy = solid_min_y; sy <= solid_max_y; sy++) {
+        for (int sx = solid_min_x; sx <= solid_max_x; sx++) {
+            Section *sec = get_section(sx, sy);
+
+            for (int i = 0; i < sec->object_count; i++) {
+                int obj = sec->objects[i];
+                int id = objects.id[obj];
+
+                if (!is_valid_object(id)) continue;
+
+                const ObjectHitbox *hitbox = game_objects[id].hitbox;
+
+                if (!hitbox) continue;
+                if (objects.flags[obj] & FLAG_TOGGLED) continue;
+                if (is_hazard) {
+                    if (hitbox->collision_type != HITBOX_HAZARD) continue;
+                } else if (hitbox->collision_type != HITBOX_SOLID) continue;
+
+                if (!spider_rect_hits(obj, min_x, min_y, max_x, max_y)) continue;
+
+                if (count < capacity) out[count++] = obj;
+            }
+        }
     }
 
-    player->robot_landing_blend_timer += STEPS_DT;
-    if (player->robot_landing_blend_timer > ROBOT_LANDING_BLEND_DURATION) {
-        player->robot_landing_blend_timer = ROBOT_LANDING_BLEND_DURATION;
+    return count;
+}
+
+static void spider_sort(int *list, int count, bool upside_down) {
+    for (int i = 1; i < count; i++) {
+        int obj = list[i];
+        float key = upside_down ? -obj_getTop(obj) : obj_getBottom(obj);
+        int j = i - 1;
+
+        while (j >= 0) {
+            float prev = upside_down ? -obj_getTop(list[j]) : obj_getBottom(list[j]);
+            if (prev <= key) break;
+            list[j + 1] = list[j];
+            j--;
+        }
+
+        list[j + 1] = obj;
+    }
+}
+
+static float spider_slope_y(Player *player, int obj) {
+    float ydist = (player->upside_down ^ (grav_slope_orient(obj, player) >= ORIENT_UD_DOWN) ? -1.f : 1.f)
+                * (player->height / 2) / cosf(slope_angle(obj, player));
+    return expected_slope_y(obj, player) - ydist - grav(player, player->height / 2);
+}
+
+void spider_test_jump(Player *player, bool is_retry) {
+    if (state.dead) return;
+
+    float player_width = player->width;
+    float player_height = player->height;
+    float player_left = player->x - player_width * 0.5f;
+    float player_bottom = player->y - player_height * 0.5f;
+    float player_top = player->y + player_height * 0.5f;
+
+    float min_teleport = MAX(state.ground_y, player->y - 3000.0f);
+    float max_teleport = MIN(state.ceiling_y, player->y + 3000.0f);
+
+    float tolerance = 2.0f;
+
+    float solid_min_y = !player->upside_down ? (player_top - tolerance) : min_teleport;
+    float solid_max_y = !player->upside_down ? max_teleport : (player_bottom + tolerance);
+
+    bool going_left = state.mirror_mult < 0;
+
+    float solid_min_x = going_left ? (player_left - player_width * 0.5f - 1.0f) : (player_left + player_width * 0.5f);
+    float solid_max_x = solid_min_x + (player_width * 0.5f + 1.0f);
+
+    float hazard_min_x = player_left;
+    float hazard_max_x = player_left + player_width;
+    float extra_min_x = hazard_min_x;
+    float extra_max_x = hazard_max_x + 4.0f;
+
+    float hazard_width = (player->mini ? 0.6f : 1.0f) * 8.0f;
+    float hazard_narrow_min_x = hazard_min_x + (solid_max_x - solid_min_x - hazard_width) * 0.5f;
+    float hazard_narrow_max_x = hazard_narrow_min_x + hazard_width;
+
+    int solid_count = spider_collect(solid_min_x, solid_min_y, solid_max_x, solid_max_y, spider_solid_buffer, SPIDER_RAY_MAX, false);
+    int hazard_count = spider_collect(hazard_narrow_min_x, solid_min_y, hazard_narrow_max_x, solid_max_y, spider_hazard_buffer, SPIDER_RAY_MAX, true);
+
+    bool only_damaging = (solid_count == 0 && hazard_count != 0);
+
+    if (only_damaging || is_retry) {
+        is_retry = true;
+        solid_count = spider_collect(extra_min_x, solid_min_y, extra_max_x, solid_max_y, spider_solid_buffer, SPIDER_RAY_MAX, false);
+    }
+
+    spider_sort(spider_solid_buffer, solid_count, player->upside_down);
+    spider_sort(spider_hazard_buffer, hazard_count, player->upside_down);
+
+    float prev_land_y = 0.0f;
+    float land_y = 0.0f;
+
+    if (only_damaging) {
+        int nearest = spider_hazard_buffer[0];
+        land_y = objects.y[nearest];
+    } else {
+        int i = 0;
+
+        for (i = 0; i < solid_count; i++) {
+            int obj = spider_solid_buffer[i];
+            bool checking_slope = false;
+
+            if (!player->upside_down) {
+                land_y = obj_getBottom(obj) - player_height * 0.5f;
+            } else {
+                land_y = obj_getTop(obj) + player_height * 0.5f;
+            }
+
+            if (game_objects[objects.id[obj]].hitbox->type == COLLISION_SLOPE) {
+                checking_slope = true;
+                land_y = spider_slope_y(player, obj);
+            }
+
+            if ((!player->upside_down && land_y < player->y - 10.0f) ||
+                (player->upside_down && land_y > player->y + 10.0f)) continue;
+
+            if (!going_left) {
+                if (obj_getLeft(obj) <= player->x) break;
+            } else {
+                if (obj_getRight(obj) >= player->x) break;
+            }
+
+            bool hit = false;
+
+            for (int j = 0; j < solid_count; j++) {
+                if (j == i) continue;
+
+                int inner = spider_solid_buffer[j];
+                float object_height = objects.height[inner] - (checking_slope ? 0.0f : 4.0f);
+
+                if (spider_overlap(player->x, land_y, player_width, player_height, objects.x[inner], objects.y[inner], objects.width[inner], object_height)) {
+                    if (checking_slope) {
+                        if (prev_land_y != 0.0f) land_y = !player->upside_down ? MIN(land_y, prev_land_y) : MAX(land_y, prev_land_y);
+                    } else {
+                        land_y = prev_land_y;
+                    }
+
+                    hit = true;
+                    prev_land_y = land_y;
+                    break;
+                }
+            }
+
+            if (!hit) break;
+        }
+
+        if (i >= solid_count) land_y = 0.0f;
+    }
+
+    if (land_y == 0.0f) {
+        land_y = player->upside_down ? (min_teleport + player_height * 0.5f) : (max_teleport - player_height * 0.5f);
+    }
+
+    if (!only_damaging && hazard_count != 0) {
+        float hazard_y = objects.y[spider_hazard_buffer[0]];
+
+        if ((!player->upside_down && hazard_y < land_y) ||
+            (player->upside_down && hazard_y > land_y)) {
+            if (!is_retry) {
+                spider_test_jump(player, true);
+                return;
+            }
+
+            land_y = hazard_y;
+        }
+    }
+
+    float old_y = player->y;
+    player->y = land_y;
+    player->upside_down = !player->upside_down;
+    player->vel_y = player->upside_down ? 1.0f : -1.0f;
+    player->on_ground = false;
+    player->on_ceiling = false;
+    player->left_ground = true;
+    player->inverse_rotation = false;
+    player->snap_rotation = true;
+    player->buffering_state = BUFFER_END;
+
+    Color dash_color = get_white_if_black(state.current_player == 1 ? p1_color : p2_color);
+    add_spider_dash_effect(player->x, old_y, land_y, player->upside_down, dash_color);
+
+    player_flash(player, 0.3f, 0.05f);
+
+    player->spider_scale_active = true;
+    player->spider_scale_timer = 0.f;
+
+    UseEffect *effect = add_use_effect(player->x, land_y, USE_EFFECT_OBJ_NOTHING, &spider_in_effect, get_use_effect_array_ptr(SCREEN_TOP));
+    if (effect) {
+        Color p2_not_white = get_white_if_black(p2_color);
+
+        effect->def.colorR = p2_not_white.r / 255.f;
+        effect->def.colorG = p2_not_white.g / 255.f;
+        effect->def.colorB = p2_not_white.b / 255.f;
+        effect->def.start_rad = spider_in_effect.start_rad * (player->mini ? 0.6f : 1);
+    }
+    effect = add_use_effect(player->x, old_y, USE_EFFECT_OBJ_NOTHING, &spider_out_effect, get_use_effect_array_ptr(SCREEN_TOP));
+    if (effect) {
+        Color p2_not_white = get_white_if_black(p2_color);
+
+        effect->def.colorR = p2_not_white.r / 255.f;
+        effect->def.colorG = p2_not_white.g / 255.f;
+        effect->def.colorB = p2_not_white.b / 255.f;
+        effect->def.start_rad = spider_out_effect.start_rad * (player->mini ? 0.6f : 1);
+    }
+    update_rotation_direction(player);
+    clear_slope_data(player);
+    
+    MotionTrail_Clear(trail);
+    trail->positionR = (Vec2D){player->x, player->y};
+}
+
+void spider_gamemode(Player *player) {
+    trail->positionR = (Vec2D){player->x, player->y};
+    trail->startingPositionInitialized = true;
+
+    player->min_vel = -810;
+    player->max_vel = 810;
+
+    if (!player->upside_down && player->vel_y < player->min_vel) player->vel_y = player->min_vel;
+    if (player->upside_down && player->vel_y > player->max_vel) player->vel_y = player->max_vel;
+
+    player->gravity = -2794.1082f * 0.6f;
+
+    if (player->y > 2794.f) kill_player(DEATH_FELL_OFF_LEVEL);
+
+    if (player->on_ground) {
+        set_animation(player, (state.speed <= SPEED_NORMAL) ? SPIDER_ANIM_WALK : SPIDER_ANIM_RUN);
+        MotionTrail_StopStroke(trail);
+
+        if (player->slope_data.slope_id < 0 && !player->dashing) player->rotation = roundf(player->rotation / 90.0f) * 90.0f;
+    }
+
+    if (player->snap_rotation) {
+        player->rotation = 0;
+    }
+
+    drag_particles[state.current_player].emitterX = player->x;
+    drag_particles[state.current_player].emitterY = fabsf(gravBottom(player)) + (player->upside_down ? -2 : 2);
+    drag_particles[state.current_player].emitting = player->on_ground || player->on_ceiling;
+
+    drag_particles[state.current_player].gravityFlipped = player->upside_down;
+    drag_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
+
+    drag_particles[state.current_player].cfg.sourcePositionVariancey = 0;
+
+    bool came_from_black_orb = (player->last_orb_pressed >= 0 && objects.id[player->last_orb_pressed] == BLACK_ORB);
+
+    if ((player->slope_data.slope_id >= 0 || player->on_ground) && (curr_input.holdJump && (player->buffering_state == BUFFER_READY || came_from_black_orb)) && !player->dashing) {
+        spider_test_jump(player, false);
+        player->buffering_state = BUFFER_END;
+        player->jumped = true;
+        player->last_orb_pressed = -1;
+    }
+
+    if (!player->on_ground && player->vel_y < 0 && player->anim_id != SPIDER_ANIM_FALL) {
+        set_animation(player, SPIDER_ANIM_FALL);
+    }
+
+    const PlayerAnimation *anim = &spider_animations[player->anim_id];
+
+    float anim_speed = (state.speed == SPEED_SLOW) ? 0.9f
+                     : (state.speed == SPEED_FAST) ? 1.15f
+                     : (state.speed == SPEED_FASTER) ? 1.3f
+                     : (state.speed == SPEED_FASTEST) ? 1.5f : 1.0f;
+
+    if (player->mini) anim_speed /= 0.85f;
+    if (state.speed >= SPEED_FAST) anim_speed /= 1.1f;
+
+    player->anim_timer += STEPS_DT * anim_speed;
+
+    if (player->anim_timer >= anim->frames[player->anim_frame].delay) {
+        player->anim_timer -= anim->frames[player->anim_frame].delay;
+
+        int next = player->anim_frame + 1;
+
+        if (next >= anim->frame_count) next = 0;
+
+        player->anim_frame = next;
     }
 }
 
@@ -695,7 +1123,7 @@ void clamp_player_ground(Player *player) {
         
         if (player->gamemode != GAMEMODE_WAVE && grav(player, player->vel_y) <= 0) set_p_velocity(player, 0, player->gamemode == GAMEMODE_BALL);
         player->y = state.ground_y + (player->height / 2) + ((player->gamemode == GAMEMODE_WAVE) ? (player->mini ? 3 : 5) : 0);;
-        player->snap_data.player_frame = 0;
+        player->snap_data.player_frame = 0;    
     }
 
     // Check for ceiling collision
@@ -709,7 +1137,8 @@ void clamp_player_ground(Player *player) {
         }
         
         if (player->gamemode != GAMEMODE_WAVE && grav(player, player->vel_y) >= 0) set_p_velocity(player, 0, player->gamemode == GAMEMODE_BALL);
-        player->y = state.ceiling_y - (player->height / 2) - ((player->gamemode == GAMEMODE_WAVE) ? (player->mini ? 3 : 5) : 0);
+        player->y = state.ceiling_y - (player->height / 2) - ((player->gamemode == GAMEMODE_WAVE) ? (player->mini ? 3 : 5) : 0);    
+        
     } 
 }
 void run_player(Player *player) {
@@ -724,7 +1153,7 @@ void run_player(Player *player) {
                 player->on_ceiling = true;
                 player->inverse_rotation = false;
             } else {
-                player->on_ground = true;          
+                player->on_ground = true;      
                 player->inverse_rotation = false;
                 player_non_flying_landing(player);
             }
@@ -766,6 +1195,9 @@ void run_player(Player *player) {
 		player->coyote_frames = INT32_MAX;
 	}
 
+    // Disable cap
+    if (player->on_ground) player->velocity_uncapped = false;
+
     switch (player->gamemode) {
         case GAMEMODE_PLAYER:
             cube_gamemode(player);
@@ -774,7 +1206,7 @@ void run_player(Player *player) {
             glitter_particles.emitterX = state.camera_x_middle;
             glitter_particles.emitterY = state.camera_y_middle;
             glitter_particles.emitting = true;
-            if (!state.mirroring) MotionTrail_ResumeStroke(trail);
+            if (!state.mirroring && state.show_player) MotionTrail_ResumeStroke(trail);
             ship_gamemode(player);
             break;
         case GAMEMODE_BALL:
@@ -784,14 +1216,14 @@ void run_player(Player *player) {
             glitter_particles.emitterX = state.camera_x_middle;
             glitter_particles.emitterY = state.camera_y_middle;
             glitter_particles.emitting = true;
-            if (!state.mirroring) MotionTrail_ResumeStroke(trail);
+            if (!state.mirroring && state.show_player) MotionTrail_ResumeStroke(trail);
             ufo_gamemode(player);
             break;
         case GAMEMODE_WAVE:
             glitter_particles.emitterX = state.camera_x_middle;
             glitter_particles.emitterY = state.camera_y_middle;
             glitter_particles.emitting = true;
-            if (!state.mirroring) {
+            if (!state.mirroring && state.show_player) {
                 if (settingsState.noWaveTrailBehind) {
                     MotionTrail_StopStroke(trail);
                 } else {
@@ -803,7 +1235,27 @@ void run_player(Player *player) {
         case GAMEMODE_ROBOT:
             robot_gamemode(player);
             break;
+        case GAMEMODE_SPIDER:
+            spider_gamemode(player);
+            break;
     } 
+    
+    if (player->flash_active) {
+        player->flash_timer += STEPS_DT;
+        if (player->flash_timer >= player->flash_delay + player->flash_duration) player->flash_active = false;
+    }
+
+    if (player->spider_scale_active) {
+        player->spider_scale_timer += STEPS_DT;
+        if (player->spider_scale_timer >= SPIDER_DASH_SCALE_DURATION) player->spider_scale_active = false;
+    }
+
+    update_robot_fire(player);
+
+    player->blend_timer += STEPS_DT;
+    if (player->blend_timer > get_blend_duration(player)) {
+        set_blend_timer(player, get_blend_duration(player));
+    }
     
     player->time_since_ground += STEPS_DT;
 
@@ -818,7 +1270,7 @@ void run_player(Player *player) {
     }
 
     // Weird stuff indeed
-    if (!player->velocity_override) {
+    if (!player->velocity_override && !player->dashing) {
 		float newVel = player->vel_y + player->gravity * STEPS_DT;
 
 		// Player will fall off blocks a frame faster than expected
@@ -875,7 +1327,7 @@ void run_player(Player *player) {
     float lerp_speed = player_speed_mults[state.speed] * 0.175f;
 
     // Handle rotation for ship and wave
-    switch (player->gamemode) {
+    if (!player->dashing) switch (player->gamemode) {
         case GAMEMODE_PLAYER:
             if (player->on_ground || player->slope_data.slope_id >= 0) {
                 lerp_speed *= 3.0f;
@@ -894,6 +1346,7 @@ void run_player(Player *player) {
             rotate_fly(player, player->mini ? 0.4f : 0.25f);
             break;
         case GAMEMODE_ROBOT:
+        case GAMEMODE_SPIDER:
             float angle_rad = 0;
             if (player->slope_data.slope_id >= 0) {
                 angle_rad = slope_snap_angle(player->slope_data.slope_id, player);
@@ -905,21 +1358,29 @@ void run_player(Player *player) {
     player->snap_rotation = false;
 
     player->buffer_ufo = false;
+
+    if (player->on_ground) player->last_orb_pressed = -1;
 }
 
 void handle_player(Player *player) {
     u64 start_player = svcGetSystemTick();
-    if (curr_input.holdJump) {
+
+    if (curr_input.holdJump) {    
         if (player->buffering_state == BUFFER_NONE) {
             player->buffering_state = BUFFER_READY;
         }
     } else {
+        player->holding_jump_cancelled = false;
         player->buffering_state = BUFFER_NONE;
+        stop_dashing(player);
     }
     
     player->on_ground = false;
     player->on_ceiling = false;
     player->landed_from_jump = false;
+    
+    player->allow_dart_slide = false;
+    player->allow_head_hit = false;
 
     player->velocity_override = false;
 
@@ -930,7 +1391,18 @@ void handle_player(Player *player) {
 
     player->vel_x = player_speeds[state.speed]; 
     player->x += player->vel_x * STEPS_DT;
-    player->y += player_get_vel(player, player->vel_y) * STEPS_DT;
+    if (player->dashing) {
+        player->vel_y = 0;
+        player->y += (player->vel_x * STEPS_DT) * player->dash_slope;
+        player->dash_fire_timer += STEPS_DT;
+        if (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_BALL) {
+            player->rotation += (player->upside_down ? -1.f : 1.f) * (288.f / 0.3f) * STEPS_DT;
+        } else {
+            player->rotation = -player->dash_angle;
+        }
+    } else {
+        player->y += player_get_vel(player, player->vel_y) * STEPS_DT;
+    }
 
     clamp_player_ground(player);
 
@@ -959,11 +1431,15 @@ void handle_player(Player *player) {
     
     if (state.noclip || state.end_wall_anim_playing) state.dead = false;
     
-    if (state.dead) return;
+    if (state.dead) {
+        stop_dashing(player);
+        return;
+    }
 
     start = svcGetSystemTick();
 
     if (player->x >= level_info.wall_x - END_ANIMATION_X_START) {
+        stop_dashing(player);
         state.end_wall_anim_playing = true;
         p1_trail = true;
         if (player->cutscene_timer == 0) {
@@ -984,6 +1460,9 @@ void handle_player(Player *player) {
     } 
 
     run_player(player);
+
+    if (state.dead) stop_dashing(player);
+
     end = svcGetSystemTick();
     ticks = end - start;
     snapshot.play_ms += ticks / CPU_TICKS_PER_MSEC;
@@ -1060,6 +1539,8 @@ void spawn_p1_trail(Player *player, int player_id) {
             break;
         case GAMEMODE_ROBOT:
             return;
+        case GAMEMODE_SPIDER:
+            return;
     }
 
     float end_scale = trail_data->scale * P1_TRAIL_END_SCALE;
@@ -1129,13 +1610,13 @@ void draw_p1_trail(Player *player, int player_id) {
                 trail_data->scale,
                 color,
                 (IconParameters) { 
-                    .robot_anim_id = player->robot_anim_id,
-                    .robot_anim_frame = player->robot_anim_frame,
-                    .robot_anim_timer = player->robot_anim_timer,
-                    .robot_blend_from_anim_id = player->robot_blend_from_anim_id,
-                    .robot_blend_from_frame = player->robot_blend_from_frame,
-                    .robot_blend_from_timer = player->robot_blend_from_timer,
-                    .robot_blend_fraction = player->robot_landing_blend_timer / ROBOT_LANDING_BLEND_DURATION
+                    .anim_id = player->anim_id,
+                    .anim_frame = player->anim_frame,
+                    .anim_timer = player->anim_timer,
+                    .blend_from_anim_id = player->blend_from_anim_id,
+                    .blend_from_frame = player->blend_from_frame,
+                    .blend_from_timer = player->blend_from_timer,
+                    .blend_fraction = player->blend_timer / get_blend_duration(player)
                  }
             );
         }
@@ -1157,6 +1638,19 @@ void draw_player(Player *player) {
     Color p2_color = player->player_icons.p2_color;
     Color glow_color = player->player_icons.glow_color;
 
+    if (player->flash_active) {
+        float flash_t = player->flash_timer - player->flash_delay;
+        float flash_k = (flash_t <= 0.f) ? 0.f : CLAMP(flash_t / player->flash_duration, 0.f, 1.f);
+
+        p1_color.r = (unsigned char)(255.f + ((float)p1_color.r - 255.f) * flash_k);
+        p1_color.g = (unsigned char)(255.f + ((float)p1_color.g - 255.f) * flash_k);
+        p1_color.b = (unsigned char)(255.f + ((float)p1_color.b - 255.f) * flash_k);
+
+        p2_color.r = (unsigned char)(255.f + ((float)p2_color.r - 255.f) * flash_k);
+        p2_color.g = (unsigned char)(255.f + ((float)p2_color.g - 255.f) * flash_k);
+        p2_color.b = (unsigned char)(255.f + ((float)p2_color.b - 255.f) * flash_k);
+    }
+
     u32 primary_color = C2D_Color32(p1_color.r, p1_color.g, p1_color.b, 255);
     u32 secondary_color = C2D_Color32(p2_color.r, p2_color.g, p2_color.b, 255);
 
@@ -1167,6 +1661,11 @@ void draw_player(Player *player) {
     }
 
     float scale = (player->mini) ? 0.6f : 1.f;
+
+    if (player->gamemode == GAMEMODE_SPIDER && player->spider_scale_active) {
+        float scale_t = CLAMP(player->spider_scale_timer / SPIDER_DASH_SCALE_DURATION, 0.f, 1.f);
+        scale *= SPIDER_DASH_SCALE_START + (1.f - SPIDER_DASH_SCALE_START) * elasticEaseOut(scale_t, SPIDER_DASH_ELASTIC_PERIOD);
+    }
 
     // All of this is just for calculating the cube position in ufo and ship
     float rad = C3D_AngleFromDegrees(player->rotation);
@@ -1199,8 +1698,9 @@ void draw_player(Player *player) {
     int selected_ufo =  player->player_icons.ufo;
     int selected_wave = player->player_icons.wave;
     int selected_robot = player->player_icons.robot;
+    int selected_spider = player->player_icons.spider;
 
-    bool glow_enabled = (player->player_icons.glow || ((p1_color.r | p1_color.g | p1_color.b) == 0));
+    bool glow_enabled = (player->player_icons.glow || ((player->player_icons.p1_color.r | player->player_icons.p1_color.g | player->player_icons.p1_color.b) == 0));
 
     switch (player->gamemode) {
         case GAMEMODE_PLAYER:
@@ -1273,13 +1773,31 @@ void draw_player(Player *player) {
                 secondary_color,
                 C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255),
                 (IconParameters) { 
-                    .robot_anim_id = player->robot_anim_id,
-                    .robot_anim_frame = player->robot_anim_frame,
-                    .robot_anim_timer = player->robot_anim_timer,
-                    .robot_blend_from_anim_id = player->robot_blend_from_anim_id,
-                    .robot_blend_from_frame = player->robot_blend_from_frame,
-                    .robot_blend_from_timer = player->robot_blend_from_timer,
-                    .robot_blend_fraction = player->robot_landing_blend_timer / ROBOT_LANDING_BLEND_DURATION
+                    .anim_id = player->anim_id,
+                    .anim_frame = player->anim_frame,
+                    .anim_timer = player->anim_timer,
+                    .blend_from_anim_id = player->blend_from_anim_id,
+                    .blend_from_frame = player->blend_from_frame,
+                    .blend_from_timer = player->blend_from_timer,
+                    .blend_fraction = player->blend_timer / get_blend_duration(player),
+                    .robot_fire_scale = player->robot_fire_visible ? player->robot_fire_scale : 0.f
+                 }
+            );
+            break;
+        }
+        case GAMEMODE_SPIDER: {
+            spawn_icon_at(GAMEMODE_SPIDER, selected_spider, glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale,
+                primary_color,
+                secondary_color,
+                C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255),
+                (IconParameters) {
+                    .anim_id = player->anim_id,
+                    .anim_frame = player->anim_frame,
+                    .anim_timer = player->anim_timer,
+                    .blend_from_anim_id = player->blend_from_anim_id,
+                    .blend_from_frame = player->blend_from_frame,
+                    .blend_from_timer = player->blend_from_timer,
+                    .blend_fraction = player->blend_timer / get_blend_duration(player)
                  }
             );
             break;
@@ -1290,21 +1808,28 @@ void draw_player(Player *player) {
 extern void get_corners(float cx, float cy, float w, float h, float angle, Vec2D out[4]);
 
 
-void draw_triangle_from_rect(Vec2D rect[4], int skip_index, uint32_t color) {
+void draw_triangle_from_rect(Vec2D rect[4], int skip_index, uint32_t color, uint32_t hypo_color, float depth) {
     Vec2D tri[3];
+    u32 col[3];
     int ti = 0;
+
+    int hypo_id = skip_index - 1;
+    if (hypo_id < 0) hypo_id = 3;
 
     // Collect 3 points that are not the skipped one
     for (int i = 0; i < 4; ++i) {
         if (i == skip_index) continue;
         tri[ti].x = mirror_x_on_screen(rect[i].x);
-        tri[ti++].y = calc_y_on_screen(rect[i].y);
+        tri[ti].y = calc_y_on_screen(rect[i].y);
+        
+        if (i == hypo_id) col[ti++] = hypo_color;
+        else col[ti++] = color;
     }
 
-    draw_polygon_inward_mitered(tri, 3, 2.f, color);
+    draw_polygon_inward_mitered(tri, 3, 2.f, col, depth);
 }
 
-void draw_square(Vec2D rect[4], uint32_t color) {
+void draw_square(Vec2D rect[4], uint32_t color, float depth) {
     Vec2D center = {
         (rect[0].x + rect[1].x + rect[2].x + rect[3].x) / 4.f,
         (rect[0].y + rect[1].y + rect[2].y + rect[3].y) / 4.f
@@ -1316,24 +1841,39 @@ void draw_square(Vec2D rect[4], uint32_t color) {
         draw_hitbox_line_inward(rect,
             mirror_x_on_screen(rect[i].x), calc_y_on_screen(rect[i].y),
             mirror_x_on_screen(rect[j].x), calc_y_on_screen(rect[j].y),
-            1.5f, center.x, center.y, color
+            1.5f, center.x, center.y, color, depth
         );
     }
 }
 
+static u32 get_id_color(int id, float *out_depth) {
+    switch (id) {
+        case J_MODIFIERBLOCK:
+        case D_MODIFIERBLOCK:
+        case S_MODIFIERBLOCK:
+        case H_MODIFIERBLOCK:
+            *out_depth = 0.75f;
+            return C2D_Color32(0xff, 0xff, 0x00, 0xff);
+    }
+    return 0;
+}
+
 void draw_hitbox(int obj) {
-    if (!is_valid_object(objects.id[obj])) return;
+    int id = objects.id[obj];
+    if (!is_valid_object(id)) return;
 
     Vec2D rect[4];
-    if (is_trigger_object(objects.id[obj]) && objects.touch_triggered[obj]) {
+    if (is_trigger_object(id) && objects.touch_triggered[obj]) {
         get_corners(objects.x[obj], objects.y[obj], objects.width[obj], objects.height[obj], objects.rotation[obj], rect);
-        draw_square(rect, C2D_Color32(0x00, 0xff, 0xff, 0xff));
+        draw_square(rect, C2D_Color32(0x00, 0xff, 0xff, 0xff), 3.f);
         return;
     }
 
-    const ObjectHitbox *hitbox = game_objects[objects.id[obj]].hitbox;
+    const ObjectHitbox *hitbox = game_objects[id].hitbox;
 
     if (!hitbox) return;
+
+    float depth = 0.f;
 
     float angle = -objects.rotation[obj];
     float rot_rad = C3D_AngleFromDegrees(adjust_angle_y(angle, objects.flippedH[obj]));
@@ -1358,10 +1898,22 @@ void draw_hitbox(int obj) {
     unsigned int color = C2D_Color32(0x00, 0xff, 0xff, 0xff);
 
     int hitbox_type = hitbox->collision_type;
-    if (hitbox_type == HITBOX_HAZARD) color = C2D_Color32(0xff, 0x00, 0x00, 0xff);
-    if (hitbox_type == HITBOX_SOLID) color = C2D_Color32(0x00, 0x00, 0xff, 0xff);
-    if (hitbox_type == HITBOX_SPECIAL) color = C2D_Color32(0x00, 0xff, 0x00, 0xff);
-    
+    if (hitbox_type == HITBOX_HAZARD) {
+        color = C2D_Color32(0xff, 0x00, 0x00, 0xff);
+        depth = 0.5f;
+    }
+    if (hitbox_type == HITBOX_SOLID) {
+        color = C2D_Color32(0x00, 0x00, 0xff, 0xff);
+        depth = 0.f;
+    }
+    if (hitbox_type == HITBOX_SPECIAL) {
+        color = C2D_Color32(0x00, 0xff, 0x00, 0xff);
+        depth = 1.f;
+    }
+
+    u32 id_color = get_id_color(id, &depth);
+    if (id_color) color = id_color;
+
     // Current slope and x snapped obj gets its own colors
     if (obj == state.player.slope_data.slope_id || obj == state.player2.slope_data.slope_id) color = C2D_Color32(0x00, 0xff, 0x00, 0xff);
     if (obj == state.player.snap_data.snapped_obj || obj == state.player2.snap_data.snapped_obj) color = C2D_Color32(0xff, 0xff, 0x00, 0xff);
@@ -1371,14 +1923,21 @@ void draw_hitbox(int obj) {
         h = objects.height[obj];
         get_corners(x, y, w, h, 0, rect);
 
-        draw_triangle_from_rect(rect, 3 - objects.orientation[obj], color);
+        depth = 0.f;
+
+        if (is_spike_slope(obj)) {
+            depth += 0.5f;
+            draw_triangle_from_rect(rect, 3 - objects.orientation[obj], color, C2D_Color32(0xff, 0x00, 0x00, 0xff), depth);
+        } else {
+            draw_triangle_from_rect(rect, 3 - objects.orientation[obj], color, color, depth);
+        }
     } else if (hitbox->type == COLLISION_CIRCLE) {
         float calc_radius = objects.width[obj];
 
         custom_circunference(mirror_x_on_screen(x), calc_y_on_screen(y), calc_radius, color, 2.f);
     } else if (w != 0 && h != 0) {
         get_corners(x, y, w, h, rot, rect);
-        draw_square(rect, color);
+        draw_square(rect, color, depth);
     }
 }
 
@@ -1388,7 +1947,7 @@ void draw_player_hitbox(Player *player) {
     // Unrotated hitbox
     get_corners(player->x, player->y, player->width, player->height, 0, rect);
 
-    draw_square(rect, C2D_Color32(0xff, 0x00, 0x00, 0xff));
+    draw_square(rect, C2D_Color32(0xff, 0x00, 0x00, 0xff), 0.f);
 }
 
 void draw_internal_hitbox(Player *player) {
@@ -1397,7 +1956,7 @@ void draw_internal_hitbox(Player *player) {
     // Internal hitbox
     get_corners(player->x, player->y, internal.width, internal.height, 0, rect);
 
-    draw_square(rect, C2D_Color32(0x00, 0x00, 0xff, 0xff));
+    draw_square(rect, C2D_Color32(0x00, 0x00, 0xff, 0xff), 0.f);
 }
 
 void draw_rotated_hitbox(Player *player) {
@@ -1405,7 +1964,7 @@ void draw_rotated_hitbox(Player *player) {
     // Rotated hitbox
     get_corners(player->x, player->y, player->width, player->height, player->rotation, rect);
 
-    draw_square(rect, C2D_Color32(0x7f, 0x00, 0x00, 0xff));
+    draw_square(rect, C2D_Color32(0x7f, 0x00, 0x00, 0xff), 0.f);
 }
 
 

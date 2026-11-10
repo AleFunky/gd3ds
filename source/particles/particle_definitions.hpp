@@ -2,7 +2,7 @@
 
 #include <3ds.h>
 
-#define PARTICLE_DEF_COUNT (29)
+#define PARTICLE_DEF_COUNT (30)
 
 typedef enum {
     TEXTURE_SQUARE_PNG,
@@ -85,6 +85,7 @@ extern const ParticleDefinition speed_effect_fast;
 extern const ParticleDefinition speed_effect_normal;
 extern const ParticleDefinition speed_effect_slow;
 extern const ParticleDefinition speed_effect_vfast;
+extern const ParticleDefinition speed_effect_fastest;
 extern const ParticleDefinition firework;
 extern const ParticleDefinition explode_effect;
 extern const ParticleDefinition coin_effect;

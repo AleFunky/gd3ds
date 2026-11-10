@@ -41,6 +41,14 @@ static UILabel *level_name;
 
 static UIWindow *pause_window;
 
+#define MAX_PAUSE_MENU_ELEMENTS 16
+static UIElement *pause_menu_elements[MAX_PAUSE_MENU_ELEMENTS];
+static float pause_menu_base_y[MAX_PAUSE_MENU_ELEMENTS];
+static int pause_menu_count;
+static UIElement *pause_hide_btn;
+static float pause_hide_btn_y;
+static float pause_hide_offset;
+
 static UIProgressBar *normal_progress;
 static UILabel *normal_progress_val;
 static UIProgressBar *practice_progress;
@@ -82,9 +90,22 @@ static void update_progress_bars() {
     ui_label_set_text(normal_progress_val, normal);
     ui_label_set_text(practice_progress_val, practice);
 
-    ui_image_set_image(coin_1_top, (level_data_sel->coin1 ? PAUSE_COIN_FILLED_ID : PAUSE_COIN_UNFILLED_ID), 0);
-    ui_image_set_image(coin_2_top, (level_data_sel->coin2 ? PAUSE_COIN_FILLED_ID : PAUSE_COIN_UNFILLED_ID), 0);
-    ui_image_set_image(coin_3_top, (level_data_sel->coin3 ? PAUSE_COIN_FILLED_ID : PAUSE_COIN_UNFILLED_ID), 0);
+    if (state.custom_level) {
+        bool unrated = level_has_unverified_coins();
+        UIImage *tops[3] = { coin_1_top, coin_2_top, coin_3_top };
+        bool got[3] = { level_data_sel->coin1, level_data_sel->coin2, level_data_sel->coin3 };
+
+        for (int i = 0; i < 3; i++) {
+            ui_image_set_image(tops[i], COIN_BIG_USER_ID, 0);
+            ui_image_set_tint(tops[i], got[i]
+                ? (unrated ? USER_COIN_UNRATED_TINT : C2D_Color32(255, 255, 255, 255))
+                : (unrated ? USER_COIN_UNRATED_EMPTY_TINT : C2D_Color32(165, 165, 165, 255)));
+        }
+    } else {
+        ui_image_set_image(coin_1_top, (level_data_sel->coin1 ? PAUSE_COIN_FILLED_ID : PAUSE_COIN_UNFILLED_ID), 0);
+        ui_image_set_image(coin_2_top, (level_data_sel->coin2 ? PAUSE_COIN_FILLED_ID : PAUSE_COIN_UNFILLED_ID), 0);
+        ui_image_set_image(coin_3_top, (level_data_sel->coin3 ? PAUSE_COIN_FILLED_ID : PAUSE_COIN_UNFILLED_ID), 0);
+    }
 }
 
 static void reset_coin(LevelData *level_data_sel, int i){
@@ -131,24 +152,57 @@ void pause_game() {
     update_progress_bars();
     game_paused = true;
     if (song_loaded || state.practice_mode) pause_playback_mp3();
-    if (!state.custom_level){
-        ui_run_func_on_tag(screen_top, "coin_1", ui_enable_element);
-        ui_run_func_on_tag(screen_top, "coin_2", ui_enable_element);
-        ui_run_func_on_tag(screen_top, "coin_3", ui_enable_element);
-        ui_run_func_on_tag(screen, "coin_1", ui_disable_element);
-        ui_run_func_on_tag(screen, "coin_2", ui_disable_element);
-        ui_run_func_on_tag(screen, "coin_3", ui_disable_element);
-        ui_run_func_on_tag(screen, "coin_1_full", ui_disable_element);
-        ui_run_func_on_tag(screen, "coin_2_full", ui_disable_element);
-        ui_run_func_on_tag(screen, "coin_3_full", ui_disable_element);
-        ui_run_func_on_tag(screen, "coin_circle", ui_disable_element);
+    int coin_count = get_level_coin_count();
+    if (coin_count > 3) coin_count = 3;
+
+    UIImage *coin_top_slots[3] = { coin_1_top, coin_2_top, coin_3_top };
+    for (int i = 0; i < 3; i++) {
+        coin_top_slots[i]->base.x = (i - (coin_count - 1) / 2.f) * 50.f;
+        coin_top_slots[i]->base.enabled = (i < coin_count);
     }
+    ui_run_func_on_tag(screen, "coin_1", ui_disable_element);
+    ui_run_func_on_tag(screen, "coin_2", ui_disable_element);
+    ui_run_func_on_tag(screen, "coin_3", ui_disable_element);
+    ui_run_func_on_tag(screen, "coin_1_full", ui_disable_element);
+    ui_run_func_on_tag(screen, "coin_2_full", ui_disable_element);
+    ui_run_func_on_tag(screen, "coin_3_full", ui_disable_element);
+    ui_run_func_on_tag(screen, "coin_circle", ui_disable_element);
     ui_run_func_on_tag(screen_top, "pause_menu", ui_enable_element);
     ui_run_func_on_tag(screen, "paused", ui_enable_element);
     ui_run_func_on_tag(screen, "not_paused", ui_disable_element);
 }
 
+static void collect_pause_menu_element(UIElement *e) {
+    if (e == pause_hide_btn || pause_menu_count >= MAX_PAUSE_MENU_ELEMENTS) return;
+
+    pause_menu_elements[pause_menu_count] = e;
+    pause_menu_base_y[pause_menu_count] = e->y;
+    pause_menu_count++;
+}
+
+static void apply_pause_menu_offset(float offset) {
+    for (int i = 0; i < pause_menu_count; i++) pause_menu_elements[i]->y = pause_menu_base_y[i] + offset;
+
+    if (pause_hide_btn) {
+        float y = pause_hide_btn_y + offset;
+
+        pause_hide_btn->y = (y > SCREEN_HEIGHT - 20.f) ? SCREEN_HEIGHT - 20.f : y;
+    }
+}
+
 static void handle_hide_animation(float delta) {
+    if (settingsState.swapGameplayScreens) {
+        float target_offset = hide_pause_menu ? SCREEN_HEIGHT : 0.f;
+
+        if (pause_hide_offset == target_offset) return;
+
+        pause_hide_offset = easeValue(QUAD_IN, pause_hide_offset, target_offset, anim_time, 4.f, 1.f);
+        apply_pause_menu_offset(pause_hide_offset);
+
+        anim_time += delta;
+        return;
+    }
+
     if (hide_pause_menu) {
         target_pos = 0.f - 120.f;
     } else {
@@ -170,30 +224,31 @@ void unpause_game() {
 
     ui_element_set_position((UIElement *) pause_window, (float)SCREEN_WIDTH / 2.f, (float)SCREEN_HEIGHT / 2.f);
 
+    pause_hide_offset = 0.f;
+    apply_pause_menu_offset(0.f);
+
     if (pi_enabled) {
         sync_precise_input(true);
     }
     if (state.death_timer <= 0 && (song_loaded || state.practice_mode)) {
         unpause_playback_mp3();
     }
-    if (!state.custom_level){
-        ui_run_func_on_tag(screen_top, "coin_1", ui_disable_element);
-        ui_run_func_on_tag(screen_top, "coin_2", ui_disable_element);
-        ui_run_func_on_tag(screen_top, "coin_3", ui_disable_element);
-        ui_run_func_on_tag(screen, "coin_1", ui_enable_element);
-        ui_run_func_on_tag(screen, "coin_2", ui_enable_element);
-        ui_run_func_on_tag(screen, "coin_3", ui_enable_element);
-        for(int i = 0; i < 3; i++){
-            reset_coin(&current_level_entry->data, i);
-        }
-        ui_run_func_on_tag(screen, "coin_circle", ui_enable_element);
-        apply_coin_slot_count();
+    ui_run_func_on_tag(screen_top, "coin_1", ui_disable_element);
+    ui_run_func_on_tag(screen_top, "coin_2", ui_disable_element);
+    ui_run_func_on_tag(screen_top, "coin_3", ui_disable_element);
+    ui_run_func_on_tag(screen, "coin_1", ui_enable_element);
+    ui_run_func_on_tag(screen, "coin_2", ui_enable_element);
+    ui_run_func_on_tag(screen, "coin_3", ui_enable_element);
+    for(int i = 0; i < 3; i++){
+        reset_coin(&current_level_entry->data, i);
     }
+    ui_run_func_on_tag(screen, "coin_circle", ui_enable_element);
+    apply_coin_slot_count();
     ui_run_func_on_tag(screen_top, "pause_menu", ui_disable_element);
     ui_run_func_on_tag(screen, "paused", ui_disable_element);
     ui_run_func_on_tag(screen, "not_paused", ui_enable_element);
     
-    if (!state.practice_mode) {
+    if (!state.practice_mode || settingsState.hidePracticeButtons) {
         ui_run_func_on_tag(screen, "practice_buttons", ui_disable_element);
     }
 }
@@ -347,6 +402,12 @@ void gameplay_init(UIScreen *s) {
     ui_window_set_tint((UIWindow *) ui_get_element_by_tag(s, "bgwindow"), C2D_Color32(0, 0, 0, 150));
     ui_image_set_tint((UIImage *) ui_get_element_by_tag(s, "hide_btn"), C2D_Color32(255, 255, 255, 150));
 
+    pause_hide_btn = (UIElement *) ui_get_element_by_tag(s, "hide_btn");
+    pause_hide_btn_y = pause_hide_btn ? pause_hide_btn->y : 0.f;
+    pause_menu_count = 0;
+    pause_hide_offset = 0.f;
+    ui_run_func_on_tag(s, "paused", collect_pause_menu_element);
+
     ui_run_func_on_tag(s, "paused", ui_disable_element);
     ui_run_func_on_tag(s, "practice_buttons", ui_disable_element);
     
@@ -459,12 +520,17 @@ void gameplay_update(UIScreen *s, UIInput *touch) {
     float complete_y_offset = easeValue(EASE_IN, 20.f, -20.f, cutscene_timer, 0.3f, 1.3f);
     float complete_y_offset_practice = easeValue(EASE_IN, 200.f, 270.f, cutscene_timer, 0.3f, 1.8f);
 
-    coin_1->base.y = complete_y_offset;
-    coin_2->base.y = complete_y_offset;
-    coin_3->base.y = complete_y_offset;
-    coins_full[0]->base.y = complete_y_offset;
-    coins_full[1]->base.y = complete_y_offset;
-    coins_full[2]->base.y = complete_y_offset;
+    bool swap_coins = settingsState.swapGameplayScreens && !in_level_complete;
+    float coin_x = swap_coins ? 20.f - SWAP_SIDE_OFFSET_X : 20.f;
+    float coin_y = swap_coins ? SCREEN_HEIGHT - complete_y_offset : complete_y_offset;
+    UIImage *coin_slots[3] = { coin_1, coin_2, coin_3 };
+
+    for (int i = 0; i < 3; i++) {
+        coin_slots[i]->base.x = coin_x + 35.f * i;
+        coin_slots[i]->base.y = coin_y;
+        coins_full[i]->base.x = coin_x + 35.f * i;
+        coins_full[i]->base.y = coin_y;
+    }
 
     UIElement *pause_btn = ui_get_element_by_tag(s, "pause_btn");
     pause_btn->y = complete_y_offset;

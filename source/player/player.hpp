@@ -10,6 +10,9 @@
 #define STEPS_HZ 240
 #define STEPS_DT (1.f / STEPS_HZ) // 1/240 seconds per physics step
 
+#define FOLLOW_Y_SAMPLES 200
+#define FOLLOW_Y_INTERVAL 0.01f
+
 #define P1_TRAIL_LENGTH 10
 #define P1_TRAIL_DURATION 0.45f
 #define P1_TRAIL_END_SCALE 0.8f
@@ -17,6 +20,10 @@
 #define BURST_PARTICLES_DURATION 0.10f
 
 #define DRAG_PARTICLES_FLOOR_DURATION 0.1f
+
+#define ROBOT_FIRE_MAX_AIR_TIME 1.23f
+#define ROBOT_FIRE_OUT_TIME 0.15f
+#define ROBOT_FIRE_MIN_SCALE 0.05f
 
 #define BALL_SLOW_ROTATION 0.7f
 
@@ -67,6 +74,7 @@ typedef struct {
     int ufo;
     int wave;
     int robot;
+    int spider;
 
     Color p1_color;
     Color p2_color;
@@ -136,6 +144,8 @@ typedef struct {
     float cutscene_initial_player_y;
 
     int slope_slide_coyote_time;
+    int allow_dart_slide;
+    int allow_head_hit;
 
     int frame;
 
@@ -145,24 +155,49 @@ typedef struct {
     SnapData snap_data;
 
     bool velocity_override;
+    bool velocity_uncapped;
+    bool holding_jump_cancelled;
+    bool dashing;
+    float dash_slope;
+    float dash_angle;
+    float dash_fire_timer;
+
+    bool flash_active;
+    float flash_timer;
+    float flash_duration;
+    float flash_delay;
+
+    bool spider_scale_active;
+    float spider_scale_timer;
 
     bool jumped;
     bool landed_from_jump;
+
+    int last_orb_pressed;
 
     bool buffer_ufo;
 
     bool just_teleported;
 
     float robot_air_time;
-    int robot_anim_id;
-    int robot_anim_frame;
-    float robot_anim_timer;
-    int robot_blend_from_anim_id;
-    int robot_blend_from_frame;
-    float robot_blend_from_timer;
-    float robot_landing_blend_timer;
+    bool robot_fire_visible;
+    bool robot_fire_out;
+    float robot_fire_timer;
+    float robot_fire_scale;
+    float robot_fire_exit_scale;
+    int anim_id;
+    int anim_frame;
+    float anim_timer;
+    int blend_from_anim_id;
+    int blend_from_frame;
+    float blend_from_timer;
+    float blend_timer;
 
     float coyote_frames;
+
+    float follow_y[FOLLOW_Y_SAMPLES];
+    int follow_y_index;
+    float follow_y_timer;
 
     IconsDrawing player_icons;
 
@@ -190,6 +225,7 @@ enum PlayerSpeeds {
     SPEED_NORMAL,
     SPEED_FAST,
     SPEED_FASTER,
+    SPEED_FASTEST,
     SPEED_COUNT
 };
 
@@ -218,6 +254,7 @@ extern ParticleSystem slow_speed_particles;
 extern ParticleSystem normal_speed_particles;
 extern ParticleSystem fast_speed_particles;
 extern ParticleSystem faster_speed_particles;
+extern ParticleSystem fastest_speed_particles;
 extern ParticleSystem coin_pickup_particles;
 
 typedef struct KeyInput KeyInput;
@@ -226,6 +263,7 @@ extern KeyInput curr_input;
 extern KeyInput curr_old_input;
 
 extern const float player_speeds[SPEED_COUNT];
+extern const float player_speed_mults[SPEED_COUNT];
 
 inline float getTop(Player *player)  { return player->y + player->height / 2; }
 inline float getBottom(Player *player)  { return player->y - player->height / 2; }
@@ -268,6 +306,11 @@ void handle_player(Player *player);
 void draw_player(Player *player);
 void run_player(Player *player);
 
+void player_flash(Player *player, float duration, float delay);
+
+void draw_dash_fire(Player *player);
+void add_dash_exit(Player *player);
+
 void draw_hitbox(int obj);
 void draw_player_hitbox(Player *player);
 void draw_internal_hitbox(Player *player);
@@ -275,7 +318,8 @@ void draw_rotated_hitbox(Player *player);
 void draw_hitbox_trail(int player);
 void add_new_hitbox(Player *player);
 
-void set_robot_animation(Player *player, int robot_anim_id);
+void set_animation(Player *player, int robot_anim_id);
+void set_animation(Player *player, int spider_anim_id);
 
 void update_p1_trail(Player *player, int player_id);
 void draw_p1_trail(Player *player, int player_id);
@@ -288,3 +332,8 @@ float convert_to_closest_rotation(float rotation, float angle);
 
 bool player_gamemode_is_flying(Player *player);
 void player_non_flying_landing(Player *player);
+
+float get_blend_duration(Player *player);
+void set_blend_timer(Player *player, float timer);
+
+void stop_dashing(Player *player);

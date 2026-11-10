@@ -12,6 +12,7 @@ extern int selected_ball;
 extern int selected_ufo;
 extern int selected_wave;
 extern int selected_robot;
+extern int selected_spider;
 extern int selected_trail;
 
 extern int selected_p1;

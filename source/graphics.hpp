@@ -21,6 +21,7 @@
 #define SCREEN_HEIGHT_AREA (320.f)
 #define SCREEN_WIDTH_AREA ((SCREEN_HEIGHT_AREA / SCREEN_HEIGHT) * SCREEN_WIDTH)
 #define SCREEN_WIDTH_AREA_BOT ((SCREEN_HEIGHT_AREA / SCREEN_HEIGHT) * SCREEN_BOT_WIDTH)
+#define SCREEN_WIDTH_AREA_GAMEPLAY(swap_screens) ((swap_screens) ? SCREEN_WIDTH_AREA_BOT : SCREEN_WIDTH_AREA)
 
 #define SCALE (SCREEN_HEIGHT / SCREEN_HEIGHT_AREA)
 
@@ -100,7 +101,9 @@ extern int current_fading_effect;
 extern C2D_SpriteSheet spriteSheet;
 extern C2D_SpriteSheet spriteSheet2;
 extern C2D_SpriteSheet spriteSheet3;
+extern C2D_SpriteSheet spriteSheet4;
 extern C2D_SpriteSheet animatedSheet;
+extern C2D_SpriteSheet playerEffectsSheet;
 extern C2D_SpriteSheet glowSheet;
 extern C2D_SpriteSheet bgSheet;
 extern int loaded_bg_sheet;
@@ -112,8 +115,15 @@ extern C2D_SpriteSheet ballSheet;
 extern C2D_SpriteSheet ufoSheet;
 extern C2D_SpriteSheet waveSheet;
 extern C2D_SpriteSheet robotSheet;
+extern C2D_SpriteSheet spiderSheet;
 extern C2D_SpriteSheet trailSheet;
 extern C2D_SpriteSheet particleSheet;
+
+#define PLAYER_EFFECTS_FIRE_START 0
+#define PLAYER_EFFECTS_BOOM_START 12
+#define PLAYER_EFFECTS_OUTLINE_START 21
+#define PLAYER_EFFECTS_SPIDER_START 33
+#define PLAYER_EFFECTS_FIRE_BOOST 41
 
 extern SpriteTemplate sprite_templates[GAME_OBJECT_COUNT];
 
@@ -142,13 +152,14 @@ void update_player_colors();
 void set_player_colors(Color p1, Color p2, Color glow);
 
 typedef struct {
-    int robot_anim_id;
-    int robot_anim_frame;
-    float robot_anim_timer;
-    int robot_blend_from_anim_id;
-    int robot_blend_from_frame;
-    float robot_blend_from_timer;
-    float robot_blend_fraction;
+    int anim_id;
+    int anim_frame;
+    float anim_timer;
+    int blend_from_anim_id;
+    int blend_from_frame;
+    float blend_from_timer;
+    float blend_fraction;
+    float robot_fire_scale;
 } IconParameters;
 
 void spawn_icon_at(
@@ -203,6 +214,12 @@ void handle_mirror_transition();
 void draw_player_effects();
 void draw_post_player_effects();
 void draw_player_graphics();
+
+void add_dash_boom(float x, float y, float rotation);
+void add_gravity_dash_boom(float x, float y, float rotation);
+void add_spider_dash_effect(float x, float from_y, float to_y, bool upside_down, Color color);
+void update_dash_booms(float delta);
+void draw_dash_booms(void);
 int get_coin_texture(int tex, int ticks);
 C2D_SpriteSheet get_sprite_sheet_ex(int index, int *rel_index);
 

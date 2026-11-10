@@ -5,8 +5,10 @@
 #include "main.hpp"
 #include "math_helpers.hpp"
 #include "player/robot_anim_data.hpp"
+#include "player/spider_anim_data.hpp"
 #include "triggers.hpp"
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include "mp3_player.hpp"
 #include "icons.hpp"
@@ -23,8 +25,6 @@
 #include "particles/object_particles.hpp"
 #include "particles/circles.hpp"
 #include "particles/coin_effect.hpp"
-#include "particles/key_effect.hpp"
-#include "particles/lightning.hpp"
 
 #include "menus/settings_hub/settings.hpp"
 
@@ -36,13 +36,13 @@
 
 extern const Color white = { 255, 255, 255 };
 
-#define KEY_FLOAT_AMP 1.5f
-#define KEY_FLOAT_PERIOD 0.8f
-#define KEY_FLOAT_BASE 0.0f
+#define COLLECTABLE_FLOAT_AMP 1.5f
+#define COLLECTABLE_FLOAT_PERIOD 0.8f
+#define GAMEPLAY_SCREEN_WIDTH_AREA SCREEN_WIDTH_AREA_GAMEPLAY(settingsState.swapGameplayScreens && !in_level_complete)
+#define COLLECTABLE_FLOAT_BASE 0.0f
 
-static inline float key_float_offset(int obj) {
-    float phase = objects.x[obj] * 0.05f;
-    return KEY_FLOAT_BASE + KEY_FLOAT_AMP * lut_sin(6.2831853f * (frame_timer / KEY_FLOAT_PERIOD) + phase);
+static inline float collectable_float_offset(void) {
+    return COLLECTABLE_FLOAT_BASE + COLLECTABLE_FLOAT_AMP * lut_sin(6.2831853f * (frame_timer / COLLECTABLE_FLOAT_PERIOD));
 }
 
 static const HSV lighter_hsv = {
@@ -93,7 +93,9 @@ static bool blending_state = false;
 C2D_SpriteSheet spriteSheet;
 C2D_SpriteSheet spriteSheet2;
 C2D_SpriteSheet spriteSheet3;
+C2D_SpriteSheet spriteSheet4;
 C2D_SpriteSheet animatedSheet;
+C2D_SpriteSheet playerEffectsSheet;
 C2D_SpriteSheet glowSheet;
 C2D_SpriteSheet bgSheet;
 int loaded_bg_sheet = 0;
@@ -105,6 +107,7 @@ C2D_SpriteSheet ballSheet;
 C2D_SpriteSheet ufoSheet;
 C2D_SpriteSheet waveSheet;
 C2D_SpriteSheet robotSheet;
+C2D_SpriteSheet spiderSheet;
 C2D_SpriteSheet trailSheet;
 C2D_SpriteSheet particleSheet;
 
@@ -138,13 +141,19 @@ static C2D_SpriteSheet get_sprite_sheet(int index, int *rel_index) {
         return spriteSheet2;
     }
 
-    if (index < ANIMATEDSHEET_START) {
+    if (index < SPRITESHEET4_START) {
         // Return spritesheet 3 (2.0 objects)
         *rel_index = index - SPRITESHEET3_START;
         return spriteSheet3;
     }
 
-    // Return spritesheet 4 (animated objects)
+    if (index < ANIMATEDSHEET_START) {
+        // Return spritesheet 4 (2.1 objects)
+        *rel_index = index - SPRITESHEET4_START;
+        return spriteSheet4;
+    }
+
+    // Return spritesheet 5 (animated objects)
     *rel_index = index - ANIMATEDSHEET_START;
     return animatedSheet;
 }
@@ -259,7 +268,14 @@ void set_player_colors(Color p1, Color p2, Color glow) {
 // This might make sprite making faster, im not sure thought
 void cache_all_sprites() {
     for (int id = 0; id < GAME_OBJECT_COUNT; id++) {
-        const GameObject* obj = &game_objects[id];
+        const GameObject* obj = (const GameObject*)&game_objects[id];
+
+        // Get glow frame
+        if (obj->glow_frame >= 0) {
+            C2D_SpriteFromSheet(&sprite_templates[id].glow_template, glowSheet, obj->glow_frame);
+            C3D_TexSetFilter(sprite_templates[id].glow_template.image.tex, GPU_LINEAR, GPU_LINEAR);
+            C2D_SpriteSetCenter(&sprite_templates[id].glow_template, 0.5f, 0.5f);
+        }
 
         // Skip if object has no texture
         if (obj->texture < 0 && obj->child_count == 0) continue;
@@ -274,18 +290,11 @@ void cache_all_sprites() {
             C2D_SpriteSetCenter(&sprite_templates[id].parent_template, 0.5f, 0.5f);
         }
 
-        // Get glow frame
-        if (obj->glow_frame >= 0) {
-            C2D_SpriteFromSheet(&sprite_templates[id].glow_template, glowSheet, obj->glow_frame);
-            C3D_TexSetFilter(sprite_templates[id].glow_template.image.tex, GPU_LINEAR, GPU_LINEAR);
-            C2D_SpriteSetCenter(&sprite_templates[id].glow_template, 0.5f, 0.5f);
-        }
-
         // Children
         sprite_templates[id].child_count = obj->child_count;
         if (obj->child_count > 0) {
             sprite_templates[id].child_templates = (C2D_Sprite *)malloc(sizeof(C2D_Sprite) * obj->child_count);
-            for (size_t i = 0; i < obj->child_count; i++) {
+            for (int i = 0; i < obj->child_count; i++) {
                 const ChildSprite* c = &obj->children[i];
                 if (c->texture < 0) continue;
 
@@ -361,7 +370,7 @@ inline int get_color_channel(int col_type, int obj, const GameObject *game_obj) 
             if (col_type == COLOR_TYPE_DETAIL) col_channel = objects.v1p9_col_channel[obj];
         }
     } else {
-        // 2.0 color channels, here for 1.9 levels that got updated in 2.0 (and for making 1.9 levels in 2.2)
+        // 2.0 color channels
         if (objects.col_channel[obj]) {
             if (col_type != COLOR_TYPE_DETAIL) {
                 col_channel = objects.col_channel[obj];
@@ -377,6 +386,14 @@ inline int get_color_channel(int col_type, int obj, const GameObject *game_obj) 
                 }
             }
         }
+
+        
+        // Pulserods can have obj channel but be p1
+        if (obj_id >= 15 && obj_id <= 17) {
+            if (col_type == COLOR_TYPE_BASE && col_channel == CHANNEL_OBJ) {
+                col_channel = CHANNEL_P1;
+            }
+        }
     }
 
     return col_channel;
@@ -384,13 +401,14 @@ inline int get_color_channel(int col_type, int obj, const GameObject *game_obj) 
 
 // Baby's first reverse engineered function
 
-const float leftFadeBound = (SCREEN_WIDTH_AREA/2) - 75.f;
-const float leftFadeWidth = leftFadeBound - 30;
-const float rightFadeBound = leftFadeBound + 110;
-const float rightFadeWidth = (SCREEN_WIDTH_AREA) - (leftFadeBound + 190);
-
 float get_fading_obj_fade(int obj, float right_edge, float *glow_out) {
     if (!state.dead) {
+        float camera_width = GAMEPLAY_SCREEN_WIDTH_AREA;
+        float leftFadeBound = (camera_width / 2) - 75.f;
+        float leftFadeWidth = leftFadeBound - 30;
+        float rightFadeBound = leftFadeBound + 110;
+        float rightFadeWidth = camera_width - (leftFadeBound + 190);
+
         // Offset fade checks slightly so invisible blocks
         // begin fading before reaching the actual boundary
         float objX = objects.x[obj];
@@ -402,7 +420,7 @@ float get_fading_obj_fade(int obj, float right_edge, float *glow_out) {
         }
         objX = marginX;
 
-        float halfCameraWidth = (SCREEN_WIDTH_AREA / 2);
+        float halfCameraWidth = (camera_width / 2);
         float camX = state.camera_x;
         
         // Additional screen-edge fade so objects near the
@@ -575,6 +593,16 @@ float get_rotation_speed(int obj) {
         case 740:
         case 741:
         case 742:
+        case 1705:
+        case 1706:
+        case 1707:
+        case 1708:
+        case 1709:
+        case 1710:
+        case 1734:
+        case 1735:
+        case 1736:
+        case 1752:
             return 360.f;
         
         case 85:
@@ -608,7 +636,20 @@ float get_rotation_speed(int obj) {
         case 1056:
         case 1057:
         case GREEN_ORB:
+        case BLACK_ORB:
+        case 1521:
+        case 1525:
+        case 1582:
             return 180.f;
+        case 1522:
+        case 1526:
+            return 150.f;
+        case 1523:
+        case 1527:
+            return 120.f;
+        case 1524:
+        case 1528:
+            return 80.f;
         case 1019:
             return 180.f + map_range(objects.random[obj] & 0xff, 0, 255, -10, 10);
         case 1020:
@@ -619,7 +660,14 @@ float get_rotation_speed(int obj) {
         case 1059:
         case 1060:
         case 1061:
+        case 1831:
+        case 1832:
+        case 1833:
+        case 1834:
             return 300.f;
+        case 1619:
+        case 1620:
+            return 720;
     }
     return 0.f;
 }
@@ -634,6 +682,11 @@ float get_object_pulse(float amplitude, int id, int layer) {
         case BLUE_ORB:
         case PINK_ORB:
         case GREEN_ORB:
+        case BLACK_ORB:
+        case RED_ORB:
+        case DASH_ORB:
+        case GRAVITY_DASH_ORB:
+        case TOGGLE_ORB:
             return map_range(amplitude, 0.f, 1.f, 0.3f, 1.2f);
         case 15:
         case 16:
@@ -674,7 +727,7 @@ int get_color_type(const GameObject *game_obj, int obj, int col_type) {
     } else {
         if (col_type == COLOR_TYPE_DETAIL) {
             if (!obj_has_main(game_obj)) {
-                col_type = COLOR_TYPE_ONLY_DETAIL;
+                col_type = game_obj->swap_base_detail ? COLOR_TYPE_BASE : COLOR_TYPE_ONLY_DETAIL;
             }
         }
     }
@@ -691,7 +744,7 @@ void spawn_object_at(
     unsigned char flip_y,
     float scale
 ) {
-    const GameObject* obj = &game_objects[id];
+    const GameObject* obj = (const GameObject*)&game_objects[id];
 
     float rad = C3D_AngleFromDegrees(adjust_angle(deg, 0, state.mirror_mult < 0));
     float cos_r = lut_cos(rad);
@@ -723,45 +776,67 @@ void spawn_object_at(
 
     if (sprite_count >= MAX_SPRITES - 1) return;
 
-    if (id == TEXT_OBJECT) {
-        TextObject *text_obj = get_text_object(obj_game);
-        if (text_obj->len > 0) {
-            if (!text_obj->layout_done) {
-                text_obj->glyph_count = text_object_layout(level_font, text_obj->text, text_obj->glyphs, MAX_TEXT_LEN);
-                text_obj->layout_done = 1;
+    if (id == COUNTER_LABEL || id == TEXT_OBJECT) {
+        const TextGlyphPlacement *glyphs = NULL;
+        int glyph_count = 0;
+
+        if (id == COUNTER_LABEL) {
+            CounterLabel *label = get_counter_label(obj_game);
+            if (!label) return;
+            int value = get_item_count(label->item_id);
+            if (label->text[0] == 0 || value != label->last_value) {
+                snprintf(label->text, sizeof(label->text), "%d", value);
+                label->last_value = value;
+                label->layout_done = 0;
             }
-
-            for (int i = 0; i < text_obj->glyph_count; i++) {
-                if (sprite_count >= MAX_SPRITES - 1) break;
-
-                const TextGlyphPlacement *place = &text_obj->glyphs[i];
-                SpriteObject *vo = &viewable_objects[sprite_count];
-
-                vo->hidden = false;
-
-                float local_x = place->x * flip_x_mult;
-                float local_y = place->y * flip_y_mult;
-
-                float rot_x = local_x * cos_r - local_y * sin_r;
-                float rot_y = local_x * sin_r + local_y * cos_r;
-
-                C2D_SpriteFromSheet(&vo->spr, level_font_sheet ? level_font_sheet : bigFont_sheet, place->sprite);
-                C3D_TexSetFilter(vo->spr.image.tex, GPU_LINEAR, GPU_LINEAR);
-                C2D_SpriteSetCenter(&vo->spr, 0.5f, 0.5f);
-                C2D_SpriteSetPos(&vo->spr, x + rot_x * scale * obj_scale_x, y + rot_y * scale * obj_scale_y);
-                C2D_SpriteSetScale(&vo->spr, TEXT_OBJECT_SCALE * sx, TEXT_OBJECT_SCALE * sy);
-                C2D_SpriteSetRotation(&vo->spr, rad);
-
-                vo->obj = obj_game;
-                vo->layer = 0;
-                vo->col_type = get_color_type(obj, obj_game, obj->color_type);
-                vo->opacity = obj->opacity;
-                vo->col_channel = get_color_channel(obj->color_type, obj_game, obj);
-                calc_quad_params(vo);
-                viewable_objects_ptr[sprite_count] = vo;
-
-                sprite_count++;
+            if (!label->layout_done) {
+                label->glyph_count = text_object_layout(level_font, label->text, label->glyphs, MAX_COUNTER_TEXT);
+                label->layout_done = 1;
             }
+            glyphs = label->glyphs;
+            glyph_count = label->glyph_count;
+        } else {
+            TextObject *text_obj = get_text_object(obj_game);
+            if (text_obj->len > 0) {
+                if (!text_obj->layout_done) {
+                    text_obj->glyph_count = text_object_layout(level_font, text_obj->text, text_obj->glyphs, MAX_TEXT_LEN);
+                    text_obj->layout_done = 1;
+                }
+                glyphs = text_obj->glyphs;
+                glyph_count = text_obj->glyph_count;
+            }
+        }
+
+        for (int i = 0; i < glyph_count; i++) {
+            if (sprite_count >= MAX_SPRITES - 1) break;
+
+            const TextGlyphPlacement *place = &glyphs[i];
+            SpriteObject *vo = &viewable_objects[sprite_count];
+
+            vo->hidden = false;
+
+            float local_x = place->x * flip_x_mult;
+            float local_y = place->y * flip_y_mult;
+
+            float rot_x = local_x * cos_r - local_y * sin_r;
+            float rot_y = local_x * sin_r + local_y * cos_r;
+
+            C2D_SpriteFromSheet(&vo->spr, level_font_sheet ? level_font_sheet : bigFont_sheet, place->sprite);
+            C3D_TexSetFilter(vo->spr.image.tex, GPU_LINEAR, GPU_LINEAR);
+            C2D_SpriteSetCenter(&vo->spr, 0.5f, 0.5f);
+            C2D_SpriteSetPos(&vo->spr, x + rot_x * scale * obj_scale_x, y + rot_y * scale * obj_scale_y);
+            C2D_SpriteSetScale(&vo->spr, TEXT_OBJECT_SCALE * sx, TEXT_OBJECT_SCALE * sy);
+            C2D_SpriteSetRotation(&vo->spr, rad);
+
+            vo->obj = obj_game;
+            vo->layer = 0;
+            vo->col_type = get_color_type(obj, obj_game, obj->color_type);
+            vo->opacity = obj->opacity;
+            vo->col_channel = get_color_channel(obj->color_type, obj_game, obj);
+            calc_quad_params(vo);
+            viewable_objects_ptr[sprite_count] = vo;
+
+            sprite_count++;
         }
         return;
     }
@@ -892,7 +967,7 @@ void spawn_object_at(
                 if (group >= 0) {
                     const AnimSprite* anim_sprite = NULL;
                     for (size_t k = 0; k < anim_keyframe->sprite_count; k++) {
-                        if (anim_keyframe->sprites[k].child_slot == group) {
+                        if (anim_keyframe->sprites[k].child_slot == (size_t)group) {
                             anim_sprite = &anim_keyframe->sprites[k];
                             break;
                         }
@@ -976,7 +1051,7 @@ static inline uint32_t make_sort_key(SpriteObject *s)
     }
 
     const int id = objects.id[obj];
-    const GameObject *game_obj = &game_objects[id];
+    const GameObject *game_obj = (const GameObject*)&game_objects[id];
 
     int zlayer = objects.zlayer[obj];
     int zorder = objects.zorder[obj];
@@ -1089,10 +1164,10 @@ int get_object_layers(int id) {
     int count = 0;
     if (id < 0 || id >= GAME_OBJECT_COUNT) return 0;
 
-    const GameObject *obj = &game_objects[id];
+    const GameObject *obj = (const GameObject*)&game_objects[id];
     if (obj->texture >= 0) count++;
     
-    for (size_t c = 0; c < obj->child_count; c++) {
+    for (int c = 0; c < obj->child_count; c++) {
         if (obj->children[c].texture >= 0) count++;
     }
     return count;
@@ -1128,7 +1203,7 @@ float get_out_scale_fade(float x, int right_edge) {
 int get_obj_opacity(int obj, float x) {
     if ((objects.flags[obj] & FLAG_DONT_FADE) && objects.transition_applied[obj] == FADE_SIMPLE) return 255;
 
-    float opacity = obj_edge_fade(x, SCREEN_WIDTH / SCALE);
+    float opacity = obj_edge_fade(x, GAMEPLAY_SCREEN_WIDTH_AREA);
     bool blending;
 
     switch (objects.id[obj]) {
@@ -1186,7 +1261,7 @@ void handle_special_fading(int obj, float calc_x, float calc_y) {
             }
             break;
         case FADE_CIRCLE_LEFT:
-            if (calc_x > (SCREEN_WIDTH / SCALE / 2)) {
+            if (calc_x > (GAMEPLAY_SCREEN_WIDTH_AREA / 2)) {
                 if (calc_y > (SCREEN_HEIGHT / SCALE / 2)) {
                     objects.transition_applied[obj] = FADE_UP_STATIONARY;
                 } else {
@@ -1201,7 +1276,7 @@ void handle_special_fading(int obj, float calc_x, float calc_y) {
             }
             break;
         case FADE_CIRCLE_RIGHT:
-            if (calc_x > (SCREEN_WIDTH / SCALE / 2)) {
+            if (calc_x > (GAMEPLAY_SCREEN_WIDTH_AREA / 2)) {
                 if (calc_y > (SCREEN_HEIGHT / SCALE / 2)) {
                     objects.transition_applied[obj] = FADE_UP_SLOW_RIGHT;
                 } else {
@@ -1227,44 +1302,44 @@ void get_fade_vars(int obj, float x, float *fade_x, float *fade_y, float *fade_s
         case FADE_SIMPLE:
             break;
         case FADE_UP:
-            *fade_y = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
+            *fade_y = get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
             break;
         case FADE_DOWN:
-            *fade_y = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
+            *fade_y = -get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
             break;
         case FADE_RIGHT:
-            *fade_x = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
+            *fade_x = get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
             break;
         case FADE_LEFT:
-            *fade_x = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
+            *fade_x = -get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
             break;
         case FADE_SCALE_IN:
-            *fade_scale = get_in_scale_fade(x, SCREEN_WIDTH / SCALE);
+            *fade_scale = get_in_scale_fade(x, GAMEPLAY_SCREEN_WIDTH_AREA);
             break;
         case FADE_SCALE_OUT:
-            *fade_scale = get_out_scale_fade(x, SCREEN_WIDTH / SCALE);
+            *fade_scale = get_out_scale_fade(x, GAMEPLAY_SCREEN_WIDTH_AREA);
             break;
         case FADE_UP_SLOW_LEFT:
-            *fade_x = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
-            *fade_y = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            *fade_x = -get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
+            *fade_y = get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA) / 3;
             break;
         case FADE_UP_SLOW_RIGHT:
-            *fade_x = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
-            *fade_y = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            *fade_x = get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
+            *fade_y = get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA) / 3;
             break;
         case FADE_UP_STATIONARY:
-            *fade_y = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            *fade_y = get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA) / 3;
             break;
         case FADE_DOWN_SLOW_LEFT:
-            *fade_x = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
-            *fade_y = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            *fade_x = -get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
+            *fade_y = -get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA) / 3;
             break;
         case FADE_DOWN_SLOW_RIGHT:
-            *fade_x = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
-            *fade_y = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            *fade_x = get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
+            *fade_y = -get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA) / 3;
             break;
         case FADE_DOWN_STATIONARY:
-            *fade_y = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            *fade_y = -get_xy_fade_offset(x, GAMEPLAY_SCREEN_WIDTH_AREA) / 3;
             break;
     }
 }
@@ -1275,8 +1350,8 @@ float get_special_fading_vars(int obj, float fade_val) {
     if (objects.transition_applied[obj] == FADE_DOWN_STATIONARY || objects.transition_applied[obj] == FADE_UP_STATIONARY) {
         if (fade_val < 255) {
             float calc_x = objects.x[obj] - state.camera_x;
-            if (calc_x > (SCREEN_WIDTH / SCALE) / 2) {
-                return (SCREEN_WIDTH / SCALE - FADE_WIDTH) - calc_x;
+            if (calc_x > (GAMEPLAY_SCREEN_WIDTH_AREA) / 2) {
+                return (GAMEPLAY_SCREEN_WIDTH_AREA - FADE_WIDTH) - calc_x;
             } else {
                 return FADE_WIDTH - calc_x;
             }
@@ -1352,7 +1427,7 @@ void draw_background(float x, float y) {
     }
 }
 
-const int ground_indexes[G_COUNT] = {1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14};
+const int ground_indexes[G_COUNT] = {1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26};
 
 void draw_ground(float cam_x, float cam_y, float y, bool is_ceiling, int screen_width) {
     change_blending(false);
@@ -1567,7 +1642,7 @@ static void update_current_objects(void) {
         float calc_x = objects.x[obj] - state.camera_x;
         float calc_y = SCREEN_HEIGHT - (objects.y[obj] - state.camera_y);
 
-        float fade_val = obj_edge_fade(calc_x, SCREEN_WIDTH / SCALE);
+        float fade_val = obj_edge_fade(calc_x, GAMEPLAY_SCREEN_WIDTH_AREA);
         if (fade_val == 255) {
             objects.transition_applied[obj] = FADE_NONE;
         } else if (objects.transition_applied[obj] == FADE_NONE) {
@@ -1735,7 +1810,7 @@ void update_tints() {
             // Handle invisible object opacity
             if (object_fades(game_object)) {
                 float glow_out = 1.f;
-                float fading_opacity = get_fading_obj_fade(game_object, SCREEN_WIDTH / SCALE, &glow_out);
+                float fading_opacity = get_fading_obj_fade(game_object, GAMEPLAY_SCREEN_WIDTH_AREA, &glow_out);
                 
                 // Check if layer is glow
                 if (obj->layer == 1) opacity *= glow_out;
@@ -1798,19 +1873,396 @@ void create_objects() {
     update_tints();
 }
 
-void draw_player_effects() {
+#define MAX_DASH_FX 8
+
+typedef struct {
+    bool active;
+    bool exit;
+    float x, y;
+    float rotation;
+    float elapsed;
+    float scale_x, scale_y;
+    Color color;
+    int start_frame;
+} DashEffect;
+
+static DashEffect dash_effects[MAX_DASH_FX];
+
+static const signed char dash_fire_off_x[12] = { -21, -22, -22, -24, -24, -24, -22, -21, -23, -23, -21, -19 };
+static const signed char dash_fire_off_y[12] = { 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+static const signed char dash_outline_off_x[12] = { -21, -22, -22, -24, -24, -24, -22, -21, -23, -22, -21, -19 };
+static const signed char dash_boom_off_x[9] = { -2, -1, -1, -1, -1, -1, 0, 0, 0 };
+static const signed char dash_boom_off_y[9] = { 1, 2, 3, 2, 2, 1, 1, 1, 1 };
+
+static float dash_ease_in_out(float t) {
+    if (t < 0.5f) return 0.5f * (t * 2.f) * (t * 2.f);
+    return 1.f - 0.5f * (2.f - t * 2.f) * (2.f - t * 2.f);
+}
+
+static void dash_sprite_pos(float x, float y, float rotation, float off_x, float off_y, float *out_x, float *out_y) {
+    float rad = C3D_AngleFromDegrees(rotation);
+    float cos_r = cosf(rad);
+    float sin_r = sinf(rad);
+
+    *out_x = x + off_x * cos_r + off_y * sin_r;
+    *out_y = y + off_x * sin_r - off_y * cos_r;
+}
+
+static void dash_fire_state(const Player *player, float *local_x, float *local_y, float *sx, float *sy, Color *color) {
+    float base_x = 0.9f;
+
+    *local_x = 0.f;
+    *local_y = 0.f;
+
+    switch (player->gamemode) {
+        case GAMEMODE_SHIP:
+            *local_y = 2.f;
+            base_x = 1.0f;
+            break;
+        case GAMEMODE_UFO:
+            base_x = 0.95f;
+            break;
+        case GAMEMODE_ROBOT:
+            *local_x = 1.f;
+            break;
+    }
+
+    float final_scale = base_x * 1.1f;
+    float t = player->dash_fire_timer;
+
+    if (t < 0.1f) {
+        float k = dash_ease_in_out(t / 0.1f);
+        *sx = 0.3f + (final_scale * 0.9f - 0.3f) * k;
+        *sy = 0.2f + (final_scale * 0.9f - 0.2f) * k;
+    } else if (t < 0.2f) {
+        float k = dash_ease_in_out((t - 0.1f) / 0.1f);
+        *sx = final_scale * 0.9f + (final_scale * 0.1f) * k;
+        *sy = *sx;
+    } else {
+        *sx = final_scale;
+        *sy = final_scale;
+    }
+
+    float ck = CLAMP((t - 0.1f) / 0.2f, 0.f, 1.f);
+    Color target = (player == &state.player2) ? player->player_icons.p1_color : player->player_icons.p2_color;
+    color->r = (unsigned char)(255.f + ((float)target.r - 255.f) * ck);
+    color->g = (unsigned char)(255.f + ((float)target.g - 255.f) * ck);
+    color->b = (unsigned char)(255.f + ((float)target.b - 255.f) * ck);
+}
+
+void draw_dash_fire(Player *player) {
+    if (!player->dashing || state.dead || !playerEffectsSheet) return;
+
+    float local_x, local_y, sx, sy;
+    Color color;
+    dash_fire_state(player, &local_x, &local_y, &sx, &sy, &color);
+
+    float calc_x = player->x - state.camera_x;
+    float calc_y = SCREEN_HEIGHT - (player->y - state.camera_y);
+
+    float rotation = -player->dash_angle;
+    float rad = C3D_AngleFromDegrees(rotation);
+    float rot_x = local_x * cosf(rad) + local_y * sinf(rad);
+    float rot_y = local_x * sinf(rad) - local_y * cosf(rad);
+
+    float base_x = get_mirror_x(calc_x + rot_x, state.mirror_factor);
+    float base_y = calc_y + rot_y;
+
+    int frame = (int)(player->timeElapsed / ((0.04f / player_speed_mults[state.speed]) * (1.f - fabsf(player->dash_angle) / 70.f * 0.4f))) % 12;
+
+    C2D_ImageTint tint = { 0 };
+    C2D_PlainImageTint(&tint, C2D_Color32(color.r, color.g, color.b, 255), 1.f);
+
+    C2D_ImageTint outline_tint = { 0 };
+    C2D_PlainImageTint(&outline_tint, C2D_Color32(255, 255, 255, 150), 1.f);
+
+    float px, py;
+
     change_blending(true);
 
-    for (int i = 0; i < 2; i++) {
-        drawParticleSystem(&drag_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&ship_fire_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&ship_secondary_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&secondary_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&burst_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&robot_fire_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&robot_fire_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&land_particles[i], 0, 0, 1.f);
-        drawParticleSystem(&explosion_particles[i], 0, 0, 1.f);
+    C2D_Sprite spr = { 0 };
+    C2D_SpriteFromSheet(&spr, playerEffectsSheet, PLAYER_EFFECTS_FIRE_START + frame);
+    C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
+    dash_sprite_pos(base_x, base_y, rotation, dash_fire_off_x[frame], dash_fire_off_y[frame], &px, &py);
+    C2D_SpriteSetPos(&spr, (int)px, (int)py);
+    C2D_SpriteSetScale(&spr, sx, sy);
+    C2D_SpriteSetRotationDegrees(&spr, rotation);
+    C2D_DrawSpriteTinted(&spr, &tint);
+
+    change_blending(false);
+
+    C2D_SpriteFromSheet(&spr, playerEffectsSheet, PLAYER_EFFECTS_OUTLINE_START + frame);
+    C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
+    dash_sprite_pos(base_x, base_y, rotation, dash_outline_off_x[frame], 0.f, &px, &py);
+    C2D_SpriteSetPos(&spr, (int)px, (int)py);
+    C2D_SpriteSetScale(&spr, sx, sy);
+    C2D_SpriteSetRotationDegrees(&spr, rotation);
+    C2D_DrawSpriteTinted(&spr, &outline_tint);
+}
+
+static DashEffect *dash_effect_free(void) {
+    for (int i = 0; i < MAX_DASH_FX; i++) {
+        if (!dash_effects[i].active) return &dash_effects[i];
+    }
+    return NULL;
+}
+
+void add_dash_boom(float x, float y, float rotation) {
+    DashEffect *fx = dash_effect_free();
+    if (!fx) return;
+
+    fx->active = true;
+    fx->exit = false;
+    fx->x = x;
+    fx->y = y;
+    fx->rotation = rotation;
+    fx->elapsed = 0.f;
+    fx->scale_x = 1.2f;
+    fx->scale_y = 1.2f;
+    fx->color = (Color){ 0, 255, 0 };
+    fx->start_frame = state.player.frame;
+}
+
+void add_gravity_dash_boom(float x, float y, float rotation) {
+    DashEffect *fx = dash_effect_free();
+    if (!fx) return;
+
+    fx->active = true;
+    fx->exit = false;
+    fx->x = x;
+    fx->y = y;
+    fx->rotation = rotation;
+    fx->elapsed = 0.f;
+    fx->scale_x = 1.2f;
+    fx->scale_y = 1.2f;
+    fx->color = (Color){ 255, 0, 255 };
+    fx->start_frame = state.player.frame;
+}
+
+void add_dash_exit(Player *player) {
+    DashEffect *fx = dash_effect_free();
+    if (!fx) return;
+
+    float local_x, local_y, sx, sy;
+    Color color;
+    dash_fire_state(player, &local_x, &local_y, &sx, &sy, &color);
+
+    float player_scale = player->mini ? 0.6f : 1.f;
+
+    fx->active = true;
+    fx->exit = true;
+    fx->x = player->x + local_x;
+    fx->y = player->y + local_y;
+    fx->rotation = -player->dash_angle;
+    fx->elapsed = 0.f;
+    fx->scale_x = sx * player_scale;
+    fx->scale_y = sy * player_scale;
+    fx->color = color;
+    fx->start_frame = state.player.frame;
+}
+
+void update_dash_booms(float delta) {
+    for (int i = 0; i < MAX_DASH_FX; i++) {
+        DashEffect *fx = &dash_effects[i];
+        if (!fx->active) continue;
+
+        fx->elapsed += delta;
+        if (fx->elapsed >= (fx->exit ? 0.2f : 0.45f)) fx->active = false;
+    }
+}
+
+void draw_dash_booms(void) {
+    static unsigned int last_frame = 0;
+
+    if (!playerEffectsSheet) return;
+
+    if (frame_counter != last_frame) {
+        update_dash_booms(1.f / 60.f);
+        last_frame = frame_counter;
+    }
+
+    for (int i = 0; i < MAX_DASH_FX; i++) {
+        DashEffect *fx = &dash_effects[i];
+        if (!fx->active) continue;
+
+        if (state.player.frame < fx->start_frame) {
+            fx->active = false;
+            continue;
+        }
+
+        float x = get_mirror_x(fx->x - state.camera_x, state.mirror_factor);
+        float y = SCREEN_HEIGHT - (fx->y - state.camera_y);
+        float sx, sy;
+        float alpha;
+        int frame;
+
+        C2D_ImageTint tint = { 0 };
+
+        if (fx->exit) {
+            float k = fx->elapsed / 0.2f;
+            frame = 0;
+            sx = fx->scale_x * (1.f - 0.8f * k);
+            sy = fx->scale_y * (1.f - 0.8f * k);
+            alpha = 1.f - k;
+            x -= 20.f * k;
+
+            C2D_PlainImageTint(&tint, C2D_Color32(fx->color.r, fx->color.g, fx->color.b, 255), alpha);
+
+            C2D_Sprite spr = { 0 };
+            float px, py;
+
+            C2D_SpriteFromSheet(&spr, playerEffectsSheet, PLAYER_EFFECTS_FIRE_START + frame);
+            C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
+            dash_sprite_pos(x, y, fx->rotation, dash_fire_off_x[frame], dash_fire_off_y[frame], &px, &py);
+            C2D_SpriteSetPos(&spr, (int)px, (int)py);
+            C2D_SpriteSetScale(&spr, sx, sy);
+            C2D_SpriteSetRotationDegrees(&spr, fx->rotation);
+            C2D_DrawSpriteTinted(&spr, &tint);
+
+            change_blending(false);
+
+            C2D_SpriteFromSheet(&spr, playerEffectsSheet, PLAYER_EFFECTS_OUTLINE_START + frame);
+            C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
+            dash_sprite_pos(x, y, fx->rotation, dash_outline_off_x[frame], 0.f, &px, &py);
+            C2D_SpriteSetPos(&spr, (int)px, (int)py);
+            C2D_SpriteSetScale(&spr, sx, sy);
+            C2D_SpriteSetRotationDegrees(&spr, fx->rotation);
+            C2D_PlainImageTint(&tint, C2D_Color32(255, 255, 255, 255), alpha * 150.f / 255.f);
+            C2D_DrawSpriteTinted(&spr, &tint);
+
+            change_blending(true);
+        } else {
+            frame = (int)(fx->elapsed / 0.05f);
+            if (frame > 8) frame = 8;
+            sx = fx->scale_x;
+            sy = fx->scale_y;
+            alpha = (fx->elapsed <= 0.2f) ? 1.f : 1.f - (fx->elapsed - 0.2f) / 0.3f;
+
+            float ck = CLAMP(fx->elapsed / 0.3f, 0.f, 1.f);
+            unsigned char cr = (unsigned char)(255.f + ((float)fx->color.r - 255.f) * ck);
+            unsigned char cg = (unsigned char)(255.f + ((float)fx->color.g - 255.f) * ck);
+            unsigned char cb = (unsigned char)(255.f + ((float)fx->color.b - 255.f) * ck);
+
+            C2D_PlainImageTint(&tint, C2D_Color32(cr, cg, cb, 255), alpha);
+
+            C2D_Sprite spr = { 0 };
+            float px, py;
+
+            C2D_SpriteFromSheet(&spr, playerEffectsSheet, PLAYER_EFFECTS_BOOM_START + frame);
+            C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
+            dash_sprite_pos(x, y, fx->rotation, dash_boom_off_x[frame], dash_boom_off_y[frame], &px, &py);
+            C2D_SpriteSetPos(&spr, (int)px, (int)py);
+            C2D_SpriteSetScale(&spr, sx, sy);
+            C2D_SpriteSetRotationDegrees(&spr, fx->rotation);
+            C2D_DrawSpriteTinted(&spr, &tint);
+        }
+    }
+}
+
+#define MAX_SPIDER_DASH_FX 4
+#define SPIDER_DASH_FRAME_TIME 0.04f
+#define SPIDER_DASH_FRAME_COUNT 8
+#define SPIDER_DASH_LIFETIME (SPIDER_DASH_FRAME_TIME * SPIDER_DASH_FRAME_COUNT)
+#define SPIDER_DASH_WIDTH 221.f
+
+typedef struct {
+    bool active;
+    float x, y;
+    float rotation;
+    float scale_x;
+    float elapsed;
+    Color color;
+    int start_frame;
+} SpiderDashEffect;
+
+static SpiderDashEffect spider_dash_effects[MAX_SPIDER_DASH_FX];
+
+static const signed char spider_dash_off_x[SPIDER_DASH_FRAME_COUNT] = { 2, -4, -31, -47, -55, -72, -79, -98 };
+static const signed char spider_dash_off_y[SPIDER_DASH_FRAME_COUNT] = { 0, 0, 0, 1, 1, 1, 1, 2 };
+
+void add_spider_dash_effect(float x, float from_y, float to_y, bool upside_down, Color color) {
+    SpiderDashEffect *fx = NULL;
+
+    for (int i = 0; i < MAX_SPIDER_DASH_FX; i++) {
+        if (!spider_dash_effects[i].active) {
+            fx = &spider_dash_effects[i];
+            break;
+        }
+    }
+
+    if (!fx) return;
+
+    fx->active = true;
+    fx->x = x;
+    fx->y = from_y + (to_y - from_y) * 0.5f;
+    fx->rotation = upside_down ? 90.f : -90.f;
+    fx->scale_x = (fabsf(from_y - to_y) + 30.f) / SPIDER_DASH_WIDTH;
+    fx->elapsed = 0.f;
+    fx->color = color;
+    fx->start_frame = state.player.frame;
+}
+
+static void draw_spider_dash_effects(void) {
+    static unsigned int last_frame = 0;
+
+    if (!playerEffectsSheet) return;
+
+    if (frame_counter != last_frame) {
+        for (int i = 0; i < MAX_SPIDER_DASH_FX; i++) {
+            SpiderDashEffect *fx = &spider_dash_effects[i];
+            if (!fx->active) continue;
+
+            fx->elapsed += 1.f / 60.f;
+            if (fx->elapsed >= SPIDER_DASH_LIFETIME) fx->active = false;
+        }
+        last_frame = frame_counter;
+    }
+
+    for (int i = 0; i < MAX_SPIDER_DASH_FX; i++) {
+        SpiderDashEffect *fx = &spider_dash_effects[i];
+        if (!fx->active) continue;
+
+        if (state.player.frame < fx->start_frame) {
+            fx->active = false;
+            continue;
+        }
+
+        float x = get_mirror_x(fx->x - state.camera_x, state.mirror_factor);
+        float y = SCREEN_HEIGHT - (fx->y - state.camera_y);
+
+        int frame = (int)(fx->elapsed / SPIDER_DASH_FRAME_TIME);
+        if (frame >= SPIDER_DASH_FRAME_COUNT) frame = SPIDER_DASH_FRAME_COUNT - 1;
+
+        float px, py;
+        dash_sprite_pos(x, y, fx->rotation, spider_dash_off_x[frame] * fx->scale_x, spider_dash_off_y[frame], &px, &py);
+
+        C2D_ImageTint tint = { 0 };
+        C2D_PlainImageTint(&tint, C2D_Color32(fx->color.r, fx->color.g, fx->color.b, 255), 1.f);
+
+        C2D_Sprite spr = { 0 };
+        C2D_SpriteFromSheet(&spr, playerEffectsSheet, PLAYER_EFFECTS_SPIDER_START + frame);
+        C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
+        C2D_SpriteSetPos(&spr, (int)px, (int)py);
+        C2D_SpriteSetScale(&spr, fx->scale_x, 1.f);
+        C2D_SpriteSetRotationDegrees(&spr, fx->rotation);
+        C2D_DrawSpriteTinted(&spr, &tint);
+    }
+}
+
+void draw_player_effects() {
+    change_blending(true);
+    if (state.show_player) {
+        for (int i = 0; i < 2; i++) {
+            drawParticleSystem(&drag_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&ship_fire_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&ship_secondary_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&secondary_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&burst_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&robot_fire_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&robot_fire_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&land_particles[i], 0, 0, 1.f);
+            drawParticleSystem(&explosion_particles[i], 0, 0, 1.f);
+        }
     }
     drawParticleSystem(&brick_destroy_particles, 0, 0, 1.f);
     drawParticleSystem(&coin_pickup_particles, 0, 0, 1.f);
@@ -1832,7 +2284,6 @@ void draw_player_graphics() {
     change_blending(false);
     
     draw_collect_effect();
-    draw_key_effect();
 
     change_blending(true);
     draw_use_effects(get_use_effect_array_ptr(GFX_TOP));
@@ -1854,15 +2305,27 @@ void draw_player_graphics() {
 
     change_blending(false);
     state.current_player = 0;
-    draw_checkpoints();
-    draw_player(&state.player);
-    
-    if (state.dual) {
-        state.current_player = 1;
-        draw_player(&state.player2);
-    }  
 
-    draw_post_player_effects();
+    if (state.show_player) {
+        change_blending(true);
+        draw_dash_booms();
+        draw_spider_dash_effects();
+        change_blending(false);
+    }
+
+    draw_checkpoints();
+    if (state.show_player) {
+        draw_dash_fire(&state.player);
+        draw_player(&state.player);
+        
+        if (state.dual) {
+            state.current_player = 1;
+            draw_dash_fire(&state.player2);
+            draw_player(&state.player2);
+        }  
+    }
+
+    if (state.show_player) draw_post_player_effects();
 }
 
 void draw_objects() {
@@ -1877,9 +2340,9 @@ void draw_objects() {
 
             change_blending(obj->blending);
 
-            if (objects.id[obj->obj] == KEY_OBJ) {
+            if (is_collectable_object(objects.id[obj->obj])) {
                 QuadParams key_params = obj->params;
-                float off = key_float_offset(obj->obj);
+                float off = collectable_float_offset();
                 key_params.quadr.topLeft[1]  += off;
                 key_params.quadr.topRight[1] += off;
                 key_params.quadr.botLeft[1]  += off;
@@ -1898,6 +2361,7 @@ void draw_objects() {
     drawParticleSystem(&normal_speed_particles, 0, 0, 1.f);
     drawParticleSystem(&fast_speed_particles, 0, 0, 1.f);
     drawParticleSystem(&faster_speed_particles, 0, 0, 1.f);
+    drawParticleSystem(&fastest_speed_particles, 0, 0, 1.f);
     change_blending(false);
 
     if (state.hitbox_display) {
@@ -1934,7 +2398,9 @@ void update_touch_effect(float delta) {
 
     touch_drag_particles.emitting = false;
 
-    if ((settingsState.touchEffectEverywhere || (game_state == STATE_GAME && !game_paused)) && (kHeld & KEY_TOUCH)) {
+    bool tap_effect_enabled = (game_state == STATE_GAME && !game_paused) ? settingsState.gameplayTapEffect : settingsState.touchEffectEverywhere;
+
+    if (tap_effect_enabled && (kHeld & KEY_TOUCH)) {
         // Flipped for particles
         float flipped_y = SCREEN_HEIGHT - pos.py;
 
@@ -1980,6 +2446,7 @@ void draw_bottom_particles() {
     drawParticleSystem(&normal_speed_particles_bottom, 0, 0, 1.f);
     drawParticleSystem(&fast_speed_particles_bottom, 0, 0, 1.f);
     drawParticleSystem(&faster_speed_particles_bottom, 0, 0, 1.f);
+    drawParticleSystem(&fastest_speed_particles_bottom, 0, 0, 1.f);
 }
 
 void update_bottom_particles(float delta) {
@@ -2010,6 +2477,10 @@ void update_bottom_particles(float delta) {
         faster_speed_particles_bottom.emitting = faster_speed_particles_timer > 0;
         faster_speed_particles_bottom.emitterX = 320/SCALE;
         faster_speed_particles_bottom.emitterY = 240/2;
+
+        fastest_speed_particles_bottom.emitting = fastest_speed_particles_timer > 0;
+        fastest_speed_particles_bottom.emitterX = 320/SCALE;
+        fastest_speed_particles_bottom.emitterY = 240/2;
     }
 
     updateParticleSystem(&glitter_particles_bottom, delta);
@@ -2017,6 +2488,7 @@ void update_bottom_particles(float delta) {
     updateParticleSystem(&normal_speed_particles_bottom, delta);
     updateParticleSystem(&fast_speed_particles_bottom, delta);
     updateParticleSystem(&faster_speed_particles_bottom, delta);
+    updateParticleSystem(&fastest_speed_particles_bottom, delta);
 }
 
 C2D_SpriteSheet *get_icon_sheet(const IconPart *part, int gamemode) {
@@ -2033,6 +2505,8 @@ C2D_SpriteSheet *get_icon_sheet(const IconPart *part, int gamemode) {
             return &waveSheet;
         case GAMEMODE_ROBOT:
             return &robotSheet;
+        case GAMEMODE_SPIDER:
+            return &spiderSheet;
     }
     return NULL;
 }
@@ -2052,7 +2526,7 @@ static void robot_icon(
     float sin_rot = sinf(C3D_AngleFromDegrees(deg));
 
     for (int i = 0; i < frame->part_count; i++) {
-        const RobotSpritePart *part = &frame->parts[i];
+        const PlayerSpritePart *part = &frame->parts[i];
 
         float part_x = part->px;
         float part_y = part->py * flip_y_mult;
@@ -2085,6 +2559,18 @@ static void robot_icon(
     }
     break;
 }*/
+
+const PlayerAnimation *get_gamemode_animation(int gamemode) {
+    if (gamemode == GAMEMODE_ROBOT) return robot_animations;
+    if (gamemode == GAMEMODE_SPIDER) return spider_animations;
+    return NULL;
+}
+
+int get_animation_count(int gamemode) {
+    if (gamemode == GAMEMODE_ROBOT) return ROBOT_ANIM_COUNT;
+    if (gamemode == GAMEMODE_SPIDER) return SPIDER_ANIM_COUNT;
+    return 0;
+}
 
 static void spawn_icon_at_internal(
     int gamemode,
@@ -2137,43 +2623,46 @@ static void spawn_icon_at_internal(
         C2D_PlainImageTint(&tints[ICON_COLOR_GLOW], 0, 1.0f);
     }
 
-    if (gamemode == GAMEMODE_ROBOT) {
-        const RobotAnimation *anim = &robot_animations[params.robot_anim_id];
-        if (params.robot_anim_frame >= anim->frame_count)
-            params.robot_anim_frame = 0;
-        const RobotFrame *frame = &anim->frames[params.robot_anim_frame];
-        const RobotFrame *next_frame = frame;
+    if (gamemode == GAMEMODE_ROBOT || gamemode == GAMEMODE_SPIDER) {
+        const PlayerAnimation *animations = get_gamemode_animation(gamemode);
+        if (!animations) return;
+
+        const PlayerAnimation *anim = &animations[params.anim_id];
+        if (params.anim_frame >= anim->frame_count)
+            params.anim_frame = 0;
+        const PlayerFrame *frame = &anim->frames[params.anim_frame];
+        const PlayerFrame *next_frame = frame;
         float anim_fraction = 0.0f;
         if (anim->frame_count > 1) {
-            int next_idx = params.robot_anim_frame + 1;
+            int next_idx = params.anim_frame + 1;
             if (next_idx >= anim->frame_count) next_idx = 0;
-            bool hold_last = next_idx == 0 && (params.robot_anim_id == ROBOT_ANIM_JUMP_START
-                                            || params.robot_anim_id == ROBOT_ANIM_FALL_START);
+            bool hold_last = next_idx == 0 && (params.anim_id == ROBOT_ANIM_JUMP_START
+                                            || params.anim_id == ROBOT_ANIM_FALL_START);
             if (!hold_last) {
                 next_frame = &anim->frames[next_idx];
-                anim_fraction = params.robot_anim_timer / frame->delay;
+                anim_fraction = params.anim_timer / frame->delay;
             }
         }
 
-        const RobotAnimation *blend_from_anim = NULL;
-        const RobotFrame *blend_from_frame = NULL;
-        const RobotFrame *blend_from_next_frame = NULL;
+        const PlayerAnimation *blend_from_anim = NULL;
+        const PlayerFrame *blend_from_frame = NULL;
+        const PlayerFrame *blend_from_next_frame = NULL;
         float blend_from_fraction = 0.f;
-        if (params.robot_blend_fraction > 0.f && params.robot_blend_from_anim_id >= 0 && params.robot_blend_from_anim_id < ROBOT_ANIM_COUNT) {
-            blend_from_anim = &robot_animations[params.robot_blend_from_anim_id];
+        if (params.blend_fraction > 0.f && params.blend_from_anim_id >= 0 && params.blend_from_anim_id < get_animation_count(gamemode)) {
+            blend_from_anim = &animations[params.blend_from_anim_id];
 
-            if (params.robot_blend_from_frame >= 0 && params.robot_blend_from_frame < blend_from_anim->frame_count) {
-                blend_from_frame = &blend_from_anim->frames[params.robot_blend_from_frame];
+            if (params.blend_from_frame >= 0 && params.blend_from_frame < blend_from_anim->frame_count) {
+                blend_from_frame = &blend_from_anim->frames[params.blend_from_frame];
                 blend_from_next_frame = blend_from_frame;
                 
                 if (blend_from_anim->frame_count > 1) {
-                    int next_idx = params.robot_blend_from_frame + 1;
+                    int next_idx = params.blend_from_frame + 1;
                     if (next_idx >= blend_from_anim->frame_count) next_idx = 0;
-                    bool hold_last = next_idx == 0 && (params.robot_blend_from_anim_id == ROBOT_ANIM_JUMP_START
-                                                    || params.robot_blend_from_anim_id == ROBOT_ANIM_FALL_START);
+                    bool hold_last = next_idx == 0 && (params.blend_from_anim_id == ROBOT_ANIM_JUMP_START
+                                                    || params.blend_from_anim_id == ROBOT_ANIM_FALL_START);
                     if (!hold_last) {
                         blend_from_next_frame = &blend_from_anim->frames[next_idx];
-                        blend_from_fraction = params.robot_blend_from_timer / blend_from_frame->delay;
+                        blend_from_fraction = params.blend_from_timer / blend_from_frame->delay;
                     }
                 }
                 if (blend_from_frame->part_count != frame->part_count) {
@@ -2183,8 +2672,8 @@ static void spawn_icon_at_internal(
         }
         
         for (int i = 0; i < frame->part_count; i++) {
-            const RobotSpritePart *animation_part = &frame->parts[i];
-            const RobotSpritePart *next_part = &next_frame->parts[i];
+            const PlayerSpritePart *animation_part = &frame->parts[i];
+            const PlayerSpritePart *next_part = &next_frame->parts[i];
             float anim_px = animation_part->px + (next_part->px - animation_part->px) * anim_fraction;
             float anim_py = animation_part->py + (next_part->py - animation_part->py) * anim_fraction;
             float anim_rot = next_part->rotation - animation_part->rotation;
@@ -2193,8 +2682,8 @@ static void spawn_icon_at_internal(
             anim_rot = animation_part->rotation + anim_rot * anim_fraction;
 
             if (blend_from_frame) {
-                const RobotSpritePart *from_part = &blend_from_frame->parts[i];
-                const RobotSpritePart *from_next_part = &blend_from_next_frame->parts[i];
+                const PlayerSpritePart *from_part = &blend_from_frame->parts[i];
+                const PlayerSpritePart *from_next_part = &blend_from_next_frame->parts[i];
                 float from_px = from_part->px + (from_next_part->px - from_part->px) * blend_from_fraction;
                 float from_py = from_part->py + (from_next_part->py - from_part->py) * blend_from_fraction;
                 float from_rot = from_next_part->rotation - from_part->rotation;
@@ -2202,7 +2691,7 @@ static void spawn_icon_at_internal(
                 if (from_rot < -180.0f) from_rot += 360.0f;
                 from_rot = from_part->rotation + from_rot * blend_from_fraction;
 
-                float blend = params.robot_blend_fraction;
+                float blend = params.blend_fraction;
                 anim_px = from_px + (anim_px - from_px) * blend;
                 anim_py = from_py + (anim_py - from_py) * blend;
                 float rot_delta = anim_rot - from_rot;
@@ -2266,12 +2755,24 @@ static void spawn_icon_at_internal(
                     float p_x = x + (rot_anim_x + rot_part_x) * scale;
                     float p_y = y + (rot_anim_y + rot_part_y) * scale;
 
+                    float part_sx = (animation_part->scale_x < 0.0f) ? -sx : sx;
+                    float part_sy = (animation_part->scale_y < 0.0f) ? -sy : sy;
+
+                    if (i == 6 && j == 0 && draw_white && params.robot_fire_scale > 0.f && playerEffectsSheet) {
+                        C2D_SpriteFromSheet(&spr, playerEffectsSheet, PLAYER_EFFECTS_FIRE_BOOST);
+                        C2D_SpriteSetCenter(&spr, 0.5f, 0.0f);
+                        C2D_SpriteSetPos(&spr, p_x, p_y);
+                        C2D_SpriteSetScale(&spr, sx * params.robot_fire_scale, scale * params.robot_fire_scale);
+                        C2D_SpriteSetRotation(&spr, part_rad + C3D_AngleFromDegrees(180.0f * flip_y));
+                        C2D_DrawSpriteTinted(&spr, &tints[ICON_COLOR_WHITE]);
+                    }
+
                     C2D_SpriteFromSheet(&spr, *sheet, part->texture);
                     C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
                     C3D_TexSetFilter(spr.image.tex, GPU_LINEAR, GPU_LINEAR);
 
                     C2D_SpriteSetPos(&spr, p_x, p_y);
-                    C2D_SpriteSetScale(&spr, sx, sy);
+                    C2D_SpriteSetScale(&spr, part_sx, part_sy);
                     C2D_SpriteSetRotation(&spr, part_rad);
 
                     C2D_DrawSpriteTinted(&spr, &tints[part->color_type]);

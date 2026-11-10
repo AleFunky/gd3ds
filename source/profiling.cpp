@@ -1,6 +1,6 @@
 #include "profiling.hpp"
 #include "3ds/services/hid.h"
-#include <citro3d.h>
+#include "arena.hpp"
 #include "fonts/chatFont.hpp"
 #include "main.hpp"
 #include "math_helpers.hpp"
@@ -86,6 +86,9 @@ typedef enum {
     PROFILER_STAT_HEAP_USED,
     PROFILER_STAT_HEAP_FREE,
     PROFILER_STAT_HEAP_TOTAL,
+    PROFILER_STAT_LEVEL_ARENA_USED,
+    PROFILER_STAT_LEVEL_ARENA_FREE,
+    PROFILER_STAT_LEVEL_ARENA_TOTAL,
 } ProfilerStat;
 
 typedef struct {
@@ -158,7 +161,11 @@ static const ProfilerRow memory_rows[] = {
     {},
     { "Heap used",   PROFILER_STAT_HEAP_USED,   PROFILER_VALUE_HEX },
     { "Heap free",   PROFILER_STAT_HEAP_FREE,   PROFILER_VALUE_HEX },
-    { "Heap total",  PROFILER_STAT_HEAP_TOTAL,  PROFILER_VALUE_HEX }
+    { "Heap total",  PROFILER_STAT_HEAP_TOTAL,  PROFILER_VALUE_HEX },
+    {},
+    { "Level arena used",   PROFILER_STAT_LEVEL_ARENA_USED,   PROFILER_VALUE_HEX },
+    { "Level arena free",   PROFILER_STAT_LEVEL_ARENA_FREE,   PROFILER_VALUE_HEX },
+    { "Level arena total",  PROFILER_STAT_LEVEL_ARENA_TOTAL,  PROFILER_VALUE_HEX }
 };
 
 static const char *page_names[PROFILER_PAGE_COUNT] = {
@@ -249,6 +256,10 @@ static unsigned int profiler_stat_integer(ProfilerStat stat) {
         case PROFILER_STAT_HEAP_USED: return internal_snapshot.heap_used;
         case PROFILER_STAT_HEAP_FREE: return internal_snapshot.heap_free;
         case PROFILER_STAT_HEAP_TOTAL: return internal_snapshot.heap_total;
+
+        case PROFILER_STAT_LEVEL_ARENA_USED: return internal_snapshot.level_arena_used;
+        case PROFILER_STAT_LEVEL_ARENA_FREE: return internal_snapshot.level_arena_free;
+        case PROFILER_STAT_LEVEL_ARENA_TOTAL: return internal_snapshot.level_arena_total;
         default: return 0;
     }
 }
@@ -367,6 +378,10 @@ void profiler_update(ProfilerUpdateData data) {
     snapshot.heap_used = mi.uordblks;
     snapshot.heap_free = envGetHeapSize() - mi.uordblks;
     snapshot.heap_total = envGetHeapSize();
+
+    snapshot.level_arena_used = arena_used(&level_arena);
+    snapshot.level_arena_free = arena_available(&level_arena);
+    snapshot.level_arena_total = arena_total(&level_arena);
 
     if (!game_paused) internal_snapshot = snapshot;
 

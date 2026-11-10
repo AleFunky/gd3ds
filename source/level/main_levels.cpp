@@ -243,6 +243,18 @@ MainLevelDefinition robtop_main_levels[] = {
             .title = "Deadlocked",
             .artist = "F-777"
         }
+    },
+    {
+        .level_id = 20,
+        .level_name = "Fingerdash",
+        .gmd_path = "romfs:/main_levels/Fingerdash.gmd",
+        .song_path = "romfs:/songs/Fingerdash.mp3",
+        .difficulty = MAIN_DIFF_INSANE,
+        .stars = 12,
+        .song_data = {
+            .title = "Fingerdash",
+            .artist = "MDK"
+        }
     }
 };
 

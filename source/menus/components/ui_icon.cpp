@@ -10,6 +10,7 @@
 
 #include "menus/icon_kit.hpp"
 #include "player/robot_anim_data.hpp"
+#include "player/spider_anim_data.hpp"
 
 #define FIRST_TRAIL_ID 27
 
@@ -45,8 +46,8 @@ static void ui_icon_draw(UIElement* e, UITransform *transform) {
             icon->p2_color,
             icon->glow_color,
             (IconParameters) { 
-                .robot_anim_id = ROBOT_ANIM_IDLE,
-                .robot_anim_frame = 0
+                .anim_id = (icon->gamemode == (int)GAMEMODE_ROBOT ? (int)ROBOT_ANIM_IDLE : (int)SPIDER_ANIM_IDLE),
+                .anim_frame = 0
             }
         );
     }

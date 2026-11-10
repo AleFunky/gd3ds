@@ -1,5 +1,6 @@
 #include <citro2d.h>
 #include "triggers.hpp"
+#include "arena.hpp"
 #include "color.h"
 #include "icons.hpp"
 #include "math_helpers.hpp"
@@ -17,6 +18,7 @@
 #include <string.h>
 
 #include "player/player.hpp"
+#include "player/trail.hpp"
 #include "state.hpp"
 
 #define LAUNCH_CAP 1080.f
@@ -37,10 +39,30 @@ int alpha_trigger_capacity = 0;
 MoveTriggerBuffer *move_trigger_buffer = NULL;
 int move_trigger_count = 0;
 int move_trigger_capacity = 0;
+CountTriggerBuffer *count_trigger_buffer = NULL;
+int count_trigger_count = 0;
+int count_trigger_capacity = 0;
+TouchTriggerBuffer *touch_trigger_buffer = NULL;
+int touch_trigger_count = 0;
+int touch_trigger_capacity = 0;
+ItemCount *item_counter_buffer = NULL;
+int item_counter_count = 0;
+int item_counter_capacity = 0;
 
 SpawnTriggerBuffer *spawn_trigger_buffer = NULL;
 int spawn_trigger_count = 0;
 int spawn_trigger_capacity = 0;
+
+RotateTriggerBuffer *rotate_trigger_buffer = NULL;
+int rotate_trigger_count = 0;
+int rotate_trigger_capacity = 0;
+FollowPlayerYTriggerBuffer *follow_player_y_trigger_buffer = NULL;
+int follow_player_y_trigger_count = 0;
+int follow_player_y_trigger_capacity = 0;
+
+FollowTriggerBuffer *follow_trigger_buffer = NULL;
+int follow_trigger_count = 0;
+int follow_trigger_capacity = 0;
 
 PulseTriggerBuffer *pulse_trigger_buffer = NULL;
 int pulse_trigger_count = 0;
@@ -81,6 +103,99 @@ MoveTriggerBuffer *get_new_move_trigger() {
     return buffer;
 }
 
+static CountTriggerBuffer *get_new_count_trigger(void) {
+    if (count_trigger_count >= count_trigger_capacity) {
+        size_t new_capacity = count_trigger_capacity == 0 ? 32 : count_trigger_capacity + 32;
+        CountTriggerBuffer *new_list = (CountTriggerBuffer *)realloc(count_trigger_buffer, new_capacity * sizeof(CountTriggerBuffer));
+        if (!new_list) return NULL;
+        count_trigger_buffer = new_list;
+        count_trigger_capacity = new_capacity;
+    }
+    CountTriggerBuffer *buffer = &count_trigger_buffer[count_trigger_count++];
+    memset(buffer, 0, sizeof(CountTriggerBuffer));
+    return buffer;
+}
+
+static TouchTriggerBuffer *get_new_touch_trigger(void) {
+    if (touch_trigger_count >= touch_trigger_capacity) {
+        size_t new_capacity = touch_trigger_capacity == 0 ? 32 : touch_trigger_capacity + 32;
+        TouchTriggerBuffer *new_list = (TouchTriggerBuffer *)realloc(touch_trigger_buffer, new_capacity * sizeof(TouchTriggerBuffer));
+        if (!new_list) return NULL;
+        touch_trigger_buffer = new_list;
+        touch_trigger_capacity = new_capacity;
+    }
+    TouchTriggerBuffer *buffer = &touch_trigger_buffer[touch_trigger_count++];
+    memset(buffer, 0, sizeof(TouchTriggerBuffer));
+    return buffer;
+}
+
+static ItemCount *find_item_count(int id) {
+    for (int i = 0; i < item_counter_count; i++) {
+        if (item_counter_buffer[i].id == id) return &item_counter_buffer[i];
+    }
+    return NULL;
+}
+
+static ItemCount *get_new_item_count(int id) {
+    if (item_counter_count >= item_counter_capacity) {
+        size_t new_capacity = item_counter_capacity == 0 ? 16 : item_counter_capacity + 16;
+        ItemCount *new_list = (ItemCount *)realloc(item_counter_buffer, new_capacity * sizeof(ItemCount));
+        if (!new_list) return NULL;
+        item_counter_buffer = new_list;
+        item_counter_capacity = new_capacity;
+    }
+    ItemCount *slot = &item_counter_buffer[item_counter_count++];
+    slot->id = id;
+    slot->value = 0;
+    return slot;
+}
+
+int get_item_count(int id) {
+    ItemCount *slot = find_item_count(id);
+    return slot ? slot->value : 0;
+}
+
+void add_item_count(int id, int delta) {
+    if (id < 0 || id > 9999) return;
+    ItemCount *slot = find_item_count(id);
+    if (!slot) slot = get_new_item_count(id);
+    if (slot) slot->value += delta;
+}
+
+FollowPlayerYTriggerBuffer *get_new_follow_player_y_trigger() {
+    if (follow_player_y_trigger_count >= follow_player_y_trigger_capacity) {
+        size_t new_capacity = follow_player_y_trigger_capacity == 0 ? 32 : follow_player_y_trigger_capacity + 32;
+
+        FollowPlayerYTriggerBuffer *new_list = (FollowPlayerYTriggerBuffer *)realloc(follow_player_y_trigger_buffer, new_capacity * sizeof(FollowPlayerYTriggerBuffer));
+        if (!new_list) {
+            return NULL;
+        }
+
+        follow_player_y_trigger_buffer = new_list;
+        follow_player_y_trigger_capacity = new_capacity;
+    }
+    FollowPlayerYTriggerBuffer *buffer = &follow_player_y_trigger_buffer[follow_player_y_trigger_count++];
+    memset(buffer, 0, sizeof(FollowPlayerYTriggerBuffer));
+    return buffer;
+}
+
+FollowTriggerBuffer *get_new_follow_trigger() {
+    if (follow_trigger_count >= follow_trigger_capacity) {
+        size_t new_capacity = follow_trigger_capacity == 0 ? 32 : follow_trigger_capacity + 32;
+
+        FollowTriggerBuffer *new_list = (FollowTriggerBuffer *)realloc(follow_trigger_buffer, new_capacity * sizeof(FollowTriggerBuffer));
+        if (!new_list) {
+            return NULL;
+        }
+
+        follow_trigger_buffer = new_list;
+        follow_trigger_capacity = new_capacity;
+    }
+    FollowTriggerBuffer *buffer = &follow_trigger_buffer[follow_trigger_count++];
+    memset(buffer, 0, sizeof(FollowTriggerBuffer));
+    return buffer;
+}
+
 SpawnTriggerBuffer *get_new_spawn_trigger() {
     if (spawn_trigger_count >= spawn_trigger_capacity) {
         size_t new_capacity = spawn_trigger_capacity == 0 ? 32 : spawn_trigger_capacity + 32;
@@ -95,6 +210,24 @@ SpawnTriggerBuffer *get_new_spawn_trigger() {
     }
     SpawnTriggerBuffer *buffer = &spawn_trigger_buffer[spawn_trigger_count++];
     memset(buffer, 0, sizeof(SpawnTriggerBuffer));
+    return buffer;
+}
+
+RotateTriggerBuffer *get_new_rotate_trigger() {
+    if (rotate_trigger_count >= rotate_trigger_capacity) {
+        size_t new_capacity = rotate_trigger_capacity == 0 ? 32 : rotate_trigger_capacity + 32;
+
+        RotateTriggerBuffer *new_list = (RotateTriggerBuffer *)realloc(rotate_trigger_buffer, new_capacity * sizeof(RotateTriggerBuffer));
+        if (!new_list) {
+            return NULL;
+        }
+
+        rotate_trigger_buffer = new_list;
+        rotate_trigger_capacity = new_capacity;
+    }
+
+    RotateTriggerBuffer *buffer = &rotate_trigger_buffer[rotate_trigger_count++];
+    memset(buffer, 0, sizeof(RotateTriggerBuffer));
     return buffer;
 }
 
@@ -115,22 +248,77 @@ PulseTriggerBuffer *get_new_pulse_trigger() {
     return buffer;
 }
 
+typedef struct {
+    bool saved;
+    float rotation;
+    float visual_rotation;
+} RotateInitialRotation;
+
+static RotateInitialRotation *rotate_initial_rotations = NULL;
+static int rotate_initial_rotations_capacity = 0;
+
+static void remember_rotate_initial_rotation(int obj) {
+    if (obj < 0) return;
+    if (obj >= rotate_initial_rotations_capacity) {
+        int new_capacity = rotate_initial_rotations_capacity ? rotate_initial_rotations_capacity : 64;
+        while (new_capacity <= obj) new_capacity *= 2;
+        RotateInitialRotation *new_list = (RotateInitialRotation *)realloc(rotate_initial_rotations, sizeof(RotateInitialRotation) * new_capacity);
+        if (!new_list) return;
+        memset(new_list + rotate_initial_rotations_capacity, 0, sizeof(RotateInitialRotation) * (new_capacity - rotate_initial_rotations_capacity));
+        rotate_initial_rotations = new_list;
+        rotate_initial_rotations_capacity = new_capacity;
+    }
+    if (rotate_initial_rotations[obj].saved) return;
+    rotate_initial_rotations[obj].saved = true;
+    rotate_initial_rotations[obj].rotation = objects.rotation[obj];
+    rotate_initial_rotations[obj].visual_rotation = objects.visual_rotation[obj];
+}
+
+static void restore_rotate_initial_rotations(void) {
+    if (!rotate_initial_rotations) return;
+    if (!objects.rotation || !objects.visual_rotation) {
+        free(rotate_initial_rotations);
+        rotate_initial_rotations = NULL;
+        rotate_initial_rotations_capacity = 0;
+        return;
+    }
+    int limit = objects.count < rotate_initial_rotations_capacity ? objects.count : rotate_initial_rotations_capacity;
+    for (int i = 0; i < limit; i++) {
+        if (!rotate_initial_rotations[i].saved) continue;
+        objects.rotation[i] = rotate_initial_rotations[i].rotation;
+        objects.visual_rotation[i] = rotate_initial_rotations[i].visual_rotation;
+    }
+}
+
 void free_trigger_buffers() {
+    restore_rotate_initial_rotations();
     free(alpha_trigger_buffer);
     free(move_trigger_buffer);
+    free(count_trigger_buffer);
+    free(touch_trigger_buffer);
+    free(item_counter_buffer);
     free(spawn_trigger_buffer);
+    free(follow_player_y_trigger_buffer);
+    free(follow_trigger_buffer);
 
-    if (pulse_trigger_buffer) {
-        for (int i = 0; i < pulse_trigger_count; i++) {
-            if (pulse_trigger_buffer[i].main_pulse_index) { free(pulse_trigger_buffer[i].main_pulse_index); pulse_trigger_buffer[i].main_pulse_index = NULL; }
-            if (pulse_trigger_buffer[i].detail_pulse_index) { free(pulse_trigger_buffer[i].detail_pulse_index); pulse_trigger_buffer[i].detail_pulse_index = NULL; }
+    if (rotate_trigger_buffer) {
+        for (int i = 0; i < rotate_trigger_count; i++) {
+            if (rotate_trigger_buffer[i].targets) { free(rotate_trigger_buffer[i].targets); rotate_trigger_buffer[i].targets = NULL; }
         }
     }
+    free(rotate_trigger_buffer);
+
     free(pulse_trigger_buffer);
 
     alpha_trigger_buffer = NULL;
     move_trigger_buffer = NULL;
+    count_trigger_buffer = NULL;
+    touch_trigger_buffer = NULL;
+    item_counter_buffer = NULL;
     spawn_trigger_buffer = NULL;
+    follow_player_y_trigger_buffer = NULL;
+    follow_trigger_buffer = NULL;
+    rotate_trigger_buffer = NULL;
     pulse_trigger_buffer = NULL;
 
     alpha_trigger_count = 0;
@@ -140,17 +328,57 @@ void free_trigger_buffers() {
     move_step_dt = 0.f;
     move_trigger_capacity = 0;
 
+    count_trigger_count = 0;
+    count_trigger_capacity = 0;
+    touch_trigger_count = 0;
+    touch_trigger_capacity = 0;
+    item_counter_count = 0;
+    item_counter_capacity = 0;
+
+    follow_player_y_trigger_count = 0;
+    follow_player_y_trigger_capacity = 0;
+
+    follow_trigger_count = 0;
+    follow_trigger_capacity = 0;
+
     spawn_trigger_count = 0;
     spawn_trigger_capacity = 0;
+
+    rotate_trigger_count = 0;
+    rotate_trigger_capacity = 0;
 
     pulse_trigger_count = 0;
     pulse_trigger_capacity = 0;
 }
 
-static unsigned int pulse_activation_counter = 0;
 float move_lock_player_x_delta = 0.0f;
 float move_lock_player_y_delta = 0.0f;
 float move_step_dt = 0.0f;
+
+static void player_follow_y_step(Player *player, float dt) {
+    if (player->follow_y_index == 0 && player->follow_y_timer == 0.f) {
+        for (int i = 0; i < FOLLOW_Y_SAMPLES; i++) player->follow_y[i] = player->y;
+    }
+    player->follow_y_timer += dt;
+    if (player->follow_y_timer >= FOLLOW_Y_INTERVAL) {
+        player->follow_y_timer -= FOLLOW_Y_INTERVAL;
+        player->follow_y_index++;
+    }
+    player->follow_y[player->follow_y_index % FOLLOW_Y_SAMPLES] = player->y;
+}
+
+static float player_follow_y_old(Player *player, float time_ago) {
+    if (time_ago <= 0.f) return player->y;
+    int index = (int)floorf(time_ago / FOLLOW_Y_INTERVAL);
+    if (index > FOLLOW_Y_SAMPLES - 1) index = FOLLOW_Y_SAMPLES - 1;
+    int i = (player->follow_y_index - index) % FOLLOW_Y_SAMPLES;
+    if (i < 0) i += FOLLOW_Y_SAMPLES;
+    return player->follow_y[i];
+}
+
+static int toggle_spawn_buffer[8];
+static int toggle_spawn_count = 0;
+static bool toggle_spawn_active = false;
 
 float get_group_opacities(int object) {
     float group_opacity = 1.f;
@@ -275,11 +503,17 @@ Color HSV_combine(Color base, HSV hsv) {
 
 int trigger_pool_add(TriggerPool *pool, size_t element_size) {
     if (pool->count >= pool->capacity) {
-        int new_capacity = pool->capacity ? pool->capacity + 8 : 8;
+        size_t new_capacity = pool->capacity ? pool->capacity * 2 : 8;
+        void *new_data = arena_realloc(&level_arena, pool->data, pool->capacity * element_size, new_capacity * element_size);
 
-        pool->data = realloc(pool->data, new_capacity * element_size);
-        if (!pool->data) return -1;
+        if (!new_data) {
+            new_capacity = pool->capacity + 8;
+            new_data = arena_realloc(&level_arena, pool->data, pool->capacity * element_size, new_capacity * element_size);
+        }
 
+        if (!new_data) return -1;
+
+        pool->data = new_data;
         pool->capacity = new_capacity;
     }
     
@@ -617,6 +851,33 @@ void upload_to_move_buffer(int obj) {
     buffer->active = true;
 }
 
+void upload_to_follow_player_y_buffer(int obj) {
+    FollowPlayerYTrigger *trigger = get_follow_player_y_trigger(obj);
+    GroupNode *group = get_group(trigger->target_group);
+    if (!group || group->count <= 0) return;
+
+    for (int i = 0; i < follow_player_y_trigger_count; i++) {
+        if (follow_player_y_trigger_buffer[i].active &&
+            follow_player_y_trigger_buffer[i].source_obj == obj &&
+            follow_player_y_trigger_buffer[i].restored_from_checkpoint) {
+            follow_player_y_trigger_buffer[i].restored_from_checkpoint = false;
+            return;
+        }
+    }
+
+    FollowPlayerYTriggerBuffer *buffer = get_new_follow_player_y_trigger();
+    if (!buffer) return;
+
+    buffer->target_group = trigger->target_group;
+    buffer->source_obj = obj;
+    buffer->speed = trigger->follow_speed > 0.f ? trigger->follow_speed : 1.f;
+    buffer->delay = trigger->follow_delay;
+    buffer->offset = trigger->follow_offset;
+    buffer->max_speed = trigger->follow_max_speed;
+    buffer->group_y = objects.y[group->objects[0]];
+    buffer->active = true;
+}
+
 void handle_move_triggers(void) {
     if (trigger_dt <= 0.f) return;
     move_step_dt = trigger_dt;
@@ -660,14 +921,401 @@ void handle_move_triggers(void) {
     apply_group_combination_move();
 }
 
-void upload_to_spawn_buffer(int obj, bool from_spawn) {
-    for (int i = 0; i < spawn_trigger_count; i++) {
-        if (spawn_trigger_buffer[i].active &&
-            spawn_trigger_buffer[i].source_obj == obj &&
-            spawn_trigger_buffer[i].restored_from_checkpoint) {
-            spawn_trigger_buffer[i].restored_from_checkpoint = false;
+void upload_to_count_buffer(int obj) {
+    CountTrigger *trigger = get_count_trigger(obj);
+    for (int i = 0; i < count_trigger_count; i++) {
+        if (count_trigger_buffer[i].active &&
+            count_trigger_buffer[i].source_obj == obj &&
+            count_trigger_buffer[i].restored_from_checkpoint) {
+            count_trigger_buffer[i].restored_from_checkpoint = false;
             return;
         }
+    }
+
+    CountTriggerBuffer *buffer = get_new_count_trigger();
+    if (!buffer) return;
+
+    buffer->target_group = trigger->target_group;
+    buffer->source_obj = obj;
+    buffer->item_id = trigger->item_id;
+    buffer->target_count = trigger->target_count;
+    buffer->activate_group = trigger->activate_group;
+    buffer->multi_activate = trigger->multi_activate;
+    buffer->previous_value = get_item_count(trigger->item_id);
+    buffer->active = true;
+}
+
+void handle_count_triggers(void) {
+    if (count_trigger_count == 0) return;
+
+    int total = count_trigger_count;
+    bool compact = false;
+    for (int i = 0; i < total; i++) {
+        CountTriggerBuffer buffer = count_trigger_buffer[i];
+        if (!buffer.active) {
+            compact = true;
+            continue;
+        }
+        int value = get_item_count(buffer.item_id);
+        bool fire = value == buffer.target_count && value != buffer.previous_value;
+        count_trigger_buffer[i].previous_value = value;
+        if (fire) {
+            if (!buffer.multi_activate) {
+                count_trigger_buffer[i].active = false;
+                compact = true;
+            }
+            toggle_group(buffer.target_group, buffer.activate_group, true);
+        }
+    }
+
+    if (compact) {
+        int count = 0;
+        for (int i = 0; i < count_trigger_count; i++) {
+            if (count_trigger_buffer[i].active) count_trigger_buffer[count++] = count_trigger_buffer[i];
+        }
+        count_trigger_count = count;
+    }
+}
+
+void upload_to_touch_buffer(int obj) {
+    for (int i = 0; i < touch_trigger_count; i++) {
+        if (touch_trigger_buffer[i].source_obj == obj) {
+            return;
+        }
+    }
+
+    TouchTriggerBuffer *buffer = get_new_touch_trigger();
+    if (!buffer) return;
+
+    buffer->source_obj = obj;
+}
+
+static bool touch_toggle_value(TouchTrigger *trigger) {
+    switch (trigger->toggle_mode) {
+        case 1: return true;
+        case 2: return false;
+        default: {
+            GroupNode *group = get_group(trigger->target_group);
+            return group && group->toggled;
+        }
+    }
+}
+
+void handle_touch_triggers(void) {
+    if (state.dead) return;
+    if (touch_trigger_count == 0) return;
+
+    bool p1_pressed = state.input.pressedJump || (!state.old_input.holdJump && state.input.holdJump);
+    bool p1_released = state.old_input.holdJump && !state.input.holdJump;
+    bool p2_pressed = false;
+    bool p2_released = false;
+
+    if (state.dual) {
+        p2_pressed = state.input_p2.pressedJump || (!state.old_input_p2.holdJump && state.input_p2.holdJump);
+        p2_released = state.old_input_p2.holdJump && !state.input_p2.holdJump;
+    }
+
+    int total = touch_trigger_count;
+    for (int i = 0; i < total; i++) {
+        TouchTriggerBuffer buffer = touch_trigger_buffer[i];
+
+        TouchTrigger *trigger = get_touch_trigger(buffer.source_obj);
+        if (!trigger) continue;
+
+        unsigned char held = buffer.held_mask;
+        unsigned char next_held = held;
+
+        if (state.dual) {
+            if (p1_pressed && !(held & 1)) next_held |= 1;
+            if (p1_released && (held & 1)) next_held &= ~1;
+            if (p2_pressed && !(held & 2)) next_held |= 2;
+            if (p2_released && (held & 2)) next_held &= ~2;
+        } else {
+            if (p1_pressed && !(held & 1)) next_held |= 1;
+            if (p1_released && (held & 1)) next_held &= ~1;
+        }
+
+        if (trigger->hold_mode && held == 0) {
+            if (state.input.holdJump) next_held |= 1;
+            if (state.dual && state.input_p2.holdJump) next_held |= 2;
+        }
+
+        bool pressed = held == 0 && next_held != 0;
+        bool released = held != 0 && next_held == 0;
+        touch_trigger_buffer[i].held_mask = next_held;
+
+        if (pressed) {
+            bool applied = touch_toggle_value(trigger);
+            touch_trigger_buffer[i].applied = applied;
+            toggle_group(trigger->target_group, applied, true);
+        } else if (released && trigger->hold_mode) {
+            toggle_group(trigger->target_group, !buffer.applied, true);
+        }
+    }
+}
+
+void handle_follow_player_y_triggers(void) {
+    if (trigger_dt <= 0.f) return;
+    if (follow_player_y_trigger_count == 0) return;
+
+    begin_group_combination_move_step();
+
+    for (int slot = 0; slot < follow_player_y_trigger_count; slot++) {
+        FollowPlayerYTriggerBuffer *buffer = &follow_player_y_trigger_buffer[slot];
+        float target = player_follow_y_old(&state.player, buffer->delay) + buffer->offset;
+        float delta = (target - buffer->group_y) * buffer->speed;
+        if (buffer->max_speed > 0.f) {
+            float max_delta = buffer->max_speed * trigger_dt;
+            if (delta > max_delta) delta = max_delta;
+            else if (delta < -max_delta) delta = -max_delta;
+        }
+        buffer->group_y += delta;
+        add_move_to_group_combinations(buffer->target_group, 0.f, delta);
+    }
+
+    apply_group_combination_move();
+}
+
+void upload_to_follow_buffer(int obj) {
+    FollowTrigger *trigger = get_follow_trigger(obj);
+    if (trigger->trig_duration <= 0.f) return;
+    if (trigger->target_group == trigger->follow_group) return;
+
+    GroupNode *target = get_group(trigger->target_group);
+    GroupNode *follow = get_group(trigger->follow_group);
+    if (!target || target->count <= 0) return;
+    if (!follow || follow->count <= 0) return;
+
+    for (int i = 0; i < follow_trigger_count; i++) {
+        if (follow_trigger_buffer[i].active &&
+            follow_trigger_buffer[i].source_obj == obj &&
+            follow_trigger_buffer[i].restored_from_checkpoint) {
+            follow_trigger_buffer[i].restored_from_checkpoint = false;
+            return;
+        }
+    }
+
+    FollowTriggerBuffer *buffer = get_new_follow_trigger();
+    if (!buffer) return;
+
+    int ref_obj = follow->objects[0];
+
+    buffer->target_group = trigger->target_group;
+    buffer->follow_group = trigger->follow_group;
+    buffer->source_obj = obj;
+    buffer->ref_obj = ref_obj;
+    buffer->x_mod = trigger->x_mod;
+    buffer->y_mod = trigger->y_mod;
+    buffer->seconds = trigger->trig_duration;
+    buffer->time_run = 0.f;
+    buffer->last_x = objects.x[ref_obj];
+    buffer->last_y = objects.y[ref_obj];
+    buffer->active = true;
+}
+
+static void compact_follow_triggers(void) {
+    int count = 0;
+    for (int i = 0; i < follow_trigger_count; i++) {
+        if (!follow_trigger_buffer[i].active) continue;
+        if (count != i) {
+            follow_trigger_buffer[count] = follow_trigger_buffer[i];
+        }
+        count++;
+    }
+    follow_trigger_count = count;
+}
+
+void handle_follow_triggers(void) {
+    if (trigger_dt <= 0.f) return;
+    if (follow_trigger_count == 0) return;
+
+    begin_group_combination_move_step();
+
+    for (int slot = 0; slot < follow_trigger_count; slot++) {
+        FollowTriggerBuffer *buffer = &follow_trigger_buffer[slot];
+        if (!buffer->active) continue;
+
+        GroupNode *follow = get_group(buffer->follow_group);
+        if (!follow || follow->count <= 0) {
+            buffer->active = false;
+            continue;
+        }
+
+        int ref_obj = buffer->ref_obj;
+        if (ref_obj < 0 || ref_obj >= (int)objects.count) {
+            buffer->active = false;
+            continue;
+        }
+
+        float delta_x = (objects.x[ref_obj] - buffer->last_x) * buffer->x_mod;
+        float delta_y = (objects.y[ref_obj] - buffer->last_y) * buffer->y_mod;
+        buffer->last_x = objects.x[ref_obj];
+        buffer->last_y = objects.y[ref_obj];
+
+        if (delta_x != 0.f || delta_y != 0.f) {
+            add_move_to_group_combinations(buffer->target_group, delta_x, delta_y);
+        }
+
+        buffer->time_run += trigger_dt;
+        if (buffer->time_run >= buffer->seconds) {
+            buffer->active = false;
+        }
+    }
+
+    apply_group_combination_move();
+    compact_follow_triggers();
+}
+
+void upload_to_rotate_buffer(int obj) {
+    RotateTrigger *trigger = get_rotate_trigger(obj);
+    GroupNode *group = get_group(trigger->target_group);
+    if (!group || group->count <= 0) return;
+
+    for (int i = 0; i < rotate_trigger_count; i++) {
+        if (rotate_trigger_buffer[i].active &&
+            rotate_trigger_buffer[i].source_obj == obj &&
+            rotate_trigger_buffer[i].restored_from_checkpoint) {
+            rotate_trigger_buffer[i].restored_from_checkpoint = false;
+            return;
+        }
+    }
+
+    for (int i = 0; i < rotate_trigger_count; i++) {
+        RotateTriggerBuffer *old = &rotate_trigger_buffer[i];
+        if (!old->active) continue;
+        bool overlap = false;
+        for (int a = 0; a < group->count && !overlap; a++) {
+            for (int b = 0; b < old->target_count; b++) {
+                if (group->objects[a] == old->targets[b].obj) {
+                    overlap = true;
+                    break;
+                }
+            }
+        }
+        if (overlap) old->active = false;
+    }
+
+    RotateTriggerBuffer *buffer = get_new_rotate_trigger();
+    if (!buffer) return;
+
+    buffer->center_obj = -1;
+    buffer->use_center = trigger->center_group != 0;
+    buffer->source_obj = obj;
+    buffer->total_degrees = trigger->degrees + (float)trigger->times360 * 360.f;
+    buffer->lock_object_rotation = trigger->lock_object_rotation;
+    buffer->easing_type = convert_ease(trigger->rotate_easing);
+    buffer->easing_rate = trigger->easing_rate > 0.f ? trigger->easing_rate : 2.f;
+    buffer->seconds = trigger->trig_duration;
+    buffer->time_run = 0.f;
+
+    buffer->target_count = group->count;
+    buffer->targets = (RotateTargetState *)malloc(sizeof(RotateTargetState) * group->count);
+    if (!buffer->targets) {
+        buffer->target_count = 0;
+        buffer->active = false;
+        return;
+    }
+    for (int i = 0; i < group->count; i++) {
+        int target = group->objects[i];
+        remember_rotate_initial_rotation(target);
+        buffer->targets[i].obj = target;
+        buffer->targets[i].rotation = objects.rotation[target];
+    }
+
+    if (buffer->use_center) {
+        GroupNode *center = get_group(trigger->center_group);
+        if (center && center->count > 0 && trigger->center_group != trigger->target_group) {
+            buffer->center_obj = center->objects[0];
+        } else {
+            buffer->use_center = false;
+        }
+    }
+    buffer->active = true;
+}
+
+static void compact_rotate_triggers(void) {
+    int count = 0;
+    for (int i = 0; i < rotate_trigger_count; i++) {
+        RotateTriggerBuffer *buffer = &rotate_trigger_buffer[i];
+        if (!buffer->active) {
+            free(buffer->targets);
+            buffer->targets = NULL;
+            continue;
+        }
+        if (count != i) {
+            rotate_trigger_buffer[count] = *buffer;
+            buffer->targets = NULL;
+        }
+        count++;
+    }
+    rotate_trigger_count = count;
+}
+
+static bool rotate_target_is_solid(int obj) {
+    int id = objects.id[obj];
+    if (id <= 0 || id >= GAME_OBJECT_COUNT) return false;
+    const ObjectHitbox *hitbox = game_objects[id].hitbox;
+    return hitbox && hitbox->collision_type == HITBOX_SOLID;
+}
+
+void handle_rotate_triggers(void) {
+    if (trigger_dt <= 0.f) return;
+
+    for (int slot = 0; slot < rotate_trigger_count; slot++) {
+        RotateTriggerBuffer *buffer = &rotate_trigger_buffer[slot];
+        if (!buffer->active) continue;
+        buffer->time_run += trigger_dt;
+        float prev_time = buffer->time_run - trigger_dt;
+        if (prev_time < 0.f) prev_time = 0.f;
+        float t = buffer->seconds > 0.f ? easeTime((EaseTypes)buffer->easing_type,
+            buffer->time_run, buffer->seconds, buffer->easing_rate) : 1.f;
+        float prev_t = buffer->seconds > 0.f ? easeTime((EaseTypes)buffer->easing_type,
+            prev_time, buffer->seconds, buffer->easing_rate) : 0.f;
+        float angle = buffer->total_degrees * t;
+        float prev_angle = buffer->total_degrees * prev_t;
+        float cos_a = 1.f;
+        float sin_a = 0.f;
+        float pivot_x = 0.f;
+        float pivot_y = 0.f;
+        if (buffer->use_center) {
+            pivot_x = objects.x[buffer->center_obj];
+            pivot_y = objects.y[buffer->center_obj];
+            float rad = -(angle - prev_angle) * (float)(M_PI / 180.0);
+            cos_a = cosf(rad);
+            sin_a = sinf(rad);
+        }
+
+        for (int i = 0; i < buffer->target_count; i++) {
+            RotateTargetState *target = &buffer->targets[i];
+            int obj = target->obj;
+            objects.last_y[obj] = objects.y[obj];
+            if (buffer->use_center) {
+                float dx = objects.x[obj] - pivot_x;
+                float dy = objects.y[obj] - pivot_y;
+                objects.x[obj] = pivot_x + dx * cos_a - dy * sin_a;
+                objects.y[obj] = pivot_y + dx * sin_a + dy * cos_a;
+                update_object_section(obj);
+            }
+            if (!buffer->lock_object_rotation && !rotate_target_is_solid(obj)) {
+                objects.rotation[obj] = target->rotation + angle;
+                objects.visual_rotation[obj] = objects.rotation[obj];
+            }
+        }
+        if (buffer->time_run >= buffer->seconds) buffer->active = false;
+    }
+
+    compact_rotate_triggers();
+}
+
+void upload_to_spawn_buffer(int obj, bool from_spawn) {
+    for (int i = 0; i < spawn_trigger_count; i++) {
+        SpawnTriggerBuffer *existing = &spawn_trigger_buffer[i];
+        if (!existing->active || existing->source_obj != obj) continue;
+
+        if (existing->restored_from_checkpoint) {
+            existing->restored_from_checkpoint = false;
+        }
+        return;
     }
 
     SpawnTriggerBuffer *buffer = get_new_spawn_trigger();
@@ -694,16 +1342,7 @@ void handle_spawn_triggers(void) {
         if (buffer->time_run > buffer->seconds) {
             buffer->active = false;
 
-            GroupNode *p = get_group(buffer->target_group);
-            for (int i = 0; i < p->count; i++) {
-                int obj_idx = p->objects[i];
-                if (trigger_is_spawn_triggered(objects.id[obj_idx], obj_idx)
-                    && is_trigger_object(objects.id[obj_idx])
-                    && (trigger_is_multi_triggered(objects.id[obj_idx], obj_idx) || !GET_ACTIVATED(obj_idx))
-                    && !(objects.flags[obj_idx] & FLAG_TOGGLED)) {
-                    run_trigger(obj_idx, true);
-                }
-            }
+            spawn_group(buffer->target_group);
 
             for (int j = slot; j < spawn_trigger_count - 1; j++) {
                 // Shift buffer array
@@ -748,25 +1387,19 @@ static void pulse_register(PulseTriggerBuffer *buffer, PulseTrigger *trigger) {
     } else if (buffer->pulse_target_type == PULSE_TARGET_GROUP) {
         bool both = !buffer->main_only && !buffer->detail_only;
         GroupNode *p = get_group(buffer->target_group);
+        if (!p) return;
 
-        buffer->main_pulse_index = (int *)malloc(sizeof(int) * p->count);
-        buffer->detail_pulse_index = (int *)malloc(sizeof(int) * p->count);
-
-        if (!buffer->main_pulse_index || !buffer->detail_pulse_index) return;
-
-        int index = 0;
         for (int i = 0; i < p->count; i++) {
             int obj_idx = p->objects[i];
             if (both || buffer->main_only) {
-                buffer->main_pulse_index[index] = objects.num_main_pulses[obj_idx]++;
+                objects.num_main_pulses[obj_idx]++;
                 objects.main_being_pulsed[obj_idx] = true;
             }
 
             if (both || buffer->detail_only) {
-                buffer->detail_pulse_index[index] = objects.num_detail_pulses[obj_idx]++;
+                objects.num_detail_pulses[obj_idx]++;
                 objects.detail_being_pulsed[obj_idx] = true;
             }
-            index++;
         }
     }
 
@@ -780,12 +1413,16 @@ void upload_to_pulse_buffer(int obj) {
     if (channel == 0) return;
 
     for (int i = 0; i < pulse_trigger_count; i++) {
-        if (pulse_trigger_buffer[i].active &&
-            pulse_trigger_buffer[i].source_obj == obj &&
-            pulse_trigger_buffer[i].restored_from_checkpoint) {
-            pulse_trigger_buffer[i].restored_from_checkpoint = false;
+        PulseTriggerBuffer *existing = &pulse_trigger_buffer[i];
+        if (!existing->active || existing->source_obj != obj) continue;
+
+        if (existing->restored_from_checkpoint) {
+            existing->restored_from_checkpoint = false;
             return;
         }
+
+        existing->time_run = 0;
+        return;
     }
 
     PulseTriggerBuffer *buffer = get_new_pulse_trigger();
@@ -794,13 +1431,11 @@ void upload_to_pulse_buffer(int obj) {
     pulse_register(buffer, trigger);
 
     buffer->source_obj = obj;
-    buffer->started_fade_out = false;
     buffer->time_run = 0;
-    buffer->activation_order = pulse_activation_counter++;
     buffer->active = true;
 }
 
-void restore_pulse_trigger(int obj, float time_run, unsigned int activation_order, bool started_fade_out) {
+void restore_pulse_trigger(int obj, float time_run) {
     PulseTrigger *trigger = get_pulse_trigger(obj);
     if (trigger->target_group == 0) return;
 
@@ -809,13 +1444,9 @@ void restore_pulse_trigger(int obj, float time_run, unsigned int activation_orde
 
     pulse_register(buffer, trigger);
 
-    if (activation_order >= pulse_activation_counter) pulse_activation_counter = activation_order + 1;
-
     buffer->source_obj = obj;
     buffer->restored_from_checkpoint = true;
-    buffer->started_fade_out = started_fade_out;
     buffer->time_run = time_run;
-    buffer->activation_order = activation_order;
     buffer->active = true;
 }
 
@@ -871,19 +1502,12 @@ void handle_pulse_triggers(void) {
         chan->color = result_color;
     }
 
-    // process group pulses in ascending activation_order
-    int group_order[pulse_trigger_count];
-    int group_order_count = 0;
-    for (int i = 0; i < pulse_trigger_count; i++) {
-        PulseTriggerBuffer *b = &pulse_trigger_buffer[i];
-        if (!b->active || b->pulse_target_type != PULSE_TARGET_GROUP) continue;
-        group_order[group_order_count++] = i;
-    }
-
-    for (int gi = 0; gi < group_order_count; gi++) {
-        PulseTriggerBuffer *buffer = &pulse_trigger_buffer[group_order[gi]];
+    for (int gi = 0; gi < pulse_trigger_count; gi++) {
+        PulseTriggerBuffer *buffer = &pulse_trigger_buffer[gi];
+        if (!buffer->active || buffer->pulse_target_type != PULSE_TARGET_GROUP) continue;
         bool both = !buffer->main_only && !buffer->detail_only;
         GroupNode *p = get_group(buffer->target_group);
+        if (!p) continue;
         for (int i = 0; i < p->count; i++) {
             int obj_idx = p->objects[i];
             if (obj_idx < 0 || obj_idx >= objects.count) continue;
@@ -898,8 +1522,9 @@ void handle_pulse_triggers(void) {
         }
     }
 
-    for (int gi = 0; gi < group_order_count; gi++) {
-        PulseTriggerBuffer *buffer = &pulse_trigger_buffer[group_order[gi]];
+    for (int gi = 0; gi < pulse_trigger_count; gi++) {
+        PulseTriggerBuffer *buffer = &pulse_trigger_buffer[gi];
+        if (!buffer->active || buffer->pulse_target_type != PULSE_TARGET_GROUP) continue;
         bool both = !buffer->main_only && !buffer->detail_only;
 
         float alpha;
@@ -916,6 +1541,7 @@ void handle_pulse_triggers(void) {
         else if (alpha > 1.f) alpha = 1.f;
 
         GroupNode *p = get_group(buffer->target_group);
+        if (!p) continue;
         for (int i = 0; i < p->count; i++) {
             int obj_idx = p->objects[i];
             if (obj_idx < 0 || obj_idx >= objects.count) continue;
@@ -957,7 +1583,8 @@ void handle_pulse_triggers(void) {
             if (buffer->pulse_target_type == PULSE_TARGET_GROUP) {
                 bool both = !buffer->main_only && !buffer->detail_only;
                 GroupNode *p = get_group(buffer->target_group);
-                for (int i = 0; i < p->count; i++) {
+                int count = p ? p->count : 0;
+                for (int i = 0; i < count; i++) {
                     int obj_idx = p->objects[i];
                     if (obj_idx < 0 || obj_idx >= objects.count) continue;
                     if (both || buffer->main_only) {
@@ -975,12 +1602,6 @@ void handle_pulse_triggers(void) {
                         }
                     }
                 }
-                
-                free(buffer->main_pulse_index);
-                free(buffer->detail_pulse_index);
-            
-                buffer->main_pulse_index = NULL;
-                buffer->detail_pulse_index = NULL;
             } else if (buffer->pulse_target_type == PULSE_TARGET_CHANNEL) {
                 int chan_idx = get_col_channel_index(buffer->target_color_id);
                 ColorChannel *chan = &channels[chan_idx];
@@ -1083,6 +1704,48 @@ void upload_color_to_buffer(int channel, u32 color, float seconds) {
     buffer->seconds = seconds;
     buffer->time_run = 0;
     buffer->active = true;
+}
+
+void toggle_group(int group, bool activate, bool spawn) {
+    GroupNode *p = get_group(group);
+    if (p) {
+        p->toggled = !activate;
+        for (int i = 0; i < p->count; i++) {
+            int object = p->objects[i];
+            objects.flags[object] &= ~FLAG_TOGGLED;
+            objects.flags[object] |= get_group_toggles(object) ? FLAG_TOGGLED : 0;
+        }
+
+        if (activate && spawn) {
+            if (toggle_spawn_count < 8) toggle_spawn_buffer[toggle_spawn_count++] = group;
+            if (toggle_spawn_active) return;
+
+            toggle_spawn_active = true;
+            int guard = 0;
+            while (toggle_spawn_count > 0 && guard++ < 64) {
+                int next = toggle_spawn_buffer[0];
+                for (int i = 1; i < toggle_spawn_count; i++) toggle_spawn_buffer[i - 1] = toggle_spawn_buffer[i];
+                toggle_spawn_count--;
+                spawn_group(next);
+            }
+            toggle_spawn_active = false;
+        }
+    }
+}
+
+void spawn_group(int group) {
+    GroupNode *p = get_group(group);
+    if (!p) return;
+
+    for (int i = 0; i < p->count; i++) {
+        int obj_idx = p->objects[i];
+        if (trigger_is_spawn_triggered(objects.id[obj_idx], obj_idx)
+            && is_trigger_object(objects.id[obj_idx])
+            && (trigger_is_multi_triggered(objects.id[obj_idx], obj_idx) || !GET_ACTIVATED(obj_idx))
+            && !(objects.flags[obj_idx] & FLAG_TOGGLED)) {
+            run_trigger(obj_idx, true);
+        }
+    }
 }
 
 void run_trigger(int obj, bool from_spawn) {
@@ -1193,6 +1856,31 @@ void run_trigger(int obj, bool from_spawn) {
         case MOVE_TRIGGER:
             upload_to_move_buffer(obj);
             break;
+        case COUNT_TRIGGER:
+            upload_to_count_buffer(obj);
+            break;
+        case INSTANT_COUNT_TRIGGER:
+        {
+            InstantCountTrigger *trigger = get_instant_count_trigger(obj);
+            int value = get_item_count(trigger->item_id);
+            bool pass = false;
+            switch (trigger->instant_count_mode) {
+                case INSTANT_COUNT_MODE_EQUALS: pass = value == trigger->target_count; break;
+                case INSTANT_COUNT_MODE_LARGER: pass = value > trigger->target_count; break;
+                case INSTANT_COUNT_MODE_SMALLER: pass = value < trigger->target_count; break;
+            }
+            if (pass) toggle_group(trigger->target_group, trigger->activate_group, true);
+            break;
+        }
+        case FOLLOW_PLAYER_Y_TRIGGER:
+            upload_to_follow_player_y_buffer(obj);
+            break;
+        case FOLLOW_TRIGGER:
+            upload_to_follow_buffer(obj);
+            break;
+        case ROTATE_TRIGGER:
+            upload_to_rotate_buffer(obj);
+            break;
         case SPAWN_TRIGGER:
             upload_to_spawn_buffer(obj, from_spawn);
             break;
@@ -1204,17 +1892,28 @@ void run_trigger(int obj, bool from_spawn) {
         case TOGGLE_TRIGGER:
         {
             ToggleTrigger *trigger = get_toggle_trigger(obj);
-            GroupNode *p = get_group(trigger->target_group);
-            if (p) {
-                p->toggled = !trigger->activate_group;
-                for (int i = 0; i < p->count; i++) {
-                    int object = p->objects[i];
-                    objects.flags[object] &= ~FLAG_TOGGLED;
-                    objects.flags[object] |= get_group_toggles(object) ? FLAG_TOGGLED : 0;
-                }
-            }
+            toggle_group(trigger->target_group, trigger->activate_group, false);
             break;
         }
+        case TOUCH_TRIGGER:
+            upload_to_touch_buffer(obj);
+            break;
+        case HIDE_PLAYER_TRIGGER:
+            MotionTrail_StopStroke(&trail_p1);
+            MotionTrail_StopStroke(&trail_p2);
+            MotionTrail_Clear(&wave_trail_p1);
+            MotionTrail_Clear(&wave_trail_p2);
+            MotionTrail_StopStroke(&wave_trail_p1);
+            MotionTrail_StopStroke(&wave_trail_p2);
+            state.show_player = false;
+            break;
+        case SHOW_PLAYER_TRIGGER:
+            MotionTrail_ResumeStroke(&trail_p1);
+            MotionTrail_ResumeStroke(&trail_p2);
+            MotionTrail_ResumeStroke(&wave_trail_p1);
+            MotionTrail_ResumeStroke(&wave_trail_p2);
+            state.show_player = true;
+            break;
         default:
             return;
     }
@@ -1255,20 +1954,6 @@ bool object_can_be_x_moved(int obj) {
     return true;
 }
 
-bool is_position_trigger(int id) {
-    if (is_trigger_object(id)) return true;
-    switch (id) {
-        case ENABLE_TRAIL: case DISABLE_TRAIL:
-        case TRIGGER_FADE_SIMPLE: case TRIGGER_FADE_UP: case TRIGGER_FADE_DOWN:
-        case TRIGGER_FADE_RIGHT: case TRIGGER_FADE_LEFT:
-        case TRIGGER_FADE_SCALE_IN: case TRIGGER_FADE_SCALE_OUT:
-        case TRIGGER_FADE_INWARDS: case TRIGGER_FADE_OUTWARDS:
-        case TRIGGER_FADE_LEFT_SEMICIRCLE: case TRIGGER_FADE_RIGHT_SEMICIRCLE:
-            return true;
-        default: return false;
-    }
-}
-
 void handle_triggers(void) {
     trigger_count = 0;
     int cam_sx = (int)((state.player.x) / SECTION_SIZE);
@@ -1285,7 +1970,7 @@ void handle_triggers(void) {
             int count = cached ? list->count : sec->object_count;
             for (int i = 0; i < count; i++) {
                 int obj = sec->objects[cached ? list->indices[i] : i];
-                if (!cached && !is_position_trigger(objects.id[obj])) continue;
+                if (!cached && !is_trigger_object(objects.id[obj])) continue;
                 
                 if (!GET_ACTIVATED(obj)) {
                     if (objects.touch_triggered[obj]) {
@@ -1321,9 +2006,18 @@ void handle_triggers(void) {
 }
 
 void handle_step_triggers(void) {
+    if (has_follow_player_y) {
+        player_follow_y_step(&state.player, trigger_dt);
+        if (state.dual) player_follow_y_step(&state.player2, trigger_dt);
+    }
     handle_triggers();
+    handle_touch_triggers();
+    handle_count_triggers();
     handle_spawn_triggers();
     handle_move_triggers();
+    handle_follow_player_y_triggers();
+    handle_rotate_triggers();
+    handle_follow_triggers();
 }
 
 // https://github.com/gd-programming/gd.docs/issues/87

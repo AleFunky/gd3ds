@@ -40,6 +40,9 @@ extern int alpha_trigger_count;
 extern int move_trigger_count;
 extern int spawn_trigger_count;
 extern int pulse_trigger_count;
+extern int rotate_trigger_count;
+extern int follow_player_y_trigger_count;
+extern int rotate_trigger_capacity;
 
 typedef struct {
     Color color;
@@ -92,6 +95,66 @@ typedef struct {
 
 typedef struct {
     bool active;
+    bool restored_from_checkpoint;
+    bool activate_group;
+    bool multi_activate;
+    int target_group;
+    int item_id;
+    int target_count;
+    int previous_value;
+    int source_obj;
+} CountTriggerBuffer;
+
+typedef struct {
+    bool applied;
+    unsigned char held_mask;
+    int source_obj;
+} TouchTriggerBuffer;
+
+typedef struct {
+    int id;
+    int value;
+} ItemCount;
+
+extern CountTriggerBuffer *count_trigger_buffer;
+extern int count_trigger_count;
+extern int count_trigger_capacity;
+extern TouchTriggerBuffer *touch_trigger_buffer;
+extern int touch_trigger_count;
+extern int touch_trigger_capacity;
+extern ItemCount *item_counter_buffer;
+extern int item_counter_count;
+extern int item_counter_capacity;
+
+typedef struct {
+    bool active;
+    bool restored_from_checkpoint;
+    int target_group;
+    int source_obj;
+    float speed;
+    float delay;
+    float offset;
+    float max_speed;
+    float group_y;
+} FollowPlayerYTriggerBuffer;
+
+typedef struct {
+    bool active;
+    bool restored_from_checkpoint;
+    int target_group;
+    int follow_group;
+    int source_obj;
+    int ref_obj;
+    float x_mod;
+    float y_mod;
+    float seconds;
+    float time_run;
+    float last_x;
+    float last_y;
+} FollowTriggerBuffer;
+
+typedef struct {
+    bool active;
     bool queued;
     bool restored_from_checkpoint;
     int target_group;
@@ -104,6 +167,9 @@ typedef struct {
 #define PULSE_TARGET_GROUP 1
 #define PULSE_MODE_COLOR 0
 #define PULSE_MODE_HSV 1
+#define INSTANT_COUNT_MODE_EQUALS 0
+#define INSTANT_COUNT_MODE_LARGER 1
+#define INSTANT_COUNT_MODE_SMALLER 2
 
 typedef struct {
     bool active;
@@ -119,20 +185,50 @@ typedef struct {
     int pulse_target_type;
     bool main_only;
     bool detail_only;
-    bool started_fade_out;
     int pulse_index;
-    int *main_pulse_index;
-    int *detail_pulse_index;
     float seconds;
     float time_run;
-    unsigned int activation_order;
 
     int source_obj;
     bool restored_from_checkpoint;
 } PulseTriggerBuffer;
 
+typedef struct {
+    bool spawn_triggered;
+    bool multi_triggered;
+    float trig_duration;
+    int target_group;
+    int center_group;
+    float degrees;
+    int times360;
+    bool lock_object_rotation;
+    int rotate_easing;
+    float easing_rate;
+} RotateTrigger;
+
+typedef struct {
+    int obj;
+    float rotation;
+} RotateTargetState;
+
+typedef struct {
+    bool active;
+    bool restored_from_checkpoint;
+    bool use_center;
+    int center_obj;
+    int source_obj;
+    float total_degrees;
+    bool lock_object_rotation;
+    int easing_type;
+    float easing_rate;
+    float seconds;
+    float time_run;
+    int target_count;
+    RotateTargetState *targets;
+} RotateTriggerBuffer;
+
 void free_trigger_buffers();
-void restore_pulse_trigger(int obj, float time_run, unsigned int activation_order, bool started_fade_out);
+void restore_pulse_trigger(int obj, float time_run);
 
 extern ColorChannel channels[COL_CHANNEL_NUM];
 extern ColTriggerBuffer col_trigger_buffer[COL_CHANNEL_NUM];
@@ -140,6 +236,12 @@ extern AlphaTriggerBuffer *alpha_trigger_buffer;
 extern MoveTriggerBuffer *move_trigger_buffer;
 extern SpawnTriggerBuffer *spawn_trigger_buffer;
 extern PulseTriggerBuffer *pulse_trigger_buffer;
+extern RotateTriggerBuffer *rotate_trigger_buffer;
+extern FollowPlayerYTriggerBuffer *follow_player_y_trigger_buffer;
+extern FollowTriggerBuffer *follow_trigger_buffer;
+extern int follow_trigger_count;
+extern int follow_trigger_capacity;
+RotateTrigger *get_rotate_trigger(int obj);
 extern float move_lock_player_x_delta;
 extern float move_lock_player_y_delta;
 extern float move_step_dt;
@@ -163,10 +265,18 @@ extern float trigger_dt;
 #define COL_TRIGGER 899
 #define GROUND_2_TRIGGER 900
 #define MOVE_TRIGGER 901
+#define COUNT_TRIGGER 1611
+#define INSTANT_COUNT_TRIGGER 1811
 #define ALPHA_TRIGGER 1007
 #define TOGGLE_TRIGGER 1049
+#define TOUCH_TRIGGER 1595
 #define PULSE_TRIGGER 1006
 #define SPAWN_TRIGGER 1268
+#define ROTATE_TRIGGER 1346
+#define FOLLOW_TRIGGER 1347
+#define FOLLOW_PLAYER_Y_TRIGGER 1814
+#define HIDE_PLAYER_TRIGGER 1612
+#define SHOW_PLAYER_TRIGGER 1613
 
 #define TRIGGER_FADE_SIMPLE 22
 #define TRIGGER_FADE_UP 23
@@ -201,15 +311,26 @@ void init_col_channels();
 void handle_col_channel(int chan);
 void handle_col_triggers(void);
 void handle_copy_channels();
-bool is_position_trigger(int id);
 void handle_triggers(void);
 void upload_to_alpha_buffer(int obj);
 void handle_alpha_triggers(void);
 void upload_to_move_buffer(int obj);
 void handle_move_triggers(void);
+int get_item_count(int id);
+void add_item_count(int id, int delta);
+void upload_to_count_buffer(int obj);
+void handle_count_triggers(void);
+void upload_to_touch_buffer(int obj);
+void handle_touch_triggers(void);
+void upload_to_follow_player_y_buffer(int obj);
+void handle_follow_player_y_triggers(void);
+void upload_to_follow_buffer(int obj);
+void handle_follow_triggers(void);
 void handle_step_triggers(void);
 void upload_to_spawn_buffer(int obj, bool from_spawn);
 void handle_spawn_triggers(void);
+void toggle_group(int group, bool activate, bool spawn);
+void spawn_group(int group);
 void upload_to_pulse_buffer(int obj);
 void handle_pulse_triggers(void);
 void run_trigger(int obj, bool from_spawn);

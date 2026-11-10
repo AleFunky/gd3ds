@@ -2,6 +2,7 @@
 #include "main.hpp"
 #include "menus/components/ui_spinner.hpp"
 #include "menus/core/common_setters.hpp"
+#include "menus/settings_hub/settings.hpp"
 #include "ui_element.hpp"
 #include "ui_screen.hpp"
 
@@ -254,6 +255,14 @@ void ui_screen_close(UIScreen *screen) {
         return;
 
     UITransition *t = &screen->transition;
+
+    if (settingsState.fastMenu) {
+        t->state = UI_TRANSITION_CLOSING;
+        t->time = t->duration;
+        t->done = true;
+        screen->closing = true;
+        return;
+    }
 
     t->state = UI_TRANSITION_CLOSING;
 

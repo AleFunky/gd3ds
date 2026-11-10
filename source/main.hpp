@@ -1,5 +1,6 @@
 #pragma once
 #include <citro2d.h>
+#include "arena.hpp"
 #include "level_loading.hpp"
 
 #include "particles/particles.hpp"
@@ -26,8 +27,8 @@
 #define ARRAY_LEN(arr) (sizeof(arr) / sizeof(arr[0]))
 #define IN_BOUNDS(index, arr) ((size_t)index < ARRAY_LEN(arr))
 
-#define GD_VERSION 2.0
-#define LAST_GD_VERSION_ID 28384582  // Last 2.0 id
+#define GD_VERSION 2.1
+#define LAST_GD_VERSION_ID 97454394  // Last 2.1 id (skibidi level)
 
 #define GAME_TITLE_ID 0x000400000BB41C00
 
@@ -67,6 +68,7 @@ extern char *_3dsx_path;
 extern float global_volume;
 extern float music_volume;
 extern float sound_volume;
+extern float dim_secondary_screen;
 
 extern ParticleSystem touch_drag_particles;
 extern ParticleSystem touch_explosion_particles;
@@ -75,6 +77,7 @@ extern ParticleSystem slow_speed_particles_bottom;
 extern ParticleSystem normal_speed_particles_bottom;
 extern ParticleSystem fast_speed_particles_bottom;
 extern ParticleSystem faster_speed_particles_bottom;
+extern ParticleSystem fastest_speed_particles_bottom;
 extern ParticleSystem end_wall_particles;
 extern ParticleSystem end_wall_firework;
 extern ParticleSystem level_complete_effect_p1;
@@ -84,10 +87,14 @@ extern float slow_speed_particles_timer;
 extern float normal_speed_particles_timer;
 extern float fast_speed_particles_timer;
 extern float faster_speed_particles_timer;
+extern float fastest_speed_particles_timer;
+
+extern Arena level_arena;
 
 #define SCREEN_WIDTH  400
 #define SCREEN_BOT_WIDTH  320
 #define SCREEN_HEIGHT 240
+#define SWAP_SIDE_OFFSET_X ((SCREEN_WIDTH - SCREEN_BOT_WIDTH) / 2.f)
 
 enum GameState {
     STATE_MENU,

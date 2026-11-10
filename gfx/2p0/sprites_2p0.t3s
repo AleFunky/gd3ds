@@ -1,4 +1,4 @@
---atlas --border edge -f rgba8888 -z auto
+--atlas --border edge -f rgba4444 -z auto
 block005_02_001.png
 block005_02_color_001.png
 block005_02b_001.png
@@ -352,6 +352,8 @@ d_grassArt_01_001.png
 d_grassArt_02_001.png
 d_grassArt_03_001.png
 d_grassArt_04_001.png
+d_key01_001.png
+d_key01_color_001.png
 d_pickupCircle_01_001.png
 d_pickupCircle_02_001.png
 d_rainbow_01_001.png
@@ -598,4 +600,3 @@ merged_988_1.png
 merged_997_0.png
 merged_998_0.png
 merged_999_0.png
-d_keyHole01_001.png

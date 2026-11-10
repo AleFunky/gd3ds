@@ -1,4 +1,4 @@
---atlas --border edge -f rgba8888 -z auto
+--atlas --border edge -f rgba4444 -z auto
 blackCogwheel_01_001.png
 blackCogwheel_01_color_001.png
 blackCogwheel_02_001.png
@@ -345,7 +345,6 @@ darkblade_02_001.png
 darkblade_02_color_001.png
 darkblade_03_001.png
 darkblade_03_color_001.png
-emptyFrame.png
 fakeSpike_01_001.png
 fakeSpike_02_001.png
 fakeSpike_03_001.png

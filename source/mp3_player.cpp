@@ -34,6 +34,8 @@ static volatile bool restart_requested = false;
 
 volatile float amplitude = 0;
 
+
+static bool should_free_buf = true;
 static void *song_buf = NULL;
 static size_t song_sz = 0;
 static size_t song_pos = 0;
@@ -349,6 +351,8 @@ int play_mp3(const char *path, bool loop, float seek) {
     paused = false;
     looping = loop;
 
+    should_free_buf = true;
+
     seek_target = seek;
 
     int32_t priority = 0x30;
@@ -425,7 +429,7 @@ void fade_to_amplitude(float new_amplitude) {
 }
 
 // Play an mp3 from a pre-loaded memory buffer
-int play_mp3_buf(void *buf, size_t sz, bool loop, float seek) {
+int play_mp3_buf(void *buf, size_t sz, bool loop, float seek, bool free_buf) {
     if (!buf || sz == 0) return 0;
 
     stop_mp3();
@@ -434,6 +438,8 @@ int play_mp3_buf(void *buf, size_t sz, bool loop, float seek) {
     quit = false;
     looping = loop;
     seek_target = seek;
+
+    should_free_buf = free_buf;
 
     song_buf = buf;
     song_sz = sz;
@@ -471,10 +477,10 @@ void stop_mp3() {
         audio_exit();
     }
 
-    if (song_buf) {
+    if (should_free_buf) {
         free(song_buf);
-        song_buf = NULL;
     }
+    song_buf = NULL;
     song_sz = 0;
     song_pos = 0;
 }

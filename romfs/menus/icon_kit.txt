@@ -3,13 +3,14 @@ bggradient color=#a7a7a7
 button x=24 y=28 id=8 actions=close_menu keyBinds="B"
 button x=23 y=70 id=130 actions=open_menu[screen="palette_kit" btm_anim="slide_right"]
 
-button x=67 y=65 id=341 tag="icon_buttons,cube" actions=action_page[page=0]
-button x=104 y=65 id=351 tag="icon_buttons,ship" actions=action_page[page=1]
-button x=141 y=65 id=325 tag="icon_buttons,ball" actions=action_page[page=2]
-button x=178 y=65 id=327 tag="icon_buttons,ufo" actions=action_page[page=3]
-button x=215 y=65 id=329 tag="icon_buttons,dart" actions=action_page[page=4]
-button x=252 y=65 id=349 tag="icon_buttons,robot" actions=action_page[page=5]
-button x=289 y=65 id=355 tag="icon_buttons,trail" action=action_trail
+button x=86 y=28 id=341 tag="icon_buttons,cube" actions=action_page[page=0]
+button x=123 y=28 id=351 tag="icon_buttons,ship" actions=action_page[page=1]
+button x=160 y=28 id=325 tag="icon_buttons,ball" actions=action_page[page=2]
+button x=197 y=28 id=327 tag="icon_buttons,ufo" actions=action_page[page=3]
+button x=234 y=28 id=329 tag="icon_buttons,dart" actions=action_page[page=4]
+button x=123 y=65 id=349 tag="icon_buttons,robot" actions=action_page[page=5]
+button x=160 y=65 id=353 tag="icon_buttons,spider" actions=action_page[page=6]
+button x=197 y=65 id=355 tag="icon_buttons,trail" action=action_trail
 
 button x=20 y=145 id=6 action="icons_left" keyBinds="LEFT"
 button x=300 y=145 id=6 sx=-1 action="icons_right" keyBinds="RIGHT"

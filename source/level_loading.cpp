@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include "level_loading.hpp"
@@ -6,6 +7,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdio.h>
+#include "arena.hpp"
 #include "practice.hpp"
 #include "triggers.hpp"
 #include "main.hpp"
@@ -26,6 +28,7 @@
 #include "utils/utils.hpp"
 
 #include "menus/creator_menu/online/online_level_menu.hpp"
+#include "save/saving.hpp"
 
 ObjectsArray objects = { 0 };
 
@@ -45,10 +48,20 @@ char *curr_level_string = NULL;
 
 TriggerPool col_pool;
 TriggerPool move_pool;
+static TriggerPool count_pool;
+static TriggerPool instant_count_pool;
+TriggerPool follow_player_y_pool;
+static TriggerPool follow_pool;
+static TriggerPool counter_label_pool;
+static TriggerPool pickup_pool;
+bool has_follow_player_y = false;
 TriggerPool alpha_pool;
 TriggerPool pulse_pool;
 TriggerPool toggle_pool;
+TriggerPool touch_pool;
 TriggerPool spawn_pool;
+TriggerPool rotate_pool;
+TriggerPool simple_pool;
 static TriggerPool text_pool;
 static TextObject empty_text_object;
 
@@ -68,12 +81,62 @@ MoveTrigger *get_move_trigger(int obj) {
     return TRIGGER_AT(move_pool, MoveTrigger, objects.trigger_index[obj]);
 }
 
+CountTrigger *get_count_trigger(int obj) {
+    return TRIGGER_AT(count_pool, CountTrigger, objects.trigger_index[obj]);
+}
+
+InstantCountTrigger *get_instant_count_trigger(int obj) {
+    return TRIGGER_AT(instant_count_pool, InstantCountTrigger, objects.trigger_index[obj]);
+}
+
+CounterLabel *get_counter_label(int obj) {
+    int index = objects.trigger_index[obj];
+    if (index < 0 || !counter_label_pool.data || (size_t)index >= counter_label_pool.count) return NULL;
+    return TRIGGER_AT(counter_label_pool, CounterLabel, index);
+}
+
+PickupItem *get_pickup_item(int obj) {
+    if (!(objects.flags[obj] & FLAG_PICKUP)) return NULL;
+    int index = objects.trigger_index[obj];
+    if (index < 0 || !pickup_pool.data || (size_t)index >= pickup_pool.count) return NULL;
+    return TRIGGER_AT(pickup_pool, PickupItem, index);
+}
+
+static PickupItem *ensure_pickup_item(int obj) {
+    if (objects.flags[obj] & FLAG_PICKUP) return get_pickup_item(obj);
+    int index = trigger_pool_add(&pickup_pool, sizeof(PickupItem));
+    if (index < 0) return NULL;
+    objects.trigger_index[obj] = index;
+    objects.flags[obj] |= FLAG_PICKUP;
+    return TRIGGER_AT(pickup_pool, PickupItem, index);
+}
+
+FollowPlayerYTrigger *get_follow_player_y_trigger(int obj) {
+    return TRIGGER_AT(follow_player_y_pool, FollowPlayerYTrigger, objects.trigger_index[obj]);
+}
+
+FollowTrigger *get_follow_trigger(int obj) {
+    return TRIGGER_AT(follow_pool, FollowTrigger, objects.trigger_index[obj]);
+}
+
+RotateTrigger *get_rotate_trigger(int obj) {
+    return TRIGGER_AT(rotate_pool, RotateTrigger, objects.trigger_index[obj]);
+}
+
 ToggleTrigger *get_toggle_trigger(int obj) {
     return TRIGGER_AT(toggle_pool, ToggleTrigger, objects.trigger_index[obj]);
 }
 
+TouchTrigger *get_touch_trigger(int obj) {
+    return TRIGGER_AT(touch_pool, TouchTrigger, objects.trigger_index[obj]);
+}
+
 SpawnTrigger *get_spawn_trigger(int obj) {
     return TRIGGER_AT(spawn_pool, SpawnTrigger, objects.trigger_index[obj]);
+}
+
+SimpleTrigger *get_simple_trigger(int obj) {
+    return TRIGGER_AT(simple_pool, SimpleTrigger, objects.trigger_index[obj]);
 }
 
 TextObject *get_text_object(int obj) {
@@ -109,7 +172,7 @@ Section *get_section(int x, int y) {
 static SectionTriggers uncached_section_triggers = { .count = -1 };
 
 static void append_section_trigger(Section *sec, int object_index) {
-    if (!is_position_trigger(objects.id[sec->objects[object_index]])) return;
+    if (!is_trigger_object(objects.id[sec->objects[object_index]])) return;
     SectionTriggers *list = sec->triggers;
     if (list && list->count < 0) return;
     if (!list || list->count == list->capacity) {
@@ -245,6 +308,34 @@ char *read_file(const char *filepath, size_t *out_size) {
     rewind(f);
 
     char *buffer = (char *)malloc(size + 1);
+    if (!buffer) {
+        output_log("Failed to allocate file\n");
+        fclose(f);
+        return NULL;
+    }
+    fread(buffer, 1, size, f);
+    buffer[size] = '\0'; // Null-terminate for text files
+    fclose(f);
+
+    if (out_size) *out_size = size;
+    return buffer;
+}
+
+char *read_file_arena(Arena *arena, const char *filepath, size_t *out_size) {
+    FILE *f = fopen(filepath, "rb");
+    if (!f) {
+        output_log("Failed to open file: %s (%d)\n", filepath, errno);
+        return NULL;
+    }
+    fseek(f, 0, SEEK_END);
+    long size = ftell(f);
+    if (size < 0) {
+        output_log("Failed to ftell file: %s (%d)\n", filepath, errno);
+        return NULL;
+    }
+    rewind(f);
+
+    char *buffer = (char *)arena_alloc(arena, size + 1);
     if (!buffer) {
         output_log("Failed to allocate file\n");
         fclose(f);
@@ -397,7 +488,7 @@ char *decompress_online_level(char *data, int *out_code) {
 
     //output_log("BRO len %d lol %s\n", strlen(data), data);
 
-    unsigned char *decoded = (unsigned char *)malloc(strlen(data));
+    unsigned char *decoded = (unsigned char *)arena_alloc(&level_arena, strlen(data));
 
     if (!decoded) {
         *out_code = LOAD_OUT_OF_MEMORY;
@@ -407,20 +498,16 @@ char *decompress_online_level(char *data, int *out_code) {
     int decoded_len = base64_decode(data, decoded);
     if (decoded_len <= 0) {
         output_log("Failed to decode base64\n");
-        free(decoded);
         *out_code = LOAD_INVALID_BASE64;
         return NULL;
     }
 
     size_t decompressed_len;
-    char *decompressed = decompress_data(decoded, decoded_len, &decompressed_len, out_code);
+    char *decompressed = decompress_data_level(decoded, decoded_len, &decompressed_len, out_code);
     if (!decompressed) {
         output_log("Decompression failed (check zlib error above)\n");
-        free(decoded);
         return NULL;
     }
-
-    free(decoded);
     
     return decompressed;
 }
@@ -443,7 +530,7 @@ char *decompress_level(char *data, int *out_code) {
 
     fix_base64_url(b64);
 
-    unsigned char *decoded = (unsigned char *)malloc(strlen(b64));
+    unsigned char *decoded = (unsigned char *)arena_alloc(&level_arena, strlen(b64));
     if (!decoded) {
         *out_code = LOAD_OUT_OF_MEMORY;
         return NULL;
@@ -452,21 +539,18 @@ char *decompress_level(char *data, int *out_code) {
     if (decoded_len <= 0) {
         output_log("Failed to decode base64\n");
         free(b64);
-        free(decoded);
         *out_code = LOAD_OUT_OF_MEMORY;
         return NULL;
     }
 
     size_t decompressed_len;
-    char *decompressed = decompress_data(decoded, decoded_len, &decompressed_len, out_code);
+    char *decompressed = decompress_data_level(decoded, decoded_len, &decompressed_len, out_code);
     if (!decompressed) {
         output_log("Decompression failed (check zlib error above)\n");
-        free(decoded);
         free(b64);
         return NULL;
     }
 
-    free(decoded);
     free(b64);
     
     return decompressed;
@@ -988,138 +1072,46 @@ GDValueType get_value_type_for_key(int key) {
         case 65: return GD_VAL_BOOL;   // pulse main_only
         case 66: return GD_VAL_BOOL;   // pulse detail_only
         case 67: return GD_VAL_BOOL;   // dont enter
+        case 68: return GD_VAL_FLOAT;  // rotate degrees
+        case 69: return GD_VAL_INT;    // rotate times360
+        case 70: return GD_VAL_BOOL;   // rotate lock object rotation
+        case 71: return GD_VAL_INT;    // rotate center group
+        case 72: return GD_VAL_FLOAT;  // follow x mod
+        case 73: return GD_VAL_FLOAT;  // follow y mod
+        case 77: return GD_VAL_INT;    // target count (count/instant count)
+        case 78: return GD_VAL_BOOL;   // sub count (collectible, 2.1)
+        case 79: return GD_VAL_BOOL;   // pickup item (2.1)
+        case 80: return GD_VAL_INT;    // item ID (pickup/count/counter label)
+        case 81: return GD_VAL_INT;    // hold mode (touch trigger)
+        case 82: return GD_VAL_INT;    // on/off (touch trigger)
+        case 85: return GD_VAL_FLOAT;  // easing rate
+        case 89: return GD_VAL_INT;    // dual mode (touch trigger)
         case 87: return GD_VAL_BOOL;   // multi_triggered
+        case 88: return GD_VAL_INT;    // instant count mode (equals/larger/smaller)
+        case 104: return GD_VAL_BOOL;  // multi activate (count trigger)
+        case 381: return GD_VAL_BOOL;  // pickup item (2.2, robtop changed the pickup_item id to 381 for some reason but 2.1 levels like fingerdash use 79)
+        case 90: return GD_VAL_FLOAT;  // follow speed (follow player Y trigger)
+        case 91: return GD_VAL_FLOAT;  // follow delay (follow player Y trigger)
+        case 92: return GD_VAL_FLOAT;  // follow offset (follow player Y trigger)
+        case 105: return GD_VAL_FLOAT; // follow max speed (follow plaeyr Y trigger)
         case 128: return GD_VAL_FLOAT; // scale X
         case 129: return GD_VAL_FLOAT; // scale Y
         case 57: return GD_VAL_INT_ARRAY; // groups
+        case 504: return GD_VAL_BOOL;   // spawn only (toggle orb)
+        case 99: return GD_VAL_BOOL;   // multi activate (orbs / pads)
         default:
             return GD_VAL_INT; // Default fallback
     }
 }
 
-// Convert some 2.1 objects into the 1.9 ones, blame robtop for making GD convert those to 2.1
 int convert_object(int id) {
     switch (id) {
         case V2_0_LINE_TRIGGER:
             return LINE_TRIGGER;
-        // Saws
-        case 1734:
-            return 675;
-        case 1735:
-            return 676;
-        case 1736:
-            return 677;
-        case 1705:
-            return 88;
-        case 1706:
-            return 89;
-        case 1707:
-            return 98;
-        case 1708:
-            return 397;
-        case 1709:
-            return 398;
-        case 1710:
-            return 399;
 
         // User coin
         case 1329:
             return SECRET_COIN;
-
-        // Slopes
-        case 1743:
-            return 289;
-        case 1744:
-            return 291;
-
-        case 1745:
-            return 299;
-        case 1746:
-            return 301;
-
-        case 1747:
-            return 309;
-        case 1748:
-            return 311;
-
-        case 1749:
-            return 315;
-        case 1750:
-            return 317;
-        
-        case 1338:
-            return 665;
-        case 1339:
-            return 666;
-
-        // Ground spikes
-
-        case 1715:
-            return 9;
-
-        case 1719:
-            return 61;
-
-        case 1720:
-            return 243;
-        case 1721:
-            return 244;
-        
-        case 1716:
-            return 365;
-        case 1717:
-            return 363;
-        case 1718:
-            return 364;
-
-        case 1722:
-            return 368;
-        case 1723:
-            return 366;
-        case 1724:
-            return 367;
-
-        case 1725:
-            return 421;
-        case 1726:
-            return 422;
-        
-        case 1728:
-            return 446;
-        case 1729:
-            return 447;
-        
-        case 1730:
-            return 667;
-        case 1731:
-            return 720;
-
-        // Fake spikes
-        case 1889:
-            return 191;
-        case 1890:
-            return 198;
-        case 1891:
-            return 199;
-        case 1892:
-            return 393;
-
-        // Default slabs
-        case 1903:
-            return 40;
-
-        case 1904:
-            return 369;
-
-        case 1905:
-            return 370;
-
-        case 1910:
-            return 195;
-
-        case 1911:
-            return 196;
-        
     }
     return id;
 }
@@ -1151,6 +1143,31 @@ int allocate_trigger_component(int obj) {
                 objects.trigger_index[obj] = index;
             }
             break;
+        case COUNT_TRIGGER:
+            index = trigger_pool_add(&count_pool, sizeof(CountTrigger));
+            if (index >= 0) {
+                objects.trigger_index[obj] = index;
+            }
+            break;
+        case INSTANT_COUNT_TRIGGER:
+            index = trigger_pool_add(&instant_count_pool, sizeof(InstantCountTrigger));
+            if (index >= 0) {
+                objects.trigger_index[obj] = index;
+            }
+            break;
+        case FOLLOW_PLAYER_Y_TRIGGER:
+            has_follow_player_y = true;
+            index = trigger_pool_add(&follow_player_y_pool, sizeof(FollowPlayerYTrigger));
+            if (index >= 0) {
+                objects.trigger_index[obj] = index;
+            }
+            break;
+        case FOLLOW_TRIGGER:
+            index = trigger_pool_add(&follow_pool, sizeof(FollowTrigger));
+            if (index >= 0) {
+                objects.trigger_index[obj] = index;
+            }
+            break;
         case ALPHA_TRIGGER:
             index = trigger_pool_add(&alpha_pool, sizeof(AlphaTrigger));
             if (index >= 0) {
@@ -1165,14 +1182,36 @@ int allocate_trigger_component(int obj) {
                 get_pulse_trigger(obj)->opacity = 1.0f;
             }
             break;
+        case ENABLE_TRAIL: 
+        case DISABLE_TRAIL:
+        case HIDE_PLAYER_TRIGGER:
+        case SHOW_PLAYER_TRIGGER:
+            index = trigger_pool_add(&simple_pool, sizeof(SimpleTrigger));
+            if (index >= 0) {
+                objects.trigger_index[obj] = index;
+            }
+            break;
         case TOGGLE_TRIGGER:
+        case TOGGLE_ORB:
             index = trigger_pool_add(&toggle_pool, sizeof(ToggleTrigger));
+            if (index >= 0) {
+                objects.trigger_index[obj] = index;
+            }
+            break;
+        case TOUCH_TRIGGER:
+            index = trigger_pool_add(&touch_pool, sizeof(TouchTrigger));
             if (index >= 0) {
                 objects.trigger_index[obj] = index;
             }
             break;
         case SPAWN_TRIGGER:
             index = trigger_pool_add(&spawn_pool, sizeof(SpawnTrigger));
+            if (index >= 0) {
+                objects.trigger_index[obj] = index;
+            }
+            break;
+        case ROTATE_TRIGGER:
+            index = trigger_pool_add(&rotate_pool, sizeof(RotateTrigger));
             if (index >= 0) {
                 objects.trigger_index[obj] = index;
             }
@@ -1202,7 +1241,7 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                 objects.id[object] = convert_object(val.i);
 
                 init_default_variables(object);
-                if (is_trigger_object(val.i)) {
+                if (is_complex_trigger_object(val.i) || is_simple_trigger_object(val.i) || val.i == TOGGLE_ORB) {
                     // Allocate its data
                     trigger_index = allocate_trigger_component(object);
                     if (trigger_index < 0) {
@@ -1214,6 +1253,11 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                     int text_index = trigger_pool_add(&text_pool, sizeof(TextObject));
                     objects.trigger_index[object] = (text_index < 0) ? -1 : text_index;
                 }
+                if (objects.id[object] == COUNTER_LABEL) {
+                    int counter_label_index = trigger_pool_add(&counter_label_pool, sizeof(CounterLabel));
+                    objects.trigger_index[object] = (counter_label_index < 0) ? -1 : counter_label_index;
+                }
+
             }
             break;
         case 2:  // X
@@ -1286,6 +1330,12 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                         case SPAWN_TRIGGER:
                             get_spawn_trigger(object)->trig_duration = val.f;
                             break;
+                        case ROTATE_TRIGGER:
+                            get_rotate_trigger(object)->trig_duration = val.f;
+                            break;
+                        case FOLLOW_TRIGGER:
+                            get_follow_trigger(object)->trig_duration = val.f;
+                            break;
                     }
                 }
             }
@@ -1348,8 +1398,12 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
             }
             break;
         case 30: // Move easing
-            if (type == GD_VAL_INT && objects.id[object] == MOVE_TRIGGER) {
-                get_move_trigger(object)->move_easing = val.i;
+            if (type == GD_VAL_INT) {
+                if (objects.id[object] == MOVE_TRIGGER) {
+                    get_move_trigger(object)->move_easing = val.i;
+                } else if (objects.id[object] == ROTATE_TRIGGER) {
+                    get_rotate_trigger(object)->rotate_easing = val.i;
+                }
             }
             break;
         case 31: // Text
@@ -1448,6 +1502,18 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                         case MOVE_TRIGGER:
                             get_move_trigger(object)->target_group = val.i;
                             break;
+                        case COUNT_TRIGGER:
+                            get_count_trigger(object)->target_group = val.i;
+                            break;
+                        case INSTANT_COUNT_TRIGGER:
+                            get_instant_count_trigger(object)->target_group = val.i;
+                            break;
+                        case FOLLOW_PLAYER_Y_TRIGGER:
+                            get_follow_player_y_trigger(object)->target_group = val.i;
+                            break;
+                        case FOLLOW_TRIGGER:
+                            get_follow_trigger(object)->target_group = val.i;
+                            break;
                         case ALPHA_TRIGGER:
                             get_alpha_trigger(object)->target_group = val.i;
                             break;
@@ -1457,8 +1523,17 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                         case TOGGLE_TRIGGER:
                             get_toggle_trigger(object)->target_group = val.i;
                             break;
+                        case TOGGLE_ORB:
+                            get_toggle_trigger(object)->target_group = val.i;
+                            break;
+                        case TOUCH_TRIGGER:
+                            get_touch_trigger(object)->target_group = val.i;
+                            break;
                         case SPAWN_TRIGGER:
                             get_spawn_trigger(object)->target_group = val.i;
+                            break;
+                        case ROTATE_TRIGGER:
+                            get_rotate_trigger(object)->target_group = val.i;
                             break;
                     }
                 }
@@ -1473,8 +1548,14 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
             if (type == GD_VAL_FLOAT) objects.tp_y_offset[object] = val.f;
             break;
         case 56: // Activate group
-            if (type == GD_VAL_BOOL && objects.id[object] == TOGGLE_TRIGGER) {
-                get_toggle_trigger(object)->activate_group = val.b;
+            if (type == GD_VAL_BOOL) {
+                if (objects.id[object] == TOGGLE_TRIGGER || objects.id[object] == TOGGLE_ORB) {
+                    get_toggle_trigger(object)->activate_group = val.b;
+                } else if (objects.id[object] == COUNT_TRIGGER) {
+                    get_count_trigger(object)->activate_group = val.b;
+                } else if (objects.id[object] == INSTANT_COUNT_TRIGGER) {
+                    get_instant_count_trigger(object)->activate_group = val.b;
+                }
             }
             break;
         case 58: // Lock to player X
@@ -1491,10 +1572,18 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
             if (type == GD_VAL_BOOL) {
                 if (is_color_trigger(objects.id[object])) {
                     get_color_trigger(object)->spawn_triggered = val.b;
+                } else if (is_simple_trigger_object(objects.id[object])) {
+                    get_simple_trigger(object)->spawn_triggered = val.b;
                 } else {
                     switch (objects.id[object]) {
                         case MOVE_TRIGGER:
                             get_move_trigger(object)->spawn_triggered = val.b;
+                            break;
+                        case FOLLOW_PLAYER_Y_TRIGGER:
+                            get_follow_player_y_trigger(object)->spawn_triggered = val.b;
+                            break;
+                        case FOLLOW_TRIGGER:
+                            get_follow_trigger(object)->spawn_triggered = val.b;
                             break;
                         case ALPHA_TRIGGER:
                             get_alpha_trigger(object)->spawn_triggered = val.b;
@@ -1505,8 +1594,20 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                         case TOGGLE_TRIGGER:
                             get_toggle_trigger(object)->spawn_triggered = val.b;
                             break;
+                        case TOUCH_TRIGGER:
+                            get_touch_trigger(object)->spawn_triggered = val.b;
+                            break;
                         case SPAWN_TRIGGER:
                             get_spawn_trigger(object)->spawn_triggered = val.b;
+                            break;
+                        case ROTATE_TRIGGER:
+                            get_rotate_trigger(object)->spawn_triggered = val.b;
+                            break;
+                        case COUNT_TRIGGER:
+                            get_count_trigger(object)->spawn_triggered = val.b;
+                            break;
+                        case INSTANT_COUNT_TRIGGER:
+                            get_instant_count_trigger(object)->spawn_triggered = val.b;
                             break;
                     }
                 }
@@ -1537,14 +1638,71 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                 objects.flags[object] |= val.b ? FLAG_DONT_ENTER : 0;
             }
             break;
+        case 68:
+            if (type == GD_VAL_FLOAT && objects.id[object] == ROTATE_TRIGGER) {
+                get_rotate_trigger(object)->degrees = val.f;
+            }
+            break;
+        case 69:
+            if (type == GD_VAL_INT && objects.id[object] == ROTATE_TRIGGER) {
+                get_rotate_trigger(object)->times360 = val.i;
+            }
+            break;
+        case 70:
+            if (type == GD_VAL_BOOL && objects.id[object] == ROTATE_TRIGGER) {
+                get_rotate_trigger(object)->lock_object_rotation = val.b;
+            }
+            break;
+        case 71:
+            if (type == GD_VAL_INT && objects.id[object] == ROTATE_TRIGGER) {
+                get_rotate_trigger(object)->center_group = val.i;
+            } else if (type == GD_VAL_INT && objects.id[object] == FOLLOW_TRIGGER) {
+                get_follow_trigger(object)->follow_group = val.i;
+            }
+            break;
+        case 72:
+            if (type == GD_VAL_FLOAT && objects.id[object] == FOLLOW_TRIGGER) {
+                get_follow_trigger(object)->x_mod = val.f;
+            }
+            break;
+        case 73:
+            if (type == GD_VAL_FLOAT && objects.id[object] == FOLLOW_TRIGGER) {
+                get_follow_trigger(object)->y_mod = val.f;
+            }
+            break;
+        case 85:
+            if (type == GD_VAL_FLOAT && objects.id[object] == ROTATE_TRIGGER) {
+                get_rotate_trigger(object)->easing_rate = val.f;
+            }
+            break;
+        case 81:
+            if (type == GD_VAL_INT && objects.id[object] == TOUCH_TRIGGER) {
+                get_touch_trigger(object)->hold_mode = val.i != 0;
+            }
+            break;
+        case 82:
+            if (type == GD_VAL_INT && objects.id[object] == TOUCH_TRIGGER) {
+                get_touch_trigger(object)->toggle_mode = (unsigned char)val.i;
+            }
+            break;
+        case 89:
+            break;
         case 87: // multi_triggered
             if (type == GD_VAL_BOOL) {
                 if (is_color_trigger(objects.id[object])) {
                     get_color_trigger(object)->multi_triggered = val.b;
+                } else if (is_simple_trigger_object(objects.id[object])) {
+                    get_simple_trigger(object)->multi_triggered = val.b;
                 } else {
                     switch (objects.id[object]) {
                         case MOVE_TRIGGER:
                             get_move_trigger(object)->multi_triggered = val.b;
+                            break;
+                        case FOLLOW_PLAYER_Y_TRIGGER:
+                            get_follow_player_y_trigger(object)->multi_triggered = val.b;
+                            break;
+                        case FOLLOW_TRIGGER:
+                            get_follow_trigger(object)->multi_triggered = val.b;
                             break;
                         case ALPHA_TRIGGER:
                             get_alpha_trigger(object)->multi_triggered = val.b;
@@ -1555,11 +1713,99 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                         case TOGGLE_TRIGGER:
                             get_toggle_trigger(object)->multi_triggered = val.b;
                             break;
+                        case TOUCH_TRIGGER:
+                            get_touch_trigger(object)->multi_triggered = val.b;
+                            break;
                         case SPAWN_TRIGGER:
                             get_spawn_trigger(object)->multi_triggered = val.b;
                             break;
+                        case ROTATE_TRIGGER:
+                            get_rotate_trigger(object)->multi_triggered = val.b;
+                            break;
+                        case COUNT_TRIGGER:
+                            get_count_trigger(object)->multi_triggered = val.b;
+                            break;
+                        case INSTANT_COUNT_TRIGGER:
+                            get_instant_count_trigger(object)->multi_triggered = val.b;
+                            break;
                     }
                 }
+            }
+            break;
+        case 88:
+            if (type == GD_VAL_INT && objects.id[object] == INSTANT_COUNT_TRIGGER) {
+                get_instant_count_trigger(object)->instant_count_mode = val.i;
+            }
+            break;
+        case 77:
+            if (type == GD_VAL_INT) {
+                if (objects.id[object] == COUNT_TRIGGER) {
+                    get_count_trigger(object)->target_count = val.i;
+                } else if (objects.id[object] == INSTANT_COUNT_TRIGGER) {
+                    get_instant_count_trigger(object)->target_count = val.i;
+                }
+            }
+            break;
+        case 78:
+            if (type == GD_VAL_BOOL && val.b) {
+                PickupItem *pickup = ensure_pickup_item(object);
+                if (pickup) pickup->sub_count = true;
+            }
+            break;
+        case 80:
+            if (type == GD_VAL_INT) {
+                switch (objects.id[object]) {
+                    case COUNT_TRIGGER:
+                        get_count_trigger(object)->item_id = val.i;
+                        break;
+                    case INSTANT_COUNT_TRIGGER:
+                        get_instant_count_trigger(object)->item_id = val.i;
+                        break;
+                    case COUNTER_LABEL:
+                    {
+                        CounterLabel *label = get_counter_label(object);
+                        if (label) label->item_id = val.i;
+                        break;
+                    }
+                    default:
+                    {
+                        PickupItem *pickup = ensure_pickup_item(object);
+                        if (pickup) pickup->item_id = val.i;
+                        break;
+                    }
+                }
+            }
+            break;
+        case 104:
+            if (type == GD_VAL_BOOL && objects.id[object] == COUNT_TRIGGER) {
+                get_count_trigger(object)->multi_activate = val.b;
+            }
+            break;
+        case 79:
+        case 381:
+            if (type == GD_VAL_BOOL && val.b) {
+                PickupItem *pickup = ensure_pickup_item(object);
+                if (pickup) pickup->is_pickup = true;
+            }
+            break;
+        case 90:
+            if (type == GD_VAL_FLOAT && objects.id[object] == FOLLOW_PLAYER_Y_TRIGGER) {
+                get_follow_player_y_trigger(object)->follow_speed = val.f;
+            }
+            break;
+        case 91:
+            if (type == GD_VAL_FLOAT && objects.id[object] == FOLLOW_PLAYER_Y_TRIGGER) {
+                get_follow_player_y_trigger(object)->follow_delay = val.f;
+            }
+            break;
+        case 92:
+            if (type == GD_VAL_FLOAT && objects.id[object] == FOLLOW_PLAYER_Y_TRIGGER) {
+                get_follow_player_y_trigger(object)->follow_offset = val.f;
+            }
+            break;
+        case 105:
+            if (type == GD_VAL_FLOAT && objects.id[object] == FOLLOW_PLAYER_Y_TRIGGER) {
+                get_follow_player_y_trigger(object)->follow_max_speed = val.f;
             }
             break;
         case 128: // Scale X
@@ -1582,6 +1828,16 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                     if (val.int_array[i] != 0) gcount++;
                 }
                 objects.group_count[object] = gcount;
+            }
+            break;
+        case 504:
+            if (type == GD_VAL_BOOL && objects.id[object] == TOGGLE_ORB) {
+                get_toggle_trigger(object)->spawn_only = val.b;
+            }
+            break;
+        case 99:
+            if (type == GD_VAL_BOOL) {
+                objects.flags[object] |= val.b ? FLAG_MULTI_ACTIVATE : 0;
             }
             break;
     }
@@ -1629,40 +1885,124 @@ bool is_color_trigger(int id) {
         || id == GROUND_2_TRIGGER;
 }
 
-bool is_trigger_object(int id) {
+bool is_complex_trigger_object(int id) {
     return is_color_trigger(id)
         || id == MOVE_TRIGGER
         || id == ALPHA_TRIGGER
         || id == TOGGLE_TRIGGER
+        || id == TOUCH_TRIGGER
         || id == PULSE_TRIGGER
-        || id == SPAWN_TRIGGER;
+        || id == SPAWN_TRIGGER
+        || id == ROTATE_TRIGGER
+        || id == COUNT_TRIGGER
+        || id == INSTANT_COUNT_TRIGGER
+        || id == FOLLOW_PLAYER_Y_TRIGGER
+        || id == FOLLOW_TRIGGER;
+}
+
+// Triggers that aren't configurable but have spawn triggered option
+bool is_simple_trigger_object(int id) {
+    switch (id) {
+        case HIDE_PLAYER_TRIGGER: 
+        case SHOW_PLAYER_TRIGGER:
+        case ENABLE_TRAIL: 
+        case DISABLE_TRAIL:
+            return true;
+        default:
+            return false;
+    }
+}
+
+bool is_trigger_object(int id) {
+    if (is_complex_trigger_object(id) || is_simple_trigger_object(id)) return true;
+    switch (id) {
+        case TRIGGER_FADE_SIMPLE: case TRIGGER_FADE_UP: case TRIGGER_FADE_DOWN:
+        case TRIGGER_FADE_RIGHT: case TRIGGER_FADE_LEFT:
+        case TRIGGER_FADE_SCALE_IN: case TRIGGER_FADE_SCALE_OUT:
+        case TRIGGER_FADE_INWARDS: case TRIGGER_FADE_OUTWARDS:
+        case TRIGGER_FADE_LEFT_SEMICIRCLE: case TRIGGER_FADE_RIGHT_SEMICIRCLE:
+            return true;
+        default: return false;
+    }
 }
 
 bool trigger_is_spawn_triggered(int id, int obj) {
     if (is_color_trigger(id)) return get_color_trigger(obj)->spawn_triggered;
+    if (is_simple_trigger_object(id)) return get_simple_trigger(obj)->spawn_triggered;
     switch (id) {
         case MOVE_TRIGGER:   return get_move_trigger(obj)->spawn_triggered;
+        case COUNT_TRIGGER:  return get_count_trigger(obj)->spawn_triggered;
+        case INSTANT_COUNT_TRIGGER: return get_instant_count_trigger(obj)->spawn_triggered;
+        case FOLLOW_PLAYER_Y_TRIGGER: return get_follow_player_y_trigger(obj)->spawn_triggered;
+        case FOLLOW_TRIGGER: return get_follow_trigger(obj)->spawn_triggered;
         case ALPHA_TRIGGER:  return get_alpha_trigger(obj)->spawn_triggered;
         case PULSE_TRIGGER:  return get_pulse_trigger(obj)->spawn_triggered;
         case TOGGLE_TRIGGER: return get_toggle_trigger(obj)->spawn_triggered;
+        case TOUCH_TRIGGER:  return get_touch_trigger(obj)->spawn_triggered;
         case SPAWN_TRIGGER:  return get_spawn_trigger(obj)->spawn_triggered;
+        case ROTATE_TRIGGER: return get_rotate_trigger(obj)->spawn_triggered;
     }
     return false;
 }
 
 bool trigger_is_multi_triggered(int id, int obj) {
     if (is_color_trigger(id)) return get_color_trigger(obj)->multi_triggered;
+    if (is_simple_trigger_object(id)) return get_simple_trigger(obj)->multi_triggered;
     switch (id) {
         case MOVE_TRIGGER:   return get_move_trigger(obj)->multi_triggered;
+        case COUNT_TRIGGER:  return get_count_trigger(obj)->multi_triggered;
+        case INSTANT_COUNT_TRIGGER: return get_instant_count_trigger(obj)->multi_triggered;
+        case FOLLOW_PLAYER_Y_TRIGGER: return get_follow_player_y_trigger(obj)->multi_triggered;
+        case FOLLOW_TRIGGER: return get_follow_trigger(obj)->multi_triggered;
         case ALPHA_TRIGGER:  return get_alpha_trigger(obj)->multi_triggered;
         case PULSE_TRIGGER:  return get_pulse_trigger(obj)->multi_triggered;
         case TOGGLE_TRIGGER: return get_toggle_trigger(obj)->multi_triggered;
+        case TOUCH_TRIGGER:  return get_touch_trigger(obj)->multi_triggered;
         case SPAWN_TRIGGER:  return get_spawn_trigger(obj)->multi_triggered;
+        case ROTATE_TRIGGER: return get_rotate_trigger(obj)->multi_triggered;
     }
     return false;
 }
 
-int parse_gd_object(const char *objStr, int obj) {
+static bool is_high_detail_object(const char *section, const char *end, float *out_x) {
+    if (!level_info.low_detail) return false;
+
+    if (!end) end = section + strlen(section);
+
+    bool high_detail = false;
+    const char *p = section;
+
+    while (p < end) {
+        char *key_end;
+        long key = strtol(p, &key_end, 10);
+        if (key_end == p || key_end >= end || *key_end != ',') break;
+
+        const char *value = key_end + 1;
+        const char *value_end = value;
+        while (value_end < end && *value_end != ',') value_end++;
+
+        if (key == 103) {
+            high_detail = (value_end - value == 1 && value[0] == '1');
+        } else if (key == 2 && out_x) {
+            *out_x = atof(value);
+        }
+
+        p = (value_end < end) ? value_end + 1 : end;
+    }
+
+    return high_detail;
+}
+
+int parse_gd_object(const char *objStr, const char *objEnd, int obj, int capacity) {
+    float high_detail_x = 0.f;
+
+    if (is_high_detail_object(objStr, objEnd, &high_detail_x)) {
+        if (high_detail_x > level_info.last_obj_x) level_info.last_obj_x = high_detail_x;
+        return -1;
+    }
+
+    if (obj >= capacity) return -2;
+
     int count = 0;
     // Split object into each key
     char **tokens = split_string(objStr, ',', &count, false);
@@ -1812,252 +2152,188 @@ int parse_gd_object(const char *objStr, int obj) {
     return 1;
 }
 
+static int *objects_int_block = NULL;
+static float *objects_float_block = NULL;
+static unsigned short *objects_ushort_block = NULL;
+static unsigned char *objects_uchar_block = NULL;
+static bool *objects_bool_block = NULL;
+static short (*objects_groups_block)[MAX_GROUPS_PER_OBJECT] = NULL;
+static u8 *objects_u8_block = NULL;
+static Color *objects_color_block = NULL;
+static HSV *objects_hsv_block = NULL;
+
 void free_arrays() {
-    free(col_pool.data);
-    free(move_pool.data);
-    free(alpha_pool.data);
-    free(pulse_pool.data);
-    free(toggle_pool.data);
-    free(spawn_pool.data);
-    free(text_pool.data);
+    has_follow_player_y = false;
     col_pool = (TriggerPool){0};
     move_pool = (TriggerPool){0};
+    count_pool = (TriggerPool){0};
+    instant_count_pool = (TriggerPool){0};
+    counter_label_pool = (TriggerPool){0};
+    pickup_pool = (TriggerPool){0};
+    follow_player_y_pool = (TriggerPool){0};
+    follow_pool = (TriggerPool){0};
     alpha_pool = (TriggerPool){0};
     pulse_pool = (TriggerPool){0};
     toggle_pool = (TriggerPool){0};
+    touch_pool = (TriggerPool){0};
     spawn_pool = (TriggerPool){0};
+    rotate_pool = (TriggerPool){0};
+    simple_pool = (TriggerPool){0};
     text_pool = (TriggerPool){0};
 
-    if (objects.random)             { free(objects.random);             objects.random = NULL; }
-    if (objects.id)                 { free(objects.id);                 objects.id = NULL; }
-    if (objects.x)                  { free(objects.x);                  objects.x = NULL; }
-    if (objects.y)                  { free(objects.y);                  objects.y = NULL; }
-    if (objects.last_y)             { free(objects.last_y);             objects.last_y = NULL; }
-    if (objects.rotation)           { free(objects.rotation);           objects.rotation = NULL; }
-    if (objects.visual_rotation)    { free(objects.visual_rotation);    objects.visual_rotation = NULL; }
-    if (objects.zlayer)             { free(objects.zlayer);             objects.zlayer = NULL; }
-    if (objects.zorder)             { free(objects.zorder);             objects.zorder = NULL; }
-    if (objects.opacity)            { free(objects.opacity);            objects.opacity = NULL; }
-    if (objects.alpha_trigger_opacity) { free(objects.alpha_trigger_opacity); objects.alpha_trigger_opacity = NULL; }
-    if (objects.width)              { free(objects.width);              objects.width = NULL; }
-    if (objects.height)             { free(objects.height);             objects.height = NULL; }
-    if (objects.v1p9_col_channel)   { free(objects.v1p9_col_channel);   objects.v1p9_col_channel = NULL; }
-    if (objects.col_channel)        { free(objects.col_channel);        objects.col_channel = NULL; }
-    if (objects.detail_col_channel) { free(objects.detail_col_channel); objects.detail_col_channel = NULL; }
-    if (objects.trigger_index)      { free(objects.trigger_index);      objects.trigger_index = NULL; }
-    if (objects.hitbox_counter)     { free(objects.hitbox_counter);     objects.hitbox_counter = NULL; }
-    if (objects.transition_applied) { free(objects.transition_applied); objects.transition_applied = NULL; }
-    if (objects.orientation)        { free(objects.orientation);        objects.orientation = NULL; }
-    if (objects.touch_triggered)    { free(objects.touch_triggered);    objects.touch_triggered = NULL; }
-    if (objects.flippedH)           { free(objects.flippedH);           objects.flippedH = NULL; }
-    if (objects.flippedV)           { free(objects.flippedV);           objects.flippedV = NULL; }
-    if (objects.flags)            { free(objects.flags);            objects.flags = NULL; }
-    if (objects.groups)             { free(objects.groups);             objects.groups = NULL; }
-    if (objects.group_count)        { free(objects.group_count);        objects.group_count = NULL; }
-    if (objects.original_x)             { free(objects.original_x);             objects.original_x = NULL; }
-    if (objects.original_y)             { free(objects.original_y);             objects.original_y = NULL; }
-    if (objects.num_main_pulses)        { free(objects.num_main_pulses);        objects.num_main_pulses = NULL; }
-    if (objects.num_detail_pulses)      { free(objects.num_detail_pulses);      objects.num_detail_pulses = NULL; }
-    if (objects.main_being_pulsed)      { free(objects.main_being_pulsed);      objects.main_being_pulsed = NULL; }
-    if (objects.detail_being_pulsed)    { free(objects.detail_being_pulsed);    objects.detail_being_pulsed = NULL; }
-    if (objects.main_non_pulse_color)   { free(objects.main_non_pulse_color);   objects.main_non_pulse_color = NULL; }
-    if (objects.detail_non_pulse_color) { free(objects.detail_non_pulse_color); objects.detail_non_pulse_color = NULL; }
-    if (objects.main_color)             { free(objects.main_color);             objects.main_color = NULL; }
-    if (objects.detail_color)           { free(objects.detail_color);           objects.detail_color = NULL; }
-    if (objects.main_col_HSV_enabled)   { free(objects.main_col_HSV_enabled);   objects.main_col_HSV_enabled = NULL; }
-    if (objects.detail_col_HSV_enabled) { free(objects.detail_col_HSV_enabled); objects.detail_col_HSV_enabled = NULL; }
-    if (objects.main_col_HSV)           { free(objects.main_col_HSV);           objects.main_col_HSV = NULL; }
-    if (objects.detail_col_HSV)         { free(objects.detail_col_HSV);         objects.detail_col_HSV = NULL; }
-    if (objects.cached_main_hsv_src_color)   { free(objects.cached_main_hsv_src_color);   objects.cached_main_hsv_src_color = NULL; }
-    if (objects.cached_detail_hsv_src_color) { free(objects.cached_detail_hsv_src_color); objects.cached_detail_hsv_src_color = NULL; }
-    if (objects.cached_main_hsv_color)       { free(objects.cached_main_hsv_color);       objects.cached_main_hsv_color = NULL; }
-    if (objects.cached_detail_hsv_color)     { free(objects.cached_detail_hsv_color);     objects.cached_detail_hsv_color = NULL; }
-    if (objects.cached_main_hsv_valid)       { free(objects.cached_main_hsv_valid);       objects.cached_main_hsv_valid = NULL; }
-    if (objects.cached_detail_hsv_valid)     { free(objects.cached_detail_hsv_valid);     objects.cached_detail_hsv_valid = NULL; }
-    if (objects.scale_x)                { free(objects.scale_x);                objects.scale_x = NULL; }
-    if (objects.scale_y)                { free(objects.scale_y);                objects.scale_y = NULL; }
-    if (objects.original_scale_x)       { free(objects.original_scale_x);       objects.original_scale_x = NULL; }
-    if (objects.original_scale_y)       { free(objects.original_scale_y);       objects.original_scale_y = NULL; }
-    if (objects.child_object)           { free(objects.child_object);           objects.child_object = NULL; }
-    if (objects.tp_y_offset)            { free(objects.tp_y_offset);            objects.tp_y_offset = NULL; }
-    if (objects.section_x)              { free(objects.section_x);              objects.section_x = NULL; }
-    if (objects.section_y)              { free(objects.section_y);              objects.section_y = NULL; }
-    if (objects.activated)          { free(objects.activated);          objects.activated = NULL; }
-    if (objects.collided)           { free(objects.collided);           objects.collided = NULL; }
-    if (objects.group_combination_index) { free(objects.group_combination_index); objects.group_combination_index = NULL;}
+    objects.random = NULL;
+    objects.id = NULL;
+    objects.x = NULL;
+    objects.y = NULL;
+    objects.last_y = NULL;
+    objects.rotation = NULL;
+    objects.visual_rotation = NULL;
+    objects.zlayer = NULL;
+    objects.zorder = NULL;
+    objects.opacity = NULL;
+    objects.alpha_trigger_opacity = NULL;
+    objects.width = NULL;
+    objects.height = NULL;
+    objects.v1p9_col_channel = NULL;
+    objects.col_channel = NULL;
+    objects.detail_col_channel = NULL;
+    objects.trigger_index = NULL;
+    objects.hitbox_counter = NULL;
+    objects.transition_applied = NULL;
+    objects.orientation = NULL;
+    objects.touch_triggered = NULL;
+    objects.flippedH = NULL;
+    objects.flippedV = NULL;
+    objects.groups = NULL;
+    objects.group_count = NULL;
+    objects.flags = NULL;
+    objects.activated = NULL;
+    objects.collided = NULL;
+    objects.original_x = NULL;
+    objects.original_y = NULL;
+    objects.num_main_pulses = NULL;
+    objects.num_detail_pulses = NULL;
+    objects.main_being_pulsed = NULL;
+    objects.detail_being_pulsed = NULL;
+    objects.main_non_pulse_color = NULL;
+    objects.detail_non_pulse_color = NULL;
+    objects.main_color = NULL;
+    objects.detail_color = NULL;
+    objects.main_col_HSV_enabled = NULL;
+    objects.detail_col_HSV_enabled = NULL;
+    objects.main_col_HSV = NULL;
+    objects.detail_col_HSV = NULL;
+    objects.cached_main_hsv_src_color = NULL;
+    objects.cached_detail_hsv_src_color = NULL;
+    objects.cached_main_hsv_color = NULL;
+    objects.cached_detail_hsv_color = NULL;
+    objects.cached_main_hsv_valid = NULL;
+    objects.cached_detail_hsv_valid = NULL;
+    objects.scale_x = NULL;
+    objects.scale_y = NULL;
+    objects.original_scale_x = NULL;
+    objects.original_scale_y = NULL;
+    objects.child_object = NULL;
+    objects.tp_y_offset = NULL;
+    objects.section_x = NULL;
+    objects.section_y = NULL;
+    objects.group_combination_index = NULL;
 }
 
 bool init_arrays(size_t count) {
-    objects.random = (int *)malloc(sizeof(int) * count);
-    if (!objects.random) return false;
+    has_follow_player_y = false;
+    objects_int_block = (int *)arena_alloc(&level_arena, sizeof(int) * count * 9);
+    if (!objects_int_block) return false;
 
-    objects.id = (int *)malloc(sizeof(int) * count);
-    if (!objects.id) return false;
-    
-    objects.x = (float *)malloc(sizeof(float) * count);
-    if (!objects.x) return false;
-    
-    objects.y = (float *)malloc(sizeof(float) * count);
-    if (!objects.y) return false;
-    
-    objects.last_y = (float *)malloc(sizeof(float) * count);
-    if (!objects.last_y) return false;
+    objects_float_block = (float *)arena_alloc(&level_arena, sizeof(float) * count * 16);
+    if (!objects_float_block) return false;
 
-    objects.rotation = (float *)malloc(sizeof(float) * count);
-    if (!objects.rotation) return false;
+    objects_ushort_block = (unsigned short *)arena_alloc(&level_arena, sizeof(unsigned short) * count * 4);
+    if (!objects_ushort_block) return false;
 
-    objects.visual_rotation = (float *)malloc(sizeof(float) * count);
-    if (!objects.visual_rotation) return false;
+    objects_uchar_block = (unsigned char *)arena_alloc(&level_arena, sizeof(unsigned char) * count * 2);
+    if (!objects_uchar_block) return false;
 
-    objects.zlayer = (int *)malloc(sizeof(int) * count);
-    if (!objects.zlayer) return false;
-    
-    objects.zorder = (int *)malloc(sizeof(int) * count);
-    if (!objects.zorder) return false;
-    
-    objects.opacity = (float *)malloc(sizeof(float) * count);
-    if (!objects.opacity) return false;
+    objects_bool_block = (bool *)arena_alloc(&level_arena, sizeof(bool) * count * 9);
+    if (!objects_bool_block) return false;
 
-    objects.alpha_trigger_opacity = (float *)malloc(sizeof(float) * count);
-    if (!objects.alpha_trigger_opacity) return false;
-    
-    objects.width = (float *)malloc(sizeof(float) * count);
-    if (!objects.width) return false;
-    
-    objects.height = (float *)malloc(sizeof(float) * count);
-    if (!objects.height) return false;
+    objects_groups_block = (short (*)[MAX_GROUPS_PER_OBJECT])arena_alloc(&level_arena, sizeof(short[MAX_GROUPS_PER_OBJECT]) * count);
+    if (!objects_groups_block) return false;
 
-    objects.v1p9_col_channel = (unsigned short *)malloc(sizeof(unsigned short) * count);
-    if (!objects.v1p9_col_channel) return false;
-    
-    objects.col_channel = (unsigned short *)malloc(sizeof(unsigned short) * count);
-    if (!objects.col_channel) return false;
-    
-    objects.detail_col_channel = (unsigned short *)malloc(sizeof(unsigned short) * count);
-    if (!objects.detail_col_channel) return false;
-    
-    objects.trigger_index = (int *)malloc(sizeof(int) * count);
-    if (!objects.trigger_index) return false;
-    
-    objects.hitbox_counter = (unsigned char *)malloc(sizeof(unsigned short) * count);
-    if (!objects.hitbox_counter) return false;
+    objects_u8_block = (u8 *)arena_alloc(&level_arena, sizeof(u8) * count * 6);
+    if (!objects_u8_block) return false;
 
-    objects.transition_applied = (unsigned char *)malloc(sizeof(unsigned char) * count);
-    if (!objects.transition_applied) return false;
-    
-    objects.orientation = (unsigned char *)malloc(sizeof(unsigned char) * count);
-    if (!objects.orientation) return false;
-    
-    objects.touch_triggered = (bool *)malloc(sizeof(bool) * count);
-    if (!objects.touch_triggered) return false;
-    
-    objects.flippedH = (bool *)malloc(sizeof(bool) * count);
-    if (!objects.flippedH) return false;
-    
-    objects.flippedV = (bool *)malloc(sizeof(bool) * count);
-    if (!objects.flippedV) return false;
+    objects_color_block = (Color *)arena_alloc(&level_arena, sizeof(Color) * count * 8);
+    if (!objects_color_block) return false;
 
-    objects.groups = (short (*)[MAX_GROUPS_PER_OBJECT])malloc(sizeof(short[MAX_GROUPS_PER_OBJECT]) * count);
-    if (!objects.groups) return false;
+    objects_hsv_block = (HSV *)arena_alloc(&level_arena, sizeof(HSV) * count * 2);
+    if (!objects_hsv_block) return false;
 
-    objects.group_count = (u8 *)malloc(sizeof(u8) * count);
-    if (!objects.group_count) return false;
+    objects.random = objects_int_block + 0 * count;
+    objects.id = objects_int_block + 1 * count;
+    objects.zlayer = objects_int_block + 2 * count;
+    objects.zorder = objects_int_block + 3 * count;
+    objects.trigger_index = objects_int_block + 4 * count;
+    objects.child_object = objects_int_block + 5 * count;
+    objects.section_x = objects_int_block + 6 * count;
+    objects.section_y = objects_int_block + 7 * count;
+    objects.group_combination_index = objects_int_block + 8 * count;
 
-    objects.flags = (u8 *)malloc(sizeof(u8) * count);
-    if (!objects.flags) return false;
-    
-    objects.activated = (u8 *)malloc(sizeof(u8) * count);
-    if (!objects.activated) return false;
-    
-    objects.collided = (u8 *)malloc(sizeof(u8) * count);
-    if (!objects.collided) return false;
+    objects.x = objects_float_block + 0 * count;
+    objects.y = objects_float_block + 1 * count;
+    objects.last_y = objects_float_block + 2 * count;
+    objects.rotation = objects_float_block + 3 * count;
+    objects.visual_rotation = objects_float_block + 4 * count;
+    objects.opacity = objects_float_block + 5 * count;
+    objects.alpha_trigger_opacity = objects_float_block + 6 * count;
+    objects.width = objects_float_block + 7 * count;
+    objects.height = objects_float_block + 8 * count;
+    objects.original_x = objects_float_block + 9 * count;
+    objects.original_y = objects_float_block + 10 * count;
+    objects.scale_x = objects_float_block + 11 * count;
+    objects.scale_y = objects_float_block + 12 * count;
+    objects.original_scale_x = objects_float_block + 13 * count;
+    objects.original_scale_y = objects_float_block + 14 * count;
+    objects.tp_y_offset = objects_float_block + 15 * count;
 
-    objects.original_x = (float *)malloc(sizeof(float) * count);
-    if (!objects.original_x) return false;
+    objects.v1p9_col_channel = objects_ushort_block + 0 * count;
+    objects.col_channel = objects_ushort_block + 1 * count;
+    objects.detail_col_channel = objects_ushort_block + 2 * count;
+    objects.hitbox_counter = (unsigned char *)(objects_ushort_block + 3 * count);
 
-    objects.original_y = (float *)malloc(sizeof(float) * count);
-    if (!objects.original_y) return false;
+    objects.transition_applied = objects_uchar_block + 0 * count;
+    objects.orientation = objects_uchar_block + 1 * count;
 
-    objects.num_main_pulses = (u8 *)malloc(sizeof(u8) * count);
-    if (!objects.num_main_pulses) return false;
+    objects.touch_triggered = objects_bool_block + 0 * count;
+    objects.flippedH = objects_bool_block + 1 * count;
+    objects.flippedV = objects_bool_block + 2 * count;
+    objects.main_being_pulsed = objects_bool_block + 3 * count;
+    objects.detail_being_pulsed = objects_bool_block + 4 * count;
+    objects.main_col_HSV_enabled = objects_bool_block + 5 * count;
+    objects.detail_col_HSV_enabled = objects_bool_block + 6 * count;
+    objects.cached_main_hsv_valid = objects_bool_block + 7 * count;
+    objects.cached_detail_hsv_valid = objects_bool_block + 8 * count;
 
-    objects.num_detail_pulses = (u8 *)malloc(sizeof(u8) * count);
-    if (!objects.num_detail_pulses) return false;
+    objects.groups = objects_groups_block;
 
-    objects.main_being_pulsed = (bool *)malloc(sizeof(bool) * count);
-    if (!objects.main_being_pulsed) return false;
+    objects.group_count = objects_u8_block + 0 * count;
+    objects.flags = objects_u8_block + 1 * count;
+    objects.activated = objects_u8_block + 2 * count;
+    objects.collided = objects_u8_block + 3 * count;
+    objects.num_main_pulses = objects_u8_block + 4 * count;
+    objects.num_detail_pulses = objects_u8_block + 5 * count;
 
-    objects.detail_being_pulsed = (bool *)malloc(sizeof(bool) * count);
-    if (!objects.detail_being_pulsed) return false;
+    objects.main_non_pulse_color = objects_color_block + 0 * count;
+    objects.detail_non_pulse_color = objects_color_block + 1 * count;
+    objects.main_color = objects_color_block + 2 * count;
+    objects.detail_color = objects_color_block + 3 * count;
+    objects.cached_main_hsv_src_color = objects_color_block + 4 * count;
+    objects.cached_detail_hsv_src_color = objects_color_block + 5 * count;
+    objects.cached_main_hsv_color = objects_color_block + 6 * count;
+    objects.cached_detail_hsv_color = objects_color_block + 7 * count;
 
-    objects.main_non_pulse_color = (Color *)malloc(sizeof(Color) * count);
-    if (!objects.main_non_pulse_color) return false;
-
-    objects.detail_non_pulse_color = (Color *)malloc(sizeof(Color) * count);
-    if (!objects.detail_non_pulse_color) return false;
-
-    objects.main_color = (Color *)malloc(sizeof(Color) * count);
-    if (!objects.main_color) return false;
-
-    objects.detail_color = (Color *)malloc(sizeof(Color) * count);
-    if (!objects.detail_color) return false;
-
-    objects.main_col_HSV_enabled = (bool *)malloc(sizeof(bool) * count);
-    if (!objects.main_col_HSV_enabled) return false;
-
-    objects.detail_col_HSV_enabled = (bool *)malloc(sizeof(bool) * count);
-    if (!objects.detail_col_HSV_enabled) return false;
-
-    objects.main_col_HSV = (HSV *)malloc(sizeof(HSV) * count);
-    if (!objects.main_col_HSV) return false;
-
-    objects.detail_col_HSV = (HSV *)malloc(sizeof(HSV) * count);
-    if (!objects.detail_col_HSV) return false;
-
-    objects.cached_main_hsv_src_color = (Color *)malloc(sizeof(Color) * count);
-    if (!objects.cached_main_hsv_src_color) return false;
-
-    objects.cached_detail_hsv_src_color = (Color *)malloc(sizeof(Color) * count);
-    if (!objects.cached_detail_hsv_src_color) return false;
-
-    objects.cached_main_hsv_color = (Color *)malloc(sizeof(Color) * count);
-    if (!objects.cached_main_hsv_color) return false;
-
-    objects.cached_detail_hsv_color = (Color *)malloc(sizeof(Color) * count);
-    if (!objects.cached_detail_hsv_color) return false;
-
-    objects.cached_main_hsv_valid = (bool *)malloc(sizeof(bool) * count);
-    if (!objects.cached_main_hsv_valid) return false;
-
-    objects.cached_detail_hsv_valid = (bool *)malloc(sizeof(bool) * count);
-    if (!objects.cached_detail_hsv_valid) return false;
-
-    objects.scale_x = (float *)malloc(sizeof(float) * count);
-    if (!objects.scale_x) return false;
-
-    objects.scale_y = (float *)malloc(sizeof(float) * count);
-    if (!objects.scale_y) return false;
-
-    objects.original_scale_x = (float *)malloc(sizeof(float) * count);
-    if (!objects.original_scale_x) return false;
-
-    objects.original_scale_y = (float *)malloc(sizeof(float) * count);
-    if (!objects.original_scale_y) return false;
-
-    objects.child_object = (int *)malloc(sizeof(int) * count);
-    if (!objects.child_object) return false;
-
-    objects.tp_y_offset = (float *)malloc(sizeof(float) * count);
-    if (!objects.tp_y_offset) return false;
-
-    objects.section_x = (int *)malloc(sizeof(int) * count);
-    if (!objects.section_x) return false;
-
-    objects.section_y = (int *)malloc(sizeof(int) * count);
-    if (!objects.section_y) return false;
-
-    objects.group_combination_index = (int *)malloc(sizeof(int) * count);
-    if (!objects.group_combination_index) return false;
+    objects.main_col_HSV = objects_hsv_block + 0 * count;
+    objects.detail_col_HSV = objects_hsv_block + 1 * count;
 
     // Initialize the values
     memset(objects.random,             0, sizeof(int) * count);
@@ -2152,9 +2428,15 @@ int parse_string(char *levelString, int extra_slots, int *out_object_count) {
     // Count sections
     const char *sectionStart = levelString;
     char *cursor = levelString;
+    int high_detail_count = 0;
     while(true) {
         if (*cursor == ';' || *cursor == '\0') {
-            if (cursor > sectionStart) sectionCount++;
+            if (cursor > sectionStart) {
+                if (sectionCount > 0 && is_high_detail_object(sectionStart, cursor, NULL)) {
+                    high_detail_count++;
+                }
+                sectionCount++;
+            }
             if (*cursor == '\0') break;
             sectionStart = cursor + 1;
         }
@@ -2167,21 +2449,19 @@ int parse_string(char *levelString, int extra_slots, int *out_object_count) {
     }
     
     int objectCount = sectionCount - 1;
+    int parse_capacity = objectCount - high_detail_count;
+    int alloc_count = parse_capacity + extra_slots;
 
-    printf("%d\n", objectCount);
-    
-    if (!init_arrays(objectCount + extra_slots)) {
+    if (!init_arrays(alloc_count)) {
         free_arrays();
         output_log("Failed to allocate object array\n");
         return LOAD_OUT_OF_MEMORY;
     }
 
-    objects.count = objectCount + extra_slots;
-
-    if (out_object_count) *out_object_count = objectCount;
+    objects.count = alloc_count;
 
     printf("Parsing string and converting objects...\n");
-    printf("Aproximately %d bytes of pure objects\n", sizeof(ObjectsArray) * objectCount);
+    printf("Aproximately %d bytes of pure objects\n", sizeof(ObjectsArray) * alloc_count);
     
     coin_count = 0;
 
@@ -2197,13 +2477,20 @@ int parse_string(char *levelString, int extra_slots, int *out_object_count) {
                 if (!at_end) *cursor = '\0';
                 if (sectionIndex > 0) {
                     // Parse
-                    if (!parse_gd_object(sectionStart, objectIndex)) {
+                    int parsed = parse_gd_object(sectionStart, cursor, objectIndex, parse_capacity);
+                    if (parsed == -2) {
+                        output_log("Object capacity exceeded\n");
+                        free_arrays();
+                        return LOAD_OUT_OF_MEMORY;
+                    }
+                    if (parsed > 0) {
+                        assign_object_to_section(objectIndex);
+                        objectIndex++;
+                    } else if (!parsed) {
                         output_log("Failed to parse object %d\n", objectIndex);
                         free_arrays();
                         return LOAD_COULDNT_PARSE_OBJECTS;
                     }
-                    assign_object_to_section(objectIndex);
-                    objectIndex++;
                 }
                 sectionIndex++;
             }
@@ -2213,7 +2500,11 @@ int parse_string(char *levelString, int extra_slots, int *out_object_count) {
         cursor++;
     }
 
-    for (int i = 0; i < objectCount; i++) {
+    objects.count = objectIndex + extra_slots;
+
+    if (out_object_count) *out_object_count = objectIndex;
+
+    for (int i = 0; i < objectIndex; i++) {
         for (int g = 0; g < objects.group_count[i]; g++) {
             int group_id = objects.groups[i][g];
             if (group_id > 0) {
@@ -2235,6 +2526,338 @@ int parse_string(char *levelString, int extra_slots, int *out_object_count) {
     for (int i = 1; i < MAX_GROUPS; i++) {
         sort_group(i);
     }
+
+    return LOAD_NO_ERROR;
+}
+
+static int stream_level_input(const LevelStreamInput *input, LevelStreamCallback callback, void *context) {
+    // Check if uncompressed
+    if (input->raw_data) {
+        return callback((const unsigned char *)input->raw_data, strlen(input->raw_data), context);
+    }
+
+    z_stream stream = {0};
+    stream.next_in = Z_NULL;
+    stream.avail_in = 0;
+    if (inflateInit2(&stream, 15 | 32) != Z_OK) {
+        return LOAD_INVALID_COMPRESSED_DATA;
+    }
+
+    unsigned char buffer[4096];
+    size_t input_offset = 0;
+    int result = LOAD_INVALID_COMPRESSED_DATA;
+    bool complete = false;
+
+    while (!complete) {
+        if (stream.avail_in == 0 && input_offset < input->compressed_len) {
+            // Give more data to zlib
+            size_t chunk_len = input->compressed_len - input_offset;
+            stream.next_in = input->compressed_data + input_offset;
+            stream.avail_in = chunk_len;
+            input_offset += chunk_len;
+        }
+
+        // Decompress it
+        stream.next_out = buffer;
+        stream.avail_out = sizeof(buffer);
+
+        uInt before_in = stream.avail_in;
+        int ret = inflate(&stream, input_offset == input->compressed_len ? Z_FINISH : Z_NO_FLUSH);
+
+        // Send to callback
+        size_t produced = sizeof(buffer) - stream.avail_out;
+        if (produced) {
+            result = callback(buffer, produced, context);
+            if (result != LOAD_NO_ERROR) break;
+        }
+
+        if (ret == Z_STREAM_END) {
+            // Success! yay
+            complete = true;
+            result = LOAD_NO_ERROR;
+        } else if (ret != Z_OK && ret != Z_BUF_ERROR) {
+            // Fail :(
+            result = LOAD_INVALID_COMPRESSED_DATA;
+            break;
+        } else if (before_in == stream.avail_in && produced == 0 && 
+                (stream.avail_in > 0 ||
+                (stream.avail_in == 0 && input_offset == input->compressed_len))) {
+            // Avoid decompression loop
+            result = LOAD_INVALID_COMPRESSED_DATA;
+            break;
+        }
+    }
+
+    inflateEnd(&stream);
+    return result;
+}
+
+static bool reserve_char_buffer(char **buffer, size_t *capacity, size_t needed) {
+    if (needed <= *capacity) return true;
+
+    size_t new_capacity = *capacity ? *capacity : 256;
+    if (new_capacity < needed) {
+        new_capacity = needed;
+    }
+
+    char *section = (char *)realloc(*buffer, new_capacity);
+    if (!section) return false;
+
+    *buffer = section;
+    *capacity = new_capacity;
+    return true;
+}
+
+static int finish_level_scan_section(LevelStreamScan *scan, bool terminated) {
+    if (scan->section_len > 0) {
+        if (scan->section_count == 0) {
+            // Handle metadata
+            size_t metadata_len = scan->section_len + (terminated ? 1 : 0);
+
+            scan->metadata = (char *)malloc(metadata_len + 1);
+            if (!scan->metadata) return LOAD_OUT_OF_MEMORY;
+
+            memcpy(scan->metadata, scan->section, scan->section_len);
+
+            if (terminated) scan->metadata[scan->section_len] = ';';
+            scan->metadata[metadata_len] = '\0';
+        // Count high detail objects
+        } else if (is_high_detail_object(scan->section, scan->section + scan->section_len, NULL)) {
+            scan->high_detail_count++;
+        }
+        scan->section_count++;
+    }
+    scan->section_len = 0;
+    return LOAD_NO_ERROR;
+}
+
+static int scan_level_chunk(const unsigned char *data, size_t len, void *context) {
+    static const char portal_pattern[] = "1,747,";
+    LevelStreamScan *scan = (LevelStreamScan *)context;
+
+    for (size_t i = 0; i < len; i++) {
+        char ch = (char)data[i];
+
+        if (ch == ';') {
+            // Section end
+            int result = finish_level_scan_section(scan, true);
+            if (result != LOAD_NO_ERROR) return result;
+        } else {
+            if (!reserve_char_buffer(&scan->section, &scan->section_capacity, scan->section_len + 1)) 
+                return LOAD_OUT_OF_MEMORY;
+
+            scan->section[scan->section_len++] = ch;
+        }
+
+        // Additional slots for tp portal
+        if (ch == portal_pattern[scan->portal_match]) {
+            scan->portal_match++;
+            if (portal_pattern[scan->portal_match] == '\0') {
+                scan->extra_slots++;
+                scan->portal_match = 0;
+            }
+        } else {
+            scan->portal_match = ch == portal_pattern[0] ? 1 : 0;
+        }
+    }
+
+    return LOAD_NO_ERROR;
+}
+
+static void free_level_stream_scan(LevelStreamScan *scan) {
+    free(scan->section);
+    free(scan->metadata);
+}
+
+static int parse_stream_section(LevelStreamParser *parser) {
+    // Check for nothing
+    if (!parser->section_len) return LOAD_NO_ERROR;
+
+    parser->section[parser->section_len] = '\0';
+
+    if (parser->section_count > 0) {
+        int parsed = parse_gd_object(parser->section, parser->section + parser->section_len, parser->object_index, parser->parse_capacity);
+        if (parsed == -2) {
+            output_log("Object capacity exceeded\n");
+            return LOAD_OUT_OF_MEMORY;
+        }
+        
+        if (parsed == 0) {
+            output_log("Failed to parse object %d\n", parser->object_index);
+            return LOAD_COULDNT_PARSE_OBJECTS;
+        }
+
+        if (parsed > 0) {
+            assign_object_to_section(parser->object_index);
+            parser->object_index++;
+        }
+    }
+
+    parser->section_count++;
+    parser->section_len = 0;
+    return LOAD_NO_ERROR;
+}
+
+static int parse_level_chunk(const unsigned char *data, size_t len, void *context) {
+    LevelStreamParser *parser = (LevelStreamParser *)context;
+
+    for (size_t i = 0; i < len; i++) {
+        if (data[i] == ';') {
+            // Section end
+            int result = parse_stream_section(parser);
+            if (result != LOAD_NO_ERROR) return result;
+        } else {
+            // Reserve enough capacity
+            if (!reserve_char_buffer(&parser->section, &parser->section_capacity, parser->section_len + 2)) {
+                return LOAD_OUT_OF_MEMORY;
+            }
+
+            // Append
+            parser->section[parser->section_len++] = (char)data[i];
+        }
+    }
+
+    return LOAD_NO_ERROR;
+}
+
+static int parse_level_stream(const LevelStreamInput *input, const LevelStreamScan *scan, int *out_object_count) {
+    if (scan->section_count < 1) {
+        output_log("Level string missing sections!\n");
+        return LOAD_LEVEL_STRING_MISSING_SECTIONS;
+    }
+
+    int object_count = scan->section_count - 1;
+    int parse_capacity = object_count - scan->high_detail_count;
+
+    int alloc_count = parse_capacity + scan->extra_slots;
+    if (alloc_count < 0 || !init_arrays((size_t)alloc_count)) {
+        free_arrays();
+        output_log("Failed to allocate object array\n");
+        return LOAD_OUT_OF_MEMORY;
+    }
+
+    objects.count = alloc_count;
+    coin_count = 0;
+
+    // Initialize parser
+    LevelStreamParser parser = {0};
+    parser.parse_capacity = parse_capacity;
+
+    int result = stream_level_input(input, parse_level_chunk, &parser);
+
+    // Parse last section, because we check for ; to mark the end of a section
+    if (result == LOAD_NO_ERROR) result = parse_stream_section(&parser);
+
+    free(parser.section);
+
+    if (result != LOAD_NO_ERROR) {
+        free_arrays();
+        return result;
+    }
+
+    // Update object count
+    objects.count = parser.object_index + scan->extra_slots;
+    if (out_object_count) *out_object_count = parser.object_index;
+
+    // Add groupma
+    for (int i = 0; i < parser.object_index; i++) {
+        for (int g = 0; g < objects.group_count[i]; g++) {
+            int group_id = objects.groups[i][g];
+            if (group_id > 0) {
+                add_to_group(i, group_id);
+            }
+        }
+    }
+
+    qsort(coin_ids, coin_count, sizeof(int), compare_coins);
+
+    for (int i = 0; i < coin_count; i++) {
+        objects.coin_id[coin_ids[i]] = i;
+        //output_log("Le coin %d on objeto %d\n", i, coin_ids[i]);
+    }
+    level_info.last_obj_x += (11 * 30.f);
+
+    for (int i = 1; i < MAX_GROUPS; i++) {
+        sort_group(i);
+    }
+    return LOAD_NO_ERROR;
+}
+
+static void generate_orange_portals(int orange_start);
+void set_color_channels(void);
+void load_online_level_info(char *level_string);
+void load_level_info(char *data, char *level_string);
+
+static int load_level_stream(const LevelStreamInput *input, char *gmd_data, bool online) {
+    LevelStreamScan scan = {0};
+    level_info.low_detail = current_level_entry ? current_level_entry->data.low_detail : false;
+
+    // Scan the level, we need to know how many objects to parse
+    int result = stream_level_input(input, scan_level_chunk, &scan);
+    if (result == LOAD_NO_ERROR) {
+        result = finish_level_scan_section(&scan, false);
+    } else {
+        free_level_stream_scan(&scan);
+        return result;
+    }
+
+    free(scan.section);
+    scan.section = NULL;
+    scan.section_capacity = 0;
+    scan.section_len = 0;
+    if (scan.section_count < 1) {
+        free_level_stream_scan(&scan);
+        output_log("Level string missing sections!\n");
+        return LOAD_LEVEL_STRING_MISSING_SECTIONS;
+    }
+
+    char *meta_str = get_metadata_value(scan.metadata, "kS38");
+
+    int out_code = LOAD_NO_ERROR;
+    if (meta_str) {
+        channelCount = parse_color_channels(meta_str, &colorChannels, &out_code);
+    } else {
+        channelCount = parse_old_channels(scan.metadata, &colorChannels, &out_code);
+    }
+
+    if (out_code) {
+        free(meta_str);
+        free_level_stream_scan(&scan);
+        return out_code;
+    }
+
+    if (online) load_online_level_info(scan.metadata);
+    else load_level_info(gmd_data, scan.metadata);
+
+    level_info.last_obj_x = 570.f;
+
+    // Start parsing
+    int orange_start = 0;
+    result = parse_level_stream(input, &scan, &orange_start);
+
+    free(meta_str);
+    free_level_stream_scan(&scan);
+
+    if (result != LOAD_NO_ERROR) return result;
+
+    generate_orange_portals(orange_start);
+
+    if (!build_group_combinations()) {
+        output_log("Failed to build group combinations\n");
+        return LOAD_OUT_OF_MEMORY;
+    }
+
+    init_col_channels();
+    set_color_channels();
+
+    current_pulserod_ball_image = game_objects[15].children[0].texture + (rand() % 3);
+
+    C2D_SpriteFromSheet(&sprite_templates[15].child_templates[0], spriteSheet, current_pulserod_ball_image);
+    C2D_SpriteSetCenter(&sprite_templates[15].child_templates[0], 0.5f, 0.5f);
+    C2D_SpriteFromSheet(&sprite_templates[16].child_templates[0], spriteSheet, current_pulserod_ball_image);
+    C2D_SpriteSetCenter(&sprite_templates[16].child_templates[0], 0.5f, 0.5f);
+    C2D_SpriteFromSheet(&sprite_templates[17].child_templates[0], spriteSheet, current_pulserod_ball_image);
+    C2D_SpriteSetCenter(&sprite_templates[17].child_templates[0], 0.5f, 0.5f);
 
     return LOAD_NO_ERROR;
 }
@@ -2299,7 +2922,8 @@ const char *bg_sheet_paths[] = {
     "romfs:/gfx/bg_sheet_01.t3x",
     "romfs:/gfx/bg_sheet_02.t3x",
     "romfs:/gfx/bg_sheet_03.t3x",
-    "romfs:/gfx/bg_sheet_04.t3x"
+    "romfs:/gfx/bg_sheet_04.t3x",
+    "romfs:/gfx/bg_sheet_05.t3x"
 };
 
 const char *level_font_paths[LEVEL_FONT_COUNT] = {
@@ -2323,6 +2947,8 @@ C2D_SpriteSheet level_font_sheet = NULL;
 const Charset *level_font = &bigFont_fontCharset;
 
 void load_level_string_info(char *level_string) {
+    level_info.low_detail = false;
+
     char *gmd_song_offset = get_metadata_value(level_string, "kA13");
     if (gmd_song_offset) {
         level_info.song_offset = atof(gmd_song_offset);
@@ -2432,7 +3058,9 @@ const char *default_name = "Unknown";
 
 void load_online_level_info(char *level_string) {
     load_level_string_info(level_string);
-    
+
+    level_info.low_detail = current_level_entry ? current_level_entry->data.low_detail : false;
+
     level_info.song_id = current_search_entry->mainSongId;
     level_info.custom_song_id = current_search_entry->songId;
     snprintf(level_info.level_name, sizeof(level_info.level_name), "%s", current_search_entry->name);
@@ -2483,88 +3111,40 @@ static void generate_orange_portals(int orange_start) {
 }
 
 int load_online_level(char *level_string) {
-    bool compressed = true;
-    int out_code = LOAD_NO_ERROR;
+    arena_reset(&level_arena);
 
-    // Base64 doesn't allow semicolons, so if theres one, its not compressed
-    if (strchr(level_string, ';')) compressed = false;
-    char *data;
-    if (compressed) {
-        data = decompress_online_level(level_string, &out_code);
-        if (!data) return out_code;
+    LevelStreamInput input = {0};
+    unsigned char *decoded = NULL;
+    if (strchr(level_string, ';')) {
+        // String is not even compressed
+        input.raw_data = level_string;
     } else {
-        data = strdup(level_string);
-        if (!data) return LOAD_OUT_OF_MEMORY;
-    }
+        fix_base64_url(level_string);
+        remove_char(level_string, ',');
 
-    // Get level starting colors
-    char *metaStr = get_metadata_value(data, "kS38");
-    if (metaStr) {
-        channelCount = parse_color_channels(metaStr, &colorChannels, &out_code);
-        if (out_code) {
-            free(data);
-            free(metaStr);
-            return out_code;
+        size_t encoded_len = strlen(level_string);
+        decoded = (unsigned char *)malloc(encoded_len);
+        if (!decoded) return LOAD_OUT_OF_MEMORY;
+
+        int decoded_len = base64_decode(level_string, decoded);
+        if (decoded_len <= 0) {
+            output_log("Failed to decode base64\n");
+            free(decoded);
+            return LOAD_INVALID_BASE64;
         }
-    }
-    // Fallback to pre 2.0 color keys
-    else {
-        channelCount = parse_old_channels(data, &colorChannels, &out_code);
-        if (out_code) {
-            free(data);
-            return out_code;
-        }
+        input.compressed_data = decoded;
+        input.compressed_len = (size_t)decoded_len;
     }
 
-    load_online_level_info(data);
-
-    // Minimum size
-    level_info.last_obj_x = 570.f;
-
-    // Count blue teleport portals to reserve extra object slots
-    int extra_slots = 0;
-    const char *scan = data;
-    while ((scan = strstr(scan, "1,747,")) != NULL) {
-        extra_slots++;
-        scan++;
-    }
-    int orange_start = 0;
-
-    int returned = parse_string(data, extra_slots, &orange_start);
-
-    free(data);
-    free(metaStr);
-
-    if (returned) return returned;
-
-    generate_orange_portals(orange_start);
-    
-    if (!build_group_combinations()) {
-        output_log("Failed to build group combinations\n");
-        return LOAD_OUT_OF_MEMORY;
-    }
-
-    init_col_channels();
-    set_color_channels();
-
-    // Set pulserod pulse ball image
-    current_pulserod_ball_image = game_objects[15].children[0].texture + (rand() % 3);
-
-    C2D_SpriteFromSheet(&sprite_templates[15].child_templates[0], spriteSheet, current_pulserod_ball_image);
-    C2D_SpriteSetCenter(&sprite_templates[15].child_templates[0], 0.5f, 0.5f);
-    
-    C2D_SpriteFromSheet(&sprite_templates[16].child_templates[0], spriteSheet, current_pulserod_ball_image);
-    C2D_SpriteSetCenter(&sprite_templates[16].child_templates[0], 0.5f, 0.5f);
-
-    C2D_SpriteFromSheet(&sprite_templates[17].child_templates[0], spriteSheet, current_pulserod_ball_image);
-    C2D_SpriteSetCenter(&sprite_templates[17].child_templates[0], 0.5f, 0.5f);
-
-
-    return LOAD_NO_ERROR;
+    int result = load_level_stream(&input, NULL, true);
+    free(decoded);
+    return result;
 }
 
 void load_level_info(char *data, char *level_string) {
     load_level_string_info(level_string);
+
+    level_info.low_detail = current_level_entry ? current_level_entry->data.low_detail : false;
 
     char *gmd_song_id = extract_gmd_key((const char *) data, "k8", "i");
     if (!gmd_song_id) {
@@ -2602,6 +3182,8 @@ void load_level_info(char *data, char *level_string) {
 int load_level(const char *path) {
     int out_code = LOAD_NO_ERROR;
 
+    arena_reset(&level_arena);
+
     size_t out;
     char *level = read_file(path, &out);
     if (!level) return 1;
@@ -2610,6 +3192,45 @@ int load_level(const char *path) {
     if (!level) {
         return LOAD_OUT_OF_MEMORY;
     }
+
+    char *b64 = extract_gmd_key((const char *)level, "k4", "s");
+    if (b64) {
+        LevelStreamInput input = {0};
+        unsigned char *decoded = NULL;
+
+        if (strchr(b64, ';')) {
+            // Not even compressed
+            input.raw_data = b64;
+        } else {
+            fix_base64_url(b64);
+            size_t encoded_len = strlen(b64);
+            decoded = (unsigned char *)malloc(encoded_len);
+            if (!decoded) {
+                free(b64);
+                free(level);
+                return LOAD_OUT_OF_MEMORY;
+            }
+
+            int decoded_len = base64_decode(b64, decoded);
+            if (decoded_len <= 0) {
+                output_log("Failed to decode base64\n");
+                free(decoded);
+                free(b64);
+                free(level);
+                return LOAD_INVALID_BASE64;
+            }
+            input.compressed_data = decoded;
+            input.compressed_len = (size_t)decoded_len;
+        }
+
+        int result = load_level_stream(&input, level, false);
+        free(decoded);
+        free(b64);
+        free(level);
+        return result;
+    }
+
+    // Empty level
 
     char *data = decompress_level(level, &out_code);
     if (!data) {
@@ -2622,7 +3243,6 @@ int load_level(const char *path) {
     if (metaStr) {
         channelCount = parse_color_channels(metaStr, &colorChannels, &out_code);
         if (out_code) {
-            free(data);
             free(level);
             free(metaStr);
             return out_code;
@@ -2632,13 +3252,13 @@ int load_level(const char *path) {
     else {
         channelCount = parse_old_channels(data, &colorChannels, &out_code);
         if (out_code) {
-            free(data);
             free(level);
             return out_code;
         }
     }
 
     load_level_info(level, data);
+    free(level);
 
     // Minimum size
     level_info.last_obj_x = 570.f;
@@ -2654,9 +3274,7 @@ int load_level(const char *path) {
 
     int returned = parse_string(data, extra_slots, &orange_start);
 
-    free(data);
     free(metaStr);
-    free(level);
 
     if (returned) return returned;
 
@@ -2751,6 +3369,8 @@ void unload_level() {
     free_sections();
     free_object_particles();
     init_col_channels();
+
+    arena_reset(&level_arena);
     
     channelCount = 0;
     free(colorChannels);
@@ -2773,7 +3393,7 @@ char *get_level_name(char *data_ptr) {
 char *load_user_song(int id, size_t *out_size) {
     char full_path[273];
     snprintf(full_path, sizeof(full_path), "%s%d.mp3", USER_SONGS_DIR, id);
-    return read_file(full_path, out_size);
+    return read_file_arena(&level_arena, full_path, out_size);
 }
 
 bool check_song(int id) {

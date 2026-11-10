@@ -32,7 +32,6 @@
 #include "particles/particles.hpp"
 #include "particles/object_particles.hpp"
 #include "particles/coin_effect.hpp"
-#include "particles/key_effect.hpp"
 
 #include <stdarg.h>
 
@@ -73,6 +72,8 @@
 #define CITRA_TYPE 0x20000
 #define CITRA_VERSION 11
 
+Arena level_arena;
+
 u32 __ctru_linear_heap_size = 44 << 20;
 
 bool inExclusiveState = false;
@@ -92,6 +93,7 @@ bool cheated = false;
 float global_volume;
 float music_volume;
 float sound_volume;
+float dim_secondary_screen;
 
 int steps = 0;
 int last_steps = 0;
@@ -124,6 +126,7 @@ ParticleSystem slow_speed_particles_bottom;
 ParticleSystem normal_speed_particles_bottom;
 ParticleSystem fast_speed_particles_bottom;
 ParticleSystem faster_speed_particles_bottom;
+ParticleSystem fastest_speed_particles_bottom;
 ParticleSystem end_wall_particles;
 ParticleSystem end_wall_firework;
 ParticleSystem level_complete_effect_p1;
@@ -133,6 +136,7 @@ float slow_speed_particles_timer = 0.f;
 float normal_speed_particles_timer = 0.f;
 float fast_speed_particles_timer = 0.f;
 float faster_speed_particles_timer = 0.f;
+float fastest_speed_particles_timer = 0.f;
 
 bool alt_title_screen;
 
@@ -373,6 +377,7 @@ void update_player_effects(float delta) {
     updateParticleSystem(&normal_speed_particles, delta);
     updateParticleSystem(&fast_speed_particles, delta);
     updateParticleSystem(&faster_speed_particles, delta);
+    updateParticleSystem(&fastest_speed_particles, delta);
     updateParticleSystem(&coin_pickup_particles, delta);
 }
 
@@ -410,6 +415,7 @@ void allocate_particles() {
     initParticleSystem(&normal_speed_particles, &speed_effect_normal);
     initParticleSystem(&fast_speed_particles, &speed_effect_fast);
     initParticleSystem(&faster_speed_particles, &speed_effect_vfast);
+    initParticleSystem(&fastest_speed_particles, &speed_effect_fastest);
     initParticleSystem(&coin_pickup_particles, &coin_pickup_effect);
 
     initParticleSystem(&end_wall_particles, &end_effect_portal);
@@ -437,6 +443,7 @@ void free_particles() {
     freeParticleData(&normal_speed_particles.data);
     freeParticleData(&fast_speed_particles.data);
     freeParticleData(&faster_speed_particles.data);
+    freeParticleData(&fastest_speed_particles.data);
     freeParticleData(&coin_pickup_particles.data);
 
     freeParticleData(&end_wall_particles.data);
@@ -450,11 +457,13 @@ void init_particles(Color p1_color, Color p2_color) {
     normal_speed_particles.stationary = true;
     fast_speed_particles.stationary = true;
     faster_speed_particles.stationary = true;
+    fastest_speed_particles.stationary = true;
 
     slow_speed_particles.affectedByMirror = false;
     normal_speed_particles.affectedByMirror = false;
     fast_speed_particles.affectedByMirror = false;
     faster_speed_particles.affectedByMirror = false;
+    fastest_speed_particles.affectedByMirror = false;
 
     end_wall_firework.affectedByMirror = false;
 
@@ -484,6 +493,7 @@ void init_particles(Color p1_color, Color p2_color) {
     normal_speed_particles.depth = 0.6f;
     fast_speed_particles.depth = 0.6f;
     faster_speed_particles.depth = 0.6f;
+    fastest_speed_particles.depth = 0.6f;
 
     // Its particles spiral inwards, so they start at you and fall into the portal
     end_wall_particles.depth = 0.7f;
@@ -597,6 +607,10 @@ void init_particles(Color p1_color, Color p2_color) {
     faster_speed_particles.cfg.startColorGreen = 65 / 255.f;
     faster_speed_particles.cfg.startColorBlue  = 255 / 255.f;
 
+    fastest_speed_particles.cfg.startColorRed   = 255 / 255.f;
+    fastest_speed_particles.cfg.startColorGreen = 65 / 255.f;
+    fastest_speed_particles.cfg.startColorBlue  = 65 / 255.f;
+
     coin_pickup_particles.cfg.startColorRed   = 255 / 255.f;
     coin_pickup_particles.cfg.startColorGreen = state.custom_level ? 1.f : 190 / 255.f;
     coin_pickup_particles.cfg.startColorBlue  = state.custom_level ? 1.f : 0.f;
@@ -639,7 +653,7 @@ void init_particles(Color p1_color, Color p2_color) {
 
 static bool touch_jump_filter(u16 px, u16 py) {
     bool on_pause_button = px > 300-32/2 && py < 20+32/2;
-    bool on_practice_ui = state.practice_mode && (px > 92 && px < 222 && py > 175 && py < 222);
+    bool on_practice_ui = state.practice_mode && !settingsState.hidePracticeButtons && (px > 92 && px < 222 && py > 175 && py < 222);
     return !(on_pause_button || on_practice_ui);
 }
 
@@ -733,7 +747,8 @@ void sync_precise_input(bool suppress_held) {
 
 void ui_loop(){
     playing_menu_loop = false;
-    play_menu_song();
+    if (settingsState.menuMusic) play_menu_song();
+    else stop_mp3();
     
     u64 lastTime = svcGetSystemTick();
 
@@ -846,6 +861,63 @@ void ui_loop(){
         }
     }
     C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
+}
+
+#define SWAP_CENTER_SHIFT (SWAP_SIDE_OFFSET_X / SCALE)
+
+typedef struct {
+    UIElement *element;
+    bool enabled;
+} SwapElement;
+
+static SwapElement swap_hide_tag(UIScreen *screen, const char *tag) {
+    SwapElement state = { screen ? ui_get_element_by_tag(screen, tag) : NULL, false };
+
+    if (state.element) {
+        state.enabled = state.element->enabled;
+        state.element->enabled = false;
+    }
+
+    return state;
+}
+
+static void swap_restore_element(SwapElement state) {
+    if (state.element) state.element->enabled = state.enabled;
+}
+
+static void swap_draw_identity(UIElement *e) {
+    UITransform root = { 0.f, 0.f, 1.f, 1.f };
+
+    ui_draw_tree(e, &root);
+}
+
+static void swap_draw_hud(UIScreen *screen) {
+    if (!screen) return;
+
+    SwapElement pause_menu = swap_hide_tag(screen, "pause_menu");
+    SwapElement fps = swap_hide_tag(screen, "fps");
+
+    C2D_ViewTranslate(-SWAP_SIDE_OFFSET_X, 0);
+    ui_screen_draw(screen);
+    C2D_ViewTranslate(SWAP_SIDE_OFFSET_X, 0);
+
+    swap_restore_element(fps);
+
+    if (fps.element && fps.element->enabled) swap_draw_identity(fps.element);
+
+    swap_restore_element(pause_menu);
+}
+
+static void swap_draw_pause_window(UIScreen *screen) {
+    SwapElement bar = swap_hide_tag(screen, "progressalert");
+    SwapElement percent = swap_hide_tag(screen, "percent");
+    SwapElement fps = swap_hide_tag(screen, "fps");
+
+    ui_stack_draw(SCREEN_TOP);
+
+    swap_restore_element(fps);
+    swap_restore_element(percent);
+    swap_restore_element(bar);
 }
 
 void game_loop() {
@@ -1042,6 +1114,7 @@ void game_loop() {
             normal_speed_particles_bottom.emitting = false;
             fast_speed_particles_bottom.emitting = false;
             faster_speed_particles_bottom.emitting = false;
+            fastest_speed_particles_bottom.emitting = false;
             
             if (physics_delta > 0.5f) physics_delta = STEPS_DT; // Avoid spiral of death
 
@@ -1267,10 +1340,13 @@ void game_loop() {
                     // When mirror transition ends, put a wave trail point
                     if (state.player.gamemode == GAMEMODE_WAVE) {
                         wave_trail_p1.positionR = (Vec2D){ state.player.x, state.player.y };
+                        MotionTrail_ResumeStroke(&wave_trail_p1);
                         MotionTrail_AddWavePoint(&wave_trail_p1);
                     }
                     if (state.dual && state.player2.gamemode == GAMEMODE_WAVE) {
                         wave_trail_p2.positionR = (Vec2D){ state.player2.x, state.player2.y };
+                        
+                        MotionTrail_ResumeStroke(&wave_trail_p2);
                         MotionTrail_AddWavePoint(&wave_trail_p2);
                     }
                 }
@@ -1311,7 +1387,6 @@ void game_loop() {
             handle_new_best_popup(delta);
 
             update_collect_effect(delta);
-            update_key_effect(delta);
 
             float calc_x_speed_particles = SCREEN_WIDTH_AREA;
             float calc_y_speed_particles = (SCREEN_HEIGHT_AREA / 2);
@@ -1342,6 +1417,13 @@ void game_loop() {
             faster_speed_particles.emitting = faster_speed_particles_timer > 0;
             if (faster_speed_particles_timer > 0) {
                 faster_speed_particles_timer -= delta;
+            }
+
+            fastest_speed_particles.emitterX = calc_x_speed_particles;
+            fastest_speed_particles.emitterY = calc_y_speed_particles;
+            fastest_speed_particles.emitting = fastest_speed_particles_timer > 0;
+            if (fastest_speed_particles_timer > 0) {
+                fastest_speed_particles_timer -= delta;
             }
             
             end_wall_particles.emitterX = level_info.wall_x - 15;
@@ -1430,11 +1512,18 @@ void game_loop() {
         update_bottom_particles(delta);
         update_touch_effect(delta);
 
+        bool swap_screens = settingsState.swapGameplayScreens && !in_level_complete;
+        C3D_RenderTarget *play_screen = swap_screens ? bot : top;
+        C3D_RenderTarget *side_screen = swap_screens ? top : bot;
+        UIScreen *swap_gameplay_screen = swap_screens ? ui_stack_get_screen("gameplay", SCREEN_BTM) : NULL;
+        UIScreen *swap_gameplay_top = swap_screens ? ui_stack_get_screen("gameplay", SCREEN_TOP) : NULL;
+        int world_width = swap_screens ? SCREEN_BOT_WIDTH : SCREEN_WIDTH;
+
         if(C3D_FrameBegin(settingsState.vsync ? C3D_FRAME_SYNCDRAW : C3D_FRAME_NONBLOCK)){
             C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ZERO);
 
             // Top screen, drawn once per eye when 3D is on
-            for (int eye = 0; begin_top_eye(eye); eye++) {
+            for (int eye = 0; begin_top_eye_target(eye, play_screen); eye++) {
                 begin_eye_layer(DEPTH_BACKGROUND);
                 draw_background(state.background_x / 8, -(state.camera_y / 8) + 200);
                 end_eye_layer();
@@ -1451,11 +1540,11 @@ void game_loop() {
 
                 draw_attempt_text();
 
-                draw_ground(state.ground_x, state.camera_y, 0, false, SCREEN_WIDTH);
+                draw_ground(state.ground_x, state.camera_y, 0, false, world_width);
 
                 if (state.ground_y_gfx > 2) {
-                    if (state.camera_y - LEVEL_Y_OFFSET + state.ground_y_gfx > 0) draw_ground(state.ground_x, state.camera_y, state.camera_y + state.ground_y_gfx - LEVEL_Y_OFFSET, false, SCREEN_WIDTH);
-                    draw_ground(state.ground_x, state.camera_y, state.camera_y - LEVEL_Y_OFFSET + SCREEN_HEIGHT_AREA - state.ground_y_gfx, true, SCREEN_WIDTH);
+                    if (state.camera_y - LEVEL_Y_OFFSET + state.ground_y_gfx > 0) draw_ground(state.ground_x, state.camera_y, state.camera_y + state.ground_y_gfx - LEVEL_Y_OFFSET, false, world_width);
+                    draw_ground(state.ground_x, state.camera_y, state.camera_y - LEVEL_Y_OFFSET + SCREEN_HEIGHT_AREA - state.ground_y_gfx, true, world_width);
                 }
 
                 change_blending(true);
@@ -1471,6 +1560,8 @@ void game_loop() {
 
                 change_blending(false);
 
+                if (swap_screens) C2D_ViewTranslate(-SWAP_CENTER_SHIFT, 0);
+
                 if (level_info.wall_y > 0) {
                     begin_eye_layer(DEPTH_POPUP);
                     draw_level_complete_popup();
@@ -1481,12 +1572,29 @@ void game_loop() {
                 draw_new_best_popup();
                 end_eye_layer();
 
+                if (swap_screens) C2D_ViewTranslate(SWAP_CENTER_SHIFT, 0);
+
                 C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
                 C2D_ViewScale(1/SCALE, 1/SCALE);
 
                 begin_eye_layer(DEPTH_POPUP);
                 //gameplay_screen_top_loop();
-                ui_stack_draw(SCREEN_TOP);
+                if (swap_screens) {
+                    swap_draw_hud(swap_gameplay_top);
+
+                    if (game_paused) {
+                        ui_stack_draw(SCREEN_BTM);
+                    } else if (swap_gameplay_screen) {
+                        ui_run_func_on_tag(swap_gameplay_screen, "pause_btn", swap_draw_identity);
+                        ui_run_func_on_tag(swap_gameplay_screen, "practice_buttons", swap_draw_identity);
+                    }
+
+                    change_blending(true);
+                    draw_touch_effect();
+                    change_blending(false);
+                } else {
+                    ui_stack_draw(SCREEN_TOP);
+                }
                 draw_level_complete_top();
                 draw_stack_fade();
                 //draw_stack_debug();
@@ -1494,46 +1602,79 @@ void game_loop() {
             }
 
             // Bottom screen
-            C2D_SceneBegin(bot);
-            C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
+            for (int eye = 0; begin_top_eye_target(eye, side_screen); eye++) {
+                float dim = dim_secondary_screen;
+                float side_width = swap_screens ? SCREEN_WIDTH : SCREEN_BOT_WIDTH;
 
-            draw_background((state.background_x / 8) + 40, 200);
+                if (dim < 1.f) {
+                    draw_background((state.background_x / 8) + 40, 200);
 
-            C2D_ViewScale(SCALE, SCALE);
-            C2D_ViewTranslate(0, CAM_Y_MTX_OFFSET);
-            
-            change_blending(true);
-            draw_bottom_particles();
-            change_blending(false);
+                    C2D_ViewScale(SCALE, SCALE);
+                    C2D_ViewTranslate(0, CAM_Y_MTX_OFFSET);
 
-            draw_ground(state.ground_x + 52.5f, 0.f, -71.f, false, SCREEN_BOT_WIDTH);
-            draw_ground(state.ground_x + 52.5f, 0.f, 210.f, true, SCREEN_BOT_WIDTH);
+                    change_blending(true);
+                    draw_bottom_particles();
+                    change_blending(false);
 
-            C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
-            C2D_ViewScale(1/SCALE, 1/SCALE);
+                    draw_ground(state.ground_x + 52.5f, 0.f, -71.f, false, side_width);
+                    draw_ground(state.ground_x + 52.5f, 0.f, 210.f, true, side_width);
 
-            //gameplay_screen_bot_loop();
-            ui_stack_draw(SCREEN_BTM);
-            draw_level_complete();
-            
-            change_blending(true);
-            draw_touch_effect();
-            change_blending(false);
+                    C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
+                    C2D_ViewScale(1/SCALE, 1/SCALE);
+                }
 
-            if (state.profiling) {
-                float processingTime = ticks / CPU_TICKS_PER_MSEC;
-                ProfilerUpdateData data = {
-                    .touchPos = touchPos,
-                    .kDown = touch.down,
-                    .steps = steps,
-                    .processingTime = processingTime,
-                };
+                if (dim > 0.f) {
+                    change_blending(false);
 
-                profiler_update(data);
-                profiler_draw();
+                    if (dim < 1.f) C2D_DrawRectSolid(0.f, 0.f, 0.f, side_width, SCREEN_HEIGHT, C2D_Color32(0, 0, 0, (int)(dim * 255.f)));
+                }
+
+                //gameplay_screen_bot_loop();
+                if (swap_screens) {
+                    if (game_paused) {
+                        swap_draw_pause_window(swap_gameplay_top);
+                    } else {
+                        SwapElement pause_btn = swap_hide_tag(swap_gameplay_screen, "pause_btn");
+                        SwapElement add_check = swap_hide_tag(swap_gameplay_screen, "add_checkpoint");
+                        SwapElement remove_check = swap_hide_tag(swap_gameplay_screen, "remove_checkpoint");
+
+                        C2D_ViewTranslate(SWAP_SIDE_OFFSET_X, 0);
+                        ui_stack_draw(SCREEN_BTM);
+                        C2D_ViewTranslate(-SWAP_SIDE_OFFSET_X, 0);
+
+                        swap_restore_element(remove_check);
+                        swap_restore_element(add_check);
+                        swap_restore_element(pause_btn);
+                    }
+                } else {
+                    ui_stack_draw(SCREEN_BTM);
+                }
+
+                draw_level_complete();
+
+                if (!swap_screens) {
+                    change_blending(true);
+                    draw_touch_effect();
+                    change_blending(false);
+                }
+
+                if (state.profiling && eye == EYE_LEFT) {
+                    float processingTime = ticks / CPU_TICKS_PER_MSEC;
+                    ProfilerUpdateData data = {
+                        .touchPos = touchPos,
+                        .kDown = touch.down,
+                        .steps = steps,
+                        .processingTime = processingTime
+                    };
+
+                    profiler_update(data);
+                    if (swap_screens) C2D_ViewTranslate(SWAP_SIDE_OFFSET_X, 0);
+                    profiler_draw();
+                    if (swap_screens) C2D_ViewTranslate(-SWAP_SIDE_OFFSET_X, 0);
+                }
+
+                draw_stack_fade();
             }
-
-            draw_stack_fade();
 
             if (state.noclip) {
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 234, 0.5f, 0.5f, 0, true, "Noclip Activated");
@@ -1608,8 +1749,14 @@ void game_assets_init() {
     spriteSheet3 = C2D_SpriteSheetLoad("romfs:/gfx/sprites_2p0.t3x");
     if (!spriteSheet3) svcBreak(USERBREAK_PANIC);
 
+    spriteSheet4 = C2D_SpriteSheetLoad("romfs:/gfx/sprites_2p1.t3x");
+    if (!spriteSheet4) svcBreak(USERBREAK_PANIC);
+
     animatedSheet = C2D_SpriteSheetLoad("romfs:/gfx/animated.t3x");
     if (!animatedSheet) svcBreak(USERBREAK_PANIC);
+
+    playerEffectsSheet = C2D_SpriteSheetLoad("romfs:/gfx/playerEffects.t3x");
+    if (!playerEffectsSheet) svcBreak(USERBREAK_PANIC);
     
     glowSheet = C2D_SpriteSheetLoad("romfs:/gfx/glow.t3x");
     if (!glowSheet) svcBreak(USERBREAK_PANIC);
@@ -1634,6 +1781,9 @@ void game_assets_init() {
 
     robotSheet = C2D_SpriteSheetLoad("romfs:/gfx/robot.t3x");
     if (!robotSheet) svcBreak(USERBREAK_PANIC);
+
+    spiderSheet = C2D_SpriteSheetLoad("romfs:/gfx/spider.t3x");
+    if (!spiderSheet) svcBreak(USERBREAK_PANIC);
 
     trailSheet = C2D_SpriteSheetLoad("romfs:/gfx/trails.t3x");
     if (!trailSheet) svcBreak(USERBREAK_PANIC);
@@ -1662,6 +1812,19 @@ void game_assets_init() {
 
     initParticleSystem(&faster_speed_particles_bottom, &speed_effect_vfast);
     faster_speed_particles_bottom.relativeStationary = true;
+
+    initParticleSystem(&fastest_speed_particles_bottom, &speed_effect_fastest);
+    fastest_speed_particles_bottom.relativeStationary = true;
+}
+
+static void init_level_arena() {
+    struct mallinfo mi = mallinfo();
+    size_t free = envGetHeapSize() - mi.uordblks;
+
+    size_t capacity = (size_t) (is_N3DS ? free * 0.8f : free * 0.68f);
+
+    bool could = arena_init(&level_arena, capacity);
+    if (!could) output_log("Couldn't allocate level arena\n");
 }
 
 int main(int argc, char* argv[]) {
@@ -1675,7 +1838,6 @@ int main(int argc, char* argv[]) {
     C2D_Prepare();
     osSetSpeedupEnable(1);
     soc_init();
-    check_system_model();
     check_rom_type();
     // output_log("argc: %d\n", argc);
     if (argc > 0) { 
@@ -1690,6 +1852,7 @@ int main(int argc, char* argv[]) {
 
     cfg_init();
     cfguInit();
+    check_system_model();
 
     // Sort out wide / 3D before making the targets, they need different sizes
     apply_screen_modes();
@@ -1754,6 +1917,8 @@ int main(int argc, char* argv[]) {
 
     load_sfx();
 
+    init_level_arena();
+
     memset(&level_info, 0, sizeof(LoadedLevelInfo));
 
     loading_screen_update(100, 0);
@@ -1787,6 +1952,10 @@ int main(int argc, char* argv[]) {
         faster_speed_particles_bottom.cfg.startColorGreen = 65 / 255.f;
         faster_speed_particles_bottom.cfg.startColorBlue = 255 / 255.f;
 
+        fastest_speed_particles_bottom.cfg.startColorRed = 255 / 255.f;
+        fastest_speed_particles_bottom.cfg.startColorGreen = 65 / 255.f;
+        fastest_speed_particles_bottom.cfg.startColorBlue = 65 / 255.f;
+
         switch (game_state) {
             case STATE_MENU:
                 ui_loop();
@@ -1817,7 +1986,9 @@ int main(int argc, char* argv[]) {
     C2D_SpriteSheetFree(spriteSheet);
     C2D_SpriteSheetFree(spriteSheet2);
     C2D_SpriteSheetFree(spriteSheet3);
+    C2D_SpriteSheetFree(spriteSheet4);
     C2D_SpriteSheetFree(animatedSheet);
+    C2D_SpriteSheetFree(playerEffectsSheet);
     C2D_SpriteSheetFree(glowSheet);
     C2D_SpriteSheetFree(bgSheet);
     C2D_SpriteSheetFree(cube0Sheet);
@@ -1827,6 +1998,7 @@ int main(int argc, char* argv[]) {
     C2D_SpriteSheetFree(ufoSheet);
     C2D_SpriteSheetFree(waveSheet);
     C2D_SpriteSheetFree(robotSheet);
+    C2D_SpriteSheetFree(spiderSheet);
     C2D_SpriteSheetFree(trailSheet);
     C2D_SpriteSheetFree(particleSheet);
     C2D_SpriteSheetFree(ui_sheet);

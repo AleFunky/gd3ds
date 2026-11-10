@@ -1,4 +1,5 @@
 #pragma once
+#include "arena.hpp"
 #include "objects.hpp"
 #include "text.hpp"
 #include "utils/server_utils.hpp"
@@ -75,6 +76,64 @@ typedef struct {
 typedef struct {
     bool spawn_triggered;
     bool multi_triggered;
+    bool activate_group;
+    bool multi_activate;
+    int target_group;
+    int item_id;
+    int target_count;
+} CountTrigger;
+
+typedef struct {
+    bool spawn_triggered;
+    bool multi_triggered;
+    bool activate_group;
+    int target_group;
+    int item_id;
+    int target_count;
+    int instant_count_mode;
+} InstantCountTrigger;
+
+#define COUNTER_LABEL 1615
+#define MAX_COUNTER_TEXT 12
+
+typedef struct {
+    int item_id;
+    int last_value;
+    char text[MAX_COUNTER_TEXT + 1];
+    unsigned char layout_done;
+    unsigned char glyph_count;
+    TextGlyphPlacement glyphs[MAX_COUNTER_TEXT];
+} CounterLabel;
+
+typedef struct {
+    int item_id;
+    bool is_pickup;
+    bool sub_count;
+} PickupItem;
+
+typedef struct {
+    bool spawn_triggered;
+    bool multi_triggered;
+    int target_group;
+    float follow_speed;
+    float follow_delay;
+    float follow_offset;
+    float follow_max_speed;
+} FollowPlayerYTrigger;
+
+typedef struct {
+    bool spawn_triggered;
+    bool multi_triggered;
+    int target_group;
+    int follow_group;
+    float x_mod;
+    float y_mod;
+    float trig_duration;
+} FollowTrigger;
+
+typedef struct {
+    bool spawn_triggered;
+    bool multi_triggered;
     float trig_duration;
     int target_group;
     float trigger_opacity;
@@ -106,7 +165,16 @@ typedef struct {
     bool multi_triggered;
     int target_group;
     bool activate_group;
+    bool spawn_only;
 } ToggleTrigger;
+
+typedef struct {
+    bool spawn_triggered;
+    bool multi_triggered;
+    bool hold_mode;
+    unsigned char toggle_mode;
+    int target_group;
+} TouchTrigger;
 
 typedef struct {
     bool spawn_triggered;
@@ -115,6 +183,11 @@ typedef struct {
     float spawn_delay;
     float trig_duration;
 } SpawnTrigger;
+
+typedef struct {
+    bool spawn_triggered;
+    bool multi_triggered;
+} SimpleTrigger;
 
 typedef struct {
     char text[MAX_TEXT_LEN + 1];
@@ -134,7 +207,9 @@ typedef enum {
     FLAG_TOGGLED    = (1 << 0),
     FLAG_DONT_FADE  = (1 << 1),
     FLAG_DONT_ENTER = (1 << 2),
-    FLAG_CAN_BE_X_MOVED = (1 << 3)
+    FLAG_CAN_BE_X_MOVED = (1 << 3),
+    FLAG_MULTI_ACTIVATE = (1 << 4),
+    FLAG_PICKUP = (1 << 5)
 } ObjectFlags;
 
 typedef struct {
@@ -265,11 +340,41 @@ typedef struct {
     bool initial_upsidedown;
 
     bool two_player_mode;
+    bool low_detail;
 
     char level_name[256];
     char creator_name[256];
 } LoadedLevelInfo;
 
+
+
+typedef struct {
+    unsigned char *compressed_data;
+    size_t compressed_len;
+    const char *raw_data;
+} LevelStreamInput;
+
+typedef int (*LevelStreamCallback)(const unsigned char *data, size_t len, void *context);
+
+typedef struct {
+    char *section;
+    size_t section_len;
+    size_t section_capacity;
+    char *metadata;
+    int section_count;
+    int high_detail_count;
+    int extra_slots;
+    int portal_match;
+} LevelStreamScan;
+
+typedef struct {
+    char *section;
+    size_t section_len;
+    size_t section_capacity;
+    int section_count;
+    int object_index;
+    int parse_capacity;
+} LevelStreamParser;
 
 typedef enum {
     LOAD_NO_ERROR,
@@ -287,15 +392,26 @@ extern TriggerPool move_pool;
 extern TriggerPool alpha_pool;
 extern TriggerPool pulse_pool;
 extern TriggerPool toggle_pool;
+extern TriggerPool touch_pool;
 extern TriggerPool spawn_pool;
+extern bool has_follow_player_y;
 
 ColorTrigger *get_color_trigger(int obj);
 PulseTrigger *get_pulse_trigger(int obj);
 AlphaTrigger *get_alpha_trigger(int obj);
 MoveTrigger *get_move_trigger(int obj);
+CountTrigger *get_count_trigger(int obj);
+InstantCountTrigger *get_instant_count_trigger(int obj);
+CounterLabel *get_counter_label(int obj);
+PickupItem *get_pickup_item(int obj);
+FollowPlayerYTrigger *get_follow_player_y_trigger(int obj);
+FollowTrigger *get_follow_trigger(int obj);
 ToggleTrigger *get_toggle_trigger(int obj);
+TouchTrigger *get_touch_trigger(int obj);
 SpawnTrigger *get_spawn_trigger(int obj);
 TextObject *get_text_object(int obj);
+
+bool is_simple_trigger_object(int id);
 
 bool trigger_is_spawn_triggered(int id, int obj);
 bool trigger_is_multi_triggered(int id, int obj);
@@ -308,8 +424,8 @@ extern const char *default_name;
 
 extern const char *level_lengths[5];
 
-#define BG_COUNT 13
-#define G_COUNT 11
+#define BG_COUNT 20
+#define G_COUNT 17
 
 extern char *curr_level_string;
 
@@ -319,6 +435,7 @@ extern int channelCount;
 extern GDColorChannel *colorChannels;
 
 char *read_file(const char *filepath, size_t *out_size);
+char *read_file_arena(Arena *arena, const char *filepath, size_t *out_size);
 char *decompress_level(char *data, int *out_code);
 
 int load_level(const char *path);
@@ -338,6 +455,7 @@ bool obj_has_detail(const GameObject *obj);
 
 bool is_valid_object(int id);
 bool is_trigger_object(int id);
+bool is_complex_trigger_object(int id);
 bool is_color_trigger(int id);
 int get_level_coin_count(void);
 

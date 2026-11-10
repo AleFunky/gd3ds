@@ -15,6 +15,7 @@ extern const ParticleDefenitionName particleDefNames[PARTICLE_DEF_COUNT] = {
     { "speed_effect_normal", &speed_effect_normal },
     { "speed_effect_slow", &speed_effect_slow },
     { "speed_effect_vfast", &speed_effect_vfast },
+    { "speed_effect_fastest", &speed_effect_fastest },
     { "firework", &firework },
     { "explode_effect", &explode_effect },
     { "coin_effect", &coin_effect },
@@ -83,7 +84,7 @@ extern const ParticleDefinition drag_effect = {
     .startParticleSizeVariance = 3,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition ring_effect = {
@@ -137,7 +138,7 @@ extern const ParticleDefinition ring_effect = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition portal_effect_01 = {
@@ -191,7 +192,7 @@ extern const ParticleDefinition portal_effect_01 = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition bump_effect = {
@@ -245,7 +246,7 @@ extern const ParticleDefinition bump_effect = {
     .startParticleSizeVariance = 1.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition portal_effect_08 = {
@@ -299,7 +300,7 @@ extern const ParticleDefinition portal_effect_08 = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 100.0f,
     .tangentialAcceleration = -100.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition land_effect = {
@@ -353,7 +354,7 @@ extern const ParticleDefinition land_effect = {
     .startParticleSizeVariance = 3,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition glass_destroy_01 = {
@@ -407,7 +408,7 @@ extern const ParticleDefinition glass_destroy_01 = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition glitter_effect = {
@@ -461,7 +462,7 @@ extern const ParticleDefinition glitter_effect = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition level_complete_01 = {
@@ -515,7 +516,7 @@ extern const ParticleDefinition level_complete_01 = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition ship_drag_effect = {
@@ -569,7 +570,7 @@ extern const ParticleDefinition ship_drag_effect = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition speed_effect_fast = {
@@ -623,7 +624,7 @@ extern const ParticleDefinition speed_effect_fast = {
     .startParticleSizeVariance = 1.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition speed_effect_normal = {
@@ -677,7 +678,7 @@ extern const ParticleDefinition speed_effect_normal = {
     .startParticleSizeVariance = 1.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition speed_effect_slow = {
@@ -731,7 +732,7 @@ extern const ParticleDefinition speed_effect_slow = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition speed_effect_vfast = {
@@ -785,10 +786,64 @@ extern const ParticleDefinition speed_effect_vfast = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition firework = {
+const ParticleDefinition speed_effect_fastest = {
+    .angle = 180.0f,
+    .angleVariance = 0.0f,
+    .blendFuncDestination = 1,
+    .blendFuncSource = 770,
+    .duration = 0.5f,
+    .emitterType = 0,
+    .finishColorAlpha = 0.0f,
+    .finishColorBlue = 0.25490198f,
+    .finishColorGreen = 0.25490198f,
+    .finishColorRed = 1.0f,
+    .finishColorVarianceAlpha = 0.0f,
+    .finishColorVarianceBlue = 0.0f,
+    .finishColorVarianceGreen = 0.0f,
+    .finishColorVarianceRed = 0.0f,
+    .finishParticleSize = 0.0f,
+    .finishParticleSizeVariance = 0.0f,
+    .gravityx = 0.0f,
+    .gravityy = 0.0f,
+    .maxParticles = 50.0f,
+    .maxRadius = 40.0f,
+    .maxRadiusVariance = 20.0f,
+    .minRadius = 0.0f,
+    .particleLifespan = 1.0f,
+    .particleLifespanVariance = 0.800000011920929f,
+    .radialAccelVariance = 0.0f,
+    .radialAcceleration = 100.0f,
+    .rotatePerSecond = 0.0f,
+    .rotatePerSecondVariance = 0.0f,
+    .rotationEnd = 0.0f,
+    .rotationEndVariance = 0.0f,
+    .rotationStart = 0.0f,
+    .rotationStartVariance = 0.0f,
+    .sourcePositionVariancex = 10.0f,
+    .sourcePositionVariancey = 160.0f,
+    .sourcePositionx = 471.8299560546875f,
+    .sourcePositiony = 173.6026153564453f,
+    .speed = 1000.0f,
+    .speedVariance = 150.0f,
+    .startColorAlpha = 1.0f,
+    .startColorBlue = 0.25490198f,
+    .startColorGreen = 0.25490198f,
+    .startColorRed = 1.0f,
+    .startColorVarianceAlpha = 0.2000000029802322f,
+    .startColorVarianceBlue = 0.1000000014901161f,
+    .startColorVarianceGreen = 0.0f,
+    .startColorVarianceRed = 0.0f,
+    .startParticleSize = 5.0f,
+    .startParticleSizeVariance = 2.0f,
+    .tangentialAccelVariance = 0.0f,
+    .tangentialAcceleration = 0.0f,
+    .textureFileName = TEXTURE_SQUARE_PNG
+};
+
+const ParticleDefinition firework = {
     .angle = 0.0f,
     .angleVariance = 180.0f,
     .blendFuncDestination = 1,
@@ -839,7 +894,7 @@ extern const ParticleDefinition firework = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition explode_effect = {
@@ -893,7 +948,7 @@ extern const ParticleDefinition explode_effect = {
     .startParticleSizeVariance = 5.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition coin_effect = {
@@ -947,7 +1002,7 @@ extern const ParticleDefinition coin_effect = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition coin_pickup_effect = {
@@ -1001,7 +1056,7 @@ extern const ParticleDefinition coin_pickup_effect = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition burst_effect = {
@@ -1055,7 +1110,7 @@ extern const ParticleDefinition burst_effect = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 957.03125f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition boost_01_effect = {
@@ -1109,7 +1164,7 @@ extern const ParticleDefinition boost_01_effect = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition boost_02_effect = {
@@ -1163,7 +1218,7 @@ extern const ParticleDefinition boost_02_effect = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition boost_03_effect = {
@@ -1217,7 +1272,7 @@ extern const ParticleDefinition boost_03_effect = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition boost_04_effect = {
@@ -1271,7 +1326,7 @@ extern const ParticleDefinition boost_04_effect = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition end_effect_portal = {
@@ -1325,7 +1380,7 @@ extern const ParticleDefinition end_effect_portal = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition ship_effect = {
@@ -1379,7 +1434,7 @@ extern const ParticleDefinition ship_effect = {
     .startParticleSizeVariance = 3,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition ship_fire_effect = {
@@ -1433,7 +1488,7 @@ extern const ParticleDefinition ship_fire_effect = {
     .startParticleSizeVariance = 2,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition touch_drag_effect = {
@@ -1487,7 +1542,7 @@ extern const ParticleDefinition touch_drag_effect = {
     .startParticleSizeVariance = 1,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition touch_explosion_effect = {
@@ -1541,7 +1596,7 @@ extern const ParticleDefinition touch_explosion_effect = {
     .startParticleSizeVariance = 4.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 extern const ParticleDefinition star_effect = {
@@ -1595,7 +1650,7 @@ extern const ParticleDefinition star_effect = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };
 
 
@@ -1650,5 +1705,5 @@ extern const ParticleDefinition burst_effect2 = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 600,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TEXTURE_SQUARE_PNG
 };

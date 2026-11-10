@@ -20,6 +20,8 @@
 extern int alpha_trigger_capacity;
 extern int move_trigger_capacity;
 extern int spawn_trigger_capacity;
+extern int touch_trigger_capacity;
+extern int follow_player_y_trigger_capacity;
 
 bool restored_checkpoint = false;
 
@@ -32,9 +34,12 @@ int channels_used[COL_CHANNEL_NUM];
 typedef struct {
     int source_obj;
     float time_run;
-    unsigned int activation_order;
-    bool started_fade_out;
 } PulseSnapshot;
+
+typedef struct {
+    int obj;
+    float rotation, visual_rotation;
+} RotateObjectSnapshot;
 
 typedef struct CheckpointData {
     Player p1;
@@ -63,6 +68,8 @@ typedef struct CheckpointData {
     
     bool dual;
     
+    bool show_player;
+    
     float dual_portal_y;
     unsigned char speed;
 
@@ -78,9 +85,28 @@ typedef struct CheckpointData {
     MoveTriggerBuffer *move_triggers;
     AlphaTriggerBuffer *alpha_triggers;
     SpawnTriggerBuffer *spawn_triggers;
+    FollowPlayerYTriggerBuffer *follow_triggers;
+    FollowTriggerBuffer *follow_trigger_buffers;
+    RotateTriggerBuffer *rotate_triggers;
+    RotateTargetState *rotate_targets;
+    int *rotate_target_offsets;
+    RotateObjectSnapshot *rotate_obj_snapshot;
+    ItemCount *count_items;
+    CountTriggerBuffer *count_triggers;
+    TouchTriggerBuffer *touch_triggers;
+    int *collected_pickups;
+    int count_items_count;
+    int count_triggers_count;
+    int touch_triggers_count;
+    int collected_pickups_count;
     int move_triggers_count;
     int alpha_triggers_count;
     int spawn_triggers_count;
+    int follow_triggers_count;
+    int follow_trigger_buffers_count;
+    int rotate_triggers_count;
+    int rotate_targets_count;
+    int rotate_obj_count;
 
     // per-object state for triggers that were active at checkpoint time, so they
     // can continue from the exact point instead of restarting. bounded by the
@@ -298,6 +324,16 @@ void set_checkpoint_timer(float timer) {
     }
 }
 
+static bool is_checkpoint_pickup(int obj) {
+    PickupItem *pickup = get_pickup_item(obj);
+    return pickup && objects.id[obj] != KEY_OBJ;
+}
+
+static bool is_collected_pickup(int obj) {
+    return is_checkpoint_pickup(obj) &&
+           (objects.flags[obj] & FLAG_TOGGLED) && (objects.activated[obj] & 3);
+}
+
 void new_checkpoint() {
     if (state.dead) return;
 
@@ -366,7 +402,7 @@ void new_checkpoint() {
     int fired_cap = 0;
     int key_cap = 0;
     for (int i = 0; i < objects.count; i++) {
-        if (objects.id[i] == MOVE_TRIGGER && GET_ACTIVATED(i))
+        if ((objects.id[i] == MOVE_TRIGGER || objects.id[i] == ROTATE_TRIGGER) && GET_ACTIVATED(i))
             fired_cap++;
         else if (objects.id[i] == KEY_OBJ && (objects.flags[i] & FLAG_TOGGLED)
                  && (objects.activated[i] & 3))
@@ -389,8 +425,27 @@ void new_checkpoint() {
     for (int i = 0; i < pulse_trigger_count; i++)
         if (pulse_trigger_buffer[i].active) pulse_cap++;
 
-    void *ck_ptr[16];
-    size_t ck_size[16];
+    int rotate_targets_total = 0;
+    for (int i = 0; i < rotate_trigger_count; i++)
+        rotate_targets_total += rotate_trigger_buffer[i].target_count;
+
+    int rotate_obj_cap = 0;
+    for (int i = 0; i < objects.count; i++) {
+        if (objects.id[i] != ROTATE_TRIGGER) continue;
+        RotateTrigger *rt = get_rotate_trigger(i);
+        GroupNode *target_group = get_group(rt->target_group);
+        GroupNode *center_group = get_group(rt->center_group);
+        if (target_group) rotate_obj_cap += target_group->count;
+        if (center_group) rotate_obj_cap += center_group->count;
+    }
+
+    int pickup_cap = 0;
+    for (int i = 0; i < objects.count; i++) {
+        if (is_collected_pickup(i)) pickup_cap++;
+    }
+
+    void *ck_ptr[24];
+    size_t ck_size[24];
     int ck_n = 0;
     size_t total = 0;
     void *base = NULL;
@@ -409,6 +464,16 @@ void new_checkpoint() {
     CK_ADD(check->move_triggers,     MoveTriggerBuffer,  move_trigger_count);
     CK_ADD(check->alpha_triggers,    AlphaTriggerBuffer, alpha_trigger_count);
     CK_ADD(check->spawn_triggers,    SpawnTriggerBuffer, spawn_trigger_count);
+    CK_ADD(check->follow_triggers,   FollowPlayerYTriggerBuffer, follow_player_y_trigger_count);
+    CK_ADD(check->follow_trigger_buffers, FollowTriggerBuffer, follow_trigger_count);
+    CK_ADD(check->rotate_triggers,   RotateTriggerBuffer, rotate_trigger_count);
+    CK_ADD(check->rotate_targets,    RotateTargetState,   rotate_targets_total);
+    CK_ADD(check->rotate_target_offsets, int,            rotate_trigger_count);
+    CK_ADD(check->rotate_obj_snapshot, RotateObjectSnapshot, rotate_obj_cap);
+    CK_ADD(check->count_items,       ItemCount,           item_counter_count);
+    CK_ADD(check->count_triggers,    CountTriggerBuffer,  count_trigger_count);
+    CK_ADD(check->touch_triggers,    TouchTriggerBuffer,  touch_trigger_count);
+    CK_ADD(check->collected_pickups, int,                 pickup_cap);
     CK_ADD(check->channel_snapshot,  ColorChannel,       used_count);
     CK_ADD(check->trigger_snapshot,  ColTriggerBuffer,   used_count);
     CK_ADD(check->move_idx_stream,   uint8_t,            move_idx_bytes);
@@ -445,6 +510,15 @@ void new_checkpoint() {
     check->move_triggers_count  = move_trigger_count;
     check->alpha_triggers_count = alpha_trigger_count;
     check->spawn_triggers_count = spawn_trigger_count;
+    check->follow_triggers_count = follow_player_y_trigger_count;
+    check->follow_trigger_buffers_count = follow_trigger_count;
+    check->rotate_triggers_count = rotate_trigger_count;
+    check->rotate_targets_count = rotate_targets_total;
+    check->rotate_obj_count = 0;
+    check->count_items_count = item_counter_count;
+    check->count_triggers_count = count_trigger_count;
+    check->touch_triggers_count = touch_trigger_count;
+    check->collected_pickups_count = pickup_cap;
     check->channel_snapshot_count = used_count;
 
     check->camera_x = state.camera_x;
@@ -469,6 +543,8 @@ void new_checkpoint() {
     check->dual = state.dual;
     check->dual_portal_y = state.dual_portal_y;
 
+    check->show_player = state.show_player;
+
     check->speed = state.speed;
 
     check->current_fading_effect = current_fading_effect;
@@ -488,6 +564,59 @@ void new_checkpoint() {
     if (check->move_triggers)  memcpy(check->move_triggers,  move_trigger_buffer,  sizeof(MoveTriggerBuffer)  * move_trigger_count);
     if (check->alpha_triggers) memcpy(check->alpha_triggers, alpha_trigger_buffer, sizeof(AlphaTriggerBuffer) * alpha_trigger_count);
     if (check->spawn_triggers) memcpy(check->spawn_triggers, spawn_trigger_buffer, sizeof(SpawnTriggerBuffer) * spawn_trigger_count);
+    if (check->follow_triggers) memcpy(check->follow_triggers, follow_player_y_trigger_buffer, sizeof(FollowPlayerYTriggerBuffer) * follow_player_y_trigger_count);
+    if (check->follow_trigger_buffers) memcpy(check->follow_trigger_buffers, follow_trigger_buffer, sizeof(FollowTriggerBuffer) * follow_trigger_count);
+    if (check->rotate_triggers) memcpy(check->rotate_triggers, rotate_trigger_buffer, sizeof(RotateTriggerBuffer) * rotate_trigger_count);
+    if (check->count_items) memcpy(check->count_items, item_counter_buffer, sizeof(ItemCount) * item_counter_count);
+    if (check->count_triggers) memcpy(check->count_triggers, count_trigger_buffer, sizeof(CountTriggerBuffer) * count_trigger_count);
+    if (check->touch_triggers) memcpy(check->touch_triggers, touch_trigger_buffer, sizeof(TouchTriggerBuffer) * touch_trigger_count);
+    if (check->collected_pickups) {
+        int n = 0;
+        for (int i = 0; i < objects.count && n < check->collected_pickups_count; i++) {
+            if (is_collected_pickup(i)) check->collected_pickups[n++] = i;
+        }
+    }
+
+    if (check->rotate_triggers) {
+        int offset = 0;
+        for (int i = 0; i < rotate_trigger_count; i++) {
+            check->rotate_target_offsets[i] = offset;
+            int count = rotate_trigger_buffer[i].target_count;
+            if (count > 0 && rotate_trigger_buffer[i].targets) {
+                memcpy(check->rotate_targets + offset, rotate_trigger_buffer[i].targets, sizeof(RotateTargetState) * count);
+            }
+            offset += count;
+        }
+    }
+
+    if (check->rotate_obj_snapshot) {
+        int n = 0;
+        for (int i = 0; i < objects.count && n < rotate_obj_cap; i++) {
+            if (objects.id[i] != ROTATE_TRIGGER) continue;
+            RotateTrigger *rt = get_rotate_trigger(i);
+            GroupNode *target_group = get_group(rt->target_group);
+            GroupNode *center_group = get_group(rt->center_group);
+            if (target_group) {
+                for (int j = 0; j < target_group->count && n < rotate_obj_cap; j++) {
+                    int obj = target_group->objects[j];
+                    check->rotate_obj_snapshot[n].obj = obj;
+                    check->rotate_obj_snapshot[n].rotation = objects.rotation[obj];
+                    check->rotate_obj_snapshot[n].visual_rotation = objects.visual_rotation[obj];
+                    n++;
+                }
+            }
+            if (center_group) {
+                for (int j = 0; j < center_group->count && n < rotate_obj_cap; j++) {
+                    int obj = center_group->objects[j];
+                    check->rotate_obj_snapshot[n].obj = obj;
+                    check->rotate_obj_snapshot[n].rotation = objects.rotation[obj];
+                    check->rotate_obj_snapshot[n].visual_rotation = objects.visual_rotation[obj];
+                    n++;
+                }
+            }
+        }
+        check->rotate_obj_count = n;
+    }
 
     check->move_obj_count = 0;
     check->move_idx_bytes = 0;
@@ -564,7 +693,7 @@ void new_checkpoint() {
         int n = 0;
         for (int i = 0; i < objects.count; i++) {
             if (n >= fired_cap) break;
-            if (objects.id[i] == MOVE_TRIGGER && GET_ACTIVATED(i))
+            if ((objects.id[i] == MOVE_TRIGGER || objects.id[i] == ROTATE_TRIGGER) && GET_ACTIVATED(i))
                 check->fired_move_index[n++] = i;
         }
         check->fired_move_count = n;
@@ -614,8 +743,6 @@ void new_checkpoint() {
             if (!pb->active) continue;
             check->pulse_snap[n].source_obj = pb->source_obj;
             check->pulse_snap[n].time_run = pb->time_run;
-            check->pulse_snap[n].activation_order = pb->activation_order;
-            check->pulse_snap[n].started_fade_out = pb->started_fade_out;
             n++;
         }
         check->pulse_snap_count = n;
@@ -658,6 +785,8 @@ void restore_checkpoint() {
     
     state.dual = check->dual;
     state.dual_portal_y = check->dual_portal_y;
+    
+    state.show_player = check->show_player;
 
     state.speed = check->speed;
 
@@ -702,12 +831,123 @@ void restore_checkpoint() {
         }
     }
 
+    if (check->follow_triggers && check->follow_triggers_count > 0) {
+        FollowPlayerYTriggerBuffer *buf = (FollowPlayerYTriggerBuffer *)realloc(follow_player_y_trigger_buffer, sizeof(FollowPlayerYTriggerBuffer) * check->follow_triggers_count);
+        if (buf) {
+            follow_player_y_trigger_buffer = buf;
+            follow_player_y_trigger_capacity = check->follow_triggers_count;
+            follow_player_y_trigger_count = check->follow_triggers_count;
+            memcpy(follow_player_y_trigger_buffer, check->follow_triggers, sizeof(FollowPlayerYTriggerBuffer) * check->follow_triggers_count);
+        }
+    }
+
+    follow_trigger_count = 0;
+    if (check->follow_trigger_buffers && check->follow_trigger_buffers_count > 0) {
+        FollowTriggerBuffer *buf = (FollowTriggerBuffer *)realloc(follow_trigger_buffer, sizeof(FollowTriggerBuffer) * check->follow_trigger_buffers_count);
+        if (buf) {
+            follow_trigger_buffer = buf;
+            follow_trigger_capacity = check->follow_trigger_buffers_count;
+            follow_trigger_count = check->follow_trigger_buffers_count;
+            memcpy(follow_trigger_buffer, check->follow_trigger_buffers, sizeof(FollowTriggerBuffer) * check->follow_trigger_buffers_count);
+        }
+    }
+
+    for (int i = 0; i < rotate_trigger_count; i++) {
+        free(rotate_trigger_buffer[i].targets);
+        rotate_trigger_buffer[i].targets = NULL;
+    }
+    rotate_trigger_count = 0;
+    if (check->rotate_triggers && check->rotate_triggers_count > 0) {
+        RotateTriggerBuffer *buf = (RotateTriggerBuffer *)realloc(rotate_trigger_buffer, sizeof(RotateTriggerBuffer) * check->rotate_triggers_count);
+        if (buf) {
+            rotate_trigger_buffer = buf;
+            rotate_trigger_capacity = check->rotate_triggers_count;
+            rotate_trigger_count = check->rotate_triggers_count;
+            memcpy(rotate_trigger_buffer, check->rotate_triggers, sizeof(RotateTriggerBuffer) * check->rotate_triggers_count);
+            for (int i = 0; i < rotate_trigger_count; i++) {
+                RotateTriggerBuffer *rb = &rotate_trigger_buffer[i];
+                int count = rb->target_count;
+                int offset = check->rotate_target_offsets[i];
+                rb->targets = NULL;
+                if (count > 0 && offset >= 0 && offset + count <= check->rotate_targets_count) {
+                    rb->targets = (RotateTargetState *)malloc(sizeof(RotateTargetState) * count);
+                    if (rb->targets) {
+                        memcpy(rb->targets, check->rotate_targets + offset, sizeof(RotateTargetState) * count);
+                    } else {
+                        rb->target_count = 0;
+                        rb->active = false;
+                    }
+                } else {
+                    rb->target_count = 0;
+                }
+            }
+        }
+    }
+
+    for (int i = 0; i < objects.count; i++) {
+        PickupItem *pickup = get_pickup_item(i);
+        if (pickup) {
+            objects.flags[i] &= ~FLAG_TOGGLED;
+            objects.activated[i] = 0;
+        }
+    }
+    for (int i = 0; i < check->collected_pickups_count; i++) {
+        int obj = check->collected_pickups[i];
+        if (obj >= 0 && obj < objects.count && is_checkpoint_pickup(obj)) {
+            objects.flags[obj] |= FLAG_TOGGLED;
+            objects.activated[obj] = 3;
+        }
+    }
+
+    if (check->count_items_count > 0) {
+        ItemCount *buf = (ItemCount *)realloc(item_counter_buffer, sizeof(ItemCount) * check->count_items_count);
+        if (buf) {
+            item_counter_buffer = buf;
+            item_counter_capacity = check->count_items_count;
+            item_counter_count = check->count_items_count;
+            memcpy(item_counter_buffer, check->count_items, sizeof(ItemCount) * check->count_items_count);
+        }
+    } else {
+        item_counter_count = 0;
+    }
+    if (check->count_triggers_count > 0) {
+        CountTriggerBuffer *buf = (CountTriggerBuffer *)realloc(count_trigger_buffer, sizeof(CountTriggerBuffer) * check->count_triggers_count);
+        if (buf) {
+            count_trigger_buffer = buf;
+            count_trigger_capacity = check->count_triggers_count;
+            count_trigger_count = check->count_triggers_count;
+            memcpy(count_trigger_buffer, check->count_triggers, sizeof(CountTriggerBuffer) * check->count_triggers_count);
+        }
+    } else {
+        count_trigger_count = 0;
+    }
+    if (check->touch_triggers_count > 0) {
+        TouchTriggerBuffer *buf = (TouchTriggerBuffer *)realloc(touch_trigger_buffer, sizeof(TouchTriggerBuffer) * check->touch_triggers_count);
+        if (buf) {
+            touch_trigger_buffer = buf;
+            touch_trigger_capacity = check->touch_triggers_count;
+            touch_trigger_count = check->touch_triggers_count;
+            memcpy(touch_trigger_buffer, check->touch_triggers, sizeof(TouchTriggerBuffer) * check->touch_triggers_count);
+        }
+    } else {
+        touch_trigger_count = 0;
+    }
+
+    for (int i = 0; i < count_trigger_count; i++)
+        count_trigger_buffer[i].restored_from_checkpoint = count_trigger_buffer[i].active;
+
     for (int i = 0; i < move_trigger_count; i++)
         move_trigger_buffer[i].restored_from_checkpoint = move_trigger_buffer[i].active;
     for (int i = 0; i < alpha_trigger_count; i++)
         alpha_trigger_buffer[i].restored_from_checkpoint = alpha_trigger_buffer[i].active;
     for (int i = 0; i < spawn_trigger_count; i++)
         spawn_trigger_buffer[i].restored_from_checkpoint = spawn_trigger_buffer[i].active;
+    for (int i = 0; i < follow_player_y_trigger_count; i++)
+        follow_player_y_trigger_buffer[i].restored_from_checkpoint = follow_player_y_trigger_buffer[i].active;
+    for (int i = 0; i < follow_trigger_count; i++)
+        follow_trigger_buffer[i].restored_from_checkpoint = follow_trigger_buffer[i].active;
+    for (int i = 0; i < rotate_trigger_count; i++)
+        rotate_trigger_buffer[i].restored_from_checkpoint = rotate_trigger_buffer[i].active;
 
     {
         int kx = 0, ky = 0, oi = 0;
@@ -729,6 +969,12 @@ void restore_checkpoint() {
             }
             update_object_section(oi);
         }
+    }
+    for (int i = 0; i < check->rotate_obj_count && check->rotate_obj_snapshot; i++) {
+        RotateObjectSnapshot *rs = &check->rotate_obj_snapshot[i];
+        objects.last_y[rs->obj] = objects.y[rs->obj];
+        objects.rotation[rs->obj] = rs->rotation;
+        objects.visual_rotation[rs->obj] = rs->visual_rotation;
     }
     for (int i = 0; i < check->alpha_group_count; i++) {
         GroupNode *p = get_group(check->alpha_group_id[i]);
@@ -761,14 +1007,20 @@ void restore_checkpoint() {
         objects.flags[check->key_index[i]] |= FLAG_TOGGLED;
     }
 
-    for (int i = 0; i < check->pulse_snap_count; i++) {
-        PulseTrigger *pt = get_pulse_trigger(check->pulse_snap[i].source_obj);
-        if (pt->pulse_target_type == PULSE_TARGET_CHANNEL)
-            channels[get_col_channel_index(pt->target_group)].num_pulses = 0;
+    pulse_trigger_count = 0;
+    for (int i = 0; i < objects.count; i++) {
+        objects.num_main_pulses[i] = 0;
+        objects.num_detail_pulses[i] = 0;
+        objects.main_being_pulsed[i] = false;
+        objects.detail_being_pulsed[i] = false;
     }
+    for (int i = 0; i < COL_CHANNEL_NUM; i++) {
+        channels[i].num_pulses = 0;
+    }
+
     for (int i = 0; i < check->pulse_snap_count; i++) {
         PulseSnapshot *ps = &check->pulse_snap[i];
-        restore_pulse_trigger(ps->source_obj, ps->time_run, ps->activation_order, ps->started_fade_out);
+        restore_pulse_trigger(ps->source_obj, ps->time_run);
     }
 
     update_attempt_text_pos();
@@ -845,6 +1097,7 @@ void handle_auto_checkpoints(float delta) {
             case GAMEMODE_PLAYER:
             case GAMEMODE_BALL:
             case GAMEMODE_ROBOT:
+            case GAMEMODE_SPIDER:
                 if (state.player.landed_from_jump) {
                     new_checkpoint();
                     state.just_placed_auto_checkpoint = true;

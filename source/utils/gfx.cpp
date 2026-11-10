@@ -276,9 +276,13 @@ float get_depth_shift(float depth) {
 
 // Sets the top screen up for one eye, returns false once every eye has been drawn
 bool begin_top_eye(int eye) {
+    return begin_top_eye_target(eye, top);
+}
+
+bool begin_top_eye_target(int eye, C3D_RenderTarget *primary) {
     // The slider only gets read once per frame so both eyes agree on the depth
     if (eye == EYE_LEFT) {
-        stereo_strength = top_right ? get_stereo_slider() : 0.f;
+        stereo_strength = (primary == top && top_right) ? get_stereo_slider() : 0.f;
     }
 
     // One eye is enough with the slider down
@@ -291,7 +295,7 @@ bool begin_top_eye(int eye) {
     current_eye = eye;
     drawing_top_eye = true;
 
-    C3D_RenderTarget *target = (eye == EYE_RIGHT ? top_right : top);
+    C3D_RenderTarget *target = (eye == EYE_RIGHT ? top_right : primary);
     
     C2D_SceneBegin(target);
     C2D_TargetClear(target, C2D_Color32(0, 0, 0, 255));
@@ -534,7 +538,7 @@ void compute_mitered_offsets(Vec2D *poly, Vec2D *offsets, int n, float thickness
     }
 }
 
-void draw_polygon_inward_mitered(Vec2D *poly, int n, float thickness, u32 color) {
+void draw_polygon_inward_mitered(Vec2D *poly, int n, float thickness, u32 *color, float depth) {
     bool ccw = is_ccw(poly, n);
 
     Vec2D offsets[n];
@@ -555,18 +559,18 @@ void draw_polygon_inward_mitered(Vec2D *poly, int n, float thickness, u32 color)
 
         // Triangle 1
         C2D_DrawTriangle(
-            x1, y1, color,
-            x2, y2, color,
-            ox2, oy2, color,
-            0.0f
+            x1, y1, color[i],
+            x2, y2, color[i],
+            ox2, oy2, color[i],
+            depth
         );
 
         // Triangle 2
         C2D_DrawTriangle(
-            ox2, oy2, color,
-            ox1, oy1, color,
-            x1, y1, color,
-            0.0f
+            ox2, oy2, color[i],
+            ox1, oy1, color[i],
+            x1, y1, color[i],
+            depth
         );
     }
 }
@@ -576,7 +580,7 @@ void draw_hitbox_line_inward(Vec2D rect[4],
                              const float x2, const float y2,
                              const float thickness,
                              const float cx, const float cy,
-                             const u32 color) {
+                             const u32 color, const float depth) {
 
     float ex = x2 - x1;
     float ey = y2 - y1;
@@ -618,7 +622,7 @@ void draw_hitbox_line_inward(Vec2D rect[4],
         x1a, y1a, color,
         x2a, y2a, color,
         x2b, y2b, color,
-        0.0f
+        depth
     );
 
     // Second triangle
@@ -626,7 +630,7 @@ void draw_hitbox_line_inward(Vec2D rect[4],
         x2b, y2b, color,
         x1b, y1b, color,
         x1a, y1a, color,
-        0.0f
+        depth
     );
 }
 
