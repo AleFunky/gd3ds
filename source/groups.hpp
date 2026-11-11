@@ -14,6 +14,11 @@ typedef struct GroupNode {
     int *combinations;
     int combination_count;
     int combination_capacity;
+
+    int collision_object_count;
+    float deferred_offset_x;
+    float deferred_offset_y;
+    bool deferred_touched;
 } GroupNode;
 
 bool build_group_combinations(void);

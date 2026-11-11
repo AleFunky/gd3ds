@@ -54,6 +54,10 @@ static void clear_group_combinations(void) {
         groups[i].combinations = NULL;  
         groups[i].combination_count = 0;  
         groups[i].combination_capacity = 0;  
+        groups[i].collision_object_count = 0;
+        groups[i].deferred_offset_x = 0.f;
+        groups[i].deferred_offset_y = 0.f;
+        groups[i].deferred_touched = false;
     }
 }
 
@@ -185,6 +189,9 @@ bool build_group_combinations(void) {
 
         if (object_is_240hz(obj)) {
             combination->objects[combination->collision_object_write_count++] = obj;
+
+            for (int i = 0; i < combination->group_count; i++)
+                groups[combination->groups[i]].collision_object_count++;
         } else {
             int visual_index = combination->collision_object_count + combination->visual_object_write_count++;
 
@@ -219,6 +226,15 @@ void begin_group_combination_move_step(void) {
 void add_move_to_group_combinations(int group, float delta_x, float delta_y) {
     GroupNode *node = get_group(group);
     if (!node) return;
+
+    if (node->collision_object_count == 0) {
+        if (delta_x != 0.f || delta_y != 0.f) {
+            node->deferred_offset_x += delta_x;
+            node->deferred_offset_y += delta_y;
+            node->deferred_touched = true;
+        }
+        return;
+    }
 
     for (int i = 0; i < node->combination_count; i++) {
         int combination_index = node->combinations[i];
@@ -270,6 +286,28 @@ void apply_group_combination_move(void) {
 }
 
 void flush_group_combination_visual_moves(void) {
+    for (int group = 1; group < MAX_GROUPS; group++) {
+        GroupNode *node = &groups[group];
+        if (!node->deferred_touched) continue;
+
+        for (int i = 0; i < node->combination_count; i++) {
+            int combination_index = node->combinations[i];
+            GroupCombination *combination = &group_combinations[combination_index];
+
+            if (!combination->deferred_touched) {
+                combination->deferred_touched = true;
+                deferred_combinations[deferred_combination_count++] = combination_index;
+            }
+
+            combination->deferred_offset_x += node->deferred_offset_x;
+            combination->deferred_offset_y += node->deferred_offset_y;
+        }
+
+        node->deferred_offset_x = 0.f;
+        node->deferred_offset_y = 0.f;
+        node->deferred_touched = false;
+    }
+
     for (int i = 0; i < deferred_combination_count; i++) {
         int combination_index = deferred_combinations[i];
 
@@ -302,6 +340,12 @@ void flush_group_combination_visual_moves(void) {
 }
 
 void discard_group_combination_visual_moves(void) {
+    for (int group = 1; group < MAX_GROUPS; group++) {
+        groups[group].deferred_offset_x = 0.f;
+        groups[group].deferred_offset_y = 0.f;
+        groups[group].deferred_touched = false;
+    }
+
     for (int i = 0; i < deferred_combination_count; i++) {
         GroupCombination *combination = &group_combinations[deferred_combinations[i]];
         combination->deferred_offset_x = 0.f;
