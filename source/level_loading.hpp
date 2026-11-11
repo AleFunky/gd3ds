@@ -14,8 +14,12 @@
 
 #define MAX_TEXT_LEN 64
 
-typedef struct {
+typedef struct Color {
     unsigned char r,g,b;
+
+    u32 to_color32(){
+        return C2D_Color32(r, g, b, 255);
+    }
 } Color;
 
 typedef struct {

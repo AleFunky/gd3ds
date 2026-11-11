@@ -21,7 +21,6 @@ struct LightningSegment {
     float start_y;
     float end_x;
     float end_y;
-    bool vertical_edges;
     u32 color;
 
     LightningSegment(float start_x, float start_y, float end_x, float end_y, u32 color);
@@ -35,7 +34,8 @@ private:
     std::vector<LightningSegment> generate_lighting_recursive(
         const std::vector<LightningPoint>& points, 
         int segment_length, 
-        LightningType type
+        LightningType type,
+        unsigned long long seed
     );
 public:
     Lightning(float start_x, float start_y, float end_x, float end_y, LightningType type);
