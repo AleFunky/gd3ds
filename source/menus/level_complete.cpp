@@ -126,7 +126,7 @@ const char *do_not_completion_texts[] = {
     "Goop job!",
     "Have a cookie",
     "hi you did it bye",
-    "HOLY CRAP YOU JUST VERIFIED... oh wait.",
+    "HOLY SHIT YOU JUST VERIFIED... oh wait.",
     "horse",
     "How",
     "I could do this in half the attempts",
