@@ -23,19 +23,20 @@ LightningSegment::LightningSegment(float start_x, float start_y, float end_x, fl
     this->end_x = end_x;
     this->end_y = end_y;
     this->color = color;
-    this->vertical_edges = abs(end_x - start_x) > abs(end_y - start_y);
+}
+
+static unsigned int lightning_rand(unsigned long long& seed){
+    seed = seed * 1103515245 + 12345;
+    return (unsigned)(seed / 65536) % 32768;
 }
 
 std::vector<LightningSegment> Lightning::generate_lighting_recursive(
     const std::vector<LightningPoint>& points, 
     int segment_length, 
-    LightningType type
+    LightningType type,
+    unsigned long long seed
 ){
     std::vector<LightningPoint> next_points;
-
-    //???
-    static std::mt19937 gen(std::random_device{}());
-    std::uniform_real_distribution<float> rand_offset(-segment_length * 0.3, segment_length * 0.3); 
 
     unsigned int i = 0;
     for(; i < points.size() - 1; i++){
@@ -43,8 +44,8 @@ std::vector<LightningSegment> Lightning::generate_lighting_recursive(
 
         float mid_x = (points[i].x + points[i + 1].x) / 2.0f;
         float mid_y = (points[i].y + points[i + 1].y) / 2.0f;
-        mid_x += rand_offset(gen);
-        mid_y += rand_offset(gen);
+        mid_x += ((lightning_rand(seed) % 101) / 100.0f - 0.5f) * segment_length;
+        mid_y += ((lightning_rand(seed) % 101) / 100.0f - 0.5f) * segment_length;
 
         LightningPoint point = LightningPoint(mid_x, mid_y);
 
@@ -52,9 +53,8 @@ std::vector<LightningSegment> Lightning::generate_lighting_recursive(
     }
     next_points.push_back(points.back());
 
-    segment_length /= 2;
     if(segment_length > 8){
-        return generate_lighting_recursive(next_points, segment_length, type);
+        return generate_lighting_recursive(next_points, segment_length / 2, type, seed);
     } else{
         //generate lightning
         std::vector<LightningSegment> segments;
@@ -71,7 +71,7 @@ std::vector<LightningSegment> Lightning::generate_lighting_recursive(
                     color = lightning_size_normal_col;
                     break;
                 case LightningType::TELEPORT:
-                    color = color_lerp_u32(lightning_tele_in_col, lightning_tele_out_col, i / (float)segment_count);
+                    color = p1_color.to_color32();
                     break;
                 default:
                     break;
@@ -101,34 +101,15 @@ void Lightning::render_lightning(){
 
         u32 color = (s.color & 0x00FFFFFF) |((u32)(alpha * 255.0f) << 24);
 
-        float offset_x = (s.vertical_edges ? 0 : 2);
-        float offset_y = (s.vertical_edges ? 2 : 0);
+        float top_x = s.start_x - state.camera_x;
+        float btm_x = s.end_x - state.camera_x;
+        float top_y = SCREEN_HEIGHT - (s.start_y - state.camera_y);
+        float btm_y = SCREEN_HEIGHT - (s.end_y  - state.camera_y);
 
-        float top_l_x = s.start_x - offset_x - state.camera_x;
-        float top_r_x = s.start_x + offset_x - state.camera_x;
-        float btm_l_x = s.end_x - offset_x - state.camera_x;
-        float btm_r_x = s.end_x + offset_x - state.camera_x;
-
-        float top_l_y = SCREEN_HEIGHT - ((s.start_y - offset_y) - state.camera_y);
-        float top_r_y = SCREEN_HEIGHT - ((s.start_y + offset_y) - state.camera_y);
-        float btm_l_y = SCREEN_HEIGHT - ((s.end_y - offset_y) - state.camera_y);
-        float btm_r_y = SCREEN_HEIGHT - ((s.end_y + offset_y) - state.camera_y);
-
-        C2D_DrawTriangle(
-            get_mirror_x(top_l_x, state.mirror_factor), top_l_y, color, 
-            get_mirror_x(btm_l_x, state.mirror_factor), btm_l_y, color,
-            get_mirror_x(btm_r_x, state.mirror_factor), btm_r_y, color,
-            0.0f
-        );
-        C2D_DrawTriangle(
-            get_mirror_x(btm_r_x, state.mirror_factor), btm_r_y, color,
-            get_mirror_x(top_r_x, state.mirror_factor), top_r_y, color,
-            get_mirror_x(top_l_x, state.mirror_factor), top_l_y, color,
-            0.0f
-        );
+        C2D_DrawLine(top_x, top_y, color, btm_x, btm_y, color, 2, 0.0f);
     }
 
-    this->pulseTime += delta;
+    if(!game_paused) this->pulseTime += delta;
 }
 
 bool Lightning::done(){
@@ -141,7 +122,7 @@ Lightning::Lightning(float start_x, float start_y, float end_x, float end_y, Lig
         LightningPoint(end_x, end_y)
     };
 
-    this->segments = generate_lighting_recursive(segmentPoints, 120, type);
+    this->segments = generate_lighting_recursive(segmentPoints, 160, type, rand());
 }
 
 std::deque<Lightning> lightning_bolts;

@@ -22,6 +22,8 @@
 
 #define STEPS_HZ 240
 
+#define CCRANDOM_0_1() ((float)rand()/RAND_MAX)
+
 // Vector math
 Vec2D add_vec(Vec2D a, Vec2D b);
 Vec2D sub_vec(Vec2D a, Vec2D b);

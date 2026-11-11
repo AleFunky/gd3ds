@@ -112,6 +112,15 @@ Setting settings[] = {
         .key = CONFIG_GRAPHICS_PATH "glowEnabled"
     },
     {
+        .id = "disableGravityEffect",
+        .label = "Disable gravity effect",
+        .page = PAGE_GRAPHICS, 
+
+        .defaultValue = false,
+        .var = &settingsState.disableGravityEffect,
+        .key = CONFIG_GRAPHICS_PATH "disableGravityEffect",
+    },
+    {
         .id = "showFpsCounter",
         .label = "FPS counter",
         .additionalInfo = "Displays current FPS in gameplay.",

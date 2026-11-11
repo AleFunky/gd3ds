@@ -25,6 +25,7 @@
 #include "particles/coin_effect.hpp"
 #include "particles/key_effect.hpp"
 #include "particles/lightning.hpp"
+#include "particles/gravity_sweep.hpp"
 
 #include "menus/settings_hub/settings.hpp"
 
