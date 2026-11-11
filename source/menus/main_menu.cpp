@@ -113,6 +113,7 @@ void reset_players() {
     title_screen_player.player_icons.ufo  = random_int(1, ICON_COUNT_BIRD - 1);
     title_screen_player.player_icons.wave = random_int(1, ICON_COUNT_DART - 1);
     title_screen_player.player_icons.robot = random_int(1, ICON_COUNT_ROBOT - 1);
+    title_screen_player.player_icons.spider = random_int(1, ICON_COUNT_SPIDER - 1);
     title_screen_player.player_icons.glow = false;
 
     title_screen_player_hold = random_int(0,1);
@@ -171,6 +172,10 @@ static void handle_input() {
                 // Else 1/16 change to start holding
                 if (!(rand() & 0b1111)) title_screen_player_hold = 0;
             }
+            break;
+        case GAMEMODE_SPIDER:
+            pressing = false;
+            break;
     }
 
     started = !old_pressing && pressing;
