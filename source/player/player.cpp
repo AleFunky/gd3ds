@@ -352,6 +352,9 @@ float get_ball_rotation_speed(Player *player) {
         case 3:
             speed *= 0.6657693f;
             break;
+        case 4:
+            speed *= 0.5409375f;
+            break;
         default:
             break;
     }
