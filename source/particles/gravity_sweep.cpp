@@ -2,6 +2,7 @@
 #include "main.hpp"
 #include "math_helpers.hpp"
 #include "graphics.hpp"
+#include "menus/settings_hub/settings.hpp"
 #include <array>
 
 C2D_SpriteSheet gravLineSheet;
@@ -70,6 +71,8 @@ std::array<GravitySweep, 2> down_sweeps = {
 };
 
 void start_gravity_sweep(bool down){
+    if(settingsState.disableGravityEffect) return;
+
     auto& sweeps = down ? down_sweeps : up_sweeps;
     for(auto& s : sweeps){
         if(s.done()){
