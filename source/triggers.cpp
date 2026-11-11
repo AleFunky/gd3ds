@@ -1219,7 +1219,7 @@ void upload_to_rotate_buffer(int obj) {
 
     if (buffer->use_center) {
         GroupNode *center = get_group(trigger->center_group);
-        if (center && center->count > 0 && trigger->center_group != trigger->target_group) {
+        if (center && center->count == 1 && trigger->center_group != trigger->target_group) {
             buffer->center_obj = center->objects[0];
         } else {
             buffer->use_center = false;
