@@ -75,7 +75,7 @@
 
 Arena level_arena;
 
-u32 __ctru_linear_heap_size = 44 << 20;
+u32 __ctru_linear_heap_size = 34 << 20;
 
 bool inExclusiveState = false;
 
