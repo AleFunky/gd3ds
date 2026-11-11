@@ -84,35 +84,22 @@ typedef enum {
     SAVE_1P9_GDPS,
     SAVE_EXTERNAL,
     SAVE_CONFIG,
-    SAVE_TYPE_COUNT,
 } SaveType;
-
-typedef struct SavingTask {
-    struct json_object *root;
-    char file[256];
-    char tmp_file[256];
-    SaveType type;
-    volatile bool running;
-} SavingTask;
 
 typedef enum {
     SAVE_ERROR_NONE,
     SAVE_ERROR_JSON_FAIL,
     SAVE_ERROR_MAKE_DATA_LIST,
-    SAVE_ERROR_DECOMPRESS,
     SAVE_ERROR_COMPRESS,
     SAVE_ERROR_OPEN_FILE,
     SAVE_ERROR_WRITING_FILE,
     SAVE_ERROR_REMOVE_FILE,
     SAVE_ERROR_RENAME_FILE,
-    SAVE_ERROR_DATA,
     SAVE_ERROR_MAKE_SAVE_DATA_LIST,
     SAVE_ERROR_OUTOFMEM,
 } SavingError;
 
 void begin_saving(SaveType type);
-bool is_saving();
-void wait_for_saving();
 
 extern int total_stars;
 extern int total_coins;

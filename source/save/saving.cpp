@@ -1,5 +1,4 @@
 #include "saving.hpp"
-#include "3ds/thread.h"
 #include "json-c/json_object.h"
 #include "json-c/json_tokener.h"
 #include "json-c/json_types.h"
@@ -34,8 +33,22 @@ static CreatorEntry empty_creator = (CreatorEntry) {
     .creatorName = "-"
 };
 
-static SavingTask tasks[SAVE_TYPE_COUNT] = { 0 };
-static Thread saving_threads[SAVE_TYPE_COUNT] = { 0 };
+typedef struct SavingTask {
+    struct json_object *root;
+    char file[256];
+    char tmp_file[256];
+} SavingTask;
+
+static SavingTask save_task = { 0 };
+
+static void set_task_paths(SavingTask *task, const char *path) {
+    char tmp_path[250];
+    snprintf(tmp_path, sizeof(tmp_path), "%s", path);
+    strncpy(task->file, tmp_path, sizeof(task->file));
+    strip_extension(tmp_path);
+
+    snprintf(task->tmp_file, sizeof(task->tmp_file), "%s.tmp", tmp_path);
+}
 
 int total_stars = 0;
 int total_coins = 0;
@@ -1163,15 +1176,9 @@ SavingError save_save_file(const char *path, const ServerFile *save_data) {
 
     SaveType type = (save_data == &gdps_file ? SAVE_1P9_GDPS : SAVE_ROBTOP);
 
-    SavingTask *task = &tasks[type];
+    SavingTask *task = &save_task;
 
-    char tmp_path[250];
-    snprintf(tmp_path, sizeof(tmp_path), "%s", path);
-    strncpy(task->file, tmp_path, sizeof(task->file));
-    strip_extension(tmp_path);
-
-    snprintf(task->tmp_file, sizeof(task->tmp_file), "%s.tmp", tmp_path);
-
+    set_task_paths(task, path);
     task->root = root;
     
     begin_saving(type);
@@ -1193,15 +1200,9 @@ SavingError save_external_file(const char *path, const ExternalLevelFile *save_d
 
     json_object_object_add(root, SAVE_EXTERNAL_KEY, external);
 
-    SavingTask *task = &tasks[SAVE_EXTERNAL];
+    SavingTask *task = &save_task;
 
-    char tmp_path[250];
-    snprintf(tmp_path, sizeof(tmp_path), "%s", path);
-    strncpy(task->file, tmp_path, sizeof(task->file));
-    strip_extension(tmp_path);
-
-    snprintf(task->tmp_file, sizeof(task->tmp_file), "%s.tmp", tmp_path);
-
+    set_task_paths(task, path);
     task->root = root;
     
     begin_saving(SAVE_EXTERNAL);
@@ -1434,7 +1435,7 @@ bool migrate_old_data() {
     return true;
 }
 
-static SavingError threaded_save(SavingTask *task) {
+static SavingError write_save(SavingTask *task) {
     const char *json = json_object_to_json_string_ext(task->root, JSON_C_TO_STRING_PLAIN);
     if (!json) {
         return SAVE_ERROR_OUTOFMEM;
@@ -1449,6 +1450,7 @@ static SavingError threaded_save(SavingTask *task) {
 
     FILE *file = fopen(task->tmp_file, "wb");
     if (!file) {
+        free(compressed);
         return SAVE_ERROR_OPEN_FILE;
     }
 
@@ -1497,16 +1499,16 @@ static SavingError threaded_save(SavingTask *task) {
     } 
 }
 
-static void saving_thread(void *arg) {
-    SavingTask *task = (SavingTask *)arg;
+void begin_saving(SaveType type) {
     SavingError error = SAVE_ERROR_NONE;
 
-    switch (task->type) {
+    switch (type) {
         case SAVE_ROBTOP:
         case SAVE_1P9_GDPS:
         case SAVE_EXTERNAL:
-            error = threaded_save(task);
-            json_object_put(task->root);
+            error = write_save(&save_task);
+            json_object_put(save_task.root);
+            save_task.root = NULL;
             break;
         case SAVE_CONFIG:
             config_save(&cfg);
@@ -1516,45 +1518,6 @@ static void saving_thread(void *arg) {
 
     if (error) {
         output_log("An error has occured while saving: %d\n", error);
-    }
-    task->running = false;
-}
-
-bool is_saving() {
-    for (int i = 0; i < (int)SAVE_TYPE_COUNT; i++) {
-        if (tasks[i].running) return true;
-    }
-    return false;
-}
-
-void wait_for_saving() {
-    for (int i = 0; i < (int)SAVE_TYPE_COUNT; i++) {
-        if (!saving_threads[i]) continue;
-
-        threadJoin(saving_threads[i], U64_MAX);
-        saving_threads[i] = NULL;
-    }
-}
-
-void begin_saving(SaveType type) {
-    if (!tasks[type].running) {   
-        int32_t priority = 0x30;
-        svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
-        priority += 1;
-        priority = priority < 0x18 ? 0x18 : priority;
-        priority = priority > 0x3F ? 0x3F : priority;
-
-        tasks[type].type = type;
-        tasks[type].running = true;
-    
-        saving_threads[type] = threadCreate(
-            saving_thread,
-            &tasks[type],
-            32 * 1024,
-            priority,
-            (is_N3DS ? 2 : 0),
-            false
-        );
     }
 }
 

@@ -836,10 +836,6 @@ void ui_loop(){
 
         ui_stack_draw(SCREEN_BTM);
 
-        if(is_saving()) {
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 234, 0.5f, 0.5f, 0, false, "Saving...");
-        }
-
         draw_stack_fade();
 
         change_blending(true);
@@ -1951,9 +1947,6 @@ int main(int argc, char* argv[]) {
         }
     }
     
-    // Wait for the game to save
-    wait_for_saving();
-
     ui_stack_set_stack(&menu_stack);
     ui_stack_clear();
 
