@@ -62,6 +62,7 @@ TriggerPool touch_pool;
 TriggerPool spawn_pool;
 TriggerPool rotate_pool;
 static TriggerPool stop_pool;
+static TriggerPool on_death_pool;
 TriggerPool simple_pool;
 static TriggerPool text_pool;
 static TextObject empty_text_object;
@@ -138,6 +139,10 @@ SpawnTrigger *get_spawn_trigger(int obj) {
 
 StopTrigger *get_stop_trigger(int obj) {
     return TRIGGER_AT(stop_pool, StopTrigger, objects.trigger_index[obj]);
+}
+
+OnDeathTrigger *get_on_death_trigger(int obj) {
+    return TRIGGER_AT(on_death_pool, OnDeathTrigger, objects.trigger_index[obj]);
 }
 
 SimpleTrigger *get_simple_trigger(int obj) {
@@ -1221,6 +1226,12 @@ int allocate_trigger_component(int obj) {
                 objects.trigger_index[obj] = index;
             }
             break;
+        case ON_DEATH_TRIGGER:
+            index = trigger_pool_add(&on_death_pool, sizeof(OnDeathTrigger));
+            if (index >= 0) {
+                objects.trigger_index[obj] = index;
+            }
+            break;
         case ROTATE_TRIGGER:
             index = trigger_pool_add(&rotate_pool, sizeof(RotateTrigger));
             if (index >= 0) {
@@ -1546,6 +1557,9 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                         case STOP_TRIGGER:
                             get_stop_trigger(object)->target_group = val.i;
                             break;
+                        case ON_DEATH_TRIGGER:
+                            get_on_death_trigger(object)->target_group = val.i;
+                            break;
                         case ROTATE_TRIGGER:
                             get_rotate_trigger(object)->target_group = val.i;
                             break;
@@ -1569,6 +1583,8 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                     get_count_trigger(object)->activate_group = val.b;
                 } else if (objects.id[object] == INSTANT_COUNT_TRIGGER) {
                     get_instant_count_trigger(object)->activate_group = val.b;
+                } else if (objects.id[object] == ON_DEATH_TRIGGER) {
+                    get_on_death_trigger(object)->activate = val.b;
                 }
             }
             break;
@@ -1625,6 +1641,9 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                             break;
                         case STOP_TRIGGER:
                             get_stop_trigger(object)->spawn_triggered = val.b;
+                            break;
+                        case ON_DEATH_TRIGGER:
+                            get_on_death_trigger(object)->spawn_triggered = val.b;
                             break;
                     }
                 }
@@ -1747,6 +1766,9 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                             break;
                         case STOP_TRIGGER:
                             get_stop_trigger(object)->multi_triggered = val.b;
+                            break;
+                        case ON_DEATH_TRIGGER:
+                            get_on_death_trigger(object)->multi_triggered = val.b;
                             break;
                     }
                 }
@@ -1918,7 +1940,8 @@ bool is_complex_trigger_object(int id) {
         || id == INSTANT_COUNT_TRIGGER
         || id == FOLLOW_PLAYER_Y_TRIGGER
         || id == FOLLOW_TRIGGER
-        || id == STOP_TRIGGER;
+        || id == STOP_TRIGGER
+        || id == ON_DEATH_TRIGGER;
 }
 
 // Triggers that aren't configurable but have spawn triggered option
@@ -1963,6 +1986,7 @@ bool trigger_is_spawn_triggered(int id, int obj) {
         case SPAWN_TRIGGER:  return get_spawn_trigger(obj)->spawn_triggered;
         case ROTATE_TRIGGER: return get_rotate_trigger(obj)->spawn_triggered;
         case STOP_TRIGGER:   return get_stop_trigger(obj)->spawn_triggered;
+        case ON_DEATH_TRIGGER: return get_on_death_trigger(obj)->spawn_triggered;
     }
     return false;
 }
@@ -1983,6 +2007,7 @@ bool trigger_is_multi_triggered(int id, int obj) {
         case SPAWN_TRIGGER:  return get_spawn_trigger(obj)->multi_triggered;
         case ROTATE_TRIGGER: return get_rotate_trigger(obj)->multi_triggered;
         case STOP_TRIGGER:   return get_stop_trigger(obj)->multi_triggered;
+        case ON_DEATH_TRIGGER: return get_on_death_trigger(obj)->multi_triggered;
     }
     return false;
 }
@@ -2202,6 +2227,7 @@ void free_arrays() {
     spawn_pool = (TriggerPool){0};
     rotate_pool = (TriggerPool){0};
     stop_pool = (TriggerPool){0};
+    on_death_pool = (TriggerPool){0};
     simple_pool = (TriggerPool){0};
     text_pool = (TriggerPool){0};
 
@@ -3328,6 +3354,7 @@ int load_level(const char *path) {
 }
 
 void reload_level() {
+    clear_on_death_triggers();
 
     free_trigger_buffers();
 
@@ -3387,6 +3414,7 @@ void reload_level() {
 }
 
 void unload_level() {
+    clear_on_death_triggers();
     clear_groups();
     free_arrays();
     free_trigger_buffers();

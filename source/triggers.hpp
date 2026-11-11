@@ -277,6 +277,8 @@ extern float trigger_dt;
 #define FOLLOW_TRIGGER 1347
 #define FOLLOW_PLAYER_Y_TRIGGER 1814
 #define STOP_TRIGGER 1616
+#define ON_DEATH_TRIGGER 1812
+
 #define HIDE_PLAYER_TRIGGER 1612
 #define SHOW_PLAYER_TRIGGER 1613
 
@@ -295,6 +297,21 @@ extern float trigger_dt;
 #define GET_R(color) (color & 0xff)
 #define GET_G(color) ((color >> 8) & 0xff)
 #define GET_B(color) ((color >> 16) & 0xff)
+
+#define ON_DEATH_MAX 16
+
+typedef struct {
+    int source_obj;
+    int target_group;
+    bool activate;
+    bool multi;
+} OnDeathEntry;
+
+extern OnDeathEntry on_death_entries[ON_DEATH_MAX];
+extern int on_death_count;
+
+void run_on_death_triggers();
+void clear_on_death_triggers();
 
 Color HSV_combine(Color base, HSV hsv);
 

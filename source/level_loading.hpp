@@ -189,6 +189,13 @@ typedef struct {
 typedef struct {
     bool spawn_triggered;
     bool multi_triggered;
+    bool activate;
+    int target_group;
+} OnDeathTrigger;
+
+typedef struct {
+    bool spawn_triggered;
+    bool multi_triggered;
     int target_group;
     float spawn_delay;
     float trig_duration;
@@ -408,6 +415,7 @@ extern bool has_follow_player_y;
 
 ColorTrigger *get_color_trigger(int obj);
 StopTrigger *get_stop_trigger(int obj);
+OnDeathTrigger *get_on_death_trigger(int obj);
 PulseTrigger *get_pulse_trigger(int obj);
 AlphaTrigger *get_alpha_trigger(int obj);
 MoveTrigger *get_move_trigger(int obj);

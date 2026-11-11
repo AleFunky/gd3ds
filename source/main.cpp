@@ -1280,6 +1280,7 @@ void game_loop() {
                 if (had_new_best) state.death_timer = 1.4f;
 
                 handle_death((state.current_player == 1) ? &state.player2 : &state.player, true);
+                run_on_death_triggers();
             }
 
             if (state.death_timer > 0.f) {

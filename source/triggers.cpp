@@ -68,6 +68,9 @@ PulseTriggerBuffer *pulse_trigger_buffer = NULL;
 int pulse_trigger_count = 0;
 int pulse_trigger_capacity = 0;
 
+OnDeathEntry on_death_entries[ON_DEATH_MAX];
+int on_death_count = 0;
+
 AlphaTriggerBuffer *get_new_alpha_trigger() {
     if (alpha_trigger_count >= alpha_trigger_capacity) {
         size_t new_capacity = alpha_trigger_capacity == 0 ? 32 : alpha_trigger_capacity + 32;
@@ -1764,6 +1767,43 @@ static bool object_in_group(int obj, int group) {
     return false;
 }
 
+static void register_on_death_trigger(int obj) {
+    OnDeathTrigger *trigger = get_on_death_trigger(obj);
+
+    for (int i = 0; i < on_death_count; i++) {
+        if (on_death_entries[i].source_obj == obj) return;
+    }
+
+    if (on_death_count >= ON_DEATH_MAX) return;
+
+    OnDeathEntry *entry = &on_death_entries[on_death_count++];
+    entry->source_obj = obj;
+    entry->target_group = trigger->target_group;
+    entry->activate = trigger->activate;
+    entry->multi = trigger->multi_triggered;
+}
+
+void run_on_death_triggers() {
+    int count = on_death_count;
+    int kept = 0;
+
+    for (int i = 0; i < count; i++) {
+        OnDeathEntry *entry = &on_death_entries[i];
+
+        toggle_group(entry->target_group, entry->activate, true);
+
+        if (!entry->multi) continue;
+        if (kept != i) on_death_entries[kept] = *entry;
+        kept++;
+    }
+
+    on_death_count = kept;
+}
+
+void clear_on_death_triggers() {
+    on_death_count = 0;
+}
+
 static void stop_actions(int group) {
     for (int i = 0; i < move_trigger_count; i++) {
         MoveTriggerBuffer *buffer = &move_trigger_buffer[i];
@@ -1812,6 +1852,15 @@ static void stop_actions(int group) {
         if (!buffer->active || !object_in_group(buffer->source_obj, group)) continue;
         buffer->active = false;
     }
+
+    int kept = 0;
+    for (int i = 0; i < on_death_count; i++) {
+        if (object_in_group(on_death_entries[i].source_obj, group)) continue;
+        if (kept != i) on_death_entries[kept] = on_death_entries[i];
+        kept++;
+    }
+
+    on_death_count = kept;
 }
 
 void run_trigger(int obj, bool from_spawn) {
@@ -1970,6 +2019,9 @@ void run_trigger(int obj, bool from_spawn) {
             stop_actions(trigger->target_group);
             break;
         }
+        case ON_DEATH_TRIGGER:
+            register_on_death_trigger(obj);
+            break;
         case HIDE_PLAYER_TRIGGER:
             MotionTrail_StopStroke(&trail_p1);
             MotionTrail_StopStroke(&trail_p2);
