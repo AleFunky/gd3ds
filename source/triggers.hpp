@@ -209,7 +209,6 @@ typedef struct {
 
 typedef struct {
     int obj;
-    float rotation;
 } RotateTargetState;
 
 typedef struct {

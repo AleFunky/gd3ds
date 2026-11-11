@@ -1190,21 +1190,6 @@ void upload_to_rotate_buffer(int obj) {
         }
     }
 
-    for (int i = 0; i < rotate_trigger_count; i++) {
-        RotateTriggerBuffer *old = &rotate_trigger_buffer[i];
-        if (!old->active) continue;
-        bool overlap = false;
-        for (int a = 0; a < group->count && !overlap; a++) {
-            for (int b = 0; b < old->target_count; b++) {
-                if (group->objects[a] == old->targets[b].obj) {
-                    overlap = true;
-                    break;
-                }
-            }
-        }
-        if (overlap) old->active = false;
-    }
-
     RotateTriggerBuffer *buffer = get_new_rotate_trigger();
     if (!buffer) return;
 
@@ -1230,7 +1215,6 @@ void upload_to_rotate_buffer(int obj) {
         int target = group->objects[i];
         remember_rotate_initial_rotation(target);
         buffer->targets[i].obj = target;
-        buffer->targets[i].rotation = objects.rotation[target];
     }
 
     if (buffer->use_center) {
@@ -1286,12 +1270,13 @@ void handle_rotate_triggers(void) {
             prev_time, buffer->seconds, buffer->easing_rate) : 0.f;
         float angle = buffer->total_degrees * t;
         float prev_angle = buffer->total_degrees * prev_t;
+        float angle_delta = angle - prev_angle;
         Matrix2x2 rotation_matrix = matrix2x2_identity();
         float pivot_x = 0.f;
         float pivot_y = 0.f;
         if (buffer->use_center) {
             get_group_object_position(buffer->center_obj, &pivot_x, &pivot_y);
-            float rad = -(angle - prev_angle) * (float)(M_PI / 180.0);
+            float rad = -angle_delta * (float)(M_PI / 180.0);
             rotation_matrix = matrix2x2_rotation(rad);
         }
 
@@ -1308,8 +1293,8 @@ void handle_rotate_triggers(void) {
                 RotateTargetState *target = &buffer->targets[i];
                 int obj = target->obj;
                 if (!buffer->lock_object_rotation && !rotate_target_is_solid(obj)) {
-                    objects.rotation[obj] = target->rotation + angle;
-                    objects.visual_rotation[obj] = objects.rotation[obj];
+                    objects.rotation[obj] += angle_delta;
+                    objects.visual_rotation[obj] += angle_delta;
                 }
             }
         }
