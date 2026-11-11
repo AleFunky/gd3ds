@@ -22,6 +22,17 @@
 
 #define STEPS_HZ 240
 
+typedef struct Matrix2x2 {
+    float m[2][2];
+} Matrix2x2;
+
+Matrix2x2 matrix2x2_identity(void);
+Matrix2x2 matrix2x2_rotation(float radians);
+Matrix2x2 matrix2x2_multiply(Matrix2x2 a, Matrix2x2 b);
+Vec2D matrix2x2_transform(Matrix2x2 matrix, Vec2D vector);
+Vec2D affine_transform_point(Matrix2x2 matrix, Vec2D offset, Vec2D point);
+void compose_affine_transform(Matrix2x2 *current_matrix, Vec2D *current_offset, Matrix2x2 next_matrix, Vec2D next_offset);
+
 // Vector math
 Vec2D add_vec(Vec2D a, Vec2D b);
 Vec2D sub_vec(Vec2D a, Vec2D b);

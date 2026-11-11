@@ -4,6 +4,8 @@
 
 #include <stdbool.h>
 
+struct Matrix2x2;
+
 typedef struct GroupNode {
     float alpha;
     bool toggled;
@@ -16,15 +18,16 @@ typedef struct GroupNode {
     int combination_capacity;
 
     int collision_object_count;
-    float deferred_offset_x;
-    float deferred_offset_y;
-    bool deferred_touched;
 } GroupNode;
 
 bool build_group_combinations(void);
 void begin_group_combination_move_step(void);
 void add_move_to_group_combinations(int group, float delta_x, float delta_y);
 void apply_group_combination_move(void);
+void begin_group_combination_rotation_step(void);
+bool add_rotation_to_group_combinations(int group, const struct Matrix2x2 *matrix, float pivot_x, float pivot_y);
+void apply_group_combination_rotation(void);
+void get_group_object_position(int object, float *x, float *y);
 void flush_group_combination_visual_moves(void);
 void discard_group_combination_visual_moves(void);
 

@@ -1217,6 +1217,7 @@ void upload_to_rotate_buffer(int obj) {
     buffer->easing_rate = trigger->easing_rate > 0.f ? trigger->easing_rate : 2.f;
     buffer->seconds = trigger->trig_duration;
     buffer->time_run = 0.f;
+    buffer->target_group = trigger->target_group;
 
     buffer->target_count = group->count;
     buffer->targets = (RotateTargetState *)malloc(sizeof(RotateTargetState) * group->count);
@@ -1271,6 +1272,8 @@ static bool rotate_target_is_solid(int obj) {
 void handle_rotate_triggers(void) {
     if (trigger_dt <= 0.f) return;
 
+    begin_group_combination_rotation_step();
+
     for (int slot = 0; slot < rotate_trigger_count; slot++) {
         RotateTriggerBuffer *buffer = &rotate_trigger_buffer[slot];
         if (!buffer->active) continue;
@@ -1283,37 +1286,37 @@ void handle_rotate_triggers(void) {
             prev_time, buffer->seconds, buffer->easing_rate) : 0.f;
         float angle = buffer->total_degrees * t;
         float prev_angle = buffer->total_degrees * prev_t;
-        float cos_a = 1.f;
-        float sin_a = 0.f;
+        Matrix2x2 rotation_matrix = matrix2x2_identity();
         float pivot_x = 0.f;
         float pivot_y = 0.f;
         if (buffer->use_center) {
-            pivot_x = objects.x[buffer->center_obj];
-            pivot_y = objects.y[buffer->center_obj];
+            get_group_object_position(buffer->center_obj, &pivot_x, &pivot_y);
             float rad = -(angle - prev_angle) * (float)(M_PI / 180.0);
-            cos_a = cosf(rad);
-            sin_a = sinf(rad);
+            rotation_matrix = matrix2x2_rotation(rad);
         }
 
-        for (int i = 0; i < buffer->target_count; i++) {
-            RotateTargetState *target = &buffer->targets[i];
-            int obj = target->obj;
-            objects.last_y[obj] = objects.y[obj];
-            if (buffer->use_center) {
-                float dx = objects.x[obj] - pivot_x;
-                float dy = objects.y[obj] - pivot_y;
-                objects.x[obj] = pivot_x + dx * cos_a - dy * sin_a;
-                objects.y[obj] = pivot_y + dx * sin_a + dy * cos_a;
-                update_object_section(obj);
+        bool is_last_for_group = true;
+        for (int later = slot + 1; later < rotate_trigger_count; later++) {
+            if (rotate_trigger_buffer[later].active && rotate_trigger_buffer[later].target_group == buffer->target_group) {
+                is_last_for_group = false;
+                break;
             }
-            if (!buffer->lock_object_rotation && !rotate_target_is_solid(obj)) {
-                objects.rotation[obj] = target->rotation + angle;
-                objects.visual_rotation[obj] = objects.rotation[obj];
+        }
+
+        if (is_last_for_group && add_rotation_to_group_combinations(buffer->target_group, &rotation_matrix, pivot_x, pivot_y)) {
+            for (int i = 0; i < buffer->target_count; i++) {
+                RotateTargetState *target = &buffer->targets[i];
+                int obj = target->obj;
+                if (!buffer->lock_object_rotation && !rotate_target_is_solid(obj)) {
+                    objects.rotation[obj] = target->rotation + angle;
+                    objects.visual_rotation[obj] = objects.rotation[obj];
+                }
             }
         }
         if (buffer->time_run >= buffer->seconds) buffer->active = false;
     }
 
+    apply_group_combination_rotation();
     compact_rotate_triggers();
 }
 

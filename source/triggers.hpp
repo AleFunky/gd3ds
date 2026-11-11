@@ -224,6 +224,7 @@ typedef struct {
     float easing_rate;
     float seconds;
     float time_run;
+    int target_group;
     int target_count;
     RotateTargetState *targets;
 } RotateTriggerBuffer;

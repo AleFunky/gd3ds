@@ -5,6 +5,41 @@
 #include <stdlib.h>
 #include <float.h>
 
+Matrix2x2 matrix2x2_identity(void) {
+    return (Matrix2x2){ { { 1.f, 0.f }, { 0.f, 1.f } } };
+}
+
+Matrix2x2 matrix2x2_rotation(float radians) {
+    float cosine = cosf(radians);
+    float sine = sinf(radians);
+    return (Matrix2x2){ { { cosine, -sine }, { sine, cosine } } };
+}
+
+Matrix2x2 matrix2x2_multiply(Matrix2x2 a, Matrix2x2 b) {
+    Matrix2x2 result;
+    result.m[0][0] = a.m[0][0] * b.m[0][0] + a.m[0][1] * b.m[1][0];
+    result.m[0][1] = a.m[0][0] * b.m[0][1] + a.m[0][1] * b.m[1][1];
+    result.m[1][0] = a.m[1][0] * b.m[0][0] + a.m[1][1] * b.m[1][0];
+    result.m[1][1] = a.m[1][0] * b.m[0][1] + a.m[1][1] * b.m[1][1];
+    return result;
+}
+
+Vec2D matrix2x2_transform(Matrix2x2 matrix, Vec2D vector) {
+    return (Vec2D){
+        matrix.m[0][0] * vector.x + matrix.m[0][1] * vector.y,
+        matrix.m[1][0] * vector.x + matrix.m[1][1] * vector.y
+    };
+}
+
+Vec2D affine_transform_point(Matrix2x2 matrix, Vec2D offset, Vec2D point) {
+    return add_vec(matrix2x2_transform(matrix, point), offset);
+}
+
+void compose_affine_transform(Matrix2x2 *current_matrix, Vec2D *current_offset, Matrix2x2 next_matrix, Vec2D next_offset) {
+    *current_offset = add_vec(matrix2x2_transform(next_matrix, *current_offset), next_offset);
+    *current_matrix = matrix2x2_multiply(next_matrix, *current_matrix);
+}
+
 Vec2D add_vec(Vec2D a, Vec2D b) {
     return (Vec2D) { a.x + b.x, a.y + b.y};
 }
