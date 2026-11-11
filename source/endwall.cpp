@@ -173,7 +173,7 @@ int handleWallCutscene(float delta, UIInput *touch) {
 
         if(status){
             LevelData *levelDataSel = &currentLevelEntry->data;
-            if (!cheated) {
+            if (!cheated && status != 3) {
                 if (state.practiceMode) {
                     state.currentData.maxPractice = 100;
                     levelDataSel->practiceProgress = 100;
@@ -256,11 +256,35 @@ int handleWallCutscene(float delta, UIInput *touch) {
                 }
 
                 unpausePlaybackMP3();
+            } else if (status == 3) { // Restarting from le checkpòint
+                initVariables();
+                reloadLevel();
+                resetCoins();
+                if (state.practiceMode) {
+                    if (settingsState.autoCheckpoints && pseudoCheckpointExists) {
+                        deleteLastCheckpoint();
+                        pseudoCheckpointExists = false;
+                    }
+
+                    if (getCheckpointCount() > 0) {
+                        restoreCheckpoint();
+                    } else if (settingsState.practiceMusicSync) {
+                        seekMP3(levelInfo.songOffset);
+                    }
+
+                    if (!settingsState.practiceMusicSync) {
+                        stopMP3();
+                        playPracticeSong();
+                    }
+                }
+                unpausePlaybackMP3();
             }
             levelCompleteInitialized = false;
             completionTimer = 0.0f;
             circunferenceTimer = 0.0f;
-            return status;
+            int result = (status == 3) ? 2 : status;
+            status = 0;
+            return result; 
         }
     }
 

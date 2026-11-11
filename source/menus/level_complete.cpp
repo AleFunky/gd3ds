@@ -43,6 +43,7 @@ namespace gd3ds
 static bool yesExit = false;
 static bool restart = false;
 static bool init = false;
+static bool checkpointRestartFlag = false;
 
 static bool animatingDown = false;
 static bool animatingReward = false;
@@ -128,7 +129,7 @@ const char *doNotCompletionTexts[] = {
     "Goop job!",
     "Have a cookie",
     "hi you did it bye",
-    "HOLY SHIT YOU JUST VERIFIED... oh wait.",
+    "HOLY CRAP YOU JUST VERIFIED... oh wait.",
     "horse",
     "How",
     "I could do this in half the attempts",
@@ -228,6 +229,19 @@ static void restartLevel(UIElement* e, const UIPropertyList *args) {
     }
 }
 
+static void checkPointRestart(UIElement* e, const UIPropertyList *args) {
+    if (!state.practiceMode) return;
+
+    if (!animatingUp) {
+        playSfx(&playSound, 1);
+        animatingUp = true;
+        animatingDown = false;
+        animTime = 0;
+        pausePlaybackMP3();
+        checkpointRestartFlag = true;
+    }
+}
+
 static void scaleBottomButtonsAnim(UIElement* e){
     UIButton *button = (UIButton *) e;
 
@@ -239,6 +253,7 @@ static void scaleBottomButtonsAnim(UIElement* e){
 static UIActionDef actions[] = {
     { "restart", restartLevel },
     { "exit", exitLevelComplete },
+    { "checkpointRestart", checkPointRestart },
 };
 
 // This runs the initial animation of the menu coming off screen
@@ -253,8 +268,8 @@ static void runStartAnimation(float delta) {
 
     uiRunFuncOnTag(&screen, "bottomWindow", scaleBottomButtonsAnim);
     
-    uiSetPosOnTag(&screen, (float)SCREEN_BOT_WIDTH / 2, windowYPos, "window");
-    uiSetPosOnTag(&screenTop, (float)SCREEN_WIDTH / 2, windowYPos, "window");
+    uiSetPosOnTag(&screen, SCREEN_BOT_WIDTH / 2, windowYPos, "window");
+    uiSetPosOnTag(&screenTop, SCREEN_WIDTH / 2, windowYPos, "window");
 
     if(animTime > 0.6f){
         animatingReward = true;
@@ -369,13 +384,15 @@ static void runEndAnimation(float delta) {
     float fadeValue = easeValue(EaseTypes::QuadIn, upYStart, 0, animTime, RESTART_ANIM_DURATION, 1.f);
     windowYPos = -120 + fadeValue;
 
-    uiSetPosOnTag(&screen, (float)SCREEN_BOT_WIDTH / 2.f, windowYPos, "window");
-    uiSetPosOnTag(&screenTop, (float)SCREEN_WIDTH / 2.f, windowYPos, "window");
+    uiSetPosOnTag(&screen, SCREEN_BOT_WIDTH / 2, windowYPos, "window");
+    uiSetPosOnTag(&screenTop, SCREEN_WIDTH / 2, windowYPos, "window");
     
     // Animation end
     if (animTime >= RESTART_ANIM_DURATION) {
         animatingUp = false;
-        restart = true;
+        if (!checkpointRestartFlag) {
+            restart = true;
+        }
         animTime = 0;
     }
     animTime += delta;
@@ -424,6 +441,11 @@ void levelCompleteInit() {
     uiLoadScreenOld(&screenTop, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/level_complete_top.txt");
     uiLoadScreenOld(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/level_complete.txt");
 
+    if (!state.practiceMode) {
+        UIElement *checkpointButton = uiGetElementByTag(&screen, "checkpointRestartButton");
+        if (checkpointButton) uiDisableElement(checkpointButton);
+    }
+
     state.currentData.timeEnd = svcGetSystemTick() / (CPU_TICKS_PER_MSEC * 1000);
 
     char attempts[64];
@@ -456,6 +478,7 @@ void levelCompleteInit() {
 
     yesExit = false;
     restart = false;
+    checkpointRestartFlag = false;
     animatingDown = true;
     animatingReward = false;
     animatingUp = false;
@@ -651,6 +674,10 @@ int levelCompleteLoop(UIInput *touch) {
 
     if (restart) {
         return 2;
+    }
+
+    if (checkpointRestartFlag && !animatingUp) {
+        return 3;
     }
 
     uiScreenUpdate(&screen, touch);
