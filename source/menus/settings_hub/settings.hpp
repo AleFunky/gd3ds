@@ -71,7 +71,7 @@ typedef struct {
     bool swapGameplayScreens;
 } SettingState;
 
-extern Setting settings[38];
+extern Setting settings[39];
 extern SettingState settingsState;
 
 extern const UIScreenDefPair settings_def;
