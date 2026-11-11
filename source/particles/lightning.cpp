@@ -41,14 +41,17 @@ std::vector<LightningSegment> Lightning::generateLightingRecursive(
 ){
     std::vector<LightningPoint> nextPoints;
 
+    float xRand = ((lightningRand(seed) % 101) / 100.0f - 0.5f) * segmentLength;
+    float yRand = ((lightningRand(seed) % 101) / 100.0f - 0.5f) * segmentLength;
+
     unsigned int i = 0;
     for(; i < points.size() - 1; i++){
         nextPoints.push_back(points[i]);
 
         float midX = (points[i].x + points[i + 1].x) / 2.0f;
         float midY = (points[i].y + points[i + 1].y) / 2.0f;
-        midX += ((lightningRand(seed) % 101) / 100.0f - 0.5f) * segmentLength;
-        midY += ((lightningRand(seed) % 101) / 100.0f - 0.5f) * segmentLength;
+        midX += xRand;
+        midY += yRand;
 
         LightningPoint point = LightningPoint(midX, midY);
 
@@ -56,8 +59,9 @@ std::vector<LightningSegment> Lightning::generateLightingRecursive(
     }
     nextPoints.push_back(points.back());
 
+    segmentLength /= 2;
     if(segmentLength > 8){
-        return generateLightingRecursive(nextPoints, segmentLength / 2, type, seed);
+        return generateLightingRecursive(nextPoints, segmentLength, type, seed);
     } else{
         //generate lightning
         std::vector<LightningSegment> segments;
@@ -93,6 +97,10 @@ std::vector<LightningSegment> Lightning::generateLightingRecursive(
     }
 }
 
+void Lightning::updateLightningTimer(){
+    this->pulseTime += delta;
+}
+
 void Lightning::renderLightning(){
     for(unsigned int i = 0; i < this->segments.size(); i++){
         LightningSegment s = segments[i];
@@ -111,8 +119,6 @@ void Lightning::renderLightning(){
 
         C2D_DrawLine(topX, topY, color, btmX, btmY, color, 2, 0.0f);
     }
-
-    if(!gamePaused) this->pulseTime += delta;
 }
 
 bool Lightning::done(){
@@ -130,11 +136,17 @@ Lightning::Lightning(float startX, float startY, float endX, float endY, Lightni
 
 std::deque<Lightning> lightningBolts;
 
-void drawAllLightning(){
+void updateAllLightning(){
     while (!lightningBolts.empty() && lightningBolts.front().done()) {
         lightningBolts.pop_front();
     }
 
+    for(auto& bolt : lightningBolts){
+        bolt.updateLightningTimer();
+    }
+}
+
+void drawAllLightning(){
     for(auto& bolt : lightningBolts){
         bolt.renderLightning();
     }

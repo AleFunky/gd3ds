@@ -42,11 +42,13 @@ private:
     );
 public:
     Lightning(float startX, float startY, float endX, float endY, LightningType type);
+    void updateLightningTimer();
     void renderLightning();
     bool done();
 };
 
 extern std::deque<Lightning> lightningBolts;
+void updateAllLightning();
 void drawAllLightning();
 
 }

@@ -1393,6 +1393,10 @@ void gameLoop() {
 
             u64 startPart = svcGetSystemTick();
             updatePlayerEffects(delta);
+
+            updateAllLightning();
+            updateGravitySweeps();
+
             updateRays(delta);
 
             // End wall particles

@@ -22,12 +22,14 @@ class GravitySweep {
 public:
     GravitySweep(bool down);
 
+    void updateSweepTimer();
     void startSweep();
     void renderSweep();
     bool done();
 };
 
 void startGravitySweep(bool down);
+void updateGravitySweeps();
 void drawGravitySweeps();
 
 }

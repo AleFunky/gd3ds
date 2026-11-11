@@ -1,2 +1,19 @@
 --atlas --border edge -f rgba8888 -z auto
 gravityLine_001.png
+speed_slow_shine.png
+speed_normal_shine.png
+speed_fast_shine.png
+speed_faster_shine.png
+speed_fastest_shine.png
+gravity_shine_back.png
+gravity_shine_front.png
+portal_shine_back.png
+portal_shine_front.png
+mirror_shine_back.png
+mirror_shine_front.png
+size_shine_back.png
+size_shine_front.png
+dual_shine_back.png
+dual_shine_front.png
+teleport_shine_back.png
+teleport_shine_front.png

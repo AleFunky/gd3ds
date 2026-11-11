@@ -15,9 +15,24 @@ GravitySweep::GravitySweep(bool down){
     this->time = 9999.0f;
 };
 
-bool GravitySweep::done(){
-    return this->time > 0.4f;
+void GravitySweep::updateSweepTimer(){
+    if(this->done()) return;
+    this->time += delta;
 }
+
+void GravitySweep::startSweep(){
+    this->time = 0.0f;
+    float spacing = (SCREEN_WIDTH - 30.0f) / 22.0f;
+    for(int i = 0; i < 22; i++){
+        GravityLine* l = &this->lines[i];
+        l->x = (i * spacing) + (CCRANDOM_0_1() * spacing) + 15.0f;
+        l->y = (CCRANDOM_0_1() + CCRANDOM_0_1() - 1.0f) * 10.0f;
+        l->scaleX = (CCRANDOM_0_1() * 4.0f) + 2.0f;
+        l->scaleY = CCRANDOM_0_1() + 2.0f;
+        l->opacity = ((CCRANDOM_0_1() * 130.0f) + 50.0f) / 255.0f;
+    }
+}
+
 
 void GravitySweep::renderSweep(){
     if(this->done()) return;
@@ -47,21 +62,10 @@ void GravitySweep::renderSweep(){
             C2D_SpriteSheetGetImage(gravLineSheet, 0), 
             l.x, l.y + yOffset, 0.0f, &tint, l.scaleX, l.scaleY);
     }
-
-    if(!gamePaused) this->time += delta;
 };
 
-void GravitySweep::startSweep(){
-    this->time = 0.0f;
-    float spacing = (SCREEN_WIDTH - 30.0f) / 22.0f;
-    for(int i = 0; i < 22; i++){
-        GravityLine* l = &this->lines[i];
-        l->x = (i * spacing) + (CCRANDOM_0_1() * spacing) + 15.0f;
-        l->y = (CCRANDOM_0_1() + CCRANDOM_0_1() - 1.0f) * 10.0f;
-        l->scaleX = (CCRANDOM_0_1() * 4.0f) + 2.0f;
-        l->scaleY = CCRANDOM_0_1() + 2.0f;
-        l->opacity = ((CCRANDOM_0_1() * 130.0f) + 50.0f) / 255.0f;
-    }
+bool GravitySweep::done(){
+    return this->time > 0.4f;
 }
 
 std::array<GravitySweep, 2> upSweeps = {
@@ -82,6 +86,17 @@ void startGravitySweep(bool down){
             s.startSweep(); 
             break;
         }
+    }
+}
+
+
+void updateGravitySweeps(){
+    for(auto& sweep: upSweeps){
+        sweep.updateSweepTimer();
+    }
+
+    for(auto& sweep: downSweeps){
+        sweep.updateSweepTimer();
     }
 }
 
