@@ -87,14 +87,6 @@ typedef enum {
     SAVE_TYPE_COUNT,
 } SaveType;
 
-typedef struct SavingTask {
-    struct json_object *root;
-    char file[256];
-    char tmp_file[256];
-    SaveType type;
-    volatile bool running;
-} SavingTask;
-
 typedef enum {
     SAVE_ERROR_NONE,
     SAVE_ERROR_JSON_FAIL,
@@ -110,7 +102,19 @@ typedef enum {
     SAVE_ERROR_OUTOFMEM,
 } SavingError;
 
+typedef struct SavingTask {
+    struct json_object *root;
+    unsigned char *data;
+    size_t data_len;
+    SavingError error;
+    char file[256];
+    char tmp_file[256];
+    volatile bool ready;
+    volatile bool running;
+} SavingTask;
+
 void begin_saving(SaveType type);
+void process_saving();
 bool is_saving();
 void wait_for_saving();
 

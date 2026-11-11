@@ -1434,19 +1434,22 @@ bool migrate_old_data() {
     return true;
 }
 
-static SavingError threaded_save(SavingTask *task) {
+static SavingError compress_save(SavingTask *task) {
     const char *json = json_object_to_json_string_ext(task->root, JSON_C_TO_STRING_PLAIN);
     if (!json) {
         return SAVE_ERROR_OUTOFMEM;
     }
 
-    size_t out_len;
     int out_code;
-    unsigned char *compressed = compress_data((const unsigned char *) json, strlen(json), &out_len, &out_code);
-    if (!compressed) {
+    task->data = compress_data((const unsigned char *) json, strlen(json), &task->data_len, &out_code);
+    if (!task->data) {
         return SAVE_ERROR_COMPRESS;
     }
 
+    return SAVE_ERROR_NONE;
+}
+
+static SavingError write_save(SavingTask *task) {
     FILE *file = fopen(task->tmp_file, "wb");
     if (!file) {
         return SAVE_ERROR_OPEN_FILE;
@@ -1454,70 +1457,72 @@ static SavingError threaded_save(SavingTask *task) {
 
     bool success = true;
 
-    if (fwrite(compressed, 1, out_len, file) != out_len) {
+    if (fwrite(task->data, 1, task->data_len, file) != task->data_len) {
         success = false;
     }
 
     if (fclose(file) != 0) {
         success = false;
     }
-    
-    free(compressed);
-    
-    if (success) {
-        if (remove(task->file) != 0) {
-            if (errno != ENOENT) {
-                output_log(
-                    "Failed to remove %s: errno=%d (%s)\n",
-                    task->file,
-                    errno,
-                    strerror(errno)
-                );
-                remove(task->tmp_file);
-                return SAVE_ERROR_REMOVE_FILE;
-            }
-        }
 
-        int result = rename(task->tmp_file, task->file);
-        if (result != 0) {
+    if (!success) {
+        return SAVE_ERROR_WRITING_FILE;
+    }
+
+    if (remove(task->file) != 0) {
+        if (errno != ENOENT) {
             output_log(
-                "Failed to rename %s -> %s: result=%d, errno=%d\n",
-                task->tmp_file,
+                "Failed to remove %s: errno=%d (%s)\n",
                 task->file,
-                result,
-                errno
+                errno,
+                strerror(errno)
             );
             remove(task->tmp_file);
-            return SAVE_ERROR_RENAME_FILE;
+            return SAVE_ERROR_REMOVE_FILE;
         }
+    }
 
-        return SAVE_ERROR_NONE;
-    } else {
-        return SAVE_ERROR_WRITING_FILE;
-    } 
+    int result = rename(task->tmp_file, task->file);
+    if (result != 0) {
+        output_log(
+            "Failed to rename %s -> %s: result=%d, errno=%d\n",
+            task->tmp_file,
+            task->file,
+            result,
+            errno
+        );
+        remove(task->tmp_file);
+        return SAVE_ERROR_RENAME_FILE;
+    }
+
+    return SAVE_ERROR_NONE;
 }
 
 static void saving_thread(void *arg) {
     SavingTask *task = (SavingTask *)arg;
-    SavingError error = SAVE_ERROR_NONE;
 
-    switch (task->type) {
-        case SAVE_ROBTOP:
-        case SAVE_1P9_GDPS:
-        case SAVE_EXTERNAL:
-            error = threaded_save(task);
-            json_object_put(task->root);
-            break;
-        case SAVE_CONFIG:
-            config_save(&cfg);
-            break;
-        default: break;
-    }
+    task->error = compress_save(task);
+    json_object_put(task->root);
+    task->root = NULL;
+    task->ready = true;
+}
 
-    if (error) {
-        output_log("An error has occured while saving: %d\n", error);
+void process_saving() {
+    for (int i = 0; i < (int)SAVE_TYPE_COUNT; i++) {
+        SavingTask *task = &tasks[i];
+        if (!task->ready) continue;
+
+        SavingError error = task->error ? task->error : write_save(task);
+
+        free(task->data);
+        task->data = NULL;
+        task->ready = false;
+        task->running = false;
+
+        if (error) {
+            output_log("An error has occured while saving: %d\n", error);
+        }
     }
-    task->running = false;
 }
 
 bool is_saving() {
@@ -1534,9 +1539,16 @@ void wait_for_saving() {
         threadJoin(saving_threads[i], U64_MAX);
         saving_threads[i] = NULL;
     }
+
+    process_saving();
 }
 
 void begin_saving(SaveType type) {
+    if (type == SAVE_CONFIG) {
+        config_save(&cfg);
+        return;
+    }
+
     if (!tasks[type].running) {   
         int32_t priority = 0x30;
         svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
@@ -1544,7 +1556,9 @@ void begin_saving(SaveType type) {
         priority = priority < 0x18 ? 0x18 : priority;
         priority = priority > 0x3F ? 0x3F : priority;
 
-        tasks[type].type = type;
+        tasks[type].data = NULL;
+        tasks[type].error = SAVE_ERROR_NONE;
+        tasks[type].ready = false;
         tasks[type].running = true;
     
         saving_threads[type] = threadCreate(

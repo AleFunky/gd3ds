@@ -757,6 +757,8 @@ void ui_loop(){
     ui_stack_set_stack(&menu_stack);
 
     while (aptMainLoop()) {
+        process_saving();
+
         u64 now = svcGetSystemTick();
         if (fixed_dt) {
             fixed_dt = false;
@@ -1020,6 +1022,8 @@ void game_loop() {
 
     // Main loop
     while (aptMainLoop()) {
+        process_saving();
+
         start = svcGetSystemTick();
         hidScanInput();
 
