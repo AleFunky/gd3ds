@@ -39,6 +39,7 @@
 #include "player/player.hpp"
 #include "particles/circles.hpp"
 #include "particles/lightning.hpp"
+#include "particles/gravity_sweep.hpp"
 
 #include "level/main_levels.hpp"
 #include "menus/main_menu.hpp"
@@ -1548,6 +1549,8 @@ void game_loop() {
                 }
 
                 change_blending(true);
+                draw_gravity_sweeps();
+
                 draw_use_effects(get_use_effect_array_ptr(GFX_TOP_BUT_ABOVE_LEVEL));
 
                 if (level_info.wall_y > 0) {
@@ -1768,6 +1771,9 @@ void game_assets_init() {
 
     particleSheet = C2D_SpriteSheetLoad("romfs:/gfx/particles.t3x");
     if (!particleSheet) svcBreak(USERBREAK_PANIC);
+    
+    gravLineSheet = C2D_SpriteSheetLoad("romfs:/gfx/effects.t3x");
+    if (!gravLineSheet) svcBreak(USERBREAK_PANIC);
 
     initParticleSystem(&touch_drag_particles, &touch_drag_effect);
     touch_drag_particles.relativeStationary = true;

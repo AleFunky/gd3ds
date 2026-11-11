@@ -26,6 +26,7 @@
 #include "save/saving.hpp"
 #include "menus/level_select.hpp"
 #include "particles/lightning.hpp"
+#include "particles/gravity_sweep.hpp"
 
 Player *player_1 = &state.player;
 Player *player_2 = &state.player2;
@@ -523,6 +524,9 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
 
                 player->vel_y = jump_heights_table[state.speed][JUMP_BLUE_PAD][player->gamemode][player->mini];
                 player->upside_down ^= 1;
+
+                start_gravity_sweep(!player->upside_down);
+
                 flip_other_player(state.current_player);
                 player->on_ground = false;
                 player->inverse_rotation = false;
@@ -764,10 +768,12 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 if (state.show_player) MotionTrail_ResumeStroke(trail);
                 if (player->gamemode == GAMEMODE_WAVE) MotionTrail_AddWavePoint(wave_trail);
                 player->gravObj_id = obj;
-                update_rotation_direction(player);
+                update_rotation_direction(player); 
                 
                 player->vel_y = jump_heights_table[state.speed][JUMP_BLUE_ORB][player->gamemode][player->mini];
                 player->upside_down ^= 1;
+
+                start_gravity_sweep(!player->upside_down);
 
                 flip_other_player(state.current_player);
                 
@@ -805,6 +811,9 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->gravObj_id = obj;
 
                 player->upside_down ^= 1;
+
+                start_gravity_sweep(!player->upside_down);
+
                 player->vel_y = jump_heights_table[state.speed][JUMP_YELLOW_ORB][player->gamemode][player->mini];
                 
                 update_rotation_direction(player);
@@ -863,6 +872,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         case BLUE_GRAVITY_PORTAL: {
             player->gravObj_id = obj;
             if (!GET_ACTIVATED(obj)) {
+                start_gravity_sweep(true);
                 player->ceiling_inv_time = CEILING_INVUL_TIME;
                 if (player->upside_down) {
                     if (player->gamemode != GAMEMODE_BALL && state.show_player) MotionTrail_ResumeStroke(trail);
@@ -894,6 +904,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         case YELLOW_GRAVITY_PORTAL: {
             player->gravObj_id = obj;
             if (!GET_ACTIVATED(obj)) {
+                start_gravity_sweep(false);
                 player->ceiling_inv_time = CEILING_INVUL_TIME;
                 if (!player->upside_down) {
                     if (player->gamemode != GAMEMODE_BALL && state.show_player) MotionTrail_ResumeStroke(trail);

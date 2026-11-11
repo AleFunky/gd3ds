@@ -65,6 +65,7 @@ typedef struct {
     bool skipVersionWarning;
     bool skipSongWarning;
     bool vsync;
+    bool disableGravityEffect;
     bool showFpsCounter;
     bool goldenBest;
     bool swapGameplayScreens;
