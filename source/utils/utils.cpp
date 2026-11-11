@@ -49,7 +49,7 @@ size_t get_uncompressed_size(unsigned char *data, int data_len) {
 unsigned char *compress_data(const unsigned char *data, size_t data_len, size_t *out_len, int *out_code) {
     z_stream strm = {0};
 
-    if (deflateInit2(&strm, Z_BEST_SPEED, Z_DEFLATED, 15, 8, Z_DEFAULT_STRATEGY) != Z_OK) {
+    if (deflateInit2(&strm, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 15, 8, Z_DEFAULT_STRATEGY) != Z_OK) {
         return NULL;
     }
 
