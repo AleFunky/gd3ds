@@ -27,6 +27,8 @@
 #include "particles/circles.hpp"
 #include "particles/coin_effect.hpp"
 
+#include "particles/gravity_sweep.hpp"
+
 #include "menus/settings_hub/settings.hpp"
 
 #include "menus/core/ui_screen.hpp"

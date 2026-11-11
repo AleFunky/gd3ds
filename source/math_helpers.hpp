@@ -22,6 +22,8 @@
 
 #define STEPS_HZ 240
 
+#define CCRANDOM_0_1() ((float)rand()/RAND_MAX)
+
 typedef struct Matrix2x2 {
     float m[2][2];
 } Matrix2x2;

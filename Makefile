@@ -83,7 +83,7 @@ CPPFILES := $(foreach dir,$(SOURCES),$(notdir $(call recurse,f,$(dir),*.cpp)))
 SFILES := $(foreach dir,$(SOURCES),$(notdir $(call recurse,f,$(dir),*.s)))
 PICAFILES := $(foreach dir,$(SOURCES),$(notdir $(call recurse,f,$(dir),*.pica)))
 SHLISTFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.shlist)))
-GFXFILES	:=	$(foreach dir,$(GRAPHICS),$(notdir $(call recurse,f,$(dir),*.t3s)))
+GFXFILES    :=  $(filter-out player_0.t3s player_1.t3s ship.t3s player_ball.t3s bird.t3s dart.t3s robot.t3s spider.t3s,$(foreach dir,$(GRAPHICS),$(notdir $(call recurse,f,$(dir),*.t3s))))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
 
 export T3XFILES		:=	$(addprefix $(GFXBUILD)/,$(GFXFILES:.t3s=.t3x))
