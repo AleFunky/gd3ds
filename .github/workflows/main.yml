@@ -29,7 +29,7 @@ jobs:
           excludes: prerelease
       - name: Generate github_info header file
         run: |
-          cat > source/github_info.h <<EOF
+          cat > source/github_info.hpp <<EOF
           #pragma once
           
           #define CURRENT_COMMIT_HASH "${{ github.sha }}"
