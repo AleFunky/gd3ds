@@ -12,6 +12,7 @@
 #include <string.h>
 #include "mp3_player.hpp"
 #include "icons.hpp"
+#include "icon_cache.hpp"
 #include "menus/icon_kit.hpp"
 #include "menus/palette_kit.hpp"
 
@@ -102,14 +103,6 @@ C2D_SpriteSheet glowSheet;
 C2D_SpriteSheet bgSheet;
 int loaded_bg_sheet = 0;
 C2D_SpriteSheet groundSheet;
-C2D_SpriteSheet cube0Sheet;
-C2D_SpriteSheet cube1Sheet;
-C2D_SpriteSheet shipSheet;
-C2D_SpriteSheet ballSheet;
-C2D_SpriteSheet ufoSheet;
-C2D_SpriteSheet waveSheet;
-C2D_SpriteSheet robotSheet;
-C2D_SpriteSheet spiderSheet;
 C2D_SpriteSheet trailSheet;
 C2D_SpriteSheet particleSheet;
 
@@ -2493,74 +2486,16 @@ void update_bottom_particles(float delta) {
     updateParticleSystem(&fastest_speed_particles_bottom, delta);
 }
 
-C2D_SpriteSheet *get_icon_sheet(const IconPart *part, int gamemode) {
-    switch (gamemode) {
-        case GAMEMODE_PLAYER:
-            return (part->atlas == 0 ? &cube0Sheet : &cube1Sheet);
-        case GAMEMODE_SHIP:
-            return &shipSheet;
-        case GAMEMODE_BALL:
-            return &ballSheet;
-        case GAMEMODE_UFO:
-            return &ufoSheet;
-        case GAMEMODE_WAVE:
-            return &waveSheet;
-        case GAMEMODE_ROBOT:
-            return &robotSheet;
-        case GAMEMODE_SPIDER:
-            return &spiderSheet;
+static int icon_part_texture(const IconPart *parts, int part_index) {
+    if (parts[part_index].texture < 0) return -1;
+
+    int texture = 0;
+    for (int i = 0; i < part_index; i++) {
+        if (parts[i].texture >= 0) texture++;
     }
-    return NULL;
+    return texture;
 }
-/*
-static void robot_icon(
-    float x,
-    float y,
-    float deg,
-    unsigned char flip_x,
-    unsigned char flip_y,
-    int robot_anim_id,
-    int robot_anim_frame,
-    float flip_y_mult, float scale, C2D_ImageTint *tints
-) {
 
-    float cos_rot = cosf(C3D_AngleFromDegrees(deg));
-    float sin_rot = sinf(C3D_AngleFromDegrees(deg));
-
-    for (int i = 0; i < frame->part_count; i++) {
-        const PlayerSpritePart *part = &frame->parts[i];
-
-        float part_x = part->px;
-        float part_y = part->py * flip_y_mult;
-
-        float rotated_x = (part_x * cos_rot - part_y * sin_rot) * scale;
-        float rotated_y = (part_x * sin_rot + part_y * cos_rot) * scale;
-
-        float pos_x = calc_x_mirror + rotated_x * state.mirror_mult;
-        float pos_y = calc_y - rotated_y;
-
-        float final_rot = C3D_AngleFromDegrees((part->rotation + player->rotation) * state.mirror_mult);
-        float sx = scale * part->scale_x * (flip_x ? -1 : 1);
-        float sy = scale * part->scale_y * flip_y_mult;
-
-        for (int layer = 0; layer < 2; layer++) {
-            int atlas_idx = (layer == 0) ? robot_l2_atlas[i] : robot_l1_atlas[i];
-            u32 tint_color = (layer == 0) ? secondary_color : primary_color;
-
-            C2D_Sprite spr;
-            C2D_SpriteFromSheet(&spr, robotSheet, atlas_idx);
-            C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
-            C2D_SpriteSetPos(&spr, pos_x, pos_y);
-            C2D_SpriteSetRotation(&spr, final_rot);
-            C2D_SpriteSetScale(&spr, sx, sy);
-
-            C2D_ImageTint tint;
-            C2D_PlainImageTint(&tint, tint_color, 1.0f);
-            C2D_DrawSpriteTinted(&spr, &tint);
-        }
-    }
-    break;
-}*/
 
 const PlayerAnimation *get_gamemode_animation(int gamemode) {
     if (gamemode == GAMEMODE_ROBOT) return robot_animations;
@@ -2588,6 +2523,7 @@ static void spawn_icon_at_internal(
     u32 p1_color,
     u32 p2_color,
     u32 glow_color,
+    C2D_SpriteSheet sheet,
     IconParameters params
 ) {
     const Icon icon = icons[gamemode][id];
@@ -2734,10 +2670,8 @@ static void spawn_icon_at_internal(
 
                 const IconPart *part = &parts[index + real_index];
 
-                C2D_SpriteSheet *sheet = get_icon_sheet(part, gamemode);
-                if (!sheet) return;
-
-                if (part->texture >= 0) {
+                int local_texture = icon_part_texture(parts, (int)(index + real_index));
+                if (local_texture >= 0) {
                     float part_rad = rad + C3D_AngleFromDegrees(anim_rot) * flip_x_mult * flip_y_mult;
                     float part_cos_r = cosf(part_rad);
                     float part_sin_r = sinf(part_rad);
@@ -2769,7 +2703,7 @@ static void spawn_icon_at_internal(
                         C2D_DrawSpriteTinted(&spr, &tints[ICON_COLOR_WHITE]);
                     }
 
-                    C2D_SpriteFromSheet(&spr, *sheet, part->texture);
+                    C2D_SpriteFromSheet(&spr, sheet, local_texture);
                     C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
                     C3D_TexSetFilter(spr.image.tex, GPU_LINEAR, GPU_LINEAR);
 
@@ -2794,10 +2728,9 @@ static void spawn_icon_at_internal(
             }
             
             const IconPart *part = &parts[real_index];
-            C2D_SpriteSheet *sheet = get_icon_sheet(part, gamemode);
-            if (!sheet) return;
 
-            if (part->texture >= 0) {
+            int local_texture = icon_part_texture(parts, (int) real_index);
+            if (local_texture >= 0) {
 
                 float local_x = part->x * flip_x_mult;
                 float local_y = part->y * flip_y_mult;
@@ -2808,7 +2741,7 @@ static void spawn_icon_at_internal(
                 float p_x = x + rot_x * scale;
                 float p_y = y + rot_y * scale;
 
-                C2D_SpriteFromSheet(&spr, *sheet, part->texture);
+                C2D_SpriteFromSheet(&spr, sheet, local_texture);
                 C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
                 C3D_TexSetFilter(spr.image.tex, GPU_LINEAR, GPU_LINEAR);
 
@@ -2837,18 +2770,25 @@ void spawn_icon_at(
     u32 glow_color,
     IconParameters params
 ) {
+    C2D_SpriteSheet sheet = icon_cache_get(gamemode, id);
+    if (!sheet) return;
 
     if (glow) {
-        spawn_glow_layer_at(
+        spawn_icon_at_internal(
             gamemode,
             id,
+            true,
+            false,
             x,
             y,
             deg,
             flip_x,
             flip_y,
             scale,
+            0,
+            0,
             glow_color,
+            sheet,
             params
         );
     }
@@ -2867,6 +2807,7 @@ void spawn_icon_at(
         p1_color,
         p2_color,
         0,
+        sheet,
         params
     );
 }
@@ -2883,6 +2824,9 @@ void spawn_p1_layer_at(
     u32 p1_color,
     IconParameters params
 ) {
+    C2D_SpriteSheet sheet = icon_cache_get(gamemode, id);
+    if (!sheet) return;
+
     spawn_icon_at_internal(
         gamemode,
         id,
@@ -2897,6 +2841,7 @@ void spawn_p1_layer_at(
         p1_color,
         0,
         0,
+        sheet,
         params
     );
 }
@@ -2913,6 +2858,9 @@ void spawn_glow_layer_at(
     u32 glow_color,
     IconParameters params
 ) {
+    C2D_SpriteSheet sheet = icon_cache_get(gamemode, id);
+    if (!sheet) return;
+
     spawn_icon_at_internal(
         gamemode,
         id,
@@ -2927,6 +2875,7 @@ void spawn_glow_layer_at(
         0,
         0,
         glow_color,
+        sheet,
         params
     );
 }

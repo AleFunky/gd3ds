@@ -14,6 +14,7 @@
 #include "level_loading.hpp"
 #include "main.hpp"
 #include "graphics.hpp"
+#include "icon_cache.hpp"
 #include "particles/rays.hpp"
 #include "sounds.hpp"
 #include "triggers.hpp"
@@ -827,6 +828,7 @@ void ui_loop(){
         update_touch_effect(DT);
 
         C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+        icon_cache_begin_frame();
 
         // Bottom screen
         C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
@@ -927,6 +929,7 @@ void game_loop() {
 #endif
 
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+    icon_cache_begin_frame();
 
     C2D_Fade(0);
     for (int eye = 0; begin_top_eye(eye); eye++) {
@@ -1520,6 +1523,7 @@ void game_loop() {
         int world_width = swap_screens ? SCREEN_BOT_WIDTH : SCREEN_WIDTH;
 
         if(C3D_FrameBegin(settingsState.vsync ? C3D_FRAME_SYNCDRAW : C3D_FRAME_NONBLOCK)){
+            icon_cache_begin_frame();
             C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ZERO);
 
             // Top screen, drawn once per eye when 3D is on
@@ -1761,29 +1765,7 @@ void game_assets_init() {
     glowSheet = C2D_SpriteSheetLoad("romfs:/gfx/glow.t3x");
     if (!glowSheet) svcBreak(USERBREAK_PANIC);
     
-    cube0Sheet = C2D_SpriteSheetLoad("romfs:/gfx/player_0.t3x");
-    if (!cube0Sheet) svcBreak(USERBREAK_PANIC);
-    
-    cube1Sheet = C2D_SpriteSheetLoad("romfs:/gfx/player_1.t3x");
-    if (!cube1Sheet) svcBreak(USERBREAK_PANIC);
-    
-    shipSheet = C2D_SpriteSheetLoad("romfs:/gfx/ship.t3x");
-    if (!shipSheet) svcBreak(USERBREAK_PANIC);
-    
-    ballSheet = C2D_SpriteSheetLoad("romfs:/gfx/player_ball.t3x");
-    if (!ballSheet) svcBreak(USERBREAK_PANIC);
-    
-    ufoSheet = C2D_SpriteSheetLoad("romfs:/gfx/bird.t3x");
-    if (!ufoSheet) svcBreak(USERBREAK_PANIC);
-    
-    waveSheet = C2D_SpriteSheetLoad("romfs:/gfx/dart.t3x");
-    if (!waveSheet) svcBreak(USERBREAK_PANIC);
-
-    robotSheet = C2D_SpriteSheetLoad("romfs:/gfx/robot.t3x");
-    if (!robotSheet) svcBreak(USERBREAK_PANIC);
-
-    spiderSheet = C2D_SpriteSheetLoad("romfs:/gfx/spider.t3x");
-    if (!spiderSheet) svcBreak(USERBREAK_PANIC);
+    icon_cache_init();
 
     trailSheet = C2D_SpriteSheetLoad("romfs:/gfx/trails.t3x");
     if (!trailSheet) svcBreak(USERBREAK_PANIC);
@@ -1975,10 +1957,13 @@ int main(int argc, char* argv[]) {
     ui_stack_set_stack(&menu_stack);
     ui_stack_clear();
 
+    stop_mp3();
+
     close_log_file();
 
     free_cached_sprites();
-    
+    icon_cache_shutdown();
+
     lightning_bolts.clear();
     lightning_bolts.shrink_to_fit();
 
@@ -1991,14 +1976,6 @@ int main(int argc, char* argv[]) {
     C2D_SpriteSheetFree(playerEffectsSheet);
     C2D_SpriteSheetFree(glowSheet);
     C2D_SpriteSheetFree(bgSheet);
-    C2D_SpriteSheetFree(cube0Sheet);
-    C2D_SpriteSheetFree(cube1Sheet);
-    C2D_SpriteSheetFree(shipSheet);
-    C2D_SpriteSheetFree(ballSheet);
-    C2D_SpriteSheetFree(ufoSheet);
-    C2D_SpriteSheetFree(waveSheet);
-    C2D_SpriteSheetFree(robotSheet);
-    C2D_SpriteSheetFree(spiderSheet);
     C2D_SpriteSheetFree(trailSheet);
     C2D_SpriteSheetFree(particleSheet);
     C2D_SpriteSheetFree(ui_sheet);

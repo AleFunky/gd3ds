@@ -58,6 +58,10 @@ static inline u32 channels_mp3(void) {
     return audio_channels;
 }
 
+static inline void *pcm_slot(int i) {
+    return (u8 *) audioBuffer + (size_t) i * buffsize_mp3();
+}
+
 static void audioCallback(void *const nul_) {
     (void)nul_;  // Unused
 
@@ -72,8 +76,8 @@ static void audioCallback(void *const nul_) {
 void audio_init() {
     LightEvent_Init(&soundEvent, RESET_ONESHOT);
 
-    audioBuffer = (u32*)linearAlloc(NUM_BUFS * buffsize_mp3() * channels_mp3() * sizeof(int16_t));
-    
+    audioBuffer = (u32*)linearAlloc(NUM_BUFS * buffsize_mp3());
+
     ndspChnReset(MUSIC_CHANNEL);
     ndspSetOutputMode(NDSP_OUTPUT_STEREO);
     ndspChnSetInterp(MUSIC_CHANNEL, NDSP_INTERP_POLYPHASE);
@@ -85,18 +89,27 @@ void audio_init() {
 
     for (int i = 0; i < NUM_BUFS; i++) {
         memset(&waveBuf[i], 0, sizeof(ndspWaveBuf));
-        waveBuf[i].data_vaddr = audioBuffer + i * buffsize_mp3() * channels_mp3();
+        waveBuf[i].data_vaddr = pcm_slot(i);
     }
 
     apply_volume_settings();
 }
 
 void audio_exit() {
+    ndspChnWaveBufClear(MUSIC_CHANNEL);
     ndspChnReset(MUSIC_CHANNEL);
-    linearFree(audioBuffer);
-    mpg123_close(mh);
-    mpg123_delete(mh);
-    mpg123_exit();
+
+    if (audioBuffer) {
+        linearFree(audioBuffer);
+        audioBuffer = NULL;
+    }
+
+    if (mh) {
+        mpg123_close(mh);
+        mpg123_delete(mh);
+        mpg123_exit();
+        mh = NULL;
+    }
 }
 
 static ssize_t read_mem(void *handle, void *buf, size_t count) {
@@ -346,6 +359,8 @@ int play_mp3(const char *path, bool loop, float seek) {
         return 0;
     }
 
+    stop_mp3();
+
     LightEvent_Init(&seekEvent, RESET_ONESHOT);
     quit = false;
     paused = false;
@@ -379,7 +394,7 @@ void seek_mp3(float time) {
     if (time < 0) time = 0;
 
     int location = time * samplerate_mp3();
-    if (!quit) {
+    if (!quit && audioBuffer) {
         bool oldstate = ndspChnIsPaused(MUSIC_CHANNEL);
         ndspChnSetPaused(MUSIC_CHANNEL, true); //Pause playback...
         
@@ -396,7 +411,7 @@ void seek_mp3(float time) {
 
         for (int i = 0; i < NUM_BUFS; i++) {
             memset(&waveBuf[i], 0, sizeof(ndspWaveBuf));
-            waveBuf[i].data_vaddr = audioBuffer + i * buffsize_mp3() * channels_mp3();
+            waveBuf[i].data_vaddr = pcm_slot(i);
         }
         LightLock_Unlock(&decoderLock);
         ndspChnSetPaused(MUSIC_CHANNEL, oldstate); //once the seeking is done, playback can continue.
@@ -453,7 +468,7 @@ int play_mp3_buf(void *buf, size_t sz, bool loop, float seek, bool free_buf) {
 
     threadId = threadCreate(audio_thread, NULL, THREAD_STACK_SZ, priority, THREAD_AFFINITY, true);
     if (!threadId) {
-        free(song_buf);
+        if (should_free_buf) free(song_buf);
         song_buf = NULL;
         song_sz = 0;
         song_pos = 0;
@@ -466,7 +481,7 @@ int play_mp3_buf(void *buf, size_t sz, bool loop, float seek, bool free_buf) {
 
 // Stop playback
 void stop_mp3() {
-    if (!quit && threadId) {
+    if (threadId) {
         quit = true;
         
         LightEvent_Signal(&soundEvent);
