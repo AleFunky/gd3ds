@@ -1748,6 +1748,19 @@ void update_tints() {
                 }
             }
 
+            switch (obj->col_type) {
+                case COLOR_TYPE_GLOW:
+                    col.blending = true;
+                    break;
+                case COLOR_TYPE_WHITE:
+                    if (level_has_unverified_coins() && objects.id[game_object] == SECRET_COIN) {
+                        col.color = (Color) {USER_COIN_UNRATED_R, USER_COIN_UNRATED_G, USER_COIN_UNRATED_B};
+                    } else {
+                        col.color = (Color) {255,255,255};
+                    }
+                    break;
+            }
+
             bool detail = obj->col_type == COLOR_TYPE_DETAIL || obj->col_type == COLOR_TYPE_ONLY_DETAIL;
 
             if (!detail) {
@@ -1761,19 +1774,6 @@ void update_tints() {
                     objects.detail_color[game_object] = col.color;
                 }
             }   
-
-            switch (obj->col_type) {
-                case COLOR_TYPE_GLOW:
-                    col.blending = true;
-                    break;
-                case COLOR_TYPE_WHITE:
-                    if (level_has_unverified_coins() && objects.id[game_object] == SECRET_COIN) {
-                        col.color = (Color) {USER_COIN_UNRATED_R, USER_COIN_UNRATED_G, USER_COIN_UNRATED_B};
-                    } else {
-                        col.color = (Color) {255,255,255};
-                    }
-                    break;
-            }
 
             if (!detail && objects.main_being_pulsed[game_object] && col_channel >= 0) {
                 col.color = objects.main_color[game_object];
