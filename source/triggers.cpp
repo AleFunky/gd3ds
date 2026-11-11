@@ -1062,6 +1062,7 @@ void handle_follow_player_y_triggers(void) {
 
     for (int slot = 0; slot < follow_player_y_trigger_count; slot++) {
         FollowPlayerYTriggerBuffer *buffer = &follow_player_y_trigger_buffer[slot];
+        if (!buffer->active) continue;
         float target = player_follow_y_old(&state.player, buffer->delay) + buffer->offset;
         float delta = (target - buffer->group_y) * buffer->speed;
         if (buffer->max_speed > 0.f) {
@@ -1074,6 +1075,15 @@ void handle_follow_player_y_triggers(void) {
     }
 
     apply_group_combination_move();
+
+    int count = 0;
+    for (int slot = 0; slot < follow_player_y_trigger_count; slot++) {
+        if (!follow_player_y_trigger_buffer[slot].active) continue;
+        if (count != slot) follow_player_y_trigger_buffer[count] = follow_player_y_trigger_buffer[slot];
+        count++;
+    }
+
+    follow_player_y_trigger_count = count;
 }
 
 void upload_to_follow_buffer(int obj) {
@@ -1331,9 +1341,17 @@ void upload_to_spawn_buffer(int obj, bool from_spawn) {
 }
 
 void handle_spawn_triggers(void) {
+    int count = 0;
     for (int slot = 0; slot < spawn_trigger_count; slot++) {
-        spawn_trigger_buffer[slot].queued = false;
+        SpawnTriggerBuffer *buffer = &spawn_trigger_buffer[slot];
+        if (!buffer->active) continue;
+        buffer->queued = false;
+        if (count != slot) spawn_trigger_buffer[count] = *buffer;
+        count++;
     }
+
+    spawn_trigger_count = count;
+
     for (int slot = 0; slot < spawn_trigger_count; slot++) {
         SpawnTriggerBuffer *buffer = &spawn_trigger_buffer[slot];
         if (!buffer->active || buffer->queued) continue;
@@ -1688,6 +1706,7 @@ void upload_to_buffer(int obj, int channel) {
     
     buffer->seconds = duration;
     buffer->time_run = 0;
+    buffer->source_obj = obj;
     buffer->active = true;
 }
 
@@ -1703,6 +1722,7 @@ void upload_color_to_buffer(int channel, u32 color, float seconds) {
     buffer->new_alpha = 1.0f;
     buffer->seconds = seconds;
     buffer->time_run = 0;
+    buffer->source_obj = 0;
     buffer->active = true;
 }
 
@@ -1745,6 +1765,64 @@ void spawn_group(int group) {
             && !(objects.flags[obj_idx] & FLAG_TOGGLED)) {
             run_trigger(obj_idx, true);
         }
+    }
+}
+
+static bool object_in_group(int obj, int group) {
+    if (obj < 0 || obj >= (int)objects.count) return false;
+    for (int i = 0; i < objects.group_count[obj]; i++) {
+        if (objects.groups[obj][i] == group) return true;
+    }
+    return false;
+}
+
+static void stop_actions(int group) {
+    for (int i = 0; i < move_trigger_count; i++) {
+        MoveTriggerBuffer *buffer = &move_trigger_buffer[i];
+        if (!buffer->active || !object_in_group(buffer->source_obj, group)) continue;
+        buffer->active = false;
+    }
+
+    for (int i = 0; i < rotate_trigger_count; i++) {
+        RotateTriggerBuffer *buffer = &rotate_trigger_buffer[i];
+        if (!buffer->active || !object_in_group(buffer->source_obj, group)) continue;
+        buffer->active = false;
+    }
+
+    for (int i = 0; i < alpha_trigger_count; i++) {
+        AlphaTriggerBuffer *buffer = &alpha_trigger_buffer[i];
+        if (!buffer->active || !object_in_group(buffer->source_obj, group)) continue;
+        buffer->active = false;
+    }
+
+    for (int i = 0; i < pulse_trigger_count; i++) {
+        PulseTriggerBuffer *buffer = &pulse_trigger_buffer[i];
+        if (!buffer->active || !object_in_group(buffer->source_obj, group)) continue;
+        buffer->time_run = buffer->seconds + 0.001f;
+    }
+
+    for (int i = 0; i < follow_trigger_count; i++) {
+        FollowTriggerBuffer *buffer = &follow_trigger_buffer[i];
+        if (!buffer->active || !object_in_group(buffer->source_obj, group)) continue;
+        buffer->active = false;
+    }
+
+    for (int i = 0; i < follow_player_y_trigger_count; i++) {
+        FollowPlayerYTriggerBuffer *buffer = &follow_player_y_trigger_buffer[i];
+        if (!buffer->active || !object_in_group(buffer->source_obj, group)) continue;
+        buffer->active = false;
+    }
+
+    for (int i = 0; i < COL_CHANNEL_NUM; i++) {
+        ColTriggerBuffer *buffer = &col_trigger_buffer[i];
+        if (!buffer->active || !object_in_group(buffer->source_obj, group)) continue;
+        buffer->active = false;
+    }
+
+    for (int i = 0; i < spawn_trigger_count; i++) {
+        SpawnTriggerBuffer *buffer = &spawn_trigger_buffer[i];
+        if (!buffer->active || !object_in_group(buffer->source_obj, group)) continue;
+        buffer->active = false;
     }
 }
 
@@ -1898,6 +1976,12 @@ void run_trigger(int obj, bool from_spawn) {
         case TOUCH_TRIGGER:
             upload_to_touch_buffer(obj);
             break;
+        case STOP_TRIGGER:
+        {
+            StopTrigger *trigger = get_stop_trigger(obj);
+            stop_actions(trigger->target_group);
+            break;
+        }
         case HIDE_PLAYER_TRIGGER:
             MotionTrail_StopStroke(&trail_p1);
             MotionTrail_StopStroke(&trail_p2);

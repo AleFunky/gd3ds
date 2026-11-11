@@ -64,6 +64,7 @@ typedef struct {
     float time_run;
     int copied_color_id;
     HSV copied_hsv;
+    int source_obj;
 } ColTriggerBuffer;
 
 typedef struct {
@@ -275,6 +276,7 @@ extern float trigger_dt;
 #define ROTATE_TRIGGER 1346
 #define FOLLOW_TRIGGER 1347
 #define FOLLOW_PLAYER_Y_TRIGGER 1814
+#define STOP_TRIGGER 1616
 #define HIDE_PLAYER_TRIGGER 1612
 #define SHOW_PLAYER_TRIGGER 1613
 

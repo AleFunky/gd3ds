@@ -61,6 +61,7 @@ TriggerPool toggle_pool;
 TriggerPool touch_pool;
 TriggerPool spawn_pool;
 TriggerPool rotate_pool;
+static TriggerPool stop_pool;
 TriggerPool simple_pool;
 static TriggerPool text_pool;
 static TextObject empty_text_object;
@@ -133,6 +134,10 @@ TouchTrigger *get_touch_trigger(int obj) {
 
 SpawnTrigger *get_spawn_trigger(int obj) {
     return TRIGGER_AT(spawn_pool, SpawnTrigger, objects.trigger_index[obj]);
+}
+
+StopTrigger *get_stop_trigger(int obj) {
+    return TRIGGER_AT(stop_pool, StopTrigger, objects.trigger_index[obj]);
 }
 
 SimpleTrigger *get_simple_trigger(int obj) {
@@ -1210,6 +1215,12 @@ int allocate_trigger_component(int obj) {
                 objects.trigger_index[obj] = index;
             }
             break;
+        case STOP_TRIGGER:
+            index = trigger_pool_add(&stop_pool, sizeof(StopTrigger));
+            if (index >= 0) {
+                objects.trigger_index[obj] = index;
+            }
+            break;
         case ROTATE_TRIGGER:
             index = trigger_pool_add(&rotate_pool, sizeof(RotateTrigger));
             if (index >= 0) {
@@ -1532,6 +1543,9 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                         case SPAWN_TRIGGER:
                             get_spawn_trigger(object)->target_group = val.i;
                             break;
+                        case STOP_TRIGGER:
+                            get_stop_trigger(object)->target_group = val.i;
+                            break;
                         case ROTATE_TRIGGER:
                             get_rotate_trigger(object)->target_group = val.i;
                             break;
@@ -1608,6 +1622,9 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                             break;
                         case INSTANT_COUNT_TRIGGER:
                             get_instant_count_trigger(object)->spawn_triggered = val.b;
+                            break;
+                        case STOP_TRIGGER:
+                            get_stop_trigger(object)->spawn_triggered = val.b;
                             break;
                     }
                 }
@@ -1727,6 +1744,9 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                             break;
                         case INSTANT_COUNT_TRIGGER:
                             get_instant_count_trigger(object)->multi_triggered = val.b;
+                            break;
+                        case STOP_TRIGGER:
+                            get_stop_trigger(object)->multi_triggered = val.b;
                             break;
                     }
                 }
@@ -1897,7 +1917,8 @@ bool is_complex_trigger_object(int id) {
         || id == COUNT_TRIGGER
         || id == INSTANT_COUNT_TRIGGER
         || id == FOLLOW_PLAYER_Y_TRIGGER
-        || id == FOLLOW_TRIGGER;
+        || id == FOLLOW_TRIGGER
+        || id == STOP_TRIGGER;
 }
 
 // Triggers that aren't configurable but have spawn triggered option
@@ -1941,6 +1962,7 @@ bool trigger_is_spawn_triggered(int id, int obj) {
         case TOUCH_TRIGGER:  return get_touch_trigger(obj)->spawn_triggered;
         case SPAWN_TRIGGER:  return get_spawn_trigger(obj)->spawn_triggered;
         case ROTATE_TRIGGER: return get_rotate_trigger(obj)->spawn_triggered;
+        case STOP_TRIGGER:   return get_stop_trigger(obj)->spawn_triggered;
     }
     return false;
 }
@@ -1960,6 +1982,7 @@ bool trigger_is_multi_triggered(int id, int obj) {
         case TOUCH_TRIGGER:  return get_touch_trigger(obj)->multi_triggered;
         case SPAWN_TRIGGER:  return get_spawn_trigger(obj)->multi_triggered;
         case ROTATE_TRIGGER: return get_rotate_trigger(obj)->multi_triggered;
+        case STOP_TRIGGER:   return get_stop_trigger(obj)->multi_triggered;
     }
     return false;
 }
@@ -2178,6 +2201,7 @@ void free_arrays() {
     touch_pool = (TriggerPool){0};
     spawn_pool = (TriggerPool){0};
     rotate_pool = (TriggerPool){0};
+    stop_pool = (TriggerPool){0};
     simple_pool = (TriggerPool){0};
     text_pool = (TriggerPool){0};
 
