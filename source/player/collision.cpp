@@ -1504,13 +1504,13 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     switch (state.player.gamemode) {
                         case GAMEMODE_PLAYER:
                         case GAMEMODE_ROBOT:
-                        case GAMEMODE_SPIDER:
                             state.ground_y = 0;
                             state.ceiling_y = 999999;
                             break;
                         case GAMEMODE_SHIP:
                         case GAMEMODE_UFO:
                         case GAMEMODE_BALL:
+                        case GAMEMODE_SPIDER:
                             state.ground_y = fmaxf(0, ip1_ceilf((state.dual_portal_y - ((gamemode_heights[state.player.gamemode] + 60.f) / 2.f)) / 30.f)) * 30;
                             state.ceiling_y = state.ground_y + gamemode_heights[state.player.gamemode];
                             set_intended_ceiling();
