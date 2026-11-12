@@ -1552,9 +1552,11 @@ void spawn_p1_trail(Player *player, int player_id) {
             trail_data->upside_down = player->upside_down;
             break;
         case GAMEMODE_ROBOT:
-            return;
         case GAMEMODE_SPIDER:
-            return;
+            trail_data->gamemode = player->gamemode;
+            trail_data->scale = scale;
+            trail_data->upside_down = player->upside_down;
+            break;
     }
 
     float end_scale = trail_data->scale * P1_TRAIL_END_SCALE;
