@@ -68,8 +68,11 @@ typedef struct {
 typedef struct {
     bool spawn_triggered;
     bool multi_triggered;
+    bool target_mode;
     float trig_duration;
     int target_group;
+    int target_group2;
+    int center_group;
     float move_offset_x;
     float move_offset_y;
     int move_easing;

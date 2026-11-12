@@ -837,13 +837,25 @@ void upload_to_move_buffer(int obj) {
         }
     }
 
+    float offset_x = trigger->move_offset_x;
+    float offset_y = trigger->move_offset_y;
+
+    if (trigger->target_mode) {
+        GroupNode *dest = get_group(trigger->target_group2);
+        GroupNode *center = get_group(trigger->center_group ? trigger->center_group : target_group);
+        if (!dest || dest->count <= 0 || !center || center->count <= 0) return;
+
+        offset_x = objects.x[dest->objects[0]] - objects.x[center->objects[0]];
+        offset_y = objects.y[dest->objects[0]] - objects.y[center->objects[0]];
+    }
+
     MoveTriggerBuffer *buffer = get_new_move_trigger();
     if (!buffer) return;
 
     buffer->target_group = target_group;
     buffer->source_obj = obj;
-    buffer->offset_x = trigger->move_offset_x;
-    buffer->offset_y = trigger->move_offset_y;
+    buffer->offset_x = offset_x;
+    buffer->offset_y = offset_y;
     buffer->easing = trigger->move_easing;
     buffer->lock_to_player_x = trigger->lock_to_player_x;
     buffer->lock_to_player_y = trigger->lock_to_player_y;

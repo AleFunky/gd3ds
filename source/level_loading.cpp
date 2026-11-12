@@ -1109,6 +1109,7 @@ GDValueType get_value_type_for_key(int key) {
         case 57: return GD_VAL_INT_ARRAY; // groups
         case 504: return GD_VAL_BOOL;   // spawn only (toggle orb)
         case 99: return GD_VAL_BOOL;   // multi activate (orbs / pads)
+        case 100: return GD_VAL_BOOL;  // target mode (move trigger) are you happy now, cloud?
         default:
             return GD_VAL_INT; // Default fallback
     }
@@ -1694,6 +1695,8 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
                 get_rotate_trigger(object)->center_group = val.i;
             } else if (type == GD_VAL_INT && objects.id[object] == FOLLOW_TRIGGER) {
                 get_follow_trigger(object)->follow_group = val.i;
+            } else if (type == GD_VAL_INT && objects.id[object] == MOVE_TRIGGER) {
+                get_move_trigger(object)->target_group2 = val.i;
             }
             break;
         case 72:
@@ -1880,6 +1883,16 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
         case 99:
             if (type == GD_VAL_BOOL) {
                 objects.flags[object] |= val.b ? FLAG_MULTI_ACTIVATE : 0;
+            }
+            break;
+        case 100:
+            if (type == GD_VAL_BOOL && objects.id[object] == MOVE_TRIGGER) {
+                get_move_trigger(object)->target_mode = val.b;
+            }
+            break;
+        case 395:
+            if (type == GD_VAL_INT && objects.id[object] == MOVE_TRIGGER) {
+                get_move_trigger(object)->center_group = val.i;
             }
             break;
     }
