@@ -116,10 +116,19 @@ static void defer_group_combination_transform(GroupCombination *combination,
 }
 
 static void defer_group_combination_move(GroupCombination *combination, float delta_x, float delta_y) {
-    Matrix2x2 identity = matrix2x2_identity();
     prepare_deferred_transform(combination);
-    compose_affine_transform(&combination->deferred_matrix, &combination->deferred_offset,identity, (Vec2D){ delta_x, delta_y });
-    compose_affine_transform(&combination->deferred_no_x_matrix, &combination->deferred_no_x_offset,identity, (Vec2D){ 0.f, delta_y });
+    combination->deferred_offset.x += delta_x;
+    combination->deferred_offset.y += delta_y;
+    combination->deferred_no_x_offset.y += delta_y;
+}
+
+static Vec2D apply_deferred_transform(const Matrix2x2 *matrix, Vec2D offset, Vec2D point) {
+    if (matrix->m[0][0] == 1.f && matrix->m[0][1] == 0.f &&
+        matrix->m[1][0] == 0.f && matrix->m[1][1] == 1.f) {
+        return (Vec2D){ point.x + offset.x, point.y + offset.y };
+    }
+
+    return affine_transform_point(*matrix, offset, point);
 }
 
 bool build_group_combinations(void) {
@@ -411,7 +420,7 @@ void get_group_object_position(int object, float *x, float *y) {
 
     Matrix2x2 matrix = can_move_x ? combination->deferred_matrix : combination->deferred_no_x_matrix;
     Vec2D offset = can_move_x ? combination->deferred_offset : combination->deferred_no_x_offset;
-    Vec2D transformed = affine_transform_point(matrix, offset, (Vec2D){ current_x, current_y });
+    Vec2D transformed = apply_deferred_transform(&matrix, offset, (Vec2D){ current_x, current_y });
     *x = transformed.x;
     *y = transformed.y;
 }
@@ -433,7 +442,7 @@ void flush_group_combination_visual_moves(void) {
 
             Matrix2x2 matrix = can_move_x ? combination->deferred_matrix : combination->deferred_no_x_matrix;
             Vec2D offset = can_move_x ? combination->deferred_offset : combination->deferred_no_x_offset;
-            Vec2D transformed = affine_transform_point(matrix, offset, (Vec2D){ x, y });
+            Vec2D transformed = apply_deferred_transform(&matrix, offset, (Vec2D){ x, y });
             objects.x[object] = transformed.x;
             objects.y[object] = transformed.y;
 
