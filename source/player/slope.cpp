@@ -247,6 +247,17 @@ void slope_snap_y(int obj, Player *player) {
 
 #define SHIP_UFO_EXITING_VEL (508.248f / 4)
 
+static float slope_launch_velocity(int obj, Player *player) {
+    float vel = 0.9f * MIN(1.12f / slope_angle(obj, player), 1.54f) * (objects.height[obj] * player_speeds[state.speed] / objects.width[obj]);
+    float time = clampf(10 * (player->timeElapsed - player->slope_data.elapsed), 0.4f, 1.0f);
+
+    if (player->gamemode == GAMEMODE_BALL) vel *= 0.75f;
+    if (player->gamemode == GAMEMODE_SHIP) vel *= 0.75f;
+    if (player->gamemode == GAMEMODE_UFO) vel *= 0.7499f;
+
+    return vel * time;
+}
+
 void slope_calc(int obj, Player *player) {
     int orientation = grav_slope_orient(obj, player);
     if (orientation == ORIENT_NORMAL_UP) { // Normal - up
@@ -257,6 +268,11 @@ void slope_calc(int obj, Player *player) {
         
         // Handle leaving slope
         if (!slope_touching(obj, player)) {
+            if (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_UFO) {
+                float launch = slope_launch_velocity(obj, player);
+                if (player->vel_y < launch) player->new_vel_y = launch;
+            }
+
             push_player_action(clear_slope_data);
             return;
         }
@@ -265,33 +281,15 @@ void slope_calc(int obj, Player *player) {
         if (gravBottom(player) != obj_gravTop(player, obj))
             slope_snap_y(obj, player);
 
-        //output_log("Tick %d - NRM player %.2f, obj %.2f slopes %d\n", player->frame, gravBottom(player), obj_gravTop(player, obj), get_player_touching_slopes(player));
-
         // Sliding off slope
         if (gravBottom(player) >= obj_gravTop(player, obj) - SLOPE_EPSILON && get_player_touching_slopes(player) < 2) {
-            float vel = 0.9f * MIN(1.12f / slope_angle(obj, player), 1.54f) * (objects.height[obj] * player_speeds[state.speed] / objects.width[obj]);
-            float time = clampf(10 * (player->timeElapsed - player->slope_data.elapsed), 0.4f, 1.0f);
-            
-            //float orig = vel;
-            if (player->gamemode == GAMEMODE_BALL) {
-                vel *= 0.75f;
-            }
-            
-            if (player->gamemode == GAMEMODE_SHIP) {
-                vel *= 0.75f;
-            }
-
-            if (player->gamemode == GAMEMODE_UFO) {
-                vel *= 0.7499f;
-            }
-
-            vel *= time;
+            float vel = slope_launch_velocity(obj, player);
 
             player->inverse_rotation = true;
             player->coyote_slope = player->slope_data;
             player->slope_slide_coyote_time = 2;
 
-            player->new_vel_y = vel;// + player->gravity * STEPS_DT;
+            if (player->vel_y < vel) player->new_vel_y = vel;
             player->jumped = true;
             
             //output_log("Tick %d - Time %.2f PElapsed %.4f SElapsed %.4f Exit vel %.2f\n", player->frame, time, player->timeElapsed, player->slope_data.elapsed, player->new_vel_y);
