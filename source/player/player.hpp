@@ -125,6 +125,7 @@ typedef struct {
     bool left_ground;
 
     float ball_rotation_speed;
+    float ball_slope_rotation_mult;
 
     float cutscene_timer;
 

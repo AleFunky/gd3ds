@@ -388,7 +388,7 @@ Setting settings[] = {
     {
         .id = "swapGameplayScreens",
         .label = "Switch gameplay\nto bottom screen",
-        .additionalInfo = "bullshit nobody will use. (experimental)",
+        .additionalInfo = NULL,
         .page = PAGE_GAMEPLAY, 
 
         .defaultValue = false,

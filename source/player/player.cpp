@@ -175,7 +175,10 @@ void stop_dashing(Player *player) {
     add_dash_exit(player);
     player->dashing = false;
     player->dash_fire_timer = 0.f;
-    if (player->gamemode == GAMEMODE_BALL) player->ball_rotation_speed = 1.f;
+    if (player->gamemode == GAMEMODE_BALL) {
+        player->ball_rotation_speed = 1.f;
+        player->ball_slope_rotation_mult = 1.f;
+    }
 }
 
 void player_flash(Player *player, float duration, float delay) {
@@ -494,6 +497,13 @@ void ball_gamemode(Player *player) {
     if (player->on_ground || player->on_ceiling) {
         MotionTrail_StopStroke(trail);
         player->ball_rotation_speed = 1.f;
+        player->ball_slope_rotation_mult = 1.f;
+
+        if (player->slope_data.slope_id >= 0) {
+            float slope_rot = 1.f / cosf(slope_angle(player->slope_data.slope_id, player));
+            if (slope_rot > 2.f) slope_rot = (slope_rot - 1.f) * 0.7f + 1.f;
+            player->ball_slope_rotation_mult = slope_rot;
+        }
     }
     
     drag_particles[state.current_player].emitterX = player->x;
@@ -520,12 +530,13 @@ void ball_gamemode(Player *player) {
         state.current_data.jumps++;
         
         player->ball_rotation_speed = -BALL_SLOW_ROTATION;
+        player->ball_slope_rotation_mult = 1.f;
 
         player->on_ground = false;
         player->jumped = true;
     }
     
-    if (!player->dashing) player->rotation += player->ball_rotation_speed * get_ball_rotation_speed(player) * mult * STEPS_DT;
+    if (!player->dashing) player->rotation += player->ball_rotation_speed * get_ball_rotation_speed(player) * player->ball_slope_rotation_mult * mult * STEPS_DT;
 
     player->min_vel = -810;
     player->max_vel = 810;
