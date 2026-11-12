@@ -226,9 +226,9 @@ void cube_gamemode(Player *player) {
     // Do cube rotation
     if (player->slope_data.slope_id < 0 && !player->on_ground && !player->dashing) {
         if (player->inverse_rotation) {
-            player->cube_target_rotation -= (cube_rotation_speed[player->mini] / 2) * STEPS_DT * mult;
+            player->rotation -= (cube_rotation_speed[player->mini] / 2) * STEPS_DT * mult;
         } else {
-            player->cube_target_rotation += cube_rotation_speed[player->mini] * STEPS_DT * mult;
+            player->rotation += cube_rotation_speed[player->mini] * STEPS_DT * mult;
         }
     }
 
@@ -1333,10 +1333,10 @@ void run_player(Player *player) {
     if (!player->dashing) switch (player->gamemode) {
         case GAMEMODE_PLAYER:
             if (player->on_ground || player->slope_data.slope_id >= 0) {
-                lerp_speed *= 3.0f;
+                if (player->slope_data.slope_id < 0 && !player->slope_slide_coyote_time) lerp_speed *= 3.0f;
                 player->rotation = RadToDeg(slerp_fancy(DegToRad(player->rotation), DegToRad(player->cube_target_rotation), MIN(STEPS_DT, STEPS_DT * lerp_speed) * 60));
             } else {
-                player->rotation = player->cube_target_rotation;
+                player->cube_target_rotation = player->rotation;
             }
             break;
         case GAMEMODE_SHIP:
