@@ -334,10 +334,12 @@ void end_eye_layer() {
 }
 
 float get_mirror_x(float x, float factor) {
+    float width = SCREEN_WIDTH_AREA_GAMEPLAY(settingsState.swapGameplayScreens && !in_level_complete);
+
     if (factor == 0) return x;
-    else if (factor == 1) return ((SCREEN_WIDTH / SCALE)) - x;
+    else if (factor == 1) return width - x;
     
-    return x + factor * ((SCREEN_WIDTH / SCALE) - 2.0f * x);
+    return x + factor * (width - 2.0f * x);
 }
 
 #include "c2d_internal.h"
