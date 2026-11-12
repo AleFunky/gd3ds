@@ -303,6 +303,7 @@ static void main_menu_update(UIScreen *s, UIInput *input){
     fastest_speed_particles_bottom.emitting = false;
 
     p1_trail = false;
+    clear_p1_trail();
 
     handle_input();
 

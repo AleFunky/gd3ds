@@ -261,6 +261,13 @@ void init_player(Player *player) {
     clear_snap_data(player);
 }
 
+void clear_p1_trail() {
+    memset(state.p1_trail_data, 0, sizeof(state.p1_trail_data));
+    state.p1_trail_pos[0] = 0;
+    state.p1_trail_pos[1] = 0;
+    p1_trail_timer = 0;
+}
+
 void init_state() {
     state.current_player = 0;
 
@@ -290,8 +297,7 @@ void init_state() {
 
     state.end_wall_anim_playing = false;
     
-    state.p1_trail_pos[0] = 0;
-    state.p1_trail_pos[1] = 0;
+    clear_p1_trail();
 
     state.current_data.attempts++;
     state.current_data.coin1 = false;

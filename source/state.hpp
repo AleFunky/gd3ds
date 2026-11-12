@@ -226,6 +226,7 @@ void handle_respawn_effect();
 void clear_respawn_effect();
 
 void init_player(Player *player);
+void clear_p1_trail();
 void init_state();
 void init_trails(int trail);
 void init_wave_trails();
