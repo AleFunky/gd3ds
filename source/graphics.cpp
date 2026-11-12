@@ -2074,7 +2074,7 @@ void draw_dash_booms(void) {
     if (!playerEffectsSheet) return;
 
     if (frame_counter != last_frame) {
-        update_dash_booms(1.f / 60.f);
+        update_dash_booms(delta);
         last_frame = frame_counter;
     }
 
@@ -2103,7 +2103,7 @@ void draw_dash_booms(void) {
             alpha = 1.f - k;
             x -= 20.f * k;
 
-            C2D_PlainImageTint(&tint, C2D_Color32(fx->color.r, fx->color.g, fx->color.b, 255), alpha);
+            C2D_PlainImageTint(&tint, C2D_Color32(fx->color.r, fx->color.g, fx->color.b, (int)(alpha * 255.f)), 1.f);
 
             C2D_Sprite spr = { 0 };
             float px, py;
@@ -2124,7 +2124,7 @@ void draw_dash_booms(void) {
             C2D_SpriteSetPos(&spr, (int)px, (int)py);
             C2D_SpriteSetScale(&spr, sx, sy);
             C2D_SpriteSetRotationDegrees(&spr, fx->rotation);
-            C2D_PlainImageTint(&tint, C2D_Color32(255, 255, 255, 255), alpha * 150.f / 255.f);
+            C2D_PlainImageTint(&tint, C2D_Color32(255, 255, 255, (int)(alpha * 150.f)), 1.f);
             C2D_DrawSpriteTinted(&spr, &tint);
 
             change_blending(true);
