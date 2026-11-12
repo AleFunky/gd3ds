@@ -712,7 +712,7 @@ void robot_gamemode(Player *player) {
     if (player->y > 2794.f) kill_player(DEATH_FELL_OFF_LEVEL);
 
     if (player->on_ground) {
-        set_animation(player, ROBOT_ANIM_RUN);
+        if (!player->dashing) set_animation(player, ROBOT_ANIM_RUN);
         MotionTrail_StopStroke(trail);
         if (player->slope_data.slope_id < 0 && !player->dashing) player->rotation = roundf(player->rotation / 90.0f) * 90.0f;
     }
@@ -1056,7 +1056,7 @@ void spider_gamemode(Player *player) {
     if (player->y > 2794.f) kill_player(DEATH_FELL_OFF_LEVEL);
 
     if (player->on_ground) {
-        set_animation(player, (state.speed <= SPEED_NORMAL) ? SPIDER_ANIM_WALK : SPIDER_ANIM_RUN);
+        if (!player->dashing) set_animation(player, (state.speed <= SPEED_NORMAL) ? SPIDER_ANIM_WALK : SPIDER_ANIM_RUN);
         MotionTrail_StopStroke(trail);
 
         if (player->slope_data.slope_id < 0 && !player->dashing) player->rotation = roundf(player->rotation / 90.0f) * 90.0f;

@@ -1181,7 +1181,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                         flip_other_player(state.current_player ^ 1);
                         update_rotation_direction(player);
 
-                        set_animation(player, ROBOT_ANIM_JUMP_START);
+                        set_animation(player, player->dashing ? ROBOT_ANIM_FALL_START : ROBOT_ANIM_JUMP_START);
                         player->robot_air_time = 999.f;
 
                         UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
@@ -1221,7 +1221,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     flip_other_player(state.current_player ^ 1);
                     update_rotation_direction(player);
 
-                    set_animation(player, SPIDER_ANIM_RUN);
+                    set_animation(player, player->dashing ? SPIDER_ANIM_FALL : SPIDER_ANIM_RUN);
 
                     UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
                     if (effect) {
