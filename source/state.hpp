@@ -176,7 +176,7 @@ typedef struct {
     float death_timer;
 
     bool hitbox_enabled_when_dead;
-    bool just_placed_auto_checkpoint;
+    bool pending_auto_checkpoint;
 
     bool show_player;
 

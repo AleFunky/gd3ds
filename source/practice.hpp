@@ -23,8 +23,7 @@ void draw_checkpoints();
 void clear_practice_mode();
 
 void handle_auto_checkpoints(float delta);
+void run_pending_checkpoint();
 void set_checkpoint_timer(float timer);
 
 void load_used_channels();
-
-void update_checkpoint_with_p2();

@@ -1175,7 +1175,7 @@ void game_loop() {
                         }
                     }
 
-                    state.just_placed_auto_checkpoint = false;
+                    state.pending_auto_checkpoint = false;
 
                     state.current_player = 0;
                     state.old_player = state.player;
@@ -1212,13 +1212,15 @@ void game_loop() {
                         handle_player(&state.player2);
                         state.player2.gravity_changed_move |= state.player2.upside_down != player2_upside_down_before;
 
+                        if (state.dead) break;
+
                         //revert state back to first player
                         state.current_player = 0;
                         state.old_player = state.player;
-
-                        if (state.dead) break;
                     }
-                    
+
+                    run_pending_checkpoint();
+
                     trigger_dt = STEPS_DT;
                     move_lock_player_x_delta = state.player.x - player_x_before_step;
                     move_lock_player_y_delta = state.player.delta_y;

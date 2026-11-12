@@ -148,7 +148,7 @@ typedef struct CheckpointData {
 
 CheckpointData checkpoints[MAX_CHECKPOINTS];
 
-static CheckpointData *placed_checkpoint = NULL;
+static bool is_pending_pseudo_checkpoint = false;
 
 int checkpoint_count = 0;
 int checkpoint_pointer = 0;
@@ -343,7 +343,6 @@ void new_checkpoint() {
     if (next_checkpoint >= MAX_CHECKPOINTS) next_checkpoint = 0;
 
     CheckpointData *check = &checkpoints[next_checkpoint];
-    placed_checkpoint = check;
 
     // release the snapshot of the checkpoint we are about to overwrite
     free_checkpoint_snapshot(check);
@@ -525,6 +524,7 @@ void new_checkpoint() {
     check->camera_y = state.camera_y;
 
     check->p1 = state.player;
+    check->p2 = state.player2;
 
     check->camera_intended_y = state.camera_intended_y;
 
@@ -1078,14 +1078,21 @@ void exit_practice_mode() {
     }
 }
 
-void update_checkpoint_with_p2() {
-    // Exit if not in practice mode with autocheckpoints enabled
-    if (!state.practice_mode || state.end_wall_anim_playing) return;
-
-    if (placed_checkpoint) {
-        placed_checkpoint->p2 = state.player2;
-        placed_checkpoint = NULL;
+void run_pending_checkpoint() {
+    if (!state.pending_auto_checkpoint) {
+        is_pending_pseudo_checkpoint = false;
+        return;
     }
+
+    state.pending_auto_checkpoint = false;
+
+    bool is_pseudo = is_pending_pseudo_checkpoint;
+    is_pending_pseudo_checkpoint = false;
+
+    if (state.dead) return;
+
+    new_checkpoint();
+    if (is_pseudo) pseudo_checkpoint_exists = true;
 }
 
 void handle_auto_checkpoints(float delta) {
@@ -1099,17 +1106,15 @@ void handle_auto_checkpoints(float delta) {
             case GAMEMODE_ROBOT:
             case GAMEMODE_SPIDER:
                 if (state.player.landed_from_jump) {
-                    new_checkpoint();
-                    state.just_placed_auto_checkpoint = true;
+                    state.pending_auto_checkpoint = true;
                 }
                 break;
 
             case GAMEMODE_SHIP:
             case GAMEMODE_UFO:
             case GAMEMODE_WAVE:
-                new_checkpoint();
-                state.just_placed_auto_checkpoint = true;
-                pseudo_checkpoint_exists = true;
+                state.pending_auto_checkpoint = true;
+                is_pending_pseudo_checkpoint = true;
                 break;
 
             default:
@@ -1132,7 +1137,6 @@ void handle_practice_mode() {
             delete_last_checkpoint();
         }
         new_checkpoint();
-        update_checkpoint_with_p2();
     }
 
     if (((kDown & KEY_R) && !((kHeld & KEY_B) && settingsState.enableDebugBindings)) || (kDown & KEY_ZR)) {
