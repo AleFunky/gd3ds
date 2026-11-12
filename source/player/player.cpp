@@ -175,6 +175,7 @@ void stop_dashing(Player *player) {
     add_dash_exit(player);
     player->dashing = false;
     player->dash_fire_timer = 0.f;
+    if (player->gamemode == GAMEMODE_BALL) player->ball_rotation_speed = 1.f;
 }
 
 void player_flash(Player *player, float duration, float delay) {

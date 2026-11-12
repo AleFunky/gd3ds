@@ -723,6 +723,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 if (player->gamemode == GAMEMODE_WAVE) MotionTrail_AddWavePoint(wave_trail);
                 player->vel_y /= -2;
                 player->upside_down = !player->upside_down;
+                update_rotation_direction(player);
                 player->robot_air_time = 999.f;
                 
                 player->on_ground = false;
