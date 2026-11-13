@@ -1311,7 +1311,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     set_gamemode(player, GAMEMODE_SHIP);
                     set_checkpoint_timer(AUTO_CHECKPOINT_TIME);
                     player->inverse_rotation = false;
-                    player->snap_rotation = true;
+                    player->rotation = 0;
                     flip_other_player(state.current_player ^ 1);
                     
                     float min = player->mini ? -406.566f : -345.6f;
