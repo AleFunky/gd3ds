@@ -26,6 +26,7 @@
 #include "particles/object_particles.hpp"
 #include "particles/circles.hpp"
 #include "particles/coin_effect.hpp"
+#include "particles/collectable_effect.hpp"
 
 #include "particles/gravity_sweep.hpp"
 
@@ -2281,6 +2282,7 @@ void draw_player_graphics() {
     change_blending(false);
     
     draw_collect_effect();
+    draw_collectable_effect();
 
     change_blending(true);
     draw_use_effects(get_use_effect_array_ptr(GFX_TOP));
