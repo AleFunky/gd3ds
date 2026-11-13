@@ -3345,27 +3345,27 @@ const ChildSprite children_1127[] = {
 };
 
 const ChildSprite children_1132[] = {
- { 1076, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, -45.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1076, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1133[] = {
- { 1077, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, -45.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1077, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1134[] = {
- { 1079, -0.71, 0.71, 1.00, 1.00, 0, 0, -1, 0, -45.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1079, -1.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1135[] = {
- { 1080, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, -45.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1080, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1136[] = {
- { 1081, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, -45.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1081, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1137[] = {
- { 1082, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, -45.00, COLOR_TYPE_DETAIL, 1.00 },
+ { 1082, 0.00, 0.00, 1.00, 1.00, 0, 0, -1, 0, 0.00, COLOR_TYPE_DETAIL, 1.00 },
 };
 
 const ChildSprite children_1157[] = {
