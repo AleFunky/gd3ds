@@ -11,22 +11,22 @@
 #include "main.hpp"
 #include "ui_slider.hpp"
 
-static void ui_color_button_update(UIElement* e, UIInput* touch, UITransform *transform) {
-    ui_button_update(e, touch, transform);
+static void uiColorButtonUpdate(UIElement* e, UIInput* touch, UITransform *transform) {
+    uiButtonUpdate(e, touch, transform);
 }
 
-static void ui_color_button_draw(UIElement* e, UITransform *transform) {
+static void uiColorButtonDraw(UIElement* e, UITransform *transform) {
     UIColor *color = (UIColor *) e;
     UIButton *button = (UIButton *) e;
 
     float scale = button->hoverProgress;
 
-    size_t color_idx = color->color_index;
+    size_t colorIdx = color->colorIndex;
 
-    if (color_idx >= NUM_COLORS) color_idx = NUM_COLORS - 1;
+    if (colorIdx >= numColors) colorIdx = numColors - 1;
 
     C2D_ImageTint tint = { 0 };
-    C2D_PlainImageTint(&tint, colors[color_idx], 1.0f);
+    C2D_PlainImageTint(&tint, colors[colorIdx], 1.0f);
     
     C2D_SpriteSetCenter(&button->image.sprite, 0.5f, 0.5f);
     C2D_SpriteSetPos(&button->image.sprite, transform->x, transform->y);
@@ -41,20 +41,20 @@ static void ui_color_button_draw(UIElement* e, UITransform *transform) {
     }
 }
 
-void ui_color_button_set_index(UIColor *e, int index, int color_index) {
+void uiColorButtonSetIndex(UIColor *e, int index, int colorIndex) {
     if (!e) return;
     e->index = index;
-    e->color_index = color_index;
+    e->colorIndex = colorIndex;
 }
 
-static void ui_color_button_destroy(UIElement *e) {
+static void uiColorButtonDestroy(UIElement *e) {
     if (e) {
         delete (UIColor *)e;
         e = NULL;
     }
 }
 
-UIColor *ui_create_color_button(UIScreen *screen) {
+UIColor *uiCreateColorButton(UIScreen *screen) {
     UIColor *e = new UIColor{};
 
     if (!e) return NULL;
@@ -64,40 +64,40 @@ UIColor *ui_create_color_button(UIScreen *screen) {
     button->base.type = UI_COLOR_BUTTON;
     button->base.enabled = true;
 
-    button->base.update = ui_color_button_update;
-    button->base.draw = ui_color_button_draw;
-    button->base.destroy = ui_color_button_destroy;
+    button->base.update = uiColorButtonUpdate;
+    button->base.draw = uiColorButtonDraw;
+    button->base.destroy = uiColorButtonDestroy;
     
-    ui_element_apply_default_properties(&button->base, screen);
+    uiElementApplyDefaultProperties(&button->base, screen);
     
     button->hoverProgress = 1;
     button->hoverFactor = 1;
 
-    C2D_SpriteFromSheet(&e->image.sprite, ui_sheet, 175);
+    C2D_SpriteFromSheet(&e->image.sprite, uiSheet, 175);
     C3D_TexSetFilter(e->image.sprite.image.tex, GPU_LINEAR, GPU_LINEAR);
     
-    C2D_SpriteFromSheet(&button->image.sprite, ui_sheet, 35);
+    C2D_SpriteFromSheet(&button->image.sprite, uiSheet, 35);
     C3D_TexSetFilter(button->image.sprite.image.tex, GPU_LINEAR, GPU_LINEAR);
 
     return e;
 }
 
-UIElement *ui_create_color_button_from_props(UIScreen *screen, const UIPropertyList *props) {
-    UIColor *color_button = ui_create_color_button(screen);
+UIElement *uiCreateColorButtonFromProps(UIScreen *screen, const UIPropertyList *props) {
+    UIColor *colorButton = uiCreateColorButton(screen);
 
-    if (!color_button) return NULL;
+    if (!colorButton) return NULL;
     
-    UIButton *button = (UIButton *) color_button;
+    UIButton *button = (UIButton *) colorButton;
 
-    ui_element_apply_properties(&button->base, screen, props);
+    uiElementApplyProperties(&button->base, screen, props);
     
-    ui_element_set_size(&button->base, 30, 30);
+    uiElementSetSize(&button->base, 30, 30);
 
-    button->hoverFactor = ui_prop_float(props, "hoverFactor", 1);
+    button->hoverFactor = uiPropFloat(props, "hoverFactor", 1);
 
-    ui_color_button_set_index(color_button,  
-        ui_prop_int(props, "id", 0), 
-        ui_prop_int(props, "color_index", 0));
+    uiColorButtonSetIndex(colorButton,  
+        uiPropInt(props, "id", 0), 
+        uiPropInt(props, "color_index", 0));
 
     return &button->base;
 }

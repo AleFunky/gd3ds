@@ -32,132 +32,132 @@
 
 ObjectsArray objects = { 0 };
 
-Section empty_section = { 0 };
+Section emptySection = { 0 };
 
-Section *section_hash[SECTION_HASH_SIZE] = {0};
+Section *sectionHash[SECTION_HASH_SIZE] = {0};
 
-static int coin_count;
-static int coin_ids[3];
+static int coinCount;
+static int coinIds[3];
 
 int channelCount = 0;
 GDColorChannel *colorChannels = NULL;
 
-LoadedLevelInfo level_info;
+LoadedLevelInfo levelInfo;
 
-char *curr_level_string = NULL;
+char *currLevelString = NULL;
 
-TriggerPool col_pool;
-TriggerPool move_pool;
-static TriggerPool count_pool;
-static TriggerPool instant_count_pool;
-TriggerPool follow_player_y_pool;
-static TriggerPool follow_pool;
-static TriggerPool counter_label_pool;
-static TriggerPool pickup_pool;
-bool has_follow_player_y = false;
-TriggerPool alpha_pool;
-TriggerPool pulse_pool;
-TriggerPool toggle_pool;
-TriggerPool touch_pool;
-TriggerPool spawn_pool;
-TriggerPool rotate_pool;
-static TriggerPool stop_pool;
-static TriggerPool on_death_pool;
-TriggerPool simple_pool;
-static TriggerPool text_pool;
-static TextObject empty_text_object;
+TriggerPool colPool;
+TriggerPool movePool;
+static TriggerPool countPool;
+static TriggerPool instantCountPool;
+TriggerPool followPlayerYPool;
+static TriggerPool followPool;
+static TriggerPool counterLabelPool;
+static TriggerPool pickupPool;
+bool hasFollowPlayerY = false;
+TriggerPool alphaPool;
+TriggerPool pulsePool;
+TriggerPool togglePool;
+TriggerPool touchPool;
+TriggerPool spawnPool;
+TriggerPool rotatePool;
+static TriggerPool stopPool;
+static TriggerPool onDeathPool;
+TriggerPool simplePool;
+static TriggerPool textPool;
+static TextObject emptyTextObject;
 
-ColorTrigger *get_color_trigger(int obj) {
-    return TRIGGER_AT(col_pool, ColorTrigger, objects.trigger_index[obj]);
+ColorTrigger *getColorTrigger(int obj) {
+    return TRIGGER_AT(colPool, ColorTrigger, objects.triggerIndex[obj]);
 }
 
-PulseTrigger *get_pulse_trigger(int obj) {
-    return TRIGGER_AT(pulse_pool, PulseTrigger, objects.trigger_index[obj]);
+PulseTrigger *getPulseTrigger(int obj) {
+    return TRIGGER_AT(pulsePool, PulseTrigger, objects.triggerIndex[obj]);
 }
 
-AlphaTrigger *get_alpha_trigger(int obj) {
-    return TRIGGER_AT(alpha_pool, AlphaTrigger, objects.trigger_index[obj]);
+AlphaTrigger *getAlphaTrigger(int obj) {
+    return TRIGGER_AT(alphaPool, AlphaTrigger, objects.triggerIndex[obj]);
 }
 
-MoveTrigger *get_move_trigger(int obj) {
-    return TRIGGER_AT(move_pool, MoveTrigger, objects.trigger_index[obj]);
+MoveTrigger *getMoveTrigger(int obj) {
+    return TRIGGER_AT(movePool, MoveTrigger, objects.triggerIndex[obj]);
 }
 
-CountTrigger *get_count_trigger(int obj) {
-    return TRIGGER_AT(count_pool, CountTrigger, objects.trigger_index[obj]);
+CountTrigger *getCountTrigger(int obj) {
+    return TRIGGER_AT(countPool, CountTrigger, objects.triggerIndex[obj]);
 }
 
-InstantCountTrigger *get_instant_count_trigger(int obj) {
-    return TRIGGER_AT(instant_count_pool, InstantCountTrigger, objects.trigger_index[obj]);
+InstantCountTrigger *getInstantCountTrigger(int obj) {
+    return TRIGGER_AT(instantCountPool, InstantCountTrigger, objects.triggerIndex[obj]);
 }
 
-CounterLabel *get_counter_label(int obj) {
-    int index = objects.trigger_index[obj];
-    if (index < 0 || !counter_label_pool.data || (size_t)index >= counter_label_pool.count) return NULL;
-    return TRIGGER_AT(counter_label_pool, CounterLabel, index);
+CounterLabel *getCounterLabel(int obj) {
+    int index = objects.triggerIndex[obj];
+    if (index < 0 || !counterLabelPool.data || (size_t)index >= counterLabelPool.count) return NULL;
+    return TRIGGER_AT(counterLabelPool, CounterLabel, index);
 }
 
-PickupItem *get_pickup_item(int obj) {
+PickupItem *getPickupItem(int obj) {
     if (!(objects.flags[obj] & FLAG_PICKUP)) return NULL;
-    int index = objects.trigger_index[obj];
-    if (index < 0 || !pickup_pool.data || (size_t)index >= pickup_pool.count) return NULL;
-    return TRIGGER_AT(pickup_pool, PickupItem, index);
+    int index = objects.triggerIndex[obj];
+    if (index < 0 || !pickupPool.data || (size_t)index >= pickupPool.count) return NULL;
+    return TRIGGER_AT(pickupPool, PickupItem, index);
 }
 
-static PickupItem *ensure_pickup_item(int obj) {
-    if (objects.flags[obj] & FLAG_PICKUP) return get_pickup_item(obj);
-    int index = trigger_pool_add(&pickup_pool, sizeof(PickupItem));
+static PickupItem *ensurePickupItem(int obj) {
+    if (objects.flags[obj] & FLAG_PICKUP) return getPickupItem(obj);
+    int index = triggerPoolAdd(&pickupPool, sizeof(PickupItem));
     if (index < 0) return NULL;
-    objects.trigger_index[obj] = index;
+    objects.triggerIndex[obj] = index;
     objects.flags[obj] |= FLAG_PICKUP;
-    return TRIGGER_AT(pickup_pool, PickupItem, index);
+    return TRIGGER_AT(pickupPool, PickupItem, index);
 }
 
-FollowPlayerYTrigger *get_follow_player_y_trigger(int obj) {
-    return TRIGGER_AT(follow_player_y_pool, FollowPlayerYTrigger, objects.trigger_index[obj]);
+FollowPlayerYTrigger *getFollowPlayerYTrigger(int obj) {
+    return TRIGGER_AT(followPlayerYPool, FollowPlayerYTrigger, objects.triggerIndex[obj]);
 }
 
-FollowTrigger *get_follow_trigger(int obj) {
-    return TRIGGER_AT(follow_pool, FollowTrigger, objects.trigger_index[obj]);
+FollowTrigger *getFollowTrigger(int obj) {
+    return TRIGGER_AT(followPool, FollowTrigger, objects.triggerIndex[obj]);
 }
 
-RotateTrigger *get_rotate_trigger(int obj) {
-    return TRIGGER_AT(rotate_pool, RotateTrigger, objects.trigger_index[obj]);
+RotateTrigger *getRotateTrigger(int obj) {
+    return TRIGGER_AT(rotatePool, RotateTrigger, objects.triggerIndex[obj]);
 }
 
-ToggleTrigger *get_toggle_trigger(int obj) {
-    return TRIGGER_AT(toggle_pool, ToggleTrigger, objects.trigger_index[obj]);
+ToggleTrigger *getToggleTrigger(int obj) {
+    return TRIGGER_AT(togglePool, ToggleTrigger, objects.triggerIndex[obj]);
 }
 
-TouchTrigger *get_touch_trigger(int obj) {
-    return TRIGGER_AT(touch_pool, TouchTrigger, objects.trigger_index[obj]);
+TouchTrigger *getTouchTrigger(int obj) {
+    return TRIGGER_AT(touchPool, TouchTrigger, objects.triggerIndex[obj]);
 }
 
-SpawnTrigger *get_spawn_trigger(int obj) {
-    return TRIGGER_AT(spawn_pool, SpawnTrigger, objects.trigger_index[obj]);
+SpawnTrigger *getSpawnTrigger(int obj) {
+    return TRIGGER_AT(spawnPool, SpawnTrigger, objects.triggerIndex[obj]);
 }
 
-StopTrigger *get_stop_trigger(int obj) {
-    return TRIGGER_AT(stop_pool, StopTrigger, objects.trigger_index[obj]);
+StopTrigger *getStopTrigger(int obj) {
+    return TRIGGER_AT(stopPool, StopTrigger, objects.triggerIndex[obj]);
 }
 
-OnDeathTrigger *get_on_death_trigger(int obj) {
-    return TRIGGER_AT(on_death_pool, OnDeathTrigger, objects.trigger_index[obj]);
+OnDeathTrigger *getOnDeathTrigger(int obj) {
+    return TRIGGER_AT(onDeathPool, OnDeathTrigger, objects.triggerIndex[obj]);
 }
 
-SimpleTrigger *get_simple_trigger(int obj) {
-    return TRIGGER_AT(simple_pool, SimpleTrigger, objects.trigger_index[obj]);
+SimpleTrigger *getSimpleTrigger(int obj) {
+    return TRIGGER_AT(simplePool, SimpleTrigger, objects.triggerIndex[obj]);
 }
 
-TextObject *get_text_object(int obj) {
-    int index = objects.trigger_index[obj];
-    if (index < 0 || !text_pool.data || (size_t)index >= text_pool.count) {
-        return &empty_text_object;
+TextObject *getTextObject(int obj) {
+    int index = objects.triggerIndex[obj];
+    if (index < 0 || !textPool.data || (size_t)index >= textPool.count) {
+        return &emptyTextObject;
     }
-    return TRIGGER_AT(text_pool, TextObject, index);
+    return TRIGGER_AT(textPool, TextObject, index);
 }
 
-const char *level_lengths[] = {
+const char *levelLengths[] = {
     "Tiny",
     "Short",
     "Medium",
@@ -165,24 +165,24 @@ const char *level_lengths[] = {
     "XL",
 };
 
-static inline unsigned int section_hash_func(unsigned int x, unsigned int y) {
+static inline unsigned int sectionHashFunc(unsigned int x, unsigned int y) {
     return ((unsigned int)x * 73856093u ^ (unsigned int)y * 19349663u) & (SECTION_HASH_SIZE - 1);
 }
 
-Section *get_section(int x, int y) {
-    unsigned int h = section_hash_func(x, y);
-    Section *sec = section_hash[h];
+Section *getSection(int x, int y) {
+    unsigned int h = sectionHashFunc(x, y);
+    Section *sec = sectionHash[h];
     while (sec) {
         if (sec->x == x && sec->y == y) return sec;
         sec = sec->next;
     }
-    return &empty_section;
+    return &emptySection;
 }
 
-static SectionTriggers uncached_section_triggers = { .count = -1 };
+static SectionTriggers uncachedSectionTriggers = { .count = -1 };
 
-static void append_section_trigger(Section *sec, int object_index) {
-    if (!is_trigger_object(objects.id[sec->objects[object_index]])) return;
+static void appendSectionTrigger(Section *sec, int objectIndex) {
+    if (!isTriggerObject(objects.id[sec->objects[objectIndex]])) return;
     SectionTriggers *list = sec->triggers;
     if (list && list->count < 0) return;
     if (!list || list->count == list->capacity) {
@@ -191,17 +191,17 @@ static void append_section_trigger(Section *sec, int object_index) {
         SectionTriggers *grown = (SectionTriggers *)realloc(list, sizeof(*list) + sizeof(int) * capacity);
         if (!grown) {
             free(list);
-            sec->triggers = &uncached_section_triggers;
+            sec->triggers = &uncachedSectionTriggers;
             return;
         }
         grown->count = count;
         grown->capacity = capacity;
         sec->triggers = list = grown;
     }
-    list->indices[list->count++] = object_index;
+    list->indices[list->count++] = objectIndex;
 }
 
-static void remove_section_trigger(Section *sec, int index, int last_index) {
+static void removeSectionTrigger(Section *sec, int index, int lastIndex) {
     SectionTriggers *list = sec->triggers;
     if (!list || list->count < 0) return;
     for (int i = 0; i < list->count; i++) {
@@ -211,7 +211,7 @@ static void remove_section_trigger(Section *sec, int index, int last_index) {
             sizeof(int) * (list->count - i));
         break;
     }
-    if (list->count && list->indices[list->count - 1] == last_index) {
+    if (list->count && list->indices[list->count - 1] == lastIndex) {
         int i = --list->count;
         while (i && list->indices[i - 1] > index) {
             list->indices[i] = list->indices[i - 1];
@@ -222,9 +222,9 @@ static void remove_section_trigger(Section *sec, int index, int last_index) {
     }
 }
 
-Section *get_or_create_section(int x, int y) {
-    unsigned int h = section_hash_func(x, y);
-    Section *sec = section_hash[h];
+Section *getOrCreateSection(int x, int y) {
+    unsigned int h = sectionHashFunc(x, y);
+    Section *sec = sectionHash[h];
     while (sec) {
         if (sec->x == x && sec->y == y) return sec;
         sec = sec->next;
@@ -235,19 +235,19 @@ Section *get_or_create_section(int x, int y) {
     sec->objects = (int *)malloc(sizeof(int) * 8);
     if (!sec->objects) return NULL;
 
-    sec->object_count = 0;
-    sec->object_capacity = 8;
+    sec->objectCount = 0;
+    sec->objectCapacity = 8;
     sec->triggers = NULL;
     sec->x = x;
     sec->y = y;
-    sec->next = section_hash[h];
-    section_hash[h] = sec;
+    sec->next = sectionHash[h];
+    sectionHash[h] = sec;
     return sec;
 }
 
-void free_sections(void) {
+void freeSections(void) {
     for (int i = 0; i < SECTION_HASH_SIZE; i++) {
-        Section *sec = section_hash[i];
+        Section *sec = sectionHash[i];
         while (sec) {
             Section *next = sec->next;
             free(sec->objects);
@@ -255,71 +255,71 @@ void free_sections(void) {
             free(sec);
             sec = next;
         }
-        section_hash[i] = NULL;
+        sectionHash[i] = NULL;
     }
 }
 
-void assign_object_to_section(int obj) {
+void assignObjectToSection(int obj) {
     int sx = (int)(objects.x[obj] / SECTION_SIZE);
     int sy = (int)(objects.y[obj] / SECTION_SIZE);
-    Section *sec = get_or_create_section(sx, sy);
+    Section *sec = getOrCreateSection(sx, sy);
     if (!sec) return;
 
-    if (sec->object_count >= sec->object_capacity) {
-        sec->object_capacity *= 2;
-        sec->objects = (int *)realloc(sec->objects, sizeof(int) * sec->object_capacity);
+    if (sec->objectCount >= sec->objectCapacity) {
+        sec->objectCapacity *= 2;
+        sec->objects = (int *)realloc(sec->objects, sizeof(int) * sec->objectCapacity);
         if (!sec->objects) return;
     }
-    sec->objects[sec->object_count++] = obj;
-    append_section_trigger(sec, sec->object_count - 1);
-    objects.section_x[obj] = sx;
-    objects.section_y[obj] = sy;
+    sec->objects[sec->objectCount++] = obj;
+    appendSectionTrigger(sec, sec->objectCount - 1);
+    objects.sectionX[obj] = sx;
+    objects.sectionY[obj] = sy;
 }
 
-void remove_object_from_section(Section *sec, int obj) {
-    for (int i = 0; i < sec->object_count; i++) {
+void removeObjectFromSection(Section *sec, int obj) {
+    for (int i = 0; i < sec->objectCount; i++) {
         if (sec->objects[i] == obj) {
-            remove_section_trigger(sec, i, sec->object_count - 1);
-            sec->objects[i] = sec->objects[--sec->object_count];
+            removeSectionTrigger(sec, i, sec->objectCount - 1);
+            sec->objects[i] = sec->objects[--sec->objectCount];
             break;
         }
     }
 }
 
-void update_object_section(int obj) {
-    int new_sx = (int)(objects.x[obj] / SECTION_SIZE);
-    int new_sy = (int)(objects.y[obj] / SECTION_SIZE);
-    int old_sx = objects.section_x[obj];
-    int old_sy = objects.section_y[obj];
+void updateObjectSection(int obj) {
+    int newSx = (int)(objects.x[obj] / SECTION_SIZE);
+    int newSy = (int)(objects.y[obj] / SECTION_SIZE);
+    int oldSx = objects.sectionX[obj];
+    int oldSy = objects.sectionY[obj];
 
-    if (new_sx == old_sx && new_sy == old_sy) return;
+    if (newSx == oldSx && newSy == oldSy) return;
 
-    Section *old_sec = get_section(old_sx, old_sy);
+    Section *oldSec = getSection(oldSx, oldSy);
 
-    if (old_sec) {
-        remove_object_from_section(old_sec, obj);
+    if (oldSec) {
+        removeObjectFromSection(oldSec, obj);
     }
 
-    assign_object_to_section(obj);
+    assignObjectToSection(obj);
 }
 
-char *read_file(const char *filepath, size_t *out_size) {
+char *readFile(const char *filepath, size_t *outSize) {
     FILE *f = fopen(filepath, "rb");
     if (!f) {
-        output_log("Failed to open file: %s (%d)\n", filepath, errno);
+        outputLog("Failed to open file: %s (%d)\n", filepath, errno);
         return NULL;
     }
     fseek(f, 0, SEEK_END);
     long size = ftell(f);
     if (size < 0) {
-        output_log("Failed to ftell file: %s (%d)\n", filepath, errno);
+        outputLog("Failed to ftell file: %s (%d)\n", filepath, errno);
         return NULL;
     }
     rewind(f);
 
     char *buffer = (char *)malloc(size + 1);
     if (!buffer) {
-        output_log("Failed to allocate file\n");
+        outputLog("Failed to allocate file\n");
         fclose(f);
         return NULL;
     }
@@ -327,27 +327,27 @@ char *read_file(const char *filepath, size_t *out_size) {
     buffer[size] = '\0'; // Null-terminate for text files
     fclose(f);
 
-    if (out_size) *out_size = size;
+    if (outSize) *outSize = size;
     return buffer;
 }
 
-char *read_file_arena(Arena *arena, const char *filepath, size_t *out_size) {
+char *readFileArena(Arena *arena, const char *filepath, size_t *outSize) {
     FILE *f = fopen(filepath, "rb");
     if (!f) {
-        output_log("Failed to open file: %s (%d)\n", filepath, errno);
+        outputLog("Failed to open file: %s (%d)\n", filepath, errno);
         return NULL;
     }
     fseek(f, 0, SEEK_END);
     long size = ftell(f);
     if (size < 0) {
-        output_log("Failed to ftell file: %s (%d)\n", filepath, errno);
+        outputLog("Failed to ftell file: %s (%d)\n", filepath, errno);
         return NULL;
     }
     rewind(f);
 
-    char *buffer = (char *)arena_alloc(arena, size + 1);
+    char *buffer = (char *)arenaAlloc(arena, size + 1);
     if (!buffer) {
-        output_log("Failed to allocate file\n");
+        outputLog("Failed to allocate file\n");
         fclose(f);
         return NULL;
     }
@@ -355,45 +355,45 @@ char *read_file_arena(Arena *arena, const char *filepath, size_t *out_size) {
     buffer[size] = '\0'; // Null-terminate for text files
     fclose(f);
 
-    if (out_size) *out_size = size;
+    if (outSize) *outSize = size;
     return buffer;
 }
 
-char *extract_gmd_key(const char *data, const char *key, const char *type) {
-    char key_tag[32];
-    snprintf(key_tag, sizeof(key_tag), "<k>%s</k>", key);
+char *extractGMDKey(const char *data, const char *key, const char *type) {
+    char keyTag[32];
+    snprintf(keyTag, sizeof(keyTag), "<k>%s</k>", key);
     
-    char *key_pos = strstr(data, key_tag);
-    if (!key_pos) {
+    char *keyPos = strstr(data, keyTag);
+    if (!keyPos) {
         return NULL;
     }
 
     // Move past the key tag
-    char *start = key_pos + strlen(key_tag);
+    char *start = keyPos + strlen(keyTag);
 
     // Skip whitespace (spaces, tabs, newlines, etc.)
     while (*start && isspace((unsigned char)*start)) {
         start++;
     }
 
-    char type_start_tag[16];
-    snprintf(type_start_tag, sizeof(type_start_tag), "<%s>", type);
+    char typeStartTag[16];
+    snprintf(typeStartTag, sizeof(typeStartTag), "<%s>", type);
 
     // Confirm that the type start tag is here
-    if (strncmp(start, type_start_tag, strlen(type_start_tag)) != 0) {
-        output_log("Expected start tag '%s' not found after key\n", type_start_tag);
+    if (strncmp(start, typeStartTag, strlen(typeStartTag)) != 0) {
+        outputLog("Expected start tag '%s' not found after key\n", typeStartTag);
         return NULL;
     }
 
     // Move past the type start tag
-    start += strlen(type_start_tag);
+    start += strlen(typeStartTag);
 
     // Find the end tag
-    char type_end_tag[16];
-    snprintf(type_end_tag, sizeof(type_end_tag), "</%s>", type);
-    char *end = strstr(start, type_end_tag);
+    char typeEndTag[16];
+    snprintf(typeEndTag, sizeof(typeEndTag), "</%s>", type);
+    char *end = strstr(start, typeEndTag);
     if (!end) {
-        output_log("Could not find end tag '%s'\n", type_end_tag);
+        outputLog("Could not find end tag '%s'\n", typeEndTag);
         return NULL;
     }
 
@@ -401,7 +401,7 @@ char *extract_gmd_key(const char *data, const char *key, const char *type) {
     int len = end - start;
     char *value = (char *)malloc(len + 1);
     if (!value) {
-        output_log("malloc for gmd key %s failed\n", key);
+        outputLog("malloc for gmd key %s failed\n", key);
         return NULL;
     }
     strncpy(value, start, len);
@@ -409,7 +409,7 @@ char *extract_gmd_key(const char *data, const char *key, const char *type) {
     return value;
 }
 
-bool is_ascii(const unsigned char *data, int len) {
+bool isAscii(const unsigned char *data, int len) {
     for (int i = 0; i < len; i++) {
         if (data[i] > 0x7F) {
             return false; // Non-ASCII byte found
@@ -418,7 +418,7 @@ bool is_ascii(const unsigned char *data, int len) {
     return true;
 }
 
-int b64_char(char c) {
+int b64Char(char c) {
     if ('A' <= c && c <= 'Z') return c - 'A';
     if ('a' <= c && c <= 'z') return c - 'a' + 26;
     if ('0' <= c && c <= '9') return c - '0' + 52;
@@ -427,20 +427,20 @@ int b64_char(char c) {
     return -1;
 }
 
-void fix_base64_url(char *b64) {
+void fixBase64URL(char *b64) {
     for (int i = 0; b64[i]; i++) {
         if (b64[i] == '-') b64[i] = '+';
         else if (b64[i] == '_') b64[i] = '/';
     }
 }
 
-int base64_decode(const char *in, unsigned char *out) {
+int base64Decode(const char *in, unsigned char *out) {
     int len = 0;
     for (int i = 0; in[i] && in[i+1] && in[i+2] && in[i+3]; i += 4) {
-        int a = b64_char(in[i]);
-        int b = b64_char(in[i+1]);
-        int c = in[i+2] == '=' ? 0 : b64_char(in[i+2]);
-        int d = in[i+3] == '=' ? 0 : b64_char(in[i+3]);
+        int a = b64Char(in[i]);
+        int b = b64Char(in[i+1]);
+        int c = in[i+2] == '=' ? 0 : b64Char(in[i+2]);
+        int d = in[i+3] == '=' ? 0 : b64Char(in[i+3]);
 
         if (a == -1 || b == -1 || c == -1 || d == -1) {
             return -1;
@@ -454,7 +454,7 @@ int base64_decode(const char *in, unsigned char *out) {
 }
 
 
-char *get_metadata_value(const char *levelString, const char *key) {
+char *getMetadataValue(const char *levelString, const char *key) {
     if (!levelString || !key) return NULL;
 
     // Find the first semicolon, which separates metadata from objects
@@ -488,49 +488,49 @@ char *get_metadata_value(const char *levelString, const char *key) {
     return NULL;
 }
 
-char *decompress_online_level(char *data, int *out_code) {
+char *decompressOnlineLevel(char *data, int *outCode) {
     printf("Loading level data...\n");
 
-    fix_base64_url(data);
+    fixBase64URL(data);
 
     // Bro theres some levels that randomly have , at the end of the base64 string wtf
-    remove_char(data, ',');
+    removeChar(data, ',');
 
     //output_log("BRO len %d lol %s\n", strlen(data), data);
 
-    unsigned char *decoded = (unsigned char *)arena_alloc(&level_arena, strlen(data));
+    unsigned char *decoded = (unsigned char *)arenaAlloc(&levelArena, strlen(data));
 
     if (!decoded) {
-        *out_code = LOAD_OUT_OF_MEMORY;
+        *outCode = LOAD_OUT_OF_MEMORY;
         return NULL;
     }
     
-    int decoded_len = base64_decode(data, decoded);
-    if (decoded_len <= 0) {
-        output_log("Failed to decode base64\n");
-        *out_code = LOAD_INVALID_BASE64;
+    int decodedLen = base64Decode(data, decoded);
+    if (decodedLen <= 0) {
+        outputLog("Failed to decode base64\n");
+        *outCode = LOAD_INVALID_BASE64;
         return NULL;
     }
 
-    size_t decompressed_len;
-    char *decompressed = decompress_data_level(decoded, decoded_len, &decompressed_len, out_code);
+    size_t decompressedLen;
+    char *decompressed = decompressDataLevel(decoded, decodedLen, &decompressedLen, outCode);
     if (!decompressed) {
-        output_log("Decompression failed (check zlib error above)\n");
+        outputLog("Decompression failed (check zlib error above)\n");
         return NULL;
     }
     
     return decompressed;
 }
 
-char *decompress_level(char *data, int *out_code) {
+char *decompressLevel(char *data, int *outCode) {
     printf("Loading level data...\n");
     
-    char *b64 = extract_gmd_key((const char *) data, "k4", "s");
+    char *b64 = extractGMDKey((const char *) data, "k4", "s");
     if (!b64) {
         // Empty level
         char *temp = strdup(data);
         if (!temp) {
-            *out_code = LOAD_OUT_OF_MEMORY;
+            *outCode = LOAD_OUT_OF_MEMORY;
         }
         return temp;
     }
@@ -538,25 +538,25 @@ char *decompress_level(char *data, int *out_code) {
     const char *semicolon = strchr(b64, ';');
     if (semicolon) return b64; // Rare uncompressed gmd found
 
-    fix_base64_url(b64);
+    fixBase64URL(b64);
 
-    unsigned char *decoded = (unsigned char *)arena_alloc(&level_arena, strlen(b64));
+    unsigned char *decoded = (unsigned char *)arenaAlloc(&levelArena, strlen(b64));
     if (!decoded) {
-        *out_code = LOAD_OUT_OF_MEMORY;
+        *outCode = LOAD_OUT_OF_MEMORY;
         return NULL;
     }
-    int decoded_len = base64_decode(b64, decoded);
-    if (decoded_len <= 0) {
-        output_log("Failed to decode base64\n");
+    int decodedLen = base64Decode(b64, decoded);
+    if (decodedLen <= 0) {
+        outputLog("Failed to decode base64\n");
         free(b64);
-        *out_code = LOAD_OUT_OF_MEMORY;
+        *outCode = LOAD_OUT_OF_MEMORY;
         return NULL;
     }
 
-    size_t decompressed_len;
-    char *decompressed = decompress_data_level(decoded, decoded_len, &decompressed_len, out_code);
+    size_t decompressedLen;
+    char *decompressed = decompressDataLevel(decoded, decodedLen, &decompressedLen, outCode);
     if (!decompressed) {
-        output_log("Decompression failed (check zlib error above)\n");
+        outputLog("Decompression failed (check zlib error above)\n");
         free(b64);
         return NULL;
     }
@@ -566,7 +566,7 @@ char *decompress_level(char *data, int *out_code) {
     return decompressed;
 }
 
-char **split_string_str_del(const char *str, const char *delimiter, int *outCount, bool ignoreZeroLength) {
+char **splitStringStrDel(const char *str, const char *delimiter, int *outCount, bool ignoreZeroLength) {
     char **result = NULL;
     int count = 0;
     const char *start = str;
@@ -611,7 +611,7 @@ char **split_string_str_del(const char *str, const char *delimiter, int *outCoun
     return result;
 }
 
-char **split_string(const char *str, char delimiter, int *outCount, bool ignoreZeroLength) {
+char **splitString(const char *str, char delimiter, int *outCount, bool ignoreZeroLength) {
     char **result = NULL;
     int count = 0;
     const char *start = str;
@@ -656,45 +656,45 @@ char **split_string(const char *str, char delimiter, int *outCount, bool ignoreZ
     return result;
 }
 
-void free_string_array(char **arr, int count) {
+void freeStringArray(char **arr, int count) {
     for (int i = 0; i < count; i++) free(arr[i]);
     free(arr);
 }
 
-void parse_ints(short *int_array, const char *string) {
+void parseInts(short *intArray, const char *string) {
     int count = 0;
-    char **ints = split_string(string, '.', &count, false);
+    char **ints = splitString(string, '.', &count, false);
 
     for (int j = 0; j < MAX_GROUPS_PER_OBJECT; j++) {
-        if (j < count) int_array[j] = (short) atoi(ints[j]);
-        else int_array[j] = 0;
+        if (j < count) intArray[j] = (short) atoi(ints[j]);
+        else intArray[j] = 0;
     }
 
-    free_string_array(ints, count);
+    freeStringArray(ints, count);
 }
 
-HSV parse_hsv_string(const char *string) {
+HSV parseHSVString(const char *string) {
     int count = 0;
-    char **hsv_string = split_string(string, 'a', &count, false);
+    char **hsvString = splitString(string, 'a', &count, false);
     HSV obtained = { 0 };
 
     if (count >= 5) {
-        obtained.h = atoi(hsv_string[0]);
-        obtained.s = atof(hsv_string[1]);
-        obtained.v = atof(hsv_string[2]);
-        obtained.sChecked = parse_bool(hsv_string[3]);
-        obtained.vChecked = parse_bool(hsv_string[4]);
+        obtained.h = atoi(hsvString[0]);
+        obtained.s = atof(hsvString[1]);
+        obtained.v = atof(hsvString[2]);
+        obtained.sChecked = parseBool(hsvString[3]);
+        obtained.vChecked = parseBool(hsvString[4]);
     }
 
-    free_string_array(hsv_string, count);
+    freeStringArray(hsvString, count);
     return obtained;
 }
 
-void parse_color_channel(GDColorChannel *channels, int i, char *channel_string) {
+void parseColorChannel(GDColorChannel *channels, int i, char *channelString) {
     GDColorChannel channel = {0};  // Zero-initialize
     channel.fromOpacity = 1.0f;
     int kvCount = 0;
-    char **kvs = split_string(channel_string, '_', &kvCount, false);
+    char **kvs = splitString(channelString, '_', &kvCount, false);
 
     for (int j = 0; j + 1 < kvCount; j += 2) {
         int key = atoi(kvs[j]);
@@ -710,7 +710,7 @@ void parse_color_channel(GDColorChannel *channels, int i, char *channel_string) 
             case 7:  channel.fromOpacity = atof(valStr); break;
             case 8:  channel.toggleOpacity = atoi(valStr) != 0; break;
             case 9:  channel.inheritedChannelID = atoi(valStr); break;
-            case 10: channel.hsv = parse_hsv_string(valStr); break;
+            case 10: channel.hsv = parseHSVString(valStr); break;
             case 11: channel.toRed = atoi(valStr); break;
             case 12: channel.toGreen = atoi(valStr); break;
             case 13: channel.toBlue = atoi(valStr); break;
@@ -722,121 +722,121 @@ void parse_color_channel(GDColorChannel *channels, int i, char *channel_string) 
     }
 
     channels[i] = channel;
-    free_string_array(kvs, kvCount);
+    freeStringArray(kvs, kvCount);
 }
 
-int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_code) {
+int parseOldChannels(char *levelString, GDColorChannel **outArray, int *outCode) {
     GDColorChannel *channels = (GDColorChannel *)malloc(sizeof(GDColorChannel) * 2);
     if (!channels) {
-        output_log("Couldn't alloc initial pre 2.0 color channels\n");
-        *out_code = LOAD_OUT_OF_MEMORY;
+        outputLog("Couldn't alloc initial pre 2.0 color channels\n");
+        *outCode = LOAD_OUT_OF_MEMORY;
         return 0;
     }
 
-    char *v19_bg = get_metadata_value(level_string, "kS29");
+    char *v19Bg = getMetadataValue(levelString, "kS29");
 
     int i = 0;
 
-    if (v19_bg) { // 1.9 only
-        parse_color_channel(channels, i, v19_bg);
+    if (v19Bg) { // 1.9 only
+        parseColorChannel(channels, i, v19Bg);
         channels[i].channelID = CHANNEL_BG;
         i++;
-        free(v19_bg);
+        free(v19Bg);
 
-        char *ground = get_metadata_value(level_string, "kS30");
+        char *ground = getMetadataValue(levelString, "kS30");
         if (ground) {
-            parse_color_channel(channels, i, ground);
+            parseColorChannel(channels, i, ground);
             channels[i].channelID = CHANNEL_GROUND;
             i++;
             free(ground);
         }
 
-        char *line = get_metadata_value(level_string, "kS31");
+        char *line = getMetadataValue(levelString, "kS31");
         if (line) {
             channels = (GDColorChannel *)realloc(channels, sizeof(GDColorChannel) * (i + 1));
             if (!channels) {
-                *out_code = LOAD_OUT_OF_MEMORY;
+                *outCode = LOAD_OUT_OF_MEMORY;
                 return 0;
             }
-            parse_color_channel(channels, i, line);
+            parseColorChannel(channels, i, line);
             channels[i].channelID = CHANNEL_LINE;
             i++;
             free(line);
         }
         
-        char *obj = get_metadata_value(level_string, "kS32");
+        char *obj = getMetadataValue(levelString, "kS32");
         if (obj) {
             channels = (GDColorChannel *)realloc(channels, sizeof(GDColorChannel) * (i + 1));
             if (!channels) {
-                *out_code = LOAD_OUT_OF_MEMORY;
+                *outCode = LOAD_OUT_OF_MEMORY;
                 return 0;
             }
-            parse_color_channel(channels, i, obj);
+            parseColorChannel(channels, i, obj);
             channels[i].channelID = CHANNEL_OBJ;
             i++;
             free(obj);
         }
 
-        char *col1 = get_metadata_value(level_string, "kS33");
+        char *col1 = getMetadataValue(levelString, "kS33");
         if (col1) {
             channels = (GDColorChannel *)realloc(channels, sizeof(GDColorChannel) * (i + 1));
             if (!channels) {
-                *out_code = LOAD_OUT_OF_MEMORY;
+                *outCode = LOAD_OUT_OF_MEMORY;
                 return 0;
             }
-            parse_color_channel(channels, i, col1);
+            parseColorChannel(channels, i, col1);
             channels[i].channelID = 1;
             i++;
             free(col1);
         }
 
-        char *col2 = get_metadata_value(level_string, "kS34");
+        char *col2 = getMetadataValue(levelString, "kS34");
         if (col2) {
             channels = (GDColorChannel *)realloc(channels, sizeof(GDColorChannel) * (i + 1));
             if (!channels) {
-                *out_code = LOAD_OUT_OF_MEMORY;
+                *outCode = LOAD_OUT_OF_MEMORY;
                 return 0;
             }
-            parse_color_channel(channels, i, col2);
+            parseColorChannel(channels, i, col2);
             channels[i].channelID = 2;
             i++;
             free(col2);
         }
 
-        char *col3 = get_metadata_value(level_string, "kS35");
+        char *col3 = getMetadataValue(levelString, "kS35");
         if (col3) {
             channels = (GDColorChannel *)realloc(channels, sizeof(GDColorChannel) * (i + 1));
             if (!channels) {
-                *out_code = LOAD_OUT_OF_MEMORY;
+                *outCode = LOAD_OUT_OF_MEMORY;
                 return 0;
             }
-            parse_color_channel(channels, i, col3);
+            parseColorChannel(channels, i, col3);
             channels[i].channelID = 3;
             i++;
             free(col3);
         }
 
-        char *col4 = get_metadata_value(level_string, "kS36");
+        char *col4 = getMetadataValue(levelString, "kS36");
         if (col4) {
             channels = (GDColorChannel *)realloc(channels, sizeof(GDColorChannel) * (i + 1));
             if (!channels) {
-                *out_code = LOAD_OUT_OF_MEMORY;
+                *outCode = LOAD_OUT_OF_MEMORY;
                 return 0;
             }
-            parse_color_channel(channels, i, col4);
+            parseColorChannel(channels, i, col4);
             channels[i].channelID = 4;
             i++;
             free(col4);
         }
 
-        char *dl3 = get_metadata_value(level_string, "kS37");
+        char *dl3 = getMetadataValue(levelString, "kS37");
         if (dl3) {
             channels = (GDColorChannel *)realloc(channels, sizeof(GDColorChannel) * (i + 1));
             if (!channels) {
-                *out_code = LOAD_OUT_OF_MEMORY;
+                *outCode = LOAD_OUT_OF_MEMORY;
                 return 0;
             }
-            parse_color_channel(channels, i, dl3);
+            parseColorChannel(channels, i, dl3);
             channels[i].channelID = CHANNEL_3DL;
             i++;
             free(dl3);
@@ -848,190 +848,190 @@ int parse_old_channels(char *level_string, GDColorChannel **outArray, int *out_c
 
     // Pre 1.9
 
-    char *bg_r = get_metadata_value(level_string, "kS1");
-    char *bg_g = get_metadata_value(level_string, "kS2");
-    char *bg_b = get_metadata_value(level_string, "kS3");
+    char *bgR = getMetadataValue(levelString, "kS1");
+    char *bgG = getMetadataValue(levelString, "kS2");
+    char *bgB = getMetadataValue(levelString, "kS3");
     
-    if (bg_r && bg_g && bg_b) {
-        GDColorChannel bg_channel = {0};
-        bg_channel.fromOpacity = 1.0f;
-        bg_channel.channelID = CHANNEL_BG;
-        bg_channel.fromRed = atoi(bg_r);
-        bg_channel.fromGreen = atoi(bg_g);
-        bg_channel.fromBlue = atoi(bg_b);
+    if (bgR && bgG && bgB) {
+        GDColorChannel bgChannel = {0};
+        bgChannel.fromOpacity = 1.0f;
+        bgChannel.channelID = CHANNEL_BG;
+        bgChannel.fromRed = atoi(bgR);
+        bgChannel.fromGreen = atoi(bgG);
+        bgChannel.fromBlue = atoi(bgB);
 
-        char *bg_player_color = get_metadata_value(level_string, "kS16");
-        if (bg_player_color) {
-            bg_channel.playerColor = atoi(bg_player_color);
-            free(bg_player_color);
+        char *bgPlayerColor = getMetadataValue(levelString, "kS16");
+        if (bgPlayerColor) {
+            bgChannel.playerColor = atoi(bgPlayerColor);
+            free(bgPlayerColor);
         }
 
-        channels[i] = bg_channel;
+        channels[i] = bgChannel;
         i++;
     }
 
-    free(bg_r);
-    free(bg_g);
-    free(bg_b);
+    free(bgR);
+    free(bgG);
+    free(bgB);
 
-    char *g_r = get_metadata_value(level_string, "kS4");
-    char *g_g = get_metadata_value(level_string, "kS5");
-    char *g_b = get_metadata_value(level_string, "kS6");
+    char *gR = getMetadataValue(levelString, "kS4");
+    char *gG = getMetadataValue(levelString, "kS5");
+    char *gB = getMetadataValue(levelString, "kS6");
 
-    if (g_r && g_g && g_b) {
-        GDColorChannel g_channel = {0};
-        g_channel.fromOpacity = 1.0f;
-        g_channel.channelID = CHANNEL_GROUND;
-        g_channel.fromRed = atoi(g_r);
-        g_channel.fromGreen = atoi(g_g);
-        g_channel.fromBlue = atoi(g_b);
+    if (gR && gG && gB) {
+        GDColorChannel gChannel = {0};
+        gChannel.fromOpacity = 1.0f;
+        gChannel.channelID = CHANNEL_GROUND;
+        gChannel.fromRed = atoi(gR);
+        gChannel.fromGreen = atoi(gG);
+        gChannel.fromBlue = atoi(gB);
 
-        char *g_player_color = get_metadata_value(level_string, "kS17");
-        if (g_player_color) {
-            g_channel.playerColor = atoi(g_player_color);
-            free(g_player_color);
+        char *gPlayerColor = getMetadataValue(levelString, "kS17");
+        if (gPlayerColor) {
+            gChannel.playerColor = atoi(gPlayerColor);
+            free(gPlayerColor);
         }
-        channels[i] = g_channel;
+        channels[i] = gChannel;
         i++;
     }
 
-    free(g_r);
-    free(g_g);
-    free(g_b);
+    free(gR);
+    free(gG);
+    free(gB);
 
-    char *line_r = get_metadata_value(level_string, "kS7");
-    char *line_g = get_metadata_value(level_string, "kS8");
-    char *line_b = get_metadata_value(level_string, "kS9");
+    char *lineR = getMetadataValue(levelString, "kS7");
+    char *lineG = getMetadataValue(levelString, "kS8");
+    char *lineB = getMetadataValue(levelString, "kS9");
 
-    if (line_r && line_g && line_b) {
-        GDColorChannel line_channel = {0};
-        line_channel.fromOpacity = 1.0f;
-        line_channel.channelID = CHANNEL_LINE;
-        line_channel.fromRed = atoi(line_r);
-        line_channel.fromGreen = atoi(line_g);
-        line_channel.fromBlue = atoi(line_b);
+    if (lineR && lineG && lineB) {
+        GDColorChannel lineChannel = {0};
+        lineChannel.fromOpacity = 1.0f;
+        lineChannel.channelID = CHANNEL_LINE;
+        lineChannel.fromRed = atoi(lineR);
+        lineChannel.fromGreen = atoi(lineG);
+        lineChannel.fromBlue = atoi(lineB);
         
-        char *line_player_color = get_metadata_value(level_string, "kS18");
-        if (line_player_color) {
-            line_channel.playerColor = atoi(line_player_color);
-            free(line_player_color);
+        char *linePlayerColor = getMetadataValue(levelString, "kS18");
+        if (linePlayerColor) {
+            lineChannel.playerColor = atoi(linePlayerColor);
+            free(linePlayerColor);
         }
 
         channels = (GDColorChannel *)realloc(channels, sizeof(GDColorChannel) * (i + 1));
         if (!channels) {
-            *out_code = LOAD_OUT_OF_MEMORY;
+            *outCode = LOAD_OUT_OF_MEMORY;
             return 0;
         }
-        channels[i] = line_channel;
+        channels[i] = lineChannel;
         i++;
     }
     
-    free(line_r);
-    free(line_g);
-    free(line_b);
+    free(lineR);
+    free(lineG);
+    free(lineB);
 
-    char *obj_r = get_metadata_value(level_string, "kS10");
-    char *obj_g = get_metadata_value(level_string, "kS11");
-    char *obj_b = get_metadata_value(level_string, "kS12");
+    char *objR = getMetadataValue(levelString, "kS10");
+    char *objG = getMetadataValue(levelString, "kS11");
+    char *objB = getMetadataValue(levelString, "kS12");
 
-    if (obj_r && obj_g && obj_b) {
-        GDColorChannel obj_channel = {0};
-        obj_channel.fromOpacity = 1.0f;
-        obj_channel.channelID = CHANNEL_OBJ;
-        obj_channel.fromRed = atoi(obj_r);
-        obj_channel.fromGreen = atoi(obj_g);
-        obj_channel.fromBlue = atoi(obj_b);
+    if (objR && objG && objB) {
+        GDColorChannel objChannel = {0};
+        objChannel.fromOpacity = 1.0f;
+        objChannel.channelID = CHANNEL_OBJ;
+        objChannel.fromRed = atoi(objR);
+        objChannel.fromGreen = atoi(objG);
+        objChannel.fromBlue = atoi(objB);
 
-        char *obj_player_color = get_metadata_value(level_string, "kS19");
-        if (obj_player_color) {
-            obj_channel.playerColor = atoi(obj_player_color);
-            free(obj_player_color);
+        char *objPlayerColor = getMetadataValue(levelString, "kS19");
+        if (objPlayerColor) {
+            objChannel.playerColor = atoi(objPlayerColor);
+            free(objPlayerColor);
         }
         
         channels = (GDColorChannel *)realloc(channels, sizeof(GDColorChannel) * (i + 1));
         if (!channels) {
-            *out_code = LOAD_OUT_OF_MEMORY;
+            *outCode = LOAD_OUT_OF_MEMORY;
             return 0;
         }
-        channels[i] = obj_channel;
+        channels[i] = objChannel;
         i++;
     }
 
-    free(obj_r);
-    free(obj_g);
-    free(obj_b);
+    free(objR);
+    free(objG);
+    free(objB);
 
-    char *obj_2_r = get_metadata_value(level_string, "kS13");
-    char *obj_2_g = get_metadata_value(level_string, "kS14");
-    char *obj_2_b = get_metadata_value(level_string, "kS15");
+    char *obj2R = getMetadataValue(levelString, "kS13");
+    char *obj2G = getMetadataValue(levelString, "kS14");
+    char *obj2B = getMetadataValue(levelString, "kS15");
 
-    if (obj_2_r && obj_2_g && obj_2_b) {
-        GDColorChannel obj_2_channel = {0};
-        obj_2_channel.fromOpacity = 1.0f;
-        obj_2_channel.channelID = 1;
-        obj_2_channel.fromRed = atoi(obj_2_r);
-        obj_2_channel.fromGreen = atoi(obj_2_g);
-        obj_2_channel.fromBlue = atoi(obj_2_b);
+    if (obj2R && obj2G && obj2B) {
+        GDColorChannel obj2Channel = {0};
+        obj2Channel.fromOpacity = 1.0f;
+        obj2Channel.channelID = 1;
+        obj2Channel.fromRed = atoi(obj2R);
+        obj2Channel.fromGreen = atoi(obj2G);
+        obj2Channel.fromBlue = atoi(obj2B);
         
-        char *obj_2_player_color = get_metadata_value(level_string, "kS20");
-        if (obj_2_player_color) {
-            obj_2_channel.playerColor = atoi(obj_2_player_color);
-            free(obj_2_player_color);
+        char *obj2PlayerColor = getMetadataValue(levelString, "kS20");
+        if (obj2PlayerColor) {
+            obj2Channel.playerColor = atoi(obj2PlayerColor);
+            free(obj2PlayerColor);
         }
 
-        char *obj_2_blending = get_metadata_value(level_string, "kA5");
-        if (obj_2_blending) {
-            obj_2_channel.blending = atoi(obj_2_blending) != 0;
-            free(obj_2_blending);
+        char *obj2Blending = getMetadataValue(levelString, "kA5");
+        if (obj2Blending) {
+            obj2Channel.blending = atoi(obj2Blending) != 0;
+            free(obj2Blending);
         }
 
         channels = (GDColorChannel *)realloc(channels, sizeof(GDColorChannel) * (i + 1));
         if (!channels) {
-            *out_code = LOAD_OUT_OF_MEMORY;
+            *outCode = LOAD_OUT_OF_MEMORY;
             return 0;
         }
-        channels[i] = obj_2_channel;
+        channels[i] = obj2Channel;
         i++;
     }
     
-    free(obj_2_r);
-    free(obj_2_g);
-    free(obj_2_b);
+    free(obj2R);
+    free(obj2G);
+    free(obj2B);
 
     *outArray = channels;
 
     return i;
 }
 
-int parse_color_channels(const char *colorString, GDColorChannel **outArray, int *out_code) {
+int parseColorChannels(const char *colorString, GDColorChannel **outArray, int *outCode) {
     if (!colorString || !outArray) return 0;
 
     int count = 0;
     // Split string into each channel
-    char **entries = split_string(colorString, '|', &count, false);
+    char **entries = splitString(colorString, '|', &count, false);
     if (!entries) {
-        *out_code = LOAD_OUT_OF_MEMORY;
+        *outCode = LOAD_OUT_OF_MEMORY;
         return 0;
     }
 
     GDColorChannel *channels = (GDColorChannel *)malloc(sizeof(GDColorChannel) * count);
     if (!channels) {
-        output_log("Couldn't alloc color channels\n");
-        free_string_array(entries, count);
-        *out_code = LOAD_OUT_OF_MEMORY;
+        outputLog("Couldn't alloc color channels\n");
+        freeStringArray(entries, count);
+        *outCode = LOAD_OUT_OF_MEMORY;
         return 0;
     }
 
     for (int i = 0; i < count; i++) {
-        parse_color_channel(channels, i, entries[i]);
+        parseColorChannel(channels, i, entries[i]);
     }
 
     *outArray = channels;
-    free_string_array(entries, count);
+    freeStringArray(entries, count);
     return count;
 }
 
-GDValueType get_value_type_for_key(int key) {
+GDValueType getValueTypeForKey(int key) {
     switch (key) {
         case 1:  return GD_VAL_INT;    // Object ID
         case 2:  return GD_VAL_FLOAT;  // X Position
@@ -1115,7 +1115,7 @@ GDValueType get_value_type_for_key(int key) {
     }
 }
 
-int convert_object(int id) {
+int convertObject(int id) {
     switch (id) {
         case V2_0_LINE_TRIGGER:
             return LINE_TRIGGER;
@@ -1127,7 +1127,7 @@ int convert_object(int id) {
     return id;
 }
 
-int allocate_trigger_component(int obj) {
+int allocateTriggerComponent(int obj) {
     int index = -1;
     switch (objects.id[obj]) {
         case COL_TRIGGER:
@@ -1142,143 +1142,143 @@ int allocate_trigger_component(int obj) {
         case COL4_TRIGGER:
         case THREEDL_TRIGGER:
         case GROUND_2_TRIGGER:
-            index = trigger_pool_add(&col_pool, sizeof(ColorTrigger));
+            index = triggerPoolAdd(&colPool, sizeof(ColorTrigger));
             if (index >= 0) {
-                objects.trigger_index[obj] = index;
-                get_color_trigger(obj)->opacity = 1.0f;
+                objects.triggerIndex[obj] = index;
+                getColorTrigger(obj)->opacity = 1.0f;
             }
             break;
         case MOVE_TRIGGER:
-            index = trigger_pool_add(&move_pool, sizeof(MoveTrigger));
+            index = triggerPoolAdd(&movePool, sizeof(MoveTrigger));
             if (index >= 0) {
-                objects.trigger_index[obj] = index;
+                objects.triggerIndex[obj] = index;
             }
             break;
         case COUNT_TRIGGER:
-            index = trigger_pool_add(&count_pool, sizeof(CountTrigger));
+            index = triggerPoolAdd(&countPool, sizeof(CountTrigger));
             if (index >= 0) {
-                objects.trigger_index[obj] = index;
+                objects.triggerIndex[obj] = index;
             }
             break;
         case INSTANT_COUNT_TRIGGER:
-            index = trigger_pool_add(&instant_count_pool, sizeof(InstantCountTrigger));
+            index = triggerPoolAdd(&instantCountPool, sizeof(InstantCountTrigger));
             if (index >= 0) {
-                objects.trigger_index[obj] = index;
+                objects.triggerIndex[obj] = index;
             }
             break;
         case FOLLOW_PLAYER_Y_TRIGGER:
-            has_follow_player_y = true;
-            index = trigger_pool_add(&follow_player_y_pool, sizeof(FollowPlayerYTrigger));
+            hasFollowPlayerY = true;
+            index = triggerPoolAdd(&followPlayerYPool, sizeof(FollowPlayerYTrigger));
             if (index >= 0) {
-                objects.trigger_index[obj] = index;
+                objects.triggerIndex[obj] = index;
             }
             break;
         case FOLLOW_TRIGGER:
-            index = trigger_pool_add(&follow_pool, sizeof(FollowTrigger));
+            index = triggerPoolAdd(&followPool, sizeof(FollowTrigger));
             if (index >= 0) {
-                objects.trigger_index[obj] = index;
+                objects.triggerIndex[obj] = index;
             }
             break;
         case ALPHA_TRIGGER:
-            index = trigger_pool_add(&alpha_pool, sizeof(AlphaTrigger));
+            index = triggerPoolAdd(&alphaPool, sizeof(AlphaTrigger));
             if (index >= 0) {
-                objects.trigger_index[obj] = index;
-                get_alpha_trigger(obj)->trigger_opacity = 1.0f;
+                objects.triggerIndex[obj] = index;
+                getAlphaTrigger(obj)->triggerOpacity = 1.0f;
             }
             break;
         case PULSE_TRIGGER:
-            index = trigger_pool_add(&pulse_pool, sizeof(PulseTrigger));
+            index = triggerPoolAdd(&pulsePool, sizeof(PulseTrigger));
             if (index >= 0) {
-                objects.trigger_index[obj] = index;
-                get_pulse_trigger(obj)->opacity = 1.0f;
+                objects.triggerIndex[obj] = index;
+                getPulseTrigger(obj)->opacity = 1.0f;
             }
             break;
         case ENABLE_TRAIL: 
         case DISABLE_TRAIL:
         case HIDE_PLAYER_TRIGGER:
         case SHOW_PLAYER_TRIGGER:
-            index = trigger_pool_add(&simple_pool, sizeof(SimpleTrigger));
+            index = triggerPoolAdd(&simplePool, sizeof(SimpleTrigger));
             if (index >= 0) {
-                objects.trigger_index[obj] = index;
+                objects.triggerIndex[obj] = index;
             }
             break;
         case TOGGLE_TRIGGER:
         case TOGGLE_ORB:
-            index = trigger_pool_add(&toggle_pool, sizeof(ToggleTrigger));
+            index = triggerPoolAdd(&togglePool, sizeof(ToggleTrigger));
             if (index >= 0) {
-                objects.trigger_index[obj] = index;
+                objects.triggerIndex[obj] = index;
             }
             break;
         case TOUCH_TRIGGER:
-            index = trigger_pool_add(&touch_pool, sizeof(TouchTrigger));
+            index = triggerPoolAdd(&touchPool, sizeof(TouchTrigger));
             if (index >= 0) {
-                objects.trigger_index[obj] = index;
+                objects.triggerIndex[obj] = index;
             }
             break;
         case SPAWN_TRIGGER:
-            index = trigger_pool_add(&spawn_pool, sizeof(SpawnTrigger));
+            index = triggerPoolAdd(&spawnPool, sizeof(SpawnTrigger));
             if (index >= 0) {
-                objects.trigger_index[obj] = index;
+                objects.triggerIndex[obj] = index;
             }
             break;
         case STOP_TRIGGER:
-            index = trigger_pool_add(&stop_pool, sizeof(StopTrigger));
+            index = triggerPoolAdd(&stopPool, sizeof(StopTrigger));
             if (index >= 0) {
-                objects.trigger_index[obj] = index;
+                objects.triggerIndex[obj] = index;
             }
             break;
         case ON_DEATH_TRIGGER:
-            index = trigger_pool_add(&on_death_pool, sizeof(OnDeathTrigger));
+            index = triggerPoolAdd(&onDeathPool, sizeof(OnDeathTrigger));
             if (index >= 0) {
-                objects.trigger_index[obj] = index;
+                objects.triggerIndex[obj] = index;
             }
             break;
         case ROTATE_TRIGGER:
-            index = trigger_pool_add(&rotate_pool, sizeof(RotateTrigger));
+            index = triggerPoolAdd(&rotatePool, sizeof(RotateTrigger));
             if (index >= 0) {
-                objects.trigger_index[obj] = index;
+                objects.triggerIndex[obj] = index;
             }
             break;
     }
     return index;
 }
 
-void init_default_variables(int object) {
-    if (!is_valid_object(objects.id[object])) {
+void initDefaultVariables(int object) {
+    if (!isValidObject(objects.id[object])) {
         return;
     }
     
-    const GameObject *game_obj = &game_objects[objects.id[object]];
+    const GameObject *gameObj = &gameObjects[objects.id[object]];
 
-    objects.zlayer[object] = game_obj->z_layer;
-    objects.zorder[object] = game_obj->z_order;
+    objects.zlayer[object] = gameObj->zLayer;
+    objects.zorder[object] = gameObj->zOrder;
 }
 
-bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
+bool fillObjectData(int object, int key, GDValueType type, GDValue val) {
     
     // Default members
-    int trigger_index = objects.trigger_index[object];
+    int triggerIndex = objects.triggerIndex[object];
     switch (key) {
         case 1:  // ID
             if (type == GD_VAL_INT) {
-                objects.id[object] = convert_object(val.i);
+                objects.id[object] = convertObject(val.i);
 
-                init_default_variables(object);
-                if (is_complex_trigger_object(val.i) || is_simple_trigger_object(val.i) || val.i == TOGGLE_ORB) {
+                initDefaultVariables(object);
+                if (isComplexTriggerObject(val.i) || isSimpleTriggerObject(val.i) || val.i == TOGGLE_ORB) {
                     // Allocate its data
-                    trigger_index = allocate_trigger_component(object);
-                    if (trigger_index < 0) {
+                    triggerIndex = allocateTriggerComponent(object);
+                    if (triggerIndex < 0) {
                         return false;
                     }
                 }
 
                 if (objects.id[object] == TEXT_OBJECT) {
-                    int text_index = trigger_pool_add(&text_pool, sizeof(TextObject));
-                    objects.trigger_index[object] = (text_index < 0) ? -1 : text_index;
+                    int textIndex = triggerPoolAdd(&textPool, sizeof(TextObject));
+                    objects.triggerIndex[object] = (textIndex < 0) ? -1 : textIndex;
                 }
                 if (objects.id[object] == COUNTER_LABEL) {
-                    int counter_label_index = trigger_pool_add(&counter_label_pool, sizeof(CounterLabel));
-                    objects.trigger_index[object] = (counter_label_index < 0) ? -1 : counter_label_index;
+                    int counterLabelIndex = triggerPoolAdd(&counterLabelPool, sizeof(CounterLabel));
+                    objects.triggerIndex[object] = (counterLabelIndex < 0) ? -1 : counterLabelIndex;
                 }
 
             }
@@ -1286,14 +1286,14 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
         case 2:  // X
             if (type == GD_VAL_FLOAT) {
                 objects.x[object] = val.f;
-                objects.original_x[object] = val.f;
+                objects.originalX[object] = val.f;
             }
             break;
         case 3:  // Y
             if (type == GD_VAL_FLOAT) {
                 objects.y[object] = val.f;
-                objects.last_y[object] = val.f;
-                objects.original_y[object] = val.f;
+                objects.lastY[object] = val.f;
+                objects.originalY[object] = val.f;
             }
             break;
         case 4:  // FlippedH
@@ -1305,102 +1305,102 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
         case 6:  // Rotation
             if (type == GD_VAL_FLOAT) {
                 objects.rotation[object] = val.f;
-                objects.visual_rotation[object] = val.f;
+                objects.visualRotation[object] = val.f;
             }
             break;
         case 7:  // Color R
             if (type == GD_VAL_INT) {
-                if (is_color_trigger(objects.id[object])) {
-                    get_color_trigger(object)->trig_colorR = val.i;
+                if (isColorTrigger(objects.id[object])) {
+                    getColorTrigger(object)->trigColorR = val.i;
                 } else if (objects.id[object] == PULSE_TRIGGER) {
-                    get_pulse_trigger(object)->trig_colorR = val.i;
+                    getPulseTrigger(object)->trigColorR = val.i;
                 }
             }
             break;
         case 8:  // Color G
             if (type == GD_VAL_INT) {
-                if (is_color_trigger(objects.id[object])) {
-                    get_color_trigger(object)->trig_colorG = val.i;
+                if (isColorTrigger(objects.id[object])) {
+                    getColorTrigger(object)->trigColorG = val.i;
                 } else if (objects.id[object] == PULSE_TRIGGER) {
-                    get_pulse_trigger(object)->trig_colorG = val.i;
+                    getPulseTrigger(object)->trigColorG = val.i;
                 }
             }
             break;
         case 9:  // Color B
             if (type == GD_VAL_INT) {
-                if (is_color_trigger(objects.id[object])) {
-                    get_color_trigger(object)->trig_colorB = val.i;
+                if (isColorTrigger(objects.id[object])) {
+                    getColorTrigger(object)->trigColorB = val.i;
                 } else if (objects.id[object] == PULSE_TRIGGER) {
-                    get_pulse_trigger(object)->trig_colorB = val.i;
+                    getPulseTrigger(object)->trigColorB = val.i;
                 }
             }
             break;
         case 10: // Duration
             if (type == GD_VAL_FLOAT) {
-                if (is_color_trigger(objects.id[object])) {
-                    get_color_trigger(object)->trig_duration = val.f;
+                if (isColorTrigger(objects.id[object])) {
+                    getColorTrigger(object)->trigDuration = val.f;
                 } else {
                     switch (objects.id[object]) {
                         case MOVE_TRIGGER:
-                            get_move_trigger(object)->trig_duration = val.f;
+                            getMoveTrigger(object)->trigDuration = val.f;
                             break;
                         case ALPHA_TRIGGER:
-                            get_alpha_trigger(object)->trig_duration = val.f;
+                            getAlphaTrigger(object)->trigDuration = val.f;
                             break;
                         case PULSE_TRIGGER:
-                            get_pulse_trigger(object)->trig_duration = val.f;
+                            getPulseTrigger(object)->trigDuration = val.f;
                             break;
                         case SPAWN_TRIGGER:
-                            get_spawn_trigger(object)->trig_duration = val.f;
+                            getSpawnTrigger(object)->trigDuration = val.f;
                             break;
                         case ROTATE_TRIGGER:
-                            get_rotate_trigger(object)->trig_duration = val.f;
+                            getRotateTrigger(object)->trigDuration = val.f;
                             break;
                         case FOLLOW_TRIGGER:
-                            get_follow_trigger(object)->trig_duration = val.f;
+                            getFollowTrigger(object)->trigDuration = val.f;
                             break;
                     }
                 }
             }
             break;
         case 11: // Touch triggered
-            if (type == GD_VAL_BOOL) objects.touch_triggered[object] = val.b;
+            if (type == GD_VAL_BOOL) objects.touchTriggered[object] = val.b;
             break;
         case 14: // Tint Ground
-            if (type == GD_VAL_BOOL && is_color_trigger(objects.id[object])) {
-                get_color_trigger(object)->tintGround = val.b;
+            if (type == GD_VAL_BOOL && isColorTrigger(objects.id[object])) {
+                getColorTrigger(object)->tintGround = val.b;
             }
             break;
         case 15: // Player 1 color
-            if (type == GD_VAL_BOOL && is_color_trigger(objects.id[object])) {
-                get_color_trigger(object)->p1_color = val.b;
+            if (type == GD_VAL_BOOL && isColorTrigger(objects.id[object])) {
+                getColorTrigger(object)->p1Color = val.b;
             }
             break;
         case 16: // Player 2 color
-            if (type == GD_VAL_BOOL && is_color_trigger(objects.id[object])) {
-                get_color_trigger(object)->p2_color = val.b;
+            if (type == GD_VAL_BOOL && isColorTrigger(objects.id[object])) {
+                getColorTrigger(object)->p2Color = val.b;
             }
             break;
         case 17: // Blending
-            if (type == GD_VAL_BOOL && is_color_trigger(objects.id[object])) {
-                get_color_trigger(object)->blending = val.b;
+            if (type == GD_VAL_BOOL && isColorTrigger(objects.id[object])) {
+                getColorTrigger(object)->blending = val.b;
             }
             break;
         case 19: // 1.9 channel id
-            if (type == GD_VAL_INT) objects.v1p9_col_channel[object] = convert_one_point_nine_channel(val.i);
+            if (type == GD_VAL_INT) objects.v1p9ColChannel[object] = convertOnePointNineChannel(val.i);
             break;
         case 21: // Main col channel
-            if (type == GD_VAL_INT) objects.col_channel[object] = val.i;
+            if (type == GD_VAL_INT) objects.colChannel[object] = val.i;
             break;
         case 22: // Detail col channel
-            if (type == GD_VAL_INT) objects.detail_col_channel[object] = val.i;
+            if (type == GD_VAL_INT) objects.detailColChannel[object] = val.i;
             break;
         case 23: // Target color ID
             if (type == GD_VAL_INT) {
-                if (is_color_trigger(objects.id[object])) {
-                    get_color_trigger(object)->target_color_id = val.i;
+                if (isColorTrigger(objects.id[object])) {
+                    getColorTrigger(object)->targetColorID = val.i;
                 } else if (objects.id[object] == PULSE_TRIGGER) {
-                    get_pulse_trigger(object)->target_color_id = val.i;
+                    getPulseTrigger(object)->targetColorID = val.i;
                 }
             }
             break;
@@ -1412,37 +1412,37 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
             break;
         case 28: // Move offset X
             if (type == GD_VAL_FLOAT && objects.id[object] == MOVE_TRIGGER) {
-                get_move_trigger(object)->move_offset_x = val.f;
+                getMoveTrigger(object)->moveOffsetX = val.f;
             }
             break;
         case 29: // Move offset Y
             if (type == GD_VAL_FLOAT && objects.id[object] == MOVE_TRIGGER) {
-                get_move_trigger(object)->move_offset_y = val.f;
+                getMoveTrigger(object)->moveOffsetY = val.f;
             }
             break;
         case 30: // Move easing
             if (type == GD_VAL_INT) {
                 if (objects.id[object] == MOVE_TRIGGER) {
-                    get_move_trigger(object)->move_easing = val.i;
+                    getMoveTrigger(object)->moveEasing = val.i;
                 } else if (objects.id[object] == ROTATE_TRIGGER) {
-                    get_rotate_trigger(object)->rotate_easing = val.i;
+                    getRotateTrigger(object)->rotateEasing = val.i;
                 }
             }
             break;
         case 31: // Text
             if (type == GD_VAL_STRING && objects.id[object] == TEXT_OBJECT && val.str) {
-                fix_base64_url(val.str);
+                fixBase64URL(val.str);
 
                 char *decoded = (char *)malloc(strlen(val.str) + 1);
                 if (decoded) {
-                    int decoded_len = base64_decode(val.str, (unsigned char *)decoded);
+                    int decodedLen = base64Decode(val.str, (unsigned char *)decoded);
 
-                    if (decoded_len > 0 && is_ascii((unsigned char *)decoded, decoded_len)) {
-                        int len = decoded_len > MAX_TEXT_LEN ? MAX_TEXT_LEN : decoded_len;
-                        TextObject *text_obj = get_text_object(object);
-                        memcpy(text_obj->text, decoded, len);
-                        text_obj->text[len] = '\0';
-                        text_obj->len = (unsigned char)len;
+                    if (decodedLen > 0 && isAscii((unsigned char *)decoded, decodedLen)) {
+                        int len = decodedLen > MAX_TEXT_LEN ? MAX_TEXT_LEN : decodedLen;
+                        TextObject *textObj = getTextObject(object);
+                        memcpy(textObj->text, decoded, len);
+                        textObj->text[len] = '\0';
+                        textObj->len = (unsigned char)len;
                     }
 
                     free(decoded);
@@ -1451,118 +1451,118 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
             break;
         case 32: // Scale (uniform)
             if (type == GD_VAL_FLOAT) {
-                objects.scale_x[object] = objects.scale_y[object] = val.f;
-                objects.original_scale_x[object] = objects.original_scale_y[object] = val.f;
+                objects.scaleX[object] = objects.scaleY[object] = val.f;
+                objects.originalScaleX[object] = objects.originalScaleY[object] = val.f;
             }
             break;
         case 35: // Opacity (alpha trigger)
             if (type == GD_VAL_FLOAT) {
-                if (is_color_trigger(objects.id[object])) {
-                    get_color_trigger(object)->opacity = val.f;
+                if (isColorTrigger(objects.id[object])) {
+                    getColorTrigger(object)->opacity = val.f;
                 } else if (objects.id[object] == ALPHA_TRIGGER) {
-                    get_alpha_trigger(object)->trigger_opacity = val.f;
+                    getAlphaTrigger(object)->triggerOpacity = val.f;
                 } else if (objects.id[object] == PULSE_TRIGGER) {
-                    get_pulse_trigger(object)->opacity = val.f;
+                    getPulseTrigger(object)->opacity = val.f;
                 }
             }
             break;
         case 41: // main_col_HSV_enabled
-            if (type == GD_VAL_BOOL) objects.main_col_HSV_enabled[object] = val.b;
+            if (type == GD_VAL_BOOL) objects.mainColHSVEnabled[object] = val.b;
             break;
         case 42: // detail_col_HSV_enabled
-            if (type == GD_VAL_BOOL) objects.detail_col_HSV_enabled[object] = val.b;
+            if (type == GD_VAL_BOOL) objects.detailColHSVEnabled[object] = val.b;
             break;
         case 43: // main_col_HSV
-            if (type == GD_VAL_HSV) objects.main_col_HSV[object] = val.hsv;
+            if (type == GD_VAL_HSV) objects.mainColHSV[object] = val.hsv;
             break;
         case 44: // detail_col_HSV
-            if (type == GD_VAL_HSV) objects.detail_col_HSV[object] = val.hsv;
+            if (type == GD_VAL_HSV) objects.detailColHSV[object] = val.hsv;
             break;
         case 45: // pulse fade_in
             if (type == GD_VAL_FLOAT && objects.id[object] == PULSE_TRIGGER) {
-                get_pulse_trigger(object)->pulse_fade_in = val.f;
+                getPulseTrigger(object)->pulseFadeIn = val.f;
             }
             break;
         case 46: // pulse hold
             if (type == GD_VAL_FLOAT && objects.id[object] == PULSE_TRIGGER) {
-                get_pulse_trigger(object)->pulse_hold = val.f;
+                getPulseTrigger(object)->pulseHold = val.f;
             }
             break;
         case 47: // pulse fade_out
             if (type == GD_VAL_FLOAT && objects.id[object] == PULSE_TRIGGER) {
-                get_pulse_trigger(object)->pulse_fade_out = val.f;
+                getPulseTrigger(object)->pulseFadeOut = val.f;
             }
             break;
         case 48: // pulse_mode
             if (type == GD_VAL_INT && objects.id[object] == PULSE_TRIGGER) {
-                get_pulse_trigger(object)->pulse_mode = val.i;
+                getPulseTrigger(object)->pulseMode = val.i;
             }
             break;
         case 49: // copied_hsv
             if (type == GD_VAL_HSV) {
-                if (is_color_trigger(objects.id[object])) {
-                    get_color_trigger(object)->copied_hsv = val.hsv;
+                if (isColorTrigger(objects.id[object])) {
+                    getColorTrigger(object)->copiedHSV = val.hsv;
                 } else if (objects.id[object] == PULSE_TRIGGER) {
-                    get_pulse_trigger(object)->copied_hsv = val.hsv;
+                    getPulseTrigger(object)->copiedHSV = val.hsv;
                 }
             }
             break;
         case 50: // copied_color_id
             if (type == GD_VAL_INT) {
-                if (is_color_trigger(objects.id[object])) {
-                    get_color_trigger(object)->copied_color_id = val.i;
+                if (isColorTrigger(objects.id[object])) {
+                    getColorTrigger(object)->copiedColorID = val.i;
                 } else if (objects.id[object] == PULSE_TRIGGER) {
-                    get_pulse_trigger(object)->copied_color_id = val.i;
+                    getPulseTrigger(object)->copiedColorID = val.i;
                 }
             }
             break;
         case 51: // Target group
             if (type == GD_VAL_INT) {
-                if (is_color_trigger(objects.id[object])) {
-                    get_color_trigger(object)->target_group = val.i;
+                if (isColorTrigger(objects.id[object])) {
+                    getColorTrigger(object)->targetGroup = val.i;
                 } else {
                     switch (objects.id[object]) {
                         case MOVE_TRIGGER:
-                            get_move_trigger(object)->target_group = val.i;
+                            getMoveTrigger(object)->targetGroup = val.i;
                             break;
                         case COUNT_TRIGGER:
-                            get_count_trigger(object)->target_group = val.i;
+                            getCountTrigger(object)->targetGroup = val.i;
                             break;
                         case INSTANT_COUNT_TRIGGER:
-                            get_instant_count_trigger(object)->target_group = val.i;
+                            getInstantCountTrigger(object)->targetGroup = val.i;
                             break;
                         case FOLLOW_PLAYER_Y_TRIGGER:
-                            get_follow_player_y_trigger(object)->target_group = val.i;
+                            getFollowPlayerYTrigger(object)->targetGroup = val.i;
                             break;
                         case FOLLOW_TRIGGER:
-                            get_follow_trigger(object)->target_group = val.i;
+                            getFollowTrigger(object)->targetGroup = val.i;
                             break;
                         case ALPHA_TRIGGER:
-                            get_alpha_trigger(object)->target_group = val.i;
+                            getAlphaTrigger(object)->targetGroup = val.i;
                             break;
                         case PULSE_TRIGGER:
-                            get_pulse_trigger(object)->target_group = val.i;
+                            getPulseTrigger(object)->targetGroup = val.i;
                             break;
                         case TOGGLE_TRIGGER:
-                            get_toggle_trigger(object)->target_group = val.i;
+                            getToggleTrigger(object)->targetGroup = val.i;
                             break;
                         case TOGGLE_ORB:
-                            get_toggle_trigger(object)->target_group = val.i;
+                            getToggleTrigger(object)->targetGroup = val.i;
                             break;
                         case TOUCH_TRIGGER:
-                            get_touch_trigger(object)->target_group = val.i;
+                            getTouchTrigger(object)->targetGroup = val.i;
                             break;
                         case SPAWN_TRIGGER:
-                            get_spawn_trigger(object)->target_group = val.i;
+                            getSpawnTrigger(object)->targetGroup = val.i;
                             break;
                         case STOP_TRIGGER:
-                            get_stop_trigger(object)->target_group = val.i;
+                            getStopTrigger(object)->targetGroup = val.i;
                             break;
                         case ON_DEATH_TRIGGER:
-                            get_on_death_trigger(object)->target_group = val.i;
+                            getOnDeathTrigger(object)->targetGroup = val.i;
                             break;
                         case ROTATE_TRIGGER:
-                            get_rotate_trigger(object)->target_group = val.i;
+                            getRotateTrigger(object)->targetGroup = val.i;
                             break;
                     }
                 }
@@ -1570,81 +1570,81 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
             break;
         case 52: // pulse_target_type
             if (type == GD_VAL_INT && objects.id[object] == PULSE_TRIGGER) {
-                get_pulse_trigger(object)->pulse_target_type = val.i;
+                getPulseTrigger(object)->pulseTargetType = val.i;
             }
             break;
         case 54: // teleport portal Y offset
-            if (type == GD_VAL_FLOAT) objects.tp_y_offset[object] = val.f;
+            if (type == GD_VAL_FLOAT) objects.tpYOffset[object] = val.f;
             break;
         case 56: // Activate group
             if (type == GD_VAL_BOOL) {
                 if (objects.id[object] == TOGGLE_TRIGGER || objects.id[object] == TOGGLE_ORB) {
-                    get_toggle_trigger(object)->activate_group = val.b;
+                    getToggleTrigger(object)->activateGroup = val.b;
                 } else if (objects.id[object] == COUNT_TRIGGER) {
-                    get_count_trigger(object)->activate_group = val.b;
+                    getCountTrigger(object)->activateGroup = val.b;
                 } else if (objects.id[object] == INSTANT_COUNT_TRIGGER) {
-                    get_instant_count_trigger(object)->activate_group = val.b;
+                    getInstantCountTrigger(object)->activateGroup = val.b;
                 } else if (objects.id[object] == ON_DEATH_TRIGGER) {
-                    get_on_death_trigger(object)->activate = val.b;
+                    getOnDeathTrigger(object)->activate = val.b;
                 }
             }
             break;
         case 58: // Lock to player X
             if (type == GD_VAL_BOOL && objects.id[object] == MOVE_TRIGGER) {
-                get_move_trigger(object)->lock_to_player_x = val.b;
+                getMoveTrigger(object)->lockToPlayerX = val.b;
             }
             break;
         case 59: // Lock to player Y
             if (type == GD_VAL_BOOL && objects.id[object] == MOVE_TRIGGER) {
-                get_move_trigger(object)->lock_to_player_y = val.b;
+                getMoveTrigger(object)->lockToPlayerY = val.b;
             }
             break;
         case 62: // spawn_triggered
             if (type == GD_VAL_BOOL) {
-                if (is_color_trigger(objects.id[object])) {
-                    get_color_trigger(object)->spawn_triggered = val.b;
-                } else if (is_simple_trigger_object(objects.id[object])) {
-                    get_simple_trigger(object)->spawn_triggered = val.b;
+                if (isColorTrigger(objects.id[object])) {
+                    getColorTrigger(object)->spawnTriggered = val.b;
+                } else if (isSimpleTriggerObject(objects.id[object])) {
+                    getSimpleTrigger(object)->spawnTriggered = val.b;
                 } else {
                     switch (objects.id[object]) {
                         case MOVE_TRIGGER:
-                            get_move_trigger(object)->spawn_triggered = val.b;
+                            getMoveTrigger(object)->spawnTriggered = val.b;
                             break;
                         case FOLLOW_PLAYER_Y_TRIGGER:
-                            get_follow_player_y_trigger(object)->spawn_triggered = val.b;
+                            getFollowPlayerYTrigger(object)->spawnTriggered = val.b;
                             break;
                         case FOLLOW_TRIGGER:
-                            get_follow_trigger(object)->spawn_triggered = val.b;
+                            getFollowTrigger(object)->spawnTriggered = val.b;
                             break;
                         case ALPHA_TRIGGER:
-                            get_alpha_trigger(object)->spawn_triggered = val.b;
+                            getAlphaTrigger(object)->spawnTriggered = val.b;
                             break;
                         case PULSE_TRIGGER:
-                            get_pulse_trigger(object)->spawn_triggered = val.b;
+                            getPulseTrigger(object)->spawnTriggered = val.b;
                             break;
                         case TOGGLE_TRIGGER:
-                            get_toggle_trigger(object)->spawn_triggered = val.b;
+                            getToggleTrigger(object)->spawnTriggered = val.b;
                             break;
                         case TOUCH_TRIGGER:
-                            get_touch_trigger(object)->spawn_triggered = val.b;
+                            getTouchTrigger(object)->spawnTriggered = val.b;
                             break;
                         case SPAWN_TRIGGER:
-                            get_spawn_trigger(object)->spawn_triggered = val.b;
+                            getSpawnTrigger(object)->spawnTriggered = val.b;
                             break;
                         case ROTATE_TRIGGER:
-                            get_rotate_trigger(object)->spawn_triggered = val.b;
+                            getRotateTrigger(object)->spawnTriggered = val.b;
                             break;
                         case COUNT_TRIGGER:
-                            get_count_trigger(object)->spawn_triggered = val.b;
+                            getCountTrigger(object)->spawnTriggered = val.b;
                             break;
                         case INSTANT_COUNT_TRIGGER:
-                            get_instant_count_trigger(object)->spawn_triggered = val.b;
+                            getInstantCountTrigger(object)->spawnTriggered = val.b;
                             break;
                         case STOP_TRIGGER:
-                            get_stop_trigger(object)->spawn_triggered = val.b;
+                            getStopTrigger(object)->spawnTriggered = val.b;
                             break;
                         case ON_DEATH_TRIGGER:
-                            get_on_death_trigger(object)->spawn_triggered = val.b;
+                            getOnDeathTrigger(object)->spawnTriggered = val.b;
                             break;
                     }
                 }
@@ -1652,7 +1652,7 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
             break;
         case 63: // spawn_delay
             if (type == GD_VAL_FLOAT && objects.id[object] == SPAWN_TRIGGER) {
-                get_spawn_trigger(object)->spawn_delay = val.f;
+                getSpawnTrigger(object)->spawnDelay = val.f;
             }
             break;
         case 64: // dont fade
@@ -1662,12 +1662,12 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
             break;
         case 65: // pulse main_only
             if (type == GD_VAL_BOOL && objects.id[object] == PULSE_TRIGGER) {
-                get_pulse_trigger(object)->pulse_main_only = val.b;
+                getPulseTrigger(object)->pulseMainOnly = val.b;
             }
             break;
         case 66: // pulse detail_only
             if (type == GD_VAL_BOOL && objects.id[object] == PULSE_TRIGGER) {
-                get_pulse_trigger(object)->pulse_detail_only = val.b;
+                getPulseTrigger(object)->pulseDetailOnly = val.b;
             }
             break;
         case 67: // dont enter
@@ -1677,101 +1677,101 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
             break;
         case 68:
             if (type == GD_VAL_FLOAT && objects.id[object] == ROTATE_TRIGGER) {
-                get_rotate_trigger(object)->degrees = val.f;
+                getRotateTrigger(object)->degrees = val.f;
             }
             break;
         case 69:
             if (type == GD_VAL_INT && objects.id[object] == ROTATE_TRIGGER) {
-                get_rotate_trigger(object)->times360 = val.i;
+                getRotateTrigger(object)->times360 = val.i;
             }
             break;
         case 70:
             if (type == GD_VAL_BOOL && objects.id[object] == ROTATE_TRIGGER) {
-                get_rotate_trigger(object)->lock_object_rotation = val.b;
+                getRotateTrigger(object)->lockObjectRotation = val.b;
             }
             break;
         case 71:
             if (type == GD_VAL_INT && objects.id[object] == ROTATE_TRIGGER) {
-                get_rotate_trigger(object)->center_group = val.i;
+                getRotateTrigger(object)->centerGroup = val.i;
             } else if (type == GD_VAL_INT && objects.id[object] == FOLLOW_TRIGGER) {
-                get_follow_trigger(object)->follow_group = val.i;
+                getFollowTrigger(object)->followGroup = val.i;
             } else if (type == GD_VAL_INT && objects.id[object] == MOVE_TRIGGER) {
-                get_move_trigger(object)->target_group2 = val.i;
+                getMoveTrigger(object)->targetGroup2 = val.i;
             }
             break;
         case 72:
             if (type == GD_VAL_FLOAT && objects.id[object] == FOLLOW_TRIGGER) {
-                get_follow_trigger(object)->x_mod = val.f;
+                getFollowTrigger(object)->xMod = val.f;
             }
             break;
         case 73:
             if (type == GD_VAL_FLOAT && objects.id[object] == FOLLOW_TRIGGER) {
-                get_follow_trigger(object)->y_mod = val.f;
+                getFollowTrigger(object)->yMod = val.f;
             }
             break;
         case 85:
             if (type == GD_VAL_FLOAT && objects.id[object] == ROTATE_TRIGGER) {
-                get_rotate_trigger(object)->easing_rate = val.f;
+                getRotateTrigger(object)->easingRate = val.f;
             }
             break;
         case 81:
             if (type == GD_VAL_INT && objects.id[object] == TOUCH_TRIGGER) {
-                get_touch_trigger(object)->hold_mode = val.i != 0;
+                getTouchTrigger(object)->holdMode = val.i != 0;
             }
             break;
         case 82:
             if (type == GD_VAL_INT && objects.id[object] == TOUCH_TRIGGER) {
-                get_touch_trigger(object)->toggle_mode = (unsigned char)val.i;
+                getTouchTrigger(object)->toggleMode = (unsigned char)val.i;
             }
             break;
         case 89:
             break;
         case 87: // multi_triggered
             if (type == GD_VAL_BOOL) {
-                if (is_color_trigger(objects.id[object])) {
-                    get_color_trigger(object)->multi_triggered = val.b;
-                } else if (is_simple_trigger_object(objects.id[object])) {
-                    get_simple_trigger(object)->multi_triggered = val.b;
+                if (isColorTrigger(objects.id[object])) {
+                    getColorTrigger(object)->multiTriggered = val.b;
+                } else if (isSimpleTriggerObject(objects.id[object])) {
+                    getSimpleTrigger(object)->multiTriggered = val.b;
                 } else {
                     switch (objects.id[object]) {
                         case MOVE_TRIGGER:
-                            get_move_trigger(object)->multi_triggered = val.b;
+                            getMoveTrigger(object)->multiTriggered = val.b;
                             break;
                         case FOLLOW_PLAYER_Y_TRIGGER:
-                            get_follow_player_y_trigger(object)->multi_triggered = val.b;
+                            getFollowPlayerYTrigger(object)->multiTriggered = val.b;
                             break;
                         case FOLLOW_TRIGGER:
-                            get_follow_trigger(object)->multi_triggered = val.b;
+                            getFollowTrigger(object)->multiTriggered = val.b;
                             break;
                         case ALPHA_TRIGGER:
-                            get_alpha_trigger(object)->multi_triggered = val.b;
+                            getAlphaTrigger(object)->multiTriggered = val.b;
                             break;
                         case PULSE_TRIGGER:
-                            get_pulse_trigger(object)->multi_triggered = val.b;
+                            getPulseTrigger(object)->multiTriggered = val.b;
                             break;
                         case TOGGLE_TRIGGER:
-                            get_toggle_trigger(object)->multi_triggered = val.b;
+                            getToggleTrigger(object)->multiTriggered = val.b;
                             break;
                         case TOUCH_TRIGGER:
-                            get_touch_trigger(object)->multi_triggered = val.b;
+                            getTouchTrigger(object)->multiTriggered = val.b;
                             break;
                         case SPAWN_TRIGGER:
-                            get_spawn_trigger(object)->multi_triggered = val.b;
+                            getSpawnTrigger(object)->multiTriggered = val.b;
                             break;
                         case ROTATE_TRIGGER:
-                            get_rotate_trigger(object)->multi_triggered = val.b;
+                            getRotateTrigger(object)->multiTriggered = val.b;
                             break;
                         case COUNT_TRIGGER:
-                            get_count_trigger(object)->multi_triggered = val.b;
+                            getCountTrigger(object)->multiTriggered = val.b;
                             break;
                         case INSTANT_COUNT_TRIGGER:
-                            get_instant_count_trigger(object)->multi_triggered = val.b;
+                            getInstantCountTrigger(object)->multiTriggered = val.b;
                             break;
                         case STOP_TRIGGER:
-                            get_stop_trigger(object)->multi_triggered = val.b;
+                            getStopTrigger(object)->multiTriggered = val.b;
                             break;
                         case ON_DEATH_TRIGGER:
-                            get_on_death_trigger(object)->multi_triggered = val.b;
+                            getOnDeathTrigger(object)->multiTriggered = val.b;
                             break;
                     }
                 }
@@ -1779,43 +1779,43 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
             break;
         case 88:
             if (type == GD_VAL_INT && objects.id[object] == INSTANT_COUNT_TRIGGER) {
-                get_instant_count_trigger(object)->instant_count_mode = val.i;
+                getInstantCountTrigger(object)->instantCountMode = val.i;
             }
             break;
         case 77:
             if (type == GD_VAL_INT) {
                 if (objects.id[object] == COUNT_TRIGGER) {
-                    get_count_trigger(object)->target_count = val.i;
+                    getCountTrigger(object)->targetCount = val.i;
                 } else if (objects.id[object] == INSTANT_COUNT_TRIGGER) {
-                    get_instant_count_trigger(object)->target_count = val.i;
+                    getInstantCountTrigger(object)->targetCount = val.i;
                 }
             }
             break;
         case 78:
             if (type == GD_VAL_BOOL && val.b) {
-                PickupItem *pickup = ensure_pickup_item(object);
-                if (pickup) pickup->sub_count = true;
+                PickupItem *pickup = ensurePickupItem(object);
+                if (pickup) pickup->subCount = true;
             }
             break;
         case 80:
             if (type == GD_VAL_INT) {
                 switch (objects.id[object]) {
                     case COUNT_TRIGGER:
-                        get_count_trigger(object)->item_id = val.i;
+                        getCountTrigger(object)->itemID = val.i;
                         break;
                     case INSTANT_COUNT_TRIGGER:
-                        get_instant_count_trigger(object)->item_id = val.i;
+                        getInstantCountTrigger(object)->itemID = val.i;
                         break;
                     case COUNTER_LABEL:
                     {
-                        CounterLabel *label = get_counter_label(object);
-                        if (label) label->item_id = val.i;
+                        CounterLabel *label = getCounterLabel(object);
+                        if (label) label->itemID = val.i;
                         break;
                     }
                     default:
                     {
-                        PickupItem *pickup = ensure_pickup_item(object);
-                        if (pickup) pickup->item_id = val.i;
+                        PickupItem *pickup = ensurePickupItem(object);
+                        if (pickup) pickup->itemID = val.i;
                         break;
                     }
                 }
@@ -1823,61 +1823,61 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
             break;
         case 104:
             if (type == GD_VAL_BOOL && objects.id[object] == COUNT_TRIGGER) {
-                get_count_trigger(object)->multi_activate = val.b;
+                getCountTrigger(object)->multiActivate = val.b;
             }
             break;
         case 79:
         case 381:
             if (type == GD_VAL_BOOL && val.b) {
-                PickupItem *pickup = ensure_pickup_item(object);
-                if (pickup) pickup->is_pickup = true;
+                PickupItem *pickup = ensurePickupItem(object);
+                if (pickup) pickup->isPickup = true;
             }
             break;
         case 90:
             if (type == GD_VAL_FLOAT && objects.id[object] == FOLLOW_PLAYER_Y_TRIGGER) {
-                get_follow_player_y_trigger(object)->follow_speed = val.f;
+                getFollowPlayerYTrigger(object)->followSpeed = val.f;
             }
             break;
         case 91:
             if (type == GD_VAL_FLOAT && objects.id[object] == FOLLOW_PLAYER_Y_TRIGGER) {
-                get_follow_player_y_trigger(object)->follow_delay = val.f;
+                getFollowPlayerYTrigger(object)->followDelay = val.f;
             }
             break;
         case 92:
             if (type == GD_VAL_FLOAT && objects.id[object] == FOLLOW_PLAYER_Y_TRIGGER) {
-                get_follow_player_y_trigger(object)->follow_offset = val.f;
+                getFollowPlayerYTrigger(object)->followOffset = val.f;
             }
             break;
         case 105:
             if (type == GD_VAL_FLOAT && objects.id[object] == FOLLOW_PLAYER_Y_TRIGGER) {
-                get_follow_player_y_trigger(object)->follow_max_speed = val.f;
+                getFollowPlayerYTrigger(object)->followMaxSpeed = val.f;
             }
             break;
         case 128: // Scale X
             if (type == GD_VAL_FLOAT) {
-                objects.scale_x[object] = val.f;
-                objects.original_scale_x[object] = val.f;
+                objects.scaleX[object] = val.f;
+                objects.originalScaleX[object] = val.f;
             }
             break;
         case 129: // Scale Y
             if (type == GD_VAL_FLOAT) {
-                objects.scale_y[object] = val.f;
-                objects.original_scale_y[object] = val.f;
+                objects.scaleY[object] = val.f;
+                objects.originalScaleY[object] = val.f;
             }
             break;
         case 57: // Groups
             if (type == GD_VAL_INT_ARRAY) {
                 int gcount = 0;
                 for (int i = 0; i < MAX_GROUPS_PER_OBJECT; i++) {
-                    objects.groups[object][i] = val.int_array[i];
-                    if (val.int_array[i] != 0) gcount++;
+                    objects.groups[object][i] = val.intArray[i];
+                    if (val.intArray[i] != 0) gcount++;
                 }
-                objects.group_count[object] = gcount;
+                objects.groupCount[object] = gcount;
             }
             break;
         case 504:
             if (type == GD_VAL_BOOL && objects.id[object] == TOGGLE_ORB) {
-                get_toggle_trigger(object)->spawn_only = val.b;
+                getToggleTrigger(object)->spawnOnly = val.b;
             }
             break;
         case 99:
@@ -1887,45 +1887,45 @@ bool fill_object_data(int object, int key, GDValueType type, GDValue val) {
             break;
         case 100:
             if (type == GD_VAL_BOOL && objects.id[object] == MOVE_TRIGGER) {
-                get_move_trigger(object)->target_mode = val.b;
+                getMoveTrigger(object)->targetMode = val.b;
             }
             break;
         case 395:
             if (type == GD_VAL_INT && objects.id[object] == MOVE_TRIGGER) {
-                get_move_trigger(object)->center_group = val.i;
+                getMoveTrigger(object)->centerGroup = val.i;
             }
             break;
     }
     return true;
 }
 
-bool obj_has_main(const GameObject *obj) {
-    if (obj->color_type != COLOR_TYPE_DETAIL) return true;
+bool objHasMain(const GameObject *obj) {
+    if (obj->colorType != COLOR_TYPE_DETAIL) return true;
     
-    for (size_t i = 0; i < obj->child_count; i++) {
-        if (obj->children[i].color_type != COLOR_TYPE_DETAIL) return true;
+    for (size_t i = 0; i < obj->childCount; i++) {
+        if (obj->children[i].colorType != COLOR_TYPE_DETAIL) return true;
     }
     return false;
 }
 
-bool obj_has_detail(const GameObject *obj) {
-    if (obj->color_type == COLOR_TYPE_DETAIL) return true;
+bool objHasDetail(const GameObject *obj) {
+    if (obj->colorType == COLOR_TYPE_DETAIL) return true;
     
-    for (size_t i = 0; i < obj->child_count; i++) {
-        if (obj->children[i].color_type == COLOR_TYPE_DETAIL) return true;
+    for (size_t i = 0; i < obj->childCount; i++) {
+        if (obj->children[i].colorType == COLOR_TYPE_DETAIL) return true;
     }
     return false;
 }
 
-bool is_valid_object(int id) {
+bool isValidObject(int id) {
     return id >= 1 && id < GAME_OBJECT_COUNT;
 }
 
-int get_level_coin_count(void) {
-    return coin_count;
+int getLevelCoinCount(void) {
+    return coinCount;
 }
 
-bool is_color_trigger(int id) {
+bool isColorTrigger(int id) {
     return id == COL_TRIGGER
         || id == BG_TRIGGER
         || id == GROUND_TRIGGER
@@ -1940,8 +1940,8 @@ bool is_color_trigger(int id) {
         || id == GROUND_2_TRIGGER;
 }
 
-bool is_complex_trigger_object(int id) {
-    return is_color_trigger(id)
+bool isComplexTriggerObject(int id) {
+    return isColorTrigger(id)
         || id == MOVE_TRIGGER
         || id == ALPHA_TRIGGER
         || id == TOGGLE_TRIGGER
@@ -1958,7 +1958,7 @@ bool is_complex_trigger_object(int id) {
 }
 
 // Triggers that aren't configurable but have spawn triggered option
-bool is_simple_trigger_object(int id) {
+bool isSimpleTriggerObject(int id) {
     switch (id) {
         case HIDE_PLAYER_TRIGGER: 
         case SHOW_PLAYER_TRIGGER:
@@ -1970,8 +1970,8 @@ bool is_simple_trigger_object(int id) {
     }
 }
 
-bool is_trigger_object(int id) {
-    if (is_complex_trigger_object(id) || is_simple_trigger_object(id)) return true;
+bool isTriggerObject(int id) {
+    if (isComplexTriggerObject(id) || isSimpleTriggerObject(id)) return true;
     switch (id) {
         case TRIGGER_FADE_SIMPLE: case TRIGGER_FADE_UP: case TRIGGER_FADE_DOWN:
         case TRIGGER_FADE_RIGHT: case TRIGGER_FADE_LEFT:
@@ -1983,82 +1983,82 @@ bool is_trigger_object(int id) {
     }
 }
 
-bool trigger_is_spawn_triggered(int id, int obj) {
-    if (is_color_trigger(id)) return get_color_trigger(obj)->spawn_triggered;
-    if (is_simple_trigger_object(id)) return get_simple_trigger(obj)->spawn_triggered;
+bool triggerIsSpawnTriggered(int id, int obj) {
+    if (isColorTrigger(id)) return getColorTrigger(obj)->spawnTriggered;
+    if (isSimpleTriggerObject(id)) return getSimpleTrigger(obj)->spawnTriggered;
     switch (id) {
-        case MOVE_TRIGGER:   return get_move_trigger(obj)->spawn_triggered;
-        case COUNT_TRIGGER:  return get_count_trigger(obj)->spawn_triggered;
-        case INSTANT_COUNT_TRIGGER: return get_instant_count_trigger(obj)->spawn_triggered;
-        case FOLLOW_PLAYER_Y_TRIGGER: return get_follow_player_y_trigger(obj)->spawn_triggered;
-        case FOLLOW_TRIGGER: return get_follow_trigger(obj)->spawn_triggered;
-        case ALPHA_TRIGGER:  return get_alpha_trigger(obj)->spawn_triggered;
-        case PULSE_TRIGGER:  return get_pulse_trigger(obj)->spawn_triggered;
-        case TOGGLE_TRIGGER: return get_toggle_trigger(obj)->spawn_triggered;
-        case TOUCH_TRIGGER:  return get_touch_trigger(obj)->spawn_triggered;
-        case SPAWN_TRIGGER:  return get_spawn_trigger(obj)->spawn_triggered;
-        case ROTATE_TRIGGER: return get_rotate_trigger(obj)->spawn_triggered;
-        case STOP_TRIGGER:   return get_stop_trigger(obj)->spawn_triggered;
-        case ON_DEATH_TRIGGER: return get_on_death_trigger(obj)->spawn_triggered;
+        case MOVE_TRIGGER:   return getMoveTrigger(obj)->spawnTriggered;
+        case COUNT_TRIGGER:  return getCountTrigger(obj)->spawnTriggered;
+        case INSTANT_COUNT_TRIGGER: return getInstantCountTrigger(obj)->spawnTriggered;
+        case FOLLOW_PLAYER_Y_TRIGGER: return getFollowPlayerYTrigger(obj)->spawnTriggered;
+        case FOLLOW_TRIGGER: return getFollowTrigger(obj)->spawnTriggered;
+        case ALPHA_TRIGGER:  return getAlphaTrigger(obj)->spawnTriggered;
+        case PULSE_TRIGGER:  return getPulseTrigger(obj)->spawnTriggered;
+        case TOGGLE_TRIGGER: return getToggleTrigger(obj)->spawnTriggered;
+        case TOUCH_TRIGGER:  return getTouchTrigger(obj)->spawnTriggered;
+        case SPAWN_TRIGGER:  return getSpawnTrigger(obj)->spawnTriggered;
+        case ROTATE_TRIGGER: return getRotateTrigger(obj)->spawnTriggered;
+        case STOP_TRIGGER:   return getStopTrigger(obj)->spawnTriggered;
+        case ON_DEATH_TRIGGER: return getOnDeathTrigger(obj)->spawnTriggered;
     }
     return false;
 }
 
-bool trigger_is_multi_triggered(int id, int obj) {
-    if (is_color_trigger(id)) return get_color_trigger(obj)->multi_triggered;
-    if (is_simple_trigger_object(id)) return get_simple_trigger(obj)->multi_triggered;
+bool triggerIsMultiTriggered(int id, int obj) {
+    if (isColorTrigger(id)) return getColorTrigger(obj)->multiTriggered;
+    if (isSimpleTriggerObject(id)) return getSimpleTrigger(obj)->multiTriggered;
     switch (id) {
-        case MOVE_TRIGGER:   return get_move_trigger(obj)->multi_triggered;
-        case COUNT_TRIGGER:  return get_count_trigger(obj)->multi_triggered;
-        case INSTANT_COUNT_TRIGGER: return get_instant_count_trigger(obj)->multi_triggered;
-        case FOLLOW_PLAYER_Y_TRIGGER: return get_follow_player_y_trigger(obj)->multi_triggered;
-        case FOLLOW_TRIGGER: return get_follow_trigger(obj)->multi_triggered;
-        case ALPHA_TRIGGER:  return get_alpha_trigger(obj)->multi_triggered;
-        case PULSE_TRIGGER:  return get_pulse_trigger(obj)->multi_triggered;
-        case TOGGLE_TRIGGER: return get_toggle_trigger(obj)->multi_triggered;
-        case TOUCH_TRIGGER:  return get_touch_trigger(obj)->multi_triggered;
-        case SPAWN_TRIGGER:  return get_spawn_trigger(obj)->multi_triggered;
-        case ROTATE_TRIGGER: return get_rotate_trigger(obj)->multi_triggered;
-        case STOP_TRIGGER:   return get_stop_trigger(obj)->multi_triggered;
-        case ON_DEATH_TRIGGER: return get_on_death_trigger(obj)->multi_triggered;
+        case MOVE_TRIGGER:   return getMoveTrigger(obj)->multiTriggered;
+        case COUNT_TRIGGER:  return getCountTrigger(obj)->multiTriggered;
+        case INSTANT_COUNT_TRIGGER: return getInstantCountTrigger(obj)->multiTriggered;
+        case FOLLOW_PLAYER_Y_TRIGGER: return getFollowPlayerYTrigger(obj)->multiTriggered;
+        case FOLLOW_TRIGGER: return getFollowTrigger(obj)->multiTriggered;
+        case ALPHA_TRIGGER:  return getAlphaTrigger(obj)->multiTriggered;
+        case PULSE_TRIGGER:  return getPulseTrigger(obj)->multiTriggered;
+        case TOGGLE_TRIGGER: return getToggleTrigger(obj)->multiTriggered;
+        case TOUCH_TRIGGER:  return getTouchTrigger(obj)->multiTriggered;
+        case SPAWN_TRIGGER:  return getSpawnTrigger(obj)->multiTriggered;
+        case ROTATE_TRIGGER: return getRotateTrigger(obj)->multiTriggered;
+        case STOP_TRIGGER:   return getStopTrigger(obj)->multiTriggered;
+        case ON_DEATH_TRIGGER: return getOnDeathTrigger(obj)->multiTriggered;
     }
     return false;
 }
 
-static bool is_high_detail_object(const char *section, const char *end, float *out_x) {
-    if (!level_info.low_detail) return false;
+static bool isHighDetailObject(const char *section, const char *end, float *outX) {
+    if (!levelInfo.lowDetail) return false;
 
     if (!end) end = section + strlen(section);
 
-    bool high_detail = false;
+    bool highDetail = false;
     const char *p = section;
 
     while (p < end) {
-        char *key_end;
-        long key = strtol(p, &key_end, 10);
-        if (key_end == p || key_end >= end || *key_end != ',') break;
+        char *keyEnd;
+        long key = strtol(p, &keyEnd, 10);
+        if (keyEnd == p || keyEnd >= end || *keyEnd != ',') break;
 
-        const char *value = key_end + 1;
-        const char *value_end = value;
-        while (value_end < end && *value_end != ',') value_end++;
+        const char *value = keyEnd + 1;
+        const char *valueEnd = value;
+        while (valueEnd < end && *valueEnd != ',') valueEnd++;
 
         if (key == 103) {
-            high_detail = (value_end - value == 1 && value[0] == '1');
-        } else if (key == 2 && out_x) {
-            *out_x = atof(value);
+            highDetail = (valueEnd - value == 1 && value[0] == '1');
+        } else if (key == 2 && outX) {
+            *outX = atof(value);
         }
 
-        p = (value_end < end) ? value_end + 1 : end;
+        p = (valueEnd < end) ? valueEnd + 1 : end;
     }
 
-    return high_detail;
+    return highDetail;
 }
 
-int parse_gd_object(const char *objStr, const char *objEnd, int obj, int capacity) {
-    float high_detail_x = 0.f;
+int parseGdObject(const char *objStr, const char *objEnd, int obj, int capacity) {
+    float highDetailX = 0.f;
 
-    if (is_high_detail_object(objStr, objEnd, &high_detail_x)) {
-        if (high_detail_x > level_info.last_obj_x) level_info.last_obj_x = high_detail_x;
+    if (isHighDetailObject(objStr, objEnd, &highDetailX)) {
+        if (highDetailX > levelInfo.lastObjX) levelInfo.lastObjX = highDetailX;
         return -1;
     }
 
@@ -2066,9 +2066,9 @@ int parse_gd_object(const char *objStr, const char *objEnd, int obj, int capacit
 
     int count = 0;
     // Split object into each key
-    char **tokens = split_string(objStr, ',', &count, false);
+    char **tokens = splitString(objStr, ',', &count, false);
     if (count < 1) {
-        free_string_array(tokens, count);
+        freeStringArray(tokens, count);
         return 0;
     }
 
@@ -2076,75 +2076,75 @@ int parse_gd_object(const char *objStr, const char *objEnd, int obj, int capacit
     for (int i = 0; i + 1 < count; i += 2) {
         int key = atoi(tokens[i]);
         const char *valStr = tokens[i + 1];
-        GDValueType type = get_value_type_for_key(key);
+        GDValueType type = getValueTypeForKey(key);
         GDValue val;
 
         switch (type) {
             case GD_VAL_INT:
                 val.i = atoi(valStr);
-                if (!fill_object_data(obj, key, GD_VAL_INT, val)) {
+                if (!fillObjectData(obj, key, GD_VAL_INT, val)) {
                     return 0;
                 }
                 break;
             case GD_VAL_FLOAT:
                 val.f = atof(valStr);
-                if (!fill_object_data(obj, key, GD_VAL_FLOAT, val)) {
+                if (!fillObjectData(obj, key, GD_VAL_FLOAT, val)) {
                     return 0;
                 }
                 break;
             case GD_VAL_BOOL:
-                val.b = parse_bool(valStr);
-                if (!fill_object_data(obj, key, GD_VAL_BOOL, val)) {
+                val.b = parseBool(valStr);
+                if (!fillObjectData(obj, key, GD_VAL_BOOL, val)) {
                     return 0;
                 }
                 break;
             case GD_VAL_HSV:
-                val.hsv = parse_hsv_string(valStr);
-                if (!fill_object_data(obj, key, GD_VAL_HSV, val)) {
+                val.hsv = parseHSVString(valStr);
+                if (!fillObjectData(obj, key, GD_VAL_HSV, val)) {
                     return 0;
                 }
                 break;
             case GD_VAL_INT_ARRAY:
-                parse_ints(val.int_array, valStr);
-                fill_object_data(obj, key, GD_VAL_INT_ARRAY, val);
+                parseInts(val.intArray, valStr);
+                fillObjectData(obj, key, GD_VAL_INT_ARRAY, val);
                 break;
             case GD_VAL_STRING:
                 val.str = (char *) valStr;
-                fill_object_data(obj, key, GD_VAL_STRING, val);
+                fillObjectData(obj, key, GD_VAL_STRING, val);
                 break;
             default:
                 break;
         }
     }
 
-    int obj_id = objects.id[obj];
+    int objID = objects.id[obj];
     
-    if (is_valid_object(obj_id)) {
+    if (isValidObject(objID)) {
         // Get coins
-        if (obj_id == SECRET_COIN) {
-            if (coin_count < 3) {
-                coin_ids[coin_count++] = obj;
+        if (objID == SECRET_COIN) {
+            if (coinCount < 3) {
+                coinIds[coinCount++] = obj;
             }
         }
         
-        const GameObject *game_object = &game_objects[objects.id[obj]];
+        const GameObject *gameObject = &gameObjects[objects.id[obj]];
 
         // Get proper color channels
-        if (game_object->swap_base_detail) {
-            if (!obj_has_main(game_object)) {
-                if (!objects.col_channel[obj]) objects.col_channel[obj] = game_object->base_color;
+        if (gameObject->swapBaseDetail) {
+            if (!objHasMain(gameObject)) {
+                if (!objects.colChannel[obj]) objects.colChannel[obj] = gameObject->baseColor;
             } else {
-                if (!objects.detail_col_channel[obj]) objects.detail_col_channel[obj] = game_object->base_color;
+                if (!objects.detailColChannel[obj]) objects.detailColChannel[obj] = gameObject->baseColor;
             }
         } else {
-            if (!objects.col_channel[obj]) objects.col_channel[obj] = game_object->base_color;
-            if (!objects.detail_col_channel[obj]) objects.detail_col_channel[obj] = game_object->detail_color ? game_object->detail_color : 1;
+            if (!objects.colChannel[obj]) objects.colChannel[obj] = gameObject->baseColor;
+            if (!objects.detailColChannel[obj]) objects.detailColChannel[obj] = gameObject->detailColor ? gameObject->detailColor : 1;
         }
 
         // Give each object its own random value
         objects.random[obj] = rand();
 
-        const ObjectHitbox *hitbox = game_object->hitbox;
+        const ObjectHitbox *hitbox = gameObject->hitbox;
         if (hitbox) {
             objects.width[obj] = hitbox->width;
             objects.height[obj] = hitbox->height;
@@ -2162,7 +2162,7 @@ int parse_gd_object(const char *objStr, const char *objEnd, int obj, int capacit
                 objects.orientation[obj] = orientation;
             }
 
-            if (hitbox->collision_type == HITBOX_SOLID) {
+            if (hitbox->collisionType == HITBOX_SOLID) {
                 // Modify height and width depending on rotation
                 if ((int) fabsf(objects.rotation[obj]) % 180 != 0) {
                     objects.width[obj] = hitbox->height;
@@ -2175,41 +2175,41 @@ int parse_gd_object(const char *objStr, const char *objEnd, int obj, int capacit
 
             // precompute scaled hitbox dimensions (scale_x/scale_y)
             if (hitbox->type == COLLISION_CIRCLE) {
-                float s = fmaxf(fabsf(objects.scale_x[obj]), fabsf(objects.scale_y[obj]));
+                float s = fmaxf(fabsf(objects.scaleX[obj]), fabsf(objects.scaleY[obj]));
                 objects.width[obj] *= s;
-            } else if (hitbox->type == COLLISION_SLOPE || hitbox->collision_type == HITBOX_SOLID) {
+            } else if (hitbox->type == COLLISION_SLOPE || hitbox->collisionType == HITBOX_SOLID) {
                 if ((int) fabsf(objects.rotation[obj]) % 180 != 0) {
-                    objects.width[obj] *= fabsf(objects.scale_y[obj]);
-                    objects.height[obj] *= fabsf(objects.scale_x[obj]);
+                    objects.width[obj] *= fabsf(objects.scaleY[obj]);
+                    objects.height[obj] *= fabsf(objects.scaleX[obj]);
                 } else {
-                    objects.width[obj] *= fabsf(objects.scale_x[obj]);
-                    objects.height[obj] *= fabsf(objects.scale_y[obj]);
+                    objects.width[obj] *= fabsf(objects.scaleX[obj]);
+                    objects.height[obj] *= fabsf(objects.scaleY[obj]);
                 }
             } else {
-                objects.width[obj] *= fabsf(objects.scale_x[obj]);
-                objects.height[obj] *= fabsf(objects.scale_y[obj]);
+                objects.width[obj] *= fabsf(objects.scaleX[obj]);
+                objects.height[obj] *= fabsf(objects.scaleY[obj]);
             }
         }
 
         // Modify level ending pos
-        if (objects.x[obj] > level_info.last_obj_x) {
-            level_info.last_obj_x = objects.x[obj];
+        if (objects.x[obj] > levelInfo.lastObjX) {
+            levelInfo.lastObjX = objects.x[obj];
         }
-    } else if (!is_trigger_object(obj_id)) { // Keep trigger objects even if outside the table
+    } else if (!isTriggerObject(objID)) { // Keep trigger objects even if outside the table
         // Invalid object
         objects.id[obj] = 0;
     }
 
-    if (is_trigger_object(obj_id)) {
-        objects.width[obj] = 30 * fabsf(objects.scale_x[obj]);
-        objects.height[obj] = 30 * fabsf(objects.scale_y[obj]);
+    if (isTriggerObject(objID)) {
+        objects.width[obj] = 30 * fabsf(objects.scaleX[obj]);
+        objects.height[obj] = 30 * fabsf(objects.scaleY[obj]);
     }
 
-    if (object_can_be_x_moved(obj)) {
+    if (objectCanBeXMoved(obj)) {
         objects.flags[obj] |= FLAG_CAN_BE_X_MOVED;
     }
 
-    free_string_array(tokens, count);
+    freeStringArray(tokens, count);
     return 1;
 }
 
@@ -2223,180 +2223,180 @@ static u8 *objects_u8_block = NULL;
 static Color *objects_color_block = NULL;
 static HSV *objects_hsv_block = NULL;
 
-void free_arrays() {
-    has_follow_player_y = false;
-    col_pool = (TriggerPool){0};
-    move_pool = (TriggerPool){0};
-    count_pool = (TriggerPool){0};
-    instant_count_pool = (TriggerPool){0};
-    counter_label_pool = (TriggerPool){0};
-    pickup_pool = (TriggerPool){0};
-    follow_player_y_pool = (TriggerPool){0};
-    follow_pool = (TriggerPool){0};
-    alpha_pool = (TriggerPool){0};
-    pulse_pool = (TriggerPool){0};
-    toggle_pool = (TriggerPool){0};
-    touch_pool = (TriggerPool){0};
-    spawn_pool = (TriggerPool){0};
-    rotate_pool = (TriggerPool){0};
-    stop_pool = (TriggerPool){0};
-    on_death_pool = (TriggerPool){0};
-    simple_pool = (TriggerPool){0};
-    text_pool = (TriggerPool){0};
+void freeArrays() {
+    hasFollowPlayerY = false;
+    colPool = (TriggerPool){0};
+    movePool = (TriggerPool){0};
+    countPool = (TriggerPool){0};
+    instantCountPool = (TriggerPool){0};
+    counterLabelPool = (TriggerPool){0};
+    pickupPool = (TriggerPool){0};
+    followPlayerYPool = (TriggerPool){0};
+    followPool = (TriggerPool){0};
+    alphaPool = (TriggerPool){0};
+    pulsePool = (TriggerPool){0};
+    togglePool = (TriggerPool){0};
+    touchPool = (TriggerPool){0};
+    spawnPool = (TriggerPool){0};
+    rotatePool = (TriggerPool){0};
+    stopPool = (TriggerPool){0};
+    onDeathPool = (TriggerPool){0};
+    simplePool = (TriggerPool){0};
+    textPool = (TriggerPool){0};
 
     objects.random = NULL;
     objects.id = NULL;
     objects.x = NULL;
     objects.y = NULL;
-    objects.last_y = NULL;
+    objects.lastY = NULL;
     objects.rotation = NULL;
-    objects.visual_rotation = NULL;
+    objects.visualRotation = NULL;
     objects.zlayer = NULL;
     objects.zorder = NULL;
     objects.opacity = NULL;
-    objects.alpha_trigger_opacity = NULL;
+    objects.alphaTriggerOpacity = NULL;
     objects.width = NULL;
     objects.height = NULL;
-    objects.v1p9_col_channel = NULL;
-    objects.col_channel = NULL;
-    objects.detail_col_channel = NULL;
-    objects.trigger_index = NULL;
-    objects.hitbox_counter = NULL;
-    objects.transition_applied = NULL;
+    objects.v1p9ColChannel = NULL;
+    objects.colChannel = NULL;
+    objects.detailColChannel = NULL;
+    objects.triggerIndex = NULL;
+    objects.hitboxCounter = NULL;
+    objects.transitionApplied = NULL;
     objects.orientation = NULL;
-    objects.touch_triggered = NULL;
+    objects.touchTriggered = NULL;
     objects.flippedH = NULL;
     objects.flippedV = NULL;
     objects.groups = NULL;
-    objects.group_count = NULL;
+    objects.groupCount = NULL;
     objects.flags = NULL;
     objects.activated = NULL;
     objects.collided = NULL;
-    objects.original_x = NULL;
-    objects.original_y = NULL;
-    objects.num_main_pulses = NULL;
-    objects.num_detail_pulses = NULL;
-    objects.main_being_pulsed = NULL;
-    objects.detail_being_pulsed = NULL;
-    objects.main_non_pulse_color = NULL;
-    objects.detail_non_pulse_color = NULL;
-    objects.main_color = NULL;
-    objects.detail_color = NULL;
-    objects.main_col_HSV_enabled = NULL;
-    objects.detail_col_HSV_enabled = NULL;
-    objects.main_col_HSV = NULL;
-    objects.detail_col_HSV = NULL;
-    objects.cached_main_hsv_src_color = NULL;
-    objects.cached_detail_hsv_src_color = NULL;
-    objects.cached_main_hsv_color = NULL;
-    objects.cached_detail_hsv_color = NULL;
-    objects.cached_main_hsv_valid = NULL;
-    objects.cached_detail_hsv_valid = NULL;
-    objects.scale_x = NULL;
-    objects.scale_y = NULL;
-    objects.original_scale_x = NULL;
-    objects.original_scale_y = NULL;
-    objects.child_object = NULL;
-    objects.tp_y_offset = NULL;
-    objects.section_x = NULL;
-    objects.section_y = NULL;
-    objects.group_combination_index = NULL;
+    objects.originalX = NULL;
+    objects.originalY = NULL;
+    objects.numMainPulses = NULL;
+    objects.numDetailPulses = NULL;
+    objects.mainBeingPulsed = NULL;
+    objects.detailBeingPulsed = NULL;
+    objects.mainNonPulseColor = NULL;
+    objects.detailNonPulseColor = NULL;
+    objects.mainColor = NULL;
+    objects.detailColor = NULL;
+    objects.mainColHSVEnabled = NULL;
+    objects.detailColHSVEnabled = NULL;
+    objects.mainColHSV = NULL;
+    objects.detailColHSV = NULL;
+    objects.cachedMainHSVSrcColor = NULL;
+    objects.cachedDetailHSVSrcColor = NULL;
+    objects.cachedMainHSVColor = NULL;
+    objects.cachedDetailHSVColor = NULL;
+    objects.cachedMainHSVValid = NULL;
+    objects.cachedDetailHSVValid = NULL;
+    objects.scaleX = NULL;
+    objects.scaleY = NULL;
+    objects.originalScaleX = NULL;
+    objects.originalScaleY = NULL;
+    objects.childObject = NULL;
+    objects.tpYOffset = NULL;
+    objects.sectionX = NULL;
+    objects.sectionY = NULL;
+    objects.groupCombinationIndex = NULL;
 }
 
-bool init_arrays(size_t count) {
-    has_follow_player_y = false;
-    objects_int_block = (int *)arena_alloc(&level_arena, sizeof(int) * count * 9);
+bool initArrays(size_t count) {
+    hasFollowPlayerY = false;
+    objects_int_block = (int *)arenaAlloc(&levelArena, sizeof(int) * count * 9);
     if (!objects_int_block) return false;
 
-    objects_float_block = (float *)arena_alloc(&level_arena, sizeof(float) * count * 16);
+    objects_float_block = (float *)arenaAlloc(&levelArena, sizeof(float) * count * 16);
     if (!objects_float_block) return false;
 
-    objects_ushort_block = (unsigned short *)arena_alloc(&level_arena, sizeof(unsigned short) * count * 4);
+    objects_ushort_block = (unsigned short *)arenaAlloc(&levelArena, sizeof(unsigned short) * count * 4);
     if (!objects_ushort_block) return false;
 
-    objects_uchar_block = (unsigned char *)arena_alloc(&level_arena, sizeof(unsigned char) * count * 2);
+    objects_uchar_block = (unsigned char *)arenaAlloc(&levelArena, sizeof(unsigned char) * count * 2);
     if (!objects_uchar_block) return false;
 
-    objects_bool_block = (bool *)arena_alloc(&level_arena, sizeof(bool) * count * 9);
+    objects_bool_block = (bool *)arenaAlloc(&levelArena, sizeof(bool) * count * 9);
     if (!objects_bool_block) return false;
 
-    objects_groups_block = (short (*)[MAX_GROUPS_PER_OBJECT])arena_alloc(&level_arena, sizeof(short[MAX_GROUPS_PER_OBJECT]) * count);
+    objects_groups_block = (short (*)[MAX_GROUPS_PER_OBJECT])arenaAlloc(&levelArena, sizeof(short[MAX_GROUPS_PER_OBJECT]) * count);
     if (!objects_groups_block) return false;
 
-    objects_u8_block = (u8 *)arena_alloc(&level_arena, sizeof(u8) * count * 6);
+    objects_u8_block = (u8 *)arenaAlloc(&levelArena, sizeof(u8) * count * 6);
     if (!objects_u8_block) return false;
 
-    objects_color_block = (Color *)arena_alloc(&level_arena, sizeof(Color) * count * 8);
+    objects_color_block = (Color *)arenaAlloc(&levelArena, sizeof(Color) * count * 8);
     if (!objects_color_block) return false;
 
-    objects_hsv_block = (HSV *)arena_alloc(&level_arena, sizeof(HSV) * count * 2);
+    objects_hsv_block = (HSV *)arenaAlloc(&levelArena, sizeof(HSV) * count * 2);
     if (!objects_hsv_block) return false;
 
     objects.random = objects_int_block + 0 * count;
     objects.id = objects_int_block + 1 * count;
     objects.zlayer = objects_int_block + 2 * count;
     objects.zorder = objects_int_block + 3 * count;
-    objects.trigger_index = objects_int_block + 4 * count;
-    objects.child_object = objects_int_block + 5 * count;
-    objects.section_x = objects_int_block + 6 * count;
-    objects.section_y = objects_int_block + 7 * count;
-    objects.group_combination_index = objects_int_block + 8 * count;
+    objects.triggerIndex = objects_int_block + 4 * count;
+    objects.childObject = objects_int_block + 5 * count;
+    objects.sectionX = objects_int_block + 6 * count;
+    objects.sectionY = objects_int_block + 7 * count;
+    objects.groupCombinationIndex = objects_int_block + 8 * count;
 
     objects.x = objects_float_block + 0 * count;
     objects.y = objects_float_block + 1 * count;
-    objects.last_y = objects_float_block + 2 * count;
+    objects.lastY = objects_float_block + 2 * count;
     objects.rotation = objects_float_block + 3 * count;
-    objects.visual_rotation = objects_float_block + 4 * count;
+    objects.visualRotation = objects_float_block + 4 * count;
     objects.opacity = objects_float_block + 5 * count;
-    objects.alpha_trigger_opacity = objects_float_block + 6 * count;
+    objects.alphaTriggerOpacity = objects_float_block + 6 * count;
     objects.width = objects_float_block + 7 * count;
     objects.height = objects_float_block + 8 * count;
-    objects.original_x = objects_float_block + 9 * count;
-    objects.original_y = objects_float_block + 10 * count;
-    objects.scale_x = objects_float_block + 11 * count;
-    objects.scale_y = objects_float_block + 12 * count;
-    objects.original_scale_x = objects_float_block + 13 * count;
-    objects.original_scale_y = objects_float_block + 14 * count;
-    objects.tp_y_offset = objects_float_block + 15 * count;
+    objects.originalX = objects_float_block + 9 * count;
+    objects.originalY = objects_float_block + 10 * count;
+    objects.scaleX = objects_float_block + 11 * count;
+    objects.scaleY = objects_float_block + 12 * count;
+    objects.originalScaleX = objects_float_block + 13 * count;
+    objects.originalScaleY = objects_float_block + 14 * count;
+    objects.tpYOffset = objects_float_block + 15 * count;
 
-    objects.v1p9_col_channel = objects_ushort_block + 0 * count;
-    objects.col_channel = objects_ushort_block + 1 * count;
-    objects.detail_col_channel = objects_ushort_block + 2 * count;
-    objects.hitbox_counter = (unsigned char *)(objects_ushort_block + 3 * count);
+    objects.v1p9ColChannel = objects_ushort_block + 0 * count;
+    objects.colChannel = objects_ushort_block + 1 * count;
+    objects.detailColChannel = objects_ushort_block + 2 * count;
+    objects.hitboxCounter = (unsigned char *)(objects_ushort_block + 3 * count);
 
-    objects.transition_applied = objects_uchar_block + 0 * count;
+    objects.transitionApplied = objects_uchar_block + 0 * count;
     objects.orientation = objects_uchar_block + 1 * count;
 
-    objects.touch_triggered = objects_bool_block + 0 * count;
+    objects.touchTriggered = objects_bool_block + 0 * count;
     objects.flippedH = objects_bool_block + 1 * count;
     objects.flippedV = objects_bool_block + 2 * count;
-    objects.main_being_pulsed = objects_bool_block + 3 * count;
-    objects.detail_being_pulsed = objects_bool_block + 4 * count;
-    objects.main_col_HSV_enabled = objects_bool_block + 5 * count;
-    objects.detail_col_HSV_enabled = objects_bool_block + 6 * count;
-    objects.cached_main_hsv_valid = objects_bool_block + 7 * count;
-    objects.cached_detail_hsv_valid = objects_bool_block + 8 * count;
+    objects.mainBeingPulsed = objects_bool_block + 3 * count;
+    objects.detailBeingPulsed = objects_bool_block + 4 * count;
+    objects.mainColHSVEnabled = objects_bool_block + 5 * count;
+    objects.detailColHSVEnabled = objects_bool_block + 6 * count;
+    objects.cachedMainHSVValid = objects_bool_block + 7 * count;
+    objects.cachedDetailHSVValid = objects_bool_block + 8 * count;
 
     objects.groups = objects_groups_block;
 
-    objects.group_count = objects_u8_block + 0 * count;
+    objects.groupCount = objects_u8_block + 0 * count;
     objects.flags = objects_u8_block + 1 * count;
     objects.activated = objects_u8_block + 2 * count;
     objects.collided = objects_u8_block + 3 * count;
-    objects.num_main_pulses = objects_u8_block + 4 * count;
-    objects.num_detail_pulses = objects_u8_block + 5 * count;
+    objects.numMainPulses = objects_u8_block + 4 * count;
+    objects.numDetailPulses = objects_u8_block + 5 * count;
 
-    objects.main_non_pulse_color = objects_color_block + 0 * count;
-    objects.detail_non_pulse_color = objects_color_block + 1 * count;
-    objects.main_color = objects_color_block + 2 * count;
-    objects.detail_color = objects_color_block + 3 * count;
-    objects.cached_main_hsv_src_color = objects_color_block + 4 * count;
-    objects.cached_detail_hsv_src_color = objects_color_block + 5 * count;
-    objects.cached_main_hsv_color = objects_color_block + 6 * count;
-    objects.cached_detail_hsv_color = objects_color_block + 7 * count;
+    objects.mainNonPulseColor = objects_color_block + 0 * count;
+    objects.detailNonPulseColor = objects_color_block + 1 * count;
+    objects.mainColor = objects_color_block + 2 * count;
+    objects.detailColor = objects_color_block + 3 * count;
+    objects.cachedMainHSVSrcColor = objects_color_block + 4 * count;
+    objects.cachedDetailHSVSrcColor = objects_color_block + 5 * count;
+    objects.cachedMainHSVColor = objects_color_block + 6 * count;
+    objects.cachedDetailHSVColor = objects_color_block + 7 * count;
 
-    objects.main_col_HSV = objects_hsv_block + 0 * count;
-    objects.detail_col_HSV = objects_hsv_block + 1 * count;
+    objects.mainColHSV = objects_hsv_block + 0 * count;
+    objects.detailColHSV = objects_hsv_block + 1 * count;
 
     // Initialize the values
     memset(objects.random,             0, sizeof(int) * count);
@@ -2404,99 +2404,99 @@ bool init_arrays(size_t count) {
     memset(objects.x,                  0, sizeof(float) * count);
     memset(objects.y,                  0, sizeof(float) * count);
     memset(objects.rotation,           0, sizeof(float) * count);
-    memset(objects.visual_rotation,    0, sizeof(float) * count);
+    memset(objects.visualRotation,    0, sizeof(float) * count);
     memset(objects.zlayer,             0, sizeof(int) * count);
     memset(objects.zorder,             0, sizeof(int) * count);
     memset(objects.opacity,            0, sizeof(float) * count);
-    memset(objects.alpha_trigger_opacity, 0, sizeof(float) * count);
+    memset(objects.alphaTriggerOpacity, 0, sizeof(float) * count);
     memset(objects.width,              0, sizeof(float) * count);
     memset(objects.height,             0, sizeof(float) * count);
-    memset(objects.v1p9_col_channel,   0, sizeof(unsigned short) * count);
-    memset(objects.col_channel,        0, sizeof(unsigned short) * count);
-    memset(objects.detail_col_channel, 0, sizeof(unsigned short) * count);
-    memset(objects.trigger_index,      0, sizeof(int) * count);
-    memset(objects.hitbox_counter,     0, sizeof(unsigned short) * count);
-    memset(objects.transition_applied, 0, sizeof(unsigned char) * count);
+    memset(objects.v1p9ColChannel,   0, sizeof(unsigned short) * count);
+    memset(objects.colChannel,        0, sizeof(unsigned short) * count);
+    memset(objects.detailColChannel, 0, sizeof(unsigned short) * count);
+    memset(objects.triggerIndex,      0, sizeof(int) * count);
+    memset(objects.hitboxCounter,     0, sizeof(unsigned short) * count);
+    memset(objects.transitionApplied, 0, sizeof(unsigned char) * count);
     memset(objects.orientation,        0, sizeof(unsigned char) * count);
-    memset(objects.touch_triggered,    0, sizeof(bool) * count);
+    memset(objects.touchTriggered,    0, sizeof(bool) * count);
     memset(objects.flippedH,           0, sizeof(bool) * count);
     memset(objects.flippedV,           0, sizeof(bool) * count);
     memset(objects.groups,             0, sizeof(short[MAX_GROUPS_PER_OBJECT]) * count);
-    memset(objects.group_count,        0, sizeof(u8) * count);
+    memset(objects.groupCount,        0, sizeof(u8) * count);
     memset(objects.flags,              0, sizeof(u8) * count);
     memset(objects.activated,          0, sizeof(u8) * count);
     memset(objects.collided,           0, sizeof(u8) * count);
 
     for (size_t i = 0; i < count; i++) {
-        objects.alpha_trigger_opacity[i] = 1.0f;
-        objects.scale_x[i] = 1.0f;
-        objects.scale_y[i] = 1.0f;
-        objects.original_scale_x[i] = 1.0f;
-        objects.original_scale_y[i] = 1.0f;
+        objects.alphaTriggerOpacity[i] = 1.0f;
+        objects.scaleX[i] = 1.0f;
+        objects.scaleY[i] = 1.0f;
+        objects.originalScaleX[i] = 1.0f;
+        objects.originalScaleY[i] = 1.0f;
     }
 
-    memset(objects.num_main_pulses,    0, sizeof(u8) * count);
-    memset(objects.num_detail_pulses,  0, sizeof(u8) * count);
-    memset(objects.main_being_pulsed,  0, sizeof(bool) * count);
-    memset(objects.detail_being_pulsed,0, sizeof(bool) * count);
+    memset(objects.numMainPulses,    0, sizeof(u8) * count);
+    memset(objects.numDetailPulses,  0, sizeof(u8) * count);
+    memset(objects.mainBeingPulsed,  0, sizeof(bool) * count);
+    memset(objects.detailBeingPulsed,0, sizeof(bool) * count);
 
     for (size_t i = 0; i < count; i++) {
-        objects.main_non_pulse_color[i].r = 255;
-        objects.main_non_pulse_color[i].g = 255;
-        objects.main_non_pulse_color[i].b = 255;
-        objects.detail_non_pulse_color[i].r = 255;
-        objects.detail_non_pulse_color[i].g = 255;
-        objects.detail_non_pulse_color[i].b = 255;
-        objects.main_color[i].r = 255;
-        objects.main_color[i].g = 255;
-        objects.main_color[i].b = 255;
-        objects.detail_color[i].r = 255;
-        objects.detail_color[i].g = 255;
-        objects.detail_color[i].b = 255;
+        objects.mainNonPulseColor[i].r = 255;
+        objects.mainNonPulseColor[i].g = 255;
+        objects.mainNonPulseColor[i].b = 255;
+        objects.detailNonPulseColor[i].r = 255;
+        objects.detailNonPulseColor[i].g = 255;
+        objects.detailNonPulseColor[i].b = 255;
+        objects.mainColor[i].r = 255;
+        objects.mainColor[i].g = 255;
+        objects.mainColor[i].b = 255;
+        objects.detailColor[i].r = 255;
+        objects.detailColor[i].g = 255;
+        objects.detailColor[i].b = 255;
     }
 
-    memset(objects.main_col_HSV_enabled,   0, sizeof(bool) * count);
-    memset(objects.detail_col_HSV_enabled, 0, sizeof(bool) * count);
-    memset(objects.main_col_HSV,           0, sizeof(HSV) * count);
-    memset(objects.detail_col_HSV,         0, sizeof(HSV) * count);
-    memset(objects.cached_main_hsv_src_color,  0, sizeof(Color) * count);
-    memset(objects.cached_detail_hsv_src_color, 0, sizeof(Color) * count);
-    memset(objects.cached_main_hsv_color,       0, sizeof(Color) * count);
-    memset(objects.cached_detail_hsv_color,     0, sizeof(Color) * count);
-    memset(objects.cached_main_hsv_valid,       0, sizeof(bool) * count);
-    memset(objects.cached_detail_hsv_valid,     0, sizeof(bool) * count);
+    memset(objects.mainColHSVEnabled,   0, sizeof(bool) * count);
+    memset(objects.detailColHSVEnabled, 0, sizeof(bool) * count);
+    memset(objects.mainColHSV,           0, sizeof(HSV) * count);
+    memset(objects.detailColHSV,         0, sizeof(HSV) * count);
+    memset(objects.cachedMainHSVSrcColor,  0, sizeof(Color) * count);
+    memset(objects.cachedDetailHSVSrcColor, 0, sizeof(Color) * count);
+    memset(objects.cachedMainHSVColor,       0, sizeof(Color) * count);
+    memset(objects.cachedDetailHSVColor,     0, sizeof(Color) * count);
+    memset(objects.cachedMainHSVValid,       0, sizeof(bool) * count);
+    memset(objects.cachedDetailHSVValid,     0, sizeof(bool) * count);
 
     for (size_t i = 0; i < count; i++) {
-        objects.child_object[i] = -1;
-        objects.tp_y_offset[i] = 0.0f;
+        objects.childObject[i] = -1;
+        objects.tpYOffset[i] = 0.0f;
     }
 
-    memset(objects.section_x,           0, sizeof(int) * count);
-    memset(objects.section_y,           0, sizeof(int) * count);
-    memset(objects.group_combination_index, 0, sizeof(int) * count);
+    memset(objects.sectionX,           0, sizeof(int) * count);
+    memset(objects.sectionY,           0, sizeof(int) * count);
+    memset(objects.groupCombinationIndex, 0, sizeof(int) * count);
 
     return true;
 }
 
-int compare_coins(const void *a, const void *b) {
+int compareCoins(const void *a, const void *b) {
     const int *c1 = (const int *)a;
     const int *c2 = (const int *)b;
 
     return objects.x[*c1] - objects.x[*c2];
 }
 
-int parse_string(char *levelString, int extra_slots, int *out_object_count) {
+int parseString(char *levelString, int extraSlots, int *outObjectCount) {
     int sectionCount = 0;
 
     // Count sections
     const char *sectionStart = levelString;
     char *cursor = levelString;
-    int high_detail_count = 0;
+    int highDetailCount = 0;
     while(true) {
         if (*cursor == ';' || *cursor == '\0') {
             if (cursor > sectionStart) {
-                if (sectionCount > 0 && is_high_detail_object(sectionStart, cursor, NULL)) {
-                    high_detail_count++;
+                if (sectionCount > 0 && isHighDetailObject(sectionStart, cursor, NULL)) {
+                    highDetailCount++;
                 }
                 sectionCount++;
             }
@@ -2507,26 +2507,26 @@ int parse_string(char *levelString, int extra_slots, int *out_object_count) {
     }
 
     if (sectionCount < 1) {
-        output_log("Level string missing sections!\n");
+        outputLog("Level string missing sections!\n");
         return LOAD_LEVEL_STRING_MISSING_SECTIONS;
     }
     
     int objectCount = sectionCount - 1;
-    int parse_capacity = objectCount - high_detail_count;
-    int alloc_count = parse_capacity + extra_slots;
+    int parseCapacity = objectCount - highDetailCount;
+    int allocCount = parseCapacity + extraSlots;
 
-    if (!init_arrays(alloc_count)) {
-        free_arrays();
-        output_log("Failed to allocate object array\n");
+    if (!initArrays(allocCount)) {
+        freeArrays();
+        outputLog("Failed to allocate object array\n");
         return LOAD_OUT_OF_MEMORY;
     }
 
-    objects.count = alloc_count;
+    objects.count = allocCount;
 
     printf("Parsing string and converting objects...\n");
-    printf("Aproximately %d bytes of pure objects\n", sizeof(ObjectsArray) * alloc_count);
+    printf("Aproximately %d bytes of pure objects\n", sizeof(ObjectsArray) * allocCount);
     
-    coin_count = 0;
+    coinCount = 0;
 
     sectionStart = levelString;
     int sectionIndex = 0;
@@ -2535,68 +2535,68 @@ int parse_string(char *levelString, int extra_slots, int *out_object_count) {
     cursor = levelString;
     while (true) {
         if (*cursor == ';' || *cursor == '\0') {
-            bool at_end = *cursor == '\0';
+            bool atEnd = *cursor == '\0';
             if (cursor > sectionStart) {
-                if (!at_end) *cursor = '\0';
+                if (!atEnd) *cursor = '\0';
                 if (sectionIndex > 0) {
                     // Parse
-                    int parsed = parse_gd_object(sectionStart, cursor, objectIndex, parse_capacity);
+                    int parsed = parseGdObject(sectionStart, cursor, objectIndex, parseCapacity);
                     if (parsed == -2) {
-                        output_log("Object capacity exceeded\n");
-                        free_arrays();
+                        outputLog("Object capacity exceeded\n");
+                        freeArrays();
                         return LOAD_OUT_OF_MEMORY;
                     }
                     if (parsed > 0) {
-                        assign_object_to_section(objectIndex);
+                        assignObjectToSection(objectIndex);
                         objectIndex++;
                     } else if (!parsed) {
-                        output_log("Failed to parse object %d\n", objectIndex);
-                        free_arrays();
+                        outputLog("Failed to parse object %d\n", objectIndex);
+                        freeArrays();
                         return LOAD_COULDNT_PARSE_OBJECTS;
                     }
                 }
                 sectionIndex++;
             }
-            if (at_end) break;
+            if (atEnd) break;
             sectionStart = cursor + 1;
         }
         cursor++;
     }
 
-    objects.count = objectIndex + extra_slots;
+    objects.count = objectIndex + extraSlots;
 
-    if (out_object_count) *out_object_count = objectIndex;
+    if (outObjectCount) *outObjectCount = objectIndex;
 
     for (int i = 0; i < objectIndex; i++) {
-        for (int g = 0; g < objects.group_count[i]; g++) {
-            int group_id = objects.groups[i][g];
-            if (group_id > 0) {
-                add_to_group(i, group_id);
+        for (int g = 0; g < objects.groupCount[i]; g++) {
+            int groupID = objects.groups[i][g];
+            if (groupID > 0) {
+                addToGroup(i, groupID);
             }
         }
     }
 
-    qsort(coin_ids, coin_count, sizeof(int), compare_coins);
+    qsort(coinIds, coinCount, sizeof(int), compareCoins);
 
     // Set IDs here
-    for (int i = 0; i < coin_count; i++) {
-        objects.coin_id[coin_ids[i]] = i;
+    for (int i = 0; i < coinCount; i++) {
+        objects.coinID[coinIds[i]] = i;
         //output_log("Le coin %d on objeto %d\n", i, coin_ids[i]);
     }
     
-    level_info.last_obj_x += (11 * 30.f);
+    levelInfo.lastObjX += (11 * 30.f);
 
     for (int i = 1; i < MAX_GROUPS; i++) {
-        sort_group(i);
+        sortGroup(i);
     }
 
     return LOAD_NO_ERROR;
 }
 
-static int stream_level_input(const LevelStreamInput *input, LevelStreamCallback callback, void *context) {
+static int streamLevelInput(const LevelStreamInput *input, LevelStreamCallback callback, void *context) {
     // Check if uncompressed
-    if (input->raw_data) {
-        return callback((const unsigned char *)input->raw_data, strlen(input->raw_data), context);
+    if (input->rawData) {
+        return callback((const unsigned char *)input->rawData, strlen(input->rawData), context);
     }
 
     z_stream stream = {0};
@@ -2607,25 +2607,25 @@ static int stream_level_input(const LevelStreamInput *input, LevelStreamCallback
     }
 
     unsigned char buffer[4096];
-    size_t input_offset = 0;
+    size_t inputOffset = 0;
     int result = LOAD_INVALID_COMPRESSED_DATA;
     bool complete = false;
 
     while (!complete) {
-        if (stream.avail_in == 0 && input_offset < input->compressed_len) {
+        if (stream.avail_in == 0 && inputOffset < input->compressedLen) {
             // Give more data to zlib
-            size_t chunk_len = input->compressed_len - input_offset;
-            stream.next_in = input->compressed_data + input_offset;
-            stream.avail_in = chunk_len;
-            input_offset += chunk_len;
+            size_t chunkLen = input->compressedLen - inputOffset;
+            stream.next_in = input->compressedData + inputOffset;
+            stream.avail_in = chunkLen;
+            inputOffset += chunkLen;
         }
 
         // Decompress it
         stream.next_out = buffer;
         stream.avail_out = sizeof(buffer);
 
-        uInt before_in = stream.avail_in;
-        int ret = inflate(&stream, input_offset == input->compressed_len ? Z_FINISH : Z_NO_FLUSH);
+        uInt beforeIn = stream.avail_in;
+        int ret = inflate(&stream, inputOffset == input->compressedLen ? Z_FINISH : Z_NO_FLUSH);
 
         // Send to callback
         size_t produced = sizeof(buffer) - stream.avail_out;
@@ -2642,9 +2642,9 @@ static int stream_level_input(const LevelStreamInput *input, LevelStreamCallback
             // Fail :(
             result = LOAD_INVALID_COMPRESSED_DATA;
             break;
-        } else if (before_in == stream.avail_in && produced == 0 && 
+        } else if (beforeIn == stream.avail_in && produced == 0 && 
                 (stream.avail_in > 0 ||
-                (stream.avail_in == 0 && input_offset == input->compressed_len))) {
+                (stream.avail_in == 0 && inputOffset == input->compressedLen))) {
             // Avoid decompression loop
             result = LOAD_INVALID_COMPRESSED_DATA;
             break;
@@ -2655,47 +2655,47 @@ static int stream_level_input(const LevelStreamInput *input, LevelStreamCallback
     return result;
 }
 
-static bool reserve_char_buffer(char **buffer, size_t *capacity, size_t needed) {
+static bool reserveCharBuffer(char **buffer, size_t *capacity, size_t needed) {
     if (needed <= *capacity) return true;
 
-    size_t new_capacity = *capacity ? *capacity : 256;
-    if (new_capacity < needed) {
-        new_capacity = needed;
+    size_t newCapacity = *capacity ? *capacity : 256;
+    if (newCapacity < needed) {
+        newCapacity = needed;
     }
 
-    char *section = (char *)realloc(*buffer, new_capacity);
+    char *section = (char *)realloc(*buffer, newCapacity);
     if (!section) return false;
 
     *buffer = section;
-    *capacity = new_capacity;
+    *capacity = newCapacity;
     return true;
 }
 
-static int finish_level_scan_section(LevelStreamScan *scan, bool terminated) {
-    if (scan->section_len > 0) {
-        if (scan->section_count == 0) {
+static int finishLevelScanSection(LevelStreamScan *scan, bool terminated) {
+    if (scan->sectionLen > 0) {
+        if (scan->sectionCount == 0) {
             // Handle metadata
-            size_t metadata_len = scan->section_len + (terminated ? 1 : 0);
+            size_t metadataLen = scan->sectionLen + (terminated ? 1 : 0);
 
-            scan->metadata = (char *)malloc(metadata_len + 1);
+            scan->metadata = (char *)malloc(metadataLen + 1);
             if (!scan->metadata) return LOAD_OUT_OF_MEMORY;
 
-            memcpy(scan->metadata, scan->section, scan->section_len);
+            memcpy(scan->metadata, scan->section, scan->sectionLen);
 
-            if (terminated) scan->metadata[scan->section_len] = ';';
-            scan->metadata[metadata_len] = '\0';
+            if (terminated) scan->metadata[scan->sectionLen] = ';';
+            scan->metadata[metadataLen] = '\0';
         // Count high detail objects
-        } else if (is_high_detail_object(scan->section, scan->section + scan->section_len, NULL)) {
-            scan->high_detail_count++;
+        } else if (isHighDetailObject(scan->section, scan->section + scan->sectionLen, NULL)) {
+            scan->highDetailCount++;
         }
-        scan->section_count++;
+        scan->sectionCount++;
     }
-    scan->section_len = 0;
+    scan->sectionLen = 0;
     return LOAD_NO_ERROR;
 }
 
-static int scan_level_chunk(const unsigned char *data, size_t len, void *context) {
-    static const char portal_pattern[] = "1,747,";
+static int scanLevelChunk(const unsigned char *data, size_t len, void *context) {
+    static const char portalPattern[] = "1,747,";
     LevelStreamScan *scan = (LevelStreamScan *)context;
 
     for (size_t i = 0; i < len; i++) {
@@ -2703,229 +2703,229 @@ static int scan_level_chunk(const unsigned char *data, size_t len, void *context
 
         if (ch == ';') {
             // Section end
-            int result = finish_level_scan_section(scan, true);
+            int result = finishLevelScanSection(scan, true);
             if (result != LOAD_NO_ERROR) return result;
         } else {
-            if (!reserve_char_buffer(&scan->section, &scan->section_capacity, scan->section_len + 1)) 
+            if (!reserveCharBuffer(&scan->section, &scan->sectionCapacity, scan->sectionLen + 1)) 
                 return LOAD_OUT_OF_MEMORY;
 
-            scan->section[scan->section_len++] = ch;
+            scan->section[scan->sectionLen++] = ch;
         }
 
         // Additional slots for tp portal
-        if (ch == portal_pattern[scan->portal_match]) {
-            scan->portal_match++;
-            if (portal_pattern[scan->portal_match] == '\0') {
-                scan->extra_slots++;
-                scan->portal_match = 0;
+        if (ch == portalPattern[scan->portalMatch]) {
+            scan->portalMatch++;
+            if (portalPattern[scan->portalMatch] == '\0') {
+                scan->extraSlots++;
+                scan->portalMatch = 0;
             }
         } else {
-            scan->portal_match = ch == portal_pattern[0] ? 1 : 0;
+            scan->portalMatch = ch == portalPattern[0] ? 1 : 0;
         }
     }
 
     return LOAD_NO_ERROR;
 }
 
-static void free_level_stream_scan(LevelStreamScan *scan) {
+static void freeLevelStreamScan(LevelStreamScan *scan) {
     free(scan->section);
     free(scan->metadata);
 }
 
-static int parse_stream_section(LevelStreamParser *parser) {
+static int parseStreamSection(LevelStreamParser *parser) {
     // Check for nothing
-    if (!parser->section_len) return LOAD_NO_ERROR;
+    if (!parser->sectionLen) return LOAD_NO_ERROR;
 
-    parser->section[parser->section_len] = '\0';
+    parser->section[parser->sectionLen] = '\0';
 
-    if (parser->section_count > 0) {
-        int parsed = parse_gd_object(parser->section, parser->section + parser->section_len, parser->object_index, parser->parse_capacity);
+    if (parser->sectionCount > 0) {
+        int parsed = parseGdObject(parser->section, parser->section + parser->sectionLen, parser->objectIndex, parser->parseCapacity);
         if (parsed == -2) {
-            output_log("Object capacity exceeded\n");
+            outputLog("Object capacity exceeded\n");
             return LOAD_OUT_OF_MEMORY;
         }
         
         if (parsed == 0) {
-            output_log("Failed to parse object %d\n", parser->object_index);
+            outputLog("Failed to parse object %d\n", parser->objectIndex);
             return LOAD_COULDNT_PARSE_OBJECTS;
         }
 
         if (parsed > 0) {
-            assign_object_to_section(parser->object_index);
-            parser->object_index++;
+            assignObjectToSection(parser->objectIndex);
+            parser->objectIndex++;
         }
     }
 
-    parser->section_count++;
-    parser->section_len = 0;
+    parser->sectionCount++;
+    parser->sectionLen = 0;
     return LOAD_NO_ERROR;
 }
 
-static int parse_level_chunk(const unsigned char *data, size_t len, void *context) {
+static int parseLevelChunk(const unsigned char *data, size_t len, void *context) {
     LevelStreamParser *parser = (LevelStreamParser *)context;
 
     for (size_t i = 0; i < len; i++) {
         if (data[i] == ';') {
             // Section end
-            int result = parse_stream_section(parser);
+            int result = parseStreamSection(parser);
             if (result != LOAD_NO_ERROR) return result;
         } else {
             // Reserve enough capacity
-            if (!reserve_char_buffer(&parser->section, &parser->section_capacity, parser->section_len + 2)) {
+            if (!reserveCharBuffer(&parser->section, &parser->sectionCapacity, parser->sectionLen + 2)) {
                 return LOAD_OUT_OF_MEMORY;
             }
 
             // Append
-            parser->section[parser->section_len++] = (char)data[i];
+            parser->section[parser->sectionLen++] = (char)data[i];
         }
     }
 
     return LOAD_NO_ERROR;
 }
 
-static int parse_level_stream(const LevelStreamInput *input, const LevelStreamScan *scan, int *out_object_count) {
-    if (scan->section_count < 1) {
-        output_log("Level string missing sections!\n");
+static int parseLevelStream(const LevelStreamInput *input, const LevelStreamScan *scan, int *outObjectCount) {
+    if (scan->sectionCount < 1) {
+        outputLog("Level string missing sections!\n");
         return LOAD_LEVEL_STRING_MISSING_SECTIONS;
     }
 
-    int object_count = scan->section_count - 1;
-    int parse_capacity = object_count - scan->high_detail_count;
+    int objectCount = scan->sectionCount - 1;
+    int parseCapacity = objectCount - scan->highDetailCount;
 
-    int alloc_count = parse_capacity + scan->extra_slots;
-    if (alloc_count < 0 || !init_arrays((size_t)alloc_count)) {
-        free_arrays();
-        output_log("Failed to allocate object array\n");
+    int allocCount = parseCapacity + scan->extraSlots;
+    if (allocCount < 0 || !initArrays((size_t)allocCount)) {
+        freeArrays();
+        outputLog("Failed to allocate object array\n");
         return LOAD_OUT_OF_MEMORY;
     }
 
-    objects.count = alloc_count;
-    coin_count = 0;
+    objects.count = allocCount;
+    coinCount = 0;
 
     // Initialize parser
     LevelStreamParser parser = {0};
-    parser.parse_capacity = parse_capacity;
+    parser.parseCapacity = parseCapacity;
 
-    int result = stream_level_input(input, parse_level_chunk, &parser);
+    int result = streamLevelInput(input, parseLevelChunk, &parser);
 
     // Parse last section, because we check for ; to mark the end of a section
-    if (result == LOAD_NO_ERROR) result = parse_stream_section(&parser);
+    if (result == LOAD_NO_ERROR) result = parseStreamSection(&parser);
 
     free(parser.section);
 
     if (result != LOAD_NO_ERROR) {
-        free_arrays();
+        freeArrays();
         return result;
     }
 
     // Update object count
-    objects.count = parser.object_index + scan->extra_slots;
-    if (out_object_count) *out_object_count = parser.object_index;
+    objects.count = parser.objectIndex + scan->extraSlots;
+    if (outObjectCount) *outObjectCount = parser.objectIndex;
 
     // Add groupma
-    for (int i = 0; i < parser.object_index; i++) {
-        for (int g = 0; g < objects.group_count[i]; g++) {
-            int group_id = objects.groups[i][g];
-            if (group_id > 0) {
-                add_to_group(i, group_id);
+    for (int i = 0; i < parser.objectIndex; i++) {
+        for (int g = 0; g < objects.groupCount[i]; g++) {
+            int groupID = objects.groups[i][g];
+            if (groupID > 0) {
+                addToGroup(i, groupID);
             }
         }
     }
 
-    qsort(coin_ids, coin_count, sizeof(int), compare_coins);
+    qsort(coinIds, coinCount, sizeof(int), compareCoins);
 
-    for (int i = 0; i < coin_count; i++) {
-        objects.coin_id[coin_ids[i]] = i;
+    for (int i = 0; i < coinCount; i++) {
+        objects.coinID[coinIds[i]] = i;
         //output_log("Le coin %d on objeto %d\n", i, coin_ids[i]);
     }
-    level_info.last_obj_x += (11 * 30.f);
+    levelInfo.lastObjX += (11 * 30.f);
 
     for (int i = 1; i < MAX_GROUPS; i++) {
-        sort_group(i);
+        sortGroup(i);
     }
     return LOAD_NO_ERROR;
 }
 
-static void generate_orange_portals(int orange_start);
-void set_color_channels(void);
-void load_online_level_info(char *level_string);
-void load_level_info(char *data, char *level_string);
+static void generateOrangePortals(int orangeStart);
+void setColorChannels(void);
+void loadOnlineLevelInfo(char *levelString);
+void loadLevelInfo(char *data, char *levelString);
 
-static int load_level_stream(const LevelStreamInput *input, char *gmd_data, bool online) {
+static int loadLevelStream(const LevelStreamInput *input, char *gmdData, bool online) {
     LevelStreamScan scan = {0};
-    level_info.low_detail = current_level_entry ? current_level_entry->data.low_detail : false;
+    levelInfo.lowDetail = currentLevelEntry ? currentLevelEntry->data.lowDetail : false;
 
     // Scan the level, we need to know how many objects to parse
-    int result = stream_level_input(input, scan_level_chunk, &scan);
+    int result = streamLevelInput(input, scanLevelChunk, &scan);
     if (result == LOAD_NO_ERROR) {
-        result = finish_level_scan_section(&scan, false);
+        result = finishLevelScanSection(&scan, false);
     } else {
-        free_level_stream_scan(&scan);
+        freeLevelStreamScan(&scan);
         return result;
     }
 
     free(scan.section);
     scan.section = NULL;
-    scan.section_capacity = 0;
-    scan.section_len = 0;
-    if (scan.section_count < 1) {
-        free_level_stream_scan(&scan);
-        output_log("Level string missing sections!\n");
+    scan.sectionCapacity = 0;
+    scan.sectionLen = 0;
+    if (scan.sectionCount < 1) {
+        freeLevelStreamScan(&scan);
+        outputLog("Level string missing sections!\n");
         return LOAD_LEVEL_STRING_MISSING_SECTIONS;
     }
 
-    char *meta_str = get_metadata_value(scan.metadata, "kS38");
+    char *metaStr = getMetadataValue(scan.metadata, "kS38");
 
-    int out_code = LOAD_NO_ERROR;
-    if (meta_str) {
-        channelCount = parse_color_channels(meta_str, &colorChannels, &out_code);
+    int outCode = LOAD_NO_ERROR;
+    if (metaStr) {
+        channelCount = parseColorChannels(metaStr, &colorChannels, &outCode);
     } else {
-        channelCount = parse_old_channels(scan.metadata, &colorChannels, &out_code);
+        channelCount = parseOldChannels(scan.metadata, &colorChannels, &outCode);
     }
 
-    if (out_code) {
-        free(meta_str);
-        free_level_stream_scan(&scan);
-        return out_code;
+    if (outCode) {
+        free(metaStr);
+        freeLevelStreamScan(&scan);
+        return outCode;
     }
 
-    if (online) load_online_level_info(scan.metadata);
-    else load_level_info(gmd_data, scan.metadata);
+    if (online) loadOnlineLevelInfo(scan.metadata);
+    else loadLevelInfo(gmdData, scan.metadata);
 
-    level_info.last_obj_x = 570.f;
+    levelInfo.lastObjX = 570.f;
 
     // Start parsing
-    int orange_start = 0;
-    result = parse_level_stream(input, &scan, &orange_start);
+    int orangeStart = 0;
+    result = parseLevelStream(input, &scan, &orangeStart);
 
-    free(meta_str);
-    free_level_stream_scan(&scan);
+    free(metaStr);
+    freeLevelStreamScan(&scan);
 
     if (result != LOAD_NO_ERROR) return result;
 
-    generate_orange_portals(orange_start);
+    generateOrangePortals(orangeStart);
 
-    if (!build_group_combinations()) {
-        output_log("Failed to build group combinations\n");
+    if (!buildGroupCombinations()) {
+        outputLog("Failed to build group combinations\n");
         return LOAD_OUT_OF_MEMORY;
     }
 
-    init_col_channels();
-    set_color_channels();
+    initColChannels();
+    setColorChannels();
 
-    current_pulserod_ball_image = game_objects[15].children[0].texture + (rand() % 3);
+    currentPulserodBallImage = gameObjects[15].children[0].texture + (rand() % 3);
 
-    C2D_SpriteFromSheet(&sprite_templates[15].child_templates[0], spriteSheet, current_pulserod_ball_image);
-    C2D_SpriteSetCenter(&sprite_templates[15].child_templates[0], 0.5f, 0.5f);
-    C2D_SpriteFromSheet(&sprite_templates[16].child_templates[0], spriteSheet, current_pulserod_ball_image);
-    C2D_SpriteSetCenter(&sprite_templates[16].child_templates[0], 0.5f, 0.5f);
-    C2D_SpriteFromSheet(&sprite_templates[17].child_templates[0], spriteSheet, current_pulserod_ball_image);
-    C2D_SpriteSetCenter(&sprite_templates[17].child_templates[0], 0.5f, 0.5f);
+    C2D_SpriteFromSheet(&spriteTemplates[15].childTemplates[0], spriteSheet, currentPulserodBallImage);
+    C2D_SpriteSetCenter(&spriteTemplates[15].childTemplates[0], 0.5f, 0.5f);
+    C2D_SpriteFromSheet(&spriteTemplates[16].childTemplates[0], spriteSheet, currentPulserodBallImage);
+    C2D_SpriteSetCenter(&spriteTemplates[16].childTemplates[0], 0.5f, 0.5f);
+    C2D_SpriteFromSheet(&spriteTemplates[17].childTemplates[0], spriteSheet, currentPulserodBallImage);
+    C2D_SpriteSetCenter(&spriteTemplates[17].childTemplates[0], 0.5f, 0.5f);
 
     return LOAD_NO_ERROR;
 }
 
-void set_color_channels() {
+void setColorChannels() {
     for (int i = 0; i < channelCount; i++) {
         GDColorChannel colorChannel = colorChannels[i];
         int id = colorChannel.channelID;
@@ -2939,7 +2939,7 @@ void set_color_channels() {
 
             default:
                 if (id >= 0 && id < COL_CHANNEL_NUM) {
-                    int chan = get_col_channel_index(id);
+                    int chan = getColChannelIndex(id);
 
                     Color color;
                     color.r = colorChannel.fromRed;
@@ -2948,40 +2948,40 @@ void set_color_channels() {
 
                     channels[chan].blending = colorChannel.blending;
                     channels[chan].color = color;
-                    channels[chan].non_pulse_color = color;
+                    channels[chan].nonPulseColor = color;
                     channels[chan].alpha = colorChannel.fromOpacity < 0.0f ? 0.0f : (colorChannel.fromOpacity > 1.0f ? 1.0f : colorChannel.fromOpacity);
 
                     if (colorChannel.inheritedChannelID > 0) {
-                        channels[chan].copy_color_id = colorChannel.inheritedChannelID;
+                        channels[chan].copyColorID = colorChannel.inheritedChannelID;
                         channels[chan].hsv = colorChannel.hsv;
                     } else {
-                        channels[chan].copy_color_id = 0;
+                        channels[chan].copyColorID = 0;
                     }
 
                     if (colorChannel.playerColor == 1) {
-                        channels[chan].color = get_p2_if_black(p1_color);
-                        channels[chan].non_pulse_color = channels[chan].color;
+                        channels[chan].color = getP2IfBlack(p1Color);
+                        channels[chan].nonPulseColor = channels[chan].color;
                     }
                     if (colorChannel.playerColor == 2) {
-                        channels[chan].color = get_p1_if_black(p2_color);
-                        channels[chan].non_pulse_color = channels[chan].color;
+                        channels[chan].color = getP1IfBlack(p2Color);
+                        channels[chan].nonPulseColor = channels[chan].color;
                     }
 
                     if (id == CHANNEL_OBJ) {
-                        channels[get_col_channel_index(CHANNEL_OBJ_BLENDING)].color = color;
-                        channels[get_col_channel_index(CHANNEL_OBJ_BLENDING)].non_pulse_color = color;
+                        channels[getColChannelIndex(CHANNEL_OBJ_BLENDING)].color = color;
+                        channels[getColChannelIndex(CHANNEL_OBJ_BLENDING)].nonPulseColor = color;
                     }
                 }
         }
     }
 
     for (int i = 0; i < COL_CHANNEL_NUM; i++)
-        channels[i].non_pulse_color = channels[i].color;
+        channels[i].nonPulseColor = channels[i].color;
 
-    load_used_channels();
+    loadUsedChannels();
 }
 
-const char *bg_sheet_paths[] = {
+const char *bgSheetPaths[] = {
     "romfs:/gfx/bg_sheet_01.t3x",
     "romfs:/gfx/bg_sheet_02.t3x",
     "romfs:/gfx/bg_sheet_03.t3x",
@@ -2989,7 +2989,7 @@ const char *bg_sheet_paths[] = {
     "romfs:/gfx/bg_sheet_05.t3x"
 };
 
-const char *level_font_paths[LEVEL_FONT_COUNT] = {
+const char *levelFontPaths[LEVEL_FONT_COUNT] = {
     NULL,
     "romfs:/gfx/gjFont01.t3x",
     "romfs:/gfx/gjFont02.t3x",
@@ -3005,288 +3005,288 @@ const char *level_font_paths[LEVEL_FONT_COUNT] = {
     "romfs:/gfx/gjFont12.t3x"
 };
 
-int loaded_level_font = 0;
-C2D_SpriteSheet level_font_sheet = NULL;
-const Charset *level_font = &bigFont_fontCharset;
+int loadedLevelFont = 0;
+C2D_SpriteSheet levelFontSheet = NULL;
+const Charset *levelFont = &bigFontFontCharset;
 
-void load_level_string_info(char *level_string) {
-    level_info.low_detail = false;
+void loadLevelStringInfo(char *levelString) {
+    levelInfo.lowDetail = false;
 
-    char *gmd_song_offset = get_metadata_value(level_string, "kA13");
-    if (gmd_song_offset) {
-        level_info.song_offset = atof(gmd_song_offset);
-        free(gmd_song_offset);
+    char *gmdSongOffset = getMetadataValue(levelString, "kA13");
+    if (gmdSongOffset) {
+        levelInfo.songOffset = atof(gmdSongOffset);
+        free(gmdSongOffset);
     } else {
-        level_info.song_offset = 0;
+        levelInfo.songOffset = 0;
     }
 
-    char *background_data = get_metadata_value(level_string, "kA6");
-    if (background_data) {
-        level_info.background_id = CLAMP(atoi(background_data) - 1, 0, BG_COUNT - 1);
-        free(background_data);
+    char *backgroundData = getMetadataValue(levelString, "kA6");
+    if (backgroundData) {
+        levelInfo.backgroundID = CLAMP(atoi(backgroundData) - 1, 0, BG_COUNT - 1);
+        free(backgroundData);
     } else {
-        level_info.background_id = 0;
+        levelInfo.backgroundID = 0;
     }
 
     // load the background sheet on demand
-    int new_sheet = level_info.background_id / 4;
-    if (loaded_bg_sheet != new_sheet) {
+    int newSheet = levelInfo.backgroundID / 4;
+    if (loadedBgSheet != newSheet) {
         C2D_SpriteSheetFree(bgSheet);
-        bgSheet = C2D_SpriteSheetLoad(bg_sheet_paths[new_sheet]);
-        loaded_bg_sheet = new_sheet;
+        bgSheet = C2D_SpriteSheetLoad(bgSheetPaths[newSheet]);
+        loadedBgSheet = newSheet;
     }
 
-    char *ground_data = get_metadata_value(level_string, "kA7");
-    if (ground_data) {
-        level_info.ground_id = CLAMP(atoi(ground_data) - 1, 0, G_COUNT - 1);
-        free(ground_data);
+    char *groundData = getMetadataValue(levelString, "kA7");
+    if (groundData) {
+        levelInfo.groundID = CLAMP(atoi(groundData) - 1, 0, G_COUNT - 1);
+        free(groundData);
     } else {
-        level_info.ground_id = 0;
+        levelInfo.groundID = 0;
     }
     
-    char *gamemode_data = get_metadata_value(level_string, "kA2");
-    if (gamemode_data) {
-        level_info.initial_gamemode = CLAMP(atoi(gamemode_data), 0, GAMEMODE_COUNT - 1);
-        free(gamemode_data);
+    char *gamemodeData = getMetadataValue(levelString, "kA2");
+    if (gamemodeData) {
+        levelInfo.initialGamemode = CLAMP(atoi(gamemodeData), 0, GAMEMODE_COUNT - 1);
+        free(gamemodeData);
     } else {
-        level_info.initial_gamemode = GAMEMODE_PLAYER;
+        levelInfo.initialGamemode = GAMEMODE_PLAYER;
     }
 
-    char *mini_data = get_metadata_value(level_string, "kA3");
-    if (mini_data) {
-        level_info.initial_mini = atoi(mini_data) != 0;    
-        free(mini_data);
+    char *miniData = getMetadataValue(levelString, "kA3");
+    if (miniData) {
+        levelInfo.initialMini = atoi(miniData) != 0;    
+        free(miniData);
     } else {
-        level_info.initial_mini = 0; 
+        levelInfo.initialMini = 0; 
     }
 
-    char *speed_data = get_metadata_value(level_string, "kA4");
-    if (speed_data) {
-        level_info.initial_speed = CLAMP(atoi(speed_data), 0, SPEED_COUNT - 1);
-        if (level_info.initial_speed == 0) level_info.initial_speed = SPEED_NORMAL;
-        else if (level_info.initial_speed == 1) level_info.initial_speed = SPEED_SLOW;
-        free(speed_data);
+    char *speedData = getMetadataValue(levelString, "kA4");
+    if (speedData) {
+        levelInfo.initialSpeed = CLAMP(atoi(speedData), 0, SPEED_COUNT - 1);
+        if (levelInfo.initialSpeed == 0) levelInfo.initialSpeed = SPEED_NORMAL;
+        else if (levelInfo.initialSpeed == 1) levelInfo.initialSpeed = SPEED_SLOW;
+        free(speedData);
     } else {
-        level_info.initial_speed = SPEED_NORMAL;
+        levelInfo.initialSpeed = SPEED_NORMAL;
     }
 
-    char *dual_data = get_metadata_value(level_string, "kA8");
-    if (dual_data) {
-        level_info.initial_dual = atoi(dual_data) != 0;
-        free(dual_data);
+    char *dualData = getMetadataValue(levelString, "kA8");
+    if (dualData) {
+        levelInfo.initialDual = atoi(dualData) != 0;
+        free(dualData);
     } else {
-        level_info.initial_dual = 0; 
+        levelInfo.initialDual = 0; 
     }
     
-    char *two_player_mode_data = get_metadata_value(level_string, "kA10");
-    if (two_player_mode_data) {
-        level_info.two_player_mode = atoi(two_player_mode_data) != 0;
-        free(two_player_mode_data);
+    char *twoPlayerModeData = getMetadataValue(levelString, "kA10");
+    if (twoPlayerModeData) {
+        levelInfo.twoPlayerMode = atoi(twoPlayerModeData) != 0;
+        free(twoPlayerModeData);
     } else {
-        level_info.two_player_mode = 0; 
+        levelInfo.twoPlayerMode = 0; 
     }
 
-    char *upsidedown_data = get_metadata_value(level_string, "kA11");
-    if (upsidedown_data) {
-        level_info.initial_upsidedown = atoi(upsidedown_data) != 0;
-        free(upsidedown_data);
+    char *upsidedownData = getMetadataValue(levelString, "kA11");
+    if (upsidedownData) {
+        levelInfo.initialUpsidedown = atoi(upsidedownData) != 0;
+        free(upsidedownData);
     } else {
-        level_info.initial_upsidedown = 0; 
+        levelInfo.initialUpsidedown = 0; 
     }
 
     // load the level font on demand (0 = bigFont)
-    char *font_data = get_metadata_value(level_string, "kA18");
-    int font_index = 0;
-    if (font_data) {
-        font_index = CLAMP(atoi(font_data), 0, LEVEL_FONT_COUNT - 1);
-        free(font_data);
+    char *fontData = getMetadataValue(levelString, "kA18");
+    int fontIndex = 0;
+    if (fontData) {
+        fontIndex = CLAMP(atoi(fontData), 0, LEVEL_FONT_COUNT - 1);
+        free(fontData);
     }
 
-    if (loaded_level_font != font_index) {
-        if (level_font_sheet) {
-            C2D_SpriteSheetFree(level_font_sheet);
-            level_font_sheet = NULL;
+    if (loadedLevelFont != fontIndex) {
+        if (levelFontSheet) {
+            C2D_SpriteSheetFree(levelFontSheet);
+            levelFontSheet = NULL;
         }
-        if (font_index > 0) {
-            level_font_sheet = C2D_SpriteSheetLoad(level_font_paths[font_index]);
-            if (!level_font_sheet) font_index = 0;
+        if (fontIndex > 0) {
+            levelFontSheet = C2D_SpriteSheetLoad(levelFontPaths[fontIndex]);
+            if (!levelFontSheet) fontIndex = 0;
         }
-        loaded_level_font = font_index;
+        loadedLevelFont = fontIndex;
     }
-    level_font = level_font_charsets[font_index];
+    levelFont = levelFontCharsets[fontIndex];
     
 }
 
-const char *default_name = "Unknown";
+const char *defaultName = "Unknown";
 
-void load_online_level_info(char *level_string) {
-    load_level_string_info(level_string);
+void loadOnlineLevelInfo(char *levelString) {
+    loadLevelStringInfo(levelString);
 
-    level_info.low_detail = current_level_entry ? current_level_entry->data.low_detail : false;
+    levelInfo.lowDetail = currentLevelEntry ? currentLevelEntry->data.lowDetail : false;
 
-    level_info.song_id = current_search_entry->mainSongId;
-    level_info.custom_song_id = current_search_entry->songId;
-    snprintf(level_info.level_name, sizeof(level_info.level_name), "%s", current_search_entry->name);
-    snprintf(level_info.creator_name, sizeof(level_info.level_name), "%s", (current_creator_entry ? current_creator_entry->creatorName : "-"));
+    levelInfo.songID = currentSearchEntry->mainSongId;
+    levelInfo.customSongID = currentSearchEntry->songId;
+    snprintf(levelInfo.levelName, sizeof(levelInfo.levelName), "%s", currentSearchEntry->name);
+    snprintf(levelInfo.creatorName, sizeof(levelInfo.levelName), "%s", (currentCreatorEntry ? currentCreatorEntry->creatorName : "-"));
 }
 
-static void generate_orange_portals(int orange_start) {
-    int next_orange = orange_start;
-    for (int i = 0; i < orange_start; i++) {
+static void generateOrangePortals(int orangeStart) {
+    int nextOrange = orangeStart;
+    for (int i = 0; i < orangeStart; i++) {
         if (objects.id[i] != BLUE_TP_PORTAL) continue;
 
-        float angle_rad = objects.rotation[i] * (M_PI / 180.0f);
-        float x_off = 10.0f * fabsf(cosf(angle_rad));
+        float angleRad = objects.rotation[i] * (M_PI / 180.0f);
+        float xOff = 10.0f * fabsf(cosf(angleRad));
 
-        int oi = next_orange++;
+        int oi = nextOrange++;
         objects.id[oi]           = ORANGE_TP_PORTAL;
-        objects.x[oi]            = objects.x[i] - x_off;
-        objects.y[oi]            = objects.y[i] + objects.tp_y_offset[i];
-        objects.last_y[oi]       = objects.y[oi];
-        objects.rotation[oi]     = adjust_angle_y(objects.rotation[i], objects.flippedH[i]) + 180.0f;
-        objects.visual_rotation[oi] = objects.rotation[oi];
+        objects.x[oi]            = objects.x[i] - xOff;
+        objects.y[oi]            = objects.y[i] + objects.tpYOffset[i];
+        objects.lastY[oi]       = objects.y[oi];
+        objects.rotation[oi]     = adjustAngleY(objects.rotation[i], objects.flippedH[i]) + 180.0f;
+        objects.visualRotation[oi] = objects.rotation[oi];
         objects.flippedH[oi]     = false;
         objects.flippedV[oi]     = false;
         objects.opacity[oi]      = 1.0f;
         objects.flags[oi]        &= ~FLAG_TOGGLED;
         objects.activated[oi]    = 0;
         objects.collided[oi]     = 0;
-        objects.child_object[oi] = -1;
-        objects.tp_y_offset[oi]  = 0.0f;
-        objects.original_x[oi]   = objects.x[oi];
-        objects.original_y[oi]   = objects.y[oi];
+        objects.childObject[oi] = -1;
+        objects.tpYOffset[oi]  = 0.0f;
+        objects.originalX[oi]   = objects.x[oi];
+        objects.originalY[oi]   = objects.y[oi];
         objects.zlayer[oi]       = objects.zlayer[i];
         objects.zorder[oi]       = objects.zorder[i];
-        objects.child_object[i]  = oi;
+        objects.childObject[i]  = oi;
 
         // Copy groups from blue portal to orange portal
-        objects.group_count[oi] = objects.group_count[i];
-        for (int g = 0; g < objects.group_count[i] && g < MAX_GROUPS_PER_OBJECT; g++) {
+        objects.groupCount[oi] = objects.groupCount[i];
+        for (int g = 0; g < objects.groupCount[i] && g < MAX_GROUPS_PER_OBJECT; g++) {
             objects.groups[oi][g] = objects.groups[i][g];
             if (objects.groups[i][g] > 0) {
-                add_to_group(oi, objects.groups[i][g]);
+                addToGroup(oi, objects.groups[i][g]);
             }
         }
 
-        assign_object_to_section(oi);
+        assignObjectToSection(oi);
     }
-    objects.count = next_orange;
+    objects.count = nextOrange;
 }
 
-int load_online_level(char *level_string) {
-    arena_reset(&level_arena);
+int loadOnlineLevel(char *levelString) {
+    arenaReset(&levelArena);
 
     LevelStreamInput input = {0};
     unsigned char *decoded = NULL;
-    if (strchr(level_string, ';')) {
+    if (strchr(levelString, ';')) {
         // String is not even compressed
-        input.raw_data = level_string;
+        input.rawData = levelString;
     } else {
-        fix_base64_url(level_string);
-        remove_char(level_string, ',');
+        fixBase64URL(levelString);
+        removeChar(levelString, ',');
 
-        size_t encoded_len = strlen(level_string);
-        decoded = (unsigned char *)malloc(encoded_len);
+        size_t encodedLen = strlen(levelString);
+        decoded = (unsigned char *)malloc(encodedLen);
         if (!decoded) return LOAD_OUT_OF_MEMORY;
 
-        int decoded_len = base64_decode(level_string, decoded);
-        if (decoded_len <= 0) {
-            output_log("Failed to decode base64\n");
+        int decodedLen = base64Decode(levelString, decoded);
+        if (decodedLen <= 0) {
+            outputLog("Failed to decode base64\n");
             free(decoded);
             return LOAD_INVALID_BASE64;
         }
-        input.compressed_data = decoded;
-        input.compressed_len = (size_t)decoded_len;
+        input.compressedData = decoded;
+        input.compressedLen = (size_t)decodedLen;
     }
 
-    int result = load_level_stream(&input, NULL, true);
+    int result = loadLevelStream(&input, NULL, true);
     free(decoded);
     return result;
 }
 
-void load_level_info(char *data, char *level_string) {
-    load_level_string_info(level_string);
+void loadLevelInfo(char *data, char *levelString) {
+    loadLevelStringInfo(levelString);
 
-    level_info.low_detail = current_level_entry ? current_level_entry->data.low_detail : false;
+    levelInfo.lowDetail = currentLevelEntry ? currentLevelEntry->data.lowDetail : false;
 
-    char *gmd_song_id = extract_gmd_key((const char *) data, "k8", "i");
-    if (!gmd_song_id) {
-        level_info.song_id = 0; // Stereo Madness
+    char *gmdSongID = extractGMDKey((const char *) data, "k8", "i");
+    if (!gmdSongID) {
+        levelInfo.songID = 0; // Stereo Madness
     } else {
-        level_info.song_id = atoi(gmd_song_id); // Official song id
-        free(gmd_song_id);
+        levelInfo.songID = atoi(gmdSongID); // Official song id
+        free(gmdSongID);
     }
 
-    char *gmd_custom_song_id = extract_gmd_key((const char *) data, "k45", "i");
-    if (!gmd_custom_song_id) {
-        level_info.custom_song_id = -1;
+    char *gmdCustomSongID = extractGMDKey((const char *) data, "k45", "i");
+    if (!gmdCustomSongID) {
+        levelInfo.customSongID = -1;
     } else {
-        level_info.custom_song_id = atoi(gmd_custom_song_id); // Custom song id
-        free(gmd_custom_song_id);
+        levelInfo.customSongID = atoi(gmdCustomSongID); // Custom song id
+        free(gmdCustomSongID);
     }
 
-    char *level_name_data = extract_gmd_key((const char *) data, "k2", "s");
-    if (level_name_data) {
-        snprintf(level_info.level_name, sizeof(level_info.level_name), "%s", level_name_data);
-        free(level_name_data);
+    char *levelNameData = extractGMDKey((const char *) data, "k2", "s");
+    if (levelNameData) {
+        snprintf(levelInfo.levelName, sizeof(levelInfo.levelName), "%s", levelNameData);
+        free(levelNameData);
     } else {
-        snprintf(level_info.level_name, sizeof(level_info.level_name), "%s", default_name);
+        snprintf(levelInfo.levelName, sizeof(levelInfo.levelName), "%s", defaultName);
     }
 
-    char *creator_name_data = extract_gmd_key((const char *) data, "k5", "s");
-    if (creator_name_data) {
-        snprintf(level_info.creator_name, sizeof(level_info.creator_name), "%s", creator_name_data);
-        free(creator_name_data);
+    char *creatorNameData = extractGMDKey((const char *) data, "k5", "s");
+    if (creatorNameData) {
+        snprintf(levelInfo.creatorName, sizeof(levelInfo.creatorName), "%s", creatorNameData);
+        free(creatorNameData);
     } else {
-        snprintf(level_info.creator_name, sizeof(level_info.creator_name), "%s", default_name);
+        snprintf(levelInfo.creatorName, sizeof(levelInfo.creatorName), "%s", defaultName);
     }
 }
 
-int load_level(const char *path) {
-    int out_code = LOAD_NO_ERROR;
+int loadLevel(const char *path) {
+    int outCode = LOAD_NO_ERROR;
 
-    arena_reset(&level_arena);
+    arenaReset(&levelArena);
 
     size_t out;
-    char *level = read_file(path, &out);
+    char *level = readFile(path, &out);
     if (!level) return 1;
 
-    level = convert_if_gdlvl(level, path);
+    level = convertIfGdlvl(level, path);
     if (!level) {
         return LOAD_OUT_OF_MEMORY;
     }
 
-    char *b64 = extract_gmd_key((const char *)level, "k4", "s");
+    char *b64 = extractGMDKey((const char *)level, "k4", "s");
     if (b64) {
         LevelStreamInput input = {0};
         unsigned char *decoded = NULL;
 
         if (strchr(b64, ';')) {
             // Not even compressed
-            input.raw_data = b64;
+            input.rawData = b64;
         } else {
-            fix_base64_url(b64);
-            size_t encoded_len = strlen(b64);
-            decoded = (unsigned char *)malloc(encoded_len);
+            fixBase64URL(b64);
+            size_t encodedLen = strlen(b64);
+            decoded = (unsigned char *)malloc(encodedLen);
             if (!decoded) {
                 free(b64);
                 free(level);
                 return LOAD_OUT_OF_MEMORY;
             }
 
-            int decoded_len = base64_decode(b64, decoded);
-            if (decoded_len <= 0) {
-                output_log("Failed to decode base64\n");
+            int decodedLen = base64Decode(b64, decoded);
+            if (decodedLen <= 0) {
+                outputLog("Failed to decode base64\n");
                 free(decoded);
                 free(b64);
                 free(level);
                 return LOAD_INVALID_BASE64;
             }
-            input.compressed_data = decoded;
-            input.compressed_len = (size_t)decoded_len;
+            input.compressedData = decoded;
+            input.compressedLen = (size_t)decodedLen;
         }
 
-        int result = load_level_stream(&input, level, false);
+        int result = loadLevelStream(&input, level, false);
         free(decoded);
         free(b64);
         free(level);
@@ -3295,180 +3295,180 @@ int load_level(const char *path) {
 
     // Empty level
 
-    char *data = decompress_level(level, &out_code);
+    char *data = decompressLevel(level, &outCode);
     if (!data) {
         free(level);
-        return out_code;
+        return outCode;
     }
 
     // Get level starting colors
-    char *metaStr = get_metadata_value(data, "kS38");
+    char *metaStr = getMetadataValue(data, "kS38");
     if (metaStr) {
-        channelCount = parse_color_channels(metaStr, &colorChannels, &out_code);
-        if (out_code) {
+        channelCount = parseColorChannels(metaStr, &colorChannels, &outCode);
+        if (outCode) {
             free(level);
             free(metaStr);
-            return out_code;
+            return outCode;
         }
     }
     // Fallback to pre 2.0 color keys
     else {
-        channelCount = parse_old_channels(data, &colorChannels, &out_code);
-        if (out_code) {
+        channelCount = parseOldChannels(data, &colorChannels, &outCode);
+        if (outCode) {
             free(level);
-            return out_code;
+            return outCode;
         }
     }
 
-    load_level_info(level, data);
+    loadLevelInfo(level, data);
     free(level);
 
     // Minimum size
-    level_info.last_obj_x = 570.f;
+    levelInfo.lastObjX = 570.f;
 
     // Count blue teleport portals to reserve extra object slots
-    int extra_slots = 0;
+    int extraSlots = 0;
     const char *scan = data;
     while ((scan = strstr(scan, "1,747,")) != NULL) {
-        extra_slots++;
+        extraSlots++;
         scan++;
     }
-    int orange_start = 0;
+    int orangeStart = 0;
 
-    int returned = parse_string(data, extra_slots, &orange_start);
+    int returned = parseString(data, extraSlots, &orangeStart);
 
     free(metaStr);
 
     if (returned) return returned;
 
-    generate_orange_portals(orange_start);
+    generateOrangePortals(orangeStart);
     
-    if (!build_group_combinations()) {
-        output_log("Failed to build group combinations\n");
+    if (!buildGroupCombinations()) {
+        outputLog("Failed to build group combinations\n");
         return LOAD_OUT_OF_MEMORY;
     }
 
-    init_col_channels();
-    set_color_channels();
+    initColChannels();
+    setColorChannels();
 
     // Set pulserod pulse ball image
-    current_pulserod_ball_image = game_objects[15].children[0].texture + (rand() % 3);
+    currentPulserodBallImage = gameObjects[15].children[0].texture + (rand() % 3);
 
-    C2D_SpriteFromSheet(&sprite_templates[15].child_templates[0], spriteSheet, current_pulserod_ball_image);
-    C2D_SpriteSetCenter(&sprite_templates[15].child_templates[0], 0.5f, 0.5f);
+    C2D_SpriteFromSheet(&spriteTemplates[15].childTemplates[0], spriteSheet, currentPulserodBallImage);
+    C2D_SpriteSetCenter(&spriteTemplates[15].childTemplates[0], 0.5f, 0.5f);
     
-    C2D_SpriteFromSheet(&sprite_templates[16].child_templates[0], spriteSheet, current_pulserod_ball_image);
-    C2D_SpriteSetCenter(&sprite_templates[16].child_templates[0], 0.5f, 0.5f);
+    C2D_SpriteFromSheet(&spriteTemplates[16].childTemplates[0], spriteSheet, currentPulserodBallImage);
+    C2D_SpriteSetCenter(&spriteTemplates[16].childTemplates[0], 0.5f, 0.5f);
 
-    C2D_SpriteFromSheet(&sprite_templates[17].child_templates[0], spriteSheet, current_pulserod_ball_image);
-    C2D_SpriteSetCenter(&sprite_templates[17].child_templates[0], 0.5f, 0.5f);
+    C2D_SpriteFromSheet(&spriteTemplates[17].childTemplates[0], spriteSheet, currentPulserodBallImage);
+    C2D_SpriteSetCenter(&spriteTemplates[17].childTemplates[0], 0.5f, 0.5f);
 
     return LOAD_NO_ERROR;
 }
 
-void reload_level() {
-    clear_on_death_triggers();
+void reloadLevel() {
+    clearOnDeathTriggers();
 
-    free_trigger_buffers();
+    freeTriggerBuffers();
 
     for (int i = 1; i < MAX_GROUPS; i++) {
-        reset_group_data(i);
+        resetGroupData(i);
     }
 
     for (int i = 0; i < objects.count; i++) {
         objects.activated[i] = false;
         objects.collided[i] = false;
-        objects.hitbox_counter[i] = 0;
-        objects.transition_applied[i] = FADE_NONE;
+        objects.hitboxCounter[i] = 0;
+        objects.transitionApplied[i] = FADE_NONE;
         objects.flags[i] &= ~FLAG_TOGGLED;
         objects.opacity[i] = 1.f;
-        objects.x[i] = objects.original_x[i];
-        objects.y[i] = objects.original_y[i];
-        objects.last_y[i] = objects.original_y[i];
-        objects.alpha_trigger_opacity[i] = 1.0f;
-        objects.scale_x[i] = objects.original_scale_x[i];
-        objects.scale_y[i] = objects.original_scale_y[i];
-        objects.num_main_pulses[i] = 0;
-        objects.num_detail_pulses[i] = 0;
-        objects.main_being_pulsed[i] = false;
-        objects.detail_being_pulsed[i] = false;
-        objects.main_color[i] = (Color){255, 255, 255};
-        objects.detail_color[i] = (Color){255, 255, 255};
-        objects.child_object[i] = -1;
-        objects.tp_y_offset[i] = 0.0f;
-        objects.cached_main_hsv_valid[i] = false;
-        objects.cached_detail_hsv_valid[i] = false;
+        objects.x[i] = objects.originalX[i];
+        objects.y[i] = objects.originalY[i];
+        objects.lastY[i] = objects.originalY[i];
+        objects.alphaTriggerOpacity[i] = 1.0f;
+        objects.scaleX[i] = objects.originalScaleX[i];
+        objects.scaleY[i] = objects.originalScaleY[i];
+        objects.numMainPulses[i] = 0;
+        objects.numDetailPulses[i] = 0;
+        objects.mainBeingPulsed[i] = false;
+        objects.detailBeingPulsed[i] = false;
+        objects.mainColor[i] = (Color){255, 255, 255};
+        objects.detailColor[i] = (Color){255, 255, 255};
+        objects.childObject[i] = -1;
+        objects.tpYOffset[i] = 0.0f;
+        objects.cachedMainHSVValid[i] = false;
+        objects.cachedDetailHSVValid[i] = false;
     }
 
     for (int i = 0; i < objects.count; i++) {
-        update_object_section(i);
+        updateObjectSection(i);
     }
 
-    int next_orange = 0;
+    int nextOrange = 0;
     for (int i = 0; i < objects.count; i++) {
         if (objects.id[i] == BLUE_TP_PORTAL) {
-            while (next_orange < objects.count && objects.id[next_orange] != ORANGE_TP_PORTAL)
-                next_orange++;
-            if (next_orange < objects.count) {
-                objects.child_object[i] = next_orange;
-                next_orange++;
+            while (nextOrange < objects.count && objects.id[nextOrange] != ORANGE_TP_PORTAL)
+                nextOrange++;
+            if (nextOrange < objects.count) {
+                objects.childObject[i] = nextOrange;
+                nextOrange++;
             }
         }
     }
 
     accumulator = 0.f;
-    fixed_dt = true;
+    fixedDt = true;
 
-    init_col_channels();
-    set_color_channels();
+    initColChannels();
+    setColorChannels();
     
     // Run triggers behind the start
-    handle_triggers();
+    handleTriggers();
 }
 
-void unload_level() {
-    clear_on_death_triggers();
-    clear_groups();
-    free_arrays();
-    free_trigger_buffers();
-    free_sections();
-    free_object_particles();
-    init_col_channels();
+void unloadLevel() {
+    clearOnDeathTriggers();
+    clearGroups();
+    freeArrays();
+    freeTriggerBuffers();
+    freeSections();
+    freeObjectParticles();
+    initColChannels();
 
-    arena_reset(&level_arena);
+    arenaReset(&levelArena);
     
     channelCount = 0;
     free(colorChannels);
     colorChannels = NULL;
 
-    if (level_font_sheet) {
-        C2D_SpriteSheetFree(level_font_sheet);
-        level_font_sheet = NULL;
+    if (levelFontSheet) {
+        C2D_SpriteSheetFree(levelFontSheet);
+        levelFontSheet = NULL;
     }
-    loaded_level_font = 0;
-    level_font = &bigFont_fontCharset;
+    loadedLevelFont = 0;
+    levelFont = &bigFontFontCharset;
 
-    stop_mp3();
+    stopMP3();
 }
 
-char *get_level_name(char *data_ptr) {
-    return extract_gmd_key((const char *) data_ptr, "k2", "s");
+char *getLevelName(char *dataPtr) {
+    return extractGMDKey((const char *) dataPtr, "k2", "s");
 }
 
-char *load_user_song(int id, size_t *out_size) {
-    char full_path[273];
-    snprintf(full_path, sizeof(full_path), "%s%d.mp3", USER_SONGS_DIR, id);
-    return read_file_arena(&level_arena, full_path, out_size);
+char *loadUserSong(int id, size_t *outSize) {
+    char fullPath[273];
+    snprintf(fullPath, sizeof(fullPath), "%s%d.mp3", USER_SONGS_DIR, id);
+    return readFileArena(&levelArena, fullPath, outSize);
 }
 
-bool check_song(int id) {
-    char full_path[273];
-    snprintf(full_path, sizeof(full_path), "%s%d.mp3", USER_SONGS_DIR, id);
-    return access(full_path, F_OK) == 0;
+bool checkSong(int id) {
+    char fullPath[273];
+    snprintf(fullPath, sizeof(fullPath), "%s%d.mp3", USER_SONGS_DIR, id);
+    return access(fullPath, F_OK) == 0;
 }
 
-char *convert_if_gdlvl(char *gmd, const char *path) {
-    const char *extension = get_filename_ext(path);
+char *convertIfGdlvl(char *gmd, const char *path) {
+    const char *extension = getFilenameExt(path);
     if (strcmp(extension, "gdlvl") == 0) {
         unsigned char *decoded = (unsigned char *)malloc(strlen(gmd));
         if (!decoded) {
@@ -3476,20 +3476,20 @@ char *convert_if_gdlvl(char *gmd, const char *path) {
             return NULL;
         }
 
-        fix_base64_url(gmd);
-        int decoded_len = base64_decode(gmd, decoded);
-        if (decoded_len <= 0) {
-            output_log("Failed to decode base64\n");
+        fixBase64URL(gmd);
+        int decodedLen = base64Decode(gmd, decoded);
+        if (decodedLen <= 0) {
+            outputLog("Failed to decode base64\n");
             free(gmd);
             free(decoded);
             return NULL;
         }
 
-        size_t decompressed_len;
-        int out_code;
-        char *decompressed = decompress_data(decoded, decoded_len, &decompressed_len, &out_code);
+        size_t decompressedLen;
+        int outCode;
+        char *decompressed = decompressData(decoded, decodedLen, &decompressedLen, &outCode);
         if (!decompressed) {
-            output_log("Decompression failed (check zlib error above)\n");
+            outputLog("Decompression failed (check zlib error above)\n");
             free(gmd);
             free(decoded);
             return NULL;

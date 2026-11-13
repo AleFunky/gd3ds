@@ -10,10 +10,10 @@
 #define COLLECTABLE_EFFECT_LIFE        3.0f
 #define COLLECTABLE_EFFECT_DRAW_OFFSET 6.0f
 
-void collectable_effect_spawn(float x, float y, int base_tex, int detail_tex,
-                              int main_channel, int detail_channel,
-                              float detail_x, float detail_y,
-                              float scale_x, float scale_y,
-                              unsigned char flip_x, unsigned char flip_y);
-void update_collectable_effect(float delta);
-void draw_collectable_effect();
+void collectableEffectSpawn(float x, float y, int baseTex, int detailTex,
+                              int mainChannel, int detailChannel,
+                              float detailX, float detailY,
+                              float scaleX, float scaleY,
+                              unsigned char flipX, unsigned char flipY);
+void updateCollectableEffect(float delta);
+void drawCollectableEffect();

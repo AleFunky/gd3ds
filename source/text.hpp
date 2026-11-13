@@ -27,13 +27,13 @@ typedef struct {
     short sprite;
 } TextGlyphPlacement;
 
-bool parse_hex_color(const char *str, u32 *out);
+bool parseHexColor(const char *str, u32 *out);
 
-unsigned char text_object_layout(const Charset *font, const char *text, TextGlyphPlacement *out, unsigned char max_out);
+unsigned char textObjectLayout(const Charset *font, const char *text, TextGlyphPlacement *out, unsigned char maxOut);
 
-void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const float y, const float scaleX, const float scaleY, float alignment, bool parse_tags, const char *text, ...);
-float get_text_length(const Charset *font, const float zoom_x, bool parse_tags, const char *text);
-float get_longest_line_length(const Charset *font, const float zoom_x, const char *text);
-char *wrap_text(const Charset *font, float zoom_x, const char *text, float max_width);
-int count_lines(const char *text, bool parse_tags);
-float get_text_height(const Charset *font, C2D_SpriteSheet *sheet, const float scaleY, bool parse_tags, const char *text);
+void drawText(const Charset *font, C2D_SpriteSheet *sheet, const float x, const float y, const float scaleX, const float scaleY, float alignment, bool parseTags, const char *text, ...);
+float getTextLength(const Charset *font, const float zoomX, bool parseTags, const char *text);
+float getLongestLineLength(const Charset *font, const float zoomX, const char *text);
+char *wrapText(const Charset *font, float zoomX, const char *text, float maxWidth);
+int countLines(const char *text, bool parseTags);
+float getTextHeight(const Charset *font, C2D_SpriteSheet *sheet, const float scaleY, bool parseTags, const char *text);

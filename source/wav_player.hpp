@@ -8,5 +8,5 @@ typedef struct {
     int channels;
 } SFX;
 
-bool load_wav(const char* path, SFX* sfx);
-void play_sfx(SFX* sfx, int channel);
+bool loadWav(const char* path, SFX* sfx);
+void playSfx(SFX* sfx, int channel);

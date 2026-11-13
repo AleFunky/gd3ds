@@ -13,63 +13,63 @@
 #include "utils/gfx.hpp"
 #include <stdlib.h>
 
-void ui_list_reset(UIList *list) {
+void uiListReset(UIList *list) {
     if (!list) return;
     
     list->scrollY = 0;
 
-    UIElement *child = list->base.first_child;
+    UIElement *child = list->base.firstChild;
 
     while (child) {
-        UIElement *next = child->next_sibling;
-        ui_destroy_tree(child);
+        UIElement *next = child->nextSibling;
+        uiDestroyTree(child);
         child = next;
     }
 
-    list->base.first_child = NULL;
-    list->base.last_child = NULL;
+    list->base.firstChild = NULL;
+    list->base.lastChild = NULL;
     
     list->contentHeight = 0;
     list->lastTouchY = 0;
 }
 
 
-void ui_list_add(UIList* list, UIElement* item) {
+void uiListAdd(UIList* list, UIElement* item) {
     if (!list) return;
 
-    ui_element_add_child((UIElement *) list, item);
+    uiElementAddChild((UIElement *) list, item);
 
     list->contentHeight += item->h;
 }
 
-void ui_list_set_bg_color(UIList *list, u32 color) {
+void uiListSetBgColor(UIList *list, u32 color) {
     if (!list) return;
 
-    list->background_color = color;
+    list->backgroundColor = color;
 }
 
-static void ui_list_forward_touch(UIList *list, UIInput *input, UITransform *transform) {
+static void uiListForwardTouch(UIList *list, UIInput *input, UITransform *transform) {
     UITransform child = *transform;
     child.y += list->scrollY;
 
     float y = list->scrollY - list->base.h * 0.5f;
 
-    for (UIElement *item = list->base.first_child; item; item = item->next_sibling) {
+    for (UIElement *item = list->base.firstChild; item; item = item->nextSibling) {
         UITransform t = *transform;
         t.y += y + (item->h * 0.5f);
 
-        ui_update_tree(item, input, &t);
+        uiUpdateTree(item, input, &t);
 
         y += item->h;
     }
 }
 
-static void ui_list_update(UIElement* e, UIInput* touch, UITransform *transform) {
+static void uiListUpdate(UIElement* e, UIInput* touch, UITransform *transform) {
     UIList* l = (UIList *) e;
 
-    bool inside = ui_element_basic_bound_check(e, touch, transform);
+    bool inside = uiElementBasicBoundCheck(e, touch, transform);
 
-    ui_list_forward_touch(l, touch, transform);
+    uiListForwardTouch(l, touch, transform);
     if (inside) {  
         // Exit if used something
         if (touch->interacted) return;
@@ -135,30 +135,30 @@ static void ui_list_update(UIElement* e, UIInput* touch, UITransform *transform)
     }
 }
 
-static void ui_list_draw(UIElement* e, UITransform *transform) {
+static void uiListDraw(UIElement* e, UITransform *transform) {
     UIList* l = (UIList *) e;
 
     float width = e->w * transform->scaleX;
     float height = e->h * transform->scaleY;
 
-    float scissor_x = transform->x - (width / 2);
-    float scissor_y = transform->y - (height / 2);
+    float scissorX = transform->x - (width / 2);
+    float scissorY = transform->y - (height / 2);
 
     // Draw background
-    C2D_DrawRectSolid(scissor_x, scissor_y, 0, width, height, l->background_color);
+    C2D_DrawRectSolid(scissorX, scissorY, 0, width, height, l->backgroundColor);
     
     // Enable clipping
-    set_scissor(GPU_SCISSOR_NORMAL, scissor_x, scissor_y, width, height);
+    setScissor(GPU_SCISSOR_NORMAL, scissorX, scissorY, width, height);
 
     float y = l->scrollY - e->h * 0.5f;
 
-    for (UIElement *item = e->first_child; item; item = item->next_sibling) {
+    for (UIElement *item = e->firstChild; item; item = item->nextSibling) {
         UITransform t = *transform;
         t.y += (y + (item->h * 0.5f)) * transform->scaleY;
 
         item->w = e->w;
 
-        ui_draw_tree(item, &t);
+        uiDrawTree(item, &t);
 
         y += item->h;
     }
@@ -169,14 +169,14 @@ static void ui_list_draw(UIElement* e, UITransform *transform) {
     C2D_Prepare();
 }
 
-static void ui_list_destroy(UIElement *e) {
+static void uiListDestroy(UIElement *e) {
     if (e) {
         delete (UIList *)e;
         e = NULL;
     }
 }
 
-UIList *ui_create_list(UIScreen *screen) {
+UIList *uiCreateList(UIScreen *screen) {
     UIList *e = new UIList{};
 
     if (!e) return NULL;
@@ -184,25 +184,25 @@ UIList *ui_create_list(UIScreen *screen) {
     e->base.type = UI_LIST;
     e->base.enabled = true;
 
-    e->base.update = ui_list_update;
-    e->base.draw = ui_list_draw;
-    e->base.destroy = ui_list_destroy;
+    e->base.update = uiListUpdate;
+    e->base.draw = uiListDraw;
+    e->base.destroy = uiListDestroy;
 
-    e->base.draws_children = true;
+    e->base.drawsChildren = true;
     
-    ui_list_reset(e);
+    uiListReset(e);
 
     return e;
 }
 
-UIElement *ui_create_list_from_props(UIScreen *screen, const UIPropertyList *props) {
-    UIList *list = ui_create_list(screen);
+UIElement *uiCreateListFromProps(UIScreen *screen, const UIPropertyList *props) {
+    UIList *list = uiCreateList(screen);
 
     if (!list) return NULL;
     
-    ui_element_apply_properties(&list->base, screen, props);
+    uiElementApplyProperties(&list->base, screen, props);
 
-    ui_list_set_bg_color(list, ui_prop_color(props, "bgColor", ABGR8(0, 0, 0, 0)));
+    uiListSetBgColor(list, uiPropColor(props, "bgColor", ABGR8(0, 0, 0, 0)));
 
     return &list->base;
 }

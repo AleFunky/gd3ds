@@ -11,8 +11,8 @@
 #define COIN_BIG_USER_ID 417
 #define COIN_BIG_USER_SCALE 0.325f
 
-void reset_coins();
-void unpause_game();
-void pause_game();
+void resetCoins();
+void unpauseGame();
+void pauseGame();
 
-extern const UIScreenDefPair gameplay_def;
+extern const UIScreenDefPair gameplayDef;

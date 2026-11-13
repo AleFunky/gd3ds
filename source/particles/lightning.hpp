@@ -17,13 +17,13 @@ struct LightningPoint {
 };
 
 struct LightningSegment {
-    float start_x;
-    float start_y;
-    float end_x;
-    float end_y;
+    float startX;
+    float startY;
+    float endX;
+    float endY;
     u32 color;
 
-    LightningSegment(float start_x, float start_y, float end_x, float end_y, u32 color);
+    LightningSegment(float startX, float startY, float endX, float endY, u32 color);
 };
 
 class Lightning {
@@ -31,17 +31,17 @@ private:
     std::vector<LightningSegment> segments;
     float pulseTime;
 
-    std::vector<LightningSegment> generate_lighting_recursive(
+    std::vector<LightningSegment> generateLightingRecursive(
         const std::vector<LightningPoint>& points, 
-        int segment_length, 
+        int segmentLength, 
         LightningType type,
         unsigned long long seed
     );
 public:
-    Lightning(float start_x, float start_y, float end_x, float end_y, LightningType type);
-    void render_lightning();
+    Lightning(float startX, float startY, float endX, float endY, LightningType type);
+    void renderLightning();
     bool done();
 };
 
-extern std::deque<Lightning> lightning_bolts;
-void draw_all_lightning();
+extern std::deque<Lightning> lightningBolts;
+void drawAllLightning();

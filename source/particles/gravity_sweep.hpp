@@ -19,10 +19,10 @@ class GravitySweep {
 public:
     GravitySweep(bool down);
 
-    void start_sweep();
-    void render_sweep();
+    void startSweep();
+    void renderSweep();
     bool done();
 };
 
-void start_gravity_sweep(bool down);
-void draw_gravity_sweeps();
+void startGravitySweep(bool down);
+void drawGravitySweeps();

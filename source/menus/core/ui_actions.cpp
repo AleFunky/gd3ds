@@ -3,7 +3,7 @@
 #include "wav_player.hpp"
 #include "ui_actions.hpp"
 
-const UIIntEnumEntry anim_enum[] = {
+const UIIntEnumEntry animEnum[] = {
     { "none", ANIM_NONE },
     { "slide_down", ANIM_SLIDE_DOWN },
     { "slide_right", ANIM_SLIDE_RIGHT },
@@ -13,58 +13,58 @@ const UIIntEnumEntry anim_enum[] = {
     { "bounce_down_slow", ANIM_BOUNCE_DOWN_SLOW },
 };
 
-const UIIntEnumEntry screen_enum[] = {
+const UIIntEnumEntry screenEnum[] = {
     { "top", SCREEN_TOP },
     { "btm", SCREEN_BTM }
 };
 
-const UIIntEnumEntry push_enum[] = {
+const UIIntEnumEntry pushEnum[] = {
     { "next", PUSH_NEXT },
     { "after_close", PUSH_AFTER_CLOSE },
     { "root", PUSH_ROOT }
 };
 
-static void action_open_menu(UIElement *e, const UIPropertyList *args){
-    UIAnimation top_anim = (UIAnimation)ui_prop_int_enum(args, "top_anim", anim_enum, ARRAY_LEN(anim_enum), ANIM_NONE);
-    UIAnimation btm_anim = (UIAnimation)ui_prop_int_enum(args, "btm_anim", anim_enum, ARRAY_LEN(anim_enum), ANIM_NONE);
-    ui_stack_push_name(ui_prop_string(args, "screen", "soggy"), top_anim, btm_anim, (UIStackPushType)ui_prop_int_enum(args, "type", push_enum, ARRAY_LEN(push_enum), PUSH_NEXT));
+static void actionOpenMenu(UIElement *e, const UIPropertyList *args){
+    UIAnimation topAnim = (UIAnimation)uiPropIntEnum(args, "top_anim", animEnum, ARRAY_LEN(animEnum), ANIM_NONE);
+    UIAnimation btmAnim = (UIAnimation)uiPropIntEnum(args, "btm_anim", animEnum, ARRAY_LEN(animEnum), ANIM_NONE);
+    uiStackPushName(uiPropString(args, "screen", "soggy"), topAnim, btmAnim, (UIStackPushType)uiPropIntEnum(args, "type", pushEnum, ARRAY_LEN(pushEnum), PUSH_NEXT));
 }
 
-static void action_close_menu(UIElement *e, const UIPropertyList *args){
-    ui_stack_pop();
+static void actionCloseMenu(UIElement *e, const UIPropertyList *args){
+    uiStackPop();
 }
 
-static void action_close_context(UIElement *e, const UIPropertyList *args){
-    ui_stack_pop_context();
+static void actionCloseContext(UIElement *e, const UIPropertyList *args){
+    uiStackPopContext();
 }
 
-static void action_disable_tag(UIElement *e, const UIPropertyList *args){
-    int screen = ui_prop_int_enum(args, "screen", screen_enum, ARRAY_LEN(screen_enum), -1);
+static void actionDisableTag(UIElement *e, const UIPropertyList *args){
+    int screen = uiPropIntEnum(args, "screen", screenEnum, ARRAY_LEN(screenEnum), -1);
     if(screen >= 0 && screen < 2){
-        ui_run_func_on_tag(&e->screen->pair->screens[screen], ui_prop_string(args, "tag", ";,[]{}Nope"), ui_disable_element);
+        uiRunFuncOnTag(&e->screen->pair->screens[screen], uiPropString(args, "tag", ";,[]{}Nope"), uiDisableElement);
         return;
     }
-    ui_run_func_on_tag(e->screen, ui_prop_string(args, "tag", "unused"), ui_disable_element);
+    uiRunFuncOnTag(e->screen, uiPropString(args, "tag", "unused"), uiDisableElement);
 }
 
-static void action_enable_tag(UIElement *e, const UIPropertyList *args){
-    int screen = ui_prop_int_enum(args, "screen", screen_enum, ARRAY_LEN(screen_enum), -1);
+static void actionEnableTag(UIElement *e, const UIPropertyList *args){
+    int screen = uiPropIntEnum(args, "screen", screenEnum, ARRAY_LEN(screenEnum), -1);
     if(screen >= 0 && screen < 2){
-        ui_run_func_on_tag(&e->screen->pair->screens[screen], ui_prop_string(args, "tag", ";,[]{}Nope"), ui_enable_element);
+        uiRunFuncOnTag(&e->screen->pair->screens[screen], uiPropString(args, "tag", ";,[]{}Nope"), uiEnableElement);
         return;
     }
-    ui_run_func_on_tag(e->screen, ui_prop_string(args, "tag", "unused"), ui_enable_element);
+    uiRunFuncOnTag(e->screen, uiPropString(args, "tag", "unused"), uiEnableElement);
 }
 
-static void action_play_sound(UIElement *e, const UIPropertyList *args){
-    play_sfx(get_sound(ui_prop_string(args, "sound", "boop")), ui_prop_int(args, "channel", 1));
+static void actionPlaySound(UIElement *e, const UIPropertyList *args){
+    playSfx(getSound(uiPropString(args, "sound", "boop")), uiPropInt(args, "channel", 1));
 }
 
-extern const UIActionDef base_actions[] = {
-    { "open_menu", action_open_menu },
-    { "close_menu", action_close_menu },
-    { "close_context", action_close_context },
-    { "disable_tag", action_disable_tag },
-    { "enable_tag", action_enable_tag },
-    { "play_sound", action_play_sound }
+extern const UIActionDef baseActions[] = {
+    { "open_menu", actionOpenMenu },
+    { "close_menu", actionCloseMenu },
+    { "close_context", actionCloseContext },
+    { "disable_tag", actionDisableTag },
+    { "enable_tag", actionEnableTag },
+    { "play_sound", actionPlaySound }
 };

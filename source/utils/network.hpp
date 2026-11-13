@@ -51,31 +51,31 @@ typedef struct {
     volatile bool running;
     volatile bool cancelled;
 
-    u64 last_time;
-    curl_off_t last_bytes;
+    u64 lastTime;
+    curl_off_t lastBytes;
 
     const char *path;
     const char *url;
-    char file_name[16];
+    char fileName[16];
     char extension[8];
 } DownloadTask;
 
-Thread create_file_download_thread(DownloadTask *task);
+Thread createFileDownloadThread(DownloadTask *task);
 
-int soc_init();
+int socInit();
 
-int get_level_from_id(GenericTask *task, char **out_data, int id, bool useGdps);
+int getLevelFromID(GenericTask *task, char **outData, int id, bool useGdps);
 
-int get_search_results(GenericTask *task, char **out_data, int gameVer, SearchFilters f, bool useGdps);
+int getSearchResults(GenericTask *task, char **outData, int gameVer, SearchFilters f, bool useGdps);
 
-int get_comments_from_id(GenericTask *task, char **out_data, int id, int page, int mode, bool useGdps);
+int getCommentsFromID(GenericTask *task, char **outData, int id, int page, int mode, bool useGdps);
 
-int get_song_info_from_id(GenericTask *task, char **out_data, int songId, bool useGdps);
+int getSongInfoFromID(GenericTask *task, char **outData, int songId, bool useGdps);
 
-int get_commits(GenericTask *task, char **out_data, const char *repoOwner, const char *repoName, const char *repoBranch);
+int getCommits(GenericTask *task, char **outData, const char *repoOwner, const char *repoName, const char *repoBranch);
 
-int get_releases(GenericTask *task, char **out_data, const char *repoOwner, const char *repoName);
+int getReleases(GenericTask *task, char **outData, const char *repoOwner, const char *repoName);
 
-int get_actions(GenericTask *task, char **out_data, const char *repoOwner, const char *repoName, const char *actionName);
+int getActions(GenericTask *task, char **outData, const char *repoOwner, const char *repoName, const char *actionName);
 
-void soc_exit();
+void shutdownSoc();

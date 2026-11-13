@@ -36,18 +36,18 @@
 #define COIN_UNCOLLECTED_CUSTOM_SHEET 4
 #define COIN_UNCOLLECTED_CUSTOM_SCALE 0.968f
 
-static bool yes_exit = false;
+static bool yesExit = false;
 static bool restart = false;
 static bool init = false;
 
-static bool animating_down = false;
-static bool animating_reward = false;
-static bool animating_up = false;
+static bool animatingDown = false;
+static bool animatingReward = false;
+static bool animatingUp = false;
 
-static float anim_time = 0;
+static float animTime = 0;
 
-static float up_y_start = 0;
-static float window_y_pos = 0;
+static float upYStart = 0;
+static float windowYPos = 0;
 
 static int rewardAnimPhase = 0;
 static float rewardAnimTime = 0.f;
@@ -55,24 +55,24 @@ static bool playedRewardSFX;
 
 static bool showStars;
 
-static UIScreen screen_top;
+static UIScreen screenTop;
 static UIScreen screen = {
     .isBottom = true
 };
 
-static UILabel *attempt_text;
-static UILabel *jumps_text;
-static UILabel *time_text;
+static UILabel *attemptText;
+static UILabel *jumpsText;
+static UILabel *timeText;
 
-static UILabel *completion_text;
+static UILabel *completionText;
 
-static UIImage *coins_full[3];
-static UIImage *coins_base[3];
+static UIImage *coinsFull[3];
+static UIImage *coinsBase[3];
 static UIParticle *particles[4];
 
-const char *practice_completion_text = "Well done... Now try to complete it\nwithout any checkpoints!";
+const char *practiceCompletionText = "Well done... Now try to complete it\nwithout any checkpoints!";
 
-const char *do_not_completion_texts[] = {
+const char *doNotCompletionTexts[] = {
     "Not 1 attempt",
     "You beat this instead of Story Madness...",
     "That was kinda sloppy",
@@ -183,7 +183,7 @@ const char *do_not_completion_texts[] = {
     "your winner!"
 };
 
-const char *completion_texts[] = {
+const char *completionTexts[] = {
     "Impressive",
     "Awesome!",
     "Not bad!",
@@ -203,140 +203,140 @@ const char *completion_texts[] = {
 };
 
 
-static void exit_level_complete(UIElement* e, const UIPropertyList *args) {
-    if (!animating_up) {
-        play_sfx(&quit_sound, 1);
-        yes_exit = true;
-        animating_up = true;
-        animating_down = false;
-        anim_time = 0;
+static void exitLevelComplete(UIElement* e, const UIPropertyList *args) {
+    if (!animatingUp) {
+        playSfx(&quitSound, 1);
+        yesExit = true;
+        animatingUp = true;
+        animatingDown = false;
+        animTime = 0;
     }
 }
 
-static void restart_level(UIElement* e, const UIPropertyList *args) {
-    if (!animating_up) {
-        play_sfx(&play_sound, 1);
-        animating_up = true;
-        animating_down = false;
-        anim_time = 0;
-        pause_playback_mp3();
+static void restartLevel(UIElement* e, const UIPropertyList *args) {
+    if (!animatingUp) {
+        playSfx(&playSound, 1);
+        animatingUp = true;
+        animatingDown = false;
+        animTime = 0;
+        pausePlaybackMP3();
     }
 }
 
-static void scale_bottom_buttons_anim(UIElement* e){
+static void scaleBottomButtonsAnim(UIElement* e){
     UIButton *button = (UIButton *) e;
 
-    float fade_value_scale = easeValue(ELASTIC_OUT, 0, 1, anim_time, ANIM_DURATION, 1.f);
+    float fadeValueScale = easeValue(ELASTIC_OUT, 0, 1, animTime, ANIM_DURATION, 1.f);
     
-    ui_element_set_scale((UIElement *) button, fade_value_scale);
+    uiElementSetScale((UIElement *) button, fadeValueScale);
 }
 
 static UIActionDef actions[] = {
-    { "restart", restart_level },
-    { "exit", exit_level_complete },
+    { "restart", restartLevel },
+    { "exit", exitLevelComplete },
 };
 
 // This runs the initial animation of the menu coming off screen
-static void run_start_animation(float delta) {
-    float fade_value = easeValue(BOUNCE_OUT, 0, 240, anim_time, ANIM_DURATION, 1.f);\
-    window_y_pos = -120 + fade_value;
-    up_y_start = fade_value;
+static void runStartAnimation(float delta) {
+    float fadeValue = easeValue(BOUNCE_OUT, 0, 240, animTime, ANIM_DURATION, 1.f);\
+    windowYPos = -120 + fadeValue;
+    upYStart = fadeValue;
 
-    UIDarken *darken = (UIDarken *) ui_get_element_by_tag(&screen, "endDarken");
-    darken->base.opacity = clampf(anim_time, 0.f, 0.6f);
-    ui_darken_reset_opacity(darken);
+    UIDarken *darken = (UIDarken *) uiGetElementByTag(&screen, "endDarken");
+    darken->base.opacity = clampf(animTime, 0.f, 0.6f);
+    uiDarkenResetOpacity(darken);
 
-    ui_run_func_on_tag(&screen, "bottomWindow", scale_bottom_buttons_anim);
+    uiRunFuncOnTag(&screen, "bottomWindow", scaleBottomButtonsAnim);
     
-    ui_set_pos_on_tag(&screen, (float)SCREEN_BOT_WIDTH / 2, window_y_pos, "window");
-    ui_set_pos_on_tag(&screen_top, (float)SCREEN_WIDTH / 2, window_y_pos, "window");
+    uiSetPosOnTag(&screen, (float)SCREEN_BOT_WIDTH / 2, windowYPos, "window");
+    uiSetPosOnTag(&screenTop, (float)SCREEN_WIDTH / 2, windowYPos, "window");
 
-    if(anim_time > 0.6f){
-        animating_reward = true;
+    if(animTime > 0.6f){
+        animatingReward = true;
     }
 
     // Animation end
-    if (anim_time >= ANIM_DURATION) {
-        animating_down = false;
-        anim_time = 0;
+    if (animTime >= ANIM_DURATION) {
+        animatingDown = false;
+        animTime = 0;
     }
-    anim_time += delta;
+    animTime += delta;
 }
 
-static void spawn_reward_firework(UIImage* e){
+static void spawnRewardFirework(UIImage* e){
     float x = e->base.x;
     float y = e->base.y;
 
     UIParticle *particle = particles[rewardAnimPhase];
-    ui_particle_emit(particle, 60);
+    uiParticleEmit(particle, 60);
 
-    ui_set_use_effect_col(
-        ui_add_use_effect(
-            (UIUseEffect *) ui_get_element_by_tag(&screen_top, "rewardCircle"),
-        x, y, &death_effect),
+    uiSetUseEffectCol(
+        uiAddUseEffect(
+            (UIUseEffect *) uiGetElementByTag(&screenTop, "rewardCircle"),
+        x, y, &deathEffect),
     1.f,
-    level_has_unverified_coins() ? USER_COIN_UNRATED_G / 255.f : (state.custom_level ? 1.f : 0.75f),
-    level_has_unverified_coins() ? USER_COIN_UNRATED_B / 255.f : (state.custom_level ? 1.f : 0.f));
+    levelHasUnverifiedCoins() ? USER_COIN_UNRATED_G / 255.f : (state.customLevel ? 1.f : 0.75f),
+    levelHasUnverifiedCoins() ? USER_COIN_UNRATED_B / 255.f : (state.customLevel ? 1.f : 0.f));
 }
 
 // This plays the animation of the coins popping into place and the stars
-static void run_rewards_animation(float delta){
+static void runRewardsAnimation(float delta){
     if(rewardAnimPhase > 3){
-        animating_reward = false;
+        animatingReward = false;
         return;
     }
 
     //move particles and use effects to align with coin when still animating the window coming onscreen
-    if(animating_down || animating_up){
-        ui_particle_update_pos(particles[rewardAnimPhase]);
-        ui_use_effect_update_pos((UIUseEffect *) ui_get_element_by_tag(&screen_top, "rewardCircle"));
+    if(animatingDown || animatingUp){
+        uiParticleUpdatePos(particles[rewardAnimPhase]);
+        uiUseEffectUpdatePos((UIUseEffect *) uiGetElementByTag(&screenTop, "rewardCircle"));
     }
 
-    LevelData *level_data_sel = &current_level_entry->data;
+    LevelData *levelDataSel = &currentLevelEntry->data;
     UIImage *rewardCenter = NULL;
 
-    float scale_value = easeValue(BOUNCE_OUT, 3.f, 1.f, rewardAnimTime, 0.35f, 1.f);
-    float opacity_value = easeValue(EASE_LINEAR, 0.f, 1.f, rewardAnimTime, 0.1f, 1.f);
+    float scaleValue = easeValue(BOUNCE_OUT, 3.f, 1.f, rewardAnimTime, 0.35f, 1.f);
+    float opacityValue = easeValue(EASE_LINEAR, 0.f, 1.f, rewardAnimTime, 0.1f, 1.f);
     //coins
     if(rewardAnimPhase < 3){
         //Skip uncollected/already collected coins
-        if((rewardAnimPhase == 0 && (!state.current_data.coin1 || level_data_sel->coin1))
-        || (rewardAnimPhase == 1 && (!state.current_data.coin2 || level_data_sel->coin2))
-        || (rewardAnimPhase == 2 && (!state.current_data.coin3 || level_data_sel->coin3))){
+        if((rewardAnimPhase == 0 && (!state.currentData.coin1 || levelDataSel->coin1))
+        || (rewardAnimPhase == 1 && (!state.currentData.coin2 || levelDataSel->coin2))
+        || (rewardAnimPhase == 2 && (!state.currentData.coin3 || levelDataSel->coin3))){
             rewardAnimPhase++;
             rewardAnimTime = 0;
             return;
         }
 
-        UIImage* coin = coins_full[rewardAnimPhase];
+        UIImage* coin = coinsFull[rewardAnimPhase];
         rewardCenter = coin;
         
         coin->base.enabled = true;
 
-        ui_element_set_scale((UIElement *) coin, scale_value * 0.88f);
+        uiElementSetScale((UIElement *) coin, scaleValue * 0.88f);
 
-        ui_image_set_tint(coin, level_has_unverified_coins()
-            ? C2D_Color32(USER_COIN_UNRATED_R, USER_COIN_UNRATED_G, USER_COIN_UNRATED_B, (u8)(opacity_value * 255.f))
-            : C2D_Color32f(1, 1, 1, opacity_value));
+        uiImageSetTint(coin, levelHasUnverifiedCoins()
+            ? C2D_Color32(USER_COIN_UNRATED_R, USER_COIN_UNRATED_G, USER_COIN_UNRATED_B, (u8)(opacityValue * 255.f))
+            : C2D_Color32f(1, 1, 1, opacityValue));
     } else{
         if(showStars) {
-            UIImage* star = (UIImage *) ui_get_element_by_tag(&screen_top, "star");
-            UILabel* star_text = (UILabel *) ui_get_element_by_tag(&screen_top, "startext");
+            UIImage* star = (UIImage *) uiGetElementByTag(&screenTop, "star");
+            UILabel* starText = (UILabel *) uiGetElementByTag(&screenTop, "startext");
             rewardCenter = star;
 
             star->base.enabled = true;
-            star_text->base.enabled = true;
+            starText->base.enabled = true;
 
             //scale around y = 128 (relative to window)
-            int center = up_y_start - 128;
-            star->base.y = ((scale_value * 0.7f) * (up_y_start - 127 - center) + center);
-            star_text->base.y = ((scale_value * 0.55f) * (up_y_start - 83 - center) + center);
+            int center = upYStart - 128;
+            star->base.y = ((scaleValue * 0.7f) * (upYStart - 127 - center) + center);
+            starText->base.y = ((scaleValue * 0.55f) * (upYStart - 83 - center) + center);
 
-            ui_element_set_scale((UIElement *) star, scale_value * 0.7f);
-            ui_element_set_scale_xy((UIElement *) star_text, scale_value * 0.55f, scale_value * 0.55f);
+            uiElementSetScale((UIElement *) star, scaleValue * 0.7f);
+            uiElementSetScaleXy((UIElement *) starText, scaleValue * 0.55f, scaleValue * 0.55f);
 
-            ui_image_set_tint(star, C2D_Color32f(1, 1, 1, opacity_value));
-            star_text->base.opacity = opacity_value;
+            uiImageSetTint(star, C2D_Color32f(1, 1, 1, opacityValue));
+            starText->base.opacity = opacityValue;
         } else {
             return;
         }
@@ -344,8 +344,8 @@ static void run_rewards_animation(float delta){
 
     if(rewardAnimTime >= 0.1f){
         if(!playedRewardSFX){
-            play_sfx(&coin_sound, 1);
-            spawn_reward_firework(rewardCenter);
+            playSfx(&coinSound, 1);
+            spawnRewardFirework(rewardCenter);
             playedRewardSFX = true;
         }
     }
@@ -360,75 +360,75 @@ static void run_rewards_animation(float delta){
 }
 
 // This runs the animation that happens when you press "restart"
-static void run_end_animation(float delta) {
-    float fade_value = easeValue(QUAD_IN, up_y_start, 0, anim_time, RESTART_ANIM_DURATION, 1.f);
-    window_y_pos = -120 + fade_value;
+static void runEndAnimation(float delta) {
+    float fadeValue = easeValue(QUAD_IN, upYStart, 0, animTime, RESTART_ANIM_DURATION, 1.f);
+    windowYPos = -120 + fadeValue;
 
-    ui_set_pos_on_tag(&screen, (float)SCREEN_BOT_WIDTH / 2.f, window_y_pos, "window");
-    ui_set_pos_on_tag(&screen_top, (float)SCREEN_WIDTH / 2.f, window_y_pos, "window");
+    uiSetPosOnTag(&screen, (float)SCREEN_BOT_WIDTH / 2.f, windowYPos, "window");
+    uiSetPosOnTag(&screenTop, (float)SCREEN_WIDTH / 2.f, windowYPos, "window");
     
     // Animation end
-    if (anim_time >= RESTART_ANIM_DURATION) {
-        animating_up = false;
+    if (animTime >= RESTART_ANIM_DURATION) {
+        animatingUp = false;
         restart = true;
-        anim_time = 0;
+        animTime = 0;
     }
-    anim_time += delta;
+    animTime += delta;
 }
 
 #define COMPLETION_TEXT_MAX_WIDTH 250.f
 
-static const UIScreenDefinition level_complete_def = {
-    .action_list = {
+static const UIScreenDefinition levelCompleteDef = {
+    .actionList = {
         .actions = actions,
-        .action_count = ARRAY_LEN(actions)
+        .actionCount = ARRAY_LEN(actions)
     }
 };
 
-static void enable_saved_coins(LevelData *level_data_sel) {
+static void enableSavedCoins(LevelData *levelDataSel) {
     for (int i = 0; i < 3; i++) {
         bool alreadyCollectedCoin = false;
-        if ((i == 0 && level_data_sel->coin1)
-        || (i == 1 && level_data_sel->coin2)
-        || (i == 2 && level_data_sel->coin3)) {
+        if ((i == 0 && levelDataSel->coin1)
+        || (i == 1 && levelDataSel->coin2)
+        || (i == 2 && levelDataSel->coin3)) {
             alreadyCollectedCoin = true;
         }
 
-        UIImage *coin = coins_full[i];
+        UIImage *coin = coinsFull[i];
 
         if (alreadyCollectedCoin) {
             coin->base.enabled = true;
             coin->base.opacity = 1.f;
 
-            ui_element_set_scale((UIElement *) coin, 0.88f);
+            uiElementSetScale((UIElement *) coin, 0.88f);
         }
     }
 }
 
-void level_complete_init() {
+void levelCompleteInit() {
     init = true;
-    in_level_complete = true;
+    inLevelComplete = true;
 
-    level_unrated_online_refresh();
+    levelUnratedOnlineRefresh();
     
-    ui_unload_screen(&screen);
-    ui_unload_screen(&screen_top);
+    uiUnloadScreen(&screen);
+    uiUnloadScreen(&screenTop);
     
-    screen.def = &level_complete_def;
+    screen.def = &levelCompleteDef;
 
-    ui_load_screen_old(&screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/level_complete_top.txt");
-    ui_load_screen_old(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/level_complete.txt");
+    uiLoadScreenOld(&screenTop, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/level_complete_top.txt");
+    uiLoadScreenOld(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/level_complete.txt");
 
-    state.current_data.time_end = svcGetSystemTick() / (CPU_TICKS_PER_MSEC * 1000);
+    state.currentData.timeEnd = svcGetSystemTick() / (CPU_TICKS_PER_MSEC * 1000);
 
     char attempts[64];
     char jumps[64];
     char time[64];
 
-    snprintf(attempts, sizeof(attempts), "Attempts: %d", state.current_data.attempts);
-    snprintf(jumps, sizeof(jumps), "Jumps: %d", state.current_data.jumps);
+    snprintf(attempts, sizeof(attempts), "Attempts: %d", state.currentData.attempts);
+    snprintf(jumps, sizeof(jumps), "Jumps: %d", state.currentData.jumps);
 
-    float timer = state.current_data.time_end - state.current_data.time_start;
+    float timer = state.currentData.timeEnd - state.currentData.timeStart;
 
     int hours   = (int)(timer) / (60 * 60);
     int minutes = (int)(timer / 60) % 60;
@@ -440,53 +440,53 @@ void level_complete_init() {
         snprintf(time, sizeof(time), "Time: %02d:%02d", minutes, seconds);
     }
 
-    attempt_text = (UILabel *) ui_get_element_by_tag(&screen_top, "attempts");
-    if (attempt_text) ui_label_set_text(attempt_text, attempts);
+    attemptText = (UILabel *) uiGetElementByTag(&screenTop, "attempts");
+    if (attemptText) uiLabelSetText(attemptText, attempts);
 
-    jumps_text = (UILabel *) ui_get_element_by_tag(&screen_top, "jumps");
-    if (jumps_text) ui_label_set_text(jumps_text, jumps);
+    jumpsText = (UILabel *) uiGetElementByTag(&screenTop, "jumps");
+    if (jumpsText) uiLabelSetText(jumpsText, jumps);
 
-    time_text = (UILabel *) ui_get_element_by_tag(&screen_top, "time");
-    if (time_text) ui_label_set_text(time_text, time);
+    timeText = (UILabel *) uiGetElementByTag(&screenTop, "time");
+    if (timeText) uiLabelSetText(timeText, time);
 
-    yes_exit = false;
+    yesExit = false;
     restart = false;
-    animating_down = true;
-    animating_reward = false;
-    animating_up = false;
-    anim_time = 0;
-    window_y_pos = 0;
+    animatingDown = true;
+    animatingReward = false;
+    animatingUp = false;
+    animTime = 0;
+    windowYPos = 0;
 
     rewardAnimPhase = 0;
     rewardAnimTime = 0.f;
     playedRewardSFX = false;
 
-    coins_full[0] = (UIImage *) ui_get_element_by_tag(&screen_top, "coin1full");
-    coins_full[1] = (UIImage *) ui_get_element_by_tag(&screen_top, "coin2full");
-    coins_full[2] = (UIImage *) ui_get_element_by_tag(&screen_top, "coin3full");
+    coinsFull[0] = (UIImage *) uiGetElementByTag(&screenTop, "coin1full");
+    coinsFull[1] = (UIImage *) uiGetElementByTag(&screenTop, "coin2full");
+    coinsFull[2] = (UIImage *) uiGetElementByTag(&screenTop, "coin3full");
 
-    coins_base[0] = (UIImage *) ui_get_element_by_tag(&screen_top, "coin1");
-    coins_base[1] = (UIImage *) ui_get_element_by_tag(&screen_top, "coin2");
-    coins_base[2] = (UIImage *) ui_get_element_by_tag(&screen_top, "coin3");
+    coinsBase[0] = (UIImage *) uiGetElementByTag(&screenTop, "coin1");
+    coinsBase[1] = (UIImage *) uiGetElementByTag(&screenTop, "coin2");
+    coinsBase[2] = (UIImage *) uiGetElementByTag(&screenTop, "coin3");
 
-    int coin_display_count = get_level_coin_count();
-    if (coin_display_count > 3) coin_display_count = 3;
+    int coinDisplayCount = getLevelCoinCount();
+    if (coinDisplayCount > 3) coinDisplayCount = 3;
 
-    if (state.custom_level) {
+    if (state.customLevel) {
         for (int i = 0; i < 3; i++) {
-            ui_image_set_image(coins_full[i], SECRET_COIN_UI2_ID, 0);
-            if (level_has_unverified_coins()) ui_image_set_tint(coins_full[i], USER_COIN_UNRATED_TINT);
+            uiImageSetImage(coinsFull[i], SECRET_COIN_UI2_ID, 0);
+            if (levelHasUnverifiedCoins()) uiImageSetTint(coinsFull[i], USER_COIN_UNRATED_TINT);
         }
     }
 
-    ui_run_func_on_tag(&screen_top, "coinfull", ui_disable_element);
+    uiRunFuncOnTag(&screenTop, "coinfull", uiDisableElement);
 
-    particles[0] = (UIParticle *) ui_get_element_by_tag(&screen_top, "coinParticle1");
-    particles[1] = (UIParticle *) ui_get_element_by_tag(&screen_top, "coinParticle2");
-    particles[2] = (UIParticle *) ui_get_element_by_tag(&screen_top, "coinParticle3");
-    particles[3] = (UIParticle *) ui_get_element_by_tag(&screen_top, "starParticle");
+    particles[0] = (UIParticle *) uiGetElementByTag(&screenTop, "coinParticle1");
+    particles[1] = (UIParticle *) uiGetElementByTag(&screenTop, "coinParticle2");
+    particles[2] = (UIParticle *) uiGetElementByTag(&screenTop, "coinParticle3");
+    particles[3] = (UIParticle *) uiGetElementByTag(&screenTop, "starParticle");
 
-    if (level_has_unverified_coins()) {
+    if (levelHasUnverifiedCoins()) {
         for (int i = 0; i < 3; i++) {
             particles[i]->particle.cfg.startColorRed    = USER_COIN_UNRATED_R / 255.f;
             particles[i]->particle.cfg.startColorGreen  = USER_COIN_UNRATED_G / 255.f;
@@ -498,149 +498,149 @@ void level_complete_init() {
     }
 
     // Set completion text
-    completion_text = (UILabel *) ui_get_element_by_tag(&screen_top, "funnytext");
+    completionText = (UILabel *) uiGetElementByTag(&screenTop, "funnytext");
     
-    LevelData *level_data_sel = &current_level_entry->data;
+    LevelData *levelDataSel = &currentLevelEntry->data;
 
-    UILabel *star_text = (UILabel *) ui_get_element_by_tag(&screen_top, "startext");
+    UILabel *starText = (UILabel *) uiGetElementByTag(&screenTop, "startext");
 
-    char star_count[4];
-    int stars = level_data_sel->stars;
-    snprintf(star_count, sizeof(star_count), "+%d", stars);
-    ui_label_set_text(star_text, star_count);
+    char starCount[4];
+    int stars = levelDataSel->stars;
+    snprintf(starCount, sizeof(starCount), "+%d", stars);
+    uiLabelSetText(starText, starCount);
 
-    ui_disable_element(ui_get_element_by_tag(&screen_top, "star"));
-    ui_disable_element((UIElement *) star_text);
+    uiDisableElement(uiGetElementByTag(&screenTop, "star"));
+    uiDisableElement((UIElement *) starText);
 
-    showStars = stars > 0 && level_data_sel->normal_progress < 100;
+    showStars = stars > 0 && levelDataSel->normalProgress < 100;
 
-    if(state.custom_level == true || state.practice_mode || cheated) {
-        if (state.custom_level && !state.practice_mode && !cheated) {
+    if(state.customLevel == true || state.practiceMode || cheated) {
+        if (state.customLevel && !state.practiceMode && !cheated) {
             for (int k = 0; k < 3; k++) {
-                bool saved = (k == 0 && level_data_sel->coin1)
-                          || (k == 1 && level_data_sel->coin2)
-                          || (k == 2 && level_data_sel->coin3);
-                if (k < coin_display_count && !saved) {
-                    ui_image_set_image(coins_base[k], COIN_UNCOLLECTED_CUSTOM_ID, COIN_UNCOLLECTED_CUSTOM_SHEET);
-                    ui_element_set_scale((UIElement *) coins_base[k], COIN_UNCOLLECTED_CUSTOM_SCALE);
-                    if (level_has_unverified_coins()) ui_image_set_tint(coins_base[k], USER_COIN_UNRATED_TINT);
-                    coins_base[k]->base.enabled = true;
+                bool saved = (k == 0 && levelDataSel->coin1)
+                          || (k == 1 && levelDataSel->coin2)
+                          || (k == 2 && levelDataSel->coin3);
+                if (k < coinDisplayCount && !saved) {
+                    uiImageSetImage(coinsBase[k], COIN_UNCOLLECTED_CUSTOM_ID, COIN_UNCOLLECTED_CUSTOM_SHEET);
+                    uiElementSetScale((UIElement *) coinsBase[k], COIN_UNCOLLECTED_CUSTOM_SCALE);
+                    if (levelHasUnverifiedCoins()) uiImageSetTint(coinsBase[k], USER_COIN_UNRATED_TINT);
+                    coinsBase[k]->base.enabled = true;
                 } else {
-                    coins_base[k]->base.enabled = false;
+                    coinsBase[k]->base.enabled = false;
                 }
             }
-            enable_saved_coins(level_data_sel);
+            enableSavedCoins(levelDataSel);
         } else {
-            ui_run_func_on_tag(&screen_top, "coin1", ui_disable_element);
-            ui_run_func_on_tag(&screen_top, "coin2", ui_disable_element);
-            ui_run_func_on_tag(&screen_top, "coin3", ui_disable_element);
+            uiRunFuncOnTag(&screenTop, "coin1", uiDisableElement);
+            uiRunFuncOnTag(&screenTop, "coin2", uiDisableElement);
+            uiRunFuncOnTag(&screenTop, "coin3", uiDisableElement);
         }
     
-        int start_index = 0;
+        int startIndex = 0;
 
         // Skip the "Not 1 attempt" line
         if (settingsState.doNot) {
-            if (state.current_data.attempts == 1) start_index++;
+            if (state.currentData.attempts == 1) startIndex++;
         }
 
-        int text_index = random_int(start_index, (settingsState.doNot ? ARRAY_LEN(do_not_completion_texts) : ARRAY_LEN(completion_texts))- 1);
+        int textIndex = randomInt(startIndex, (settingsState.doNot ? ARRAY_LEN(doNotCompletionTexts) : ARRAY_LEN(completionTexts))- 1);
 
         if (settingsState.doNot) {
             // If exactly 2 attempts, say "Not 1 attempt"
-            if (state.current_data.attempts == 2) text_index = 0;
+            if (state.currentData.attempts == 2) textIndex = 0;
 
             // If on story madness, reroll to not say the story madness line
-            if (text_index == 1 && contains(level_info.level_name, "story madness")) {
+            if (textIndex == 1 && contains(levelInfo.levelName, "story madness")) {
                 do {
-                    text_index = random_int(start_index, (settingsState.doNot ? ARRAY_LEN(do_not_completion_texts) : ARRAY_LEN(completion_texts))- 1);
-                } while(text_index == 1);
+                    textIndex = randomInt(startIndex, (settingsState.doNot ? ARRAY_LEN(doNotCompletionTexts) : ARRAY_LEN(completionTexts))- 1);
+                } while(textIndex == 1);
             }
         }
 
-        const char *text = (settingsState.doNot ? do_not_completion_texts[text_index] : completion_texts[text_index]);
+        const char *text = (settingsState.doNot ? doNotCompletionTexts[textIndex] : completionTexts[textIndex]);
 
         char tmp[512];
 
-        if (state.practice_mode) {
-            text = practice_completion_text;
+        if (state.practiceMode) {
+            text = practiceCompletionText;
         }
         
         if (cheated) {
-            char enabled_cheats[256] = "";
+            char enabledCheats[256] = "";
             size_t len = 0;
             
             for (int i = 0; i < CHEAT_COUNT; i++) {
-                if (cheats_used[i]) {
+                if (cheatsUsed[i]) {
                     if (len > 0) {
-                        len += snprintf(enabled_cheats + len,
-                                        sizeof(enabled_cheats) - len,
+                        len += snprintf(enabledCheats + len,
+                                        sizeof(enabledCheats) - len,
                                         ", ");
                     }
 
-                    len += snprintf(enabled_cheats + len,
-                                    sizeof(enabled_cheats) - len,
+                    len += snprintf(enabledCheats + len,
+                                    sizeof(enabledCheats) - len,
                                     "%s",
-                                    cheat_names[i]);
+                                    cheatNames[i]);
                 }
             }
-            snprintf(tmp, sizeof(tmp), "Safe mode - %s", enabled_cheats);
+            snprintf(tmp, sizeof(tmp), "Safe mode - %s", enabledCheats);
             text = tmp;
         }
         
-        ui_label_set_text(completion_text, text);
+        uiLabelSetText(completionText, text);
     } else {
-        ui_run_func_on_tag(&screen_top, "funnytext", ui_disable_element);
+        uiRunFuncOnTag(&screenTop, "funnytext", uiDisableElement);
 
-        enable_saved_coins(level_data_sel);
+        enableSavedCoins(levelDataSel);
     }
 
-    for (int k = coin_display_count; k < 3; k++) {
-        if (coins_base[k]) coins_base[k]->base.enabled = false;
+    for (int k = coinDisplayCount; k < 3; k++) {
+        if (coinsBase[k]) coinsBase[k]->base.enabled = false;
     }
 
     for (int k = 0; k < 3; k++) {
-        float coin_x = (SCREEN_WIDTH / 2.f) + (k - (coin_display_count - 1) / 2.f) * 50.f;
-        if (coins_base[k]) ui_element_set_position((UIElement *) coins_base[k], coin_x, coins_base[k]->base.y);
-        if (coins_full[k]) ui_element_set_position((UIElement *) coins_full[k], coin_x, coins_full[k]->base.y);
+        float coinX = (SCREEN_WIDTH / 2.f) + (k - (coinDisplayCount - 1) / 2.f) * 50.f;
+        if (coinsBase[k]) uiElementSetPosition((UIElement *) coinsBase[k], coinX, coinsBase[k]->base.y);
+        if (coinsFull[k]) uiElementSetPosition((UIElement *) coinsFull[k], coinX, coinsFull[k]->base.y);
         if (particles[k]) {
-            particles[k]->base.x = coin_x;
-            ui_particle_update_pos(particles[k]);
+            particles[k]->base.x = coinX;
+            uiParticleUpdatePos(particles[k]);
         }
     }
 
-    if (get_level_coin_count() > 0 && !state.practice_mode && !cheated) {
-        ui_run_func_on_tag(&screen_top, "funnytext", ui_disable_element);
+    if (getLevelCoinCount() > 0 && !state.practiceMode && !cheated) {
+        uiRunFuncOnTag(&screenTop, "funnytext", uiDisableElement);
     }
 
-    if (state.practice_mode) {
-        ui_run_func_on_tag(&screen_top, "levelcomplete", ui_disable_element);
+    if (state.practiceMode) {
+        uiRunFuncOnTag(&screenTop, "levelcomplete", uiDisableElement);
         if (settingsState.doNot) {
-            UIImage *level_complete_text = (UIImage *) ui_get_element_by_tag(&screen_top, "practicecomplete");
-            if (level_complete_text) {
-                ui_element_set_scale_x((UIElement *) level_complete_text, level_complete_text->base.scaleX * -1);
+            UIImage *levelCompleteText = (UIImage *) uiGetElementByTag(&screenTop, "practicecomplete");
+            if (levelCompleteText) {
+                uiElementSetScaleX((UIElement *) levelCompleteText, levelCompleteText->base.scaleX * -1);
             }
         }
     } else {
-        ui_run_func_on_tag(&screen_top, "practicecomplete", ui_disable_element);
+        uiRunFuncOnTag(&screenTop, "practicecomplete", uiDisableElement);
         if (settingsState.doNot) {
-            UIImage *level_complete_text = (UIImage *) ui_get_element_by_tag(&screen_top, "levelcomplete");
-            if (level_complete_text) {
-                ui_element_set_scale_x((UIElement *) level_complete_text, level_complete_text->base.scaleX * -1);
+            UIImage *levelCompleteText = (UIImage *) uiGetElementByTag(&screenTop, "levelcomplete");
+            if (levelCompleteText) {
+                uiElementSetScaleX((UIElement *) levelCompleteText, levelCompleteText->base.scaleX * -1);
             }
         }
     }
 
-    ui_get_element_by_tag(&screen, "endDarken")->opacity = 0.f;
+    uiGetElementByTag(&screen, "endDarken")->opacity = 0.f;
 }
 
-int level_complete_loop(UIInput *touch) {
+int levelCompleteLoop(UIInput *touch) {
     if (!init) return 0;
 
-    if (animating_down) run_start_animation(delta);
-    if (animating_reward && !state.practice_mode && !cheated) run_rewards_animation(delta);
-    if (animating_up) run_end_animation(delta);
+    if (animatingDown) runStartAnimation(delta);
+    if (animatingReward && !state.practiceMode && !cheated) runRewardsAnimation(delta);
+    if (animatingUp) runEndAnimation(delta);
 
-    if (yes_exit) {
+    if (yesExit) {
         return 1;
     }
 
@@ -648,23 +648,23 @@ int level_complete_loop(UIInput *touch) {
         return 2;
     }
 
-    ui_screen_update(&screen, touch);
-    ui_screen_update(&screen_top, touch);
+    uiScreenUpdate(&screen, touch);
+    uiScreenUpdate(&screenTop, touch);
 
     return 0;
 }
 
-void level_complete_destroy() {
+void levelCompleteDestroy() {
     init = false;
 }
 
-void draw_level_complete() {
+void drawLevelComplete() {
     if (init) {
-        ui_screen_draw(&screen);
+        uiScreenDraw(&screen);
     }
 }
-void draw_level_complete_top() {
+void drawLevelCompleteTop() {
     if (init) {
-        ui_screen_draw(&screen_top);
+        uiScreenDraw(&screenTop);
     }
 }

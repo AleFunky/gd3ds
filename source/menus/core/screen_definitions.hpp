@@ -3,4 +3,4 @@
 
 extern const UIScreenDefPair *defs[];
 
-extern const UIScreenDefPair *ui_get_screen_def(const char* name);
+extern const UIScreenDefPair *uiGetScreenDef(const char* name);

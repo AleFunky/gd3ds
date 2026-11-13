@@ -4,12 +4,12 @@
 #include "menus/components/ui_label.hpp"
 #include "save/saving.hpp"
 
-static void external_level_infobox_init(UIScreen *s) {
-    UILabel *name = (UILabel *) ui_get_element_by_tag(s, "levelname");
+static void externalLevelInfoboxInit(UIScreen *s) {
+    UILabel *name = (UILabel *) uiGetElementByTag(s, "levelname");
 
-    ui_label_set_text(name, level_info.level_name);
+    uiLabelSetText(name, levelInfo.levelName);
 
-    LevelData *data = &current_level_entry->data;
+    LevelData *data = &currentLevelEntry->data;
 
     char attempts[256];
     snprintf(attempts, sizeof(attempts), "<#40e348>Total Attempts</>: %d", data->attempts);
@@ -18,21 +18,21 @@ static void external_level_infobox_init(UIScreen *s) {
     snprintf(jumps, sizeof(jumps), "<#60abef>Total Jumps</>: %d", data->jumps);
     
     char normal[256];
-    snprintf(normal, sizeof(normal), "<#ff00ff>Normal</>: %d%%", data->normal_progress);
+    snprintf(normal, sizeof(normal), "<#ff00ff>Normal</>: %d%%", data->normalProgress);
     
     char practice[256];
-    snprintf(practice, sizeof(practice), "<#ffa54b>Practice</>: %d%%", data->practice_progress);
+    snprintf(practice, sizeof(practice), "<#ffa54b>Practice</>: %d%%", data->practiceProgress);
 
-    ui_label_set_text((UILabel *) ui_get_element_by_tag(s, "totalattempts"), attempts);
-    ui_label_set_text((UILabel *) ui_get_element_by_tag(s, "totaljumps"), jumps);
-    ui_label_set_text((UILabel *) ui_get_element_by_tag(s, "normalprogressvalue"), normal);
-    ui_label_set_text((UILabel *) ui_get_element_by_tag(s, "practiceprogressvalue"), practice);
+    uiLabelSetText((UILabel *) uiGetElementByTag(s, "totalattempts"), attempts);
+    uiLabelSetText((UILabel *) uiGetElementByTag(s, "totaljumps"), jumps);
+    uiLabelSetText((UILabel *) uiGetElementByTag(s, "normalprogressvalue"), normal);
+    uiLabelSetText((UILabel *) uiGetElementByTag(s, "practiceprogressvalue"), practice);
 }
 
-extern const UIScreenDefPair external_infobox_def = {
+extern const UIScreenDefPair externalInfoboxDef = {
     .name = "external_infobox",
     .btm = {
         .path = "romfs:/menus/creator_menu/external/level_info_pop_up.txt",
-        .init = external_level_infobox_init
+        .init = externalLevelInfoboxInit
     }
 };

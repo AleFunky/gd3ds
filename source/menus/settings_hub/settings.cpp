@@ -25,21 +25,21 @@
 #include "menus/settings_hub/info_card.hpp"
 #include "menus/creator_menu/online/two_option_pop_up.hpp"
 
-static int current_page = 0;
+static int currentPage = 0;
 
 SettingState settingsState;
 
 UIList *list;
-UILabel *category_name;
+UILabel *categoryName;
 
-bool request_list_reload = false;
+bool requestListReload = false;
 
-void wide_setting(bool checked);
-void stereo_setting(bool checked);
-void practiceMusicSync_setting(bool checked);
-void menuMusic_setting(bool checked);
+void wideSetting(bool checked);
+void stereoSetting(bool checked);
+void practiceMusicSyncSetting(bool checked);
+void menuMusicSetting(bool checked);
 
-const char *category_names[] = {
+const char *categoryNames[] = {
     "Graphics",
     "Input",
     "Misc",
@@ -49,14 +49,14 @@ const char *category_names[] = {
 
 // Conditions
 
-bool condition_supports_wide() {
-    u8 model = get_model();
+bool conditionSupportsWide() {
+    u8 model = getModel();
 
-    return model != CFG_MODEL_2DS && !is_citra();
+    return model != CFG_MODEL_2DS && !isCitra();
 }
 
-bool condition_supports_3D() {
-    u8 model = get_model();
+bool conditionSupports3D() {
+    u8 model = getModel();
 
     return model != CFG_MODEL_2DS && model != CFG_MODEL_N2DSXL;
 }
@@ -72,10 +72,10 @@ Setting settings[] = {
         .var = &settingsState.wideEnabled,
         .key = CONFIG_GRAPHICS_PATH "wideEnabled",
 
-        .onChanged = wide_setting,
+        .onChanged = wideSetting,
         
         .disabledForceValue = false,
-        .condition = condition_supports_wide
+        .condition = conditionSupportsWide
     },
     {
         .id = "stereoEnabled",
@@ -87,10 +87,10 @@ Setting settings[] = {
         .var = &settingsState.stereoEnabled,
         .key = CONFIG_GRAPHICS_PATH "stereoEnabled",
 
-        .onChanged = stereo_setting,
+        .onChanged = stereoSetting,
 
         .disabledForceValue = false,
-        .condition = condition_supports_3D
+        .condition = conditionSupports3D
     },
     {
         .id = "particlesDisabled",
@@ -188,7 +188,7 @@ Setting settings[] = {
         .page = PAGE_INPUT,
 
         .defaultValue = false,
-        .var = &pi_enabled,
+        .var = &piEnabled,
         .key = CONFIG_INPUT_PATH "preciseInput"
     },
     {
@@ -241,7 +241,7 @@ Setting settings[] = {
         .var = &settingsState.practiceMusicSync,
         .key = CONFIG_MISC_PATH "practiceMusicSync",
 
-        .onChanged = practiceMusicSync_setting
+        .onChanged = practiceMusicSyncSetting
     },
     {
         .id = "menuMusic",
@@ -253,7 +253,7 @@ Setting settings[] = {
         .var = &settingsState.menuMusic,
         .key = CONFIG_MISC_PATH "menuMusic",
 
-        .onChanged = menuMusic_setting
+        .onChanged = menuMusicSetting
     },
     {
         .id = "fastMenu",
@@ -479,12 +479,12 @@ typedef struct InfoButtonData {
     const char *text;
 } InfoButtonData;
 
-UICheckBox *get_setting_checkbox_by_id(const char *id) {
+UICheckBox *getSettingCheckboxByID(const char *id) {
     if (list) {
         // Iterate through list children
-        for (UIElement *rectangle = list->base.first_child; rectangle; rectangle = rectangle->next_sibling) {
+        for (UIElement *rectangle = list->base.firstChild; rectangle; rectangle = rectangle->nextSibling) {
             // Find checkbox in the rectangle
-            UIElement *checkbox = ui_get_child_by_type(rectangle, UI_CHECKBOX);
+            UIElement *checkbox = uiGetChildByType(rectangle, UI_CHECKBOX);
             if (checkbox) {
                 if (checkbox->userdata) {
                     CheckboxData *data = (CheckboxData *)checkbox->userdata;
@@ -502,69 +502,69 @@ UICheckBox *get_setting_checkbox_by_id(const char *id) {
 }
 
 // Wide and 3D both want the whole top screen, so only one of them gets it
-void turn_off_setting(const char *id, bool *var) {
+void turnOffSetting(const char *id, bool *var) {
     *var = false;
 
-    UICheckBox *checkbox = get_setting_checkbox_by_id(id);
+    UICheckBox *checkbox = getSettingCheckboxByID(id);
 
-    if (checkbox) ui_set_checkbox_checked(checkbox, false);
+    if (checkbox) uiSetCheckboxChecked(checkbox, false);
 }
 
-void wide_setting(bool checked) {
-    if (checked) turn_off_setting("stereoEnabled", &settingsState.stereoEnabled);
+void wideSetting(bool checked) {
+    if (checked) turnOffSetting("stereoEnabled", &settingsState.stereoEnabled);
 }
 
-void stereo_setting(bool checked) {
+void stereoSetting(bool checked) {
     if (!checked) return;
-    if (!_3dWarningPassed) {
-        TwoOptionPopupData *_3d_warning_data = (TwoOptionPopupData *)malloc(sizeof(TwoOptionPopupData));
-        if (!_3d_warning_data) return;
+    if (!threeDWarningPassed) {
+        TwoOptionPopupData *threeDWarningData = (TwoOptionPopupData *)malloc(sizeof(TwoOptionPopupData));
+        if (!threeDWarningData) return;
         
-        _3d_warning_data->text = strdup("3D can significantly lower performance.\nAre you sure you want to keep it on?");
-        _3d_warning_data->title = strdup("Disclaimer");
-        _3d_warning_data->proceed_text = strdup("Enable");
-        _3d_warning_data->cancel_text = strdup("Disable");
-        ui_stack_push(&_3d_warning_pop_up_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
-        ui_stack_push_data(_3d_warning_data);
-        _3dWarningPassed = true;
+        threeDWarningData->text = strdup("3D can significantly lower performance.\nAre you sure you want to keep it on?");
+        threeDWarningData->title = strdup("Disclaimer");
+        threeDWarningData->proceedText = strdup("Enable");
+        threeDWarningData->cancelText = strdup("Disable");
+        uiStackPush(&threeDWarningPopUpDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+        uiStackPushData(threeDWarningData);
+        threeDWarningPassed = true;
     }
 
     // No 3D on this console, so don't let the box stay ticked
-    if (!stereo_supported()) {
-        turn_off_setting("stereoEnabled", &settingsState.stereoEnabled);
+    if (!stereoSupported()) {
+        turnOffSetting("stereoEnabled", &settingsState.stereoEnabled);
         return;
     }
 
-    turn_off_setting("wideEnabled", &settingsState.wideEnabled);
+    turnOffSetting("wideEnabled", &settingsState.wideEnabled);
 }
 
-void practiceMusicSync_setting(bool checked) {
+void practiceMusicSyncSetting(bool checked) {
     // Enable song
-    if (state.practice_mode) {
-        stop_mp3();
+    if (state.practiceMode) {
+        stopMP3();
         if (checked) {
-            play_level_song(level_info.song_offset + state.player.timeElapsed);
+            playLevelSong(levelInfo.songOffset + state.player.timeElapsed);
         } else {
-            play_practice_song();
+            playPracticeSong();
         }
-        pause_playback_mp3();
+        pausePlaybackMP3();
     }
 }
 
-void menuMusic_setting(bool checked) {
-    if (game_state != STATE_MENU) return;
+void menuMusicSetting(bool checked) {
+    if (gameState != STATE_MENU) return;
 
     if (!checked) {
-        if (playing_menu_loop) {
-            stop_mp3();
-            playing_menu_loop = false;
+        if (playingMenuLoop) {
+            stopMP3();
+            playingMenuLoop = false;
         }
-    } else if (!playing_menu_loop) {
-        play_menu_song();
+    } else if (!playingMenuLoop) {
+        playMenuSong();
     }
 }
 
-static void checkbox_action(UIElement *e, const UIPropertyList* args) {
+static void checkboxAction(UIElement *e, const UIPropertyList* args) {
     CheckboxData *data = (CheckboxData *)e->userdata;
     bool checked = ((UICheckBox *)e)->checked;
     if (data) {
@@ -573,17 +573,17 @@ static void checkbox_action(UIElement *e, const UIPropertyList* args) {
     }
 }
 
-static void set_button_style(UIElement *e) {
+static void setButtonStyle(UIElement *e) {
     UIWindowButton *button = (UIWindowButton *) e;
-    int page = ui_prop_int(&e->custom_properties, "page", 0);
-    ui_window_button_set_style(button, (page == current_page ? 10 : 5));
+    int page = uiPropInt(&e->customProperties, "page", 0);
+    uiWindowButtonSetStyle(button, (page == currentPage ? 10 : 5));
 }
 
-void action_open_info(UIElement *e, const UIPropertyList *args){
-    InfoButtonData *e_data = (InfoButtonData *)e->userdata;
-    if(!e_data) return;
+void actionOpenInfo(UIElement *e, const UIPropertyList *args){
+    InfoButtonData *eData = (InfoButtonData *)e->userdata;
+    if(!eData) return;
 
-    const char *text = e_data->text;
+    const char *text = eData->text;
     if(!text) return;
     
     InfoCardData *data = (InfoCardData *)malloc(sizeof(InfoCardData));
@@ -593,101 +593,101 @@ void action_open_info(UIElement *e, const UIPropertyList *args){
     data->text = text;
     data->copied = false;
 
-    ui_stack_push_data(data);
+    uiStackPushData(data);
 }
 
-void action_category(UIElement *e, const UIPropertyList *args) {
-    current_page = ui_prop_int(&e->custom_properties, "page", 0);
-    request_list_reload = true;
+void actionCategory(UIElement *e, const UIPropertyList *args) {
+    currentPage = uiPropInt(&e->customProperties, "page", 0);
+    requestListReload = true;
 }
 
-static UIActionDef settings_actions[] = {
-    { "open_info", action_open_info },
-    { "category", action_category}
+static UIActionDef settingsActions[] = {
+    { "open_info", actionOpenInfo },
+    { "category", actionCategory}
 };
 
-void create_setting(Setting *setting, int id, UIScreen *s) {
+void createSetting(Setting *setting, int id, UIScreen *s) {
     if (list) {
-        float list_width = list->base.w * 0.5f;
+        float listWidth = list->base.w * 0.5f;
 
-        UIElement *card = (UIElement *) ui_create_rectangle(s);
+        UIElement *card = (UIElement *) uiCreateRectangle(s);
 
         if (card) {
-            ui_rectangle_set_color((UIRectangle *) card, (id & 1 ? C2D_Color32(194,114,62,255) :  C2D_Color32(161,88,48,255)));
-            ui_element_set_size(card, 0, 28);
+            uiRectangleSetColor((UIRectangle *) card, (id & 1 ? C2D_Color32(194,114,62,255) :  C2D_Color32(161,88,48,255)));
+            uiElementSetSize(card, 0, 28);
 
             if (setting->buttonActions) {
-                UIButton *set_button = ui_create_button(s);
-                if (set_button) {
-                    ui_button_set_image(set_button, setting->buttonIcon, setting->buttonSheet);
-                    ui_element_set_position((UIElement *) set_button, -list_width + 13, 0);
-                    ui_element_set_scale((UIElement *) set_button, (32.f * 0.6f) / set_button->base.w);
+                UIButton *setButton = uiCreateButton(s);
+                if (setButton) {
+                    uiButtonSetImage(setButton, setting->buttonIcon, setting->buttonSheet);
+                    uiElementSetPosition((UIElement *) setButton, -listWidth + 13, 0);
+                    uiElementSetScale((UIElement *) setButton, (32.f * 0.6f) / setButton->base.w);
 
-                    UIElement *set_element = (UIElement *) set_button;
-                    set_element->actions = parse_actions(setting->buttonActions, settings_actions, ARRAY_LEN(settings_actions), &set_element->action_count);
+                    UIElement *setElement = (UIElement *) setButton;
+                    setElement->actions = parseActions(setting->buttonActions, settingsActions, ARRAY_LEN(settingsActions), &setElement->actionCount);
 
-                    ui_element_add_child(card, (UIElement *) set_button);
+                    uiElementAddChild(card, (UIElement *) setButton);
                 }
             } else {
-                UICheckBox *checkbox = ui_create_checkbox(s);
+                UICheckBox *checkbox = uiCreateCheckbox(s);
                 if (checkbox) {
                     // Store in the user data
                     CheckboxData *data = (CheckboxData *)malloc(sizeof(*data));
                     data->setting = setting;
 
-                    ui_element_set_userdata((UIElement *) checkbox, data);
+                    uiElementSetUserdata((UIElement *) checkbox, data);
 
-                    ui_element_set_position((UIElement *) checkbox, -list_width + 13, 0);
-                    ui_element_set_scale((UIElement *) checkbox, 0.6f);
-                    ui_element_set_action((UIElement *) checkbox, checkbox_action);
+                    uiElementSetPosition((UIElement *) checkbox, -listWidth + 13, 0);
+                    uiElementSetScale((UIElement *) checkbox, 0.6f);
+                    uiElementSetAction((UIElement *) checkbox, checkboxAction);
 
-                    ui_set_checkbox_checked(checkbox, *setting->var);
-                    ui_element_add_child(card, (UIElement *) checkbox);
+                    uiSetCheckboxChecked(checkbox, *setting->var);
+                    uiElementAddChild(card, (UIElement *) checkbox);
                 }
             }
 
-            UILabel *name = ui_create_label(s);
+            UILabel *name = uiCreateLabel(s);
             if (name) {
                 name->base.w = list->base.w - 60;
-                ui_label_set_text(name, setting->label);
-                ui_element_set_position((UIElement *) name, -list_width + 28, 0);
-                ui_element_set_scale((UIElement *) name, 0.38f);
+                uiLabelSetText(name, setting->label);
+                uiElementSetPosition((UIElement *) name, -listWidth + 28, 0);
+                uiElementSetScale((UIElement *) name, 0.38f);
 
-                ui_element_add_child(card, (UIElement *) name);
+                uiElementAddChild(card, (UIElement *) name);
             }
 
             if (setting->additionalInfo) {
-                UIButton *info = ui_create_button(s);
+                UIButton *info = uiCreateButton(s);
                 if (info) {
                     // Store the text pointer in the user data
                     InfoButtonData *data = (InfoButtonData *)malloc(sizeof(*data));
                     data->text = setting->additionalInfo;
-                    ui_element_set_userdata((UIElement *) info, data);
+                    uiElementSetUserdata((UIElement *) info, data);
 
-                    ui_element_set_position((UIElement *) info, list_width -+ 13, 0);
-                    ui_element_set_scale((UIElement *) info, 0.7f);
-                    info->base.actions = parse_actions(
+                    uiElementSetPosition((UIElement *) info, listWidth -+ 13, 0);
+                    uiElementSetScale((UIElement *) info, 0.7f);
+                    info->base.actions = parseActions(
                         "open_menu[screen=\"info_card\" btm_anim=\"zoom\"],open_info", 
-                        settings_actions, 
-                        ARRAY_LEN(settings_actions), 
-                        &info->base.action_count
+                        settingsActions, 
+                        ARRAY_LEN(settingsActions), 
+                        &info->base.actionCount
                     );
 
-                    ui_button_set_image(info, 90, 0);
+                    uiButtonSetImage(info, 90, 0);
 
-                    ui_element_add_child(card, (UIElement *) info);
+                    uiElementAddChild(card, (UIElement *) info);
                 }
             }
 
-            ui_list_add(list, card);
+            uiListAdd(list, card);
         }
     }
 }
 
-void load_category(SettingPage page, UIScreen *s) {
-    ui_list_reset(list);
-    ui_label_set_text(category_name, category_names[page]);
-    ui_run_func_on_tag(s, "category", set_button_style);
+void loadCategory(SettingPage page, UIScreen *s) {
+    uiListReset(list);
+    uiLabelSetText(categoryName, categoryNames[page]);
+    uiRunFuncOnTag(s, "category", setButtonStyle);
 
     int count = 0;
     for (size_t i = 0; i < ARRAY_LEN(settings); i++) {
@@ -699,41 +699,41 @@ void load_category(SettingPage page, UIScreen *s) {
         }
 
         if (setting->page == page) {
-            create_setting(setting, count, s);
+            createSetting(setting, count, s);
             count++;
         }
     }
 }
 
-static void settings_init(UIScreen *s) {
-    list = (UIList *) ui_get_element_by_tag(s, "list");
-    category_name = (UILabel *) ui_get_element_by_tag(s, "listlabel");
-    current_page = 0;
-    load_category((SettingPage)current_page, s);
+static void settingsInit(UIScreen *s) {
+    list = (UIList *) uiGetElementByTag(s, "list");
+    categoryName = (UILabel *) uiGetElementByTag(s, "listlabel");
+    currentPage = 0;
+    loadCategory((SettingPage)currentPage, s);
 }
 
-static void settings_update(UIScreen *s, UIInput *i) {
-    if (request_list_reload) {
-        load_category((SettingPage)current_page, s);
-        request_list_reload = false;
+static void settingsUpdate(UIScreen *s, UIInput *i) {
+    if (requestListReload) {
+        loadCategory((SettingPage)currentPage, s);
+        requestListReload = false;
     }
 }
 
-static void settings_exit(UIScreen *s) {
-    cfg_save();
+static void settingsExit(UIScreen *s) {
+    cfgSave();
 }
 
 
-extern const UIScreenDefPair settings_def = {
+extern const UIScreenDefPair settingsDef = {
     .name = "settings",
     .btm = {
         .path = "romfs:/menus/settings_hub/settings.txt",
-        .init = settings_init,
-        .update = settings_update,
-        .exit = settings_exit,
-        .action_list = {
-            .actions = settings_actions,
-            .action_count = ARRAY_LEN(settings_actions)
+        .init = settingsInit,
+        .update = settingsUpdate,
+        .exit = settingsExit,
+        .actionList = {
+            .actions = settingsActions,
+            .actionCount = ARRAY_LEN(settingsActions)
         }
     }
 };

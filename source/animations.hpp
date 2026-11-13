@@ -4,22 +4,22 @@
 #include <stdint.h>
 
 typedef struct {
-    size_t child_slot;
+    size_t childSlot;
     float x, y;
-    float scale_x, scale_y;
-    int flip_x, flip_y;
+    float scaleX, scaleY;
+    int flipX, flipY;
     float rot;
     int z;
 } AnimSprite;
 
 typedef struct {
     const AnimSprite* sprites;
-    size_t sprite_count;
+    size_t spriteCount;
 } AnimFrame;
 
 typedef struct {
     const AnimFrame* frames;
-    int frame_count;
+    int frameCount;
     float fps;
 } Animation;
 

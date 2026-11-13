@@ -65,25 +65,25 @@ typedef struct {
 typedef struct {
     float fade;
     float width;
-    bool always_on;
+    bool alwaysOn;
     bool colored;
     bool stationary;
     bool blending;
 } MotionTrailConfig;
 
-extern const MotionTrailConfig trail_properties[TRAIL_COUNT];
+extern const MotionTrailConfig trailProperties[TRAIL_COUNT];
 
-void MotionTrail_Init(MotionTrail* trail, int player, float fade, bool always_on, float stroke, bool waveTrail, bool blending, bool stationary, Color color, C2D_Image tex);
-void MotionTrail_UpdateWaveTrail(MotionTrail *trail, float delta);
-void MotionTrail_Update(MotionTrail* trail, float delta);
-void MotionTrail_ResumeStroke(MotionTrail* trail);
-void MotionTrail_Clear(MotionTrail *trail);
-void MotionTrail_StopStroke(MotionTrail* trail);
-void MotionTrail_Draw(MotionTrail* trail);
-void MotionTrail_DrawWaveTrail(MotionTrail *trail);
+void motionTrailInit(MotionTrail* trail, int player, float fade, bool alwaysOn, float stroke, bool waveTrail, bool blending, bool stationary, Color color, C2D_Image tex);
+void motionTrailUpdateWaveTrail(MotionTrail *trail, float delta);
+void motionTrailUpdate(MotionTrail* trail, float delta);
+void motionTrailResumeStroke(MotionTrail* trail);
+void motionTrailClear(MotionTrail *trail);
+void motionTrailStopStroke(MotionTrail* trail);
+void motionTrailDraw(MotionTrail* trail);
+void motionTrailDrawWaveTrail(MotionTrail *trail);
 
-void MotionTrail_CopyTrail(MotionTrail *dst, MotionTrail *src);
+void motionTrailCopyTrail(MotionTrail *dst, MotionTrail *src);
 
-void MotionTrail_AddWavePoint(MotionTrail* trail);
+void motionTrailAddWavePoint(MotionTrail* trail);
 
 #endif

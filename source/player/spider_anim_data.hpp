@@ -13,4 +13,4 @@ typedef enum {
     SPIDER_ANIM_COUNT = 5,
 } SpiderAnimId;
 
-extern const PlayerAnimation spider_animations[SPIDER_ANIM_COUNT];
+extern const PlayerAnimation spiderAnimations[SPIDER_ANIM_COUNT];

@@ -12,7 +12,7 @@
 typedef struct CreditsEntries {
     const char *contributor;
     const char *contribution;
-    const float name_scale;
+    const float nameScale;
 } CreditsEntries;
 
 static const CreditsEntries credits[] = {
@@ -32,63 +32,63 @@ static const CreditsEntries credits[] = {
     {"AleYoshi", "Tweaks", 0.5f},
 };
 
-void credits_init(UIScreen *s) {
-    UIList *list = (UIList *) ui_get_element_by_tag(s, "list");
+void creditsInit(UIScreen *s) {
+    UIList *list = (UIList *) uiGetElementByTag(s, "list");
 
     if (list) {
-        float list_width = list->base.w * 0.5f;
+        float listWidth = list->base.w * 0.5f;
 
         for (size_t i = 0; i < ARRAY_LEN(credits); i++) {
             const char *contributor = credits[i].contributor;
             const char *contribution = credits[i].contribution;
-            const float contributor_scale = credits[i].name_scale;
+            const float contributorScale = credits[i].nameScale;
 
-            UIElement *card = (UIElement *) ui_create_rectangle(s);
+            UIElement *card = (UIElement *) uiCreateRectangle(s);
 
             if (card) {
-                ui_rectangle_set_color((UIRectangle *) card, C2D_Color32(0,34,65,0));
-                ui_element_set_size(card, 0, 17);
+                uiRectangleSetColor((UIRectangle *) card, C2D_Color32(0,34,65,0));
+                uiElementSetSize(card, 0, 17);
 
                 // Contibutor name
-                UILabel *name = ui_create_label(s);
+                UILabel *name = uiCreateLabel(s);
                 if (name) {
                     name->base.w = list->base.w - 12;
-                    ui_label_set_text(name, contributor);
-                    ui_element_set_position((UIElement *) name, -list_width + 3, 0);
-                    ui_element_set_scale((UIElement *) name, contributor_scale);
+                    uiLabelSetText(name, contributor);
+                    uiElementSetPosition((UIElement *) name, -listWidth + 3, 0);
+                    uiElementSetScale((UIElement *) name, contributorScale);
                     
                     // name->font = 2;
 
-                    ui_element_add_child(card, (UIElement *) name);
+                    uiElementAddChild(card, (UIElement *) name);
                 }
 
                 // Contribution name
-                UILabel *description = ui_create_label(s);
+                UILabel *description = uiCreateLabel(s);
                 if (description) {
                     char text[256];
                     snprintf(text, sizeof(text) - 1, "- %s", contribution);
-                    ui_label_set_text(description, text);
-                    ui_element_set_position((UIElement *) description, -list_width + 8 + get_text_length(&bigFont_fontCharset, contributor_scale, true, contributor), 0);
-                    ui_element_set_scale((UIElement *) description, 0.7f);
+                    uiLabelSetText(description, text);
+                    uiElementSetPosition((UIElement *) description, -listWidth + 8 + getTextLength(&bigFontFontCharset, contributorScale, true, contributor), 0);
+                    uiElementSetScale((UIElement *) description, 0.7f);
                     
                     description->font = 1;
 
-                    ui_element_add_child(card, (UIElement *) description);
+                    uiElementAddChild(card, (UIElement *) description);
                 }
 
-                ui_list_add(list, card);
+                uiListAdd(list, card);
             }
         }
     }
 }
 
-extern const UIScreenDefPair credits_def = {
+extern const UIScreenDefPair creditsDef = {
     .name = "credits",
     .top = {
         0
     },
     .btm = {
         .path = "romfs:/menus/settings_hub/credits.txt",
-        .init = credits_init
+        .init = creditsInit
     }
 };

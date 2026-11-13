@@ -4,12 +4,12 @@
 #include <stddef.h>
 
 bool contains(const char *first, const char *second);
-bool parse_bool(const char *str);
-char *truncate_number(int number);
-char *truncate_speed(size_t bytes);
-void strip_character(char* s, char character);
-void strip_enclosures(char* s);
-char *url_decode(const char *str);
-void url_convert_to_http(char *str);
-void remove_char(char *str, char character);
-const char *get_filename_ext(const char *filename);
+bool parseBool(const char *str);
+char *truncateNumber(int number);
+char *truncateSpeed(size_t bytes);
+void stripCharacter(char* s, char character);
+void stripEnclosures(char* s);
+char *urlDecode(const char *str);
+void urlConvertToHTTP(char *str);
+void removeChar(char *str, char character);
+const char *getFilenameExt(const char *filename);

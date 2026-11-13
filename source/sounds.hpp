@@ -7,14 +7,14 @@ typedef struct {
     SFX *sound;
 } SFXKVP;
 
-extern SFX play_sound;
-extern SFX quit_sound;
-extern SFX explode_sound;
-extern SFX end_sound;
+extern SFX playSound;
+extern SFX quitSound;
+extern SFX explodeSound;
+extern SFX endSound;
 extern SFX honk;
-extern SFX coin_sound;
+extern SFX coinSound;
 
 extern SFXKVP sounds[];
 
-void load_sfx();
-SFX *get_sound(const char *name);
+void loadSfx();
+SFX *getSound(const char *name);

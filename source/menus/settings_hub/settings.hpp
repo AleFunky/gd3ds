@@ -74,7 +74,7 @@ typedef struct {
 extern Setting settings[39];
 extern SettingState settingsState;
 
-extern const UIScreenDefPair settings_def;
+extern const UIScreenDefPair settingsDef;
 
-bool condition_supports_3D();
-void turn_off_setting(const char *id, bool *var);
+bool conditionSupports3D();
+void turnOffSetting(const char *id, bool *var);

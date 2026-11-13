@@ -3,4 +3,4 @@
 
 #define MAX_LEVELS_PER_PAGE 10
 
-extern const UIScreenDefPair saved_levels_def;
+extern const UIScreenDefPair savedLevelsDef;

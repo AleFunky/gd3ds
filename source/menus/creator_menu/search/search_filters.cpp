@@ -13,33 +13,33 @@
 #include "save/config.hpp"
 #include "save/saving.hpp"
 
-static void toggle_gdps(UIScreen *s){
+static void toggleGdps(UIScreen *s){
     if(gdps){
-        ui_run_func_on_tag(s, "gdps", ui_enable_element);
-        ui_run_func_on_tag(s, "no_gdps", ui_disable_element);
+        uiRunFuncOnTag(s, "gdps", uiEnableElement);
+        uiRunFuncOnTag(s, "no_gdps", uiDisableElement);
     } else{
-        ui_run_func_on_tag(s, "gdps", ui_disable_element);
-        ui_run_func_on_tag(s, "no_gdps", ui_enable_element);
+        uiRunFuncOnTag(s, "gdps", uiDisableElement);
+        uiRunFuncOnTag(s, "no_gdps", uiEnableElement);
     }
 }
 
-static void reset_checkboxes(UIScreen *s){
+static void resetCheckboxes(UIScreen *s){
     //set checkboxes to their saved values
-    ui_set_checkbox_checked(((UICheckBox *)ui_get_element_by_tag(s, "chk_uncompleted")), filters.uncompleted);
-    ui_set_checkbox_checked(((UICheckBox *)ui_get_element_by_tag(s, "chk_completed")), filters.completed);
-    ui_set_checkbox_checked(((UICheckBox *)ui_get_element_by_tag(s, "chk_original")), filters.original);
-    ui_set_checkbox_checked(((UICheckBox *)ui_get_element_by_tag(s, "chk_unrated")), filters.noStar);
-    ui_set_checkbox_checked(((UICheckBox *)ui_get_element_by_tag(s, "chk_rated")), filters.star);
-    ui_set_checkbox_checked(((UICheckBox *)ui_get_element_by_tag(s, "chk_featured")), filters.featured);
+    uiSetCheckboxChecked(((UICheckBox *)uiGetElementByTag(s, "chk_uncompleted")), filters.uncompleted);
+    uiSetCheckboxChecked(((UICheckBox *)uiGetElementByTag(s, "chk_completed")), filters.completed);
+    uiSetCheckboxChecked(((UICheckBox *)uiGetElementByTag(s, "chk_original")), filters.original);
+    uiSetCheckboxChecked(((UICheckBox *)uiGetElementByTag(s, "chk_unrated")), filters.noStar);
+    uiSetCheckboxChecked(((UICheckBox *)uiGetElementByTag(s, "chk_rated")), filters.star);
+    uiSetCheckboxChecked(((UICheckBox *)uiGetElementByTag(s, "chk_featured")), filters.featured);
 
-    ui_set_checkbox_checked(((UICheckBox *)ui_get_element_by_tag(s, "chk_original_gdps")), filters.original);
-    ui_set_checkbox_checked(((UICheckBox *)ui_get_element_by_tag(s, "chk_unrated_gdps")), filters.noStar);
-    ui_set_checkbox_checked(((UICheckBox *)ui_get_element_by_tag(s, "chk_rated_gdps")), filters.star);
-    ui_set_checkbox_checked(((UICheckBox *)ui_get_element_by_tag(s, "chk_featured_gdps")), filters.featured);
-    ui_set_checkbox_checked(((UICheckBox *)ui_get_element_by_tag(s, "chk_super")), filters.super);
+    uiSetCheckboxChecked(((UICheckBox *)uiGetElementByTag(s, "chk_original_gdps")), filters.original);
+    uiSetCheckboxChecked(((UICheckBox *)uiGetElementByTag(s, "chk_unrated_gdps")), filters.noStar);
+    uiSetCheckboxChecked(((UICheckBox *)uiGetElementByTag(s, "chk_rated_gdps")), filters.star);
+    uiSetCheckboxChecked(((UICheckBox *)uiGetElementByTag(s, "chk_featured_gdps")), filters.featured);
+    uiSetCheckboxChecked(((UICheckBox *)uiGetElementByTag(s, "chk_super")), filters.super);
 }
 
-void reset_search_filters() {
+void resetSearchFilters() {
     filters.uncompleted = false;
     filters.completed = false;
     filters.original = false;
@@ -54,63 +54,63 @@ void reset_search_filters() {
     filters.isAuto = false;
     filters.isNA = false;
     filters.customSongQuery[0] = '\0';
-    update_difficulty_tints(
-        ui_stack_get_screen("search_menu", SCREEN_BTM)
+    updateDifficultyTints(
+        uiStackGetScreen("search_menu", SCREEN_BTM)
     );
 }
 
-void uncompleted_filter(UIElement* e, const UIPropertyList *args) {
+void uncompletedFilter(UIElement* e, const UIPropertyList *args) {
     filters.uncompleted = ((UICheckBox *)e)->checked;
 }
 
-void completed_filter(UIElement* e, const UIPropertyList *args) {
+void completedFilter(UIElement* e, const UIPropertyList *args) {
     filters.completed = ((UICheckBox *)e)->checked;
 }
 
-void original_filter(UIElement* e, const UIPropertyList *args) {
+void originalFilter(UIElement* e, const UIPropertyList *args) {
     filters.original = ((UICheckBox *)e)->checked;
 }
 
-void unrated_filter(UIElement* e, const UIPropertyList *args) {
+void unratedFilter(UIElement* e, const UIPropertyList *args) {
     filters.noStar = ((UICheckBox *)e)->checked;
 }
 
-void rated_filter(UIElement* e, const UIPropertyList *args) {
+void ratedFilter(UIElement* e, const UIPropertyList *args) {
     filters.star = ((UICheckBox *)e)->checked;
 }
 
-void featured_filter(UIElement* e, const UIPropertyList *args) {
+void featuredFilter(UIElement* e, const UIPropertyList *args) {
     filters.featured = ((UICheckBox *)e)->checked;
 }
 
-void super_filter(UIElement* e, const UIPropertyList *args) {
+void superFilter(UIElement* e, const UIPropertyList *args) {
     filters.super = ((UICheckBox *)e)->checked;
 }
 
-static UIActionDef search_filters_actions[] = {
-    { "uncompleted", uncompleted_filter },
-    { "completed", completed_filter },
-    { "original", original_filter },
-    { "unrated", unrated_filter },
-    { "rated", rated_filter },
-    { "featured", featured_filter },
-    { "super", super_filter },
+static UIActionDef searchFiltersActions[] = {
+    { "uncompleted", uncompletedFilter },
+    { "completed", completedFilter },
+    { "original", originalFilter },
+    { "unrated", unratedFilter },
+    { "rated", ratedFilter },
+    { "featured", featuredFilter },
+    { "super", superFilter },
 };
 
-void search_filters_init(UIScreen *s) {
-    toggle_gdps(s);
+void searchFiltersInit(UIScreen *s) {
+    toggleGdps(s);
 
-    reset_checkboxes(s);
+    resetCheckboxes(s);
 }
 
-extern const UIScreenDefPair search_filters_def = {
+extern const UIScreenDefPair searchFiltersDef = {
     .name = "search_filters",
     .btm = {
         .path = "romfs:/menus/creator_menu/search/search_filters_pop_up.txt",
-        .init = search_filters_init,
-        .action_list = {
-            .actions = search_filters_actions,
-            .action_count = ARRAY_LEN(search_filters_actions)
+        .init = searchFiltersInit,
+        .actionList = {
+            .actions = searchFiltersActions,
+            .actionCount = ARRAY_LEN(searchFiltersActions)
         }
     }
 };

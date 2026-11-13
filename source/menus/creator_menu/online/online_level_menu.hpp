@@ -3,14 +3,14 @@
 #include "menus/level_options.hpp"
 #include "utils/server_utils.hpp"
 
-void delete_level();
-void check_warnings_and_play();
+void deleteLevel();
+void checkWarningsAndPlay();
 
-extern int online_menu_level_id;
-extern SearchEntry *current_search_entry;
-extern CreatorEntry *current_creator_entry;
-extern SongEntry *current_song_entry;
+extern int onlineMenuLevelID;
+extern SearchEntry *currentSearchEntry;
+extern CreatorEntry *currentCreatorEntry;
+extern SongEntry *currentSongEntry;
 
 extern bool refresh;
 
-extern const UIScreenDefPair online_level_menu_def;
+extern const UIScreenDefPair onlineLevelMenuDef;

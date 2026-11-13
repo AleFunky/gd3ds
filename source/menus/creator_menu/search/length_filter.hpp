@@ -1,3 +1,3 @@
 #pragma once
 
-extern const UIScreenDefPair length_filter_def;
+extern const UIScreenDefPair lengthFilterDef;

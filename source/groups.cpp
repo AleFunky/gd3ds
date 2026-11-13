@@ -9,202 +9,202 @@
 
 typedef struct GroupCombination {
     short groups[MAX_GROUPS_PER_OBJECT];
-    unsigned char group_count;
+    unsigned char groupCount;
     int *objects;
 
-    int object_count;
+    int objectCount;
 
-    int collision_object_count;
-    int collision_object_write_count;
+    int collisionObjectCount;
+    int collisionObjectWriteCount;
 
-    int visual_object_write_count;
+    int visualObjectWriteCount;
 
-    float offset_x;
-    float offset_y;
+    float offsetX;
+    float offsetY;
 
-    Matrix2x2 rotation_matrix;
-    Vec2D rotation_offset;
-    bool rotation_touched;
+    Matrix2x2 rotationMatrix;
+    Vec2D rotationOffset;
+    bool rotationTouched;
     
-    Matrix2x2 deferred_matrix;
-    Vec2D deferred_offset;
-    Matrix2x2 deferred_no_x_matrix;
-    Vec2D deferred_no_x_offset;
+    Matrix2x2 deferredMatrix;
+    Vec2D deferredOffset;
+    Matrix2x2 deferredNoXMatrix;
+    Vec2D deferredNoXOffset;
     
     bool touched;
-    bool deferred_touched;
+    bool deferredTouched;
 } GroupCombination;
 
 static GroupNode groups[MAX_GROUPS];
 
 static GroupCombination *group_combinations = NULL;
-static int group_combination_count = 0;
+static int groupCombinationCount = 0;
 
 static int *touched_combinations = NULL;
-static int touched_combination_count = 0;
+static int touchedCombinationCount = 0;
 
 static int *rotation_combinations = NULL;
-static int rotation_combination_count = 0;
+static int rotationCombinationCount = 0;
 
 static int *deferred_combinations = NULL;
-static int deferred_combination_count = 0;
+static int deferredCombinationCount = 0;
 
 // Group combinations
 
-static void clear_group_combinations(void) {
+static void clearGroupCombinations(void) {
 
     group_combinations = NULL;
     touched_combinations = NULL;
     rotation_combinations = NULL;
     deferred_combinations = NULL;
-    group_combination_count = 0;
-    touched_combination_count = 0;
-    rotation_combination_count = 0;
-    deferred_combination_count = 0;
+    groupCombinationCount = 0;
+    touchedCombinationCount = 0;
+    rotationCombinationCount = 0;
+    deferredCombinationCount = 0;
 
     for (int i = 0; i < MAX_GROUPS; i++) {
         groups[i].combinations = NULL;  
-        groups[i].combination_count = 0;  
-        groups[i].combination_capacity = 0;  
-        groups[i].collision_object_count = 0;
+        groups[i].combinationCount = 0;  
+        groups[i].combinationCapacity = 0;  
+        groups[i].collisionObjectCount = 0;
     }
 }
 
-static bool object_is_240hz(int object) {
+static bool objectIs240hz(int object) {
     int id = objects.id[object];
 
-    return objects.touch_triggered[object] || is_trigger_object(id) || (is_valid_object(id) && game_objects[id].hitbox != NULL);
+    return objects.touchTriggered[object] || isTriggerObject(id) || (isValidObject(id) && gameObjects[id].hitbox != NULL);
 }
 
-static int collect_groups(int object, short *group_ids) {
+static int collectGroups(int object, short *groupIds) {
     int count = 0;
     for (int i = 0; i < MAX_GROUPS_PER_OBJECT; i++) {
         int group = objects.groups[object][i];
         if (group <= 0 || group >= MAX_GROUPS) continue;
 
-        group_ids[count++] = group;
+        groupIds[count++] = group;
     }
 
-    qsort(group_ids, count, sizeof(short), compare_ids);
+    qsort(groupIds, count, sizeof(short), compareIds);
 
     return count;
 }
 
-static bool is_same_group_combination(int count, short *group_a, short *group_b) {
+static bool isSameGroupCombination(int count, short *groupA, short *groupB) {
     for (int i = 0; i < count; i++) {
-        if (group_a[i] != group_b[i]) return false;
+        if (groupA[i] != groupB[i]) return false;
     }
     return true;
 }
 
-static void prepare_deferred_transform(GroupCombination *combination) {
-    if (!combination->deferred_touched) {
-        combination->deferred_matrix = matrix2x2_identity();
-        combination->deferred_offset = (Vec2D){ 0.f, 0.f };
-        combination->deferred_no_x_matrix = matrix2x2_identity();
-        combination->deferred_no_x_offset = (Vec2D){ 0.f, 0.f };
-        combination->deferred_touched = true;
-        deferred_combinations[deferred_combination_count++] = (int)(combination - group_combinations);
+static void prepareDeferredTransform(GroupCombination *combination) {
+    if (!combination->deferredTouched) {
+        combination->deferredMatrix = matrix2x2Identity();
+        combination->deferredOffset = (Vec2D){ 0.f, 0.f };
+        combination->deferredNoXMatrix = matrix2x2Identity();
+        combination->deferredNoXOffset = (Vec2D){ 0.f, 0.f };
+        combination->deferredTouched = true;
+        deferred_combinations[deferredCombinationCount++] = (int)(combination - group_combinations);
     }
 }
 
-static void defer_group_combination_transform(GroupCombination *combination,
+static void deferGroupCombinationTransform(GroupCombination *combination,
     Matrix2x2 matrix, Vec2D offset) {
-    prepare_deferred_transform(combination);
-    compose_affine_transform(&combination->deferred_matrix, &combination->deferred_offset, matrix, offset);
-    compose_affine_transform(&combination->deferred_no_x_matrix, &combination->deferred_no_x_offset, matrix, offset);
+    prepareDeferredTransform(combination);
+    composeAffineTransform(&combination->deferredMatrix, &combination->deferredOffset, matrix, offset);
+    composeAffineTransform(&combination->deferredNoXMatrix, &combination->deferredNoXOffset, matrix, offset);
 }
 
-static void defer_group_combination_move(GroupCombination *combination, float delta_x, float delta_y) {
-    prepare_deferred_transform(combination);
-    combination->deferred_offset.x += delta_x;
-    combination->deferred_offset.y += delta_y;
-    combination->deferred_no_x_offset.y += delta_y;
+static void deferGroupCombinationMove(GroupCombination *combination, float deltaX, float deltaY) {
+    prepareDeferredTransform(combination);
+    combination->deferredOffset.x += deltaX;
+    combination->deferredOffset.y += deltaY;
+    combination->deferredNoXOffset.y += deltaY;
 }
 
-static Vec2D apply_deferred_transform(const Matrix2x2 *matrix, Vec2D offset, Vec2D point) {
+static Vec2D applyDeferredTransform(const Matrix2x2 *matrix, Vec2D offset, Vec2D point) {
     if (matrix->m[0][0] == 1.f && matrix->m[0][1] == 0.f &&
         matrix->m[1][0] == 0.f && matrix->m[1][1] == 1.f) {
         return (Vec2D){ point.x + offset.x, point.y + offset.y };
     }
 
-    return affine_transform_point(*matrix, offset, point);
+    return affineTransformPoint(*matrix, offset, point);
 }
 
-bool build_group_combinations(void) {
-    clear_group_combinations();
+bool buildGroupCombinations(void) {
+    clearGroupCombinations();
 
     if (objects.count <= 0) return true;
 
     for (int i = 0; i < objects.count; i++)
-        objects.group_combination_index[i] = -1;
+        objects.groupCombinationIndex[i] = -1;
 
-    GroupCombination *new_combinations = (GroupCombination *)arena_calloc(&level_arena, objects.count, sizeof(GroupCombination));
-    int *new_touched_combinations = (int *)arena_alloc(&level_arena, objects.count * sizeof(int));
-    int *new_rotation_combinations = (int *)arena_alloc(&level_arena, objects.count * sizeof(int));
-    int *new_deferred_combinations = (int *)arena_alloc(&level_arena, objects.count * sizeof(int));
+    GroupCombination *newCombinations = (GroupCombination *)arenaCalloc(&levelArena, objects.count, sizeof(GroupCombination));
+    int *newTouchedCombinations = (int *)arenaAlloc(&levelArena, objects.count * sizeof(int));
+    int *newRotationCombinations = (int *)arenaAlloc(&levelArena, objects.count * sizeof(int));
+    int *newDeferredCombinations = (int *)arenaAlloc(&levelArena, objects.count * sizeof(int));
 
-    if (!new_combinations || !new_touched_combinations || !new_rotation_combinations || !new_deferred_combinations) {
+    if (!newCombinations || !newTouchedCombinations || !newRotationCombinations || !newDeferredCombinations) {
         return false;
     }
 
-    group_combinations = new_combinations;
-    touched_combinations = new_touched_combinations;
-    rotation_combinations = new_rotation_combinations;
-    deferred_combinations = new_deferred_combinations;
+    group_combinations = newCombinations;
+    touched_combinations = newTouchedCombinations;
+    rotation_combinations = newRotationCombinations;
+    deferred_combinations = newDeferredCombinations;
 
     // Build the unique combinations
     for (int obj = 0; obj < objects.count; obj++) {
-        short object_groups[MAX_GROUPS_PER_OBJECT];
-        int group_count = collect_groups(obj, object_groups);
+        short objectGroups[MAX_GROUPS_PER_OBJECT];
+        int groupCount = collectGroups(obj, objectGroups);
 
-        int combination_index = -1;
+        int combinationIndex = -1;
 
-        for (int i = 0; i < group_combination_count; i++) {
+        for (int i = 0; i < groupCombinationCount; i++) {
             GroupCombination *combination = &group_combinations[i];
 
-            if (combination->group_count == group_count && is_same_group_combination(group_count, combination->groups, object_groups)) {
-                combination_index = i;
+            if (combination->groupCount == groupCount && isSameGroupCombination(groupCount, combination->groups, objectGroups)) {
+                combinationIndex = i;
                 break;
             }
         }
         
-        if (combination_index < 0) {
+        if (combinationIndex < 0) {
             // New combination
-            combination_index = group_combination_count++;
+            combinationIndex = groupCombinationCount++;
 
-            GroupCombination *combination = &group_combinations[combination_index];
+            GroupCombination *combination = &group_combinations[combinationIndex];
             
-            combination->group_count = group_count;
+            combination->groupCount = groupCount;
 
             // Copy groups
-            for (int i = 0; i < group_count; i++) {
-                combination->groups[i] = object_groups[i];
+            for (int i = 0; i < groupCount; i++) {
+                combination->groups[i] = objectGroups[i];
             }
         }
 
-        objects.group_combination_index[obj] = combination_index;
+        objects.groupCombinationIndex[obj] = combinationIndex;
 
-        group_combinations[combination_index].object_count++;
+        group_combinations[combinationIndex].objectCount++;
 
-        if (object_is_240hz(obj)) {
-            group_combinations[combination_index].collision_object_count++;
+        if (objectIs240hz(obj)) {
+            group_combinations[combinationIndex].collisionObjectCount++;
         }
     }
 
     // Count group combinations
-    for (int i = 0; i < group_combination_count; i++) {
+    for (int i = 0; i < groupCombinationCount; i++) {
         GroupCombination *combination = &group_combinations[i];
 
-        combination->objects = (int *)arena_alloc(&level_arena, combination->object_count * sizeof(int));
+        combination->objects = (int *)arenaAlloc(&levelArena, combination->objectCount * sizeof(int));
 
         if (!combination->objects) {
-            clear_group_combinations();
+            clearGroupCombinations();
             return false;
         }
 
-        for (int group = 0; group < combination->group_count; group++) {
-            groups[combination->groups[group]].combination_count++;
+        for (int group = 0; group < combination->groupCount; group++) {
+            groups[combination->groups[group]].combinationCount++;
         }
 
     }
@@ -213,44 +213,44 @@ bool build_group_combinations(void) {
     for (int group = 1; group < MAX_GROUPS; group++) {
         GroupNode *node = &groups[group];
 
-        if (node->combination_count == 0) continue;
+        if (node->combinationCount == 0) continue;
 
-        node->combinations = (int *)arena_alloc(&level_arena, node->combination_count * sizeof(int));
+        node->combinations = (int *)arenaAlloc(&levelArena, node->combinationCount * sizeof(int));
 
         if (!node->combinations) {
-            clear_group_combinations();
+            clearGroupCombinations();
             return false;
         }
 
-        node->combination_capacity = node->combination_count;
-        node->combination_count = 0;
+        node->combinationCapacity = node->combinationCount;
+        node->combinationCount = 0;
     }
     
     // Fill object arrays
     for (int obj = 0; obj < objects.count; obj++) {
-        int combination_index = objects.group_combination_index[obj];
+        int combinationIndex = objects.groupCombinationIndex[obj];
 
-        GroupCombination *combination = &group_combinations[combination_index];
+        GroupCombination *combination = &group_combinations[combinationIndex];
 
-        if (object_is_240hz(obj)) {
-            combination->objects[combination->collision_object_write_count++] = obj;
+        if (objectIs240hz(obj)) {
+            combination->objects[combination->collisionObjectWriteCount++] = obj;
 
-            for (int i = 0; i < combination->group_count; i++)
-                groups[combination->groups[i]].collision_object_count++;
+            for (int i = 0; i < combination->groupCount; i++)
+                groups[combination->groups[i]].collisionObjectCount++;
         } else {
-            int visual_index = combination->collision_object_count + combination->visual_object_write_count++;
+            int visualIndex = combination->collisionObjectCount + combination->visualObjectWriteCount++;
 
-            combination->objects[visual_index] = obj;
+            combination->objects[visualIndex] = obj;
         }
     }
 
     // Fill combination arrays
-    for (int i = 0; i < group_combination_count; i++) {
+    for (int i = 0; i < groupCombinationCount; i++) {
         GroupCombination *combination = &group_combinations[i];
 
-        for (int group = 0; group < combination->group_count; group++) {
+        for (int group = 0; group < combination->groupCount; group++) {
             GroupNode *g = &groups[combination->groups[group]];
-            g->combinations[g->combination_count++] = i;
+            g->combinations[g->combinationCount++] = i;
         }
     }
 
@@ -258,221 +258,221 @@ bool build_group_combinations(void) {
     return true;
 }
 
-void begin_group_combination_move_step(void) {
-    for (int i = 0; i < touched_combination_count; i++) {
+void beginGroupCombinationMoveStep(void) {
+    for (int i = 0; i < touchedCombinationCount; i++) {
         GroupCombination *combination = &group_combinations[touched_combinations[i]];
-        combination->offset_x = 0.f;
-        combination->offset_y = 0.f;
+        combination->offsetX = 0.f;
+        combination->offsetY = 0.f;
         combination->touched = false;
     }
-    touched_combination_count = 0;
+    touchedCombinationCount = 0;
 }
 
-void begin_group_combination_rotation_step(void) {
-    for (int i = 0; i < rotation_combination_count; i++) {
+void beginGroupCombinationRotationStep(void) {
+    for (int i = 0; i < rotationCombinationCount; i++) {
         GroupCombination *combination = &group_combinations[rotation_combinations[i]];
-        combination->rotation_matrix = matrix2x2_identity();
-        combination->rotation_offset = (Vec2D){ 0.f, 0.f };
-        combination->rotation_touched = false;
+        combination->rotationMatrix = matrix2x2Identity();
+        combination->rotationOffset = (Vec2D){ 0.f, 0.f };
+        combination->rotationTouched = false;
     }
-    rotation_combination_count = 0;
+    rotationCombinationCount = 0;
 }
 
-void add_move_to_group_combinations(int group, float delta_x, float delta_y) {
-    GroupNode *node = get_group(group);
+void addMoveToGroupCombinations(int group, float deltaX, float deltaY) {
+    GroupNode *node = getGroup(group);
     if (!node) return;
 
-    if (node->collision_object_count == 0) {
-        if (delta_x != 0.f || delta_y != 0.f) {
-            for (int i = 0; i < node->combination_count; i++) {
+    if (node->collisionObjectCount == 0) {
+        if (deltaX != 0.f || deltaY != 0.f) {
+            for (int i = 0; i < node->combinationCount; i++) {
                 GroupCombination *combination = &group_combinations[node->combinations[i]];
-                defer_group_combination_move(combination, delta_x, delta_y);
+                deferGroupCombinationMove(combination, deltaX, deltaY);
             }
         }
         return;
     }
 
-    for (int i = 0; i < node->combination_count; i++) {
-        int combination_index = node->combinations[i];
-        GroupCombination *combination = &group_combinations[combination_index];
+    for (int i = 0; i < node->combinationCount; i++) {
+        int combinationIndex = node->combinations[i];
+        GroupCombination *combination = &group_combinations[combinationIndex];
         if (!combination->touched) {
             combination->touched = true;
-            touched_combinations[touched_combination_count++] = combination_index;
+            touched_combinations[touchedCombinationCount++] = combinationIndex;
         }
-        combination->offset_x += delta_x;
-        combination->offset_y += delta_y;
+        combination->offsetX += deltaX;
+        combination->offsetY += deltaY;
     }
 }
 
-bool add_rotation_to_group_combinations(int group, const Matrix2x2 *matrix, float pivot_x, float pivot_y) {
-    GroupNode *node = get_group(group);
+bool addRotationToGroupCombinations(int group, const Matrix2x2 *matrix, float pivotX, float pivotY) {
+    GroupNode *node = getGroup(group);
     if (!node) return false;
 
-    Vec2D pivot = { pivot_x, pivot_y };
-    Vec2D offset = sub_vec(pivot, matrix2x2_transform(*matrix, pivot));
-    bool has_transform = matrix->m[0][0] != 1.f || matrix->m[0][1] != 0.f || matrix->m[1][0] != 0.f || matrix->m[1][1] != 1.f || offset.x != 0.f || offset.y != 0.f;
+    Vec2D pivot = { pivotX, pivotY };
+    Vec2D offset = subVec(pivot, matrix2x2Transform(*matrix, pivot));
+    bool hasTransform = matrix->m[0][0] != 1.f || matrix->m[0][1] != 0.f || matrix->m[1][0] != 0.f || matrix->m[1][1] != 1.f || offset.x != 0.f || offset.y != 0.f;
 
-    for (int i = 0; i < node->combination_count; i++) {
-        int combination_index = node->combinations[i];
-        GroupCombination *combination = &group_combinations[combination_index];
-        if (has_transform && combination->collision_object_count > 0) {
-            if (!combination->rotation_touched) {
-                combination->rotation_matrix = matrix2x2_identity();
-                combination->rotation_offset = (Vec2D){ 0.f, 0.f };
-                combination->rotation_touched = true;
-                rotation_combinations[rotation_combination_count++] = combination_index;
+    for (int i = 0; i < node->combinationCount; i++) {
+        int combinationIndex = node->combinations[i];
+        GroupCombination *combination = &group_combinations[combinationIndex];
+        if (hasTransform && combination->collisionObjectCount > 0) {
+            if (!combination->rotationTouched) {
+                combination->rotationMatrix = matrix2x2Identity();
+                combination->rotationOffset = (Vec2D){ 0.f, 0.f };
+                combination->rotationTouched = true;
+                rotation_combinations[rotationCombinationCount++] = combinationIndex;
             }
-            compose_affine_transform(&combination->rotation_matrix, &combination->rotation_offset, *matrix, offset);
+            composeAffineTransform(&combination->rotationMatrix, &combination->rotationOffset, *matrix, offset);
         }
 
-        if (has_transform && combination->object_count > combination->collision_object_count) {
-            defer_group_combination_transform(combination, *matrix, offset);
+        if (hasTransform && combination->objectCount > combination->collisionObjectCount) {
+            deferGroupCombinationTransform(combination, *matrix, offset);
         }
     }
     return true;
 }
 
-void apply_group_combination_move(void) {
-    for (int i = 0; i < touched_combination_count; i++) {
-        int combination_index = touched_combinations[i];
+void applyGroupCombinationMove(void) {
+    for (int i = 0; i < touchedCombinationCount; i++) {
+        int combinationIndex = touched_combinations[i];
 
-        GroupCombination *combination = &group_combinations[combination_index];
+        GroupCombination *combination = &group_combinations[combinationIndex];
 
-        float delta_x = combination->offset_x;
-        float delta_y = combination->offset_y;
-        bool has_position_delta = delta_x != 0.f || delta_y != 0.f;
+        float deltaX = combination->offsetX;
+        float deltaY = combination->offsetY;
+        bool hasPositionDelta = deltaX != 0.f || deltaY != 0.f;
 
-        for (int j = 0; j < combination->collision_object_count; j++) {
+        for (int j = 0; j < combination->collisionObjectCount; j++) {
             int object = combination->objects[j];
-            objects.last_y[object] = objects.y[object];
+            objects.lastY[object] = objects.y[object];
 
-            if (has_position_delta) {
-                int old_sx = objects.section_x[object];
-                int old_sy = objects.section_y[object];
+            if (hasPositionDelta) {
+                int oldSx = objects.sectionX[object];
+                int oldSy = objects.sectionY[object];
 
-                if (delta_x != 0.f && (objects.flags[object] & FLAG_CAN_BE_X_MOVED)) objects.x[object] += delta_x;
-                if (delta_y != 0.f) objects.y[object] += delta_y;
+                if (deltaX != 0.f && (objects.flags[object] & FLAG_CAN_BE_X_MOVED)) objects.x[object] += deltaX;
+                if (deltaY != 0.f) objects.y[object] += deltaY;
 
-                if ((int)(objects.x[object] / SECTION_SIZE) != old_sx || (int)(objects.y[object] / SECTION_SIZE) != old_sy)
-                    update_object_section(object);
+                if ((int)(objects.x[object] / SECTION_SIZE) != oldSx || (int)(objects.y[object] / SECTION_SIZE) != oldSy)
+                    updateObjectSection(object);
             }
         }
 
-        if (has_position_delta && combination->object_count > combination->collision_object_count) {
-            defer_group_combination_move(combination, delta_x, delta_y);
+        if (hasPositionDelta && combination->objectCount > combination->collisionObjectCount) {
+            deferGroupCombinationMove(combination, deltaX, deltaY);
         }
     }
 }
 
-void apply_group_combination_rotation(void) {
-    for (int i = 0; i < rotation_combination_count; i++) {
-        int combination_index = rotation_combinations[i];
-        GroupCombination *combination = &group_combinations[combination_index];
+void applyGroupCombinationRotation(void) {
+    for (int i = 0; i < rotationCombinationCount; i++) {
+        int combinationIndex = rotation_combinations[i];
+        GroupCombination *combination = &group_combinations[combinationIndex];
 
-        for (int j = 0; j < combination->collision_object_count; j++) {
+        for (int j = 0; j < combination->collisionObjectCount; j++) {
             int object = combination->objects[j];
-            objects.last_y[object] = objects.y[object];
+            objects.lastY[object] = objects.y[object];
 
             float x = objects.x[object];
             float y = objects.y[object];
 
-            Vec2D transformed = affine_transform_point(combination->rotation_matrix, combination->rotation_offset, (Vec2D){ x, y });
+            Vec2D transformed = affineTransformPoint(combination->rotationMatrix, combination->rotationOffset, (Vec2D){ x, y });
             objects.x[object] = transformed.x;
             objects.y[object] = transformed.y;
 
-            if ((int)(objects.x[object] / SECTION_SIZE) != objects.section_x[object] || (int)(objects.y[object] / SECTION_SIZE) != objects.section_y[object])
-                update_object_section(object);
+            if ((int)(objects.x[object] / SECTION_SIZE) != objects.sectionX[object] || (int)(objects.y[object] / SECTION_SIZE) != objects.sectionY[object])
+                updateObjectSection(object);
         }
 
-        combination->rotation_matrix = matrix2x2_identity();
-        combination->rotation_offset = (Vec2D){ 0.f, 0.f };
-        combination->rotation_touched = false;
+        combination->rotationMatrix = matrix2x2Identity();
+        combination->rotationOffset = (Vec2D){ 0.f, 0.f };
+        combination->rotationTouched = false;
     }
-    rotation_combination_count = 0;
+    rotationCombinationCount = 0;
 }
 
-void get_group_object_position(int object, float *x, float *y) {
+void getGroupObjectPosition(int object, float *x, float *y) {
     if (object < 0 || object >= objects.count) return;
     *x = objects.x[object];
     *y = objects.y[object];
 
-    int combination_index = objects.group_combination_index[object];
-    if (combination_index < 0 || combination_index >= group_combination_count) return;
+    int combinationIndex = objects.groupCombinationIndex[object];
+    if (combinationIndex < 0 || combinationIndex >= groupCombinationCount) return;
 
-    GroupCombination *combination = &group_combinations[combination_index];
-    if (object_is_240hz(object)) {
-        if (!combination->rotation_touched) return;
+    GroupCombination *combination = &group_combinations[combinationIndex];
+    if (objectIs240hz(object)) {
+        if (!combination->rotationTouched) return;
 
-        float current_x = *x;
-        float current_y = *y;
-        Vec2D transformed = affine_transform_point(combination->rotation_matrix, combination->rotation_offset, (Vec2D){ current_x, current_y });
+        float currentX = *x;
+        float currentY = *y;
+        Vec2D transformed = affineTransformPoint(combination->rotationMatrix, combination->rotationOffset, (Vec2D){ currentX, currentY });
         *x = transformed.x;
         *y = transformed.y;
         return;
     }
 
-    if (!combination->deferred_touched) return;
+    if (!combination->deferredTouched) return;
 
-    float current_x = *x;
-    float current_y = *y;
+    float currentX = *x;
+    float currentY = *y;
 
-    bool can_move_x = (objects.flags[object] & FLAG_CAN_BE_X_MOVED) != 0;
+    bool canMoveX = (objects.flags[object] & FLAG_CAN_BE_X_MOVED) != 0;
 
-    Matrix2x2 matrix = can_move_x ? combination->deferred_matrix : combination->deferred_no_x_matrix;
-    Vec2D offset = can_move_x ? combination->deferred_offset : combination->deferred_no_x_offset;
-    Vec2D transformed = apply_deferred_transform(&matrix, offset, (Vec2D){ current_x, current_y });
+    Matrix2x2 matrix = canMoveX ? combination->deferredMatrix : combination->deferredNoXMatrix;
+    Vec2D offset = canMoveX ? combination->deferredOffset : combination->deferredNoXOffset;
+    Vec2D transformed = applyDeferredTransform(&matrix, offset, (Vec2D){ currentX, currentY });
     *x = transformed.x;
     *y = transformed.y;
 }
 
-void flush_group_combination_visual_moves(void) {
-    for (int i = 0; i < deferred_combination_count; i++) {
-        int combination_index = deferred_combinations[i];
-        GroupCombination *combination = &group_combinations[combination_index];
-        for (int j = combination->collision_object_count; j < combination->object_count; j++) {
+void flushGroupCombinationVisualMoves(void) {
+    for (int i = 0; i < deferredCombinationCount; i++) {
+        int combinationIndex = deferred_combinations[i];
+        GroupCombination *combination = &group_combinations[combinationIndex];
+        for (int j = combination->collisionObjectCount; j < combination->objectCount; j++) {
             int object = combination->objects[j];
 
-            int old_sx = objects.section_x[object];
-            int old_sy = objects.section_y[object];
+            int oldSx = objects.sectionX[object];
+            int oldSy = objects.sectionY[object];
 
             float x = objects.x[object];
             float y = objects.y[object];
 
-            bool can_move_x = (objects.flags[object] & FLAG_CAN_BE_X_MOVED) != 0;
+            bool canMoveX = (objects.flags[object] & FLAG_CAN_BE_X_MOVED) != 0;
 
-            Matrix2x2 matrix = can_move_x ? combination->deferred_matrix : combination->deferred_no_x_matrix;
-            Vec2D offset = can_move_x ? combination->deferred_offset : combination->deferred_no_x_offset;
-            Vec2D transformed = apply_deferred_transform(&matrix, offset, (Vec2D){ x, y });
+            Matrix2x2 matrix = canMoveX ? combination->deferredMatrix : combination->deferredNoXMatrix;
+            Vec2D offset = canMoveX ? combination->deferredOffset : combination->deferredNoXOffset;
+            Vec2D transformed = applyDeferredTransform(&matrix, offset, (Vec2D){ x, y });
             objects.x[object] = transformed.x;
             objects.y[object] = transformed.y;
 
-            if ((int)(objects.x[object] / SECTION_SIZE) != old_sx || (int)(objects.y[object] / SECTION_SIZE) != old_sy)
-                update_object_section(object);
+            if ((int)(objects.x[object] / SECTION_SIZE) != oldSx || (int)(objects.y[object] / SECTION_SIZE) != oldSy)
+                updateObjectSection(object);
         }
-        combination->deferred_offset = (Vec2D){ 0.f, 0.f };
-        combination->deferred_matrix = matrix2x2_identity();
-        combination->deferred_touched = false;
-        combination->deferred_no_x_matrix = matrix2x2_identity();
-        combination->deferred_no_x_offset = (Vec2D){ 0.f, 0.f };
+        combination->deferredOffset = (Vec2D){ 0.f, 0.f };
+        combination->deferredMatrix = matrix2x2Identity();
+        combination->deferredTouched = false;
+        combination->deferredNoXMatrix = matrix2x2Identity();
+        combination->deferredNoXOffset = (Vec2D){ 0.f, 0.f };
     }
-    deferred_combination_count = 0;
+    deferredCombinationCount = 0;
 }
 
-void discard_group_combination_visual_moves(void) {
-    for (int i = 0; i < deferred_combination_count; i++) {
+void discardGroupCombinationVisualMoves(void) {
+    for (int i = 0; i < deferredCombinationCount; i++) {
         GroupCombination *combination = &group_combinations[deferred_combinations[i]];
-        combination->deferred_offset = (Vec2D){ 0.f, 0.f };
-        combination->deferred_matrix = matrix2x2_identity();
-        combination->deferred_touched = false;
-        combination->deferred_no_x_matrix = matrix2x2_identity();
-        combination->deferred_no_x_offset = (Vec2D){ 0.f, 0.f };
+        combination->deferredOffset = (Vec2D){ 0.f, 0.f };
+        combination->deferredMatrix = matrix2x2Identity();
+        combination->deferredTouched = false;
+        combination->deferredNoXMatrix = matrix2x2Identity();
+        combination->deferredNoXOffset = (Vec2D){ 0.f, 0.f };
     }
-    deferred_combination_count = 0;
+    deferredCombinationCount = 0;
 }
 
 // Groups
 
-void reset_group_data(int g) {
+void resetGroupData(int g) {
     if (g < 1 || g >= MAX_GROUPS) return;
     
     GroupNode *gr = &groups[g]; 
@@ -481,35 +481,35 @@ void reset_group_data(int g) {
     gr->alpha = 1.0f;
 }
 
-void add_to_group(int obj, int g) {
+void addToGroup(int obj, int g) {
     if (g < 1 || g >= MAX_GROUPS) return;
     GroupNode *gr = &groups[g]; 
     
     // Initialize
     if (gr->objects == NULL) {
-        reset_group_data(g);
+        resetGroupData(g);
     }
 
     if (gr->count >= gr->capacity) {
-        size_t new_capacity = gr->capacity == 0 ? 32 : gr->capacity + 32;
+        size_t newCapacity = gr->capacity == 0 ? 32 : gr->capacity + 32;
 
-        int *new_list = (int *)realloc(gr->objects, new_capacity * sizeof(int));
-        if (!new_list) {
+        int *newList = (int *)realloc(gr->objects, newCapacity * sizeof(int));
+        if (!newList) {
             return;
         }
 
-        gr->objects = new_list;
-        gr->capacity = new_capacity;
+        gr->objects = newList;
+        gr->capacity = newCapacity;
     }
     gr->objects[gr->count++] = obj;
 }
 
-GroupNode *get_group(int g) {
+GroupNode *getGroup(int g) {
     if (g < 1 || g >= MAX_GROUPS) return NULL;
     return &groups[g];
 }
 
-void clear_groups(void) {
+void clearGroups(void) {
     for (int g = 0; g < MAX_GROUPS; g++) {
         groups[g].toggled = false;
         groups[g].alpha = 1.0f;
@@ -522,21 +522,21 @@ void clear_groups(void) {
     }
 }
 
-int compare_objects(const void *a, const void *b) {
-    int a_x = objects.x[*(int *)a];
-    int b_x = objects.x[*(int *)b];
-    int a_y = objects.y[*(int *)a];
-    int b_y = objects.y[*(int *)b];
+int compareObjects(const void *a, const void *b) {
+    int aX = objects.x[*(int *)a];
+    int bX = objects.x[*(int *)b];
+    int aY = objects.y[*(int *)a];
+    int bY = objects.y[*(int *)b];
 
-    if (a_x != b_x) return a_x - b_x;   // smaller x first
-    return b_y - a_y;                   // if x same, bigger y first
+    if (aX != bX) return aX - bX;   // smaller x first
+    return bY - aY;                   // if x same, bigger y first
 }
 
 
-void sort_group(int g) {
+void sortGroup(int g) {
     if (g < 1 || g >= MAX_GROUPS) return;
     
     GroupNode *gr = &groups[g];
     // Sort array
-    qsort(gr->objects, gr->count, sizeof(int), compare_objects);
+    qsort(gr->objects, gr->count, sizeof(int), compareObjects);
 }

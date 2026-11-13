@@ -14,172 +14,172 @@
 #include "fonts/goldFont.hpp"
 #include "save/config.hpp"
 
-static void two_option_pop_up_init(UIScreen *s) {
-    TwoOptionPopupData *pop_up_data = (TwoOptionPopupData *)s->pair->data;
-    if(!pop_up_data) return;
+static void twoOptionPopUpInit(UIScreen *s) {
+    TwoOptionPopupData *popUpData = (TwoOptionPopupData *)s->pair->data;
+    if(!popUpData) return;
 
-    UILabel *title = (UILabel *) ui_get_element_by_tag(s, "title");
-    UILabel *content = (UILabel *) ui_get_element_by_tag(s, "content");
-    UIWindowButton *yes_button = (UIWindowButton *) ui_get_element_by_tag(s, "yesbutton");
-    UIWindowButton *no_button = (UIWindowButton *) ui_get_element_by_tag(s, "nobutton");
+    UILabel *title = (UILabel *) uiGetElementByTag(s, "title");
+    UILabel *content = (UILabel *) uiGetElementByTag(s, "content");
+    UIWindowButton *yesButton = (UIWindowButton *) uiGetElementByTag(s, "yesbutton");
+    UIWindowButton *noButton = (UIWindowButton *) uiGetElementByTag(s, "nobutton");
 
-    ui_label_set_text(title, pop_up_data->title);
-    ui_label_set_text(content, pop_up_data->text);
+    uiLabelSetText(title, popUpData->title);
+    uiLabelSetText(content, popUpData->text);
 
-    ui_button_set_text((UIButton *)yes_button, pop_up_data->proceed_text);
-    ui_button_set_text((UIButton *)no_button, pop_up_data->cancel_text);
+    uiButtonSetText((UIButton *)yesButton, popUpData->proceedText);
+    uiButtonSetText((UIButton *)noButton, popUpData->cancelText);
 
-    float yes_button_text_width = get_text_length(&goldFont_fontCharset, yes_button->base.textScale, false, yes_button->base.text) + 20;
-    float no_button_text_width = get_text_length(&goldFont_fontCharset, no_button->base.textScale, false, no_button->base.text) + 20;
+    float yesButtonTextWidth = getTextLength(&goldFontFontCharset, yesButton->base.textScale, false, yesButton->base.text) + 20;
+    float noButtonTextWidth = getTextLength(&goldFontFontCharset, noButton->base.textScale, false, noButton->base.text) + 20;
 
-    yes_button->base.base.w = yes_button_text_width;
-    yes_button->base.base.x = 0 + (((yes_button_text_width / 2) + (no_button_text_width / 2)) / 2) - 4;
+    yesButton->base.base.w = yesButtonTextWidth;
+    yesButton->base.base.x = 0 + (((yesButtonTextWidth / 2) + (noButtonTextWidth / 2)) / 2) - 4;
 
-    no_button->base.base.w = no_button_text_width;
-    no_button->base.base.x = 0 - (((yes_button_text_width / 2) + (no_button_text_width / 2)) / 2) + 4;
+    noButton->base.base.w = noButtonTextWidth;
+    noButton->base.base.x = 0 - (((yesButtonTextWidth / 2) + (noButtonTextWidth / 2)) / 2) + 4;
 }
 
-static void two_option_pop_up_free_data(void *data){
-    TwoOptionPopupData *pop_up_data = (TwoOptionPopupData *)data;
-    if(!pop_up_data) return;
-    free((void *)pop_up_data->text);
-    free((void *)pop_up_data->title);
-    free((void *)pop_up_data->proceed_text);
-    free((void *)pop_up_data->cancel_text);
-    free(pop_up_data);
+static void twoOptionPopUpFreeData(void *data){
+    TwoOptionPopupData *popUpData = (TwoOptionPopupData *)data;
+    if(!popUpData) return;
+    free((void *)popUpData->text);
+    free((void *)popUpData->title);
+    free((void *)popUpData->proceedText);
+    free((void *)popUpData->cancelText);
+    free(popUpData);
 }
 
-extern const UIScreenDefPair two_option_pop_up_def = {
+extern const UIScreenDefPair twoOptionPopUpDef = {
     .name = "two_option_popup",
     .btm = {
         .path = "romfs:/menus/creator_menu/online/two_option_pop_up.txt",
-        .init = two_option_pop_up_init
+        .init = twoOptionPopUpInit
     },
-    .free_data = two_option_pop_up_free_data,
+    .freeData = twoOptionPopUpFreeData,
 };
 
 //WARNING POPUP
 
-static void action_online_level_warning(UIElement *e, const UIPropertyList *args){
-    check_warnings_and_play();
+static void actionOnlineLevelWarning(UIElement *e, const UIPropertyList *args){
+    checkWarningsAndPlay();
 }
 
-const UIActionDef warning_actions[] = {
-    { "on_confirm", action_online_level_warning }
+const UIActionDef warningActions[] = {
+    { "on_confirm", actionOnlineLevelWarning }
 };
 
-extern const UIScreenDefPair warning_pop_up_def = {
+extern const UIScreenDefPair warningPopUpDef = {
     .name = "warning_popup",
     .btm = {
         .path = "romfs:/menus/creator_menu/online/two_option_pop_up.txt",
-        .init = two_option_pop_up_init,
-        .action_list = {
-            .actions = warning_actions,
-            .action_count = ARRAY_LEN(warning_actions)
+        .init = twoOptionPopUpInit,
+        .actionList = {
+            .actions = warningActions,
+            .actionCount = ARRAY_LEN(warningActions)
         }
     },
-    .free_data = two_option_pop_up_free_data,
+    .freeData = twoOptionPopUpFreeData,
 };
 
 //DELETE POPUP
 
-static void action_delete_level(UIElement *e, const UIPropertyList *args){
-    delete_level();
+static void actionDeleteLevel(UIElement *e, const UIPropertyList *args){
+    deleteLevel();
 }
 
-const UIActionDef delete_actions[] = {
-    { "on_confirm", action_delete_level }
+const UIActionDef deleteActions[] = {
+    { "on_confirm", actionDeleteLevel }
 };
 
-extern const UIScreenDefPair delete_pop_up_def = {
+extern const UIScreenDefPair deletePopUpDef = {
     .name = "delete_popup",
     .btm = {
         .path = "romfs:/menus/creator_menu/online/delete_pop_up.txt",
-        .init = two_option_pop_up_init,
-        .action_list = {
-            .actions = delete_actions,
-            .action_count = ARRAY_LEN(delete_actions)
+        .init = twoOptionPopUpInit,
+        .actionList = {
+            .actions = deleteActions,
+            .actionCount = ARRAY_LEN(deleteActions)
         }
     },
-    .free_data = two_option_pop_up_free_data,
+    .freeData = twoOptionPopUpFreeData,
 };
 
 //EXIT POPUP
 
-static void action_quit_game(UIElement *e, const UIPropertyList *args){
-    ui_stack_push_game_state(STATE_EXIT);
-    stop_mp3();
+static void actionQuitGame(UIElement *e, const UIPropertyList *args){
+    uiStackPushGameState(STATE_EXIT);
+    stopMP3();
     return;
 }
 
 
-const UIActionDef quit_pop_up_actions[] = {
-    { "on_confirm", action_quit_game }
+const UIActionDef quitPopUpActions[] = {
+    { "on_confirm", actionQuitGame }
 };
 
-extern const UIScreenDefPair quit_pop_up_def = {
+extern const UIScreenDefPair quitPopUpDef = {
     .name = "quit_pop_up",
     .btm = {
         .path = "romfs:/menus/creator_menu/online/two_option_pop_up.txt",
-        .init = two_option_pop_up_init,
-        .action_list = {
-            .actions = quit_pop_up_actions,
-            .action_count = ARRAY_LEN(quit_pop_up_actions)
+        .init = twoOptionPopUpInit,
+        .actionList = {
+            .actions = quitPopUpActions,
+            .actionCount = ARRAY_LEN(quitPopUpActions)
         }
     },
-    .free_data = two_option_pop_up_free_data,
+    .freeData = twoOptionPopUpFreeData,
 };
 
 // AUTOUPDATE POPUP
 
-static void action_open_updater(UIElement *e, const UIPropertyList *args){
-    ui_stack_push(&updater_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_AFTER_CLOSE);
+static void actionOpenUpdater(UIElement *e, const UIPropertyList *args){
+    uiStackPush(&updaterDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_AFTER_CLOSE);
     return;
 }
 
-const UIActionDef autoupdate_pop_up_actions[] = {
-    { "on_confirm", action_open_updater }
+const UIActionDef autoupdatePopUpActions[] = {
+    { "on_confirm", actionOpenUpdater }
 };
 
-extern const UIScreenDefPair autoupdate_pop_up_def = {
+extern const UIScreenDefPair autoupdatePopUpDef = {
     .name = "autoupdate_pop_up",
     .btm = {
         .path = "romfs:/menus/creator_menu/online/two_option_pop_up.txt",
-        .init = two_option_pop_up_init,
-        .action_list = {
-            .actions = autoupdate_pop_up_actions,
-            .action_count = ARRAY_LEN(autoupdate_pop_up_actions)
+        .init = twoOptionPopUpInit,
+        .actionList = {
+            .actions = autoupdatePopUpActions,
+            .actionCount = ARRAY_LEN(autoupdatePopUpActions)
         }
     },
-    .free_data = two_option_pop_up_free_data,
+    .freeData = twoOptionPopUpFreeData,
 };
 
 // AUTOUPDATE POPUP
 
-static void action_disable_3d(UIElement *e, const UIPropertyList *args){
-    turn_off_setting("stereoEnabled", &settingsState.stereoEnabled);
+static void actionDisable3d(UIElement *e, const UIPropertyList *args){
+    turnOffSetting("stereoEnabled", &settingsState.stereoEnabled);
 }
 
-static void action_confirm(UIElement *e, const UIPropertyList *args){
-    cfg_save();
+static void actionConfirm(UIElement *e, const UIPropertyList *args){
+    cfgSave();
     return;
 }
 
-const UIActionDef _3d_warning_pop_up_actions[] = {
+const UIActionDef threeDWarningPopUpActions[] = {
     // { "on_confirm", action_open_updater }
-    { "on_decline", action_disable_3d },
-    { "on_confirm", action_confirm }
+    { "on_decline", actionDisable3d },
+    { "on_confirm", actionConfirm }
 };
 
-extern const UIScreenDefPair _3d_warning_pop_up_def = {
+extern const UIScreenDefPair threeDWarningPopUpDef = {
     .name = "3d_warning_pop_up",
     .btm = {
         .path = "romfs:/menus/creator_menu/online/two_option_pop_up.txt",
-        .init = two_option_pop_up_init,
-        .action_list = {
-            .actions = _3d_warning_pop_up_actions,
-            .action_count = ARRAY_LEN(_3d_warning_pop_up_actions)
+        .init = twoOptionPopUpInit,
+        .actionList = {
+            .actions = threeDWarningPopUpActions,
+            .actionCount = ARRAY_LEN(threeDWarningPopUpActions)
         }
     },
-    .free_data = two_option_pop_up_free_data,
+    .freeData = twoOptionPopUpFreeData,
 };

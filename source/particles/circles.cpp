@@ -6,356 +6,356 @@
 #include "level_loading.hpp"
 #include <stdlib.h>
 
-extern const UseEffectDefinition pad_use_effect = {
+extern const UseEffectDefinition padUseEffect = {
     .colorR = 1, 
     .colorG = 1,
     .colorB = 0,
     .duration = 0.3f,
-    .start_opacity = 1,
-    .end_opacity = 0,
-    .start_rad = 4,
-    .end_rad = 40,
+    .startOpacity = 1,
+    .endOpacity = 0,
+    .startRad = 4,
+    .endRad = 40,
     .hollow = false,
     .trifading = false,
-    .start_opacity_ease = EASE_IN,
-    .end_opacity_ease = EASE_LINEAR,
-    .start_rad_ease = QUAD_OUT,
-    .end_rad_ease = QUAD_OUT,
+    .startOpacityEase = EASE_IN,
+    .endOpacityEase = EASE_LINEAR,
+    .startRadEase = QUAD_OUT,
+    .endRadEase = QUAD_OUT,
 };
-extern const UseEffectDefinition orb_use_effect = {
+extern const UseEffectDefinition orbUseEffect = {
     .colorR = 1, 
     .colorG = 1,
     .colorB = 0,
     .duration = 0.4f,
-    .start_opacity = 0.03f,
-    .end_opacity = 0.90f,
-    .start_rad = 37,
-    .end_rad = 3,
+    .startOpacity = 0.03f,
+    .endOpacity = 0.90f,
+    .startRad = 37,
+    .endRad = 3,
     .hollow = false,
     .trifading = true,
-    .start_opacity_ease = CUBIC_OUT,
-    .end_opacity_ease = EASE_LINEAR,
-    .start_rad_ease = EASE_LINEAR,
-    .end_rad_ease = EASE_LINEAR,
+    .startOpacityEase = CUBIC_OUT,
+    .endOpacityEase = EASE_LINEAR,
+    .startRadEase = EASE_LINEAR,
+    .endRadEase = EASE_LINEAR,
 };
-extern const UseEffectDefinition portal_use_effect = {
+extern const UseEffectDefinition portalUseEffect = {
     .colorR = 1, 
     .colorG = 1,
     .colorB = 0,
     .duration = 0.4f,
-    .start_opacity = 0.01f,
-    .end_opacity = 0.91f,
-    .start_rad = 48,
-    .end_rad = 0,
+    .startOpacity = 0.01f,
+    .endOpacity = 0.91f,
+    .startRad = 48,
+    .endRad = 0,
     .hollow = false,
     .trifading = true,
-    .start_opacity_ease = CUBIC_OUT,
-    .end_opacity_ease = EASE_LINEAR,
-    .start_rad_ease = EASE_LINEAR,
-    .end_rad_ease = EASE_LINEAR,
+    .startOpacityEase = CUBIC_OUT,
+    .endOpacityEase = EASE_LINEAR,
+    .startRadEase = EASE_LINEAR,
+    .endRadEase = EASE_LINEAR,
 };
-extern const UseEffectDefinition orb_collide_effect = {
+extern const UseEffectDefinition orbCollideEffect = {
     .colorR = 1, 
     .colorG = 1,
     .colorB = 1,
     .duration = 0.35f,
-    .start_opacity = .7f,
-    .end_opacity = 0,
-    .start_rad = 0,
-    .end_rad = 65,
+    .startOpacity = .7f,
+    .endOpacity = 0,
+    .startRad = 0,
+    .endRad = 65,
     .hollow = true,
     .trifading = false,
-    .start_opacity_ease = EASE_IN,
-    .end_opacity_ease = EASE_OUT,
-    .start_rad_ease = QUAD_OUT,
-    .end_rad_ease = QUAD_OUT,
-    .line_thickness = 1.f
+    .startOpacityEase = EASE_IN,
+    .endOpacityEase = EASE_OUT,
+    .startRadEase = QUAD_OUT,
+    .endRadEase = QUAD_OUT,
+    .lineThickness = 1.f
 };
-extern const UseEffectDefinition speed_collide_effect = {
+extern const UseEffectDefinition speedCollideEffect = {
     .colorR = 1, 
     .colorG = 1,
     .colorB = 1,
     .duration = 0.4f,
-    .start_opacity = .7f,
-    .end_opacity = 0,
-    .start_rad = 5,
-    .end_rad = 75,
+    .startOpacity = .7f,
+    .endOpacity = 0,
+    .startRad = 5,
+    .endRad = 75,
     .hollow = true,
     .trifading = false,
-    .start_opacity_ease = EASE_IN,
-    .end_opacity_ease = EASE_OUT,
-    .start_rad_ease = EASE_OUT,
-    .end_rad_ease = EASE_OUT,
-    .line_thickness = 2.0f
+    .startOpacityEase = EASE_IN,
+    .endOpacityEase = EASE_OUT,
+    .startRadEase = EASE_OUT,
+    .endRadEase = EASE_OUT,
+    .lineThickness = 2.0f
 };
-extern const UseEffectDefinition death_effect = {
+extern const UseEffectDefinition deathEffect = {
     .colorR = 1, 
     .colorG = 1,
     .colorB = 1,
     .duration = 0.5f,
-    .start_opacity = 0.9f,
-    .end_opacity = 0,
-    .start_rad = 8,
-    .end_rad = 80,
+    .startOpacity = 0.9f,
+    .endOpacity = 0,
+    .startRad = 8,
+    .endRad = 80,
     .hollow = false,
     .trifading = false,
-    .start_opacity_ease = EASE_IN,
-    .end_opacity_ease = EASE_LINEAR,
-    .start_rad_ease = QUAD_OUT,
-    .end_rad_ease = QUAD_OUT,
+    .startOpacityEase = EASE_IN,
+    .endOpacityEase = EASE_LINEAR,
+    .startRadEase = QUAD_OUT,
+    .endRadEase = QUAD_OUT,
 };
-extern const UseEffectDefinition tap_effect = {
+extern const UseEffectDefinition tapEffect = {
     .colorR = 1, 
     .colorG = 1,
     .colorB = 0,
     .duration = 0.25f,
-    .start_opacity = 1,
-    .end_opacity = 0,
-    .start_rad = 1,
-    .end_rad = 40,
+    .startOpacity = 1,
+    .endOpacity = 0,
+    .startRad = 1,
+    .endRad = 40,
     .hollow = false,
     .trifading = false,
-    .start_opacity_ease = EASE_IN,
-    .end_opacity_ease = EASE_LINEAR,
-    .start_rad_ease = QUAD_OUT,
-    .end_rad_ease = QUAD_OUT,
+    .startOpacityEase = EASE_IN,
+    .endOpacityEase = EASE_LINEAR,
+    .startRadEase = QUAD_OUT,
+    .endRadEase = QUAD_OUT,
 };
-extern const UseEffectDefinition coin_use_effect = {
+extern const UseEffectDefinition coinUseEffect = {
     .colorR = 1, 
     .colorG = 1,
     .colorB = 0,
     .duration = 0.4f,
-    .start_opacity = 0.03f,
-    .end_opacity = 0.90f,
-    .start_rad = 30,
-    .end_rad = 4,
+    .startOpacity = 0.03f,
+    .endOpacity = 0.90f,
+    .startRad = 30,
+    .endRad = 4,
     .hollow = false,
     .trifading = true,
-    .start_opacity_ease = CUBIC_OUT,
-    .end_opacity_ease = EASE_LINEAR,
-    .start_rad_ease = EASE_LINEAR,
-    .end_rad_ease = EASE_LINEAR,
+    .startOpacityEase = CUBIC_OUT,
+    .endOpacityEase = EASE_LINEAR,
+    .startRadEase = EASE_LINEAR,
+    .endRadEase = EASE_LINEAR,
 };
-extern const UseEffectDefinition coin_radius_effect = {
+extern const UseEffectDefinition coinRadiusEffect = {
     .colorR = 1, 
     .colorG = 1,
     .colorB = 0,
     .duration = 0.35f,
-    .start_opacity = .7f,
-    .end_opacity = 0,
-    .start_rad = 0,
-    .end_rad = 65,
+    .startOpacity = .7f,
+    .endOpacity = 0,
+    .startRad = 0,
+    .endRad = 65,
     .hollow = true,
     .trifading = false,
-    .start_opacity_ease = EASE_IN,
-    .end_opacity_ease = EASE_OUT,
-    .start_rad_ease = QUAD_OUT,
-    .end_rad_ease = QUAD_OUT,
-    .line_thickness = 2.5f
+    .startOpacityEase = EASE_IN,
+    .endOpacityEase = EASE_OUT,
+    .startRadEase = QUAD_OUT,
+    .endRadEase = QUAD_OUT,
+    .lineThickness = 2.5f
 };
-extern const UseEffectDefinition wave_radius_effect = {
+extern const UseEffectDefinition waveRadiusEffect = {
     .colorR = 1, 
     .colorG = 1,
     .colorB = 1,
     .duration = 0.44f,
-    .start_opacity = .7f,
-    .end_opacity = 0,
-    .start_rad = 5,
-    .end_rad = 80,
+    .startOpacity = .7f,
+    .endOpacity = 0,
+    .startRad = 5,
+    .endRad = 80,
     .hollow = true,
     .trifading = false,
-    .start_opacity_ease = EASE_IN,
-    .end_opacity_ease = EASE_OUT,
-    .start_rad_ease = QUAD_OUT,
-    .end_rad_ease = QUAD_OUT,
-    .line_thickness = 2.0f
+    .startOpacityEase = EASE_IN,
+    .endOpacityEase = EASE_OUT,
+    .startRadEase = QUAD_OUT,
+    .endRadEase = QUAD_OUT,
+    .lineThickness = 2.0f
 };
-extern const UseEffectDefinition size_change_big_effect = {
+extern const UseEffectDefinition sizeChangeBigEffect = {
     .colorR = 1, 
     .colorG = 1,
     .colorB = 0,
     .duration = 0.4f,
-    .start_opacity = 0.95f,
-    .end_opacity = 0,
-    .start_rad = 5,
-    .end_rad = 40,
+    .startOpacity = 0.95f,
+    .endOpacity = 0,
+    .startRad = 5,
+    .endRad = 40,
     .hollow = false,
     .trifading = false,
-    .start_opacity_ease = EASE_IN,
-    .end_opacity_ease = EASE_LINEAR,
-    .start_rad_ease = EASE_OUT,
-    .end_rad_ease = EASE_OUT,
+    .startOpacityEase = EASE_IN,
+    .endOpacityEase = EASE_LINEAR,
+    .startRadEase = EASE_OUT,
+    .endRadEase = EASE_OUT,
 }; 
 
-extern const UseEffectDefinition end_wall_filled_first = {
+extern const UseEffectDefinition endWallFilledFirst = {
     .colorR = 1, 
     .colorG = 1,
     .colorB = 0,
     .duration = 0.5f,
-    .start_opacity = 1.f,
-    .end_opacity = 0,
-    .start_rad = 2.5f,
-    .end_rad = 250,
+    .startOpacity = 1.f,
+    .endOpacity = 0,
+    .startRad = 2.5f,
+    .endRad = 250,
     .hollow = false,
     .trifading = false,
-    .start_opacity_ease = EASE_IN,
-    .end_opacity_ease = EASE_OUT,
-    .start_rad_ease = QUAD_OUT,
-    .end_rad_ease = QUAD_OUT,
+    .startOpacityEase = EASE_IN,
+    .endOpacityEase = EASE_OUT,
+    .startRadEase = QUAD_OUT,
+    .endRadEase = QUAD_OUT,
 }; 
 
-extern const UseEffectDefinition end_wall_filled_second = {
+extern const UseEffectDefinition endWallFilledSecond = {
     .colorR = 1, 
     .colorG = 1,
     .colorB = 0,
     .duration = 0.8f,
-    .start_opacity = 1.f,
-    .end_opacity = 0,
-    .start_rad = 2.5f,
-    .end_rad = SCREEN_WIDTH_AREA,
+    .startOpacity = 1.f,
+    .endOpacity = 0,
+    .startRad = 2.5f,
+    .endRad = SCREEN_WIDTH_AREA,
     .hollow = false,
     .trifading = false,
-    .start_opacity_ease = EASE_IN,
-    .end_opacity_ease = EASE_LINEAR,
-    .start_rad_ease = QUAD_OUT,
-    .end_rad_ease = QUAD_OUT,
+    .startOpacityEase = EASE_IN,
+    .endOpacityEase = EASE_LINEAR,
+    .startRadEase = QUAD_OUT,
+    .endRadEase = QUAD_OUT,
 }; 
 
-extern const UseEffectDefinition end_wall_filled_title = {
+extern const UseEffectDefinition endWallFilledTitle = {
     .colorR = 1, 
     .colorG = 1,
     .colorB = 0,
     .duration = 1.f,
-    .start_opacity = 0.9f,
-    .end_opacity = 0,
-    .start_rad = 25.f,
-    .end_rad = 250.f,
+    .startOpacity = 0.9f,
+    .endOpacity = 0,
+    .startRad = 25.f,
+    .endRad = 250.f,
     .hollow = false,
     .trifading = false,
-    .start_opacity_ease = EASE_IN,
-    .end_opacity_ease = EASE_LINEAR,
-    .start_rad_ease = QUAD_OUT,
-    .end_rad_ease = QUAD_OUT,
+    .startOpacityEase = EASE_IN,
+    .endOpacityEase = EASE_LINEAR,
+    .startRadEase = QUAD_OUT,
+    .endRadEase = QUAD_OUT,
 }; 
 
-extern const UseEffectDefinition end_wall_firework_circle = {
+extern const UseEffectDefinition endWallFireworkCircle = {
     .colorR = 1, 
     .colorG = 1,
     .colorB = 0,
     .duration = 0.5f,
-    .start_opacity = 0.f,
-    .end_opacity = 1.f,
-    .start_rad = 10.f,
-    .end_rad = 42.5f,
+    .startOpacity = 0.f,
+    .endOpacity = 1.f,
+    .startRad = 10.f,
+    .endRad = 42.5f,
     .hollow = false,
     .trifading = true,
-    .start_opacity_ease = CUBIC_OUT,
-    .end_opacity_ease = EASE_LINEAR,
-    .start_rad_ease = EASE_LINEAR,
-    .end_rad_ease = EASE_LINEAR,
+    .startOpacityEase = CUBIC_OUT,
+    .endOpacityEase = EASE_LINEAR,
+    .startRadEase = EASE_LINEAR,
+    .endRadEase = EASE_LINEAR,
 }; 
 
-extern const UseEffectDefinition end_wall_circunference = {
+extern const UseEffectDefinition endWallCircunference = {
     .colorR = 1, 
     .colorG = 1,
     .colorB = 0,
     .duration = 0.5f,
-    .start_opacity = 0.f,
-    .end_opacity = 1.f,
-    .start_rad = 2.5f,
-    .end_rad = SCREEN_WIDTH_AREA,
+    .startOpacity = 0.f,
+    .endOpacity = 1.f,
+    .startRad = 2.5f,
+    .endRad = SCREEN_WIDTH_AREA,
     .hollow = true,
     .trifading = true,
-    .start_opacity_ease = EASE_LINEAR,
-    .end_opacity_ease = EASE_LINEAR,
-    .start_rad_ease = EASE_LINEAR,
-    .end_rad_ease = EASE_LINEAR,
-    .line_thickness = 1.8f,
+    .startOpacityEase = EASE_LINEAR,
+    .endOpacityEase = EASE_LINEAR,
+    .startRadEase = EASE_LINEAR,
+    .endRadEase = EASE_LINEAR,
+    .lineThickness = 1.8f,
 }; 
 
-extern const UseEffectDefinition respawn_effect = {
+extern const UseEffectDefinition respawnEffect = {
     .colorR = 1, 
     .colorG = 1,
     .colorB = 1,
     .duration = 0.3f,
-    .start_opacity = 0.1f,
-    .end_opacity = 0.95f,
-    .start_rad = 67.f,
-    .end_rad = 3.f,
+    .startOpacity = 0.1f,
+    .endOpacity = 0.95f,
+    .startRad = 67.f,
+    .endRad = 3.f,
     .hollow = true,
     .trifading = true,
-    .start_opacity_ease = CUBIC_OUT,
-    .end_opacity_ease = EASE_LINEAR,
-    .start_rad_ease = EASE_LINEAR,
-    .end_rad_ease = EASE_LINEAR,
-    .line_thickness = 1.f
+    .startOpacityEase = CUBIC_OUT,
+    .endOpacityEase = EASE_LINEAR,
+    .startRadEase = EASE_LINEAR,
+    .endRadEase = EASE_LINEAR,
+    .lineThickness = 1.f
 }; 
 
-const UseEffectDefinition spider_in_effect = {
+const UseEffectDefinition spiderInEffect = {
     .colorR = 1, 
     .colorG = 1,
     .colorB = 1,
     .duration = 0.2f,
-    .start_opacity = 0.95f,
-    .end_opacity = 0.f,
-    .start_rad = 25.f,
-    .end_rad = 3.f,
+    .startOpacity = 0.95f,
+    .endOpacity = 0.f,
+    .startRad = 25.f,
+    .endRad = 3.f,
     .hollow = false,
     .trifading = false,
-    .start_opacity_ease = EASE_IN,
-    .end_opacity_ease = EASE_LINEAR,
-    .start_rad_ease = EASE_IN,
-    .end_rad_ease = EASE_LINEAR,
+    .startOpacityEase = EASE_IN,
+    .endOpacityEase = EASE_LINEAR,
+    .startRadEase = EASE_IN,
+    .endRadEase = EASE_LINEAR,
 }; 
 
-const UseEffectDefinition spider_out_effect = {
+const UseEffectDefinition spiderOutEffect = {
     .colorR = 1, 
     .colorG = 1,
     .colorB = 1,
     .duration = 0.1f,
-    .start_opacity = 0.95f,
-    .end_opacity = 0.f,
-    .start_rad = 10.f,
-    .end_rad = 3.f,
+    .startOpacity = 0.95f,
+    .endOpacity = 0.f,
+    .startRad = 10.f,
+    .endRad = 3.f,
     .hollow = false,
     .trifading = false,
-    .start_opacity_ease = EASE_IN,
-    .end_opacity_ease = EASE_LINEAR,
-    .start_rad_ease = EASE_IN,
-    .end_rad_ease = EASE_LINEAR,
+    .startOpacityEase = EASE_IN,
+    .endOpacityEase = EASE_LINEAR,
+    .startRadEase = EASE_IN,
+    .endRadEase = EASE_LINEAR,
 }; 
 
-UseEffectPool use_effects_top = {
+UseEffectPool useEffectsTop = {
     .stationary = false
 };
-UseEffectPool use_effects_top_above_level = {
+UseEffectPool useEffectsTopAboveLevel = {
     .stationary = false
 };
-UseEffectPool use_effects_bot = {
+UseEffectPool useEffectsBot = {
     .stationary = true
 };
 
-void init_default_use_effect_pools() {
-    init_use_effect_pool(&use_effects_top, MAX_USE_EFFECTS);
-    init_use_effect_pool(&use_effects_top_above_level, MAX_USE_EFFECTS);
-    init_use_effect_pool(&use_effects_bot, MAX_USE_EFFECTS);
+void initDefaultUseEffectPools() {
+    initUseEffectPool(&useEffectsTop, MAX_USE_EFFECTS);
+    initUseEffectPool(&useEffectsTopAboveLevel, MAX_USE_EFFECTS);
+    initUseEffectPool(&useEffectsBot, MAX_USE_EFFECTS);
 }
 
-UseEffectPool *get_use_effect_array_ptr(int screen) {
+UseEffectPool *getUseEffectArrayPtr(int screen) {
     switch (screen) {
         case GFX_TOP:
-            return &use_effects_top;
+            return &useEffectsTop;
             
         case GFX_BOTTOM:
-            return &use_effects_bot;
+            return &useEffectsBot;
         
         case GFX_TOP_BUT_ABOVE_LEVEL:
-            return &use_effects_top_above_level;
+            return &useEffectsTopAboveLevel;
     }
-    return &use_effects_top;
+    return &useEffectsTop;
 }
 
-void init_use_effect_pool(UseEffectPool *pool, int capacity) {
+void initUseEffectPool(UseEffectPool *pool, int capacity) {
     pool->pool = (UseEffect *)malloc(sizeof(UseEffect) * capacity);
     if (pool->pool) {
         memset(pool->pool, 0, sizeof(UseEffect) * capacity);
@@ -363,7 +363,7 @@ void init_use_effect_pool(UseEffectPool *pool, int capacity) {
     pool->capacity = capacity;
 }
 
-UseEffect *add_use_effect(float x, float y, int obj, const UseEffectDefinition *def, UseEffectPool *pool) {
+UseEffect *addUseEffect(float x, float y, int obj, const UseEffectDefinition *def, UseEffectPool *pool) {
     UseEffect *ptr = pool->pool;
     if (!ptr) return NULL;
 
@@ -380,8 +380,8 @@ UseEffect *add_use_effect(float x, float y, int obj, const UseEffectDefinition *
 
             effect->obj = obj;
 
-            effect->mid_rad = (effect->def.end_rad + effect->def.start_rad) / 2;
-            effect->mid_opacity = (effect->def.end_opacity + effect->def.start_opacity) / 2;
+            effect->midRad = (effect->def.endRad + effect->def.startRad) / 2;
+            effect->midOpacity = (effect->def.endOpacity + effect->def.startOpacity) / 2;
 
             effect->elapsed = 0;
 
@@ -392,7 +392,7 @@ UseEffect *add_use_effect(float x, float y, int obj, const UseEffectDefinition *
     return NULL;
 }
 
-void update_use_effects(float delta, UseEffectPool *pool) {
+void updateUseEffects(float delta, UseEffectPool *pool) {
     UseEffect *ptr = pool->pool;
     if (!ptr) return;
 
@@ -404,24 +404,24 @@ void update_use_effects(float delta, UseEffectPool *pool) {
                 effect->y = objects.y[effect->obj];
             }
             float progress = (effect->elapsed / effect->def.duration);
-            float duration_halved = effect->def.duration / 2;
+            float durationHalved = effect->def.duration / 2;
 
             float opacity;
             if (effect->def.trifading) {
                 if (progress < 0.5f) {
-                    opacity = easeValue(effect->def.start_opacity_ease, effect->def.start_opacity, effect->def.end_opacity, effect->elapsed, duration_halved, 2.f);
+                    opacity = easeValue(effect->def.startOpacityEase, effect->def.startOpacity, effect->def.endOpacity, effect->elapsed, durationHalved, 2.f);
                 } else {
-                    opacity = easeValue(effect->def.end_opacity_ease, effect->def.end_opacity, effect->def.start_opacity, effect->elapsed - duration_halved, duration_halved, 2.f);
+                    opacity = easeValue(effect->def.endOpacityEase, effect->def.endOpacity, effect->def.startOpacity, effect->elapsed - durationHalved, durationHalved, 2.f);
                 }
             } else {
                 // Merge both easings if both are the same
-                if (effect->def.start_opacity_ease == effect->def.end_opacity_ease) {
-                    opacity = easeValue(effect->def.start_opacity_ease, effect->def.start_opacity, effect->def.end_opacity, effect->elapsed, effect->def.duration, 2.f);
+                if (effect->def.startOpacityEase == effect->def.endOpacityEase) {
+                    opacity = easeValue(effect->def.startOpacityEase, effect->def.startOpacity, effect->def.endOpacity, effect->elapsed, effect->def.duration, 2.f);
                 } else {
                     if (progress < 0.5f) {
-                        opacity = easeValue(effect->def.start_opacity_ease, effect->def.start_opacity, effect->mid_opacity, effect->elapsed, duration_halved, 2.f);
+                        opacity = easeValue(effect->def.startOpacityEase, effect->def.startOpacity, effect->midOpacity, effect->elapsed, durationHalved, 2.f);
                     } else {
-                        opacity = easeValue(effect->def.end_opacity_ease, effect->mid_opacity, effect->def.end_opacity, effect->elapsed - duration_halved, duration_halved, 2.f);
+                        opacity = easeValue(effect->def.endOpacityEase, effect->midOpacity, effect->def.endOpacity, effect->elapsed - durationHalved, durationHalved, 2.f);
                     }
                 }
             }
@@ -431,13 +431,13 @@ void update_use_effects(float delta, UseEffectPool *pool) {
             float rad;
 
             // Merge both easings if both are the same
-            if (effect->def.start_rad_ease == effect->def.end_rad_ease) {
-                rad = easeValue(effect->def.start_rad_ease, effect->def.start_rad, effect->def.end_rad, effect->elapsed, effect->def.duration, 2.f);
+            if (effect->def.startRadEase == effect->def.endRadEase) {
+                rad = easeValue(effect->def.startRadEase, effect->def.startRad, effect->def.endRad, effect->elapsed, effect->def.duration, 2.f);
             } else {
                 if (progress < 0.5f) {
-                    rad = easeValue(effect->def.start_rad_ease, effect->def.start_rad, effect->mid_rad, effect->elapsed, duration_halved, 2.f);
+                    rad = easeValue(effect->def.startRadEase, effect->def.startRad, effect->midRad, effect->elapsed, durationHalved, 2.f);
                 } else {
-                    rad = easeValue(effect->def.end_rad_ease, effect->mid_rad, effect->def.end_rad, effect->elapsed - duration_halved, duration_halved, 2.f);
+                    rad = easeValue(effect->def.endRadEase, effect->midRad, effect->def.endRad, effect->elapsed - durationHalved, durationHalved, 2.f);
                 }
             }
 
@@ -451,7 +451,7 @@ void update_use_effects(float delta, UseEffectPool *pool) {
     }
 }
 
-void clear_use_effects(UseEffectPool *pool) {
+void clearUseEffects(UseEffectPool *pool) {
     UseEffect *ptr = pool->pool;
     if (!ptr) return;
 
@@ -460,7 +460,7 @@ void clear_use_effects(UseEffectPool *pool) {
     }
 }
 
-void draw_use_effects(UseEffectPool *pool) {
+void drawUseEffects(UseEffectPool *pool) {
     UseEffect *ptr = pool->pool;
     if (!ptr) return;
 
@@ -476,49 +476,49 @@ void draw_use_effects(UseEffectPool *pool) {
             float b = effect->def.colorB;
             float a = effect->opacity;
 
-            float fade_x = 0;
-            float fade_y = 0;
+            float fadeX = 0;
+            float fadeY = 0;
 
-            float fade_scale = 1.f;
+            float fadeScale = 1.f;
             float opacity = 1.f;
 
             // If stationary, dont convert to screen space
             if (!pool->stationary) {
                 // If obj is positive, it is an object, else it is a player
                 if (effect->obj >= 0) { // Obj
-                    float tmp_x = (x - state.camera_x);
-                    float fade_scale = 1.f;
-                    get_fade_vars(effect->obj, tmp_x, &fade_x, &fade_y, &fade_scale);
+                    float tmpX = (x - state.cameraX);
+                    float fadeScale = 1.f;
+                    getFadeVars(effect->obj, tmpX, &fadeX, &fadeY, &fadeScale);
 
-                    opacity = obj_edge_fade(tmp_x, SCREEN_WIDTH / SCALE) / 255.f;
+                    opacity = objEdgeFade(tmpX, SCREEN_WIDTH / SCALE) / 255.f;
 
-                    x = get_mirror_x(tmp_x + fade_x, state.mirror_factor);
-                    y = GSP_SCREEN_WIDTH - ((y - state.camera_y));  
+                    x = getMirrorX(tmpX + fadeX, state.mirrorFactor);
+                    y = GSP_SCREEN_WIDTH - ((y - state.cameraY));  
                 } else if (effect->obj == USE_EFFECT_OBJ_NOTHING) { // No objects
-                    x = get_mirror_x((x - state.camera_x), state.mirror_factor);
-                    y = GSP_SCREEN_WIDTH - ((y - state.camera_y));  
+                    x = getMirrorX((x - state.cameraX), state.mirrorFactor);
+                    y = GSP_SCREEN_WIDTH - ((y - state.cameraY));  
                 } else { // Player
-                    float tmp_x;
-                    float tmp_y;
+                    float tmpX;
+                    float tmpY;
                     if (effect->obj == USE_EFFECT_OBJ_P1) {
-                        tmp_x = state.player.x;
-                        tmp_y = state.player.y;
+                        tmpX = state.player.x;
+                        tmpY = state.player.y;
                     } else { // P2
-                        tmp_x = state.player2.x;
-                        tmp_y = state.player2.y;
+                        tmpX = state.player2.x;
+                        tmpY = state.player2.y;
                     }
                     
-                    x = get_mirror_x(tmp_x - state.camera_x, state.mirror_factor);
-                    y = GSP_SCREEN_WIDTH - ((tmp_y - state.camera_y));
+                    x = getMirrorX(tmpX - state.cameraX, state.mirrorFactor);
+                    y = GSP_SCREEN_WIDTH - ((tmpY - state.cameraY));
                 }
             }
 
             u32 color = C2D_Color32f(r, g, b, a * opacity);
 
             if (effect->def.hollow) {
-                custom_circunference(x, y + fade_y, size * fade_scale, color, effect->def.line_thickness);
+                customCircunference(x, y + fadeY, size * fadeScale, color, effect->def.lineThickness);
             } else {
-                custom_circle(x, y + fade_y, size * fade_scale, color);
+                customCircle(x, y + fadeY, size * fadeScale, color);
             }
         }
     }

@@ -1,39 +1,39 @@
 #include "particle_definitions.hpp"
 
 extern const ParticleDefenitionName particleDefNames[PARTICLE_DEF_COUNT] = {
-    { "drag_effect", &drag_effect },
-    { "ring_effect", &ring_effect },
-    { "portal_effect_01", &portal_effect_01 },
-    { "bump_effect", &bump_effect },
-    { "portal_effect_08", &portal_effect_08 },
-    { "land_effect", &land_effect },
-    { "glass_destroy_01", &glass_destroy_01 },
-    { "glitter_effect", &glitter_effect },
-    { "level_complete_01", &level_complete_01 },
-    { "ship_drag_effect", &ship_drag_effect },
-    { "speed_effect_fast", &speed_effect_fast },
-    { "speed_effect_normal", &speed_effect_normal },
-    { "speed_effect_slow", &speed_effect_slow },
-    { "speed_effect_vfast", &speed_effect_vfast },
-    { "speed_effect_fastest", &speed_effect_fastest },
+    { "drag_effect", &dragEffect },
+    { "ring_effect", &ringEffect },
+    { "portal_effect_01", &portalEffect01 },
+    { "bump_effect", &bumpEffect },
+    { "portal_effect_08", &portalEffect08 },
+    { "land_effect", &landEffect },
+    { "glass_destroy_01", &glassDestroy01 },
+    { "glitter_effect", &glitterEffect },
+    { "level_complete_01", &levelComplete01 },
+    { "ship_drag_effect", &shipDragEffect },
+    { "speed_effect_fast", &speedEffectFast },
+    { "speed_effect_normal", &speedEffectNormal },
+    { "speed_effect_slow", &speedEffectSlow },
+    { "speed_effect_vfast", &speedEffectVfast },
+    { "speed_effect_fastest", &speedEffectFastest },
     { "firework", &firework },
-    { "explode_effect", &explode_effect },
-    { "coin_effect", &coin_effect },
-    { "coin_pickup_effect", &coin_pickup_effect },
-    { "burst_effect", &burst_effect },
-    { "boost_01_effect", &boost_01_effect },
-    { "boost_02_effect", &boost_02_effect },
-    { "boost_03_effect", &boost_03_effect },
-    { "boost_04_effect", &boost_04_effect },
-    { "end_effect_portal", &end_effect_portal },
-    { "ship_effect", &ship_effect },
-    { "ship_fire_effect", &ship_fire_effect },
-    { "touch_explosion_effect", &touch_explosion_effect },
-    { "touch_drag_effect", &touch_drag_effect },
-    { "star_effect", &star_effect }
+    { "explode_effect", &explodeEffect },
+    { "coin_effect", &coinEffect },
+    { "coin_pickup_effect", &coinPickupEffect },
+    { "burst_effect", &burstEffect },
+    { "boost_01_effect", &boost01Effect },
+    { "boost_02_effect", &boost02Effect },
+    { "boost_03_effect", &boost03Effect },
+    { "boost_04_effect", &boost04Effect },
+    { "end_effect_portal", &endEffectPortal },
+    { "ship_effect", &shipEffect },
+    { "ship_fire_effect", &shipFireEffect },
+    { "touch_explosion_effect", &touchExplosionEffect },
+    { "touch_drag_effect", &touchDragEffect },
+    { "star_effect", &starEffect }
 };
 
-extern const ParticleDefinition drag_effect = {
+extern const ParticleDefinition dragEffect = {
     .angle = 90,
     .angleVariance = 45,
     .blendFuncDestination = 1,
@@ -87,7 +87,7 @@ extern const ParticleDefinition drag_effect = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition ring_effect = {
+extern const ParticleDefinition ringEffect = {
     .angle = 0.0f,
     .angleVariance = 360.0f,
     .blendFuncDestination = 1,
@@ -141,7 +141,7 @@ extern const ParticleDefinition ring_effect = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition portal_effect_01 = {
+extern const ParticleDefinition portalEffect01 = {
     .angle = 0.0f,
     .angleVariance = 95.0f,
     .blendFuncDestination = 1,
@@ -195,7 +195,7 @@ extern const ParticleDefinition portal_effect_01 = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition bump_effect = {
+extern const ParticleDefinition bumpEffect = {
     .angle = 90.0f,
     .angleVariance = 0.0f,
     .blendFuncDestination = 1,
@@ -249,7 +249,7 @@ extern const ParticleDefinition bump_effect = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition portal_effect_08 = {
+extern const ParticleDefinition portalEffect08 = {
     .angle = 0.0f,
     .angleVariance = 360.0f,
     .blendFuncDestination = 1,
@@ -303,7 +303,7 @@ extern const ParticleDefinition portal_effect_08 = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition land_effect = {
+extern const ParticleDefinition landEffect = {
     .angle = 90.0f,
     .angleVariance = 60,
     .blendFuncDestination = 1,
@@ -357,7 +357,7 @@ extern const ParticleDefinition land_effect = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition glass_destroy_01 = {
+extern const ParticleDefinition glassDestroy01 = {
     .angle = 90.0f,
     .angleVariance = 90.0f,
     .blendFuncDestination = 1,
@@ -411,7 +411,7 @@ extern const ParticleDefinition glass_destroy_01 = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition glitter_effect = {
+extern const ParticleDefinition glitterEffect = {
     .angle = 270.0f,
     .angleVariance = 0.0f,
     .blendFuncDestination = 1,
@@ -465,7 +465,7 @@ extern const ParticleDefinition glitter_effect = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition level_complete_01 = {
+extern const ParticleDefinition levelComplete01 = {
     .angle = 270.0f,
     .angleVariance = 180.0f,
     .blendFuncDestination = 1,
@@ -519,7 +519,7 @@ extern const ParticleDefinition level_complete_01 = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition ship_drag_effect = {
+extern const ParticleDefinition shipDragEffect = {
     .angle = 110.0f,
     .angleVariance = 45.0f,
     .blendFuncDestination = 1,
@@ -573,7 +573,7 @@ extern const ParticleDefinition ship_drag_effect = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition speed_effect_fast = {
+extern const ParticleDefinition speedEffectFast = {
     .angle = 180.0f,
     .angleVariance = 0.0f,
     .blendFuncDestination = 1,
@@ -627,7 +627,7 @@ extern const ParticleDefinition speed_effect_fast = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition speed_effect_normal = {
+extern const ParticleDefinition speedEffectNormal = {
     .angle = 180.0f,
     .angleVariance = 0.0f,
     .blendFuncDestination = 1,
@@ -681,7 +681,7 @@ extern const ParticleDefinition speed_effect_normal = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition speed_effect_slow = {
+extern const ParticleDefinition speedEffectSlow = {
     .angle = 180.0f,
     .angleVariance = 0.0f,
     .blendFuncDestination = 1,
@@ -735,7 +735,7 @@ extern const ParticleDefinition speed_effect_slow = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition speed_effect_vfast = {
+extern const ParticleDefinition speedEffectVfast = {
     .angle = 180.0f,
     .angleVariance = 0.0f,
     .blendFuncDestination = 1,
@@ -789,7 +789,7 @@ extern const ParticleDefinition speed_effect_vfast = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-const ParticleDefinition speed_effect_fastest = {
+const ParticleDefinition speedEffectFastest = {
     .angle = 180.0f,
     .angleVariance = 0.0f,
     .blendFuncDestination = 1,
@@ -897,7 +897,7 @@ const ParticleDefinition firework = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition explode_effect = {
+extern const ParticleDefinition explodeEffect = {
     .angle = 0.0f,
     .angleVariance = 360.0f,
     .blendFuncDestination = 1,
@@ -951,7 +951,7 @@ extern const ParticleDefinition explode_effect = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition coin_effect = {
+extern const ParticleDefinition coinEffect = {
     .angle = 270.0f,
     .angleVariance = 0.0f,
     .blendFuncDestination = 1,
@@ -1005,7 +1005,7 @@ extern const ParticleDefinition coin_effect = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition coin_pickup_effect = {
+extern const ParticleDefinition coinPickupEffect = {
     .angle = 0.0f,
     .angleVariance = 360.0f,
     .blendFuncDestination = 1,
@@ -1059,7 +1059,7 @@ extern const ParticleDefinition coin_pickup_effect = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition burst_effect = {
+extern const ParticleDefinition burstEffect = {
     .angle = 330.0f,
     .angleVariance = 45.0f,
     .blendFuncDestination = 1,
@@ -1113,7 +1113,7 @@ extern const ParticleDefinition burst_effect = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition boost_01_effect = {
+extern const ParticleDefinition boost01Effect = {
     .angle = 0.0f,
     .angleVariance = 180.0f,
     .blendFuncDestination = 1,
@@ -1167,7 +1167,7 @@ extern const ParticleDefinition boost_01_effect = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition boost_02_effect = {
+extern const ParticleDefinition boost02Effect = {
     .angle = 0.0f,
     .angleVariance = 180.0f,
     .blendFuncDestination = 1,
@@ -1221,7 +1221,7 @@ extern const ParticleDefinition boost_02_effect = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition boost_03_effect = {
+extern const ParticleDefinition boost03Effect = {
     .angle = 0.0f,
     .angleVariance = 180.0f,
     .blendFuncDestination = 1,
@@ -1275,7 +1275,7 @@ extern const ParticleDefinition boost_03_effect = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition boost_04_effect = {
+extern const ParticleDefinition boost04Effect = {
     .angle = 0.0f,
     .angleVariance = 180.0f,
     .blendFuncDestination = 1,
@@ -1329,7 +1329,7 @@ extern const ParticleDefinition boost_04_effect = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition end_effect_portal = {
+extern const ParticleDefinition endEffectPortal = {
     .angle = 0.0f,
     .angleVariance = 95.0f,
     .blendFuncDestination = 1,
@@ -1383,7 +1383,7 @@ extern const ParticleDefinition end_effect_portal = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition ship_effect = {
+extern const ParticleDefinition shipEffect = {
     .angle = -90,
     .angleVariance = -45,
     .blendFuncDestination = 1,
@@ -1437,7 +1437,7 @@ extern const ParticleDefinition ship_effect = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition ship_fire_effect = {
+extern const ParticleDefinition shipFireEffect = {
     .angle = 90,
     .angleVariance = 45,
     .blendFuncDestination = 1,
@@ -1491,7 +1491,7 @@ extern const ParticleDefinition ship_fire_effect = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition touch_drag_effect = {
+extern const ParticleDefinition touchDragEffect = {
     .angle = 0,
     .angleVariance = 180,
     .blendFuncDestination = 1,
@@ -1545,7 +1545,7 @@ extern const ParticleDefinition touch_drag_effect = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition touch_explosion_effect = {
+extern const ParticleDefinition touchExplosionEffect = {
     .angle = 0.0f,
     .angleVariance = 360.0f,
     .blendFuncDestination = 1,
@@ -1599,7 +1599,7 @@ extern const ParticleDefinition touch_explosion_effect = {
     .textureFileName = TEXTURE_SQUARE_PNG
 };
 
-extern const ParticleDefinition star_effect = {
+extern const ParticleDefinition starEffect = {
     .angle = 270.0f,
     .angleVariance = 180.0f,
     .blendFuncDestination = 1,
@@ -1654,7 +1654,7 @@ extern const ParticleDefinition star_effect = {
 };
 
 
-extern const ParticleDefinition burst_effect2 = {
+extern const ParticleDefinition burstEffect2 = {
     .angle = 330.0f,
     .angleVariance = 45.0f,
     .blendFuncDestination = 1,

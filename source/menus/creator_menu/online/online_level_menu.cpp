@@ -48,7 +48,7 @@
 #define USER_COIN_ROW_Y_RATED   131.f
 #define USER_COIN_ROW_Y_UNRATED 123.f
 
-const int demon_faces_1[] = {
+const int demonFaces1[] = {
     NA_FACE,
     EASY_DEMON_FACE_1,
     MEDIUM_DEMON_FACE_1,
@@ -57,7 +57,7 @@ const int demon_faces_1[] = {
     EXTREME_DEMON_FACE_1
 };
 
-const int demon_face_featured_offsets[] = {
+const int demonFaceFeaturedOffsets[] = {
     0,
     -9,
     -8,
@@ -66,91 +66,91 @@ const int demon_face_featured_offsets[] = {
     -8
 };
 
-static bool has_saved_level = false;
+static bool hasSavedLevel = false;
 static char *loaded_level_string = NULL;
-int online_menu_level_id = 0;
-SearchEntry *current_search_entry = NULL;
-CreatorEntry *current_creator_entry = NULL;
-SongEntry *current_song_entry = NULL;
+int onlineMenuLevelID = 0;
+SearchEntry *currentSearchEntry = NULL;
+CreatorEntry *currentCreatorEntry = NULL;
+SongEntry *currentSongEntry = NULL;
 
-int get_saved_level(GenericTask *task) {
-    size_t out_size;
-    loaded_level_string = load_saved_level(online_menu_level_id, gdps, &out_size);
+int getSavedLevel(GenericTask *task) {
+    size_t outSize;
+    loaded_level_string = loadSavedLevel(onlineMenuLevelID, gdps, &outSize);
     return loaded_level_string == NULL;
 }
 
-static GenericTask level_task = {
-    .func = get_level
+static GenericTask levelTask = {
+    .func = getLevel
 };
 
-static Thread level_thread;
+static Thread levelThread;
 
-static GenericTask song_data_task = {
-    .func = get_song_data
+static GenericTask songDataTask = {
+    .func = getSongData
 };
 
-static Thread song_data_thread;
+static Thread songDataThread;
 
-static DownloadTask song_task = {
+static DownloadTask songTask = {
     .path = USER_SONGS_DIR,
     .extension = "mp3"
 };
 
-static Thread saved_level_thread;
+static Thread savedLevelThread;
 
-static GenericTask saved_level_task = {
-    .func = get_saved_level
+static GenericTask savedLevelTask = {
+    .func = getSavedLevel
 };
 
-static Thread song_thread;
+static Thread songThread;
 
-static bool already_played_online_level = false;
+static bool alreadyPlayedOnlineLevel = false;
 
 int result = -2;
 
 bool refresh = false;
-bool song_exists = false;
+bool songExists = false;
 
-int warning_step = 0;
+int warningStep = 0;
 
-char download_speed[24] = "Speed: 0 B/s";
+char onlineLevelDownloadSpeed[24] = "Speed: 0 B/s";
 
-static UIScreen *screen_top;
+static UIScreen *screenTop;
 static UIScreen *screen;
 
-static UILabel *level_name_label;
-static UILabel *level_creator_label;
-static UIImage *high_obj_icon_image;
-static UIImage *collab_icon_image;
-static UILabel *downloads_label;
-static UIImage *likes_image;
-static UILabel *likes_label;
-static UILabel *length_label;
-static UILabel *stars_label;
-static UILabel *description_label;
-static UILabel *level_id_label;
-static UIImage *difficulty_face_image;
-static UIImage *featured_glow_image;
-static UIImage *usercoin_slots[3];
+static UILabel *levelNameLabel;
+static UILabel *levelCreatorLabel;
+static UIImage *highObjIconImage;
+static UIImage *collabIconImage;
+static UILabel *downloadsLabel;
+static UIImage *likesImage;
+static UILabel *likesLabel;
+static UILabel *lengthLabel;
+static UILabel *starsLabel;
+static UILabel *descriptionLabel;
+static UILabel *levelIDLabel;
+static UIImage *difficultyFaceImage;
+static UIImage *featuredGlowImage;
+static UIImage *usercoinSlots[3];
 
-static UIProgressBar *normal_percent_prog;
-static UIProgressBar *practice_percent_prog;
+static UIProgressBar *normalPercentProg;
+static UIProgressBar *practicePercentProg;
 
 static UISpinner *spinner;
-static UIButton *play_button;
-static UILabel *normal_percent_label;
-static UILabel *practice_percent_label;
-static UILabel *song_name_label;
-static UILabel *song_artist_label;
-static UILabel *song_status_label;
-static UIProgressBar *song_progress_bar;
-static UILabel *song_id_label;
-static UILabel *speed_label;
-static UILabel *song_size_label;
-static UIButton *song_download_button;
+static UIButton *playButton;
+static UILabel *normalPercentLabel;
+static UILabel *practicePercentLabel;
+static UILabel *songNameLabel;
+static UILabel *songArtistLabel;
+static UILabel *songStatusLabel;
+static UIProgressBar *songProgressBar;
+static UILabel *songIDLabel;
+static UILabel *speedLabel;
+static UILabel *songSizeLabel;
+static UIButton *songDownloadButton;
 
-bool in_warning = false;
-bool in_warning_screen = false;
+bool inWarning = false;
+bool inWarningScreen = false;
 
 typedef enum WarningPopupStep {
     WARNING_HIGH_OBJECT,
@@ -159,7 +159,7 @@ typedef enum WarningPopupStep {
     WARNING_DONE
 } WarningPopupStep;
 
-const char* warning_titles[] = {
+const char* warningTitles[] = {
     "High objects",
     "Version warning",
     "Missing song"
@@ -171,390 +171,390 @@ const char* warnings[] = {
     "This level uses a <#4c8cc7>custom song</> that\nhas not been <#36c244>downloaded</> yet. Play\nwithout music?"
 };
 
-static void update_download_button(SearchEntry *entry){
-    bool song_exists = check_song(entry->songId);
-    if (song_exists) {
-        ui_disable_element((UIElement *)song_download_button);
+static void updateDownloadButton(SearchEntry *entry){
+    bool songExists = checkSong(entry->songId);
+    if (songExists) {
+        uiDisableElement((UIElement *)songDownloadButton);
     }
 }
 
-static void action_download(UIElement *e, const UIPropertyList *args){
-    if (!song_task.running && !song_data_task.running) {
-        song_progress_bar->value = 0;
-        ui_button_set_image(song_download_button, 22, 0);
-        ui_disable_element((UIElement *) song_status_label);
-        ui_disable_element((UIElement *) song_id_label);
-        ui_enable_element((UIElement *) song_progress_bar);
-        ui_enable_element((UIElement *) speed_label);
-        snprintf(download_speed, sizeof(download_speed), "Speed: 0 B/s");
-        ui_label_set_text(speed_label, download_speed);
-        song_data_thread = create_generic_thread(&song_data_task);
+static void actionDownload(UIElement *e, const UIPropertyList *args){
+    if (!songTask.running && !songDataTask.running) {
+        songProgressBar->value = 0;
+        uiButtonSetImage(songDownloadButton, 22, 0);
+        uiDisableElement((UIElement *) songStatusLabel);
+        uiDisableElement((UIElement *) songIDLabel);
+        uiEnableElement((UIElement *) songProgressBar);
+        uiEnableElement((UIElement *) speedLabel);
+        snprintf(onlineLevelDownloadSpeed, sizeof(onlineLevelDownloadSpeed), "Speed: 0 B/s");
+        uiLabelSetText(speedLabel, onlineLevelDownloadSpeed);
+        songDataThread = createGenericThread(&songDataTask);
     } else {
-        if (song_data_task.running) {
-            song_data_task.cancelled = true;
-            threadJoin(song_data_thread, U64_MAX);
+        if (songDataTask.running) {
+            songDataTask.cancelled = true;
+            threadJoin(songDataThread, U64_MAX);
         }
 
-        if (song_task.running) {
-            song_task.cancelled = true;
-            threadJoin(song_thread, U64_MAX);
+        if (songTask.running) {
+            songTask.cancelled = true;
+            threadJoin(songThread, U64_MAX);
         }
     }
 }
 
-static void open_warning(){
+static void openWarning(){
     const char *warning = "Ultra unknown error.";
-    if (IN_BOUNDS((size_t)warning_step, warnings)) {
-        warning = (const char *) warnings[warning_step]; 
+    if (IN_BOUNDS((size_t)warningStep, warnings)) {
+        warning = (const char *) warnings[warningStep]; 
     } else return;
 
-    const char *warning_title = "What?";
-    if (IN_BOUNDS((size_t)warning_step, warning_titles)) {
-        warning_title = (const char *) warning_titles[warning_step]; 
+    const char *warningTitle = "What?";
+    if (IN_BOUNDS((size_t)warningStep, warningTitles)) {
+        warningTitle = (const char *) warningTitles[warningStep]; 
     } else return;
 
-    TwoOptionPopupData *warning_data = (TwoOptionPopupData *)malloc(sizeof(TwoOptionPopupData));
-    if(!warning_data) return;
+    TwoOptionPopupData *warningData = (TwoOptionPopupData *)malloc(sizeof(TwoOptionPopupData));
+    if(!warningData) return;
 
-    warning_data->text = strdup(warning);
-    warning_data->title = strdup(warning_title);
-    warning_data->proceed_text = strdup("Play");
-    warning_data->cancel_text = strdup("Cancel");
+    warningData->text = strdup(warning);
+    warningData->title = strdup(warningTitle);
+    warningData->proceedText = strdup("Play");
+    warningData->cancelText = strdup("Cancel");
 
-    ui_stack_push(&warning_pop_up_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
-    ui_stack_push_data(warning_data);
+    uiStackPush(&warningPopUpDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+    uiStackPushData(warningData);
 }
 
-static void play_level() {
-    play_sfx(&play_sound, 1);
+static void playLevel() {
+    playSfx(&playSound, 1);
 
-    state.custom_level = true;
-    state.online_level = true;
+    state.customLevel = true;
+    state.onlineLevel = true;
 
-    already_played_online_level = true;
+    alreadyPlayedOnlineLevel = true;
 
-    stop_mp3();
-    playing_menu_loop = false;
+    stopMP3();
+    playingMenuLoop = false;
 
 
-    if (has_saved_level) {
-        curr_level_string = loaded_level_string;
+    if (hasSavedLevel) {
+        currLevelString = loaded_level_string;
     } else {
-        curr_level_string = level_entry->levelString;
+        currLevelString = levelEntry->levelString;
     }
 
-    ui_stack_push_game_state(STATE_GAME);
+    uiStackPushGameState(STATE_GAME);
 }
 
-void check_warnings_and_play(){
+void checkWarningsAndPlay(){
     if(result != 0) return;
 
-    if(!already_played_online_level){
-        bool should_warn;
+    if(!alreadyPlayedOnlineLevel){
+        bool shouldWarn;
 
-        while(warning_step <= (int)WARNING_DONE){
-            switch(warning_step){
+        while(warningStep <= (int)WARNING_DONE){
+            switch(warningStep){
                 case WARNING_HIGH_OBJECT: {
-                    int obj_count = (is_N3DS ? 44000 : 14000);
-                    should_warn = current_search_entry->objCount >= obj_count;
+                    int objCount = (isN3Ds ? 44000 : 14000);
+                    shouldWarn = currentSearchEntry->objCount >= objCount;
                     break;
                 }
                 case WARNING_VERSION: {
-                    should_warn = derive_gj_version(current_search_entry->gameVersion) > GD_VERSION;
+                    shouldWarn = deriveGJVersion(currentSearchEntry->gameVersion) > GD_VERSION;
                     break;
                 }
                 case WARNING_MISSING_SONG: {
-                    int song_id = current_search_entry->songId;
-                    should_warn = !(song_id == 0 || check_song(song_id));
+                    int songID = currentSearchEntry->songId;
+                    shouldWarn = !(songID == 0 || checkSong(songID));
                 }
                 default:
                     break;
             }
 
-            if(should_warn) break;
-            warning_step++;
+            if(shouldWarn) break;
+            warningStep++;
         }
 
-        if(should_warn){
-            open_warning();
-            warning_step++;
+        if(shouldWarn){
+            openWarning();
+            warningStep++;
             return;
         }
     }
 
-    play_level();
+    playLevel();
 }
 
-static void action_play(UIElement *e, const UIPropertyList *args) {
-    check_warnings_and_play();
+static void actionPlay(UIElement *e, const UIPropertyList *args) {
+    checkWarningsAndPlay();
 }
 
-static void action_open_info(UIElement *e, const UIPropertyList *args) {
-    if (result == 0 || already_played_online_level){
-        ui_stack_push(&online_infobox_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+static void actionOpenInfo(UIElement *e, const UIPropertyList *args) {
+    if (result == 0 || alreadyPlayedOnlineLevel){
+        uiStackPush(&onlineInfoboxDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
     }
 }
 
-void delete_level(){
-   remove_saved_level(online_menu_level_id, gdps);
+void deleteLevel(){
+   removeSavedLevel(onlineMenuLevelID, gdps);
 }
 
-static void action_open_delete_level(UIElement *e, const UIPropertyList *args){
-    if (result == 0 || already_played_online_level){
-        TwoOptionPopupData *delete_level_data = (TwoOptionPopupData *)malloc(sizeof(TwoOptionPopupData));
-        if(!delete_level_data) return;
+static void actionOpenDeleteLevel(UIElement *e, const UIPropertyList *args){
+    if (result == 0 || alreadyPlayedOnlineLevel){
+        TwoOptionPopupData *deleteLevelData = (TwoOptionPopupData *)malloc(sizeof(TwoOptionPopupData));
+        if(!deleteLevelData) return;
 
-        delete_level_data->text = strdup("Are you sure you want to\ndelete this level?");
-        delete_level_data->title = strdup("Delete Level");
-        delete_level_data->proceed_text = strdup("Yes");
-        delete_level_data->cancel_text = strdup("No");
+        deleteLevelData->text = strdup("Are you sure you want to\ndelete this level?");
+        deleteLevelData->title = strdup("Delete Level");
+        deleteLevelData->proceedText = strdup("Yes");
+        deleteLevelData->cancelText = strdup("No");
 
-        ui_stack_push(&delete_pop_up_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
-        ui_stack_push_data(delete_level_data);
+        uiStackPush(&deletePopUpDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+        uiStackPushData(deleteLevelData);
     }
 }
 
-static void update_progress_bars() {
-    LevelData *data = &current_level_entry->data;
-    normal_percent_prog->value = data->normal_progress;
-    practice_percent_prog->value = data->practice_progress;
+static void updateProgressBars() {
+    LevelData *data = &currentLevelEntry->data;
+    normalPercentProg->value = data->normalProgress;
+    practicePercentProg->value = data->practiceProgress;
 
     char normal[16];
     char practice[16];
-    snprintf(normal, sizeof(normal), "%d%%", data->normal_progress);
-    snprintf(practice, sizeof(practice), "%d%%", data->practice_progress);
+    snprintf(normal, sizeof(normal), "%d%%", data->normalProgress);
+    snprintf(practice, sizeof(practice), "%d%%", data->practiceProgress);
 
-    ui_label_set_text(normal_percent_label, normal);
-    ui_label_set_text(practice_percent_label, practice);
+    uiLabelSetText(normalPercentLabel, normal);
+    uiLabelSetText(practicePercentLabel, practice);
 }
 
-static void populate_level_info(int level_id) {
-    SearchEntry *entry_srch = current_search_entry;
-    CreatorEntry *entry_c = current_creator_entry;
-    SongEntry *entry_sng = current_song_entry;
+static void populateLevelInfo(int levelID) {
+    SearchEntry *entrySrch = currentSearchEntry;
+    CreatorEntry *entryC = currentCreatorEntry;
+    SongEntry *entrySng = currentSongEntry;
 
-    char *downloads = truncate_number(entry_srch->downloads);
-    ui_label_set_text(downloads_label, downloads);
+    char *downloads = truncateNumber(entrySrch->downloads);
+    uiLabelSetText(downloadsLabel, downloads);
 
-    char *likes = truncate_number(entry_srch->likes);
-    ui_label_set_text(likes_label, likes);
+    char *likes = truncateNumber(entrySrch->likes);
+    uiLabelSetText(likesLabel, likes);
 
-    if (entry_srch->likes < 0) {
-        ui_image_set_image(likes_image, DISLIKE_ICON, 0);
+    if (entrySrch->likes < 0) {
+        uiImageSetImage(likesImage, DISLIKE_ICON, 0);
     }
 
     // Length
     const char *length = "Unkn.";
-    if (IN_BOUNDS((size_t)entry_srch->lengthNum, level_lengths)) {
-        length = (const char *) level_lengths[entry_srch->lengthNum];
+    if (IN_BOUNDS((size_t)entrySrch->lengthNum, levelLengths)) {
+        length = (const char *) levelLengths[entrySrch->lengthNum];
     }
-    ui_label_set_text(length_label, length);
+    uiLabelSetText(lengthLabel, length);
 
     // Level ID
     char lvlid[32];
-    snprintf(lvlid, sizeof(lvlid), "<#78aaf0>ID: %d", level_id);
-    ui_label_set_text(level_id_label, lvlid);
+    snprintf(lvlid, sizeof(lvlid), "<#78aaf0>ID: %d", levelID);
+    uiLabelSetText(levelIDLabel, lvlid);
 
     // Creator
     char creator[36] = "<#5AFFFF>By -</>";
-    if (entry_c) snprintf(creator, sizeof(creator), "<#%s>By %s</>", (entry_c->userId == 0) ? "5AFFFF" : "FFFFFF", entry_c->creatorName);
-    ui_label_set_text(level_creator_label, creator);
+    if (entryC) snprintf(creator, sizeof(creator), "<#%s>By %s</>", (entryC->userId == 0) ? "5AFFFF" : "FFFFFF", entryC->creatorName);
+    uiLabelSetText(levelCreatorLabel, creator);
 
     // Song and song artist
-    const char *song_name = "Unknown";
-    const char *song_artist_name = "Unknown";
+    const char *songName = "Unknown";
+    const char *songArtistName = "Unknown";
 
-    if (entry_srch->songId != 0) {
+    if (entrySrch->songId != 0) {
         // Custom song
-        char tmp_songsize[24];
-        snprintf(tmp_songsize, sizeof(tmp_songsize), "Size: %.1fMB", entry_sng->songSize);
-        ui_label_set_text(song_size_label, tmp_songsize);
+        char tmpSongsize[24];
+        snprintf(tmpSongsize, sizeof(tmpSongsize), "Size: %.1fMB", entrySng->songSize);
+        uiLabelSetText(songSizeLabel, tmpSongsize);
 
-        if (current_song_entry) {
-            song_name = entry_sng->songTitle;
-            song_artist_name = entry_sng->artistName;
+        if (currentSongEntry) {
+            songName = entrySng->songTitle;
+            songArtistName = entrySng->artistName;
         }
-        update_download_button(entry_srch);
+        updateDownloadButton(entrySrch);
     } else {
         // Main level song
-        if (entry_srch->mainSongId >= 0 && entry_srch->mainSongId < current_main_level_pack->count) {
-            song_name = (const char *) current_main_level_pack->levels[entry_srch->mainSongId].song_data.title;
-            song_artist_name = (const char *) current_main_level_pack->levels[entry_srch->mainSongId].song_data.artist;
+        if (entrySrch->mainSongId >= 0 && entrySrch->mainSongId < currentMainLevelPack->count) {
+            songName = (const char *) currentMainLevelPack->levels[entrySrch->mainSongId].songData.title;
+            songArtistName = (const char *) currentMainLevelPack->levels[entrySrch->mainSongId].songData.artist;
         }
         
-        ui_disable_element((UIElement *)song_size_label);
-        ui_disable_element((UIElement *)song_download_button);
+        uiDisableElement((UIElement *)songSizeLabel);
+        uiDisableElement((UIElement *)songDownloadButton);
     }
 
     // Song artist again
-    char song_artist[132];
-    snprintf(song_artist, sizeof(song_artist), "By: %s", song_artist_name);
-    ui_label_set_text(song_artist_label, song_artist);
-    ui_label_set_text(song_name_label, song_name);
+    char songArtist[132];
+    snprintf(songArtist, sizeof(songArtist), "By: %s", songArtistName);
+    uiLabelSetText(songArtistLabel, songArtist);
+    uiLabelSetText(songNameLabel, songName);
     
     // Star count
-    char star_count[4];
-    snprintf(star_count, sizeof(star_count), "%d", entry_srch->stars);
-    ui_label_set_text(stars_label, star_count);
+    char starCount[4];
+    snprintf(starCount, sizeof(starCount), "%d", entrySrch->stars);
+    uiLabelSetText(starsLabel, starCount);
 
     // Unrated
-    if (entry_srch->stars == 0) {
-        ui_run_func_on_tag(screen_top, "star", ui_disable_element);
-        ui_element_set_position((UIElement *) featured_glow_image, 165, 97.65);
-        ui_element_set_position((UIElement *) difficulty_face_image, 165, 93);
+    if (entrySrch->stars == 0) {
+        uiRunFuncOnTag(screenTop, "star", uiDisableElement);
+        uiElementSetPosition((UIElement *) featuredGlowImage, 165, 97.65);
+        uiElementSetPosition((UIElement *) difficultyFaceImage, 165, 93);
     }
 
-    ui_label_set_text(level_name_label, entry_srch->name);
+    uiLabelSetText(levelNameLabel, entrySrch->name);
     
     // Set difficulty
     int difficulty_id = NA_FACE;
 
-    int featured_demon_offset = 0;
+    int featuredDemonOffset = 0;
 
-    if(entry_srch->isAuto) {
+    if(entrySrch->isAuto) {
         difficulty_id = AUTO_FACE;
-    } else if(entry_srch->isDemon && gdps) {
+    } else if(entrySrch->isDemon && gdps) {
         difficulty_id = 258;
-    } else if (entry_srch->isDemon && IN_BOUNDS((size_t)entry_srch->difficulty, demon_faces_1)) {
-        difficulty_face_image->base.y = 87 - 5;
-        featured_demon_offset = demon_face_featured_offsets[entry_srch->difficulty];
-        difficulty_id = demon_faces_1[entry_srch->difficulty];
-    } else if (!entry_srch->isDemon && IN_BOUNDS((size_t)entry_srch->difficulty, difficulty_faces)) {
-        difficulty_id = difficulty_faces[entry_srch->difficulty];
+    } else if (entrySrch->isDemon && IN_BOUNDS((size_t)entrySrch->difficulty, demonFaces1)) {
+        difficultyFaceImage->base.y = 87 - 5;
+        featuredDemonOffset = demonFaceFeaturedOffsets[entrySrch->difficulty];
+        difficulty_id = demonFaces1[entrySrch->difficulty];
+    } else if (!entrySrch->isDemon && IN_BOUNDS((size_t)entrySrch->difficulty, difficultyFaces)) {
+        difficulty_id = difficultyFaces[entrySrch->difficulty];
     }
 
-    ui_image_set_image(difficulty_face_image, difficulty_id, 0);
+    uiImageSetImage(difficultyFaceImage, difficulty_id, 0);
 
-    if (entry_srch->featureScore > 0) {
-        int featured_id = 0;
+    if (entrySrch->featureScore > 0) {
+        int featuredID = 0;
         int yOffset = 0;
 
-        if(entry_srch->epic > 0 && IN_BOUNDS((size_t)entry_srch->epic, epics)){
-            featured_id = (gdps ? SUPER_GLOW : epics[entry_srch->epic]);
+        if(entrySrch->epic > 0 && IN_BOUNDS((size_t)entrySrch->epic, epics)){
+            featuredID = (gdps ? SUPER_GLOW : epics[entrySrch->epic]);
             yOffset = -2;
-        } else if(entry_srch->featureScore > 0) {
-            featured_id = FEATURED_GLOW;
+        } else if(entrySrch->featureScore > 0) {
+            featuredID = FEATURED_GLOW;
         }
 
-        if(!entry_srch->stars) yOffset += 4;
+        if(!entrySrch->stars) yOffset += 4;
 
-        if(entry_srch->isDemon) yOffset += featured_demon_offset;
+        if(entrySrch->isDemon) yOffset += featuredDemonOffset;
 
-        featured_glow_image->base.x = 165 + (gdps ? 0.3 : 0);
-        featured_glow_image->base.y = 81.65 + yOffset;
+        featuredGlowImage->base.x = 165 + (gdps ? 0.3 : 0);
+        featuredGlowImage->base.y = 81.65 + yOffset;
 
-        ui_image_set_image(featured_glow_image, featured_id, 0);
+        uiImageSetImage(featuredGlowImage, featuredID, 0);
     } else{
-        ui_disable_element((UIElement *)featured_glow_image);
+        uiDisableElement((UIElement *)featuredGlowImage);
     }
 
     // Description
-    char *wrapped_description = wrap_text(&chatFont_fontCharset, description_label->base.scaleX, entry_srch->description, 270);
-    char *desc = strdup(wrapped_description);
-    ui_label_set_text(description_label, desc);
+    char *wrappedDescription = wrapText(&chatFontFontCharset, descriptionLabel->base.scaleX, entrySrch->description, 270);
+    char *desc = strdup(wrappedDescription);
+    uiLabelSetText(descriptionLabel, desc);
     free(desc);
 
     // Song id
-    char song_id[16];
-    snprintf(song_id, sizeof(song_id), "SongID: %d", (entry_srch->songId == 0) ? entry_srch->mainSongId + 1 : entry_sng->ngSongId);
-    ui_label_set_text(song_id_label, song_id );
+    char songID[16];
+    snprintf(songID, sizeof(songID), "SongID: %d", (entrySrch->songId == 0) ? entrySrch->mainSongId + 1 : entrySng->ngSongId);
+    uiLabelSetText(songIDLabel, songID );
 
     // Level icons
-    float half_creator_length = get_text_length(&goldFont_fontCharset, 0.7f, false, (entry_c ? entry_c->creatorName : "-")) / 2;
+    float halfCreatorLength = getTextLength(&goldFontFontCharset, 0.7f, false, (entryC ? entryC->creatorName : "-")) / 2;
 
     // Original icon
-    bool is_copy = entry_srch->originalId != 0;
-    if (is_copy) {
-        ui_element_set_position((UIElement *)collab_icon_image, 200 + half_creator_length + 24, collab_icon_image->base.y);
+    bool isCopy = entrySrch->originalId != 0;
+    if (isCopy) {
+        uiElementSetPosition((UIElement *)collabIconImage, 200 + halfCreatorLength + 24, collabIconImage->base.y);
     } else {
-        ui_disable_element((UIElement *)collab_icon_image);
+        uiDisableElement((UIElement *)collabIconImage);
     }
 
     // High object count icon
-    bool high_obj_count = entry_srch->objCount >= (is_N3DS ? 44000 : 14000);
-    if (high_obj_count) {
-        ui_element_set_position((UIElement *)high_obj_icon_image, 200 + half_creator_length + 24 + (is_copy ? 13 : 0), high_obj_icon_image->base.y);
+    bool highObjCount = entrySrch->objCount >= (isN3Ds ? 44000 : 14000);
+    if (highObjCount) {
+        uiElementSetPosition((UIElement *)highObjIconImage, 200 + halfCreatorLength + 24 + (isCopy ? 13 : 0), highObjIconImage->base.y);
     } else {
-        ui_disable_element((UIElement *)high_obj_icon_image);
+        uiDisableElement((UIElement *)highObjIconImage);
     }
     
     char key[16];
-    snprintf(key, sizeof(key), "%d", entry_srch->levelId);
+    snprintf(key, sizeof(key), "%d", entrySrch->levelId);
     
-    current_level_entry = get_or_add_level_to_server_file(current_server_file, key, LEVEL_LIST_ONLINE);
-    current_level_list = LEVEL_LIST_ONLINE;
+    currentLevelEntry = getOrAddLevelToServerFile(currentServerFile, key, LEVEL_LIST_ONLINE);
+    currentLevelList = LEVEL_LIST_ONLINE;
 
-    current_level_entry->data.level_id = entry_srch->levelId;
-    current_level_entry->data.stars = entry_srch->stars;
+    currentLevelEntry->data.levelID = entrySrch->levelId;
+    currentLevelEntry->data.stars = entrySrch->stars;
 
-    int coin_count = entry_srch->coins;
-    if (coin_count < 0) coin_count = 0;
-    if (coin_count > 3) coin_count = 3;
-    bool coins_visible = user_coins_counter_visible();
-    bool has_verified_coins = entry_srch->stars > 0 && entry_srch->verifiedCoins;
-    level_verified_coins = entry_srch->verifiedCoins;
-    float coin_row_y = entry_srch->stars > 0 ? USER_COIN_ROW_Y_RATED : USER_COIN_ROW_Y_UNRATED;
+    int coinCount = entrySrch->coins;
+    if (coinCount < 0) coinCount = 0;
+    if (coinCount > 3) coinCount = 3;
+    bool coinsVisible = userCoinsCounterVisible();
+    bool hasVerifiedCoins = entrySrch->stars > 0 && entrySrch->verifiedCoins;
+    levelVerifiedCoins = entrySrch->verifiedCoins;
+    float coinRowY = entrySrch->stars > 0 ? USER_COIN_ROW_Y_RATED : USER_COIN_ROW_Y_UNRATED;
     for (int i = 0; i < 3; i++) {
-        UIImage *slot = usercoin_slots[i];
+        UIImage *slot = usercoinSlots[i];
         if (!slot) continue;
-        if (coins_visible && i < coin_count) {
-            float coin_x = USER_COIN_CENTER_X + (i - (coin_count - 1) / 2.f) * USER_COIN_STEP_X;
-            bool collected = current_level_entry &&
-                (i == 0 ? current_level_entry->data.coin1 :
-                 i == 1 ? current_level_entry->data.coin2 :
-                          current_level_entry->data.coin3);
-            ui_element_set_position((UIElement *) slot, coin_x, coin_row_y);
-            ui_image_set_tint(slot, user_coin_icon_tint(collected, has_verified_coins));
+        if (coinsVisible && i < coinCount) {
+            float coinX = USER_COIN_CENTER_X + (i - (coinCount - 1) / 2.f) * USER_COIN_STEP_X;
+            bool collected = currentLevelEntry &&
+                (i == 0 ? currentLevelEntry->data.coin1 :
+                 i == 1 ? currentLevelEntry->data.coin2 :
+                          currentLevelEntry->data.coin3);
+            uiElementSetPosition((UIElement *) slot, coinX, coinRowY);
+            uiImageSetTint(slot, userCoinIconTint(collected, hasVerifiedCoins));
             slot->base.enabled = true;
         } else {
             slot->base.enabled = false;
         }
     }
 
-    update_progress_bars();
+    updateProgressBars();
 }
 
-static void handle_errors(int code) {
-    ui_disable_element((UIElement *) spinner);
-    char error_message[64];
+static void handleErrors(int code) {
+    uiDisableElement((UIElement *) spinner);
+    char errorMessage[64];
     switch (code) {
         case -2: 
-            snprintf(error_message, sizeof(error_message), "%s", "An unknown error has occured.");
+            snprintf(errorMessage, sizeof(errorMessage), "%s", "An unknown error has occured.");
             break;
         case -1:
-            snprintf(error_message, sizeof(error_message), "%s", "Failed to download level!\nPlease try again later.");
+            snprintf(errorMessage, sizeof(errorMessage), "%s", "Failed to download level!\nPlease try again later.");
             break;
         case 6:
         case 7:
-            snprintf(error_message, sizeof(error_message), "No <#41e24e>Internet</> connection!");
+            snprintf(errorMessage, sizeof(errorMessage), "No <#41e24e>Internet</> connection!");
             break;
         case 28:
-            snprintf(error_message, sizeof(error_message), "Connection timed out!");
+            snprintf(errorMessage, sizeof(errorMessage), "Connection timed out!");
             break;
         case 42:
             break;
         default:
-            snprintf(error_message, sizeof(error_message), "An unknown error has occurred.\nError code: %d", result);
+            snprintf(errorMessage, sizeof(errorMessage), "An unknown error has occurred.\nError code: %d", result);
             break;
     }
     InfoCardData *data = (InfoCardData *)malloc(sizeof(InfoCardData));
     if(!data) return;
 
-    data->text = strdup(error_message);
+    data->text = strdup(errorMessage);
     data->title = strdup("Error");
     data->customTitle = true;
     data->copied = true;
 
-    ui_stack_push(&info_card_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
-    ui_stack_push_data(data);
+    uiStackPush(&infoCardDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+    uiStackPushData(data);
 }
 
-static void handle_song_codes(int code) {
-    ui_disable_element((UIElement *) song_progress_bar);
-    ui_disable_element((UIElement *) speed_label);
-    ui_enable_element((UIElement *) song_id_label);
-    ui_enable_element((UIElement *) song_status_label);
-    ui_button_set_image(song_download_button, 57, 0);
+static void handleSongCodes(int code) {
+    uiDisableElement((UIElement *) songProgressBar);
+    uiDisableElement((UIElement *) speedLabel);
+    uiEnableElement((UIElement *) songIDLabel);
+    uiEnableElement((UIElement *) songStatusLabel);
+    uiButtonSetImage(songDownloadButton, 57, 0);
     char message[64];
     switch (code) {
         case -4:
@@ -566,7 +566,7 @@ static void handle_song_codes(int code) {
             break;
         case 0:
             snprintf(message, sizeof(message), "<#00FF00>Download complete.</>");
-            ui_disable_element((UIElement *) song_download_button);
+            uiDisableElement((UIElement *) songDownloadButton);
             break;
         case 6:
         case 7:
@@ -582,15 +582,15 @@ static void handle_song_codes(int code) {
             snprintf(message, sizeof(message), "<#f93219>Unknown error. Code: %d</>", code);
             break;
     }
-    ui_label_set_text(song_status_label, message);
+    uiLabelSetText(songStatusLabel, message);
 }
 
-static void handle_song_data_errors(int code) {
-    ui_disable_element((UIElement *) song_progress_bar);
-    ui_disable_element((UIElement *) speed_label);
-    ui_enable_element((UIElement *) song_status_label);
-    ui_enable_element((UIElement *) song_id_label);
-    ui_button_set_image(song_download_button, 57, 0);
+static void handleSongDataErrors(int code) {
+    uiDisableElement((UIElement *) songProgressBar);
+    uiDisableElement((UIElement *) speedLabel);
+    uiEnableElement((UIElement *) songStatusLabel);
+    uiEnableElement((UIElement *) songIDLabel);
+    uiButtonSetImage(songDownloadButton, 57, 0);
     char message[64] = "";
     switch (code) {
         case -3: 
@@ -616,250 +616,250 @@ static void handle_song_data_errors(int code) {
             snprintf(message, sizeof(message), "<#f93219>Unknown error. Code: %d</>", result);
             break;
     }
-    ui_label_set_text(song_status_label, message);
+    uiLabelSetText(songStatusLabel, message);
 }
 
-static void action_refresh_level(UIElement *e, const UIPropertyList *props) {
+static void actionRefreshLevel(UIElement *e, const UIPropertyList *props) {
     result = -2;
     refresh = true;
-    ui_enable_element((UIElement *)spinner);
-    ui_disable_element((UIElement *)play_button);
-    level_thread = create_generic_thread(&level_task);
+    uiEnableElement((UIElement *)spinner);
+    uiDisableElement((UIElement *)playButton);
+    levelThread = createGenericThread(&levelTask);
 }
 
-static UIActionDef online_level_actions[] = {
-    {"info", action_open_info },
-    {"delete", action_open_delete_level},
-    {"reload", action_refresh_level },
-    {"play", action_play },
-    {"download", action_download },
+static UIActionDef onlineLevelActions[] = {
+    {"info", actionOpenInfo },
+    {"delete", actionOpenDeleteLevel},
+    {"reload", actionRefreshLevel },
+    {"play", actionPlay },
+    {"download", actionDownload },
 };
 
-static void online_level_init_top (UIScreen *s) {
-    screen_top = s;
+static void onlineLevelInitTop (UIScreen *s) {
+    screenTop = s;
     // Top screen elements
-    level_name_label = (UILabel *) ui_get_element_by_tag(screen_top, "levelname");
-    level_creator_label = (UILabel *) ui_get_element_by_tag(screen_top, "creatorname");
+    levelNameLabel = (UILabel *) uiGetElementByTag(screenTop, "levelname");
+    levelCreatorLabel = (UILabel *) uiGetElementByTag(screenTop, "creatorname");
 
-    collab_icon_image = (UIImage *) ui_get_element_by_tag(screen_top, "collab");
-    high_obj_icon_image = (UIImage *) ui_get_element_by_tag(screen_top, "highobj");
+    collabIconImage = (UIImage *) uiGetElementByTag(screenTop, "collab");
+    highObjIconImage = (UIImage *) uiGetElementByTag(screenTop, "highobj");
 
-    downloads_label = (UILabel *) ui_get_element_by_tag(screen_top, "downloadcount");
-    likes_label = (UILabel *) ui_get_element_by_tag(screen_top, "likecount");
-    length_label = (UILabel *) ui_get_element_by_tag(screen_top, "length");
-    stars_label = (UILabel *) ui_get_element_by_tag(screen_top, "starcount");
+    downloadsLabel = (UILabel *) uiGetElementByTag(screenTop, "downloadcount");
+    likesLabel = (UILabel *) uiGetElementByTag(screenTop, "likecount");
+    lengthLabel = (UILabel *) uiGetElementByTag(screenTop, "length");
+    starsLabel = (UILabel *) uiGetElementByTag(screenTop, "starcount");
 
-    difficulty_face_image = (UIImage *) ui_get_element_by_tag(screen_top, "difficultyface");
-    featured_glow_image = (UIImage *) ui_get_element_by_tag(screen_top, "glow");
+    difficultyFaceImage = (UIImage *) uiGetElementByTag(screenTop, "difficultyface");
+    featuredGlowImage = (UIImage *) uiGetElementByTag(screenTop, "glow");
 
-    usercoin_slots[0] = (UIImage *) ui_get_element_by_tag(screen_top, "usercoin_slot_1");
-    usercoin_slots[1] = (UIImage *) ui_get_element_by_tag(screen_top, "usercoin_slot_2");
-    usercoin_slots[2] = (UIImage *) ui_get_element_by_tag(screen_top, "usercoin_slot_3");
+    usercoinSlots[0] = (UIImage *) uiGetElementByTag(screenTop, "usercoin_slot_1");
+    usercoinSlots[1] = (UIImage *) uiGetElementByTag(screenTop, "usercoin_slot_2");
+    usercoinSlots[2] = (UIImage *) uiGetElementByTag(screenTop, "usercoin_slot_3");
 
-    likes_image = (UIImage *) ui_get_element_by_tag(screen_top, "thumbsup");
+    likesImage = (UIImage *) uiGetElementByTag(screenTop, "thumbsup");
 
-    description_label = (UILabel *) ui_get_element_by_tag(screen_top, "description");
-    level_id_label = (UILabel *) ui_get_element_by_tag(screen_top, "levelid");
+    descriptionLabel = (UILabel *) uiGetElementByTag(screenTop, "description");
+    levelIDLabel = (UILabel *) uiGetElementByTag(screenTop, "levelid");
 }
 
-static void online_level_init (UIScreen *s) {
-    comments_need_refresh = true;
-    warning_step = 0;
+static void onlineLevelInit (UIScreen *s) {
+    commentsNeedRefresh = true;
+    warningStep = 0;
     result = -2;
     refresh = false;
 
     screen = s;
 
-    if(gdps) ui_disable_element(ui_get_element_by_tag(s, "garage"));
+    if(gdps) uiDisableElement(uiGetElementByTag(s, "garage"));
 
     // Bottom screen elements
-    normal_percent_prog = (UIProgressBar *) ui_get_element_by_tag(screen, "normalprogress");
-    practice_percent_prog = (UIProgressBar *) ui_get_element_by_tag(screen, "practiceprogress");
-    normal_percent_label = (UILabel *) ui_get_element_by_tag(screen, "normalprogressvalue");
-    practice_percent_label = (UILabel *) ui_get_element_by_tag(screen, "practiceprogressvalue");
+    normalPercentProg = (UIProgressBar *) uiGetElementByTag(screen, "normalprogress");
+    practicePercentProg = (UIProgressBar *) uiGetElementByTag(screen, "practiceprogress");
+    normalPercentLabel = (UILabel *) uiGetElementByTag(screen, "normalprogressvalue");
+    practicePercentLabel = (UILabel *) uiGetElementByTag(screen, "practiceprogressvalue");
 
-    song_name_label = (UILabel *) ui_get_element_by_tag(screen, "songname");
-    song_artist_label = (UILabel *) ui_get_element_by_tag(screen, "songartist");
-    song_id_label = (UILabel *) ui_get_element_by_tag(screen, "songid");
-    speed_label = (UILabel *) ui_get_element_by_tag(screen, "speed");
-    song_size_label = (UILabel *) ui_get_element_by_tag(screen, "songsize");
-    song_download_button = (UIButton *) ui_get_element_by_tag(screen, "downloadbtn");
-    song_status_label = (UILabel *) ui_get_element_by_tag(screen, "songstatus");
-    song_progress_bar = (UIProgressBar *) ui_get_element_by_tag(screen, "progressbar");
+    songNameLabel = (UILabel *) uiGetElementByTag(screen, "songname");
+    songArtistLabel = (UILabel *) uiGetElementByTag(screen, "songartist");
+    songIDLabel = (UILabel *) uiGetElementByTag(screen, "songid");
+    speedLabel = (UILabel *) uiGetElementByTag(screen, "speed");
+    songSizeLabel = (UILabel *) uiGetElementByTag(screen, "songsize");
+    songDownloadButton = (UIButton *) uiGetElementByTag(screen, "downloadbtn");
+    songStatusLabel = (UILabel *) uiGetElementByTag(screen, "songstatus");
+    songProgressBar = (UIProgressBar *) uiGetElementByTag(screen, "progressbar");
 
-    spinner = (UISpinner *) ui_get_element_by_tag(screen, "spinner");
-    play_button = (UIButton *) ui_get_element_by_tag(screen, "playbutton");
+    spinner = (UISpinner *) uiGetElementByTag(screen, "spinner");
+    playButton = (UIButton *) uiGetElementByTag(screen, "playbutton");
 
-    ui_progress_bar_set_tint(normal_percent_prog, C2D_Color32(0, 255, 0, 255));
-    ui_progress_bar_set_tint(practice_percent_prog, C2D_Color32(0, 255, 255, 255));
-    ui_progress_bar_set_tint(song_progress_bar, C2D_Color32(50, 190, 240, 255));
+    uiProgressBarSetTint(normalPercentProg, C2D_Color32(0, 255, 0, 255));
+    uiProgressBarSetTint(practicePercentProg, C2D_Color32(0, 255, 255, 255));
+    uiProgressBarSetTint(songProgressBar, C2D_Color32(50, 190, 240, 255));
 
-    ui_disable_element((UIElement *) song_progress_bar);
-    ui_disable_element((UIElement *) song_status_label);
-    ui_disable_element((UIElement *) speed_label);
+    uiDisableElement((UIElement *) songProgressBar);
+    uiDisableElement((UIElement *) songStatusLabel);
+    uiDisableElement((UIElement *) speedLabel);
 
-    SavedLevelDataEntry *data = get_saved_level_data(online_menu_level_id);
+    SavedLevelDataEntry *data = getSavedLevelData(onlineMenuLevelID);
     if (data && !refresh && !redownload) {
-        current_search_entry = &data->search_entry;
-        current_creator_entry = &data->creator_entry;
-        current_song_entry = &data->song_entry;
+        currentSearchEntry = &data->searchEntry;
+        currentCreatorEntry = &data->creatorEntry;
+        currentSongEntry = &data->songEntry;
     } else {
-        current_search_entry = &search_entries[curr_search_id];
-        int creator_index = current_search_entry->creatorIndex;
-        current_creator_entry = (creator_index >= 0 ? &creator_entries[creator_index] : NULL);
-        current_song_entry = (current_search_entry->songId >= 0 ? &song_entries[current_search_entry->songIndex] : NULL);
-        bool could_save = save_level_to_server_file(current_server_file, online_menu_level_id, current_search_entry, current_creator_entry, current_song_entry);
-        if (!could_save) {
-            output_log("Oops, couldn't save da level!\n");
+        currentSearchEntry = &searchEntries[currSearchID];
+        int creatorIndex = currentSearchEntry->creatorIndex;
+        currentCreatorEntry = (creatorIndex >= 0 ? &creatorEntries[creatorIndex] : NULL);
+        currentSongEntry = (currentSearchEntry->songId >= 0 ? &songEntries[currentSearchEntry->songIndex] : NULL);
+        bool couldSave = saveLevelToServerFile(currentServerFile, onlineMenuLevelID, currentSearchEntry, currentCreatorEntry, currentSongEntry);
+        if (!couldSave) {
+            outputLog("Oops, couldn't save da level!\n");
         }
     }
 
-    play_menu_song();
+    playMenuSong();
     
-    if (!already_played_online_level) {
-        ui_disable_element((UIElement *)play_button);
+    if (!alreadyPlayedOnlineLevel) {
+        uiDisableElement((UIElement *)playButton);
     } else {
-        ui_disable_element((UIElement *)spinner);
-        ui_enable_element((UIElement *)play_button);
+        uiDisableElement((UIElement *)spinner);
+        uiEnableElement((UIElement *)playButton);
     }
 
-    populate_level_info(online_menu_level_id);
+    populateLevelInfo(onlineMenuLevelID);
 
-    if (!already_played_online_level) {
-        level_entry = NULL;
-        if (saved_level_exists(online_menu_level_id, gdps) && !redownload) {
-            has_saved_level = true;
-            saved_level_thread = create_generic_thread(&saved_level_task);
+    if (!alreadyPlayedOnlineLevel) {
+        levelEntry = NULL;
+        if (savedLevelExists(onlineMenuLevelID, gdps) && !redownload) {
+            hasSavedLevel = true;
+            savedLevelThread = createGenericThread(&savedLevelTask);
         } else {
-            has_saved_level = false;
-            level_thread = create_generic_thread(&level_task);
+            hasSavedLevel = false;
+            levelThread = createGenericThread(&levelTask);
         }
     }
 }
 
-static void online_level_menu_update(UIScreen *s, UIInput *i) {
-    if (level_result) {
-        show_level_load_error_message();
+static void onlineLevelMenuUpdate(UIScreen *s, UIInput *i) {
+    if (levelResult) {
+        showLevelLoadErrorMessage();
     }
 
-    if (exiting_level) {
-        update_progress_bars();
-        exiting_level = false;
+    if (exitingLevel) {
+        updateProgressBars();
+        exitingLevel = false;
     }
 
-    if (song_data_task.finished) {
-        int song_data_result = -3;
-        song_data_result = song_data_task.result;
+    if (songDataTask.finished) {
+        int songDataResult = -3;
+        songDataResult = songDataTask.result;
         // Handle result
-        if (song_data_result == 0) {
-            song_data_task.finished = false;
-            snprintf(song_task.file_name, sizeof(song_task.file_name), "%d", current_search_entry->songId);
-            song_task.url = current_song_entry->songLink;
+        if (songDataResult == 0) {
+            songDataTask.finished = false;
+            snprintf(songTask.fileName, sizeof(songTask.fileName), "%d", currentSearchEntry->songId);
+            songTask.url = currentSongEntry->songLink;
 
             // enter exclusive mode, disable sleep mode and begin download 
             aptSetSleepAllowed(false);
             enterExclusiveState();
-            song_thread = create_file_download_thread(&song_task);
-        } else { handle_song_data_errors(song_data_result); }
+            songThread = createFileDownloadThread(&songTask);
+        } else { handleSongDataErrors(songDataResult); }
     }
 
-    if (song_task.running) {
-        song_progress_bar->value = song_task.progress;
+    if (songTask.running) {
+        songProgressBar->value = songTask.progress;
         
-        char *speed = truncate_speed(song_task.speed);
+        char *speed = truncateSpeed(songTask.speed);
         if (speed) {
-            snprintf(download_speed, sizeof(download_speed), "Speed: %s", speed);
-            ui_label_set_text(speed_label, download_speed);
+            snprintf(onlineLevelDownloadSpeed, sizeof(onlineLevelDownloadSpeed), "Speed: %s", speed);
+            uiLabelSetText(speedLabel, onlineLevelDownloadSpeed);
             free(speed);
         }
     }
 
     // Run when finished
-    if (song_task.finished) {
+    if (songTask.finished) {
         // Handle result
-        handle_song_codes(song_task.result);
+        handleSongCodes(songTask.result);
         exitExclusiveState(false);
         aptSetSleepAllowed(true);
-        song_task.finished = false;
+        songTask.finished = false;
     }
 
     // Run when finished
-    if (level_task.finished) {
-        result = level_task.result;
+    if (levelTask.finished) {
+        result = levelTask.result;
         // Handle result
         if (result != 0) {
-            handle_errors(result);
-            if (has_saved_level) {
+            handleErrors(result);
+            if (hasSavedLevel) {
                 result = 0;
-                ui_enable_element((UIElement *) play_button);
+                uiEnableElement((UIElement *) playButton);
             }
         } else { // No errors
-            ui_disable_element((UIElement *) spinner);
-            ui_enable_element((UIElement *) play_button);
+            uiDisableElement((UIElement *) spinner);
+            uiEnableElement((UIElement *) playButton);
             if (refresh == true) {
-                populate_level_info(online_menu_level_id);
+                populateLevelInfo(onlineMenuLevelID);
                 refresh = false;
             }
         }
-        level_task.finished = false;
+        levelTask.finished = false;
     }
 
-    if (saved_level_task.finished) {
-        result = saved_level_task.result;
-        already_played_online_level = true;
-        ui_disable_element((UIElement *) spinner);
-        ui_enable_element((UIElement *) play_button);
-        saved_level_task.finished = false;
+    if (savedLevelTask.finished) {
+        result = savedLevelTask.result;
+        alreadyPlayedOnlineLevel = true;
+        uiDisableElement((UIElement *) spinner);
+        uiEnableElement((UIElement *) playButton);
+        savedLevelTask.finished = false;
     }
 }
 
-static void online_level_menu_exit(UIScreen *s) {
-    if (level_entry) {
-        if (level_entry->levelString) free(level_entry->levelString);
-        free(level_entry);
-        level_entry = NULL;
+static void onlineLevelMenuExit(UIScreen *s) {
+    if (levelEntry) {
+        if (levelEntry->levelString) free(levelEntry->levelString);
+        free(levelEntry);
+        levelEntry = NULL;
     }
     
-    if (comment_entries) {
-        free(comment_entries);
-        comment_entries = NULL;
+    if (commentEntries) {
+        free(commentEntries);
+        commentEntries = NULL;
     }
 
-    if (level_task.running) {
-        level_task.cancelled = true;
-        threadJoin(level_thread, U64_MAX);
+    if (levelTask.running) {
+        levelTask.cancelled = true;
+        threadJoin(levelThread, U64_MAX);
     }
 
-    if (song_data_task.running) {
-        song_data_task.cancelled = true;
-        threadJoin(song_data_thread, U64_MAX);
+    if (songDataTask.running) {
+        songDataTask.cancelled = true;
+        threadJoin(songDataThread, U64_MAX);
     }
 
-    if (song_task.running) {
-        song_task.cancelled = true;
+    if (songTask.running) {
+        songTask.cancelled = true;
         exitExclusiveState(false);
         aptSetSleepAllowed(true);
-        threadJoin(song_thread, U64_MAX);
+        threadJoin(songThread, U64_MAX);
     }
 
-    already_played_online_level = false;
-    save_current_save_file(LEVEL_LIST_ONLINE);
+    alreadyPlayedOnlineLevel = false;
+    saveCurrentSaveFile(LEVEL_LIST_ONLINE);
 }
 
-extern const UIScreenDefPair online_level_menu_def = {
+extern const UIScreenDefPair onlineLevelMenuDef = {
     .name = "online_level_menu",
     .top = {
         .path = "romfs:/menus/creator_menu/online/online_level_menu_top.txt",
-        .init = online_level_init_top
+        .init = onlineLevelInitTop
     },
     .btm = {
         .path = "romfs:/menus/creator_menu/online/online_level_menu.txt",
-        .init = online_level_init,
-        .update = online_level_menu_update,
-        .exit = online_level_menu_exit,
-        .action_list = {
-            .actions = online_level_actions,
-            .action_count = ARRAY_LEN(online_level_actions)
+        .init = onlineLevelInit,
+        .update = onlineLevelMenuUpdate,
+        .exit = onlineLevelMenuExit,
+        .actionList = {
+            .actions = onlineLevelActions,
+            .actionCount = ARRAY_LEN(onlineLevelActions)
         }
     }
 };

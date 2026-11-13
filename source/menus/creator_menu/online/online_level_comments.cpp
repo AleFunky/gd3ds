@@ -23,34 +23,34 @@
 
 #include "utils/utils.hpp"
 
-bool comments_need_refresh = true;
-int comments_sort_type = 1;
-int current_comments_page = 0;
+bool commentsNeedRefresh = true;
+int commentsSortType = 1;
+int currentCommentsPage = 0;
 
 static UIScreen *screen;
 
 static UIList *list;
-static UILabel *error_label;
+static UILabel *errorLabel;
 
-static UIButton *sort_by_recency_button;
-static UIButton *sort_by_likes_button;
+static UIButton *sortByRecencyButton;
+static UIButton *sortByLikesButton;
 
 static UISpinner *spinner;
 
 static Thread thread;
 
-static GenericTask comments_task = {
-    .func = get_comments
+static GenericTask commentsTask = {
+    .func = getComments
 };
 
-static void update_comment_arrows(bool disableArrows) {
-    if (commentEntriesLength == 10 && !disableArrows) ui_run_func_on_tag(screen, "nextpage", ui_enable_element); else ui_run_func_on_tag(screen, "nextpage", ui_disable_element);
-    if ((current_comments_page) >= 1 && !disableArrows) ui_run_func_on_tag(screen, "prevpage", ui_enable_element); else ui_run_func_on_tag(screen, "prevpage", ui_disable_element);
+static void updateCommentArrows(bool disableArrows) {
+    if (commentEntriesLength == 10 && !disableArrows) uiRunFuncOnTag(screen, "nextpage", uiEnableElement); else uiRunFuncOnTag(screen, "nextpage", uiDisableElement);
+    if ((currentCommentsPage) >= 1 && !disableArrows) uiRunFuncOnTag(screen, "prevpage", uiEnableElement); else uiRunFuncOnTag(screen, "prevpage", uiDisableElement);
 }
 
-static void handle_comment_errors(int code) {
-    ui_disable_element((UIElement *)spinner);
-    ui_enable_element((UIElement *)error_label);
+static void handleCommentErrors(int code) {
+    uiDisableElement((UIElement *)spinner);
+    uiEnableElement((UIElement *)errorLabel);
     char temp[64];
     switch (code) {
         case -2:
@@ -62,299 +62,299 @@ static void handle_comment_errors(int code) {
             break;
         case 6:
         case 7:   
-            ui_label_set_text(error_label, "No\n<#41e24e>Internet</> connection!");
-            update_comment_arrows(true);
+            uiLabelSetText(errorLabel, "No\n<#41e24e>Internet</> connection!");
+            updateCommentArrows(true);
             break;
 
         case 28:
-            ui_label_set_text(error_label, "Connection timed out!");
-            update_comment_arrows(true);
+            uiLabelSetText(errorLabel, "Connection timed out!");
+            updateCommentArrows(true);
             break;
         case 42:
             break;
         default:
             snprintf(temp, sizeof(temp), "An unknown error has\noccurred.\n\nError code: %d", code);
-            ui_label_set_text(error_label, temp);
+            uiLabelSetText(errorLabel, temp);
             break;
     }
 }
 
-void populate_comments() {
-    ui_list_reset(list);
-    ui_disable_element((UIElement *) spinner);
+void populateComments() {
+    uiListReset(list);
+    uiDisableElement((UIElement *) spinner);
     for (int i = 0; i < commentEntriesLength; i++) {
         char username[36] = "-";
-        snprintf(username, sizeof(username), "<#%s>%s</>", (comment_entries[i].authorAccountId == 0) ? "5AFFFF" : "FFFFFF", comment_entries[i].name);
+        snprintf(username, sizeof(username), "<#%s>%s</>", (commentEntries[i].authorAccountId == 0) ? "5AFFFF" : "FFFFFF", commentEntries[i].name);
 
         char timestamp[136];
-        int percent = comment_entries[i].percent;
-        int likes = comment_entries[i].likes;
+        int percent = commentEntries[i].percent;
+        int likes = commentEntries[i].likes;
 
-        snprintf(timestamp, sizeof(timestamp) - 1, "%s ago", comment_entries[i].commentAge);
+        snprintf(timestamp, sizeof(timestamp) - 1, "%s ago", commentEntries[i].commentAge);
 
-        float list_width = list->base.w * 0.5f;
-        float list_height = 86 * 0.5f;
+        float listWidth = list->base.w * 0.5f;
+        float listHeight = 86 * 0.5f;
 
-        UIElement *card = (UIElement *)ui_create_rectangle(screen);
+        UIElement *card = (UIElement *)uiCreateRectangle(screen);
 
         if (card) {
-            ui_rectangle_set_color((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 255) : C2D_Color32(161, 88, 44, 255)));
-            ui_element_set_size(card, 0, 86);
+            uiRectangleSetColor((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 255) : C2D_Color32(161, 88, 44, 255)));
+            uiElementSetSize(card, 0, 86);
 
-            UIWindow *bg_window = ui_create_window(screen);
-            if (bg_window) {
-                ui_element_set_size((UIElement *)bg_window, 2 * list_width - 10, 2 * list_height - 10);
-                ui_element_set_position((UIElement *)bg_window, 0, 0);
+            UIWindow *bgWindow = uiCreateWindow(screen);
+            if (bgWindow) {
+                uiElementSetSize((UIElement *)bgWindow, 2 * listWidth - 10, 2 * listHeight - 10);
+                uiElementSetPosition((UIElement *)bgWindow, 0, 0);
 
-                bg_window->atlas = C2D_SpriteSheetGetImage(window_sheet, 2);
-                bg_window->border = bg_window->atlas.subtex->width / 3;
-                bg_window->color = C2D_Color32(130, 64, 33, 100);
-                ui_element_add_child(card, (UIElement *)bg_window);
+                bgWindow->atlas = C2D_SpriteSheetGetImage(windowSheet, 2);
+                bgWindow->border = bgWindow->atlas.subtex->width / 3;
+                bgWindow->color = C2D_Color32(130, 64, 33, 100);
+                uiElementAddChild(card, (UIElement *)bgWindow);
             }
 
             // Commenter's icon (robtop server exclusive)
-            UIIcon *user_icon = ui_create_icon(screen);
-            if (user_icon && !gdps) {
+            UIIcon *userIcon = uiCreateIcon(screen);
+            if (userIcon && !gdps) {
                 //output_log("icon type: %d\nicon id: %d\nicon p1: %d\n icon p2: %d\n\n", comment_entries[i].iconType, comment_entries[i].playerIcon, comment_entries[i].col1, comment_entries[i].col2);
-                int iconType = comment_entries[i].iconType;
-                int iconIndex = comment_entries[i].playerIcon;
+                int iconType = commentEntries[i].iconType;
+                int iconIndex = commentEntries[i].playerIcon;
 
                 // check if provided player icon is in bounds
                 if (iconType >= ICON_GAMEMODE_COUNT) {
                     iconType = 0;
                     iconIndex = 1;
-                } else if (iconIndex >= gamemode_icon_count[iconType]) iconIndex = 1;
+                } else if (iconIndex >= gamemodeIconCount[iconType]) iconIndex = 1;
 
                 
-                user_icon->glow = comment_entries[i].glow;
-                ui_icon_set_gamemode_index(user_icon, iconType, iconIndex);
+                userIcon->glow = commentEntries[i].glow;
+                uiIconSetGamemodeIndex(userIcon, iconType, iconIndex);
 
-                size_t glow_col = comment_entries[i].glowCol;
-                if (glow_col < 0 || glow_col >= NUM_COLORS) glow_col = 12;
+                size_t glowCol = commentEntries[i].glowCol;
+                if (glowCol < 0 || glowCol >= numColors) glowCol = 12;
                 
-                size_t p1_col = comment_entries[i].col1;
-                if (p1_col < 0 || p1_col >= NUM_COLORS) p1_col = 12;
+                size_t p1Col = commentEntries[i].col1;
+                if (p1Col < 0 || p1Col >= numColors) p1Col = 12;
                 
-                size_t p2_col = comment_entries[i].col2;
-                if (p2_col < 0 || p2_col >= NUM_COLORS) p2_col = 12;
+                size_t p2Col = commentEntries[i].col2;
+                if (p2Col < 0 || p2Col >= numColors) p2Col = 12;
 
-                ui_icon_set_glow(user_icon, colors[gd_to_gd3ds_color_table[glow_col]]);
-                ui_icon_set_p1(user_icon, colors[gd_to_gd3ds_color_table[p1_col]]);
-                ui_icon_set_p2(user_icon, colors[gd_to_gd3ds_color_table[p2_col]]);
+                uiIconSetGlow(userIcon, colors[gdToGd3dsColorTable[glowCol]]);
+                uiIconSetP1(userIcon, colors[gdToGd3dsColorTable[p1Col]]);
+                uiIconSetP2(userIcon, colors[gdToGd3dsColorTable[p2Col]]);
                 
-                ui_element_set_position((UIElement *)user_icon, -list_width + 20, -list_height + 15);
-                ui_element_set_scale((UIElement *)user_icon, 0.5f);
+                uiElementSetPosition((UIElement *)userIcon, -listWidth + 20, -listHeight + 15);
+                uiElementSetScale((UIElement *)userIcon, 0.5f);
 
-                ui_element_add_child(card, (UIElement *)user_icon);
+                uiElementAddChild(card, (UIElement *)userIcon);
             }
 
             // Comment author
-            UILabel *username_label = ui_create_label(screen);
-            if (username_label) {
-                ui_label_set_text(username_label, username);
-                ui_element_set_position((UIElement *)username_label, -list_width + (gdps ? 10 : 30), -list_height + 15);
-                ui_element_set_scale((UIElement *)username_label, 0.6f);
+            UILabel *usernameLabel = uiCreateLabel(screen);
+            if (usernameLabel) {
+                uiLabelSetText(usernameLabel, username);
+                uiElementSetPosition((UIElement *)usernameLabel, -listWidth + (gdps ? 10 : 30), -listHeight + 15);
+                uiElementSetScale((UIElement *)usernameLabel, 0.6f);
 
-                username_label->font = 2;
+                usernameLabel->font = 2;
 
-                ui_element_add_child(card, (UIElement *)username_label);
+                uiElementAddChild(card, (UIElement *)usernameLabel);
             }
 
             // Mod badge
 
-            UIImage *badge = ui_create_image(screen);
-            if (badge && comment_entries[i].modBadge > 0) {
+            UIImage *badge = uiCreateImage(screen);
+            if (badge && commentEntries[i].modBadge > 0) {
                 int badgeOffset = 0;
-                badgeOffset += comment_entries[i].modBadge;
-                if (comment_entries[i].modBadge > 2) badgeOffset = 2;
-                ui_image_set_image(badge, 371 + badgeOffset, 0);
-                ui_element_set_position((UIElement *)badge, -list_width + (gdps ? 15 : 30) + get_text_length(&goldFont_fontCharset, 0.7, false, comment_entries[i].name) + 3, -list_height + 15);
-                ui_element_set_scale((UIElement *)badge, 0.7f);
+                badgeOffset += commentEntries[i].modBadge;
+                if (commentEntries[i].modBadge > 2) badgeOffset = 2;
+                uiImageSetImage(badge, 371 + badgeOffset, 0);
+                uiElementSetPosition((UIElement *)badge, -listWidth + (gdps ? 15 : 30) + getTextLength(&goldFontFontCharset, 0.7, false, commentEntries[i].name) + 3, -listHeight + 15);
+                uiElementSetScale((UIElement *)badge, 0.7f);
 
-                ui_element_add_child(card, (UIElement *)badge);
+                uiElementAddChild(card, (UIElement *)badge);
             }
 
             // Comment content
-            UILabel *content_label = ui_create_label(screen);
-            if (content_label) {
-                char *wrapped_content = wrap_text(&chatFont_fontCharset, content_label->base.scaleX, comment_entries[i].content, 270);
-                char *desc = strdup(wrapped_content);
-                char tinted_desc[strlen(desc) + 13];
-                snprintf(tinted_desc, sizeof(tinted_desc), "<%s>%s</>", ((comment_entries[i].modBadge == 0) ? "#FFFFFF" : comment_entries[i].modCommentColor), desc);
-                ui_label_set_text(content_label, tinted_desc);
+            UILabel *contentLabel = uiCreateLabel(screen);
+            if (contentLabel) {
+                char *wrappedContent = wrapText(&chatFontFontCharset, contentLabel->base.scaleX, commentEntries[i].content, 270);
+                char *desc = strdup(wrappedContent);
+                char tintedDesc[strlen(desc) + 13];
+                snprintf(tintedDesc, sizeof(tintedDesc), "<%s>%s</>", ((commentEntries[i].modBadge == 0) ? "#FFFFFF" : commentEntries[i].modCommentColor), desc);
+                uiLabelSetText(contentLabel, tintedDesc);
                 free(desc);
-                ui_element_set_position((UIElement *)content_label, -list_width + 12, 0 - 1.5);
-                ui_element_set_scale((UIElement *)content_label, 0.68f);
+                uiElementSetPosition((UIElement *)contentLabel, -listWidth + 12, 0 - 1.5);
+                uiElementSetScale((UIElement *)contentLabel, 0.68f);
 
-                content_label->font = 1;
+                contentLabel->font = 1;
 
-                ui_element_add_child(card, (UIElement *)content_label);
+                uiElementAddChild(card, (UIElement *)contentLabel);
             }
 
             // Comment percent
-            UILabel *percent_label = ui_create_label(screen);
-            if (percent_label && percent > 0) {
-                char tmp_value[24];
+            UILabel *percentLabel = uiCreateLabel(screen);
+            if (percentLabel && percent > 0) {
+                char tmpValue[24];
 
-                snprintf(tmp_value, sizeof(tmp_value), "<#00000096>%d%%", percent);
-                ui_label_set_text(percent_label, tmp_value);
-                ui_element_set_position((UIElement *)percent_label, list_width - 11, -list_height + 15);
-                ui_element_set_scale((UIElement *)percent_label, 0.63f);
+                snprintf(tmpValue, sizeof(tmpValue), "<#00000096>%d%%", percent);
+                uiLabelSetText(percentLabel, tmpValue);
+                uiElementSetPosition((UIElement *)percentLabel, listWidth - 11, -listHeight + 15);
+                uiElementSetScale((UIElement *)percentLabel, 0.63f);
 
-                percent_label->font = 1;
-                percent_label->alignment = 1;
+                percentLabel->font = 1;
+                percentLabel->alignment = 1;
 
-                ui_element_add_child(card, (UIElement *)percent_label);
+                uiElementAddChild(card, (UIElement *)percentLabel);
             }
 
             // Comment likes
 
-            UIImage *like_icon = ui_create_image(screen);
-            if (like_icon) {
-                ui_image_set_image(like_icon, 97, 0);
-                ui_element_set_position((UIElement *)like_icon, -list_width + 18, list_height - 16);
-                ui_element_set_scale((UIElement *)like_icon, 0.7f);
+            UIImage *likeIcon = uiCreateImage(screen);
+            if (likeIcon) {
+                uiImageSetImage(likeIcon, 97, 0);
+                uiElementSetPosition((UIElement *)likeIcon, -listWidth + 18, listHeight - 16);
+                uiElementSetScale((UIElement *)likeIcon, 0.7f);
 
                 if (likes < 0) {
-                    ui_image_set_image(like_icon, DISLIKE_ICON, 0);
+                    uiImageSetImage(likeIcon, DISLIKE_ICON, 0);
                 }
 
-                ui_element_add_child(card, (UIElement *)like_icon);
+                uiElementAddChild(card, (UIElement *)likeIcon);
             }
 
-            UILabel *like_value = ui_create_label(screen);
-            if (like_value) {
-                char tmp_value[16];
+            UILabel *likeValue = uiCreateLabel(screen);
+            if (likeValue) {
+                char tmpValue[16];
 
-                snprintf(tmp_value, sizeof(tmp_value), "%d",  likes);
+                snprintf(tmpValue, sizeof(tmpValue), "%d",  likes);
 
-                ui_label_set_text(like_value, tmp_value);
-                ui_element_set_position((UIElement *)like_value, -list_width + 28, list_height - 16);
-                ui_element_set_scale((UIElement *)like_value, 0.35f);
+                uiLabelSetText(likeValue, tmpValue);
+                uiElementSetPosition((UIElement *)likeValue, -listWidth + 28, listHeight - 16);
+                uiElementSetScale((UIElement *)likeValue, 0.35f);
 
                 // like_value->alignment = 1.f;
 
-                ui_element_add_child(card, (UIElement *)like_value);
+                uiElementAddChild(card, (UIElement *)likeValue);
             }
 
             // Comment timestamp
             if(!gdps){
-                UILabel *timestamp_value = ui_create_label(screen);
-                if (timestamp_value) {
-                    char tmp_value[sizeof(timestamp) + 14 - 1];
-                    snprintf(tmp_value, sizeof(tmp_value), "<#0000007D>%s", timestamp);
+                UILabel *timestampValue = uiCreateLabel(screen);
+                if (timestampValue) {
+                    char tmpValue[sizeof(timestamp) + 14 - 1];
+                    snprintf(tmpValue, sizeof(tmpValue), "<#0000007D>%s", timestamp);
 
-                    ui_label_set_text(timestamp_value, tmp_value);
-                    ui_element_set_position((UIElement *)timestamp_value, list_width - 8, list_height - 15);
-                    ui_element_set_scale((UIElement *)timestamp_value, 0.65f);
+                    uiLabelSetText(timestampValue, tmpValue);
+                    uiElementSetPosition((UIElement *)timestampValue, listWidth - 8, listHeight - 15);
+                    uiElementSetScale((UIElement *)timestampValue, 0.65f);
 
-                    timestamp_value->font = 1;
-                    timestamp_value->alignment = 1.f;
+                    timestampValue->font = 1;
+                    timestampValue->alignment = 1.f;
 
-                    ui_element_add_child(card, (UIElement *)timestamp_value);
+                    uiElementAddChild(card, (UIElement *)timestampValue);
                 }
             }
-            ui_list_add(list, card);
+            uiListAdd(list, card);
         }
     }
 }
 
-static void action_refresh_comments(UIElement* e, const UIPropertyList *args) {
-    int buttonType = ui_prop_int(&e->custom_properties, "sorttype", 0);
+static void actionRefreshComments(UIElement* e, const UIPropertyList *args) {
+    int buttonType = uiPropInt(&e->customProperties, "sorttype", 0);
 
     if (buttonType != -1) {
-        ui_button_set_image(sort_by_recency_button, 422, 0);
-        ui_button_set_image(sort_by_likes_button, 422, 0);
-        ui_button_set_image((UIButton *)e, 423, 0);
+        uiButtonSetImage(sortByRecencyButton, 422, 0);
+        uiButtonSetImage(sortByLikesButton, 422, 0);
+        uiButtonSetImage((UIButton *)e, 423, 0);
 
-        current_comments_page = 0;
+        currentCommentsPage = 0;
 
-        comments_sort_type = buttonType;
+        commentsSortType = buttonType;
     }
-    ui_list_reset(list);
-    ui_disable_element((UIElement *) error_label);
-    ui_enable_element((UIElement *)spinner);
-    update_comment_arrows(true);
+    uiListReset(list);
+    uiDisableElement((UIElement *) errorLabel);
+    uiEnableElement((UIElement *)spinner);
+    updateCommentArrows(true);
     
-    thread = create_generic_thread(&comments_task);
+    thread = createGenericThread(&commentsTask);
 }
 
-static void action_change_comments_page(UIElement* e, const UIPropertyList *args) {
-    current_comments_page += ui_prop_int(&e->custom_properties, "page", 0);
+static void actionChangeCommentsPage(UIElement* e, const UIPropertyList *args) {
+    currentCommentsPage += uiPropInt(&e->customProperties, "page", 0);
     
-    ui_list_reset(list);
-    update_comment_arrows(true);
-    ui_enable_element((UIElement *)spinner);
-    thread = create_generic_thread(&comments_task);
+    uiListReset(list);
+    updateCommentArrows(true);
+    uiEnableElement((UIElement *)spinner);
+    thread = createGenericThread(&commentsTask);
 }
 
-static UIActionDef online_comments_actions[] = {
-    { "refresh", action_refresh_comments },
-    { "changepage", action_change_comments_page }
+static UIActionDef onlineCommentsActions[] = {
+    { "refresh", actionRefreshComments },
+    { "changepage", actionChangeCommentsPage }
 };
-static void online_comments_exit(UIScreen *s) {
-    if (comments_task.running) {
-        comments_task.cancelled = true;
+static void onlineCommentsExit(UIScreen *s) {
+    if (commentsTask.running) {
+        commentsTask.cancelled = true;
         threadJoin(thread, U64_MAX);
     }
 }
-void online_comments_init(UIScreen *s) {
+void onlineCommentsInit(UIScreen *s) {
     //frick you cloud i'll define a screen just like old times
     screen = s;
 
-    list = (UIList *) ui_get_element_by_tag(screen, "list");
+    list = (UIList *) uiGetElementByTag(screen, "list");
 
-    error_label = (UILabel *) ui_get_element_by_tag(screen, "errorlabel");
-    sort_by_recency_button = (UIButton *) ui_get_element_by_tag(screen, "sortbyrecency");
-    sort_by_likes_button = (UIButton *) ui_get_element_by_tag(screen, "sortbylikes");
+    errorLabel = (UILabel *) uiGetElementByTag(screen, "errorlabel");
+    sortByRecencyButton = (UIButton *) uiGetElementByTag(screen, "sortbyrecency");
+    sortByLikesButton = (UIButton *) uiGetElementByTag(screen, "sortbylikes");
 
-    spinner = (UISpinner *) ui_get_element_by_tag(screen, "spinner");
+    spinner = (UISpinner *) uiGetElementByTag(screen, "spinner");
 
-    ui_button_set_image(sort_by_likes_button, 423, 0);
-    ui_disable_element((UIElement *) spinner);
-    ui_disable_element((UIElement *) error_label);
-    update_comment_arrows(true);
-    if (comments_need_refresh) {
-        ui_enable_element((UIElement *)spinner);
-        current_comments_page = 0;
-        comments_sort_type = 1;
-        create_generic_thread(&comments_task);
+    uiButtonSetImage(sortByLikesButton, 423, 0);
+    uiDisableElement((UIElement *) spinner);
+    uiDisableElement((UIElement *) errorLabel);
+    updateCommentArrows(true);
+    if (commentsNeedRefresh) {
+        uiEnableElement((UIElement *)spinner);
+        currentCommentsPage = 0;
+        commentsSortType = 1;
+        createGenericThread(&commentsTask);
     } else {
         if (list) { // No need to fetch new comments
-            ui_label_set_text(error_label, "");
-            populate_comments();
-            update_comment_arrows(false);
+            uiLabelSetText(errorLabel, "");
+            populateComments();
+            updateCommentArrows(false);
         }
     }
 }
 
-static void online_comments_update(UIScreen *s, UIInput *i) {
+static void onlineCommentsUpdate(UIScreen *s, UIInput *i) {
     // Run when finished
-    if (comments_task.finished) {
-        int result = comments_task.result;
+    if (commentsTask.finished) {
+        int result = commentsTask.result;
         // Handle result
-        if (result != 0 && comments_need_refresh) {
-            handle_comment_errors(result);
+        if (result != 0 && commentsNeedRefresh) {
+            handleCommentErrors(result);
         } else { // No errors
-            ui_label_set_text(error_label, "");
-            update_comment_arrows(false);
-            populate_comments();
-            comments_need_refresh = false;
+            uiLabelSetText(errorLabel, "");
+            updateCommentArrows(false);
+            populateComments();
+            commentsNeedRefresh = false;
         }
-        comments_task.finished = false;
+        commentsTask.finished = false;
     }
 }
 
-extern const UIScreenDefPair online_level_comments_def = {
+extern const UIScreenDefPair onlineLevelCommentsDef = {
     .name = "online_level_comments",
     .btm = {
         .path = "romfs:/menus/creator_menu/online/online_level_comments.txt",
-        .init = online_comments_init,
-        .update = online_comments_update,
-        .exit = online_comments_exit,
-        .action_list = {
-            .actions = online_comments_actions,
-            .action_count = ARRAY_LEN(online_comments_actions)
+        .init = onlineCommentsInit,
+        .update = onlineCommentsUpdate,
+        .exit = onlineCommentsExit,
+        .actionList = {
+            .actions = onlineCommentsActions,
+            .actionCount = ARRAY_LEN(onlineCommentsActions)
         }
     }
 };

@@ -6,11 +6,11 @@ static_assert(
     "Unexpected UIElement layout!"
 );
 
-void ui_element_set_userdata(UIElement *element, void *userdata) {
+void uiElementSetUserdata(UIElement *element, void *userdata) {
     element->userdata = userdata;
 }
 
-bool ui_element_basic_bound_check(UIElement *e, UIInput *touch, UITransform *transform) {
+bool uiElementBasicBoundCheck(UIElement *e, UIInput *touch, UITransform *transform) {
     if (touch->touchPos.px == 0 && touch->touchPos.py == 0) return false;
 
     float width  = (e->w * 0.5f) * fabsf(transform->scaleX);
@@ -21,7 +21,7 @@ bool ui_element_basic_bound_check(UIElement *e, UIInput *touch, UITransform *tra
 }
 
 // Combines a transform an element's data
-UITransform ui_transform_combine(UITransform *parent, UIElement *e) {
+UITransform uiTransformCombine(UITransform *parent, UIElement *e) {
     return (UITransform){
         .x = parent->x + e->x * parent->scaleX,
         .y = parent->y + e->y * parent->scaleY,
@@ -32,125 +32,125 @@ UITransform ui_transform_combine(UITransform *parent, UIElement *e) {
 }
 
 // Updates an element and its children
-void ui_update_tree(UIElement *e, UIInput *input, UITransform *parent) {
+void uiUpdateTree(UIElement *e, UIInput *input, UITransform *parent) {
     if (!e->enabled) return;
 
-    UITransform world = ui_transform_combine(parent, e);
+    UITransform world = uiTransformCombine(parent, e);
     
     // Let the element modify its own transform
-    if (e->modify_transform)
-        e->modify_transform(e, &world);
+    if (e->modifyTransform)
+        e->modifyTransform(e, &world);
     
     if(e->update){
         e->update(e, input, &world);
     }
 
-    if (!e->draws_children) {
-        for (UIElement *child = e->first_child; child; child = child->next_sibling) {
-            ui_update_tree(child, input, &world);
+    if (!e->drawsChildren) {
+        for (UIElement *child = e->firstChild; child; child = child->nextSibling) {
+            uiUpdateTree(child, input, &world);
         }
     }
 }
 
 // Draws an element and its children
-void ui_draw_tree(UIElement *e, UITransform *parent) {
+void uiDrawTree(UIElement *e, UITransform *parent) {
     if (!e->enabled) return;
 
-    UITransform world = ui_transform_combine(parent, e);
+    UITransform world = uiTransformCombine(parent, e);
 
     // Let the element modify its own transform
-    if (e->modify_transform)
-        e->modify_transform(e, &world);
+    if (e->modifyTransform)
+        e->modifyTransform(e, &world);
 
     if(e->draw) e->draw(e, &world);
 
-    if (!e->draws_children) {
-        for (UIElement *child = e->first_child; child; child = child->next_sibling) {
-            ui_draw_tree(child, &world);
+    if (!e->drawsChildren) {
+        for (UIElement *child = e->firstChild; child; child = child->nextSibling) {
+            uiDrawTree(child, &world);
         }
     }
 }
 
 // Destroys an element and its children
-void ui_destroy_tree(UIElement *e) {
-    UIElement *child = e->first_child;
+void uiDestroyTree(UIElement *e) {
+    UIElement *child = e->firstChild;
 
     while (child) {
-        UIElement *next = child->next_sibling;
+        UIElement *next = child->nextSibling;
 
-        ui_destroy_tree(child);
+        uiDestroyTree(child);
 
         child = next;
     }
 
-    if (e->userdata && e->userdata_destroy) e->userdata_destroy(e->userdata);
+    if (e->userdata && e->userdataDestroy) e->userdataDestroy(e->userdata);
 
     if(e->actions){
-        for(size_t i = 0; i < e->action_count; i++){
-            ui_destroy_proplist(&e->actions[i].args);
+        for(size_t i = 0; i < e->actionCount; i++){
+            uiDestroyProplist(&e->actions[i].args);
         }
         free(e->actions);
     }
 
-    ui_destroy_proplist(&e->custom_properties);
+    uiDestroyProplist(&e->customProperties);
     
     e->destroy(e);
 }
 
-void ui_enable_element(UIElement *e) { 
+void uiEnableElement(UIElement *e) { 
     e->enabled = true;
 
-    if (e->on_enable) {
-        e->on_enable(e);
+    if (e->onEnable) {
+        e->onEnable(e);
     }
 }
 
-void ui_disable_element(UIElement *e) { 
+void uiDisableElement(UIElement *e) { 
     e->enabled = false;
     
-    if (e->on_disable) {
-        e->on_disable(e);
+    if (e->onDisable) {
+        e->onDisable(e);
     }
 }
 
-void ui_element_add_child(UIElement *parent, UIElement *child) {
+void uiElementAddChild(UIElement *parent, UIElement *child) {
     if (!parent || !child) return;
 
     child->parent = parent;
 
-    child->next_sibling = NULL;
-    child->prev_sibling = parent->last_child;
+    child->nextSibling = NULL;
+    child->prevSibling = parent->lastChild;
 
-    if (parent->last_child)
-        parent->last_child->next_sibling = child;
+    if (parent->lastChild)
+        parent->lastChild->nextSibling = child;
     else
-        parent->first_child = child;
+        parent->firstChild = child;
 
-    parent->last_child = child;
+    parent->lastChild = child;
 }
 
-void ui_element_remove(UIElement *element) {
+void uiElementRemove(UIElement *element) {
     if (!element->parent) return;
 
     UIElement *parent = element->parent;
 
-    if (element->prev_sibling)
-        element->prev_sibling->next_sibling = element->next_sibling;
+    if (element->prevSibling)
+        element->prevSibling->nextSibling = element->nextSibling;
     else
-        parent->first_child = element->next_sibling;
+        parent->firstChild = element->nextSibling;
 
-    if (element->next_sibling)
-        element->next_sibling->prev_sibling = element->prev_sibling;
+    if (element->nextSibling)
+        element->nextSibling->prevSibling = element->prevSibling;
     else
-        parent->last_child = element->prev_sibling;
+        parent->lastChild = element->prevSibling;
 
     element->parent = NULL;
-    element->next_sibling = NULL;
-    element->prev_sibling = NULL;
+    element->nextSibling = NULL;
+    element->prevSibling = NULL;
 }
 
-UIElement *ui_get_child_by_type(UIElement *parent, UIElementType type) {
-    for (UIElement *child = parent->first_child; child; child = child->next_sibling) {
+UIElement *uiGetChildByType(UIElement *parent, UIElementType type) {
+    for (UIElement *child = parent->firstChild; child; child = child->nextSibling) {
         if (child->type == type) {
             return child;
         }
@@ -159,72 +159,72 @@ UIElement *ui_get_child_by_type(UIElement *parent, UIElementType type) {
     return NULL;
 }
 
-UIActionFn ui_find_action(const UIActionDef* actions, size_t count, const char* name) {
+UIActionFn uiFindAction(const UIActionDef* actions, size_t count, const char* name) {
     for (size_t i = 0; i < count; i++)
         if (strcmp(actions[i].name, name) == 0)
             return actions[i].fn;
     return NULL;
 }
 
-void ui_element_apply_properties(UIElement *e, UIScreen *screen, const UIPropertyList *props) {
+void uiElementApplyProperties(UIElement *e, UIScreen *screen, const UIPropertyList *props) {
     if (!e || !screen || !props) return;
 
-    ui_element_set_position(e, 
-        ui_prop_float(props, "x", e->x), 
-        ui_prop_float(props, "y", e->y));
+    uiElementSetPosition(e, 
+        uiPropFloat(props, "x", e->x), 
+        uiPropFloat(props, "y", e->y));
 
-    ui_element_set_size(e, 
-        ui_prop_int(props, "w", e->w), 
-        ui_prop_int(props, "h", e->h));
+    uiElementSetSize(e, 
+        uiPropInt(props, "w", e->w), 
+        uiPropInt(props, "h", e->h));
     
-    float scale = ui_prop_float(props, "scale", 1.0f);
-    ui_element_set_scale_xy(e,
-        ui_prop_float(props, "sx", scale),
-        ui_prop_float(props, "sy", scale)
+    float scale = uiPropFloat(props, "scale", 1.0f);
+    uiElementSetScaleXy(e,
+        uiPropFloat(props, "sx", scale),
+        uiPropFloat(props, "sy", scale)
     );
 
     // Copy tag
-    copy_tag_array(e, ui_prop_string(props, "tag", ""));
+    copyTagArray(e, uiPropString(props, "tag", ""));
     
-    e->opacity = ui_prop_float(props, "opacity", 1);
+    e->opacity = uiPropFloat(props, "opacity", 1);
 
-    const UIActionDef* actions = (screen->def && screen->def->action_list.actions) ? screen->def->action_list.actions : NULL;
-    const size_t action_count = (screen->def && screen->def->action_list.actions) ? screen->def->action_list.action_count : 0;
+    const UIActionDef* actions = (screen->def && screen->def->actionList.actions) ? screen->def->actionList.actions : NULL;
+    const size_t actionCount = (screen->def && screen->def->actionList.actions) ? screen->def->actionList.actionCount : 0;
 
-    e->action = ui_find_action(
-        actions, action_count,
-        ui_prop_string(props, "action", "")
+    e->action = uiFindAction(
+        actions, actionCount,
+        uiPropString(props, "action", "")
     );
 
-    e->actions = ui_prop_actions(
+    e->actions = uiPropActions(
         props, 
-        actions, action_count,
+        actions, actionCount,
         "actions",
-        &e->action_count
+        &e->actionCount
     );
 
-    e->custom_properties = ui_prop_list(props, "custom");
+    e->customProperties = uiPropList(props, "custom");
 }
 
-void ui_element_apply_default_properties(UIElement *e, UIScreen *screen) {
+void uiElementApplyDefaultProperties(UIElement *e, UIScreen *screen) {
     if (!e || !screen) return;
 
-    ui_element_set_scale(e, 1);
+    uiElementSetScale(e, 1);
 
     e->opacity = 1;
 
     e->screen = screen;
 
-    e->userdata_destroy = free;
+    e->userdataDestroy = free;
 }
 
-void perform_actions(UIElement *e){
+void performActions(UIElement *e){
     if (e->action){
         e->action(e, NULL);
     }
 
     if(e->actions){
-        for(size_t i = 0; i < e->action_count; i++){
+        for(size_t i = 0; i < e->actionCount; i++){
             if(e->actions[i].action){
                 e->actions[i].action(e, &e->actions[i].args);
             }

@@ -10,23 +10,23 @@
 #include <sys/types.h>
 #include <minizip/unzip.h>
 
-u8 get_model() {
+u8 getModel() {
     u8 model = 0;
     if (R_FAILED(CFGU_GetSystemModel(&model))) return CFG_MODEL_3DS;
     return model;
 }
 
-size_t get_uncompressed_size(unsigned char *data, int data_len) {
+size_t getUncompressedSize(unsigned char *data, int dataLen) {
     z_stream strm;
     memset(&strm, 0, sizeof(strm));
     strm.next_in = data;
-    strm.avail_in = data_len;
+    strm.avail_in = dataLen;
 
     if (inflateInit2(&strm, 15 | 32) != Z_OK) {  // auto-detect gzip/zlib
         return 0;
     }
 
-    size_t total_out = 0;
+    size_t totalOut = 0;
     unsigned char buf[4096];
 
     do {
@@ -37,23 +37,23 @@ size_t get_uncompressed_size(unsigned char *data, int data_len) {
             inflateEnd(&strm);
             return 0;
         }
-        total_out += sizeof(buf) - strm.avail_out;
+        totalOut += sizeof(buf) - strm.avail_out;
         if (ret == Z_STREAM_END) break;
     } while (strm.avail_in > 0);
 
     inflateEnd(&strm);
-    return total_out;
+    return totalOut;
 }
 
 
-unsigned char *compress_data(const unsigned char *data, size_t data_len, size_t *out_len, int *out_code) {
+unsigned char *compressData(const unsigned char *data, size_t dataLen, size_t *outLen, int *outCode) {
     z_stream strm = {0};
 
     if (deflateInit2(&strm, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 15, 8, Z_DEFAULT_STRATEGY) != Z_OK) {
         return NULL;
     }
 
-    uLong bound = deflateBound(&strm, data_len);
+    uLong bound = deflateBound(&strm, dataLen);
 
     unsigned char *out = (unsigned char *)malloc(bound);
     if (!out) {
@@ -62,7 +62,7 @@ unsigned char *compress_data(const unsigned char *data, size_t data_len, size_t 
     }
 
     strm.next_in = (Bytef *)data;
-    strm.avail_in = data_len;
+    strm.avail_in = dataLen;
 
     strm.next_out = out;
     strm.avail_out = bound;
@@ -72,111 +72,111 @@ unsigned char *compress_data(const unsigned char *data, size_t data_len, size_t 
     if (ret != Z_STREAM_END) {
         free(out);
         deflateEnd(&strm);
-        *out_code = LOAD_INVALID_COMPRESSED_DATA;
+        *outCode = LOAD_INVALID_COMPRESSED_DATA;
         return NULL;
     }
 
-    *out_len = strm.total_out;
+    *outLen = strm.total_out;
 
     deflateEnd(&strm);
 
-    *out_code = LOAD_NO_ERROR;
+    *outCode = LOAD_NO_ERROR;
 
     return out;
 }
 
 
-char *decompress_data(unsigned char *data, size_t data_len, size_t *out_len, int *out_code) {
-    uLongf final_size = get_uncompressed_size(data, data_len);
+char *decompressData(unsigned char *data, size_t dataLen, size_t *outLen, int *outCode) {
+    uLongf finalSize = getUncompressedSize(data, dataLen);
 
     z_stream strm = {0};
     strm.next_in = data;
-    strm.avail_in = data_len;
+    strm.avail_in = dataLen;
 
     if (inflateInit2(&strm, 15 | 32) != Z_OK) {   // auto-detect gzip/zlib
         printf("Failed to initialize zlib stream for GZIP\n");
-        *out_code = LOAD_INVALID_COMPRESSED_DATA;
+        *outCode = LOAD_INVALID_COMPRESSED_DATA;
         return NULL;
     }
 
     // Allocate exactly enough memory
-    char *out = (char *)malloc(final_size + 1);
+    char *out = (char *)malloc(finalSize + 1);
     if (!out) {
-        printf("malloc failed for %lu bytes\n", (unsigned long)final_size);
+        printf("malloc failed for %lu bytes\n", (unsigned long)finalSize);
         inflateEnd(&strm);
-        *out_code = LOAD_OUT_OF_MEMORY;
+        *outCode = LOAD_OUT_OF_MEMORY;
         return NULL;
     }
 
     strm.next_out = (Bytef *)out;
-    strm.avail_out = final_size;
+    strm.avail_out = finalSize;
 
     int ret = inflate(&strm, Z_FINISH);
     if (ret != Z_STREAM_END) {
         printf("inflate failed with code %d\n", ret);
         free(out);
         inflateEnd(&strm);
-        *out_code = LOAD_INVALID_COMPRESSED_DATA;
+        *outCode = LOAD_INVALID_COMPRESSED_DATA;
         return NULL;
     }
 
-    *out_len = strm.total_out;
-    out[*out_len] = '\0'; // Null-terminate if treating as string
+    *outLen = strm.total_out;
+    out[*outLen] = '\0'; // Null-terminate if treating as string
 
     inflateEnd(&strm);
 
-    printf("Decompressed %lu bytes successfully\n", (unsigned long)*out_len);
+    printf("Decompressed %lu bytes successfully\n", (unsigned long)*outLen);
 
-    *out_code = LOAD_NO_ERROR;
+    *outCode = LOAD_NO_ERROR;
     return out;
 }
 
-char *decompress_data_level(unsigned char *data, size_t data_len, size_t *out_len, int *out_code) {
-    uLongf final_size = get_uncompressed_size(data, data_len);
+char *decompressDataLevel(unsigned char *data, size_t dataLen, size_t *outLen, int *outCode) {
+    uLongf finalSize = getUncompressedSize(data, dataLen);
 
     z_stream strm = {0};
     strm.next_in = data;
-    strm.avail_in = data_len;
+    strm.avail_in = dataLen;
 
     if (inflateInit2(&strm, 15 | 32) != Z_OK) {   // auto-detect gzip/zlib
         printf("Failed to initialize zlib stream for GZIP\n");
-        *out_code = LOAD_INVALID_COMPRESSED_DATA;
+        *outCode = LOAD_INVALID_COMPRESSED_DATA;
         return NULL;
     }
 
     // Allocate exactly enough memory
-    char *out = (char *)arena_alloc(&level_arena, final_size + 1);
+    char *out = (char *)arenaAlloc(&levelArena, finalSize + 1);
     if (!out) {
-        printf("malloc failed for %lu bytes\n", (unsigned long)final_size);
+        printf("malloc failed for %lu bytes\n", (unsigned long)finalSize);
         inflateEnd(&strm);
-        *out_code = LOAD_OUT_OF_MEMORY;
+        *outCode = LOAD_OUT_OF_MEMORY;
         return NULL;
     }
 
     strm.next_out = (Bytef *)out;
-    strm.avail_out = final_size;
+    strm.avail_out = finalSize;
 
     int ret = inflate(&strm, Z_FINISH);
     if (ret != Z_STREAM_END) {
         printf("inflate failed with code %d\n", ret);
         free(out);
         inflateEnd(&strm);
-        *out_code = LOAD_INVALID_COMPRESSED_DATA;
+        *outCode = LOAD_INVALID_COMPRESSED_DATA;
         return NULL;
     }
 
-    *out_len = strm.total_out;
-    out[*out_len] = '\0'; // Null-terminate if treating as string
+    *outLen = strm.total_out;
+    out[*outLen] = '\0'; // Null-terminate if treating as string
 
     inflateEnd(&strm);
 
-    printf("Decompressed %lu bytes successfully\n", (unsigned long)*out_len);
+    printf("Decompressed %lu bytes successfully\n", (unsigned long)*outLen);
 
-    *out_code = LOAD_NO_ERROR;
+    *outCode = LOAD_NO_ERROR;
     return out;
 }
 
-static void generic_thread(void *arg) {
+static void genericThread(void *arg) {
     GenericTask *task = (GenericTask *)arg;
 
     task->result = task->func(task);
@@ -185,7 +185,7 @@ static void generic_thread(void *arg) {
     task->finished = true;
 }
 
-Thread create_generic_thread(GenericTask *task) {
+Thread createGenericThread(GenericTask *task) {
     int32_t priority = 0x30;
     svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
     priority += 1;
@@ -197,11 +197,11 @@ Thread create_generic_thread(GenericTask *task) {
     task->cancelled = false;
     
     return threadCreate(
-        generic_thread,
+        genericThread,
         task,
         32 * 1024,
         priority,
-        (is_N3DS ? 2 : 0),
+        (isN3Ds ? 2 : 0),
         true
    );
 }
@@ -209,46 +209,46 @@ Thread create_generic_thread(GenericTask *task) {
 // adapted from https://stackoverflow.com/questions/10440113/simple-way-to-unzip-a-zip-file-using-zlib
 
 // extracts zip file at input_path to folder destination_path
-int extract_zip(const char *input_path, const char *destination_dir) {
+int extractZip(const char *inputPath, const char *destinationDir) {
     // open file at input path
-    unzFile *zipFile = (unzFile *)unzOpen(input_path);
+    unzFile *zipFile = (unzFile *)unzOpen(inputPath);
     if (!zipFile) {
-        output_log("failed to open zip file\n");
+        outputLog("failed to open zip file\n");
         return 1;
     }
     // get zip file metadata
-    unz_global_info global_info;
-    if (unzGetGlobalInfo(zipFile, &global_info) != UNZ_OK){
-        output_log("failed to get zip file metadata\n");
+    unz_global_info globalInfo;
+    if (unzGetGlobalInfo(zipFile, &globalInfo) != UNZ_OK){
+        outputLog("failed to get zip file metadata\n");
         return 1;
     }
 
     // buffer to hold data read from the zip file.
-    char read_buffer[8192];
+    char readBuffer[8192];
 
-    for (uLong i = 0; i < global_info.number_entry; i++) {
+    for (uLong i = 0; i < globalInfo.number_entry; i++) {
         // get current file metadata
-        unz_file_info file_info;
+        unz_file_info fileInfo;
         char filename[256];
         char path[256 + sizeof(filename)];
 
-        if (unzGetCurrentFileInfo(zipFile, &file_info, filename, sizeof(filename), NULL, 0, NULL, 0) != UNZ_OK) {
-          output_log("could not read file metadata\n");
+        if (unzGetCurrentFileInfo(zipFile, &fileInfo, filename, sizeof(filename), NULL, 0, NULL, 0) != UNZ_OK) {
+          outputLog("could not read file metadata\n");
           unzClose(zipFile);
           return 1;
         }
 
-        const size_t filename_length = strlen(filename);
+        const size_t filenameLength = strlen(filename);
 
-        snprintf(path, sizeof(path), "%s%s", destination_dir, filename);
+        snprintf(path, sizeof(path), "%s%s", destinationDir, filename);
 
-        if (filename[ filename_length-1 ] == '/') {
+        if (filename[ filenameLength-1 ] == '/') {
             // entry is a directory, so create it
             mkdir(path, 0777);
         } else {
             // entry is a file, so extract it
             if (unzOpenCurrentFile(zipFile) != UNZ_OK) {
-                output_log("could not open file\n");
+                outputLog("could not open file\n");
                 unzClose(zipFile);
                 return 1;
             }
@@ -256,7 +256,7 @@ int extract_zip(const char *input_path, const char *destination_dir) {
             // open a file to write out the data
             FILE *out = fopen(path, "wb");
             if (!out) {
-                output_log("could not open destination file\n");
+                outputLog("could not open destination file\n");
                 unzCloseCurrentFile(zipFile);
                 unzClose(zipFile);
                 return 1;
@@ -264,9 +264,9 @@ int extract_zip(const char *input_path, const char *destination_dir) {
 
             int error = UNZ_OK;
             do {
-                error = unzReadCurrentFile(zipFile, read_buffer, sizeof(read_buffer));
+                error = unzReadCurrentFile(zipFile, readBuffer, sizeof(readBuffer));
                 if (error < 0) {
-                    output_log("error %d\n", error);
+                    outputLog("error %d\n", error);
                     unzCloseCurrentFile(zipFile);
                     unzClose(zipFile);
                     return 1;
@@ -274,7 +274,7 @@ int extract_zip(const char *input_path, const char *destination_dir) {
 
                 // write data to file
                 if (error > 0) {
-                    fwrite(read_buffer, sizeof(read_buffer), 1, out);
+                    fwrite(readBuffer, sizeof(readBuffer), 1, out);
                 }
             } while (error > 0);
 
@@ -284,10 +284,10 @@ int extract_zip(const char *input_path, const char *destination_dir) {
         unzCloseCurrentFile(zipFile);
 
         // go the the next entry listed in the zip file
-        if ((i+1) < global_info.number_entry) {
+        if ((i+1) < globalInfo.number_entry) {
             if (unzGoToNextFile(zipFile) != UNZ_OK)
             {
-                output_log("could not read next file\n");
+                outputLog("could not read next file\n");
                 unzClose(zipFile);
                 return 1;
             }

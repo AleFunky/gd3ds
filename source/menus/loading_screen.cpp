@@ -14,7 +14,7 @@
 static UIProgressBar *progressbar;
 static UILabel *splashtext;
 
-const char *splash_texts[] = {
+const char *splashTexts[] = {
     "0% official",
     "2.0 Coming NOW!",
     "2.0 compatible!",
@@ -219,42 +219,42 @@ const char *splash_texts[] = {
     "You're playing on a what!?"
 };
 
-void loading_screen_init() {
-    ui_load_screen_old(&default_screen, NULL, 0, "romfs:/menus/loading_screen.txt");
-    ui_load_screen_old(&default_screen_top, NULL, 0, "romfs:/menus/loading_screen_top.txt");
+void loadingScreenInit() {
+    uiLoadScreenOld(&defaultScreen, NULL, 0, "romfs:/menus/loading_screen.txt");
+    uiLoadScreenOld(&defaultScreenTop, NULL, 0, "romfs:/menus/loading_screen_top.txt");
 
     Color col;
     col.r = 0;
     col.g = 102;
     col.b = 255;
 
-    int chan = get_col_channel_index(CHANNEL_BG);
+    int chan = getColChannelIndex(CHANNEL_BG);
 
     channels[chan].color = col;
-    get_buffer(chan)->active = false;
+    getBuffer(chan)->active = false;
 
-    handle_col_channel(chan);
+    handleColChannel(chan);
 
-    UIImage *title = (UIImage *) ui_get_element_by_tag(&default_screen_top, "title");
+    UIImage *title = (UIImage *) uiGetElementByTag(&defaultScreenTop, "title");
 
-    if (title && alt_title_screen) {
-        ui_image_set_image(title, 3, 1);
+    if (title && altTitleScreen) {
+        uiImageSetImage(title, 3, 1);
     }
     
-    progressbar = (UIProgressBar *) ui_get_element_by_tag(&default_screen_top, "loadprogress");
-    ui_progress_bar_set_tint(progressbar, C2D_Color32(50, 190, 240, 255));
-    progressbar->max_value = 100;
+    progressbar = (UIProgressBar *) uiGetElementByTag(&defaultScreenTop, "loadprogress");
+    uiProgressBarSetTint(progressbar, C2D_Color32(50, 190, 240, 255));
+    progressbar->maxValue = 100;
 
-    splashtext = (UILabel *) ui_get_element_by_tag(&default_screen_top, "splashtext");
+    splashtext = (UILabel *) uiGetElementByTag(&defaultScreenTop, "splashtext");
     
-    int text_index = random_int(0, ARRAY_LEN(splash_texts) - 1);
+    int textIndex = randomInt(0, ARRAY_LEN(splashTexts) - 1);
 
-    const char *text = splash_texts[text_index];
+    const char *text = splashTexts[textIndex];
 
-    ui_label_set_text(splashtext, text);
+    uiLabelSetText(splashtext, text);
 }
 
-void loading_screen_update(float progress, int fade) {    
+void loadingScreenUpdate(float progress, int fade) {    
     progressbar->value = progress;
     UIInput touch;
     touchPosition touchPos;
@@ -262,18 +262,18 @@ void loading_screen_update(float progress, int fade) {
     touch.touchPos = touchPos;
     touch.interacted = false;
 
-    ui_screen_update(&default_screen_top, &touch);
+    uiScreenUpdate(&defaultScreenTop, &touch);
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
     
     // Top screen, drawn once per eye when 3D is on
-    for (int eye = 0; begin_top_eye(eye); eye++) {
-        begin_eye_layer(DEPTH_BACKGROUND);
-        draw_background(-20, -30);
-        end_eye_layer();
+    for (int eye = 0; beginTopEye(eye); eye++) {
+        beginEyeLayer(DEPTH_BACKGROUND);
+        drawBackground(-20, -30);
+        endEyeLayer();
 
-        begin_eye_layer(DEPTH_UI);
-        ui_screen_draw(&default_screen_top);
-        end_eye_layer();
+        beginEyeLayer(DEPTH_UI);
+        uiScreenDraw(&defaultScreenTop);
+        endEyeLayer();
     
         C2D_DrawRectSolid(0.f, 0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT, C2D_Color32(0, 0, 0, fade));
     }
@@ -282,11 +282,11 @@ void loading_screen_update(float progress, int fade) {
     C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
     C2D_SceneBegin(bot);
 
-    draw_background(20, SCREEN_HEIGHT-30);
+    drawBackground(20, SCREEN_HEIGHT-30);
     C2D_ViewScale(SCALE, SCALE);
 
     C2D_ViewScale(1/SCALE, 1/SCALE);
-    ui_screen_draw(&default_screen);
+    uiScreenDraw(&defaultScreen);
 
     C2D_DrawRectSolid(0.f, 0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT, C2D_Color32(0, 0, 0, fade));
 

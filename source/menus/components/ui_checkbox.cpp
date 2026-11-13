@@ -11,11 +11,11 @@
 
 #include "main.hpp"
 
-static void set_checkbox_texture(UICheckBox* e, bool enabled) {
+static void setCheckboxTexture(UICheckBox* e, bool enabled) {
     if (!e) return;
     UIButton *button = (UIButton *) e;
     int tex = enabled ? 28 : 27;
-    C2D_SpriteFromSheet(&button->image.sprite, ui_sheet, tex);
+    C2D_SpriteFromSheet(&button->image.sprite, uiSheet, tex);
     C3D_TexSetFilter(button->image.sprite.image.tex, GPU_LINEAR, GPU_LINEAR);
 
     button->base.w = button->image.sprite.image.subtex->width;
@@ -23,18 +23,18 @@ static void set_checkbox_texture(UICheckBox* e, bool enabled) {
 }
 
 // Set checkbox checked state
-void ui_set_checkbox_checked(UICheckBox *e, bool enabled) {
+void uiSetCheckboxChecked(UICheckBox *e, bool enabled) {
     if (!e) return;
 
-    set_checkbox_texture(e, enabled);
+    setCheckboxTexture(e, enabled);
     e->checked = enabled;
 }
 
-static void ui_checkbox_update(UIElement* e, UIInput* touch, UITransform *transform) {
-    ui_button_update(e, touch, transform);
+static void uiCheckboxUpdate(UIElement* e, UIInput* touch, UITransform *transform) {
+    uiButtonUpdate(e, touch, transform);
 }
 
-static void ui_checkbox_draw(UIElement* e, UITransform *transform) {
+static void uiCheckboxDraw(UIElement* e, UITransform *transform) {
     UIButton *checkbox = (UIButton *) e;
 
     C2D_SpriteSetCenter(&checkbox->image.sprite, 0.5f, 0.5f);
@@ -43,28 +43,28 @@ static void ui_checkbox_draw(UIElement* e, UITransform *transform) {
     C2D_DrawSprite(&checkbox->image.sprite);
 }
 
-static void ui_checkbox_destroy(UIElement *e) {
+static void uiCheckboxDestroy(UIElement *e) {
     if (e) {
         delete (UICheckBox *)e;
         e = NULL;
     }
 }
 
-static void ui_checkbox_pre_action(UIElement *e, const UIPropertyList *args) {
+static void uiCheckboxPreAction(UIElement *e, const UIPropertyList *args) {
     UICheckBox *checkbox = (UICheckBox *) e;
 
     checkbox->checked ^= 1;
-    set_checkbox_texture(checkbox, checkbox->checked);
+    setCheckboxTexture(checkbox, checkbox->checked);
 }
 
-static void ui_checkbox_on_disable(UIElement *e) {
+static void uiCheckboxOnDisable(UIElement *e) {
     UIButton *checkbox = (UIButton *) e;
     checkbox->hovered = false;
     checkbox->hoverProgress = 1.f;
     checkbox->hoverTimer = 0.f;
 }
 
-UICheckBox *ui_create_checkbox(UIScreen *screen) {
+UICheckBox *uiCreateCheckbox(UIScreen *screen) {
     UICheckBox *e = new UICheckBox{};
 
     if (!e) return NULL;
@@ -73,40 +73,40 @@ UICheckBox *ui_create_checkbox(UIScreen *screen) {
     
     button->base.type = UI_CHECKBOX;
     button->base.enabled = true;
-    button->base.update = ui_checkbox_update;
-    button->base.draw = ui_checkbox_draw;
-    button->base.destroy = ui_checkbox_destroy;
+    button->base.update = uiCheckboxUpdate;
+    button->base.draw = uiCheckboxDraw;
+    button->base.destroy = uiCheckboxDestroy;
 
-    button->pre_action = ui_checkbox_pre_action;
+    button->preAction = uiCheckboxPreAction;
 
-    button->base.modify_transform = ui_button_modify_transform;
+    button->base.modifyTransform = uiButtonModifyTransform;
 
-    button->base.on_disable = ui_checkbox_on_disable;
+    button->base.onDisable = uiCheckboxOnDisable;
 
-    ui_element_apply_default_properties(&button->base, screen);
+    uiElementApplyDefaultProperties(&button->base, screen);
     
     button->hoverProgress = 1;
     button->hoverFactor = 1;
 
-    set_checkbox_texture(e, e->checked);
+    setCheckboxTexture(e, e->checked);
 
     return e;
 }
 
-UIElement *ui_create_checkbox_from_props(UIScreen *screen, const UIPropertyList *props) {
-    UICheckBox *checkbox = ui_create_checkbox(screen);
+UIElement *uiCreateCheckboxFromProps(UIScreen *screen, const UIPropertyList *props) {
+    UICheckBox *checkbox = uiCreateCheckbox(screen);
 
     if (!checkbox) return NULL;
 
     UIButton *button = (UIButton* ) checkbox;
 
-    ui_element_apply_properties(&button->base, screen, props);
+    uiElementApplyProperties(&button->base, screen, props);
     
-    checkbox->checked = ui_prop_bool(props, "checked", false);
+    checkbox->checked = uiPropBool(props, "checked", false);
     
-    button->hoverFactor = ui_prop_float(props, "hoverFactor", 1);
+    button->hoverFactor = uiPropFloat(props, "hoverFactor", 1);
 
-    set_checkbox_texture(checkbox, checkbox->checked);
+    setCheckboxTexture(checkbox, checkbox->checked);
 
     return &button->base;
 }

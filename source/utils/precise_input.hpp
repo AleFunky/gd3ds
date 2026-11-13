@@ -13,20 +13,20 @@ typedef struct {
     bool down;
 } PreciseInputEvent;
 
-extern bool pi_enabled;
+extern bool piEnabled;
 
-void pi_reset(void);
-void pi_poll(void);
-void pi_begin_frame(u32 frame_start_tick, u32 frame_end_tick, u32 substeps);
-void pi_apply_substep(u32 substep);
+void piReset(void);
+void piPoll(void);
+void piBeginFrame(u32 frameStartTick, u32 frameEndTick, u32 substeps);
+void piApplySubstep(u32 substep);
 
-void pi_set_jump_keys(PreciseInputPlayer player, u32 mask);
-void pi_set_touch_filter(PreciseInputPlayer player, bool (*filter)(u16 px, u16 py));
-void pi_suppress_until_release(void);
-bool pi_hold(PreciseInputPlayer player);
-bool pi_pressed(PreciseInputPlayer player);
+void piSetJumpKeys(PreciseInputPlayer player, u32 mask);
+void piSetTouchFilter(PreciseInputPlayer player, bool (*filter)(u16 px, u16 py));
+void piSuppressUntilRelease(void);
+bool piHold(PreciseInputPlayer player);
+bool piPressed(PreciseInputPlayer player);
 
-u32 pi_pad_event_count(PreciseInputPlayer player);
-PreciseInputEvent pi_pad_event_get(PreciseInputPlayer player, u32 index);
-u32 pi_touch_event_count(PreciseInputPlayer player);
-PreciseInputEvent pi_touch_event_get(PreciseInputPlayer player, u32 index);
+u32 piPadEventCount(PreciseInputPlayer player);
+PreciseInputEvent piPadEventGet(PreciseInputPlayer player, u32 index);
+u32 piTouchEventCount(PreciseInputPlayer player);
+PreciseInputEvent piTouchEventGet(PreciseInputPlayer player, u32 index);

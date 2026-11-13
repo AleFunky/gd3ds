@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static struct json_object* get_path_object(struct json_object* root, const char* path) {
+static struct json_object* getPathObject(struct json_object* root, const char* path) {
     char buffer[256];
     strncpy(buffer, path, sizeof(buffer) - 1);
 
@@ -25,7 +25,7 @@ static struct json_object* get_path_object(struct json_object* root, const char*
     return current;
 }
 
-static struct json_object* create_path_parent(struct json_object* root, const char* path, char* last_key) {
+static struct json_object* createPathParent(struct json_object* root, const char* path, char* lastKey) {
     char buffer[256];
     strncpy(buffer, path, sizeof(buffer) - 1);
 
@@ -48,11 +48,11 @@ static struct json_object* create_path_parent(struct json_object* root, const ch
         next = strtok(NULL, CONFIG_OBJECT_DELIMITER);
     }
 
-    strcpy(last_key, token);
+    strcpy(lastKey, token);
     return current;
 }
 
-int config_load(Config* cfg, const char* path) {
+int configLoad(Config* cfg, const char* path) {
     if (cfg->root && strcmp(cfg->path, path) == 0)
         return 1;
 
@@ -90,7 +90,7 @@ int config_load(Config* cfg, const char* path) {
     return 1;
 }
 
-void config_save(Config* cfg) {
+void configSave(Config* cfg) {
     const char* json = json_object_to_json_string_ext(
         cfg->root,
         JSON_C_TO_STRING_PRETTY
@@ -103,79 +103,79 @@ void config_save(Config* cfg) {
     fclose(f);
 }
 
-const char* config_get_string(Config* cfg, const char* path, const char* def) {
-    struct json_object* obj = get_path_object(cfg->root, path);
+const char* configGetString(Config* cfg, const char* path, const char* def) {
+    struct json_object* obj = getPathObject(cfg->root, path);
     if (!obj) return def;
 
     return json_object_get_string(obj);
 }
 
-int config_get_int(Config* cfg, const char* path, int def) {
-    struct json_object* obj = get_path_object(cfg->root, path);
+int configGetInt(Config* cfg, const char* path, int def) {
+    struct json_object* obj = getPathObject(cfg->root, path);
     if (!obj) return def;
 
     return json_object_get_int(obj);
 }
 
-float config_get_float(Config* cfg, const char* path, float def) {
-    struct json_object* obj = get_path_object(cfg->root, path);
+float configGetFloat(Config* cfg, const char* path, float def) {
+    struct json_object* obj = getPathObject(cfg->root, path);
     if (!obj) return def;
 
     return json_object_get_double(obj);
 }
 
-int config_get_bool(Config* cfg, const char* path, int def) {
-    struct json_object* obj = get_path_object(cfg->root, path);
+int configGetBool(Config* cfg, const char* path, int def) {
+    struct json_object* obj = getPathObject(cfg->root, path);
     if (!obj) return def;
 
     return json_object_get_boolean(obj);
 }
 
-void config_set_string(Config* cfg, const char* path, const char* value) {
+void configSetString(Config* cfg, const char* path, const char* value) {
     char key[128];
-    struct json_object* parent = create_path_parent(cfg->root, path, key);
+    struct json_object* parent = createPathParent(cfg->root, path, key);
 
     json_object_object_add(parent, key, json_object_new_string(value));
 }
 
-void config_set_int(Config* cfg, const char* path, int value) {
+void configSetInt(Config* cfg, const char* path, int value) {
     char key[128];
-    struct json_object* parent = create_path_parent(cfg->root, path, key);
+    struct json_object* parent = createPathParent(cfg->root, path, key);
 
     json_object_object_add(parent, key, json_object_new_int(value));
 }
 
-void config_set_float(Config* cfg, const char* path, float value) {
+void configSetFloat(Config* cfg, const char* path, float value) {
     char key[128];
-    struct json_object* parent = create_path_parent(cfg->root, path, key);
+    struct json_object* parent = createPathParent(cfg->root, path, key);
 
     json_object_object_add(parent, key, json_object_new_double(value));
 }
 
-void config_set_bool(Config* cfg, const char* path, int value) {
+void configSetBool(Config* cfg, const char* path, int value) {
     char key[128];
-    struct json_object* parent = create_path_parent(cfg->root, path, key);
+    struct json_object* parent = createPathParent(cfg->root, path, key);
 
     json_object_object_add(parent, key, json_object_new_boolean(value));
 }
 
-void config_init_bool(Config* cfg, const char* path, bool def) {
-    config_set_bool(cfg, path, config_get_bool(cfg, path, def));
+void configInitBool(Config* cfg, const char* path, bool def) {
+    configSetBool(cfg, path, configGetBool(cfg, path, def));
 }
 
-void config_init_int(Config* cfg, const char* path, int def) {
-    config_set_int(cfg, path, config_get_int(cfg, path, def));
+void configInitInt(Config* cfg, const char* path, int def) {
+    configSetInt(cfg, path, configGetInt(cfg, path, def));
 }
 
-void config_init_float(Config* cfg, const char* path, float def) {
-    config_set_float(cfg, path, config_get_float(cfg, path, def));
+void configInitFloat(Config* cfg, const char* path, float def) {
+    configSetFloat(cfg, path, configGetFloat(cfg, path, def));
 }
 
-void config_init_string(Config* cfg, const char* path, const char* def) {
-    config_set_string(cfg, path, config_get_string(cfg, path, def));
+void configInitString(Config* cfg, const char* path, const char* def) {
+    configSetString(cfg, path, configGetString(cfg, path, def));
 }
 
-void config_free(Config* cfg) {
+void configFree(Config* cfg) {
     json_object_put(cfg->root);
     cfg->root = NULL;
 }

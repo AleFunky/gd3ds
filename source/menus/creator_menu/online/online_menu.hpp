@@ -13,14 +13,14 @@
 #define LEGENDARY_GLOW 69
 #define MYTHIC_GLOW 70
 
-extern int curr_search_id;
+extern int currSearchID;
 extern int redownload;
 
-extern const int demon_faces[6];
-extern const int difficulty_faces[6];
+extern const int demonFaces[6];
+extern const int difficultyFaces[6];
 extern const int epics[4];
 
-extern const UIScreenDefPair online_def;
+extern const UIScreenDefPair onlineDef;
 
 typedef struct {
     bool wasUpdated;

@@ -1,5 +1,5 @@
 #include "text.hpp"
-extern const Glyph chatFont_fontGlyphs[634] = {
+extern const Glyph chatFontFontGlyphs[634] = {
     {30, 0, 0, 0, 0, 21, 20, 42, -1},
     {32, 240, 288, 0, 0, 0, 31, 8, -1},
     {33, 281, 246, 5, 21, 1, 10, 7, 0},
@@ -636,8 +636,8 @@ extern const Glyph chatFont_fontGlyphs[634] = {
     {10007, 774, 151, 17, 22, -1, 11, 16, 630},
 };
 
-extern const Charset chatFont_fontCharset = {
-    chatFont_fontGlyphs,
+extern const Charset chatFontFontCharset = {
+    chatFontFontGlyphs,
     634,
     0.6
 };

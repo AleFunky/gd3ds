@@ -75,105 +75,105 @@
 #define CITRA_TYPE 0x20000
 #define CITRA_VERSION 11
 
-Arena level_arena;
+Arena levelArena;
 
-u32 __ctru_linear_heap_size = 34 << 20;
+u32 ctruLinearHeapSize __asm__("__ctru_linear_heap_size") = 34 << 20;
 
 bool inExclusiveState = false;
 
-int game_state = STATE_MENU;
-bool escape_state;
+int gameState = STATE_MENU;
+bool escapeState;
 
-bool exiting_level;
+bool exitingLevel;
 
-bool playing_menu_loop = false;
-char menu_loop_path[32];
+bool playingMenuLoop = false;
+char menuLoopPath[32];
 
-int level_result = 0;
+int levelResult = 0;
 
 bool cheated = false;
 
-float global_volume;
-float music_volume;
-float sound_volume;
-float dim_secondary_screen;
+float globalVolume;
+float musicVolume;
+float soundVolume;
+float dimSecondaryScreen;
 
 int steps = 0;
-int last_steps = 0;
+int lastSteps = 0;
 
-bool cheats_used[CHEAT_COUNT];
+bool cheatsUsed[CHEAT_COUNT];
 
-const char *cheat_names[CHEAT_COUNT] = {
+const char *cheatNames[CHEAT_COUNT] = {
     "Noclip",
     "Hitboxes"
 };
 
 float accumulator = 0.f;
-bool fixed_dt = true;
+bool fixedDt = true;
 
 #define TARGET_FPS 60
 #define PI_SUBSTEP_BUCKETS (STEPS_HZ / TARGET_FPS)
 
-u32 pi_substep_presses[PI_SUBSTEP_BUCKETS];
+u32 piSubstepPresses[PI_SUBSTEP_BUCKETS];
 
 PrintConsole console;
 
 C3D_RenderTarget* top;
-C3D_RenderTarget* top_right;
+C3D_RenderTarget* topRight;
 C3D_RenderTarget* bot;
 
-ParticleSystem touch_drag_particles;
-ParticleSystem touch_explosion_particles;
-ParticleSystem glitter_particles_bottom;
-ParticleSystem slow_speed_particles_bottom;
-ParticleSystem normal_speed_particles_bottom;
-ParticleSystem fast_speed_particles_bottom;
-ParticleSystem faster_speed_particles_bottom;
-ParticleSystem fastest_speed_particles_bottom;
-ParticleSystem end_wall_particles;
-ParticleSystem end_wall_firework;
-ParticleSystem level_complete_effect_p1;
-ParticleSystem level_complete_effect_p2;
+ParticleSystem touchDragParticles;
+ParticleSystem touchExplosionParticles;
+ParticleSystem glitterParticlesBottom;
+ParticleSystem slowSpeedParticlesBottom;
+ParticleSystem normalSpeedParticlesBottom;
+ParticleSystem fastSpeedParticlesBottom;
+ParticleSystem fasterSpeedParticlesBottom;
+ParticleSystem fastestSpeedParticlesBottom;
+ParticleSystem endWallParticles;
+ParticleSystem endWallFirework;
+ParticleSystem levelCompleteEffectP1;
+ParticleSystem levelCompleteEffectP2;
 
-float slow_speed_particles_timer = 0.f;
-float normal_speed_particles_timer = 0.f;
-float fast_speed_particles_timer = 0.f;
-float faster_speed_particles_timer = 0.f;
-float fastest_speed_particles_timer = 0.f;
+float slowSpeedParticlesTimer = 0.f;
+float normalSpeedParticlesTimer = 0.f;
+float fastSpeedParticlesTimer = 0.f;
+float fasterSpeedParticlesTimer = 0.f;
+float fastestSpeedParticlesTimer = 0.f;
 
-bool alt_title_screen;
+bool altTitleScreen;
 
-bool is_N3DS;
-bool is_3DSX;
-bool is_nightly;
+bool isN3Ds;
+bool is3Dsx;
+bool isNightly;
 
-bool queued_restart;
+bool queuedRestart;
 
-bool _3dWarningPassed;
+bool threeDWarningPassed;
 
-char *_3dsx_path;
+char *threeDsxPath;
 
-UIStack menu_stack = {};
-UIStack gameplay_stack = {};
+UIStack menuStack = {};
+UIStack gameplayStack = {};
 
-ExternalLevelFile external_file;
-ServerFile gd_server_file;
-ServerFile gdps_file;
-ServerFile *current_server_file;
+ExternalLevelFile externalFile;
+ServerFile gdServerFile;
+ServerFile gdpsFile;
+ServerFile *currentServerFile;
 
-void load_gdps_info() {
-    current_server_file = (gdps ? &gdps_file : &gd_server_file);
-    current_main_level_pack = (gdps ? &gdps_levels : &robtop_levels);
+void loadGdpsInfo() {
+    currentServerFile = (gdps ? &gdpsFile : &gdServerFile);
+    currentMainLevelPack = (gdps ? &gdpsLevels : &robtopLevels);
 }
 
 // Checks if the game is being emulated by citra/azahar
-bool is_citra() {
+bool isCitra() {
     s64 version = 0;
     svcGetSystemInfo(&version, CITRA_TYPE, CITRA_VERSION);
     return version != 0;
 }
 
-void no_dsp_firmware(void) {
+void noDspFirmware(void) {
     consoleInit(GFX_TOP, NULL);
     printf("\x1b[01;00H///////////////////FATAL///ERROR//////////////////");
     printf("\x1b[03;00HNDSP could not be initalized!");
@@ -215,7 +215,7 @@ static void aptCallback(APT_HookType hook, void *param) {
     switch (hook) {
         case APTHOOK_ONSUSPEND: // Home button
         case APTHOOK_ONSLEEP: // Lid closed
-            pause_game();
+            pauseGame();
             break;
 
         default:
@@ -225,21 +225,21 @@ static void aptCallback(APT_HookType hook, void *param) {
 
 static FILE *log_file = NULL;
 
-static void ensure_log_file(void) {
+static void ensureLogFile(void) {
     if (log_file) return;  // already open
     
     log_file = fopen(CONFIG_ROOT "output.txt", "w");
 }
 
-static void close_log_file(void) {
+static void closeLogFile(void) {
     if (log_file) {
         fclose(log_file);
         log_file = NULL;
     }
 }
 
-int output_log(const char *fmt, ...) {
-    ensure_log_file();
+int outputLog(const char *fmt, ...) {
+    ensureLogFile();
 
     if (!log_file) return 0; // failed to open log
 
@@ -250,7 +250,7 @@ int output_log(const char *fmt, ...) {
     va_copy(args2, args1);  // duplicate args for two outputs
 
     // Output to log file
-    ensure_log_file();
+    ensureLogFile();
     if (log_file) {
         ret = vfprintf(log_file, fmt, args1);
         fflush(log_file);
@@ -267,21 +267,21 @@ int output_log(const char *fmt, ...) {
 
 #define MAX_AUDIO_DB 9
 
-float get_volume_slider() {
+float getVolumeSlider() {
     u8 slider = 63;
     HIDUSER_GetSoundVolume(&slider);
 
     return slider / 63.f;
 }
 
-float slider_to_volume(float v) {
+float sliderToVolume(float v) {
     return expm1f(v * log1pf(MAX_AUDIO_DB)) / MAX_AUDIO_DB;
 }
 
-void set_channel_volume(int channel, float volume) {
+void setChannelVolume(int channel, float volume) {
     float mix[12] = {0};
 
-    float gain = slider_to_volume(volume);
+    float gain = sliderToVolume(volume);
 
     mix[0] = gain;
     mix[1] = gain;
@@ -289,32 +289,32 @@ void set_channel_volume(int channel, float volume) {
     ndspChnSetMix(channel, mix);
 }
 
-static void check_rom_type() {
+static void checkRomType() {
     u64 id;
     APT_GetProgramID(&id);
-    is_3DSX = (id != GAME_TITLE_ID);
+    is3Dsx = (id != GAME_TITLE_ID);
 }
 
-void apply_volume_settings() {
-    set_channel_volume(0, music_volume);
+void applyVolumeSettings() {
+    setChannelVolume(0, musicVolume);
 
     for (int i = 1; i <= 7; i++) {
-        set_channel_volume(i, sound_volume);
+        setChannelVolume(i, soundVolume);
     }
 }
 
-void check_system_model() {
-    u8 model = get_model();
-    is_N3DS = model == CFG_MODEL_N2DSXL || model == CFG_MODEL_N3DS || model == CFG_MODEL_N3DSXL || is_citra();
+void checkSystemModel() {
+    u8 model = getModel();
+    isN3Ds = model == CFG_MODEL_N2DSXL || model == CFG_MODEL_N3DS || model == CFG_MODEL_N3DSXL || isCitra();
 }
 
 float delta = 0;
-float frame_timer = 0;
-unsigned int level_frame = 0;
-unsigned int frame_counter = 0;
-bool song_loaded;
+float frameTimer = 0;
+unsigned int levelFrame = 0;
+unsigned int frameCounter = 0;
+bool songLoaded;
 
-static int restart_game() {
+static int restartGame() {
     aptInit();
     Result result = 0;
 	u8 param[0x300] = {};
@@ -362,412 +362,412 @@ void exitExclusiveState(bool force) {
 }
 
 
-void update_player_effects(float delta) {
+void updatePlayerEffects(float delta) {
     for (int i = 0; i < 2; i++) {
-        updateParticleSystem(&drag_particles[i], delta);
-        updateParticleSystem(&drag_particles_2[i], delta);
-        updateParticleSystem(&ship_fire_particles[i], delta);
-        updateParticleSystem(&ship_secondary_particles[i], delta);
-        updateParticleSystem(&secondary_particles[i], delta);
-        updateParticleSystem(&burst_particles[i], delta);
-        updateParticleSystem(&robot_fire_particles[i], delta);
-        updateParticleSystem(&land_particles[i], delta);
-        updateParticleSystem(&explosion_particles[i], delta);
+        updateParticleSystem(&dragParticles[i], delta);
+        updateParticleSystem(&dragParticles2[i], delta);
+        updateParticleSystem(&shipFireParticles[i], delta);
+        updateParticleSystem(&shipSecondaryParticles[i], delta);
+        updateParticleSystem(&secondaryParticles[i], delta);
+        updateParticleSystem(&burstParticles[i], delta);
+        updateParticleSystem(&robotFireParticles[i], delta);
+        updateParticleSystem(&landParticles[i], delta);
+        updateParticleSystem(&explosionParticles[i], delta);
     }
-    updateParticleSystem(&brick_destroy_particles, delta);
-    updateParticleSystem(&glitter_particles, delta);
-    updateParticleSystem(&slow_speed_particles, delta);
-    updateParticleSystem(&normal_speed_particles, delta);
-    updateParticleSystem(&fast_speed_particles, delta);
-    updateParticleSystem(&faster_speed_particles, delta);
-    updateParticleSystem(&fastest_speed_particles, delta);
-    updateParticleSystem(&coin_pickup_particles, delta);
+    updateParticleSystem(&brickDestroyParticles, delta);
+    updateParticleSystem(&glitterParticles, delta);
+    updateParticleSystem(&slowSpeedParticles, delta);
+    updateParticleSystem(&normalSpeedParticles, delta);
+    updateParticleSystem(&fastSpeedParticles, delta);
+    updateParticleSystem(&fasterSpeedParticles, delta);
+    updateParticleSystem(&fastestSpeedParticles, delta);
+    updateParticleSystem(&coinPickupParticles, delta);
 }
 
-void allocate_particles() {
-    initParticleSystem(&drag_particles[0], &drag_effect);
-    initParticleSystem(&drag_particles[1], &drag_effect);
+void allocateParticles() {
+    initParticleSystem(&dragParticles[0], &dragEffect);
+    initParticleSystem(&dragParticles[1], &dragEffect);
 
-    initParticleSystem(&drag_particles_2[0], &ship_drag_effect);
-    initParticleSystem(&drag_particles_2[1], &ship_drag_effect);
+    initParticleSystem(&dragParticles2[0], &shipDragEffect);
+    initParticleSystem(&dragParticles2[1], &shipDragEffect);
 
-    initParticleSystem(&ship_fire_particles[0], &drag_effect);
-    initParticleSystem(&ship_fire_particles[1], &drag_effect);
+    initParticleSystem(&shipFireParticles[0], &dragEffect);
+    initParticleSystem(&shipFireParticles[1], &dragEffect);
 
-    initParticleSystem(&secondary_particles[0], &drag_effect);
-    initParticleSystem(&secondary_particles[1], &drag_effect);
+    initParticleSystem(&secondaryParticles[0], &dragEffect);
+    initParticleSystem(&secondaryParticles[1], &dragEffect);
     
-    initParticleSystem(&ship_secondary_particles[0], &drag_effect);
-    initParticleSystem(&ship_secondary_particles[1], &drag_effect);
+    initParticleSystem(&shipSecondaryParticles[0], &dragEffect);
+    initParticleSystem(&shipSecondaryParticles[1], &dragEffect);
 
-    initParticleSystem(&burst_particles[0], &burst_effect);
-    initParticleSystem(&burst_particles[1], &burst_effect);
+    initParticleSystem(&burstParticles[0], &burstEffect);
+    initParticleSystem(&burstParticles[1], &burstEffect);
 
-    initParticleSystem(&robot_fire_particles[0], &burst_effect2);
-    initParticleSystem(&robot_fire_particles[1], &burst_effect2);
+    initParticleSystem(&robotFireParticles[0], &burstEffect2);
+    initParticleSystem(&robotFireParticles[1], &burstEffect2);
 
-    initParticleSystem(&land_particles[0], &land_effect);
-    initParticleSystem(&land_particles[1], &land_effect);
+    initParticleSystem(&landParticles[0], &landEffect);
+    initParticleSystem(&landParticles[1], &landEffect);
     
-    initParticleSystem(&explosion_particles[0], &explode_effect);
-    initParticleSystem(&explosion_particles[1], &explode_effect);
+    initParticleSystem(&explosionParticles[0], &explodeEffect);
+    initParticleSystem(&explosionParticles[1], &explodeEffect);
 
-    initParticleSystem(&brick_destroy_particles, &glass_destroy_01);
-    initParticleSystem(&glitter_particles, &glitter_effect);
-    initParticleSystem(&slow_speed_particles, &speed_effect_slow);
-    initParticleSystem(&normal_speed_particles, &speed_effect_normal);
-    initParticleSystem(&fast_speed_particles, &speed_effect_fast);
-    initParticleSystem(&faster_speed_particles, &speed_effect_vfast);
-    initParticleSystem(&fastest_speed_particles, &speed_effect_fastest);
-    initParticleSystem(&coin_pickup_particles, &coin_pickup_effect);
+    initParticleSystem(&brickDestroyParticles, &glassDestroy01);
+    initParticleSystem(&glitterParticles, &glitterEffect);
+    initParticleSystem(&slowSpeedParticles, &speedEffectSlow);
+    initParticleSystem(&normalSpeedParticles, &speedEffectNormal);
+    initParticleSystem(&fastSpeedParticles, &speedEffectFast);
+    initParticleSystem(&fasterSpeedParticles, &speedEffectVfast);
+    initParticleSystem(&fastestSpeedParticles, &speedEffectFastest);
+    initParticleSystem(&coinPickupParticles, &coinPickupEffect);
 
-    initParticleSystem(&end_wall_particles, &end_effect_portal);
-    initParticleSystem(&end_wall_firework, &firework);
-    initParticleSystem(&level_complete_effect_p1, &level_complete_01);
-    initParticleSystem(&level_complete_effect_p2, &level_complete_01);
+    initParticleSystem(&endWallParticles, &endEffectPortal);
+    initParticleSystem(&endWallFirework, &firework);
+    initParticleSystem(&levelCompleteEffectP1, &levelComplete01);
+    initParticleSystem(&levelCompleteEffectP2, &levelComplete01);
 }
 
-void free_particles() {
+void freeParticles() {
     for (int i = 0; i < 2; i++) {
-        freeParticleData(&drag_particles[i].data);
-        freeParticleData(&drag_particles_2[i].data);
-        freeParticleData(&ship_fire_particles[i].data);
-        freeParticleData(&secondary_particles[i].data);
-        freeParticleData(&ship_secondary_particles[i].data);
-        freeParticleData(&burst_particles[i].data);
-        freeParticleData(&robot_fire_particles[i].data);
-        freeParticleData(&land_particles[i].data);
-        freeParticleData(&explosion_particles[i].data);
+        freeParticleData(&dragParticles[i].data);
+        freeParticleData(&dragParticles2[i].data);
+        freeParticleData(&shipFireParticles[i].data);
+        freeParticleData(&secondaryParticles[i].data);
+        freeParticleData(&shipSecondaryParticles[i].data);
+        freeParticleData(&burstParticles[i].data);
+        freeParticleData(&robotFireParticles[i].data);
+        freeParticleData(&landParticles[i].data);
+        freeParticleData(&explosionParticles[i].data);
     }
 
-    freeParticleData(&brick_destroy_particles.data);
-    freeParticleData(&glitter_particles.data);
-    freeParticleData(&slow_speed_particles.data);
-    freeParticleData(&normal_speed_particles.data);
-    freeParticleData(&fast_speed_particles.data);
-    freeParticleData(&faster_speed_particles.data);
-    freeParticleData(&fastest_speed_particles.data);
-    freeParticleData(&coin_pickup_particles.data);
+    freeParticleData(&brickDestroyParticles.data);
+    freeParticleData(&glitterParticles.data);
+    freeParticleData(&slowSpeedParticles.data);
+    freeParticleData(&normalSpeedParticles.data);
+    freeParticleData(&fastSpeedParticles.data);
+    freeParticleData(&fasterSpeedParticles.data);
+    freeParticleData(&fastestSpeedParticles.data);
+    freeParticleData(&coinPickupParticles.data);
 
-    freeParticleData(&end_wall_particles.data);
-    freeParticleData(&end_wall_firework.data);
-    freeParticleData(&level_complete_effect_p1.data);
-    freeParticleData(&level_complete_effect_p2.data);
+    freeParticleData(&endWallParticles.data);
+    freeParticleData(&endWallFirework.data);
+    freeParticleData(&levelCompleteEffectP1.data);
+    freeParticleData(&levelCompleteEffectP2.data);
 }
 
-void init_particles(Color p1_color, Color p2_color) {    
-    slow_speed_particles.stationary = true;
-    normal_speed_particles.stationary = true;
-    fast_speed_particles.stationary = true;
-    faster_speed_particles.stationary = true;
-    fastest_speed_particles.stationary = true;
+void initParticles(Color p1Color, Color p2Color) {    
+    slowSpeedParticles.stationary = true;
+    normalSpeedParticles.stationary = true;
+    fastSpeedParticles.stationary = true;
+    fasterSpeedParticles.stationary = true;
+    fastestSpeedParticles.stationary = true;
 
-    slow_speed_particles.affectedByMirror = false;
-    normal_speed_particles.affectedByMirror = false;
-    fast_speed_particles.affectedByMirror = false;
-    faster_speed_particles.affectedByMirror = false;
-    fastest_speed_particles.affectedByMirror = false;
+    slowSpeedParticles.affectedByMirror = false;
+    normalSpeedParticles.affectedByMirror = false;
+    fastSpeedParticles.affectedByMirror = false;
+    fasterSpeedParticles.affectedByMirror = false;
+    fastestSpeedParticles.affectedByMirror = false;
 
-    end_wall_firework.affectedByMirror = false;
+    endWallFirework.affectedByMirror = false;
 
-    level_complete_effect_p1.stationary = true;
-    level_complete_effect_p2.stationary = true;
+    levelCompleteEffectP1.stationary = true;
+    levelCompleteEffectP2.stationary = true;
 
     // One shot bursts fly towards you, the trails stay glued to the player
-    explosion_particles[0].depth = 1.f;
-    explosion_particles[1].depth = 1.f;
+    explosionParticles[0].depth = 1.f;
+    explosionParticles[1].depth = 1.f;
 
-    burst_particles[0].depth = 0.5f;
-    burst_particles[1].depth = 0.5f;
+    burstParticles[0].depth = 0.5f;
+    burstParticles[1].depth = 0.5f;
     
-    robot_fire_particles[0].depth = 0.5f;
-    robot_fire_particles[1].depth = 0.5f;
+    robotFireParticles[0].depth = 0.5f;
+    robotFireParticles[1].depth = 0.5f;
 
-    land_particles[0].depth = 0.35f;
-    land_particles[1].depth = 0.35f;
+    landParticles[0].depth = 0.35f;
+    landParticles[1].depth = 0.35f;
 
-    coin_pickup_particles.depth = 0.6f;
-    brick_destroy_particles.depth = 0.6f;
+    coinPickupParticles.depth = 0.6f;
+    brickDestroyParticles.depth = 0.6f;
 
     // Ambience sweeps past the player instead of sitting flat behind the level
-    glitter_particles.depth = 0.4f;
+    glitterParticles.depth = 0.4f;
 
-    slow_speed_particles.depth = 0.6f;
-    normal_speed_particles.depth = 0.6f;
-    fast_speed_particles.depth = 0.6f;
-    faster_speed_particles.depth = 0.6f;
-    fastest_speed_particles.depth = 0.6f;
+    slowSpeedParticles.depth = 0.6f;
+    normalSpeedParticles.depth = 0.6f;
+    fastSpeedParticles.depth = 0.6f;
+    fasterSpeedParticles.depth = 0.6f;
+    fastestSpeedParticles.depth = 0.6f;
 
     // Its particles spiral inwards, so they start at you and fall into the portal
-    end_wall_particles.depth = 0.7f;
-    end_wall_particles.depthInwards = true;
+    endWallParticles.depth = 0.7f;
+    endWallParticles.depthInwards = true;
 
-    end_wall_firework.depth = 0.8f;
-    level_complete_effect_p1.depth = 0.8f;
-    level_complete_effect_p2.depth = 0.8f;
+    endWallFirework.depth = 0.8f;
+    levelCompleteEffectP1.depth = 0.8f;
+    levelCompleteEffectP2.depth = 0.8f;
 
-    Color p1_not_white = get_white_if_black(p1_color);
-    Color p2_not_white = get_white_if_black(p2_color);
+    Color p1NotWhite = getWhiteIfBlack(p1Color);
+    Color p2NotWhite = getWhiteIfBlack(p2Color);
 
-    drag_particles[0].cfg.startColorRed   = p1_not_white.r / 255.f;
-    drag_particles[0].cfg.startColorGreen = p1_not_white.g / 255.f;
-    drag_particles[0].cfg.startColorBlue  = p1_not_white.b / 255.f;
+    dragParticles[0].cfg.startColorRed   = p1NotWhite.r / 255.f;
+    dragParticles[0].cfg.startColorGreen = p1NotWhite.g / 255.f;
+    dragParticles[0].cfg.startColorBlue  = p1NotWhite.b / 255.f;
 
-    drag_particles[1].cfg.startColorRed   = p2_not_white.r / 255.f;
-    drag_particles[1].cfg.startColorGreen = p2_not_white.g / 255.f;
-    drag_particles[1].cfg.startColorBlue  = p2_not_white.b / 255.f;
+    dragParticles[1].cfg.startColorRed   = p2NotWhite.r / 255.f;
+    dragParticles[1].cfg.startColorGreen = p2NotWhite.g / 255.f;
+    dragParticles[1].cfg.startColorBlue  = p2NotWhite.b / 255.f;
 
-    burst_particles[0].cfg.startColorRed   = p1_not_white.r / 255.f;
-    burst_particles[0].cfg.startColorGreen = p1_not_white.g / 255.f;
-    burst_particles[0].cfg.startColorBlue  = p1_not_white.b / 255.f;
+    burstParticles[0].cfg.startColorRed   = p1NotWhite.r / 255.f;
+    burstParticles[0].cfg.startColorGreen = p1NotWhite.g / 255.f;
+    burstParticles[0].cfg.startColorBlue  = p1NotWhite.b / 255.f;
 
-    burst_particles[0].cfg.finishColorRed   = p1_not_white.r / 255.f;
-    burst_particles[0].cfg.finishColorGreen = p1_not_white.g / 255.f;
-    burst_particles[0].cfg.finishColorBlue  = p1_not_white.b / 255.f;
+    burstParticles[0].cfg.finishColorRed   = p1NotWhite.r / 255.f;
+    burstParticles[0].cfg.finishColorGreen = p1NotWhite.g / 255.f;
+    burstParticles[0].cfg.finishColorBlue  = p1NotWhite.b / 255.f;
 
-    burst_particles[1].cfg.startColorRed   = p2_not_white.r / 255.f;
-    burst_particles[1].cfg.startColorGreen = p2_not_white.g / 255.f;
-    burst_particles[1].cfg.startColorBlue  = p2_not_white.b / 255.f;
+    burstParticles[1].cfg.startColorRed   = p2NotWhite.r / 255.f;
+    burstParticles[1].cfg.startColorGreen = p2NotWhite.g / 255.f;
+    burstParticles[1].cfg.startColorBlue  = p2NotWhite.b / 255.f;
     
-    burst_particles[1].cfg.finishColorRed   = p2_not_white.r / 255.f;
-    burst_particles[1].cfg.finishColorGreen = p2_not_white.g / 255.f;
-    burst_particles[1].cfg.finishColorBlue  = p2_not_white.b / 255.f;
+    burstParticles[1].cfg.finishColorRed   = p2NotWhite.r / 255.f;
+    burstParticles[1].cfg.finishColorGreen = p2NotWhite.g / 255.f;
+    burstParticles[1].cfg.finishColorBlue  = p2NotWhite.b / 255.f;
 
-    secondary_particles[0].cfg.startColorRed   = p2_not_white.r / 255.f;
-    secondary_particles[0].cfg.startColorGreen = p2_not_white.g / 255.f;
-    secondary_particles[0].cfg.startColorBlue  = p2_not_white.b / 255.f;
-    secondary_particles[0].cfg.finishColorAlpha = 1.f;
-    secondary_particles[0].cfg.maxParticles = 15;
-    secondary_particles[0].cfg.speed = 75 - 30;
+    secondaryParticles[0].cfg.startColorRed   = p2NotWhite.r / 255.f;
+    secondaryParticles[0].cfg.startColorGreen = p2NotWhite.g / 255.f;
+    secondaryParticles[0].cfg.startColorBlue  = p2NotWhite.b / 255.f;
+    secondaryParticles[0].cfg.finishColorAlpha = 1.f;
+    secondaryParticles[0].cfg.maxParticles = 15;
+    secondaryParticles[0].cfg.speed = 75 - 30;
 
-    secondary_particles[1].cfg.startColorRed   = p1_not_white.r / 255.f;
-    secondary_particles[1].cfg.startColorGreen = p1_not_white.g / 255.f;
-    secondary_particles[1].cfg.startColorBlue  = p1_not_white.b / 255.f;
-    secondary_particles[1].cfg.finishColorAlpha = 1.f;
-    secondary_particles[1].cfg.maxParticles = 15;
-    secondary_particles[1].cfg.speed = 75 - 30;
+    secondaryParticles[1].cfg.startColorRed   = p1NotWhite.r / 255.f;
+    secondaryParticles[1].cfg.startColorGreen = p1NotWhite.g / 255.f;
+    secondaryParticles[1].cfg.startColorBlue  = p1NotWhite.b / 255.f;
+    secondaryParticles[1].cfg.finishColorAlpha = 1.f;
+    secondaryParticles[1].cfg.maxParticles = 15;
+    secondaryParticles[1].cfg.speed = 75 - 30;
 
-    ship_secondary_particles[0].cfg.startColorRed   = 255.f/ 255.f;
-    ship_secondary_particles[0].cfg.startColorGreen = 70.f / 255.f;
-    ship_secondary_particles[0].cfg.startColorBlue  = 10.f / 255.f;
+    shipSecondaryParticles[0].cfg.startColorRed   = 255.f/ 255.f;
+    shipSecondaryParticles[0].cfg.startColorGreen = 70.f / 255.f;
+    shipSecondaryParticles[0].cfg.startColorBlue  = 10.f / 255.f;
 
-    ship_secondary_particles[0].cfg.finishColorRed   = 255.f/ 255.f;
-    ship_secondary_particles[0].cfg.finishColorGreen = 20.f / 255.f;
-    ship_secondary_particles[0].cfg.finishColorBlue  = 0.f / 255.f;
+    shipSecondaryParticles[0].cfg.finishColorRed   = 255.f/ 255.f;
+    shipSecondaryParticles[0].cfg.finishColorGreen = 20.f / 255.f;
+    shipSecondaryParticles[0].cfg.finishColorBlue  = 0.f / 255.f;
 
-    ship_secondary_particles[1].cfg = ship_secondary_particles[0].cfg;
+    shipSecondaryParticles[1].cfg = shipSecondaryParticles[0].cfg;
 
-    ship_fire_particles[0].cfg.startColorRed   = 255.f / 255.f;
-    ship_fire_particles[0].cfg.startColorGreen = 170.f / 255.f;
-    ship_fire_particles[0].cfg.startColorBlue  = 10.f / 255.f;
+    shipFireParticles[0].cfg.startColorRed   = 255.f / 255.f;
+    shipFireParticles[0].cfg.startColorGreen = 170.f / 255.f;
+    shipFireParticles[0].cfg.startColorBlue  = 10.f / 255.f;
     
-    ship_fire_particles[0].cfg.finishColorRed   = 255.f / 255.f;
-    ship_fire_particles[0].cfg.finishColorGreen = 65.f / 255.f;
-    ship_fire_particles[0].cfg.finishColorBlue  = 0.f / 255.f;
+    shipFireParticles[0].cfg.finishColorRed   = 255.f / 255.f;
+    shipFireParticles[0].cfg.finishColorGreen = 65.f / 255.f;
+    shipFireParticles[0].cfg.finishColorBlue  = 0.f / 255.f;
 
-    ship_fire_particles[0].cfg.speed = 75 - 30;
-    ship_fire_particles[0].cfg.maxRadius = 130;
-    ship_fire_particles[1].cfg = ship_fire_particles[0].cfg;
+    shipFireParticles[0].cfg.speed = 75 - 30;
+    shipFireParticles[0].cfg.maxRadius = 130;
+    shipFireParticles[1].cfg = shipFireParticles[0].cfg;
 
-    land_particles[0].cfg.startColorRed   = p1_not_white.r / 255.f;
-    land_particles[0].cfg.startColorGreen = p1_not_white.g / 255.f;
-    land_particles[0].cfg.startColorBlue  = p1_not_white.b / 255.f;
+    landParticles[0].cfg.startColorRed   = p1NotWhite.r / 255.f;
+    landParticles[0].cfg.startColorGreen = p1NotWhite.g / 255.f;
+    landParticles[0].cfg.startColorBlue  = p1NotWhite.b / 255.f;
 
-    land_particles[1].cfg.startColorRed   = p2_not_white.r / 255.f;
-    land_particles[1].cfg.startColorGreen = p2_not_white.g / 255.f;
-    land_particles[1].cfg.startColorBlue  = p2_not_white.b / 255.f;
+    landParticles[1].cfg.startColorRed   = p2NotWhite.r / 255.f;
+    landParticles[1].cfg.startColorGreen = p2NotWhite.g / 255.f;
+    landParticles[1].cfg.startColorBlue  = p2NotWhite.b / 255.f;
 
-    explosion_particles[0].cfg.startColorRed   = p1_not_white.r / 255.f;
-    explosion_particles[0].cfg.startColorGreen = p1_not_white.g / 255.f;
-    explosion_particles[0].cfg.startColorBlue  = p1_not_white.b / 255.f;
+    explosionParticles[0].cfg.startColorRed   = p1NotWhite.r / 255.f;
+    explosionParticles[0].cfg.startColorGreen = p1NotWhite.g / 255.f;
+    explosionParticles[0].cfg.startColorBlue  = p1NotWhite.b / 255.f;
 
-    explosion_particles[1].cfg.startColorRed   = p2_not_white.r / 255.f;
-    explosion_particles[1].cfg.startColorGreen = p2_not_white.g / 255.f;
-    explosion_particles[1].cfg.startColorBlue  = p2_not_white.b / 255.f;
+    explosionParticles[1].cfg.startColorRed   = p2NotWhite.r / 255.f;
+    explosionParticles[1].cfg.startColorGreen = p2NotWhite.g / 255.f;
+    explosionParticles[1].cfg.startColorBlue  = p2NotWhite.b / 255.f;
 
-    glitter_particles.cfg.startColorRed   = p1_not_white.r / 255.f;
-    glitter_particles.cfg.startColorGreen = p1_not_white.g / 255.f;
-    glitter_particles.cfg.startColorBlue  = p1_not_white.b / 255.f;
-    glitter_particles.cfg.startColorAlpha = 1.f;
+    glitterParticles.cfg.startColorRed   = p1NotWhite.r / 255.f;
+    glitterParticles.cfg.startColorGreen = p1NotWhite.g / 255.f;
+    glitterParticles.cfg.startColorBlue  = p1NotWhite.b / 255.f;
+    glitterParticles.cfg.startColorAlpha = 1.f;
     
-    glitter_particles.cfg.finishColorRed   = p1_not_white.r / 255.f;
-    glitter_particles.cfg.finishColorGreen = p1_not_white.g / 255.f;
-    glitter_particles.cfg.finishColorBlue  = p1_not_white.b / 255.f;
+    glitterParticles.cfg.finishColorRed   = p1NotWhite.r / 255.f;
+    glitterParticles.cfg.finishColorGreen = p1NotWhite.g / 255.f;
+    glitterParticles.cfg.finishColorBlue  = p1NotWhite.b / 255.f;
 
-    slow_speed_particles.cfg.startColorRed   = 255 / 255.f;
-    slow_speed_particles.cfg.startColorGreen = 255 / 255.f;
-    slow_speed_particles.cfg.startColorBlue  = 0 / 255.f;
+    slowSpeedParticles.cfg.startColorRed   = 255 / 255.f;
+    slowSpeedParticles.cfg.startColorGreen = 255 / 255.f;
+    slowSpeedParticles.cfg.startColorBlue  = 0 / 255.f;
 
-    normal_speed_particles.cfg.startColorRed   = 0 / 255.f;
-    normal_speed_particles.cfg.startColorGreen = 190 / 255.f;
-    normal_speed_particles.cfg.startColorBlue  = 255 / 255.f;
+    normalSpeedParticles.cfg.startColorRed   = 0 / 255.f;
+    normalSpeedParticles.cfg.startColorGreen = 190 / 255.f;
+    normalSpeedParticles.cfg.startColorBlue  = 255 / 255.f;
 
-    fast_speed_particles.cfg.startColorRed   = 0 / 255.f;
-    fast_speed_particles.cfg.startColorGreen = 255 / 255.f;
-    fast_speed_particles.cfg.startColorBlue  = 0 / 255.f;
+    fastSpeedParticles.cfg.startColorRed   = 0 / 255.f;
+    fastSpeedParticles.cfg.startColorGreen = 255 / 255.f;
+    fastSpeedParticles.cfg.startColorBlue  = 0 / 255.f;
 
-    faster_speed_particles.cfg.startColorRed   = 230 / 255.f;
-    faster_speed_particles.cfg.startColorGreen = 65 / 255.f;
-    faster_speed_particles.cfg.startColorBlue  = 255 / 255.f;
+    fasterSpeedParticles.cfg.startColorRed   = 230 / 255.f;
+    fasterSpeedParticles.cfg.startColorGreen = 65 / 255.f;
+    fasterSpeedParticles.cfg.startColorBlue  = 255 / 255.f;
 
-    fastest_speed_particles.cfg.startColorRed   = 255 / 255.f;
-    fastest_speed_particles.cfg.startColorGreen = 65 / 255.f;
-    fastest_speed_particles.cfg.startColorBlue  = 65 / 255.f;
+    fastestSpeedParticles.cfg.startColorRed   = 255 / 255.f;
+    fastestSpeedParticles.cfg.startColorGreen = 65 / 255.f;
+    fastestSpeedParticles.cfg.startColorBlue  = 65 / 255.f;
 
-    coin_pickup_particles.cfg.startColorRed   = 255 / 255.f;
-    coin_pickup_particles.cfg.startColorGreen = state.custom_level ? 1.f : 190 / 255.f;
-    coin_pickup_particles.cfg.startColorBlue  = state.custom_level ? 1.f : 0.f;
+    coinPickupParticles.cfg.startColorRed   = 255 / 255.f;
+    coinPickupParticles.cfg.startColorGreen = state.customLevel ? 1.f : 190 / 255.f;
+    coinPickupParticles.cfg.startColorBlue  = state.customLevel ? 1.f : 0.f;
     
-    end_wall_particles.cfg.startColorRed   = p1_not_white.r / 255.f;
-    end_wall_particles.cfg.startColorGreen = p1_not_white.g / 255.f;
-    end_wall_particles.cfg.startColorBlue  = p1_not_white.b / 255.f;
+    endWallParticles.cfg.startColorRed   = p1NotWhite.r / 255.f;
+    endWallParticles.cfg.startColorGreen = p1NotWhite.g / 255.f;
+    endWallParticles.cfg.startColorBlue  = p1NotWhite.b / 255.f;
     
-    end_wall_particles.cfg.finishColorRed   = p1_not_white.r / 255.f;
-    end_wall_particles.cfg.finishColorGreen = p1_not_white.g / 255.f;
-    end_wall_particles.cfg.finishColorBlue  = p1_not_white.b / 255.f;
+    endWallParticles.cfg.finishColorRed   = p1NotWhite.r / 255.f;
+    endWallParticles.cfg.finishColorGreen = p1NotWhite.g / 255.f;
+    endWallParticles.cfg.finishColorBlue  = p1NotWhite.b / 255.f;
 
-    end_wall_particles.scale = 1.5f;
+    endWallParticles.scale = 1.5f;
 
-    end_wall_firework.cfg.startColorRed   = p1_not_white.r / 255.f;
-    end_wall_firework.cfg.startColorGreen = p1_not_white.g / 255.f;
-    end_wall_firework.cfg.startColorBlue  = p1_not_white.b / 255.f;
+    endWallFirework.cfg.startColorRed   = p1NotWhite.r / 255.f;
+    endWallFirework.cfg.startColorGreen = p1NotWhite.g / 255.f;
+    endWallFirework.cfg.startColorBlue  = p1NotWhite.b / 255.f;
     
-    end_wall_firework.cfg.finishColorRed   = p1_not_white.r / 255.f;
-    end_wall_firework.cfg.finishColorGreen = p1_not_white.g / 255.f;
-    end_wall_firework.cfg.finishColorBlue  = p1_not_white.b / 255.f;
+    endWallFirework.cfg.finishColorRed   = p1NotWhite.r / 255.f;
+    endWallFirework.cfg.finishColorGreen = p1NotWhite.g / 255.f;
+    endWallFirework.cfg.finishColorBlue  = p1NotWhite.b / 255.f;
 
     
-    level_complete_effect_p1.cfg.startColorRed   = p1_not_white.r / 255.f;
-    level_complete_effect_p1.cfg.startColorGreen = p1_not_white.g / 255.f;
-    level_complete_effect_p1.cfg.startColorBlue  = p1_not_white.b / 255.f;
+    levelCompleteEffectP1.cfg.startColorRed   = p1NotWhite.r / 255.f;
+    levelCompleteEffectP1.cfg.startColorGreen = p1NotWhite.g / 255.f;
+    levelCompleteEffectP1.cfg.startColorBlue  = p1NotWhite.b / 255.f;
 
-    level_complete_effect_p1.cfg.finishColorRed   = p1_not_white.r / 255.f;
-    level_complete_effect_p1.cfg.finishColorGreen = p1_not_white.g / 255.f;
-    level_complete_effect_p1.cfg.finishColorBlue  = p1_not_white.b / 255.f;
+    levelCompleteEffectP1.cfg.finishColorRed   = p1NotWhite.r / 255.f;
+    levelCompleteEffectP1.cfg.finishColorGreen = p1NotWhite.g / 255.f;
+    levelCompleteEffectP1.cfg.finishColorBlue  = p1NotWhite.b / 255.f;
     
-    level_complete_effect_p2.cfg.startColorRed   = p2_not_white.r / 255.f;
-    level_complete_effect_p2.cfg.startColorGreen = p2_not_white.g / 255.f;
-    level_complete_effect_p2.cfg.startColorBlue  = p2_not_white.b / 255.f;
+    levelCompleteEffectP2.cfg.startColorRed   = p2NotWhite.r / 255.f;
+    levelCompleteEffectP2.cfg.startColorGreen = p2NotWhite.g / 255.f;
+    levelCompleteEffectP2.cfg.startColorBlue  = p2NotWhite.b / 255.f;
 
-    level_complete_effect_p2.cfg.finishColorRed   = p2_not_white.r / 255.f;
-    level_complete_effect_p2.cfg.finishColorGreen = p2_not_white.g / 255.f;
-    level_complete_effect_p2.cfg.finishColorBlue  = p2_not_white.b / 255.f;
+    levelCompleteEffectP2.cfg.finishColorRed   = p2NotWhite.r / 255.f;
+    levelCompleteEffectP2.cfg.finishColorGreen = p2NotWhite.g / 255.f;
+    levelCompleteEffectP2.cfg.finishColorBlue  = p2NotWhite.b / 255.f;
 }
 
-static bool touch_jump_filter(u16 px, u16 py) {
-    bool on_pause_button = px > 300-32/2 && py < 20+32/2;
-    bool on_practice_ui = state.practice_mode && !settingsState.hidePracticeButtons && (px > 92 && px < 222 && py > 175 && py < 222);
-    return !(on_pause_button || on_practice_ui);
+static bool touchJumpFilter(u16 px, u16 py) {
+    bool onPauseButton = px > 300-32/2 && py < 20+32/2;
+    bool onPracticeUI = state.practiceMode && !settingsState.hidePracticeButtons && (px > 92 && px < 222 && py > 175 && py < 222);
+    return !(onPauseButton || onPracticeUI);
 }
 
-static bool touch_left_half(u16 px) {
+static bool touchLeftHalf(u16 px) {
     return px < SCREEN_BOT_WIDTH / 2;
 }
 
-static bool touch_jump_filter_p1(u16 px, u16 py) {
-    return touch_jump_filter(px, py) && touch_left_half(px);
+static bool touchJumpFilterP1(u16 px, u16 py) {
+    return touchJumpFilter(px, py) && touchLeftHalf(px);
 }
 
-static bool touch_jump_filter_p2(u16 px, u16 py) {
-    return touch_jump_filter(px, py) && !touch_left_half(px);
+static bool touchJumpFilterP2(u16 px, u16 py) {
+    return touchJumpFilter(px, py) && !touchLeftHalf(px);
 }
 
-static bool touch_jump_filter_none(UNUSED u16 px, UNUSED u16 py) {
+static bool touchJumpFilterNone(UNUSED u16 px, UNUSED u16 py) {
     return false;
 }
 
-u32 jump_key_mask_p1(void) {
+u32 jumpKeyMaskP1(void) {
     return (settingsState.yJump ? KEY_Y : KEY_A);
 }
 
-u32 jump_key_mask_p2(void) {
+u32 jumpKeyMaskP2(void) {
     return KEY_UP;
 }
 
-u32 jump_key_mask(void) {
-    return jump_key_mask_p1() | jump_key_mask_p2();
+u32 jumpKeyMask(void) {
+    return jumpKeyMaskP1() | jumpKeyMaskP2();
 }
 
-static void handle_gameplay_input(touchPosition touchPos, u32 kDown, u32 kHeld) {
-    bool in_bounds = touch_jump_filter(touchPos.px, touchPos.py);
-    bool left_side = touch_left_half(touchPos.px);
+static void handleGameplayInput(touchPosition touchPos, u32 kDown, u32 kHeld) {
+    bool inBounds = touchJumpFilter(touchPos.px, touchPos.py);
+    bool leftSide = touchLeftHalf(touchPos.px);
 
-    bool touch_pressed = in_bounds && (kDown & KEY_TOUCH);
-    bool touch_held = in_bounds && (kHeld & KEY_TOUCH);
+    bool touchPressed = inBounds && (kDown & KEY_TOUCH);
+    bool touchHeld = inBounds && (kHeld & KEY_TOUCH);
 
     // CBF not enabled
-    if (!pi_enabled) {
-        if (level_info.two_player_mode) {
-            bool buttonPressed = (kDown & jump_key_mask_p1()) != 0;
-            bool buttonHeld = (kHeld & jump_key_mask_p1()) != 0;
+    if (!piEnabled) {
+        if (levelInfo.twoPlayerMode) {
+            bool buttonPressed = (kDown & jumpKeyMaskP1()) != 0;
+            bool buttonHeld = (kHeld & jumpKeyMaskP1()) != 0;
 
-            bool buttonPressedP2 = (kDown & jump_key_mask_p2()) != 0;
-            bool buttonHeldP2 = (kHeld & jump_key_mask_p2()) != 0;
+            bool buttonPressedP2 = (kDown & jumpKeyMaskP2()) != 0;
+            bool buttonHeldP2 = (kHeld & jumpKeyMaskP2()) != 0;
 
-            state.old_input = state.input;
+            state.oldInput = state.input;
             
-            state.input.pressedJump = (buttonPressed || (touch_pressed && left_side)) == true;
-            state.input.holdJump = (state.input.pressedJump || buttonHeld || (touch_held && left_side)) == true;
+            state.input.pressedJump = (buttonPressed || (touchPressed && leftSide)) == true;
+            state.input.holdJump = (state.input.pressedJump || buttonHeld || (touchHeld && leftSide)) == true;
 
-            state.old_input_p2 = state.input_p2;
+            state.oldInputP2 = state.inputP2;
 
-            state.input_p2.pressedJump = (buttonPressedP2 || (touch_pressed && !left_side)) == true;
-            state.input_p2.holdJump = (state.input_p2.pressedJump || buttonHeldP2 || (touch_held && !left_side)) == true;
+            state.inputP2.pressedJump = (buttonPressedP2 || (touchPressed && !leftSide)) == true;
+            state.inputP2.holdJump = (state.inputP2.pressedJump || buttonHeldP2 || (touchHeld && !leftSide)) == true;
         } else {
-            bool buttonPressed = (kDown & jump_key_mask()) != 0;
-            bool buttonHeld = (kHeld & jump_key_mask()) != 0;
+            bool buttonPressed = (kDown & jumpKeyMask()) != 0;
+            bool buttonHeld = (kHeld & jumpKeyMask()) != 0;
             
-            state.old_input = state.input;
+            state.oldInput = state.input;
             
-            state.input.pressedJump = (buttonPressed || touch_pressed) == true;
-            state.input.holdJump = (state.input.pressedJump || buttonHeld || touch_held) == true;
+            state.input.pressedJump = (buttonPressed || touchPressed) == true;
+            state.input.holdJump = (state.input.pressedJump || buttonHeld || touchHeld) == true;
             
-            state.old_input_p2 = state.input;
+            state.oldInputP2 = state.input;
 
-            state.input_p2.pressedJump = state.input.pressedJump;
-            state.input_p2.holdJump = state.input.holdJump;
+            state.inputP2.pressedJump = state.input.pressedJump;
+            state.inputP2.holdJump = state.input.holdJump;
         }
     }
 }
 
-void sync_precise_input(bool suppress_held) {
-    if (level_info.two_player_mode) {
-        pi_set_jump_keys(PI_PLAYER_1, jump_key_mask_p1());
-        pi_set_touch_filter(PI_PLAYER_1, touch_jump_filter_p1);
-        pi_set_jump_keys(PI_PLAYER_2, jump_key_mask_p2());
-        pi_set_touch_filter(PI_PLAYER_2, touch_jump_filter_p2);
+void syncPreciseInput(bool suppressHeld) {
+    if (levelInfo.twoPlayerMode) {
+        piSetJumpKeys(PI_PLAYER_1, jumpKeyMaskP1());
+        piSetTouchFilter(PI_PLAYER_1, touchJumpFilterP1);
+        piSetJumpKeys(PI_PLAYER_2, jumpKeyMaskP2());
+        piSetTouchFilter(PI_PLAYER_2, touchJumpFilterP2);
     } else {
-        pi_set_jump_keys(PI_PLAYER_1, jump_key_mask());
-        pi_set_touch_filter(PI_PLAYER_1, touch_jump_filter);
-        pi_set_jump_keys(PI_PLAYER_2, 0);
-        pi_set_touch_filter(PI_PLAYER_2, touch_jump_filter_none);
+        piSetJumpKeys(PI_PLAYER_1, jumpKeyMask());
+        piSetTouchFilter(PI_PLAYER_1, touchJumpFilter);
+        piSetJumpKeys(PI_PLAYER_2, 0);
+        piSetTouchFilter(PI_PLAYER_2, touchJumpFilterNone);
     }
-    pi_reset();
-    if (suppress_held) {
-        pi_suppress_until_release();
+    piReset();
+    if (suppressHeld) {
+        piSuppressUntilRelease();
     }
 }
 
-void ui_loop(){
-    playing_menu_loop = false;
-    if (settingsState.menuMusic) play_menu_song();
-    else stop_mp3();
+void uiLoop(){
+    playingMenuLoop = false;
+    if (settingsState.menuMusic) playMenuSong();
+    else stopMP3();
     
     u64 lastTime = svcGetSystemTick();
 
-    ui_stack_set_stack(&menu_stack);
+    uiStackSetStack(&menuStack);
 
     while (aptMainLoop()) {
-        process_saving();
+        processSaving();
 
         u64 now = svcGetSystemTick();
-        if (fixed_dt) {
-            fixed_dt = false;
+        if (fixedDt) {
+            fixedDt = false;
             delta = 1/60.f;
         } else {
             delta = (now - lastTime) / (CPU_TICKS_PER_MSEC * 1000);
         }
-        trigger_dt = delta;
+        triggerDt = delta;
         lastTime = now;
         hidScanInput();
 
@@ -781,88 +781,88 @@ void ui_loop(){
         touch.up = hidKeysUp();
         hidCircleRead(&touch.cpad);
 
-        ui_stack_update(&touch);
+        uiStackUpdate(&touch);
 
         // autoupdater pop up stuff
-        if (updater_task.finished && !checkedForUpdate && ui_stack_get_fade_status() == FADE_STATUS_NONE && strcmp("updater", ui_stack_get_current_screen_name()) != 0 && strcmp("3d_warning_pop_up", ui_stack_get_current_screen_name()) != 0 && strcmp("info_card", ui_stack_get_current_screen_name()) != 0 && strcmp("updater_settings", ui_stack_get_current_screen_name()) != 0)
+        if (updaterTask.finished && !checkedForUpdate && uiStackGetFadeStatus() == FADE_STATUS_NONE && strcmp("updater", uiStackGetCurrentScreenName()) != 0 && strcmp("3d_warning_pop_up", uiStackGetCurrentScreenName()) != 0 && strcmp("info_card", uiStackGetCurrentScreenName()) != 0 && strcmp("updater_settings", uiStackGetCurrentScreenName()) != 0)
         {
             // Handle result
-            if (updater_task.result == 0)
+            if (updaterTask.result == 0)
             {
-                if (update_data->isAvailable)
+                if (updateData->isAvailable)
                 {
                     checkedForUpdate = true;
-                    TwoOptionPopupData *autoupdate_data = (TwoOptionPopupData *)malloc(sizeof(TwoOptionPopupData));
-                    if (!autoupdate_data)
+                    TwoOptionPopupData *autoupdateData = (TwoOptionPopupData *)malloc(sizeof(TwoOptionPopupData));
+                    if (!autoupdateData)
                         return;
 
-                    autoupdate_data->text = strdup("Updates were found for the game.\nOpen the updater?");
-                    autoupdate_data->title = strdup("Updates Found");
-                    autoupdate_data->proceed_text = strdup("Open");
-                    autoupdate_data->cancel_text = strdup("Later");
-                    ui_stack_push(&autoupdate_pop_up_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
-                    ui_stack_push_data(autoupdate_data);
+                    autoupdateData->text = strdup("Updates were found for the game.\nOpen the updater?");
+                    autoupdateData->title = strdup("Updates Found");
+                    autoupdateData->proceedText = strdup("Open");
+                    autoupdateData->cancelText = strdup("Later");
+                    uiStackPush(&autoupdatePopUpDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+                    uiStackPushData(autoupdateData);
                 }
                 else
-                    output_log("no updates found");
+                    outputLog("no updates found");
             }
-            updater_task.finished = false;
+            updaterTask.finished = false;
         }
 
         // 3d first time use warning pop up stuff
 
-        if (stereo_supported() && settingsState.stereoEnabled && ui_stack_get_fade_status() == FADE_STATUS_NONE && !_3dWarningPassed && get_stereo_slider() > 0.f && strcmp("settings", ui_stack_get_current_screen_name()) != 0)
+        if (stereoSupported() && settingsState.stereoEnabled && uiStackGetFadeStatus() == FADE_STATUS_NONE && !threeDWarningPassed && getStereoSlider() > 0.f && strcmp("settings", uiStackGetCurrentScreenName()) != 0)
         {
-            TwoOptionPopupData *_3d_warning_data = (TwoOptionPopupData *)malloc(sizeof(TwoOptionPopupData));
-            if (!_3d_warning_data)
+            TwoOptionPopupData *threeDWarningData = (TwoOptionPopupData *)malloc(sizeof(TwoOptionPopupData));
+            if (!threeDWarningData)
                 return;
 
-            _3d_warning_data->text = strdup("Stereoscopic 3D can significantly lower performance.\nAre you sure you want to keep it enabled?");
-            _3d_warning_data->title = strdup("Disclaimer");
-            _3d_warning_data->proceed_text = strdup("Enable");
-            _3d_warning_data->cancel_text = strdup("Cancel");
-            ui_stack_push(&_3d_warning_pop_up_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
-            ui_stack_push_data(_3d_warning_data);
-            _3dWarningPassed = true;
+            threeDWarningData->text = strdup("Stereoscopic 3D can significantly lower performance.\nAre you sure you want to keep it enabled?");
+            threeDWarningData->title = strdup("Disclaimer");
+            threeDWarningData->proceedText = strdup("Enable");
+            threeDWarningData->cancelText = strdup("Cancel");
+            uiStackPush(&threeDWarningPopUpDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+            uiStackPushData(threeDWarningData);
+            threeDWarningPassed = true;
         }
 
         // Frees a render target, so keep it out of the frame below
-        update_stereo_target();
+        updateStereoTarget();
 
-        update_touch_effect(DT);
+        updateTouchEffect(DT);
 
         C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-        icon_cache_begin_frame();
+        iconCacheBeginFrame();
 
         // Bottom screen
         C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
         C2D_SceneBegin(bot);
 
-        ui_stack_draw(SCREEN_BTM);
+        uiStackDraw(SCREEN_BTM);
 
-        if(is_saving()) {
-            draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 234, 0.5f, 0.5f, 0, false, "Saving...");
+        if(isSaving()) {
+            drawText(&bigFontFontCharset, &bigFontSheet, 0, 234, 0.5f, 0.5f, 0, false, "Saving...");
         }
 
-        draw_stack_fade();
+        drawStackFade();
 
-        change_blending(true);
-        draw_touch_effect();
-        change_blending(false);
+        changeBlending(true);
+        drawTouchEffect();
+        changeBlending(false);
 
         // Top screen, drawn once per eye when 3D is on
-        for (int eye = 0; begin_top_eye(eye); eye++) {
-            begin_eye_layer(DEPTH_UI);
-            ui_stack_draw(SCREEN_TOP);
-            draw_stack_fade();
+        for (int eye = 0; beginTopEye(eye); eye++) {
+            beginEyeLayer(DEPTH_UI);
+            uiStackDraw(SCREEN_TOP);
+            drawStackFade();
             //draw_stack_debug();
-            end_eye_layer();
+            endEyeLayer();
         }
         C2D_ViewReset();
         C3D_FrameEnd(0);
 
-        if(escape_state){
-            escape_state = false;
+        if(escapeState){
+            escapeState = false;
             break;
         }
     }
@@ -876,8 +876,8 @@ typedef struct {
     bool enabled;
 } SwapElement;
 
-static SwapElement swap_hide_tag(UIScreen *screen, const char *tag) {
-    SwapElement state = { screen ? ui_get_element_by_tag(screen, tag) : NULL, false };
+static SwapElement swapHideTag(UIScreen *screen, const char *tag) {
+    SwapElement state = { screen ? uiGetElementByTag(screen, tag) : NULL, false };
 
     if (state.element) {
         state.enabled = state.element->enabled;
@@ -887,149 +887,149 @@ static SwapElement swap_hide_tag(UIScreen *screen, const char *tag) {
     return state;
 }
 
-static void swap_restore_element(SwapElement state) {
+static void swapRestoreElement(SwapElement state) {
     if (state.element) state.element->enabled = state.enabled;
 }
 
-static void swap_draw_identity(UIElement *e) {
+static void swapDrawIdentity(UIElement *e) {
     UITransform root = { 0.f, 0.f, 1.f, 1.f };
 
-    ui_draw_tree(e, &root);
+    uiDrawTree(e, &root);
 }
 
-static void swap_draw_hud(UIScreen *screen) {
+static void swapDrawHud(UIScreen *screen) {
     if (!screen) return;
 
-    SwapElement pause_menu = swap_hide_tag(screen, "pause_menu");
-    SwapElement fps = swap_hide_tag(screen, "fps");
+    SwapElement pauseMenu = swapHideTag(screen, "pause_menu");
+    SwapElement fps = swapHideTag(screen, "fps");
 
     C2D_ViewTranslate(-SWAP_SIDE_OFFSET_X, 0);
-    ui_screen_draw(screen);
+    uiScreenDraw(screen);
     C2D_ViewTranslate(SWAP_SIDE_OFFSET_X, 0);
 
-    swap_restore_element(fps);
+    swapRestoreElement(fps);
 
-    if (fps.element && fps.element->enabled) swap_draw_identity(fps.element);
+    if (fps.element && fps.element->enabled) swapDrawIdentity(fps.element);
 
-    swap_restore_element(pause_menu);
+    swapRestoreElement(pauseMenu);
 }
 
-static void swap_draw_pause_window(UIScreen *screen) {
-    SwapElement bar = swap_hide_tag(screen, "progressalert");
-    SwapElement percent = swap_hide_tag(screen, "percent");
-    SwapElement fps = swap_hide_tag(screen, "fps");
+static void swapDrawPauseWindow(UIScreen *screen) {
+    SwapElement bar = swapHideTag(screen, "progressalert");
+    SwapElement percent = swapHideTag(screen, "percent");
+    SwapElement fps = swapHideTag(screen, "fps");
 
-    ui_stack_draw(SCREEN_TOP);
+    uiStackDraw(SCREEN_TOP);
 
-    swap_restore_element(fps);
-    swap_restore_element(percent);
-    swap_restore_element(bar);
+    swapRestoreElement(fps);
+    swapRestoreElement(percent);
+    swapRestoreElement(bar);
 }
 
-void game_loop() {
+void gameLoop() {
 #ifdef DEBUG_LEAKS
     current_generation++;
     dump_leaks();
 #endif
 
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-    icon_cache_begin_frame();
+    iconCacheBeginFrame();
 
     C2D_Fade(0);
-    for (int eye = 0; begin_top_eye(eye); eye++) {
-        begin_eye_layer(DEPTH_UI);
-        draw_text(&bigFont_fontCharset, &bigFont_sheet, SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10, 0.5f, 0.5f, 1.0f, true, "Loading...");
-        end_eye_layer();
+    for (int eye = 0; beginTopEye(eye); eye++) {
+        beginEyeLayer(DEPTH_UI);
+        drawText(&bigFontFontCharset, &bigFontSheet, SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10, 0.5f, 0.5f, 1.0f, true, "Loading...");
+        endEyeLayer();
     }
     C3D_FrameEnd(0);
 
-    ui_stack_set_stack(&gameplay_stack);
-    ui_stack_clear();
-    ui_stack_push(&gameplay_def, ANIM_NONE, ANIM_NONE, PUSH_ROOT);
+    uiStackSetStack(&gameplayStack);
+    uiStackClear();
+    uiStackPush(&gameplayDef, ANIM_NONE, ANIM_NONE, PUSH_ROOT);
 
-    update_player_colors();
+    updatePlayerColors();
 
-    exiting_level = false;
+    exitingLevel = false;
         
     UIInput touch;
 
-    if (state.online_level) {
-        int returned = load_online_level(curr_level_string);
-        level_result = returned;
+    if (state.onlineLevel) {
+        int returned = loadOnlineLevel(currLevelString);
+        levelResult = returned;
         if (returned) {
-            output_log("Failed %d\n", returned);
+            outputLog("Failed %d\n", returned);
 
-            ui_stack_push_game_state(STATE_MENU);
-            ui_stack_update(&touch);
-            state.online_level = false;
-            exiting_level = true;
-            unload_level();
+            uiStackPushGameState(STATE_MENU);
+            uiStackUpdate(&touch);
+            state.onlineLevel = false;
+            exitingLevel = true;
+            unloadLevel();
             return;
         }
     } else {
         const char *path;
-        if (state.custom_level) {
-            path = state.custom_level_path;
+        if (state.customLevel) {
+            path = state.customLevelPath;
         } else {
-            path = current_main_level_pack->levels[curr_level_id].gmd_path;
+            path = currentMainLevelPack->levels[currLevelID].gmdPath;
         }
 
-        int returned = load_level(path);
-        level_result = returned;
+        int returned = loadLevel(path);
+        levelResult = returned;
         if (returned) {
-            output_log("Failed %d\n", returned);
+            outputLog("Failed %d\n", returned);
             
-            ui_stack_push_game_state(STATE_MENU);
-            ui_stack_update(&touch);
-            exiting_level = true;
-            unload_level();
+            uiStackPushGameState(STATE_MENU);
+            uiStackUpdate(&touch);
+            exitingLevel = true;
+            unloadLevel();
             return;
         }
 
-        if (!state.custom_level) {
-            snprintf(level_info.level_name, sizeof(level_info.level_name), "%s", current_main_level_pack->levels[curr_level_id].level_name);
+        if (!state.customLevel) {
+            snprintf(levelInfo.levelName, sizeof(levelInfo.levelName), "%s", currentMainLevelPack->levels[currLevelID].levelName);
         }
     }
 
-    play_level_song(level_info.song_offset);
+    playLevelSong(levelInfo.songOffset);
 
-    frame_timer = 0;
-    if (song_loaded) {
-        pause_playback_mp3();
+    frameTimer = 0;
+    if (songLoaded) {
+        pausePlaybackMP3();
     }
 
-    bool being_faded = true;
-    float level_start_delay = 1.f;
+    bool beingFaded = true;
+    float levelStartDelay = 1.f;
 
-    first_load_init_variables();
+    firstLoadInitVariables();
 
-    init_op_system();
+    initOpSystem();
 
     // Particle
-    allocate_particles();
-    init_particles(p1_color, p2_color);
-    clear_practice_mode();
+    allocateParticles();
+    initParticles(p1Color, p2Color);
+    clearPracticeMode();
 
-    fixed_dt = true;
+    fixedDt = true;
 
-    sync_precise_input(false);
-    memset(pi_substep_presses, 0, sizeof(pi_substep_presses));
+    syncPreciseInput(false);
+    memset(piSubstepPresses, 0, sizeof(piSubstepPresses));
 
     u64 lastTime = svcGetSystemTick();
     u64 start = svcGetSystemTick();
-    bool old_wide = settingsState.wideEnabled;
-    bool old_stereo = settingsState.stereoEnabled;
+    bool oldWide = settingsState.wideEnabled;
+    bool oldStereo = settingsState.stereoEnabled;
     
     aptHook(&cookie, aptCallback, NULL);
 
     // Main loop
     while (aptMainLoop()) {
-        process_saving();
+        processSaving();
 
         start = svcGetSystemTick();
         hidScanInput();
 
-        pi_poll();
+        piPoll();
         touchPosition touchPos;
         hidTouchRead(&touchPos);
         touch.touchPos = touchPos;
@@ -1040,7 +1040,7 @@ void game_loop() {
         hidCircleRead(&touch.cpad);
         static u32 kHeldPaused;
 
-        state.hitbox_display = 0;
+        state.hitboxDisplay = 0;
 
         if (touch.down & KEY_X && settingsState.enableDebugBindings) {
             state.noclip ^= 1;
@@ -1048,7 +1048,7 @@ void game_loop() {
 
         if (state.noclip) {
             cheated = true;
-            cheats_used[CHEAT_NOCLIP] = true;
+            cheatsUsed[CHEAT_NOCLIP] = true;
         }
 
         if ((touch.down & KEY_L) && (touch.held & KEY_B) && settingsState.enableDebugBindings)
@@ -1056,7 +1056,7 @@ void game_loop() {
 
         if ((touch.down & KEY_R) && (touch.held & KEY_B) && settingsState.enableDebugBindings) {
             cheated = true;
-            cheats_used[CHEAT_HITBOX_DISPLAY] = true;
+            cheatsUsed[CHEAT_HITBOX_DISPLAY] = true;
             if (settingsState.hitboxesEnabled && settingsState.hitboxTrail) {
                 settingsState.hitboxesEnabled = false;
                 settingsState.hitboxTrail = false;
@@ -1065,82 +1065,82 @@ void game_loop() {
             } else settingsState.hitboxesEnabled = true;
         }      
 
-        if (settingsState.hitboxesEnabled || state.hitbox_enabled_when_dead) {
-            state.hitbox_display = 1;
+        if (settingsState.hitboxesEnabled || state.hitboxEnabledWhenDead) {
+            state.hitboxDisplay = 1;
         }
         
         if (settingsState.hitboxTrail) {
             settingsState.hitboxesEnabled = true;
-            state.hitbox_display = 2;
+            state.hitboxDisplay = 2;
         }
 
         if (settingsState.hitboxesEnabled || settingsState.hitboxTrail) {
             cheated = true;
-            cheats_used[CHEAT_HITBOX_DISPLAY] = true;
+            cheatsUsed[CHEAT_HITBOX_DISPLAY] = true;
         }
         
         kHeldPaused &= ~touch.up;
-        if(!game_paused){
+        if(!gamePaused){
             touch.held &= ~kHeldPaused;
         }
         
-        global_volume = get_volume_slider();
+        globalVolume = getVolumeSlider();
 
-        snapshot.rendering_ms = 0;
+        snapshot.renderingMs = 0;
 
-        handle_gameplay_input(touchPos, touch.down, touch.held);
+        handleGameplayInput(touchPos, touch.down, touch.held);
         
         for (int i = 0; i < 2; i++) {
-            drag_particles[i].emitting = false;
-            drag_particles_2[i].stationary = true;
-            drag_particles_2[i].emitting = false;
-            ship_fire_particles[i].emitting = false;
-            secondary_particles[i].emitting = false;
-            ship_secondary_particles[i].emitting = false;
-            burst_particles[i].emitting = false;
-            robot_fire_particles[i].emitting = false;
-            land_particles[i].emitting = false;
+            dragParticles[i].emitting = false;
+            dragParticles2[i].stationary = true;
+            dragParticles2[i].emitting = false;
+            shipFireParticles[i].emitting = false;
+            secondaryParticles[i].emitting = false;
+            shipSecondaryParticles[i].emitting = false;
+            burstParticles[i].emitting = false;
+            robotFireParticles[i].emitting = false;
+            landParticles[i].emitting = false;
         }
 
         u64 now = svcGetSystemTick();
         delta = (now - lastTime) / (CPU_TICKS_PER_MSEC * 1000);
-        u64 frame_window_start = lastTime;
+        u64 frameWindowStart = lastTime;
         lastTime = now;
 
-        if (state.death_timer <= 0)  {
-            float physics_delta = delta;
-            snapshot.physics_ms = 0;
+        if (state.deathTimer <= 0)  {
+            float physicsDelta = delta;
+            snapshot.physicsMs = 0;
             snapshot.collisions = 0;
-            snapshot.collision_checks = 0;
-            snapshot.collision_ms = 0;
-            snapshot.play_ms = 0;
-            snapshot.handler_ms = 0;
-            snapshot.handler_ms = 0;
+            snapshot.collisionChecks = 0;
+            snapshot.collisionMs = 0;
+            snapshot.playMs = 0;
+            snapshot.handlerMs = 0;
+            snapshot.handlerMs = 0;
             
-            brick_destroy_particles.emitting = false;
-            glitter_particles.emitting = false;
-            glitter_particles_bottom.emitting = false;
-            slow_speed_particles_bottom.emitting = false;
-            normal_speed_particles_bottom.emitting = false;
-            fast_speed_particles_bottom.emitting = false;
-            faster_speed_particles_bottom.emitting = false;
-            fastest_speed_particles_bottom.emitting = false;
+            brickDestroyParticles.emitting = false;
+            glitterParticles.emitting = false;
+            glitterParticlesBottom.emitting = false;
+            slowSpeedParticlesBottom.emitting = false;
+            normalSpeedParticlesBottom.emitting = false;
+            fastSpeedParticlesBottom.emitting = false;
+            fasterSpeedParticlesBottom.emitting = false;
+            fastestSpeedParticlesBottom.emitting = false;
             
-            if (physics_delta > 0.5f) physics_delta = STEPS_DT; // Avoid spiral of death
+            if (physicsDelta > 0.5f) physicsDelta = STEPS_DT; // Avoid spiral of death
 
-            if (!game_paused) {
-                if (fixed_dt) {
-                    physics_delta = STEPS_DT;
-                    if (!being_faded) fixed_dt = false;
+            if (!gamePaused) {
+                if (fixedDt) {
+                    physicsDelta = STEPS_DT;
+                    if (!beingFaded) fixedDt = false;
                 }
-                accumulator += physics_delta;
+                accumulator += physicsDelta;
                 
-                if (level_start_delay > 0.f) {
-                    level_start_delay -= delta;
+                if (levelStartDelay > 0.f) {
+                    levelStartDelay -= delta;
                     accumulator = 0.f;
                 }
 
-                last_steps = steps;
+                lastSteps = steps;
                 steps = 0;
 
                 // in case of merge conflicts: this needs to stay after the accumulator deposit above.
@@ -1149,329 +1149,329 @@ void game_loop() {
                 // planned will always be 1, making every input land on a single substep like normal
                 // frame latching (no error, it will just silently get less precise)
                 u32 planned = (u32)(accumulator / STEPS_DT);
-                pi_begin_frame((u32)frame_window_start, (u32)now, planned ? planned : 1);
+                piBeginFrame((u32)frameWindowStart, (u32)now, planned ? planned : 1);
 
-                state.player.gravity_changed_move = false;
-                state.player2.gravity_changed_move = false;
+                state.player.gravityChangedMove = false;
+                state.player2.gravityChangedMove = false;
 
                 // Run simulation in fixed steps
                 while (accumulator >= STEPS_DT) {
-                    u64 start_physics = svcGetSystemTick();
-                    float player_x_before_step = state.player.x;
-                    bool player1_upside_down_before = state.player.upside_down;
-                    bool player2_upside_down_before = state.player2.upside_down;
+                    u64 startPhysics = svcGetSystemTick();
+                    float playerXBeforeStep = state.player.x;
+                    bool player1UpsideDownBefore = state.player.upsideDown;
+                    bool player2UpsideDownBefore = state.player2.upsideDown;
 
-                    if (pi_enabled) {
-                        pi_apply_substep((u32)steps);
+                    if (piEnabled) {
+                        piApplySubstep((u32)steps);
 
-                        state.old_input = state.input;
-                        state.old_input_p2 = state.input_p2;
+                        state.oldInput = state.input;
+                        state.oldInputP2 = state.inputP2;
 
-                        state.input.pressedJump = pi_pressed(PI_PLAYER_1);
-                        state.input.holdJump = pi_hold(PI_PLAYER_1) || state.input.pressedJump;
+                        state.input.pressedJump = piPressed(PI_PLAYER_1);
+                        state.input.holdJump = piHold(PI_PLAYER_1) || state.input.pressedJump;
 
-                        if (level_info.two_player_mode) {
-                            state.input_p2.pressedJump = pi_pressed(PI_PLAYER_2);
-                            state.input_p2.holdJump = pi_hold(PI_PLAYER_2) || state.input_p2.pressedJump;
+                        if (levelInfo.twoPlayerMode) {
+                            state.inputP2.pressedJump = piPressed(PI_PLAYER_2);
+                            state.inputP2.holdJump = piHold(PI_PLAYER_2) || state.inputP2.pressedJump;
                         } else {
-                            state.input_p2 = state.input;
+                            state.inputP2 = state.input;
                         }
 
-                        if (pi_pressed(PI_PLAYER_1) || pi_pressed(PI_PLAYER_2)) {
-                            pi_substep_presses[steps < PI_SUBSTEP_BUCKETS ? steps : PI_SUBSTEP_BUCKETS - 1]++;
+                        if (piPressed(PI_PLAYER_1) || piPressed(PI_PLAYER_2)) {
+                            piSubstepPresses[steps < PI_SUBSTEP_BUCKETS ? steps : PI_SUBSTEP_BUCKETS - 1]++;
                         }
                     }
 
-                    state.pending_auto_checkpoint = false;
+                    state.pendingAutoCheckpoint = false;
 
-                    state.current_player = 0;
-                    state.old_player = state.player;
+                    state.currentPlayer = 0;
+                    state.oldPlayer = state.player;
                     
-                    curr_input = state.input;
-                    curr_old_input = state.old_input;
+                    currInput = state.input;
+                    currOldInput = state.oldInput;
 
-                    trail = &trail_p1;
-                    wave_trail = &wave_trail_p1;
-                    handle_player(&state.player);
-                    state.player.gravity_changed_move |= state.player.upside_down != player1_upside_down_before;
-                    handle_mirror_transition();
+                    trail = &trailP1;
+                    waveTrail = &waveTrailP1;
+                    handlePlayer(&state.player);
+                    state.player.gravityChangedMove |= state.player.upsideDown != player1UpsideDownBefore;
+                    handleMirrorTransition();
 
-                    state.level_progress = (state.player.x / level_info.last_obj_x) * 100;
-                    if (state.level_progress < 0) {
-                        state.level_progress = 0;
+                    state.levelProgress = (state.player.x / levelInfo.lastObjX) * 100;
+                    if (state.levelProgress < 0) {
+                        state.levelProgress = 0;
                     }
                     
-                    if (state.level_progress > 100) {
-                        state.level_progress = 100;
+                    if (state.levelProgress > 100) {
+                        state.levelProgress = 100;
                     }
 
                     if (state.dead) break;
 
                     if (state.dual) {
                         // Run second player
-                        state.old_player = state.player2;
-                        state.current_player = 1;
-                        trail = &trail_p2;
-                        wave_trail = &wave_trail_p2;
+                        state.oldPlayer = state.player2;
+                        state.currentPlayer = 1;
+                        trail = &trailP2;
+                        waveTrail = &waveTrailP2;
 
-                        curr_input = state.input_p2;
-                        curr_old_input = state.old_input_p2;
-                        handle_player(&state.player2);
-                        state.player2.gravity_changed_move |= state.player2.upside_down != player2_upside_down_before;
+                        currInput = state.inputP2;
+                        currOldInput = state.oldInputP2;
+                        handlePlayer(&state.player2);
+                        state.player2.gravityChangedMove |= state.player2.upsideDown != player2UpsideDownBefore;
 
                         if (state.dead) break;
 
                         //revert state back to first player
-                        state.current_player = 0;
-                        state.old_player = state.player;
+                        state.currentPlayer = 0;
+                        state.oldPlayer = state.player;
                     }
 
-                    run_pending_checkpoint();
+                    runPendingCheckpoint();
 
-                    trigger_dt = STEPS_DT;
-                    move_lock_player_x_delta = state.player.x - player_x_before_step;
-                    move_lock_player_y_delta = state.player.delta_y;
-                    u64 start_step_triggers = svcGetSystemTick();
-                    handle_step_triggers();
-                    u64 end_step_triggers = svcGetSystemTick();
-                    float step_trigger_time = (end_step_triggers - start_step_triggers) / (CPU_TICKS_PER_MSEC);
-                    snapshot.step_trigger_ms += step_trigger_time;
+                    triggerDt = STEPS_DT;
+                    moveLockPlayerXDelta = state.player.x - playerXBeforeStep;
+                    moveLockPlayerYDelta = state.player.deltaY;
+                    u64 startStepTriggers = svcGetSystemTick();
+                    handleStepTriggers();
+                    u64 endStepTriggers = svcGetSystemTick();
+                    float stepTriggerTime = (endStepTriggers - startStepTriggers) / (CPU_TICKS_PER_MSEC);
+                    snapshot.stepTriggerMs += stepTriggerTime;
 
-                    run_camera();
-                    handle_bg_flash();
-                    handle_respawn_effect();
+                    runCamera();
+                    handleBgFlash();
+                    handleRespawnEffect();
 
-                    u64 end_physics = svcGetSystemTick();
-                    float physics_time = (end_physics - start_physics) / (CPU_TICKS_PER_MSEC);
-                    snapshot.physics_ms += physics_time;
+                    u64 endPhysics = svcGetSystemTick();
+                    float physicsTime = (endPhysics - startPhysics) / (CPU_TICKS_PER_MSEC);
+                    snapshot.physicsMs += physicsTime;
 
                     accumulator -= STEPS_DT;
                     steps++;
-                    level_frame++;
+                    levelFrame++;
                 }
             }
         }
 
         // Death stops the lock triggers
         if (state.dead) {
-            move_lock_player_x_delta = 0; 
-            move_lock_player_y_delta = 0;
+            moveLockPlayerXDelta = 0; 
+            moveLockPlayerYDelta = 0;
         }
 
-        if (!game_paused) {
-            frame_counter++;
-            frame_timer += delta;
-            trigger_dt = delta;
+        if (!gamePaused) {
+            frameCounter++;
+            frameTimer += delta;
+            triggerDt = delta;
 
-            if (state.dead && state.death_timer <= 0.f) {
-                state.death_timer = (settingsState.quickRetry ? 0.5f : 1.f);
-                bool had_new_best = false;
+            if (state.dead && state.deathTimer <= 0.f) {
+                state.deathTimer = (settingsState.quickRetry ? 0.5f : 1.f);
+                bool hadNewBest = false;
                 if (!cheated) {
-                    LevelData *level_data_sel = &current_level_entry->data;
+                    LevelData *levelDataSel = &currentLevelEntry->data;
                     // Save new best
-                    int progress = (int)state.level_progress;
-                    if (state.practice_mode) {
-                        if (state.current_data.max_practice < progress) {
-                            state.current_data.max_practice = progress;
-                            level_data_sel->practice_progress = progress;
+                    int progress = (int)state.levelProgress;
+                    if (state.practiceMode) {
+                        if (state.currentData.maxPractice < progress) {
+                            state.currentData.maxPractice = progress;
+                            levelDataSel->practiceProgress = progress;
                         }
                     } else {
-                        if (state.current_data.max_normal < progress) {
-                            init_new_best_popup(progress);
-                            had_new_best = true;
-                            state.current_data.max_normal = progress;
-                            level_data_sel->normal_progress = progress;
+                        if (state.currentData.maxNormal < progress) {
+                            initNewBestPopup(progress);
+                            hadNewBest = true;
+                            state.currentData.maxNormal = progress;
+                            levelDataSel->normalProgress = progress;
                         }
                     }
                 }
 
                 // New best makes the respawn timer a bit longer
-                if (had_new_best) state.death_timer = 1.4f;
+                if (hadNewBest) state.deathTimer = 1.4f;
 
-                handle_death((state.current_player == 1) ? &state.player2 : &state.player, true);
-                run_on_death_triggers();
+                handleDeath((state.currentPlayer == 1) ? &state.player2 : &state.player, true);
+                runOnDeathTriggers();
             }
 
-            if (state.death_timer > 0.f) {
-                state.death_timer -= delta;
+            if (state.deathTimer > 0.f) {
+                state.deathTimer -= delta;
 
-                fade_to_amplitude(0);
+                fadeToAmplitude(0);
 
                 if (state.player.gamemode == GAMEMODE_WAVE) {
-                    if (wave_trail_p1.opacity > 0) wave_trail_p1.opacity -= 0.02f * 4;
+                    if (waveTrailP1.opacity > 0) waveTrailP1.opacity -= 0.02f * 4;
             
-                    if (wave_trail_p1.opacity <= 0) {
-                        wave_trail_p1.opacity = 0;
-                        wave_trail_p1.nuPoints = 0;
+                    if (waveTrailP1.opacity <= 0) {
+                        waveTrailP1.opacity = 0;
+                        waveTrailP1.nuPoints = 0;
                     }
                 }
 
                 if (state.player2.gamemode == GAMEMODE_WAVE) {
-                    if (wave_trail_p2.opacity > 0) wave_trail_p2.opacity -= 0.02f * 4;
+                    if (waveTrailP2.opacity > 0) waveTrailP2.opacity -= 0.02f * 4;
 
-                    if (wave_trail_p2.opacity <= 0) {
-                        wave_trail_p2.opacity = 0;
-                        wave_trail_p2.nuPoints = 0;
+                    if (waveTrailP2.opacity <= 0) {
+                        waveTrailP2.opacity = 0;
+                        waveTrailP2.nuPoints = 0;
                     }
                 }
                 
-                handle_mirror_transition();
+                handleMirrorTransition();
 
-                if (state.death_timer <= 0.f) {
-                    init_variables();
-                    reload_level(); 
+                if (state.deathTimer <= 0.f) {
+                    initVariables();
+                    reloadLevel(); 
                     //resets UI coins on gameplay screen
-                    reset_coins();
+                    resetCoins();
 
-                    if (state.practice_mode) {
-                        if (settingsState.autoCheckpoints && player_gamemode_is_flying(&state.death_player) && pseudo_checkpoint_exists) {
-                            delete_last_checkpoint();
-                            pseudo_checkpoint_exists = false;
+                    if (state.practiceMode) {
+                        if (settingsState.autoCheckpoints && playerGamemodeIsFlying(&state.deathPlayer) && pseudoCheckpointExists) {
+                            deleteLastCheckpoint();
+                            pseudoCheckpointExists = false;
                         }
 
-                        if (get_checkpoint_count() > 0) {
-                            restore_checkpoint();
+                        if (getCheckpointCount() > 0) {
+                            restoreCheckpoint();
                         } else if (settingsState.practiceMusicSync) {
-                            seek_mp3(level_info.song_offset);
+                            seekMP3(levelInfo.songOffset);
                         }
                     }
 
-                    if (song_loaded) unpause_playback_mp3();
-                    sync_precise_input(false);
-                    fixed_dt = true;
+                    if (songLoaded) unpausePlaybackMP3();
+                    syncPreciseInput(false);
+                    fixedDt = true;
                     state.dead = false;
-                    state.hitbox_display = 0;
+                    state.hitboxDisplay = 0;
                     continue;
                 }
             }
 
-            handle_practice_mode();
-            handle_shake(delta);
+            handlePracticeMode();
+            handleShake(delta);
 
             if (state.mirroring) {
-                state.mirror_timer += delta;
-                if (state.mirror_timer > MIRROR_DURATION) {
+                state.mirrorTimer += delta;
+                if (state.mirrorTimer > MIRROR_DURATION) {
                     state.mirroring = false;
-                    state.mirror_factor = state.intended_mirror_factor;
-                    state.mirror_speed_factor = 1 - 2*state.mirror_factor;
+                    state.mirrorFactor = state.intendedMirrorFactor;
+                    state.mirrorSpeedFactor = 1 - 2*state.mirrorFactor;
 
                     // When mirror transition ends, put a wave trail point
                     if (state.player.gamemode == GAMEMODE_WAVE) {
-                        wave_trail_p1.positionR = (Vec2D){ state.player.x, state.player.y };
-                        MotionTrail_ResumeStroke(&wave_trail_p1);
-                        MotionTrail_AddWavePoint(&wave_trail_p1);
+                        waveTrailP1.positionR = (Vec2D){ state.player.x, state.player.y };
+                        motionTrailResumeStroke(&waveTrailP1);
+                        motionTrailAddWavePoint(&waveTrailP1);
                     }
                     if (state.dual && state.player2.gamemode == GAMEMODE_WAVE) {
-                        wave_trail_p2.positionR = (Vec2D){ state.player2.x, state.player2.y };
+                        waveTrailP2.positionR = (Vec2D){ state.player2.x, state.player2.y };
                         
-                        MotionTrail_ResumeStroke(&wave_trail_p2);
-                        MotionTrail_AddWavePoint(&wave_trail_p2);
+                        motionTrailResumeStroke(&waveTrailP2);
+                        motionTrailAddWavePoint(&waveTrailP2);
                     }
                 }
             }
 
-            u64 start_trig = svcGetSystemTick();
-            if (state.death_timer > 0.f) handle_step_triggers();
-            handle_col_triggers();
-            handle_copy_channels();
-            handle_alpha_triggers();
-            handle_pulse_triggers();
-            calculate_lbg();
-            flush_group_combination_visual_moves();
-            u64 end_trig = svcGetSystemTick();
-            u64 ticks_trig = end_trig - start_trig;
-            snapshot.triggers_ms = ticks_trig / CPU_TICKS_PER_MSEC;
+            u64 startTrig = svcGetSystemTick();
+            if (state.deathTimer > 0.f) handleStepTriggers();
+            handleColTriggers();
+            handleCopyChannels();
+            handleAlphaTriggers();
+            handlePulseTriggers();
+            calculateLbg();
+            flushGroupCombinationVisualMoves();
+            u64 endTrig = svcGetSystemTick();
+            u64 ticksTrig = endTrig - startTrig;
+            snapshot.triggersMs = ticksTrig / CPU_TICKS_PER_MSEC;
 
-            u64 start_obj = svcGetSystemTick();
-            create_objects();
-            u64 end_obj = svcGetSystemTick();
-            u64 ticks_obj = end_obj - start_obj;
-            snapshot.rendering_ms = ticks_obj / CPU_TICKS_PER_MSEC;
+            u64 startObj = svcGetSystemTick();
+            createObjects();
+            u64 endObj = svcGetSystemTick();
+            u64 ticksObj = endObj - startObj;
+            snapshot.renderingMs = ticksObj / CPU_TICKS_PER_MSEC;
 
-            u64 start_part = svcGetSystemTick();
-            update_player_effects(delta);
-            update_rays(delta);
+            u64 startPart = svcGetSystemTick();
+            updatePlayerEffects(delta);
+            updateRays(delta);
 
             // End wall particles
-            if (level_info.wall_y > 0) {
-                updateParticleSystem(&end_wall_particles, delta);
-                updateParticleSystem(&end_wall_firework, delta);
-                updateParticleSystem(&level_complete_effect_p1, delta);
-                updateParticleSystem(&level_complete_effect_p2, delta);
+            if (levelInfo.wallY > 0) {
+                updateParticleSystem(&endWallParticles, delta);
+                updateParticleSystem(&endWallFirework, delta);
+                updateParticleSystem(&levelCompleteEffectP1, delta);
+                updateParticleSystem(&levelCompleteEffectP2, delta);
 
-                handle_level_complete_popup(delta);
+                handleLevelCompletePopup(delta);
             }
 
-            handle_new_best_popup(delta);
+            handleNewBestPopup(delta);
 
-            update_collect_effect(delta);
-            update_collectable_effect(delta);
+            updateCollectEffect(delta);
+            updateCollectableEffect(delta);
 
             float calc_x_speed_particles = SCREEN_WIDTH_AREA;
-            float calc_y_speed_particles = (SCREEN_HEIGHT_AREA / 2);
+            float calcYSpeedParticles = (SCREEN_HEIGHT_AREA / 2);
 
-            slow_speed_particles.emitterX = calc_x_speed_particles;
-            slow_speed_particles.emitterY = calc_y_speed_particles;
-            slow_speed_particles.emitting = slow_speed_particles_timer > 0;
-            if (slow_speed_particles_timer > 0) {
-                slow_speed_particles_timer -= delta;
+            slowSpeedParticles.emitterX = calc_x_speed_particles;
+            slowSpeedParticles.emitterY = calcYSpeedParticles;
+            slowSpeedParticles.emitting = slowSpeedParticlesTimer > 0;
+            if (slowSpeedParticlesTimer > 0) {
+                slowSpeedParticlesTimer -= delta;
             }
 
-            normal_speed_particles.emitterX = calc_x_speed_particles;
-            normal_speed_particles.emitterY = calc_y_speed_particles;
-            normal_speed_particles.emitting = normal_speed_particles_timer > 0;
-            if (normal_speed_particles_timer > 0) {
-                normal_speed_particles_timer -= delta;
+            normalSpeedParticles.emitterX = calc_x_speed_particles;
+            normalSpeedParticles.emitterY = calcYSpeedParticles;
+            normalSpeedParticles.emitting = normalSpeedParticlesTimer > 0;
+            if (normalSpeedParticlesTimer > 0) {
+                normalSpeedParticlesTimer -= delta;
             }
 
-            fast_speed_particles.emitterX = calc_x_speed_particles;
-            fast_speed_particles.emitterY = calc_y_speed_particles;
-            fast_speed_particles.emitting = fast_speed_particles_timer > 0;
-            if (fast_speed_particles_timer > 0) {
-                fast_speed_particles_timer -= delta;
+            fastSpeedParticles.emitterX = calc_x_speed_particles;
+            fastSpeedParticles.emitterY = calcYSpeedParticles;
+            fastSpeedParticles.emitting = fastSpeedParticlesTimer > 0;
+            if (fastSpeedParticlesTimer > 0) {
+                fastSpeedParticlesTimer -= delta;
             }
 
-            faster_speed_particles.emitterX = calc_x_speed_particles;
-            faster_speed_particles.emitterY = calc_y_speed_particles;
-            faster_speed_particles.emitting = faster_speed_particles_timer > 0;
-            if (faster_speed_particles_timer > 0) {
-                faster_speed_particles_timer -= delta;
+            fasterSpeedParticles.emitterX = calc_x_speed_particles;
+            fasterSpeedParticles.emitterY = calcYSpeedParticles;
+            fasterSpeedParticles.emitting = fasterSpeedParticlesTimer > 0;
+            if (fasterSpeedParticlesTimer > 0) {
+                fasterSpeedParticlesTimer -= delta;
             }
 
-            fastest_speed_particles.emitterX = calc_x_speed_particles;
-            fastest_speed_particles.emitterY = calc_y_speed_particles;
-            fastest_speed_particles.emitting = fastest_speed_particles_timer > 0;
-            if (fastest_speed_particles_timer > 0) {
-                fastest_speed_particles_timer -= delta;
+            fastestSpeedParticles.emitterX = calc_x_speed_particles;
+            fastestSpeedParticles.emitterY = calcYSpeedParticles;
+            fastestSpeedParticles.emitting = fastestSpeedParticlesTimer > 0;
+            if (fastestSpeedParticlesTimer > 0) {
+                fastestSpeedParticlesTimer -= delta;
             }
             
-            end_wall_particles.emitterX = level_info.wall_x - 15;
-            end_wall_particles.emitterY = level_info.wall_y;
-            end_wall_particles.emitting = level_info.wall_y > 0;
+            endWallParticles.emitterX = levelInfo.wallX - 15;
+            endWallParticles.emitterY = levelInfo.wallY;
+            endWallParticles.emitting = levelInfo.wallY > 0;
 
-            update_use_effects(delta, get_use_effect_array_ptr(GFX_TOP));
-            update_use_effects(delta, get_use_effect_array_ptr(GFX_TOP_BUT_ABOVE_LEVEL));
-            update_object_particles(delta);
-            u64 end_part = svcGetSystemTick();
-            u64 ticks_part = end_part - start_part;
-            snapshot.particles_ms = ticks_part / CPU_TICKS_PER_MSEC;
+            updateUseEffects(delta, getUseEffectArrayPtr(GFX_TOP));
+            updateUseEffects(delta, getUseEffectArrayPtr(GFX_TOP_BUT_ABOVE_LEVEL));
+            updateObjectParticles(delta);
+            u64 endPart = svcGetSystemTick();
+            u64 ticksPart = endPart - startPart;
+            snapshot.particlesMs = ticksPart / CPU_TICKS_PER_MSEC;
 
             // Update trails
-            MotionTrail_Update(&trail_p1, delta);
-            MotionTrail_UpdateWaveTrail(&wave_trail_p1, delta);
-            update_p1_trail(&state.player, 0);
+            motionTrailUpdate(&trailP1, delta);
+            motionTrailUpdateWaveTrail(&waveTrailP1, delta);
+            updateP1Trail(&state.player, 0);
 
-            MotionTrail_Update(&trail_p2, delta);
-            MotionTrail_UpdateWaveTrail(&wave_trail_p2, delta);
-            update_p1_trail(&state.player2, 1);
+            motionTrailUpdate(&trailP2, delta);
+            motionTrailUpdateWaveTrail(&waveTrailP2, delta);
+            updateP1Trail(&state.player2, 1);
             
             // If not dual, fade the p2 wave trial
             if (!state.dual) {
-                if (wave_trail_p2.opacity > 0) wave_trail_p2.opacity -= (0.02f * STEPS_HZ) * delta;
+                if (waveTrailP2.opacity > 0) waveTrailP2.opacity -= (0.02f * STEPS_HZ) * delta;
                 
-                if (wave_trail_p2.opacity <= 0) {
-                    wave_trail_p2.opacity = 0;
-                    wave_trail_p2.nuPoints = 0;
+                if (waveTrailP2.opacity <= 0) {
+                    waveTrailP2.opacity = 0;
+                    waveTrailP2.nuPoints = 0;
                 }
             }
 
@@ -1479,47 +1479,47 @@ void game_loop() {
             kHeldPaused = touch.held;
         }
 
-        ui_stack_update(&touch);
+        uiStackUpdate(&touch);
 
-        if (stereo_supported() && settingsState.stereoEnabled && !_3dWarningPassed && get_stereo_slider() > 0.f && strcmp("3d_warning_pop_up", ui_stack_get_current_screen_name()) != 0 && ui_stack_get_fade_status() == FADE_STATUS_NONE) {
-            if (!game_paused) pause_game();
-            if (!game_paused) return; 
-            TwoOptionPopupData *_3d_warning_data = (TwoOptionPopupData *)malloc(sizeof(TwoOptionPopupData));
-            if (!_3d_warning_data) return;
+        if (stereoSupported() && settingsState.stereoEnabled && !threeDWarningPassed && getStereoSlider() > 0.f && strcmp("3d_warning_pop_up", uiStackGetCurrentScreenName()) != 0 && uiStackGetFadeStatus() == FADE_STATUS_NONE) {
+            if (!gamePaused) pauseGame();
+            if (!gamePaused) return; 
+            TwoOptionPopupData *threeDWarningData = (TwoOptionPopupData *)malloc(sizeof(TwoOptionPopupData));
+            if (!threeDWarningData) return;
 
-            _3d_warning_data->text = strdup("3D can significantly lower performance.\nAre you sure you want to keep it on?");
-            _3d_warning_data->title = strdup("Disclaimer");
-            _3d_warning_data->proceed_text = strdup("Enable");
-            _3d_warning_data->cancel_text = strdup("Disable");
-            ui_stack_push(&_3d_warning_pop_up_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
-            ui_stack_push_data(_3d_warning_data);
-            _3dWarningPassed = true;
+            threeDWarningData->text = strdup("3D can significantly lower performance.\nAre you sure you want to keep it on?");
+            threeDWarningData->title = strdup("Disclaimer");
+            threeDWarningData->proceedText = strdup("Enable");
+            threeDWarningData->cancelText = strdup("Disable");
+            uiStackPush(&threeDWarningPopUpDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+            uiStackPushData(threeDWarningData);
+            threeDWarningPassed = true;
         }
 
         // If the wide or 3D settings have been changed, reinitialize screens
-        if (settingsState.wideEnabled != old_wide || settingsState.stereoEnabled != old_stereo) {
+        if (settingsState.wideEnabled != oldWide || settingsState.stereoEnabled != oldStereo) {
             gspWaitForVBlank();
-            apply_screen_modes();
+            applyScreenModes();
             gspWaitForVBlank();
-            reinitialize_screens();
-            old_wide = settingsState.wideEnabled;
-            old_stereo = settingsState.stereoEnabled;
+            reinitializeScreens();
+            oldWide = settingsState.wideEnabled;
+            oldStereo = settingsState.stereoEnabled;
         }
 
         // Frees a render target, so keep it out of the frame below
-        update_stereo_target();
+        updateStereoTarget();
 
         // Handle level being completed
-        if (level_info.completing) {
-            int status = handle_wall_cutscene(delta, &touch);
+        if (levelInfo.completing) {
+            int status = handleWallCutscene(delta, &touch);
             // Exiting
             if (status == 1) {
-                exiting_level = true;
-                ui_stack_push_game_state(STATE_MENU);
+                exitingLevel = true;
+                uiStackPushGameState(STATE_MENU);
                 // Restarting level
             } else if (status == 2) {
-                level_info.completing = false;
-                level_complete_destroy();
+                levelInfo.completing = false;
+                levelCompleteDestroy();
                 continue;
             }
         }
@@ -1528,156 +1528,156 @@ void game_loop() {
         u64 ticks = end - start;
 
         // Render the scene
-        update_bottom_particles(delta);
-        update_touch_effect(delta);
+        updateBottomParticles(delta);
+        updateTouchEffect(delta);
 
-        bool swap_screens = settingsState.swapGameplayScreens && !in_level_complete;
-        C3D_RenderTarget *play_screen = swap_screens ? bot : top;
-        C3D_RenderTarget *side_screen = swap_screens ? top : bot;
-        UIScreen *swap_gameplay_screen = swap_screens ? ui_stack_get_screen("gameplay", SCREEN_BTM) : NULL;
-        UIScreen *swap_gameplay_top = swap_screens ? ui_stack_get_screen("gameplay", SCREEN_TOP) : NULL;
-        int world_width = swap_screens ? SCREEN_BOT_WIDTH : SCREEN_WIDTH;
+        bool swapScreens = settingsState.swapGameplayScreens && !inLevelComplete;
+        C3D_RenderTarget *playScreen = swapScreens ? bot : top;
+        C3D_RenderTarget *sideScreen = swapScreens ? top : bot;
+        UIScreen *swap_gameplay_screen = swapScreens ? uiStackGetScreen("gameplay", SCREEN_BTM) : NULL;
+        UIScreen *swap_gameplay_top = swapScreens ? uiStackGetScreen("gameplay", SCREEN_TOP) : NULL;
+        int world_width = swapScreens ? SCREEN_BOT_WIDTH : SCREEN_WIDTH;
 
         if(C3D_FrameBegin(settingsState.vsync ? C3D_FRAME_SYNCDRAW : C3D_FRAME_NONBLOCK)){
-            icon_cache_begin_frame();
+            iconCacheBeginFrame();
             C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ZERO);
 
             // Top screen, drawn once per eye when 3D is on
-            for (int eye = 0; begin_top_eye_target(eye, play_screen); eye++) {
-                begin_eye_layer(DEPTH_BACKGROUND);
-                draw_background(state.background_x / 8, -(state.camera_y / 8) + 200);
-                end_eye_layer();
+            for (int eye = 0; beginTopEyeTarget(eye, playScreen); eye++) {
+                beginEyeLayer(DEPTH_BACKGROUND);
+                drawBackground(state.backgroundX / 8, -(state.cameraY / 8) + 200);
+                endEyeLayer();
 
                 C2D_ViewScale(SCALE, SCALE);
                 C2D_ViewTranslate(0, CAM_Y_MTX_OFFSET);
 
                 // The level rides in front of the screen, the background stays way back
-                begin_eye_layer(DEPTH_LEVEL);
+                beginEyeLayer(DEPTH_LEVEL);
 
-                draw_objects();
+                drawObjects();
 
-                draw_end_wall(delta);
+                drawEndWall(delta);
 
-                draw_attempt_text();
+                drawAttemptText();
 
-                draw_ground(state.ground_x, state.camera_y, 0, false, world_width);
+                drawGround(state.groundX, state.cameraY, 0, false, world_width);
 
-                if (state.ground_y_gfx > 2) {
-                    if (state.camera_y - LEVEL_Y_OFFSET + state.ground_y_gfx > 0) draw_ground(state.ground_x, state.camera_y, state.camera_y + state.ground_y_gfx - LEVEL_Y_OFFSET, false, world_width);
-                    draw_ground(state.ground_x, state.camera_y, state.camera_y - LEVEL_Y_OFFSET + SCREEN_HEIGHT_AREA - state.ground_y_gfx, true, world_width);
+                if (state.groundYGfx > 2) {
+                    if (state.cameraY - LEVEL_Y_OFFSET + state.groundYGfx > 0) drawGround(state.groundX, state.cameraY, state.cameraY + state.groundYGfx - LEVEL_Y_OFFSET, false, world_width);
+                    drawGround(state.groundX, state.cameraY, state.cameraY - LEVEL_Y_OFFSET + SCREEN_HEIGHT_AREA - state.groundYGfx, true, world_width);
                 }
 
-                change_blending(true);
-                draw_gravity_sweeps();
+                changeBlending(true);
+                drawGravitySweeps();
 
-                draw_use_effects(get_use_effect_array_ptr(GFX_TOP_BUT_ABOVE_LEVEL));
+                drawUseEffects(getUseEffectArrayPtr(GFX_TOP_BUT_ABOVE_LEVEL));
 
-                if (level_info.wall_y > 0) {
-                    drawParticleSystem(&end_wall_firework, 0, 0, 1);
-                    drawParticleSystem(&level_complete_effect_p1, 0, 0, 1);
-                    drawParticleSystem(&level_complete_effect_p2, 0, 0, 1);
+                if (levelInfo.wallY > 0) {
+                    drawParticleSystem(&endWallFirework, 0, 0, 1);
+                    drawParticleSystem(&levelCompleteEffectP1, 0, 0, 1);
+                    drawParticleSystem(&levelCompleteEffectP2, 0, 0, 1);
                 }
 
-                end_eye_layer();
+                endEyeLayer();
 
-                change_blending(false);
+                changeBlending(false);
 
-                if (swap_screens) C2D_ViewTranslate(-SWAP_CENTER_SHIFT, 0);
+                if (swapScreens) C2D_ViewTranslate(-SWAP_CENTER_SHIFT, 0);
 
-                if (level_info.wall_y > 0) {
-                    begin_eye_layer(DEPTH_POPUP);
-                    draw_level_complete_popup();
-                    end_eye_layer();
+                if (levelInfo.wallY > 0) {
+                    beginEyeLayer(DEPTH_POPUP);
+                    drawLevelCompletePopup();
+                    endEyeLayer();
                 }
 
-                begin_eye_layer(DEPTH_POPUP);
-                draw_new_best_popup();
-                end_eye_layer();
+                beginEyeLayer(DEPTH_POPUP);
+                drawNewBestPopup();
+                endEyeLayer();
 
-                if (swap_screens) C2D_ViewTranslate(SWAP_CENTER_SHIFT, 0);
+                if (swapScreens) C2D_ViewTranslate(SWAP_CENTER_SHIFT, 0);
 
                 C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
                 C2D_ViewScale(1/SCALE, 1/SCALE);
 
-                begin_eye_layer(DEPTH_POPUP);
+                beginEyeLayer(DEPTH_POPUP);
                 //gameplay_screen_top_loop();
-                if (swap_screens) {
-                    swap_draw_hud(swap_gameplay_top);
+                if (swapScreens) {
+                    swapDrawHud(swap_gameplay_top);
 
-                    if (game_paused) {
-                        ui_stack_draw(SCREEN_BTM);
+                    if (gamePaused) {
+                        uiStackDraw(SCREEN_BTM);
                     } else if (swap_gameplay_screen) {
-                        ui_run_func_on_tag(swap_gameplay_screen, "pause_btn", swap_draw_identity);
-                        ui_run_func_on_tag(swap_gameplay_screen, "practice_buttons", swap_draw_identity);
+                        uiRunFuncOnTag(swap_gameplay_screen, "pause_btn", swapDrawIdentity);
+                        uiRunFuncOnTag(swap_gameplay_screen, "practice_buttons", swapDrawIdentity);
                     }
 
-                    change_blending(true);
-                    draw_touch_effect();
-                    change_blending(false);
+                    changeBlending(true);
+                    drawTouchEffect();
+                    changeBlending(false);
                 } else {
-                    ui_stack_draw(SCREEN_TOP);
+                    uiStackDraw(SCREEN_TOP);
                 }
-                draw_level_complete_top();
-                draw_stack_fade();
+                drawLevelCompleteTop();
+                drawStackFade();
                 //draw_stack_debug();
-                end_eye_layer();
+                endEyeLayer();
             }
 
             // Bottom screen
-            for (int eye = 0; begin_top_eye_target(eye, side_screen); eye++) {
-                float dim = dim_secondary_screen;
-                float side_width = swap_screens ? SCREEN_WIDTH : SCREEN_BOT_WIDTH;
+            for (int eye = 0; beginTopEyeTarget(eye, sideScreen); eye++) {
+                float dim = dimSecondaryScreen;
+                float side_width = swapScreens ? SCREEN_WIDTH : SCREEN_BOT_WIDTH;
 
                 if (dim < 1.f) {
-                    draw_background((state.background_x / 8) + 40, 200);
+                    drawBackground((state.backgroundX / 8) + 40, 200);
 
                     C2D_ViewScale(SCALE, SCALE);
                     C2D_ViewTranslate(0, CAM_Y_MTX_OFFSET);
 
-                    change_blending(true);
-                    draw_bottom_particles();
-                    change_blending(false);
+                    changeBlending(true);
+                    drawBottomParticles();
+                    changeBlending(false);
 
-                    draw_ground(state.ground_x + 52.5f, 0.f, -71.f, false, side_width);
-                    draw_ground(state.ground_x + 52.5f, 0.f, 210.f, true, side_width);
+                    drawGround(state.groundX + 52.5f, 0.f, -71.f, false, side_width);
+                    drawGround(state.groundX + 52.5f, 0.f, 210.f, true, side_width);
 
                     C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
                     C2D_ViewScale(1/SCALE, 1/SCALE);
                 }
 
                 if (dim > 0.f) {
-                    change_blending(false);
+                    changeBlending(false);
 
                     if (dim < 1.f) C2D_DrawRectSolid(0.f, 0.f, 0.f, side_width, SCREEN_HEIGHT, C2D_Color32(0, 0, 0, (int)(dim * 255.f)));
                 }
 
                 //gameplay_screen_bot_loop();
-                if (swap_screens) {
-                    if (game_paused) {
-                        swap_draw_pause_window(swap_gameplay_top);
+                if (swapScreens) {
+                    if (gamePaused) {
+                        swapDrawPauseWindow(swap_gameplay_top);
                     } else {
-                        SwapElement pause_btn = swap_hide_tag(swap_gameplay_screen, "pause_btn");
-                        SwapElement add_check = swap_hide_tag(swap_gameplay_screen, "add_checkpoint");
-                        SwapElement remove_check = swap_hide_tag(swap_gameplay_screen, "remove_checkpoint");
+                        SwapElement pauseBtn = swapHideTag(swap_gameplay_screen, "pause_btn");
+                        SwapElement addCheck = swapHideTag(swap_gameplay_screen, "add_checkpoint");
+                        SwapElement removeCheck = swapHideTag(swap_gameplay_screen, "remove_checkpoint");
 
                         C2D_ViewTranslate(SWAP_SIDE_OFFSET_X, 0);
-                        ui_stack_draw(SCREEN_BTM);
+                        uiStackDraw(SCREEN_BTM);
                         C2D_ViewTranslate(-SWAP_SIDE_OFFSET_X, 0);
 
-                        swap_restore_element(remove_check);
-                        swap_restore_element(add_check);
-                        swap_restore_element(pause_btn);
+                        swapRestoreElement(removeCheck);
+                        swapRestoreElement(addCheck);
+                        swapRestoreElement(pauseBtn);
                     }
                 } else {
-                    ui_stack_draw(SCREEN_BTM);
+                    uiStackDraw(SCREEN_BTM);
                 }
 
-                draw_level_complete();
+                drawLevelComplete();
 
-                if (!swap_screens) {
-                    change_blending(true);
-                    draw_touch_effect();
-                    change_blending(false);
+                if (!swapScreens) {
+                    changeBlending(true);
+                    drawTouchEffect();
+                    changeBlending(false);
                 }
 
                 if (state.profiling && eye == EYE_LEFT) {
@@ -1689,32 +1689,32 @@ void game_loop() {
                         .processingTime = processingTime
                     };
 
-                    profiler_update(data);
-                    if (swap_screens) C2D_ViewTranslate(SWAP_SIDE_OFFSET_X, 0);
-                    profiler_draw();
-                    if (swap_screens) C2D_ViewTranslate(-SWAP_SIDE_OFFSET_X, 0);
+                    profilerUpdate(data);
+                    if (swapScreens) C2D_ViewTranslate(SWAP_SIDE_OFFSET_X, 0);
+                    profilerDraw();
+                    if (swapScreens) C2D_ViewTranslate(-SWAP_SIDE_OFFSET_X, 0);
                 }
 
-                draw_stack_fade();
+                drawStackFade();
             }
 
             if (state.noclip) {
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 234, 0.5f, 0.5f, 0, true, "Noclip Activated");
+                drawText(&bigFontFontCharset, &bigFontSheet, 0, 234, 0.5f, 0.5f, 0, true, "Noclip Activated");
             }
             C2D_ViewReset();
 
             C3D_FrameEnd(0);
         }
 
-        if (being_faded && level_start_delay <= 0.f) {
-            if (song_loaded) unpause_playback_mp3();
-            being_faded = false;
+        if (beingFaded && levelStartDelay <= 0.f) {
+            if (songLoaded) unpausePlaybackMP3();
+            beingFaded = false;
         }
 
-        if (escape_state) {
-            escape_state = false;
-            game_paused = false;
-            in_level_complete = false;
+        if (escapeState) {
+            escapeState = false;
+            gamePaused = false;
+            inLevelComplete = false;
             break;
         }
     }
@@ -1723,44 +1723,44 @@ void game_loop() {
     
     aptUnhook(&cookie);
 
-    LevelData *level_data_sel = &current_level_entry->data;
+    LevelData *levelDataSel = &currentLevelEntry->data;
 
-    level_data_sel->attempts += state.current_data.attempts;
-    level_data_sel->jumps += state.current_data.jumps;
-    level_data_sel->normal_progress = state.current_data.max_normal;
-    level_data_sel->practice_progress = state.current_data.max_practice;
+    levelDataSel->attempts += state.currentData.attempts;
+    levelDataSel->jumps += state.currentData.jumps;
+    levelDataSel->normalProgress = state.currentData.maxNormal;
+    levelDataSel->practiceProgress = state.currentData.maxPractice;
 
-    total_attempts += state.current_data.attempts;
-    total_jumps += state.current_data.jumps;
+    totalAttempts += state.currentData.attempts;
+    totalJumps += state.currentData.jumps;
 
-    if (state.online_level) {
-        save_current_save_file(LEVEL_LIST_ONLINE);
-    } else if (state.custom_level) {
-        save_current_save_file(LEVEL_LIST_EXTERNAL);
+    if (state.onlineLevel) {
+        saveCurrentSaveFile(LEVEL_LIST_ONLINE);
+    } else if (state.customLevel) {
+        saveCurrentSaveFile(LEVEL_LIST_EXTERNAL);
     } else {
-        save_current_save_file(LEVEL_LIST_MAIN_LEVELS);
+        saveCurrentSaveFile(LEVEL_LIST_MAIN_LEVELS);
     }
 
-    cfg_save();
+    cfgSave();
 
-    free_particles();
+    freeParticles();
 
-    unload_level();
+    unloadLevel();
 
-    clear_practice_mode();
+    clearPracticeMode();
 
-    clear_respawn_effect();
+    clearRespawnEffect();
 
-    level_complete_destroy();
+    levelCompleteDestroy();
 
-    if (song_loaded) unpause_playback_mp3();
+    if (songLoaded) unpausePlaybackMP3();
 
-    if (state.online_level) {
-        state.online_level = false;
+    if (state.onlineLevel) {
+        state.onlineLevel = false;
     }
 }
 
-void game_assets_init() {
+void gameAssetsInit() {
     // Load graphics
     spriteSheet = C2D_SpriteSheetLoad("romfs:/gfx/sprites.t3x");
     if (!spriteSheet) svcBreak(USERBREAK_PANIC);
@@ -1783,7 +1783,7 @@ void game_assets_init() {
     glowSheet = C2D_SpriteSheetLoad("romfs:/gfx/glow.t3x");
     if (!glowSheet) svcBreak(USERBREAK_PANIC);
     
-    icon_cache_init();
+    iconCacheInit();
 
     trailSheet = C2D_SpriteSheetLoad("romfs:/gfx/trails.t3x");
     if (!trailSheet) svcBreak(USERBREAK_PANIC);
@@ -1794,45 +1794,45 @@ void game_assets_init() {
     gravLineSheet = C2D_SpriteSheetLoad("romfs:/gfx/effects.t3x");
     if (!gravLineSheet) svcBreak(USERBREAK_PANIC);
 
-    initParticleSystem(&touch_drag_particles, &touch_drag_effect);
-    touch_drag_particles.relativeStationary = true;
+    initParticleSystem(&touchDragParticles, &touchDragEffect);
+    touchDragParticles.relativeStationary = true;
 
-    initParticleSystem(&touch_explosion_particles, &touch_explosion_effect);
-    touch_explosion_particles.relativeStationary = true;
+    initParticleSystem(&touchExplosionParticles, &touchExplosionEffect);
+    touchExplosionParticles.relativeStationary = true;
 
-    initParticleSystem(&glitter_particles_bottom, &glitter_effect);
-    glitter_particles_bottom.cfg.startColorAlpha = 1.f;
-    glitter_particles_bottom.dontApplyCamY = true;
+    initParticleSystem(&glitterParticlesBottom, &glitterEffect);
+    glitterParticlesBottom.cfg.startColorAlpha = 1.f;
+    glitterParticlesBottom.dontApplyCamY = true;
 
-    initParticleSystem(&slow_speed_particles_bottom, &speed_effect_slow);
-    slow_speed_particles_bottom.relativeStationary = true;
+    initParticleSystem(&slowSpeedParticlesBottom, &speedEffectSlow);
+    slowSpeedParticlesBottom.relativeStationary = true;
 
-    initParticleSystem(&normal_speed_particles_bottom, &speed_effect_normal);
-    normal_speed_particles_bottom.relativeStationary = true;
+    initParticleSystem(&normalSpeedParticlesBottom, &speedEffectNormal);
+    normalSpeedParticlesBottom.relativeStationary = true;
 
-    initParticleSystem(&fast_speed_particles_bottom, &speed_effect_fast);
-    fast_speed_particles_bottom.relativeStationary = true;
+    initParticleSystem(&fastSpeedParticlesBottom, &speedEffectFast);
+    fastSpeedParticlesBottom.relativeStationary = true;
 
-    initParticleSystem(&faster_speed_particles_bottom, &speed_effect_vfast);
-    faster_speed_particles_bottom.relativeStationary = true;
+    initParticleSystem(&fasterSpeedParticlesBottom, &speedEffectVfast);
+    fasterSpeedParticlesBottom.relativeStationary = true;
 
-    initParticleSystem(&fastest_speed_particles_bottom, &speed_effect_fastest);
-    fastest_speed_particles_bottom.relativeStationary = true;
+    initParticleSystem(&fastestSpeedParticlesBottom, &speedEffectFastest);
+    fastestSpeedParticlesBottom.relativeStationary = true;
 }
 
-static void init_level_arena() {
+static void initLevelArena() {
     struct mallinfo mi = mallinfo();
     size_t free = envGetHeapSize() - mi.uordblks;
 
-    size_t capacity = (size_t) (is_N3DS ? free * 0.8f : free * 0.68f);
+    size_t capacity = (size_t) (isN3Ds ? free * 0.8f : free * 0.68f);
 
-    bool could = arena_init(&level_arena, capacity);
-    if (!could) output_log("Couldn't allocate level arena\n");
+    bool could = arenaInit(&levelArena, capacity);
+    if (!could) outputLog("Couldn't allocate level arena\n");
 }
 
 int main(int argc, char* argv[]) {
     // Init libs
-    init_trig_table();
+    initTrigTable();
 
     romfsInit();
     gfxInitDefault();
@@ -1840,45 +1840,45 @@ int main(int argc, char* argv[]) {
     C2D_Init(MAX_SPRITES);
     C2D_Prepare();
     osSetSpeedupEnable(1);
-    soc_init();
-    check_rom_type();
+    socInit();
+    checkRomType();
     // output_log("argc: %d\n", argc);
     if (argc > 0) { 
-        _3dsx_path = argv[0];
+        threeDsxPath = argv[0];
         // output_log("3dsx path: %s\n", _3dsx_path);
     }
     
 #ifndef IS_RELEASE
-    is_nightly = true;
+    isNightly = true;
     consoleDebugInit(debugDevice_SVC);
 #endif
 
-    cfg_init();
+    cfgInit();
     cfguInit();
-    check_system_model();
+    checkSystemModel();
 
     // Sort out wide / 3D before making the targets, they need different sizes
-    apply_screen_modes();
-    reinitialize_screens();
+    applyScreenModes();
+    reinitializeScreens();
 
     srand(time(NULL));
-    alt_title_screen = random_float(0, 1) < (1.f / 256);
-    queued_restart = false;
+    altTitleScreen = randomFloat(0, 1) < (1.f / 256);
+    queuedRestart = false;
     
     C2D_SetTintMode(C2D_TintMult);
     
     if(ndspInit()) {
-        no_dsp_firmware();
+        noDspFirmware();
     }
 
-    required_loading_screen_assets_init();
+    requiredLoadingScreenAssetsInit();
 
-    loading_screen_init();
+    loadingScreenInit();
 
     //short fade in to loading screen
     int fade = 255;
     while(aptMainLoop()){
-        loading_screen_update(0, fade);
+        loadingScreenUpdate(0, fade);
 
         fade -= FADE_SPEED * (1 / 60.f);
 
@@ -1887,84 +1887,84 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    ui_assets_init();
-    game_assets_init();
-    loading_screen_update(10, 0);
+    uiAssetsInit();
+    gameAssetsInit();
+    loadingScreenUpdate(10, 0);
 
-    load_save_file(SAVE_ROBTOP_SERVER_FILE, &gd_server_file);
+    loadSaveFile(SAVE_ROBTOP_SERVER_FILE, &gdServerFile);
     
-    loading_screen_update(20, 0);
+    loadingScreenUpdate(20, 0);
 
-    load_save_file(SAVE_1P9_SERVER_FILE, &gdps_file);
+    loadSaveFile(SAVE_1P9_SERVER_FILE, &gdpsFile);
 
-    loading_screen_update(30, 0);
+    loadingScreenUpdate(30, 0);
 
-    load_external_file(SAVE_EXTERNAL_LEVELS_FILE, &external_file);
+    loadExternalFile(SAVE_EXTERNAL_LEVELS_FILE, &externalFile);
 
-    load_gdps_info();
+    loadGdpsInfo();
 
-    migrate_old_data();
+    migrateOldData();
     
-    loading_screen_update(40, 0);
+    loadingScreenUpdate(40, 0);
 
-    calculate_stats();
+    calculateStats();
 
-    cache_all_sprites();
+    cacheAllSprites();
 
-    loading_screen_update(55, 0);
+    loadingScreenUpdate(55, 0);
     
-    init_default_use_effect_pools();
-    update_player_colors();
+    initDefaultUseEffectPools();
+    updatePlayerColors();
 
-    loading_screen_update(75, 0);
+    loadingScreenUpdate(75, 0);
 
-    load_sfx();
+    loadSfx();
 
-    init_level_arena();
+    initLevelArena();
 
-    memset(&level_info, 0, sizeof(LoadedLevelInfo));
+    memset(&levelInfo, 0, sizeof(LoadedLevelInfo));
 
-    loading_screen_update(100, 0);
+    loadingScreenUpdate(100, 0);
 
     // Unload loading screen
-    ui_unload_screen(&default_screen);
-    ui_unload_screen(&default_screen_top);
+    uiUnloadScreen(&defaultScreen);
+    uiUnloadScreen(&defaultScreenTop);
 
     // Set to known value
-    change_blending(false);
+    changeBlending(false);
 
-    ui_stack_set_stack(&menu_stack);
-    ui_stack_push_root_instant(&main_menu_def);
+    uiStackSetStack(&menuStack);
+    uiStackPushRootInstant(&mainMenuDef);
 
     bool exit = false;
     
     while (aptMainLoop() && !exit) {
-        slow_speed_particles_bottom.cfg.startColorRed = 255 / 255.f;
-        slow_speed_particles_bottom.cfg.startColorGreen = 255 / 255.f;
-        slow_speed_particles_bottom.cfg.startColorBlue = 0 / 255.f;
+        slowSpeedParticlesBottom.cfg.startColorRed = 255 / 255.f;
+        slowSpeedParticlesBottom.cfg.startColorGreen = 255 / 255.f;
+        slowSpeedParticlesBottom.cfg.startColorBlue = 0 / 255.f;
 
-        normal_speed_particles_bottom.cfg.startColorRed = 0 / 255.f;
-        normal_speed_particles_bottom.cfg.startColorGreen = 190 / 255.f;
-        normal_speed_particles_bottom.cfg.startColorBlue = 255 / 255.f;
+        normalSpeedParticlesBottom.cfg.startColorRed = 0 / 255.f;
+        normalSpeedParticlesBottom.cfg.startColorGreen = 190 / 255.f;
+        normalSpeedParticlesBottom.cfg.startColorBlue = 255 / 255.f;
 
-        fast_speed_particles_bottom.cfg.startColorRed = 0 / 255.f;
-        fast_speed_particles_bottom.cfg.startColorGreen = 255 / 255.f;
-        fast_speed_particles_bottom.cfg.startColorBlue = 0 / 255.f;
+        fastSpeedParticlesBottom.cfg.startColorRed = 0 / 255.f;
+        fastSpeedParticlesBottom.cfg.startColorGreen = 255 / 255.f;
+        fastSpeedParticlesBottom.cfg.startColorBlue = 0 / 255.f;
 
-        faster_speed_particles_bottom.cfg.startColorRed = 230 / 255.f;
-        faster_speed_particles_bottom.cfg.startColorGreen = 65 / 255.f;
-        faster_speed_particles_bottom.cfg.startColorBlue = 255 / 255.f;
+        fasterSpeedParticlesBottom.cfg.startColorRed = 230 / 255.f;
+        fasterSpeedParticlesBottom.cfg.startColorGreen = 65 / 255.f;
+        fasterSpeedParticlesBottom.cfg.startColorBlue = 255 / 255.f;
 
-        fastest_speed_particles_bottom.cfg.startColorRed = 255 / 255.f;
-        fastest_speed_particles_bottom.cfg.startColorGreen = 65 / 255.f;
-        fastest_speed_particles_bottom.cfg.startColorBlue = 65 / 255.f;
+        fastestSpeedParticlesBottom.cfg.startColorRed = 255 / 255.f;
+        fastestSpeedParticlesBottom.cfg.startColorGreen = 65 / 255.f;
+        fastestSpeedParticlesBottom.cfg.startColorBlue = 65 / 255.f;
 
-        switch (game_state) {
+        switch (gameState) {
             case STATE_MENU:
-                ui_loop();
+                uiLoop();
                 break;
             case STATE_GAME:
-                game_loop();
+                gameLoop();
                 break;
             case STATE_EXIT:
                 exit = true;
@@ -1973,20 +1973,20 @@ int main(int argc, char* argv[]) {
     }
     
     // Wait for the game to save
-    wait_for_saving();
+    waitForSaving();
 
-    ui_stack_set_stack(&menu_stack);
-    ui_stack_clear();
+    uiStackSetStack(&menuStack);
+    uiStackClear();
 
-    stop_mp3();
+    stopMP3();
 
-    close_log_file();
+    closeLogFile();
 
-    free_cached_sprites();
-    icon_cache_shutdown();
+    freeCachedSprites();
+    iconCacheShutdown();
 
-    lightning_bolts.clear();
-    lightning_bolts.shrink_to_fit();
+    lightningBolts.clear();
+    lightningBolts.shrink_to_fit();
 
     // Delete graphics
     C2D_SpriteSheetFree(spriteSheet);
@@ -1999,16 +1999,16 @@ int main(int argc, char* argv[]) {
     C2D_SpriteSheetFree(bgSheet);
     C2D_SpriteSheetFree(trailSheet);
     C2D_SpriteSheetFree(particleSheet);
-    C2D_SpriteSheetFree(ui_sheet);
-    C2D_SpriteSheetFree(ui_2_sheet);
+    C2D_SpriteSheetFree(uiSheet);
+    C2D_SpriteSheetFree(ui2Sheet);
     C2D_SpriteSheetFree(groundSheet);
-    C2D_SpriteSheetFree(bigFont_sheet);
-    C2D_SpriteSheetFree(chatFont_sheet);
-    C2D_SpriteSheetFree(goldFont_sheet);
-    C2D_SpriteSheetFree(window_sheet);
-    C2D_SpriteSheetFree(bar_sheet);
+    C2D_SpriteSheetFree(bigFontSheet);
+    C2D_SpriteSheetFree(chatFontSheet);
+    C2D_SpriteSheetFree(goldFontSheet);
+    C2D_SpriteSheetFree(windowSheet);
+    C2D_SpriteSheetFree(barSheet);
 
-    cfg_fini();
+    cfgFini();
 
     // Deinit libs
     C2D_Fini();
@@ -2018,8 +2018,8 @@ int main(int argc, char* argv[]) {
     ndspExit();
 
     // restart game if a restart was queued
-    if (queued_restart) {
-        restart_game();
+    if (queuedRestart) {
+        restartGame();
     }
 
     return 0;

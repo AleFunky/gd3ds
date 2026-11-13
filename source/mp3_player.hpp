@@ -12,12 +12,12 @@
 
 extern volatile float amplitude;
 
-void audio_init();
-int play_mp3(const char *path, bool loop, float seek);
-int play_mp3_buf(void *buf, size_t sz, bool loop, float seek, bool free_buf);
-void seek_mp3(float time);
-void stop_mp3();
-void toggle_playback_mp3();
-void pause_playback_mp3();
-void unpause_playback_mp3();
-void fade_to_amplitude(float new_amplitude);
+void audioInit();
+int playMP3(const char *path, bool loop, float seek);
+int playMP3Buf(void *buf, size_t sz, bool loop, float seek, bool freeBuf);
+void seekMP3(float time);
+void stopMP3();
+void togglePlaybackMP3();
+void pausePlaybackMP3();
+void unpausePlaybackMP3();
+void fadeToAmplitude(float newAmplitude);

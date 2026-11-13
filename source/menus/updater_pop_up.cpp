@@ -10,32 +10,32 @@
 #include "utils/folders.hpp"
 #include "utils/string_helpers.hpp"
 
-static UILabel *status_label;
-static UILabel *speed_label;
-static UILabel *time_label;
-static UIProgressBar *download_progress_bar;
-static UIButton *exit_button;
-static UIWindowButton *finish_update_button;
-static UISpinner *install_spinner;
-static UIImage *home_image;
+static UILabel *statusLabel;
+static UILabel *speedLabel;
+static UILabel *timeLabel;
+static UIProgressBar *downloadProgressBar;
+static UIButton *exitButton;
+static UIWindowButton *finishUpdateButton;
+static UISpinner *installSpinner;
+static UIImage *homeImage;
 
-static Thread download_thread;
+static Thread downloadThread;
 
-static DownloadTask download_task = {
+static DownloadTask downloadTask = {
     .path = CONFIG_ROOT,
-    .file_name = "rom"
+    .fileName = "rom"
 };
 
-static Thread install_thread;
+static Thread installThread;
 
-static GenericTask install_task = {
-    .func = install_update
+static GenericTask installTask = {
+    .func = installUpdate
 };
 
-static Thread extract_thread;
+static Thread extractThread;
 
-static GenericTask extract_task = {
-    .func = extract_update
+static GenericTask extractTask = {
+    .func = extractUpdate
 };
 
 
@@ -47,21 +47,21 @@ bool showHomeIcon = false;
 int homeIconOpacity = 255;
 int homeIconDelay = 255;
 
-static void action_exit(UIElement *e, const UIPropertyList *p) {
+static void actionExit(UIElement *e, const UIPropertyList *p) {
     if (canExit) {
-        ui_stack_pop();
+        uiStackPop();
     }
 }
 
-static void action_finish_update(UIElement *e, const UIPropertyList *p) {
+static void actionFinishUpdate(UIElement *e, const UIPropertyList *p) {
     if (updateResult == 0) {
-        ui_stack_push_game_state(STATE_EXIT);
-        stop_mp3();
+        uiStackPushGameState(STATE_EXIT);
+        stopMP3();
         return;
     }
 }
 
-const char *handle_download_error_codes(int code) {
+const char *handleDownloadErrorCodes(int code) {
     switch (code) {
         case 6:
         case 7:
@@ -82,7 +82,7 @@ const char *handle_download_error_codes(int code) {
     return "";
 }
 
-const char *handle_install_error_codes(int code) {
+const char *handleInstallErrorCodes(int code) {
     switch (code) {
         case -1:
             return "Install failed:\nFilesystem error.";
@@ -103,61 +103,61 @@ const char *handle_install_error_codes(int code) {
     return "";
 }
 
-static void updater_pop_up_init(UIScreen *s) {
-    status_label = (UILabel *)ui_get_element_by_tag(s, "statuslabel");
-    speed_label = (UILabel *)ui_get_element_by_tag(s, "speedlabel");
-    time_label = (UILabel *)ui_get_element_by_tag(s, "timelabel");
-    download_progress_bar = (UIProgressBar *)ui_get_element_by_tag(s, "progressbar");
-    exit_button = (UIButton *)ui_get_element_by_tag(s, "exitbutton");
-    install_spinner = (UISpinner *)ui_get_element_by_tag(s, "spinner");
-    finish_update_button = (UIWindowButton *)ui_get_element_by_tag(s, "finishbutton");
-    home_image = (UIImage *)ui_get_element_by_tag(s, "homeicon");
+static void updaterPopUpInit(UIScreen *s) {
+    statusLabel = (UILabel *)uiGetElementByTag(s, "statuslabel");
+    speedLabel = (UILabel *)uiGetElementByTag(s, "speedlabel");
+    timeLabel = (UILabel *)uiGetElementByTag(s, "timelabel");
+    downloadProgressBar = (UIProgressBar *)uiGetElementByTag(s, "progressbar");
+    exitButton = (UIButton *)uiGetElementByTag(s, "exitbutton");
+    installSpinner = (UISpinner *)uiGetElementByTag(s, "spinner");
+    finishUpdateButton = (UIWindowButton *)uiGetElementByTag(s, "finishbutton");
+    homeImage = (UIImage *)uiGetElementByTag(s, "homeicon");
 
-    ui_disable_element((UIElement *) install_spinner);
-    ui_disable_element((UIElement *) finish_update_button);
-    ui_disable_element((UIElement*) home_image);
-    download_task.url = update_data->releaseDownloadUrl;
-    snprintf(download_task.extension, sizeof(download_task.extension), "zip");
-    download_progress_bar->value = 0;
-    ui_progress_bar_set_tint(download_progress_bar, C2D_Color32(50, 190, 240, 255));
+    uiDisableElement((UIElement *) installSpinner);
+    uiDisableElement((UIElement *) finishUpdateButton);
+    uiDisableElement((UIElement*) homeImage);
+    downloadTask.url = updateData->releaseDownloadUrl;
+    snprintf(downloadTask.extension, sizeof(downloadTask.extension), "zip");
+    downloadProgressBar->value = 0;
+    uiProgressBarSetTint(downloadProgressBar, C2D_Color32(50, 190, 240, 255));
     canExit = true;
     // attempt to remove leftover rom
     char oldPath[256];
-    snprintf(oldPath, sizeof(oldPath), "%s%s.%s", CONFIG_ROOT, download_task.file_name, download_task.extension);
+    snprintf(oldPath, sizeof(oldPath), "%s%s.%s", CONFIG_ROOT, downloadTask.fileName, downloadTask.extension);
     remove(oldPath);
 
-    download_thread = create_file_download_thread(&download_task);
+    downloadThread = createFileDownloadThread(&downloadTask);
 
     // temporarily disable sleep mode, enter exclusive mode so network won't get interrupted
     enterExclusiveState();
     aptSetSleepAllowed(false);
 }
 
-static void updater_pop_up_update(UIScreen *s, UIInput *i) {
-    if (download_task.running) {
-        download_progress_bar->value = download_task.progress;
-        char *speed = truncate_speed(download_task.speed);
+static void updaterPopUpUpdate(UIScreen *s, UIInput *i) {
+    if (downloadTask.running) {
+        downloadProgressBar->value = downloadTask.progress;
+        char *speed = truncateSpeed(downloadTask.speed);
         if (speed) {
             snprintf(downloadSpeed, sizeof(downloadSpeed), "%s", speed);
-            ui_label_set_text(speed_label, downloadSpeed);
+            uiLabelSetText(speedLabel, downloadSpeed);
             free(speed);
         }
     }
     // Run when finished
-    if (download_task.finished) {
-        download_task.finished = false;
-        ui_disable_element((UIElement *) download_progress_bar);
-        ui_disable_element((UIElement *) speed_label);
+    if (downloadTask.finished) {
+        downloadTask.finished = false;
+        uiDisableElement((UIElement *) downloadProgressBar);
+        uiDisableElement((UIElement *) speedLabel);
 
         // networking is no longer needed, exit exclusive mode
         exitExclusiveState(false);
 
         // Handle result
-        if (download_task.result != 0) {
-            status_label->base.y = 10;
+        if (downloadTask.result != 0) {
+            statusLabel->base.y = 10;
             aptSetSleepAllowed(true);
-            output_log(handle_download_error_codes(download_task.result));
-            ui_label_set_text(status_label, handle_download_error_codes(download_task.result));
+            outputLog(handleDownloadErrorCodes(downloadTask.result));
+            uiLabelSetText(statusLabel, handleDownloadErrorCodes(downloadTask.result));
             return;
         }
 
@@ -167,106 +167,106 @@ static void updater_pop_up_update(UIScreen *s, UIInput *i) {
         aptSetHomeAllowed(false);
 
 
-        ui_enable_element((UIElement *) install_spinner);
-        ui_disable_element((UIElement *) exit_button);
-        ui_label_set_text(status_label, "Extracting...");
-        status_label->base.y = 45;
-        snprintf(downloadedUpdateFilePath, sizeof(downloadedUpdateFilePath), "%s%s.%s", download_task.path, download_task.file_name, download_task.extension);
-        extract_thread = create_generic_thread(&extract_task);
+        uiEnableElement((UIElement *) installSpinner);
+        uiDisableElement((UIElement *) exitButton);
+        uiLabelSetText(statusLabel, "Extracting...");
+        statusLabel->base.y = 45;
+        snprintf(downloadedUpdateFilePath, sizeof(downloadedUpdateFilePath), "%s%s.%s", downloadTask.path, downloadTask.fileName, downloadTask.extension);
+        extractThread = createGenericThread(&extractTask);
     }
 
-    if (extract_task.finished) {
-        extract_task.finished = false;
+    if (extractTask.finished) {
+        extractTask.finished = false;
 
         // Handle result
-        if (extract_task.result != 0) {
-            status_label->base.y = 10;
+        if (extractTask.result != 0) {
+            statusLabel->base.y = 10;
             aptSetSleepAllowed(true);
             canExit = false;
-            output_log("failed to extract rom\n");
-            ui_label_set_text(status_label, "Failed to extract update!");
-            status_label->base.y = 10;
-            ui_enable_element((UIElement *) exit_button);
+            outputLog("failed to extract rom\n");
+            uiLabelSetText(statusLabel, "Failed to extract update!");
+            statusLabel->base.y = 10;
+            uiEnableElement((UIElement *) exitButton);
             return;
         }
 
-        ui_enable_element((UIElement *) install_spinner);
-        ui_disable_element((UIElement *) exit_button);
-        ui_label_set_text(status_label, "Installing...");
-        status_label->base.y = 45;
-        download_task.finished = false;
-        install_thread = create_generic_thread(&install_task);
+        uiEnableElement((UIElement *) installSpinner);
+        uiDisableElement((UIElement *) exitButton);
+        uiLabelSetText(statusLabel, "Installing...");
+        statusLabel->base.y = 45;
+        downloadTask.finished = false;
+        installThread = createGenericThread(&installTask);
     }
 
-    if (install_task.finished) {
-        install_task.finished = false;
-        ui_disable_element((UIElement *) install_spinner);
+    if (installTask.finished) {
+        installTask.finished = false;
+        uiDisableElement((UIElement *) installSpinner);
         // reenable home button and sleep, exit exclusive mode
         aptSetHomeAllowed(true);
         aptSetSleepAllowed(true);
 
         // Handle result
-        if (install_task.result != 0) {
-            output_log(handle_install_error_codes(install_task.result));
-            status_label->base.y = 10;
-            ui_label_set_text(status_label, handle_install_error_codes(install_task.result));
+        if (installTask.result != 0) {
+            outputLog(handleInstallErrorCodes(installTask.result));
+            statusLabel->base.y = 10;
+            uiLabelSetText(statusLabel, handleInstallErrorCodes(installTask.result));
             canExit = true;
-            ui_enable_element((UIElement *) exit_button);
+            uiEnableElement((UIElement *) exitButton);
 
             return;
         }
-        queued_restart = !is_3DSX;
-        status_label->base.y = -5;
-        ui_label_set_text(status_label, is_3DSX ? "Update successful!\nPress OK to quit." : "Update successful!\nPress OK to restart.");
-        ui_enable_element((UIElement *) finish_update_button);
+        queuedRestart = !is3Dsx;
+        statusLabel->base.y = -5;
+        uiLabelSetText(statusLabel, is3Dsx ? "Update successful!\nPress OK to quit." : "Update successful!\nPress OK to restart.");
+        uiEnableElement((UIElement *) finishUpdateButton);
     }
     
 
     if (aptCheckHomePressRejected()) {
         showHomeIcon = true;
-        ui_enable_element((UIElement *)home_image); 
+        uiEnableElement((UIElement *)homeImage); 
         homeIconOpacity = 255;
         homeIconDelay = 120;
     }
 
     if (showHomeIcon) {
-        ui_image_set_tint(home_image, C2D_Color32(255, 255, 255, homeIconOpacity));
+        uiImageSetTint(homeImage, C2D_Color32(255, 255, 255, homeIconOpacity));
         if (homeIconDelay > 0) {
             homeIconDelay -= 10;
         } else {
         homeIconOpacity -= 10;
         }
         if (homeIconOpacity <= 0) {
-            ui_disable_element((UIElement*) home_image);
+            uiDisableElement((UIElement*) homeImage);
             showHomeIcon = false;
         }
     }
 }
 
-static void updater_pop_up_exit(UIScreen *s) {
-    if (download_task.running) {
-        download_task.cancelled = true;
+static void updaterPopUpExit(UIScreen *s) {
+    if (downloadTask.running) {
+        downloadTask.cancelled = true;
         exitExclusiveState(false);
         aptSetSleepAllowed(true);
-        threadJoin(download_thread, U64_MAX);
+        threadJoin(downloadThread, U64_MAX);
     }
 }
 
-static UIActionDef updater_pop_up_actions[] = {
-    {"soft_exit", action_exit },
-    {"finish_update", action_finish_update }
+static UIActionDef updaterPopUpActions[] = {
+    {"soft_exit", actionExit },
+    {"finish_update", actionFinishUpdate }
 };
 
-extern const UIScreenDefPair updater_pop_up_def = {
+extern const UIScreenDefPair updaterPopUpDef = {
     .name = "updater_pop_up",
     .btm = {
         .path = "romfs:/menus/updater_pop_up.txt",
-        .init = updater_pop_up_init,
-        .update = updater_pop_up_update,
-        .exit = updater_pop_up_exit,
-        .action_list = {
-            .actions = updater_pop_up_actions,
-            .action_count = ARRAY_LEN(updater_pop_up_actions)
+        .init = updaterPopUpInit,
+        .update = updaterPopUpUpdate,
+        .exit = updaterPopUpExit,
+        .actionList = {
+            .actions = updaterPopUpActions,
+            .actionCount = ARRAY_LEN(updaterPopUpActions)
         }
     },
 };

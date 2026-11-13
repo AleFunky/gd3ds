@@ -1,4 +1,4 @@
 #pragma once
 
-void loading_screen_init();
-void loading_screen_update(float progress, int fade);
+void loadingScreenInit();
+void loadingScreenUpdate(float progress, int fade);

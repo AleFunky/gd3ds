@@ -91,5 +91,5 @@ void updateParticleSystem(ParticleSystem* ps, float dt);
 void initParticleData(ParticleData* d, int capacity);
 void initParticleSystem(ParticleSystem* ps, const ParticleDefinition* cfg);
 void spawnMultipleParticles(ParticleSystem* ps, int emitCount);
-void drawParticleSystem(ParticleSystem* ps, float x_offset, float y_offset, float opacity);
+void drawParticleSystem(ParticleSystem* ps, float xOffset, float yOffset, float opacity);
 void freeParticleData(ParticleData* d);

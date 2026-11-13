@@ -13,17 +13,17 @@ typedef struct {
  int atlas;
  int texture;
  float x,y;
- float scale_x, scale_y;
- int flip_x, flip_y;
+ float scaleX, scaleY;
+ int flipX, flipY;
  int z;
  float rot;
- IconColorType color_type;
+ IconColorType colorType;
  float opacity;
- int animation_part;
+ int animationPart;
 } IconPart;
 
 typedef struct {
- size_t part_count;
+ size_t partCount;
  const IconPart* parts;
 } Icon;
 

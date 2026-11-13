@@ -2,9 +2,9 @@
 #include <3ds.h>
 #include "menus/core/ui_stack.hpp"
 
-extern bool comments_need_refresh;
+extern bool commentsNeedRefresh;
 
-extern int comments_sort_type;
-extern int current_comments_page;
+extern int commentsSortType;
+extern int currentCommentsPage;
 
-extern const UIScreenDefPair online_level_comments_def;
+extern const UIScreenDefPair onlineLevelCommentsDef;

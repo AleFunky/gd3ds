@@ -16,63 +16,63 @@
 
 static UIList *list;
 
-static void add_entry(const char *title, const char *artist, float list_width, UIScreen *s, int i) {
+static void addEntry(const char *title, const char *artist, float listWidth, UIScreen *s, int i) {
 
-    UIElement *card = (UIElement *) ui_create_rectangle(s);
+    UIElement *card = (UIElement *) uiCreateRectangle(s);
 
     if (card) {
-        ui_rectangle_set_color((UIRectangle *) card, (i & 1 ? C2D_Color32(194,114,62,255) :  C2D_Color32(161,88,48,255)));
-        ui_element_set_size(card, 0, 46);
+        uiRectangleSetColor((UIRectangle *) card, (i & 1 ? C2D_Color32(194,114,62,255) :  C2D_Color32(161,88,48,255)));
+        uiElementSetSize(card, 0, 46);
 
         // Song name
-        UILabel *song = ui_create_label(s);
+        UILabel *song = uiCreateLabel(s);
         if (song) {
             song->base.w = list->base.w - 12;
-            ui_label_set_text(song, title);
-            ui_element_set_position((UIElement *) song, -list_width + 6, - 5);
-            ui_element_set_scale((UIElement *) song, 0.54f);
+            uiLabelSetText(song, title);
+            uiElementSetPosition((UIElement *) song, -listWidth + 6, - 5);
+            uiElementSetScale((UIElement *) song, 0.54f);
             
             // song->font = 2;
 
-            ui_element_add_child(card, (UIElement *) song);
+            uiElementAddChild(card, (UIElement *) song);
         }
 
         // Song name
-        UILabel *creator = ui_create_label(s);
+        UILabel *creator = uiCreateLabel(s);
         if (creator) {
-            ui_label_set_text(creator, artist);
-            ui_element_set_position((UIElement *) creator, -list_width + 6, + 7);
-            ui_element_set_scale((UIElement *) creator, 0.54f);
+            uiLabelSetText(creator, artist);
+            uiElementSetPosition((UIElement *) creator, -listWidth + 6, + 7);
+            uiElementSetScale((UIElement *) creator, 0.54f);
             
             creator->font = 2;
 
-            ui_element_add_child(card, (UIElement *) creator);
+            uiElementAddChild(card, (UIElement *) creator);
         }
 
-        ui_list_add(list, card);
+        uiListAdd(list, card);
     }
 }
 
-void songs_init(UIScreen *s) {
-    list = (UIList *) ui_get_element_by_tag(s, "list");
+void songsInit(UIScreen *s) {
+    list = (UIList *) uiGetElementByTag(s, "list");
     if (list) {
-        float list_width = list->base.w * 0.5f;
+        float listWidth = list->base.w * 0.5f;
         size_t i = 0;
-        for (; i < current_main_level_pack->count; i++) {
-            const char *title = current_main_level_pack->levels[i].song_data.title;
-            const char *artist = current_main_level_pack->levels[i].song_data.artist;
+        for (; i < currentMainLevelPack->count; i++) {
+            const char *title = currentMainLevelPack->levels[i].songData.title;
+            const char *artist = currentMainLevelPack->levels[i].songData.artist;
 
-            add_entry(title, artist, list_width, s, i);
+            addEntry(title, artist, listWidth, s, i);
         }
         
-        add_entry("Practice: Stay Inside Me", "OcularNebula", list_width, s, i);
+        addEntry("Practice: Stay Inside Me", "OcularNebula", listWidth, s, i);
     }
 }
 
-extern const UIScreenDefPair songs_def = {
+extern const UIScreenDefPair songsDef = {
     .name = "songs",
     .btm = {
         .path = "romfs:/menus/settings_hub/soundtrack.txt",
-        .init = songs_init,
+        .init = songsInit,
     }
 };

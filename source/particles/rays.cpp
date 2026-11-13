@@ -8,59 +8,59 @@
 typedef struct {
     Vec2D position;
     
-    float start_delay;
+    float startDelay;
     float timer;
 
-    float target_h;
-    float tween_duration;
-    float start_alpha;
+    float targetH;
+    float tweenDuration;
+    float startAlpha;
     float angle;
 
-    float fade_timer;
+    float fadeTimer;
 } RayData;
 
-static float angles_array[BEAM_COUNT];
-static RayData ray_data[BEAM_COUNT];
+static float anglesArray[BEAM_COUNT];
+static RayData rayData[BEAM_COUNT];
 
 static bool started = false;
 static bool fading = false;
 
-static int current_ray = 0;
+static int currentRay = 0;
 static float timer = 0;
 
-static void prepare_angles_array() {
+static void prepareAnglesArray() {
     // Fill array
     for (int i = 0; i < BEAM_COUNT; i++) {
-        angles_array[i] = normalize_angle(ANGLE_START + i * ANGLE_STEP);
+        anglesArray[i] = normalizeAngle(ANGLE_START + i * ANGLE_STEP);
     }
 
     // Swap around
     for (int i = BEAM_COUNT - 1; i > 0; i--) {
-        int j = random_int(0, i);
-        float temp = angles_array[i];
-        angles_array[i] = angles_array[j];
-        angles_array[j] = temp;
+        int j = randomInt(0, i);
+        float temp = anglesArray[i];
+        anglesArray[i] = anglesArray[j];
+        anglesArray[j] = temp;
     }
 }
 
-static void prepare_rays() {
+static void prepareRays() {
     for (int i = 0; i < BEAM_COUNT; i++) {
-        ray_data[i].position.x = level_info.wall_x;
-        ray_data[i].position.y = level_info.wall_y;
+        rayData[i].position.x = levelInfo.wallX;
+        rayData[i].position.y = levelInfo.wallY;
 
-        ray_data[i].start_delay = i * STAGGER_STEP + STAGGER_BASE + STAGGER_RAND * random_float(-1, 1);
-        ray_data[i].timer = 0;
+        rayData[i].startDelay = i * STAGGER_STEP + STAGGER_BASE + STAGGER_RAND * randomFloat(-1, 1);
+        rayData[i].timer = 0;
 
-        ray_data[i].target_h = W_MID + W_JITTER * random_float(-1, 1);
-        ray_data[i].tween_duration = DUR_BASE + DUR_JITTER * random_float(-1, 1);
-        ray_data[i].start_alpha = CLAMP(ALPHA_BASE + ALPHA_JITTER * random_float(-1, 1), 0, 1);
-        ray_data[i].angle = normalize_angle(angles_array[i] + ANGLE_STEP * randomf() + 90);
+        rayData[i].targetH = W_MID + W_JITTER * randomFloat(-1, 1);
+        rayData[i].tweenDuration = DUR_BASE + DUR_JITTER * randomFloat(-1, 1);
+        rayData[i].startAlpha = CLAMP(ALPHA_BASE + ALPHA_JITTER * randomFloat(-1, 1), 0, 1);
+        rayData[i].angle = normalizeAngle(anglesArray[i] + ANGLE_STEP * randomf() + 90);
 
-        ray_data[i].fade_timer = 0;
+        rayData[i].fadeTimer = 0;
     }
 }
 
-static void draw_ray(float x, float y, float length, float startWidth, float endWidth, float angle, float t, u32 color) {
+static void drawRay(float x, float y, float length, float startWidth, float endWidth, float angle, float t, u32 color) {
     // Clamp interpolation factor
     if (t < 0.0f) t = 0.0f;
     if (t > 1.0f) t = 1.0f;
@@ -99,11 +99,11 @@ static void draw_ray(float x, float y, float length, float startWidth, float end
         verts[i].x = rx + x;
         verts[i].y = ry + y;
 
-        verts[i].x = verts[i].x - state.camera_x;
+        verts[i].x = verts[i].x - state.cameraX;
 
-        verts[i].y = SCREEN_HEIGHT - (verts[i].y - state.camera_y);
+        verts[i].y = SCREEN_HEIGHT - (verts[i].y - state.cameraY);
 
-        verts[i].x = get_mirror_x(verts[i].x, state.mirror_factor);
+        verts[i].x = getMirrorX(verts[i].x, state.mirrorFactor);
     }
 
     // Submit quad
@@ -120,33 +120,33 @@ static void draw_ray(float x, float y, float length, float startWidth, float end
         0.0f);
 }
 
-void rays_start() {
+void raysStart() {
     started = true;
     fading = false;
-    current_ray = 0;
+    currentRay = 0;
     timer = 0;
-    prepare_angles_array();
-    prepare_rays();
+    prepareAnglesArray();
+    prepareRays();
 }
 
-void rays_start_fade() {
+void raysStartFade() {
     fading = true;
     
     for (int i = 0; i < BEAM_COUNT; i++) {
-        ray_data[i].fade_timer = 0;
+        rayData[i].fadeTimer = 0;
     }
 }
 
-void update_rays(float delta) {
+void updateRays(float delta) {
     if (!started) return;
     
     for (int i = 0; i < BEAM_COUNT; i++) {
-        RayData *data = &ray_data[i];
+        RayData *data = &rayData[i];
 
         // Check if it should start
-        if (data->start_delay < timer) {
+        if (data->startDelay < timer) {
             if (fading) {
-                data->fade_timer += delta;
+                data->fadeTimer += delta;
             }
             data->timer += delta;
         }
@@ -155,44 +155,44 @@ void update_rays(float delta) {
     timer += delta;
 
     // Remove rays
-    if (ray_data[0].fade_timer > RAY_FADE_DURATION) {
+    if (rayData[0].fadeTimer > RAY_FADE_DURATION) {
         started = false;
         fading = false;
     }
 }
 
-void draw_rays() {
+void drawRays() {
     if (!started) return;
 
     for (int i = 0; i < BEAM_COUNT; i++) {
-        RayData *data = &ray_data[i];
+        RayData *data = &rayData[i];
 
         // Check if it should start
-        if (data->start_delay < timer) {
+        if (data->startDelay < timer) {
             float x = data->position.x + 30;
             float y = data->position.y;
             
-            float startWidth = data->target_h / 4;
-            float endWidth = data->target_h;
+            float startWidth = data->targetH / 4;
+            float endWidth = data->targetH;
 
             const float length = MAX_BEAM_W;
 
             float elapsed = data->timer;
-            float duration = data->tween_duration;
+            float duration = data->tweenDuration;
 
-            float alpha = data->start_alpha * 255;
+            float alpha = data->startAlpha * 255;
 
             if (fading) {
-                alpha = easeValue(EASE_LINEAR, alpha, 0, data->fade_timer, RAY_FADE_DURATION, 1);
+                alpha = easeValue(EASE_LINEAR, alpha, 0, data->fadeTimer, RAY_FADE_DURATION, 1);
             }
 
-            Color col = get_p2_if_black(p1_color);
+            Color col = getP2IfBlack(p1Color);
 
             u32 color = C2D_Color32(col.r, col.g, col.b, alpha);
 
             float t = easeValue(QUAD_OUT, 0, 1, elapsed, duration, 1);
 
-            draw_ray(x, y, length, startWidth, endWidth, data->angle, t, color);
+            drawRay(x, y, length, startWidth, endWidth, data->angle, t, color);
         }
     }
 }

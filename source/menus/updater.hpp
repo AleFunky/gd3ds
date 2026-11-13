@@ -1,8 +1,8 @@
 #pragma once
 #include "menus/core/ui_screen.hpp"
 
-extern GenericTask updater_task;
-extern Thread updater_thread;
+extern GenericTask updaterTask;
+extern Thread updaterThread;
 extern bool checkedForUpdate;
 
-extern const UIScreenDefPair updater_def;
+extern const UIScreenDefPair updaterDef;

@@ -26,38 +26,38 @@
 #include "state.hpp"
 #include "menus/creator_menu/search_menu.hpp"
 
-static int gamemode_page = 0;
+static int gamemodePage = 0;
 
 // Page handling 
 
-static int current_cube_page = 0;
-static int current_ship_page = 0;
-static int current_ball_page = 0;
-static int current_ufo_page  = 0;
-static int current_wave_page = 0;
-static int current_robot_page = 0;
-static int current_spider_page = 0;
-static int current_trail_page = 0;
+static int currentCubePage = 0;
+static int currentShipPage = 0;
+static int currentBallPage = 0;
+static int currentUfoPage  = 0;
+static int currentWavePage = 0;
+static int currentRobotPage = 0;
+static int currentSpiderPage = 0;
+static int currentTrailPage = 0;
 
-static int last_displayed_gamemode = 0;
+static int lastDisplayedGamemode = 0;
 
-int selected_cube = 1;
-int selected_ship = 1;
-int selected_ball = 1;
-int selected_ufo  = 1;
-int selected_wave = 1;
-int selected_robot = 1;
-int selected_spider = 1;
-int selected_trail = 1;
+int selectedCube = 1;
+int selectedShip = 1;
+int selectedBall = 1;
+int selectedUfo  = 1;
+int selectedWave = 1;
+int selectedRobot = 1;
+int selectedSpider = 1;
+int selectedTrail = 1;
 
-int selected_p1 = 0;
-int selected_p2 = 0;
-int selected_glow = 0;
+int selectedP1 = 0;
+int selectedP2 = 0;
+int selectedGlow = 0;
 
-bool player_glow_enabled = false;
-bool show_glow = false;
+bool playerGlowEnabled = false;
+bool showGlow = false;
 
-const int gamemode_icon_count[ICON_GAMEMODE_COUNT + 1] = {
+const int gamemodeIconCount[ICON_GAMEMODE_COUNT + 1] = {
     ICON_COUNT_PLAYER,
     ICON_COUNT_SHIP,
     ICON_COUNT_PLAYER_BALL,
@@ -68,37 +68,37 @@ const int gamemode_icon_count[ICON_GAMEMODE_COUNT + 1] = {
     TRAIL_COUNT
 };
 
-static int *current_pages[ICON_GAMEMODE_COUNT + 1] = {
-    &current_cube_page,
-    &current_ship_page,
-    &current_ball_page,
-    &current_ufo_page,
-    &current_wave_page,
-    &current_robot_page,
-    &current_spider_page,
-    &current_trail_page
+static int *currentPages[ICON_GAMEMODE_COUNT + 1] = {
+    &currentCubePage,
+    &currentShipPage,
+    &currentBallPage,
+    &currentUfoPage,
+    &currentWavePage,
+    &currentRobotPage,
+    &currentSpiderPage,
+    &currentTrailPage
 };
 
-static UIButton *gamemode_btns[ICON_GAMEMODE_COUNT + 1];
+static UIButton *gamemodeBtns[ICON_GAMEMODE_COUNT + 1];
 
-int *current_icons[ICON_GAMEMODE_COUNT + 1] = {
-    &selected_cube,
-    &selected_ship,
-    &selected_ball,
-    &selected_ufo,
-    &selected_wave,
-    &selected_robot,
-    &selected_spider,
-    &selected_trail
+int *currentIcons[ICON_GAMEMODE_COUNT + 1] = {
+    &selectedCube,
+    &selectedShip,
+    &selectedBall,
+    &selectedUfo,
+    &selectedWave,
+    &selectedRobot,
+    &selectedSpider,
+    &selectedTrail
 };
 
-int *current_colors[3] = {
-    &selected_p1,
-    &selected_p2,
-    &selected_glow
+int *currentColors[3] = {
+    &selectedP1,
+    &selectedP2,
+    &selectedGlow
 };
 
-static const int button_images[8] = {
+static const int buttonImages[8] = {
     341,
     351,
     325,
@@ -108,172 +108,172 @@ static const int button_images[8] = {
     353,
     355
 };
-static int icon_counter = 1;
+static int iconCounter = 1;
 
-static void set_icon_index(UIElement *e) {
-    int new_index = (*current_pages[gamemode_page] * ICONS_PER_PAGE) + icon_counter;
-    if (new_index < gamemode_icon_count[gamemode_page]) {
+static void setIconIndex(UIElement *e) {
+    int newIndex = (*currentPages[gamemodePage] * ICONS_PER_PAGE) + iconCounter;
+    if (newIndex < gamemodeIconCount[gamemodePage]) {
         e->enabled = true;
-        ui_icon_set_selected((UIIcon *) e, *current_icons[gamemode_page] == new_index);
-        ui_icon_set_gamemode_index((UIIcon *) e, gamemode_page, new_index);
+        uiIconSetSelected((UIIcon *) e, *currentIcons[gamemodePage] == newIndex);
+        uiIconSetGamemodeIndex((UIIcon *) e, gamemodePage, newIndex);
 
-        if (gamemode_page == GAMEMODE_SHIP || gamemode_page == GAMEMODE_UFO || gamemode_page == GAMEMODE_SPIDER) {
-            ui_element_set_scale(e, .7f);
-        } else if (gamemode_page == GAMEMODE_WAVE) {
-            ui_element_set_scale(e, .95f);
+        if (gamemodePage == GAMEMODE_SHIP || gamemodePage == GAMEMODE_UFO || gamemodePage == GAMEMODE_SPIDER) {
+            uiElementSetScale(e, .7f);
+        } else if (gamemodePage == GAMEMODE_WAVE) {
+            uiElementSetScale(e, .95f);
         } else {
-            ui_element_set_scale(e, .8f);
+            uiElementSetScale(e, .8f);
         }
 
-        icon_counter++;
+        iconCounter++;
     } else {
         e->enabled = false;
     }
 }
 
-static void set_trail_index(UIElement *e) {
-    int new_index = icon_counter;
-    if (new_index < gamemode_icon_count[gamemode_page]) {
+static void setTrailIndex(UIElement *e) {
+    int newIndex = iconCounter;
+    if (newIndex < gamemodeIconCount[gamemodePage]) {
         e->enabled = true;
-        ui_icon_set_selected((UIIcon *) e, *current_icons[gamemode_page] == new_index);
-        ui_icon_set_gamemode_index((UIIcon *) e, gamemode_page, new_index);
-        icon_counter++;
+        uiIconSetSelected((UIIcon *) e, *currentIcons[gamemodePage] == newIndex);
+        uiIconSetGamemodeIndex((UIIcon *) e, gamemodePage, newIndex);
+        iconCounter++;
     } else {
         e->enabled = false;
     }
 }
 
-static void disable_all_icon_buttons(UIScreen *s) {
-    icon_counter = (gamemode_page == TRAIL ? 0 : 1);
-    ui_button_set_image((UIButton *) ui_get_element_by_tag(s, "cube"), button_images[0], 0);
-    ui_button_set_image((UIButton *) ui_get_element_by_tag(s, "ship"), button_images[1], 0);
-    ui_button_set_image((UIButton *) ui_get_element_by_tag(s, "ball"), button_images[2], 0);
-    ui_button_set_image((UIButton *) ui_get_element_by_tag(s, "ufo"),  button_images[3], 0);
-    ui_button_set_image((UIButton *) ui_get_element_by_tag(s, "dart"), button_images[4], 0);
-    ui_button_set_image((UIButton *) ui_get_element_by_tag(s, "robot"), button_images[5], 0);
-    ui_button_set_image((UIButton *) ui_get_element_by_tag(s, "spider"), button_images[6], 0);
-    ui_button_set_image((UIButton *) ui_get_element_by_tag(s, "trail"), button_images[7], 0);
+static void disableAllIconButtons(UIScreen *s) {
+    iconCounter = (gamemodePage == TRAIL ? 0 : 1);
+    uiButtonSetImage((UIButton *) uiGetElementByTag(s, "cube"), buttonImages[0], 0);
+    uiButtonSetImage((UIButton *) uiGetElementByTag(s, "ship"), buttonImages[1], 0);
+    uiButtonSetImage((UIButton *) uiGetElementByTag(s, "ball"), buttonImages[2], 0);
+    uiButtonSetImage((UIButton *) uiGetElementByTag(s, "ufo"),  buttonImages[3], 0);
+    uiButtonSetImage((UIButton *) uiGetElementByTag(s, "dart"), buttonImages[4], 0);
+    uiButtonSetImage((UIButton *) uiGetElementByTag(s, "robot"), buttonImages[5], 0);
+    uiButtonSetImage((UIButton *) uiGetElementByTag(s, "spider"), buttonImages[6], 0);
+    uiButtonSetImage((UIButton *) uiGetElementByTag(s, "trail"), buttonImages[7], 0);
 }
 
-static void action_set_page(UIElement *e, const UIPropertyList *args) {
-    gamemode_page = ui_prop_int(args, "page", 0);
-    last_displayed_gamemode = gamemode_page;
-    disable_all_icon_buttons(e->screen);
-    ui_button_set_image((UIButton *) e, button_images[gamemode_page] + 1, 0);
-    ui_run_func_on_tag(e->screen, "icon", set_icon_index); 
+static void actionSetPage(UIElement *e, const UIPropertyList *args) {
+    gamemodePage = uiPropInt(args, "page", 0);
+    lastDisplayedGamemode = gamemodePage;
+    disableAllIconButtons(e->screen);
+    uiButtonSetImage((UIButton *) e, buttonImages[gamemodePage] + 1, 0);
+    uiRunFuncOnTag(e->screen, "icon", setIconIndex); 
 
     for(int i = 0; i < ICON_GAMEMODE_COUNT + 1; i++){
-        gamemode_btns[i]->keyBinds = 0;
-        if(i == gamemode_page - 1){
-            gamemode_btns[i]->keyBinds |= KEY_L | KEY_ZL;
-        } else if(i == gamemode_page + 1){
-            gamemode_btns[i]->keyBinds |= KEY_R | KEY_ZR;
+        gamemodeBtns[i]->keyBinds = 0;
+        if(i == gamemodePage - 1){
+            gamemodeBtns[i]->keyBinds |= KEY_L | KEY_ZL;
+        } else if(i == gamemodePage + 1){
+            gamemodeBtns[i]->keyBinds |= KEY_R | KEY_ZR;
         } 
     }
 }
 
-static void set_trail_page(UIElement *e, const UIPropertyList *args) {
-    gamemode_page = 7;
-    disable_all_icon_buttons(e->screen);
-    ui_button_set_image((UIButton *) e, button_images[7] + 1, 0);
-    ui_run_func_on_tag(e->screen, "icon", set_trail_index); 
+static void setTrailPage(UIElement *e, const UIPropertyList *args) {
+    gamemodePage = 7;
+    disableAllIconButtons(e->screen);
+    uiButtonSetImage((UIButton *) e, buttonImages[7] + 1, 0);
+    uiRunFuncOnTag(e->screen, "icon", setTrailIndex); 
 }
 
 
-static void move_index_left(UIElement* e, const UIPropertyList *args) {
-    *current_pages[gamemode_page] -= 1;
-    if (*current_pages[gamemode_page] < 0) {
-        *current_pages[gamemode_page] = (gamemode_icon_count[gamemode_page] - 2) / ICONS_PER_PAGE;
+static void moveIndexLeft(UIElement* e, const UIPropertyList *args) {
+    *currentPages[gamemodePage] -= 1;
+    if (*currentPages[gamemodePage] < 0) {
+        *currentPages[gamemodePage] = (gamemodeIconCount[gamemodePage] - 2) / ICONS_PER_PAGE;
     }
-    icon_counter = (gamemode_page == TRAIL ? 0 : 1);
-    ui_run_func_on_tag(e->screen, "icon", set_icon_index); 
+    iconCounter = (gamemodePage == TRAIL ? 0 : 1);
+    uiRunFuncOnTag(e->screen, "icon", setIconIndex); 
 }
 
-static void move_index_right(UIElement* e, const UIPropertyList *args) {
-    *current_pages[gamemode_page] += 1;
-    if ((*current_pages[gamemode_page] * ICONS_PER_PAGE) + 1 >= gamemode_icon_count[gamemode_page]) {
-        *current_pages[gamemode_page] = 0;
+static void moveIndexRight(UIElement* e, const UIPropertyList *args) {
+    *currentPages[gamemodePage] += 1;
+    if ((*currentPages[gamemodePage] * ICONS_PER_PAGE) + 1 >= gamemodeIconCount[gamemodePage]) {
+        *currentPages[gamemodePage] = 0;
     }
-    icon_counter = (gamemode_page == TRAIL ? 0 : 1);
-    ui_run_func_on_tag(e->screen, "icon", set_icon_index); 
+    iconCounter = (gamemodePage == TRAIL ? 0 : 1);
+    uiRunFuncOnTag(e->screen, "icon", setIconIndex); 
 }
 
-static void action_icon_selected(UIElement *e, const UIPropertyList *args) {
-    *current_icons[((UIIcon *) e)->gamemode] = ((UIIcon *) e)->index;
-    icon_counter = (gamemode_page == TRAIL ? 0 : 1);
-    ui_run_func_on_tag(e->screen, "icon", set_icon_index); 
+static void actionIconSelected(UIElement *e, const UIPropertyList *args) {
+    *currentIcons[((UIIcon *) e)->gamemode] = ((UIIcon *) e)->index;
+    iconCounter = (gamemodePage == TRAIL ? 0 : 1);
+    uiRunFuncOnTag(e->screen, "icon", setIconIndex); 
 }
 
-static void icon_kit_init(UIScreen *s){
-    gamemode_btns[0] = (UIButton *) ui_get_element_by_tag(s, "cube");
-    gamemode_btns[1] = (UIButton *) ui_get_element_by_tag(s, "ship");
-    gamemode_btns[2] = (UIButton *) ui_get_element_by_tag(s, "ball");
-    gamemode_btns[3] = (UIButton *) ui_get_element_by_tag(s, "ufo");
-    gamemode_btns[4] = (UIButton *) ui_get_element_by_tag(s, "dart");
-    gamemode_btns[5] = (UIButton *) ui_get_element_by_tag(s, "robot");
-    gamemode_btns[6] = (UIButton *) ui_get_element_by_tag(s, "spider");
-    gamemode_btns[7] = (UIButton *) ui_get_element_by_tag(s, "trail");
+static void iconKitInit(UIScreen *s){
+    gamemodeBtns[0] = (UIButton *) uiGetElementByTag(s, "cube");
+    gamemodeBtns[1] = (UIButton *) uiGetElementByTag(s, "ship");
+    gamemodeBtns[2] = (UIButton *) uiGetElementByTag(s, "ball");
+    gamemodeBtns[3] = (UIButton *) uiGetElementByTag(s, "ufo");
+    gamemodeBtns[4] = (UIButton *) uiGetElementByTag(s, "dart");
+    gamemodeBtns[5] = (UIButton *) uiGetElementByTag(s, "robot");
+    gamemodeBtns[6] = (UIButton *) uiGetElementByTag(s, "spider");
+    gamemodeBtns[7] = (UIButton *) uiGetElementByTag(s, "trail");
 
-    action_set_page(ui_get_element_by_tag(s, "cube"), NULL);
+    actionSetPage(uiGetElementByTag(s, "cube"), NULL);
 
-    update_player_colors();
-    show_glow = (player_glow_enabled || ((p1_color.r | p1_color.g | p1_color.b) == 0));
+    updatePlayerColors();
+    showGlow = (playerGlowEnabled || ((p1Color.r | p1Color.g | p1Color.b) == 0));
 
-    play_menu_song();
+    playMenuSong();
 }
 
-static void icon_kit_init_top(UIScreen *s){
+static void iconKitInitTop(UIScreen *s){
     char stars[32];
-    snprintf(stars, sizeof(stars), "%d", total_stars);
+    snprintf(stars, sizeof(stars), "%d", totalStars);
     
     char coins[32];
-    snprintf(coins, sizeof(coins), "%d", total_coins);
+    snprintf(coins, sizeof(coins), "%d", totalCoins);
 
-    char user_coins[32];
-    snprintf(user_coins, sizeof(user_coins), "%d", total_user_coins);
+    char userCoins[32];
+    snprintf(userCoins, sizeof(userCoins), "%d", totalUserCoins);
 
-    ui_label_set_text((UILabel *) ui_get_element_by_tag(s, "star_text"), stars);
-    ui_label_set_text((UILabel *) ui_get_element_by_tag(s, "secretcoins_text"), coins);
-    ui_label_set_text((UILabel *) ui_get_element_by_tag(s, "usercoins_text"), user_coins);
+    uiLabelSetText((UILabel *) uiGetElementByTag(s, "star_text"), stars);
+    uiLabelSetText((UILabel *) uiGetElementByTag(s, "secretcoins_text"), coins);
+    uiLabelSetText((UILabel *) uiGetElementByTag(s, "usercoins_text"), userCoins);
 
-    if (!user_coins_counter_visible()) {
-        ui_run_func_on_tag(s, "usercoins_icon", ui_disable_element);
-        ui_run_func_on_tag(s, "usercoins_text", ui_disable_element);
+    if (!userCoinsCounterVisible()) {
+        uiRunFuncOnTag(s, "usercoins_icon", uiDisableElement);
+        uiRunFuncOnTag(s, "usercoins_text", uiDisableElement);
     }
 
 }
 
-static void icon_kit_update_top(UIScreen *s, UIInput *input){
-    UIIcon *icon = (UIIcon *)ui_get_element_by_tag(s, "big_icon");
+static void iconKitUpdateTop(UIScreen *s, UIInput *input){
+    UIIcon *icon = (UIIcon *)uiGetElementByTag(s, "big_icon");
  
-    ui_icon_set_gamemode_index(icon, last_displayed_gamemode, *current_icons[last_displayed_gamemode]);
-    ui_icon_set_p1(icon, C2D_Color32(p1_color.r, p1_color.g, p1_color.b, 255));
-    ui_icon_set_p2(icon, C2D_Color32(p2_color.r, p2_color.g, p2_color.b, 255));
-    ui_icon_set_glow(icon, C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255));
-    icon->glow = show_glow;
+    uiIconSetGamemodeIndex(icon, lastDisplayedGamemode, *currentIcons[lastDisplayedGamemode]);
+    uiIconSetP1(icon, C2D_Color32(p1Color.r, p1Color.g, p1Color.b, 255));
+    uiIconSetP2(icon, C2D_Color32(p2Color.r, p2Color.g, p2Color.b, 255));
+    uiIconSetGlow(icon, C2D_Color32(glowColor.r, glowColor.g, glowColor.b, 255));
+    icon->glow = showGlow;
 }
 
-static const UIActionDef icon_kit_actions[] = {
-    {"action_page", action_set_page },
-    {"action_trail", set_trail_page },
-    {"icons_left", move_index_left },
-    {"icons_right", move_index_right },
-    {"icon_selected", action_icon_selected }
+static const UIActionDef iconKitActions[] = {
+    {"action_page", actionSetPage },
+    {"action_trail", setTrailPage },
+    {"icons_left", moveIndexLeft },
+    {"icons_right", moveIndexRight },
+    {"icon_selected", actionIconSelected }
 };
 
-extern const UIScreenDefPair icon_kit_def = {
+extern const UIScreenDefPair iconKitDef = {
     .name = "icon_kit",
     .top = {
         .path = "romfs:/menus/icon_kit_top.txt",
-        .init = icon_kit_init_top,
-        .update = icon_kit_update_top
+        .init = iconKitInitTop,
+        .update = iconKitUpdateTop
     },
     .btm = {
         .path = "romfs:/menus/icon_kit.txt",
-        .init = icon_kit_init,
-        .action_list = {
-            .actions = icon_kit_actions,
-            .action_count = ARRAY_LEN(icon_kit_actions)
+        .init = iconKitInit,
+        .actionList = {
+            .actions = iconKitActions,
+            .actionCount = ARRAY_LEN(iconKitActions)
         }
     }
 };

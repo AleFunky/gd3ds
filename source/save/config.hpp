@@ -8,6 +8,6 @@
 
 extern Config cfg;
 
-void cfg_init();
-void cfg_save();
-void cfg_fini();
+void cfgInit();
+void cfgSave();
+void cfgFini();

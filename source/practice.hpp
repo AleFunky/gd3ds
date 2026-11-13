@@ -4,26 +4,26 @@
 
 #define AUTO_CHECKPOINT_TIME 1.f
 
-extern int checkpoint_count;
-extern int checkpoint_pointer;
-extern bool pseudo_checkpoint_exists;
-extern bool restored_checkpoint;
+extern int checkpointCount;
+extern int checkpointPointer;
+extern bool pseudoCheckpointExists;
+extern bool restoredCheckpoint;
 
-void start_practice_mode();
-void exit_practice_mode();
+void startPracticeMode();
+void exitPracticeMode();
 
-int get_checkpoint_count();
+int getCheckpointCount();
 
-void new_checkpoint();
-void restore_checkpoint();
-void delete_last_checkpoint();
+void newCheckpoint();
+void restoreCheckpoint();
+void deleteLastCheckpoint();
 
-void handle_practice_mode();
-void draw_checkpoints();
-void clear_practice_mode();
+void handlePracticeMode();
+void drawCheckpoints();
+void clearPracticeMode();
 
-void handle_auto_checkpoints(float delta);
-void run_pending_checkpoint();
-void set_checkpoint_timer(float timer);
+void handleAutoCheckpoints(float delta);
+void runPendingCheckpoint();
+void setCheckpointTimer(float timer);
 
-void load_used_channels();
+void loadUsedChannels();

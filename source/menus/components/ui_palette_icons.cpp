@@ -10,38 +10,38 @@
 
 #define ICON_WIDTH 30
 
-static void ui_palette_icons_draw(UIElement* e, UITransform *transform) {
-    UIPaletteIcons *palette_icons = (UIPaletteIcons *) e;
+static void uiPaletteIconsDraw(UIElement* e, UITransform *transform) {
+    UIPaletteIcons *paletteIcons = (UIPaletteIcons *) e;
 
-    bool glow_enabled = (player_glow_enabled || ((p1_color.r | p1_color.g | p1_color.b) == 0));
+    bool glowEnabled = (playerGlowEnabled || ((p1Color.r | p1Color.g | p1Color.b) == 0));
     
-    float length = ((ICON_GAMEMODE_COUNT - 1) * (ICON_WIDTH + palette_icons->spacing)) * transform->scaleX;
+    float length = ((ICON_GAMEMODE_COUNT - 1) * (ICON_WIDTH + paletteIcons->spacing)) * transform->scaleX;
 
     float x = transform->x - length * 0.5f;
     
     for (size_t g = 0; g < ICON_GAMEMODE_COUNT; g++) {
-        float icon_x = x + (ICON_WIDTH + palette_icons->spacing) * transform->scaleX * g;
-        spawn_icon_at(
-            g, *current_icons[g], glow_enabled, icon_x, transform->y, 0, 0, 0, transform->scaleX,
-            C2D_Color32(p1_color.r, p1_color.g, p1_color.b, 255),
-            C2D_Color32(p2_color.r, p2_color.g, p2_color.b, 255),
-            C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255),
+        float iconX = x + (ICON_WIDTH + paletteIcons->spacing) * transform->scaleX * g;
+        spawnIconAt(
+            g, *currentIcons[g], glowEnabled, iconX, transform->y, 0, 0, 0, transform->scaleX,
+            C2D_Color32(p1Color.r, p1Color.g, p1Color.b, 255),
+            C2D_Color32(p2Color.r, p2Color.g, p2Color.b, 255),
+            C2D_Color32(glowColor.r, glowColor.g, glowColor.b, 255),
             (IconParameters) { 
-                .anim_id = (g == (int)GAMEMODE_ROBOT ? (int)ROBOT_ANIM_IDLE : (int)SPIDER_ANIM_IDLE),
-                .anim_frame = 0
+                .animID = (g == (int)GAMEMODE_ROBOT ? (int)ROBOT_ANIM_IDLE : (int)SPIDER_ANIM_IDLE),
+                .animFrame = 0
             }
         );
     }
 }
 
-static void ui_palette_icons(UIElement *e) {
+static void uiPaletteIcons(UIElement *e) {
     if (e) {
         delete (UIPaletteIcons *)e;
         e = NULL;
     }
 }
 
-UIPaletteIcons *ui_create_palette_icons(UIScreen *screen) {
+UIPaletteIcons *uiCreatePaletteIcons(UIScreen *screen) {
     UIPaletteIcons *e = new UIPaletteIcons{};
 
     if (!e) return NULL;
@@ -49,22 +49,22 @@ UIPaletteIcons *ui_create_palette_icons(UIScreen *screen) {
     e->base.type = UI_PALETTE_ICONS;
     e->base.enabled = true;
 
-    e->base.draw = ui_palette_icons_draw;
-    e->base.destroy = ui_palette_icons;
+    e->base.draw = uiPaletteIconsDraw;
+    e->base.destroy = uiPaletteIcons;
     
-    ui_element_apply_default_properties(&e->base, screen);
+    uiElementApplyDefaultProperties(&e->base, screen);
 
     return e;
 }
 
-UIElement *ui_create_palette_icons_from_props(UIScreen *screen, const UIPropertyList *props) {
-    UIPaletteIcons *palette_icons = ui_create_palette_icons(screen);
+UIElement *uiCreatePaletteIconsFromProps(UIScreen *screen, const UIPropertyList *props) {
+    UIPaletteIcons *paletteIcons = uiCreatePaletteIcons(screen);
 
-    if (!palette_icons) return NULL;
+    if (!paletteIcons) return NULL;
 
-    ui_element_apply_properties(&palette_icons->base, screen, props);
+    uiElementApplyProperties(&paletteIcons->base, screen, props);
 
-    palette_icons->spacing = ui_prop_float(props, "spacing", 20);
+    paletteIcons->spacing = uiPropFloat(props, "spacing", 20);
 
-    return &palette_icons->base;
+    return &paletteIcons->base;
 }

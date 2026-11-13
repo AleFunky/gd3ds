@@ -9,35 +9,35 @@
 #include "menus/core/ui_screen.hpp"
 #include "math_helpers.hpp"
 
-void ui_window_set_tint(UIWindow* e, u32 color) {
+void uiWindowSetTint(UIWindow* e, u32 color) {
     if (!e) return;
 
     e->color = color;
 }
 
-void ui_window_set_atlas(UIWindow* e, int index) {
+void uiWindowSetAtlas(UIWindow* e, int index) {
     if (!e) return;
 
-    e->atlas = C2D_SpriteSheetGetImage(window_sheet, index);
+    e->atlas = C2D_SpriteSheetGetImage(windowSheet, index);
     if (e->atlas.tex) {
         e->border = e->atlas.subtex->width / 3;
     }
 }
 
-static void ui_window_draw(UIElement* e, UITransform *transform) {
+static void uiWindowDraw(UIElement* e, UITransform *transform) {
     UIWindow *window = (UIWindow *) e;
 
-    draw_9_slice(window->atlas, transform->x, transform->y, transform->scaleX, transform->scaleY, e->w, e->h, window->border, window->color);
+    draw9Slice(window->atlas, transform->x, transform->y, transform->scaleX, transform->scaleY, e->w, e->h, window->border, window->color);
 }
 
-static void ui_window_destroy(UIElement *e) {
+static void uiWindowDestroy(UIElement *e) {
     if (e) {
         delete (UIWindow *)e;
         e = NULL;
     }
 }
 
-UIWindow *ui_create_window(UIScreen *screen) {
+UIWindow *uiCreateWindow(UIScreen *screen) {
     UIWindow *e = new UIWindow{};
 
     if (!e) return NULL;
@@ -45,27 +45,27 @@ UIWindow *ui_create_window(UIScreen *screen) {
     e->base.type = UI_WINDOW;
     e->base.enabled = true;
 
-    e->base.draw = ui_window_draw;
-    e->base.destroy = ui_window_destroy;
+    e->base.draw = uiWindowDraw;
+    e->base.destroy = uiWindowDestroy;
     
-    ui_element_apply_default_properties(&e->base, screen);
+    uiElementApplyDefaultProperties(&e->base, screen);
 
-    ui_window_set_atlas(e, 0);
-    ui_window_set_tint(e, C2D_Color32(255, 255, 255, 255));
+    uiWindowSetAtlas(e, 0);
+    uiWindowSetTint(e, C2D_Color32(255, 255, 255, 255));
 
     return e;
 }
 
-UIElement *ui_create_window_from_props(UIScreen *screen, const UIPropertyList *props) {
-    UIWindow *window = ui_create_window(screen);
+UIElement *uiCreateWindowFromProps(UIScreen *screen, const UIPropertyList *props) {
+    UIWindow *window = uiCreateWindow(screen);
 
     if (!window) return NULL;
 
-    ui_element_apply_properties(&window->base, screen, props);
+    uiElementApplyProperties(&window->base, screen, props);
 
-    ui_window_set_atlas(window, ui_prop_int(props, "style", 0));
+    uiWindowSetAtlas(window, uiPropInt(props, "style", 0));
 
-    ui_window_set_tint(window, ui_prop_color(props, "color", ABGR8(255, 255, 255, 255)));
+    uiWindowSetTint(window, uiPropColor(props, "color", ABGR8(255, 255, 255, 255)));
 
     return &window->base;
 }

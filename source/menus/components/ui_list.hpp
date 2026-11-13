@@ -1,9 +1,9 @@
 
 #include "menus/core/ui_screen.hpp"
 
-void ui_list_add(UIList* list, UIElement* item);
-void ui_list_reset(UIList *list);
-void ui_list_set_capacity(UIList *list, size_t capacity);
+void uiListAdd(UIList* list, UIElement* item);
+void uiListReset(UIList *list);
+void uiListSetCapacity(UIList *list, size_t capacity);
 
-UIList *ui_create_list(UIScreen *screen);
-UIElement *ui_create_list_from_props(UIScreen *screen, const UIPropertyList *props);
+UIList *uiCreateList(UIScreen *screen);
+UIElement *uiCreateListFromProps(UIScreen *screen, const UIPropertyList *props);

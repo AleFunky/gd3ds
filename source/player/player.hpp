@@ -33,16 +33,16 @@
 #define END_ANIMATION_X_START (10.f * 30.f)
 
 typedef struct {
-    int slope_id;
+    int slopeID;
     float elapsed;
     bool snapDown;
 } SlopeData;
 
 typedef struct {
-    int object_id;
-    int player_frame;
-    float player_snap_diff;
-    int snapped_obj;
+    int objectID;
+    int playerFrame;
+    float playerSnapDiff;
+    int snappedObj;
 } SnapData;
 
 typedef struct {
@@ -57,13 +57,13 @@ typedef struct {
     float rot;
 
     float scale;
-    float delta_scale;
+    float deltaScale;
 
     float opacity;
 
     float life;
 
-    bool upside_down;
+    bool upsideDown;
     bool active;
 } P1Trail;
 
@@ -76,9 +76,9 @@ typedef struct {
     int robot;
     int spider;
 
-    Color p1_color;
-    Color p2_color;
-    Color glow_color;
+    Color p1Color;
+    Color p2Color;
+    Color glowColor;
 
     bool glow;
 } IconsDrawing;
@@ -87,128 +87,128 @@ typedef struct {
     float x;
     float y;
     
-    float vel_x;
-    float vel_y;
+    float velX;
+    float velY;
 
-    float new_vel_y;
+    float newVelY;
 
-    float delta_y;
+    float deltaY;
 
-    float platform_velocity, last_platform_velocity;
+    float platformVelocity, lastPlatformVelocity;
     
     float gravity;
 
     float rotation;
-    float cube_target_rotation;
+    float cubeTargetRotation;
 
-    int consecutive_jumps;
+    int consecutiveJumps;
     
     float width;
     float height;
 
-    InternalHitbox internal_hitbox;
+    InternalHitbox internalHitbox;
 
     int gamemode;
     
-    int rotation_direction;
+    int rotationDirection;
 
-    bool on_ground;
-    bool on_ceiling;
+    bool onGround;
+    bool onCeiling;
     bool mini;
-    bool upside_down;
-    bool touching_slope;
-    bool inverse_rotation;
-    bool snap_rotation;
+    bool upsideDown;
+    bool touchingSlope;
+    bool inverseRotation;
+    bool snapRotation;
     
-    int potentialSlope_id;
+    int potentialSlopeID;
 
-    bool left_ground;
+    bool leftGround;
 
-    float ball_rotation_speed;
-    float ball_slope_rotation_mult;
+    float ballRotationSpeed;
+    float ballSlopeRotationMult;
 
-    float cutscene_timer;
+    float cutsceneTimer;
 
-    int buffering_state;
+    int bufferingState;
 
-    float time_since_ground;
+    float timeSinceGround;
 
-    float ceiling_inv_time;
+    float ceilingInvTime;
 
     float timeElapsed;
 
-    int gravObj_id;
+    int gravObjID;
 
-    float burst_particle_timer;
+    float burstParticleTimer;
 
-    float cutscene_initial_player_x;
-    float cutscene_initial_player_y;
+    float cutsceneInitialPlayerX;
+    float cutsceneInitialPlayerY;
 
-    int slope_slide_coyote_time;
-    int allow_dart_slide;
-    int allow_head_hit;
+    int slopeSlideCoyoteTime;
+    int allowDartSlide;
+    int allowHeadHit;
 
     int frame;
 
-    SlopeData coyote_slope;
-    SlopeData slope_data;
+    SlopeData coyoteSlope;
+    SlopeData slopeData;
 
-    SnapData snap_data;
+    SnapData snapData;
 
-    bool velocity_override;
-    bool velocity_uncapped;
-    bool holding_jump_cancelled;
+    bool velocityOverride;
+    bool velocityUncapped;
+    bool holdingJumpCancelled;
     bool dashing;
-    float dash_slope;
-    float dash_angle;
-    float dash_fire_timer;
+    float dashSlope;
+    float dashAngle;
+    float dashFireTimer;
 
-    bool flash_active;
-    float flash_timer;
-    float flash_duration;
-    float flash_delay;
+    bool flashActive;
+    float flashTimer;
+    float flashDuration;
+    float flashDelay;
 
-    bool spider_scale_active;
-    float spider_scale_timer;
+    bool spiderScaleActive;
+    float spiderScaleTimer;
 
     bool jumped;
-    bool landed_from_jump;
+    bool landedFromJump;
 
-    int last_orb_pressed;
+    int lastOrbPressed;
 
-    bool buffer_ufo;
+    bool bufferUfo;
 
-    bool just_teleported;
+    bool justTeleported;
 
-    float robot_air_time;
-    bool robot_fire_visible;
-    bool robot_fire_out;
-    float robot_fire_timer;
-    float robot_fire_scale;
-    float robot_fire_exit_scale;
-    int anim_id;
-    int anim_frame;
-    float anim_timer;
-    int blend_from_anim_id;
-    int blend_from_frame;
-    float blend_from_timer;
-    float blend_timer;
+    float robotAirTime;
+    bool robotFireVisible;
+    bool robotFireOut;
+    float robotFireTimer;
+    float robotFireScale;
+    float robotFireExitScale;
+    int animID;
+    int animFrame;
+    float animTimer;
+    int blendFromAnimID;
+    int blendFromFrame;
+    float blendFromTimer;
+    float blendTimer;
 
-    float coyote_frames;
+    float coyoteFrames;
 
-    float follow_y[FOLLOW_Y_SAMPLES];
-    int follow_y_index;
-    float follow_y_timer;
+    float followY[FOLLOW_Y_SAMPLES];
+    int followYIndex;
+    float followYTimer;
 
-    IconsDrawing player_icons;
+    IconsDrawing playerIcons;
 
-    int collided_block;
-    int last_collided_block;
+    int collidedBlock;
+    int lastCollidedBlock;
 
-    bool gravity_changed_move;
+    bool gravityChangedMove;
 
-    float min_vel;
-    float max_vel;
+    float minVel;
+    float maxVel;
 } Player;
 
 typedef struct {
@@ -230,41 +230,41 @@ enum PlayerSpeeds {
     SPEED_COUNT
 };
 
-extern PlayerAction player_actions[2][MAX_ACTIONS];
-extern int num_actions[2];
+extern PlayerAction playerActions[2][MAX_ACTIONS];
+extern int numActions[2];
 
 extern MotionTrail *trail;
-extern MotionTrail trail_p1;
-extern MotionTrail trail_p2;
+extern MotionTrail trailP1;
+extern MotionTrail trailP2;
 
-extern MotionTrail *wave_trail;
-extern MotionTrail wave_trail_p1;
-extern MotionTrail wave_trail_p2;
+extern MotionTrail *waveTrail;
+extern MotionTrail waveTrailP1;
+extern MotionTrail waveTrailP2;
 
-extern ParticleSystem drag_particles[2];
-extern ParticleSystem drag_particles_2[2];
-extern ParticleSystem ship_fire_particles[2];
-extern ParticleSystem ship_secondary_particles[2];
-extern ParticleSystem secondary_particles[2];
-extern ParticleSystem burst_particles[2];
-extern ParticleSystem robot_fire_particles[2];
-extern ParticleSystem land_particles[2];
-extern ParticleSystem explosion_particles[2];
-extern ParticleSystem glitter_particles;
-extern ParticleSystem slow_speed_particles;
-extern ParticleSystem normal_speed_particles;
-extern ParticleSystem fast_speed_particles;
-extern ParticleSystem faster_speed_particles;
-extern ParticleSystem fastest_speed_particles;
-extern ParticleSystem coin_pickup_particles;
+extern ParticleSystem dragParticles[2];
+extern ParticleSystem dragParticles2[2];
+extern ParticleSystem shipFireParticles[2];
+extern ParticleSystem shipSecondaryParticles[2];
+extern ParticleSystem secondaryParticles[2];
+extern ParticleSystem burstParticles[2];
+extern ParticleSystem robotFireParticles[2];
+extern ParticleSystem landParticles[2];
+extern ParticleSystem explosionParticles[2];
+extern ParticleSystem glitterParticles;
+extern ParticleSystem slowSpeedParticles;
+extern ParticleSystem normalSpeedParticles;
+extern ParticleSystem fastSpeedParticles;
+extern ParticleSystem fasterSpeedParticles;
+extern ParticleSystem fastestSpeedParticles;
+extern ParticleSystem coinPickupParticles;
 
 typedef struct KeyInput KeyInput;
 
-extern KeyInput curr_input;
-extern KeyInput curr_old_input;
+extern KeyInput currInput;
+extern KeyInput currOldInput;
 
-extern const float player_speeds[SPEED_COUNT];
-extern const float player_speed_mults[SPEED_COUNT];
+extern const float playerSpeeds[SPEED_COUNT];
+extern const float playerSpeedMults[SPEED_COUNT];
 
 inline float getTop(Player *player)  { return player->y + player->height / 2; }
 inline float getBottom(Player *player)  { return player->y - player->height / 2; }
@@ -275,66 +275,66 @@ inline float getGroundBottom(Player *player)  { return player->y - (player->heig
 inline float getRight(Player *player)  { return player->x + player->width / 2; }
 inline float getLeft(Player *player)  { return player->x - player->width / 2; }
 
-inline float getInternalTop(Player *player)  { return player->y + player->internal_hitbox.height / 2; }
-inline float getInternalBottom(Player *player)  { return player->y - player->internal_hitbox.height / 2; }
-inline float getInternalRight(Player *player)  { return player->x + player->internal_hitbox.width / 2; }
-inline float getInternalLeft(Player *player)  { return player->x - player->internal_hitbox.width / 2; }
+inline float getInternalTop(Player *player)  { return player->y + player->internalHitbox.height / 2; }
+inline float getInternalBottom(Player *player)  { return player->y - player->internalHitbox.height / 2; }
+inline float getInternalRight(Player *player)  { return player->x + player->internalHitbox.width / 2; }
+inline float getInternalLeft(Player *player)  { return player->x - player->internalHitbox.width / 2; }
 
-inline float gravBottom(Player *player) { return player->upside_down ? -getTop(player) : getBottom(player); }
-inline float gravTop(Player *player) { return player->upside_down ? -getBottom(player) : getTop(player); }
+inline float gravBottom(Player *player) { return player->upsideDown ? -getTop(player) : getBottom(player); }
+inline float gravTop(Player *player) { return player->upsideDown ? -getBottom(player) : getTop(player); }
 
-inline float gravInternalBottom(Player *player) { return player->upside_down ? -getInternalTop(player) : getInternalBottom(player); }
-inline float gravInternalTop(Player *player) { return player->upside_down ? -getInternalBottom(player) : getInternalTop(player); }
+inline float gravInternalBottom(Player *player) { return player->upsideDown ? -getInternalTop(player) : getInternalBottom(player); }
+inline float gravInternalTop(Player *player) { return player->upsideDown ? -getInternalBottom(player) : getInternalTop(player); }
 
-inline float grav(Player *player, float val) { return player->upside_down ? -val : val; }
+inline float grav(Player *player, float val) { return player->upsideDown ? -val : val; }
 
-inline float obj_getTop(int object)  { 
+inline float objGetTop(int object)  { 
     return objects.y[object] + objects.height[object] / 2; 
 }
-inline float obj_getBottom(int object)  { 
+inline float objGetBottom(int object)  { 
     return objects.y[object] - objects.height[object] / 2; 
 }
-inline float obj_getRight(int object)  {  
+inline float objGetRight(int object)  {  
     return objects.x[object] + objects.width[object] / 2; 
 }
-inline float obj_getLeft(int object)  { 
+inline float objGetLeft(int object)  { 
     return objects.x[object] - objects.width[object] / 2; 
 }
-inline float obj_gravBottom(Player *player, int object) { return player->upside_down ? -obj_getTop(object) : obj_getBottom(object); }
-inline float obj_gravTop(Player *player, int object) { return player->upside_down ? -obj_getBottom(object) : obj_getTop(object); }
+inline float objGravBottom(Player *player, int object) { return player->upsideDown ? -objGetTop(object) : objGetBottom(object); }
+inline float objGravTop(Player *player, int object) { return player->upsideDown ? -objGetBottom(object) : objGetTop(object); }
 
-void handle_player(Player *player);
-void draw_player(Player *player);
-void run_player(Player *player);
+void handlePlayer(Player *player);
+void drawPlayer(Player *player);
+void runPlayer(Player *player);
 
-void player_flash(Player *player, float duration, float delay);
+void playerFlash(Player *player, float duration, float delay);
 
-void draw_dash_fire(Player *player);
-void add_dash_exit(Player *player);
+void drawDashFire(Player *player);
+void addDashExit(Player *player);
 
-void draw_hitbox(int obj);
-void draw_player_hitbox(Player *player);
-void draw_internal_hitbox(Player *player);
-void draw_rotated_hitbox(Player *player);
-void draw_hitbox_trail(int player);
-void add_new_hitbox(Player *player);
+void drawHitbox(int obj);
+void drawPlayerHitbox(Player *player);
+void drawInternalHitbox(Player *player);
+void drawRotatedHitbox(Player *player);
+void drawHitboxTrail(int player);
+void addNewHitbox(Player *player);
 
-void set_animation(Player *player, int robot_anim_id);
-void set_animation(Player *player, int spider_anim_id);
+void setAnimation(Player *player, int robotAnimID);
+void setAnimation(Player *player, int spiderAnimID);
 
-void update_p1_trail(Player *player, int player_id);
-void draw_p1_trail(Player *player, int player_id);
+void updateP1Trail(Player *player, int playerID);
+void drawP1Trail(Player *player, int playerID);
 
-void update_rotation_direction(Player *player);
+void updateRotationDirection(Player *player);
 
-void push_player_action(void (*func)(Player *));
+void pushPlayerAction(void (*func)(Player *));
 
-float convert_to_closest_rotation(float rotation, float angle);
+float convertToClosestRotation(float rotation, float angle);
 
-bool player_gamemode_is_flying(Player *player);
-void player_non_flying_landing(Player *player);
+bool playerGamemodeIsFlying(Player *player);
+void playerNonFlyingLanding(Player *player);
 
-float get_blend_duration(Player *player);
-void set_blend_timer(Player *player, float timer);
+float getBlendDuration(Player *player);
+void setBlendTimer(Player *player, float timer);
 
-void stop_dashing(Player *player);
+void stopDashing(Player *player);

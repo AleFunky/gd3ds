@@ -30,409 +30,409 @@
 
 #include "save/saving.hpp"
 
-bool game_paused, in_level_complete = false;
-static float anim_time, target_pos, current_pos;
-static bool hide_pause_menu = false;
+bool gamePaused, inLevelComplete = false;
+static float animTime, targetPos, currentPos;
+static bool hidePauseMenu = false;
 
-static UILabel *fps_label;
-static UIProgressBar *progress_bar;
+static UILabel *fpsLabel;
+static UIProgressBar *progressBar;
 static UILabel *percent;
-static UILabel *level_name;
+static UILabel *levelName;
 
-static UIWindow *pause_window;
+static UIWindow *pauseWindow;
 
 #define MAX_PAUSE_MENU_ELEMENTS 16
-static UIElement *pause_menu_elements[MAX_PAUSE_MENU_ELEMENTS];
-static float pause_menu_base_y[MAX_PAUSE_MENU_ELEMENTS];
-static int pause_menu_count;
-static UIElement *pause_hide_btn;
-static float pause_hide_btn_y;
-static float pause_hide_offset;
+static UIElement *pauseMenuElements[MAX_PAUSE_MENU_ELEMENTS];
+static float pauseMenuBaseY[MAX_PAUSE_MENU_ELEMENTS];
+static int pauseMenuCount;
+static UIElement *pauseHideBtn;
+static float pauseHideBtnY;
+static float pauseHideOffset;
 
-static UIProgressBar *normal_progress;
-static UILabel *normal_progress_val;
-static UIProgressBar *practice_progress;
-static UILabel *practice_progress_val;
+static UIProgressBar *normalProgress;
+static UILabel *normalProgressVal;
+static UIProgressBar *practiceProgress;
+static UILabel *practiceProgressVal;
 
-static UISlider *music_slider_bar;
-static UISlider *sound_slider_bar;
+static UISlider *musicSliderBar;
+static UISlider *soundSliderBar;
 
-static UIImage *coin_1;
-static UIImage *coin_2;
-static UIImage *coin_3;
+static UIImage *coin1;
+static UIImage *coin2;
+static UIImage *coin3;
 
-static UIImage *coins_full[3];
-static bool coins_got[3];
-static float coin_anims[3];
-static bool coins_circles_spawned[3];
+static UIImage *coinsFull[3];
+static bool coinsGot[3];
+static float coinAnims[3];
+static bool coinsCirclesSpawned[3];
 
-static UIImage *coin_1_top;
-static UIImage *coin_2_top;
-static UIImage *coin_3_top;
+static UIImage *coin1Top;
+static UIImage *coin2Top;
+static UIImage *coin3Top;
 
-static UIScreen *screen_top;
+static UIScreen *screenTop;
 static UIScreen *screen;
 
 int decimal;
 float fps;
 
-static void update_progress_bars() {
-    LevelData *level_data_sel = &current_level_entry->data;
+static void updateProgressBars() {
+    LevelData *levelDataSel = &currentLevelEntry->data;
 
-    normal_progress->value = level_data_sel->normal_progress;
-    practice_progress->value = level_data_sel->practice_progress;
+    normalProgress->value = levelDataSel->normalProgress;
+    practiceProgress->value = levelDataSel->practiceProgress;
 
     char normal[32];
     char practice[32];
-    snprintf(normal, sizeof(normal), "%d%%", level_data_sel->normal_progress);
-    snprintf(practice, sizeof(practice), "%d%%", level_data_sel->practice_progress);
+    snprintf(normal, sizeof(normal), "%d%%", levelDataSel->normalProgress);
+    snprintf(practice, sizeof(practice), "%d%%", levelDataSel->practiceProgress);
 
-    ui_label_set_text(normal_progress_val, normal);
-    ui_label_set_text(practice_progress_val, practice);
+    uiLabelSetText(normalProgressVal, normal);
+    uiLabelSetText(practiceProgressVal, practice);
 
-    if (state.custom_level) {
-        bool unrated = level_has_unverified_coins();
-        UIImage *tops[3] = { coin_1_top, coin_2_top, coin_3_top };
-        bool got[3] = { level_data_sel->coin1, level_data_sel->coin2, level_data_sel->coin3 };
+    if (state.customLevel) {
+        bool unrated = levelHasUnverifiedCoins();
+        UIImage *tops[3] = { coin1Top, coin2Top, coin3Top };
+        bool got[3] = { levelDataSel->coin1, levelDataSel->coin2, levelDataSel->coin3 };
 
         for (int i = 0; i < 3; i++) {
-            ui_image_set_image(tops[i], COIN_BIG_USER_ID, 0);
-            ui_image_set_tint(tops[i], got[i]
+            uiImageSetImage(tops[i], COIN_BIG_USER_ID, 0);
+            uiImageSetTint(tops[i], got[i]
                 ? (unrated ? USER_COIN_UNRATED_TINT : C2D_Color32(255, 255, 255, 255))
                 : (unrated ? USER_COIN_UNRATED_EMPTY_TINT : C2D_Color32(165, 165, 165, 255)));
         }
     } else {
-        ui_image_set_image(coin_1_top, (level_data_sel->coin1 ? PAUSE_COIN_FILLED_ID : PAUSE_COIN_UNFILLED_ID), 0);
-        ui_image_set_image(coin_2_top, (level_data_sel->coin2 ? PAUSE_COIN_FILLED_ID : PAUSE_COIN_UNFILLED_ID), 0);
-        ui_image_set_image(coin_3_top, (level_data_sel->coin3 ? PAUSE_COIN_FILLED_ID : PAUSE_COIN_UNFILLED_ID), 0);
+        uiImageSetImage(coin1Top, (levelDataSel->coin1 ? PAUSE_COIN_FILLED_ID : PAUSE_COIN_UNFILLED_ID), 0);
+        uiImageSetImage(coin2Top, (levelDataSel->coin2 ? PAUSE_COIN_FILLED_ID : PAUSE_COIN_UNFILLED_ID), 0);
+        uiImageSetImage(coin3Top, (levelDataSel->coin3 ? PAUSE_COIN_FILLED_ID : PAUSE_COIN_UNFILLED_ID), 0);
     }
 }
 
-static void reset_coin(LevelData *level_data_sel, int i){
-    if((!level_data_sel->coin1 && i == 0)
-        || (!level_data_sel->coin2 && i == 1)
-        || (!level_data_sel->coin3 && i == 2)) { 
-            coins_full[i]->base.enabled = false;
+static void resetCoin(LevelData *levelDataSel, int i){
+    if((!levelDataSel->coin1 && i == 0)
+        || (!levelDataSel->coin2 && i == 1)
+        || (!levelDataSel->coin3 && i == 2)) { 
+            coinsFull[i]->base.enabled = false;
         } else {
-            coins_full[i]->base.enabled = true;
+            coinsFull[i]->base.enabled = true;
     }
 }
 
-void reset_coins(){
-    LevelData *level_data_sel = &current_level_entry->data;
+void resetCoins(){
+    LevelData *levelDataSel = &currentLevelEntry->data;
 
-    ui_use_effect_clear((UIUseEffect *) ui_get_element_by_tag(screen, "coin_circle"));
+    uiUseEffectClear((UIUseEffect *) uiGetElementByTag(screen, "coin_circle"));
 
     for(int i = 0; i < 3; i++){
-        reset_coin(level_data_sel, i);
-        coins_got[i] = false;
-        coin_anims[i] = 0.f;
-        coins_circles_spawned[i] = false;
+        resetCoin(levelDataSel, i);
+        coinsGot[i] = false;
+        coinAnims[i] = 0.f;
+        coinsCirclesSpawned[i] = false;
     }
 }
 
-static void apply_coin_slot_count(){
-    int count = get_level_coin_count();
+static void applyCoinSlotCount(){
+    int count = getLevelCoinCount();
     if (count > 3) count = 3;
 
-    UIImage *slots[3] = { coin_1, coin_2, coin_3 };
+    UIImage *slots[3] = { coin1, coin2, coin3 };
     for(int i = 0; i < 3; i++){
         if (slots[i]) slots[i]->base.enabled = (i < count);
-        if (i >= count && coins_full[i]) coins_full[i]->base.enabled = false;
+        if (i >= count && coinsFull[i]) coinsFull[i]->base.enabled = false;
     }
 
     if (count == 0) {
-        ui_run_func_on_tag(screen, "coin_circle", ui_disable_element);
+        uiRunFuncOnTag(screen, "coin_circle", uiDisableElement);
     }
 }
 
-void pause_game() {
-    if (state.end_wall_anim_playing) return;
+void pauseGame() {
+    if (state.endWallAnimPlaying) return;
 
-    update_progress_bars();
-    game_paused = true;
-    if (song_loaded || state.practice_mode) pause_playback_mp3();
-    int coin_count = get_level_coin_count();
-    if (coin_count > 3) coin_count = 3;
+    updateProgressBars();
+    gamePaused = true;
+    if (songLoaded || state.practiceMode) pausePlaybackMP3();
+    int coinCount = getLevelCoinCount();
+    if (coinCount > 3) coinCount = 3;
 
-    UIImage *coin_top_slots[3] = { coin_1_top, coin_2_top, coin_3_top };
+    UIImage *coinTopSlots[3] = { coin1Top, coin2Top, coin3Top };
     for (int i = 0; i < 3; i++) {
-        coin_top_slots[i]->base.x = (i - (coin_count - 1) / 2.f) * 50.f;
-        coin_top_slots[i]->base.enabled = (i < coin_count);
+        coinTopSlots[i]->base.x = (i - (coinCount - 1) / 2.f) * 50.f;
+        coinTopSlots[i]->base.enabled = (i < coinCount);
     }
-    ui_run_func_on_tag(screen, "coin_1", ui_disable_element);
-    ui_run_func_on_tag(screen, "coin_2", ui_disable_element);
-    ui_run_func_on_tag(screen, "coin_3", ui_disable_element);
-    ui_run_func_on_tag(screen, "coin_1_full", ui_disable_element);
-    ui_run_func_on_tag(screen, "coin_2_full", ui_disable_element);
-    ui_run_func_on_tag(screen, "coin_3_full", ui_disable_element);
-    ui_run_func_on_tag(screen, "coin_circle", ui_disable_element);
-    ui_run_func_on_tag(screen_top, "pause_menu", ui_enable_element);
-    ui_run_func_on_tag(screen, "paused", ui_enable_element);
-    ui_run_func_on_tag(screen, "not_paused", ui_disable_element);
+    uiRunFuncOnTag(screen, "coin_1", uiDisableElement);
+    uiRunFuncOnTag(screen, "coin_2", uiDisableElement);
+    uiRunFuncOnTag(screen, "coin_3", uiDisableElement);
+    uiRunFuncOnTag(screen, "coin_1_full", uiDisableElement);
+    uiRunFuncOnTag(screen, "coin_2_full", uiDisableElement);
+    uiRunFuncOnTag(screen, "coin_3_full", uiDisableElement);
+    uiRunFuncOnTag(screen, "coin_circle", uiDisableElement);
+    uiRunFuncOnTag(screenTop, "pause_menu", uiEnableElement);
+    uiRunFuncOnTag(screen, "paused", uiEnableElement);
+    uiRunFuncOnTag(screen, "not_paused", uiDisableElement);
 }
 
-static void collect_pause_menu_element(UIElement *e) {
-    if (e == pause_hide_btn || pause_menu_count >= MAX_PAUSE_MENU_ELEMENTS) return;
+static void collectPauseMenuElement(UIElement *e) {
+    if (e == pauseHideBtn || pauseMenuCount >= MAX_PAUSE_MENU_ELEMENTS) return;
 
-    pause_menu_elements[pause_menu_count] = e;
-    pause_menu_base_y[pause_menu_count] = e->y;
-    pause_menu_count++;
+    pauseMenuElements[pauseMenuCount] = e;
+    pauseMenuBaseY[pauseMenuCount] = e->y;
+    pauseMenuCount++;
 }
 
-static void apply_pause_menu_offset(float offset) {
-    for (int i = 0; i < pause_menu_count; i++) pause_menu_elements[i]->y = pause_menu_base_y[i] + offset;
+static void applyPauseMenuOffset(float offset) {
+    for (int i = 0; i < pauseMenuCount; i++) pauseMenuElements[i]->y = pauseMenuBaseY[i] + offset;
 
-    if (pause_hide_btn) {
-        float y = pause_hide_btn_y + offset;
+    if (pauseHideBtn) {
+        float y = pauseHideBtnY + offset;
 
-        pause_hide_btn->y = (y > SCREEN_HEIGHT - 20.f) ? SCREEN_HEIGHT - 20.f : y;
+        pauseHideBtn->y = (y > SCREEN_HEIGHT - 20.f) ? SCREEN_HEIGHT - 20.f : y;
     }
 }
 
-static void handle_hide_animation(float delta) {
+static void handleHideAnimation(float delta) {
     if (settingsState.swapGameplayScreens) {
-        float target_offset = hide_pause_menu ? SCREEN_HEIGHT : 0.f;
+        float targetOffset = hidePauseMenu ? SCREEN_HEIGHT : 0.f;
 
-        if (pause_hide_offset == target_offset) return;
+        if (pauseHideOffset == targetOffset) return;
 
-        pause_hide_offset = easeValue(QUAD_IN, pause_hide_offset, target_offset, anim_time, 4.f, 1.f);
-        apply_pause_menu_offset(pause_hide_offset);
+        pauseHideOffset = easeValue(QUAD_IN, pauseHideOffset, targetOffset, animTime, 4.f, 1.f);
+        applyPauseMenuOffset(pauseHideOffset);
 
-        anim_time += delta;
+        animTime += delta;
         return;
     }
 
-    if (hide_pause_menu) {
-        target_pos = 0.f - 120.f;
+    if (hidePauseMenu) {
+        targetPos = 0.f - 120.f;
     } else {
-        target_pos = 0.f + 120.f;
+        targetPos = 0.f + 120.f;
     }
 
-    if (pause_window->base.y == target_pos) return;
+    if (pauseWindow->base.y == targetPos) return;
     
-    current_pos = easeValue(QUAD_IN, pause_window->base.y, target_pos, anim_time, 4.f, 1.f);
-    ui_element_set_position((UIElement *) pause_window, (float)SCREEN_WIDTH / 2.f, current_pos);
+    currentPos = easeValue(QUAD_IN, pauseWindow->base.y, targetPos, animTime, 4.f, 1.f);
+    uiElementSetPosition((UIElement *) pauseWindow, (float)SCREEN_WIDTH / 2.f, currentPos);
     
-    anim_time += delta;
+    animTime += delta;
 }
 
-void unpause_game() {
-    game_paused = false;
-    hide_pause_menu = false;
-    ui_image_set_tint((UIImage *) ui_get_element_by_tag(screen, "hide_btn"), C2D_Color32(255, 255, 255, 170));
+void unpauseGame() {
+    gamePaused = false;
+    hidePauseMenu = false;
+    uiImageSetTint((UIImage *) uiGetElementByTag(screen, "hide_btn"), C2D_Color32(255, 255, 255, 170));
 
-    ui_element_set_position((UIElement *) pause_window, (float)SCREEN_WIDTH / 2.f, (float)SCREEN_HEIGHT / 2.f);
+    uiElementSetPosition((UIElement *) pauseWindow, (float)SCREEN_WIDTH / 2.f, (float)SCREEN_HEIGHT / 2.f);
 
-    pause_hide_offset = 0.f;
-    apply_pause_menu_offset(0.f);
+    pauseHideOffset = 0.f;
+    applyPauseMenuOffset(0.f);
 
-    if (pi_enabled) {
-        sync_precise_input(true);
+    if (piEnabled) {
+        syncPreciseInput(true);
     }
-    if (state.death_timer <= 0 && (song_loaded || state.practice_mode)) {
-        unpause_playback_mp3();
+    if (state.deathTimer <= 0 && (songLoaded || state.practiceMode)) {
+        unpausePlaybackMP3();
     }
-    ui_run_func_on_tag(screen_top, "coin_1", ui_disable_element);
-    ui_run_func_on_tag(screen_top, "coin_2", ui_disable_element);
-    ui_run_func_on_tag(screen_top, "coin_3", ui_disable_element);
-    ui_run_func_on_tag(screen, "coin_1", ui_enable_element);
-    ui_run_func_on_tag(screen, "coin_2", ui_enable_element);
-    ui_run_func_on_tag(screen, "coin_3", ui_enable_element);
+    uiRunFuncOnTag(screenTop, "coin_1", uiDisableElement);
+    uiRunFuncOnTag(screenTop, "coin_2", uiDisableElement);
+    uiRunFuncOnTag(screenTop, "coin_3", uiDisableElement);
+    uiRunFuncOnTag(screen, "coin_1", uiEnableElement);
+    uiRunFuncOnTag(screen, "coin_2", uiEnableElement);
+    uiRunFuncOnTag(screen, "coin_3", uiEnableElement);
     for(int i = 0; i < 3; i++){
-        reset_coin(&current_level_entry->data, i);
+        resetCoin(&currentLevelEntry->data, i);
     }
-    ui_run_func_on_tag(screen, "coin_circle", ui_enable_element);
-    apply_coin_slot_count();
-    ui_run_func_on_tag(screen_top, "pause_menu", ui_disable_element);
-    ui_run_func_on_tag(screen, "paused", ui_disable_element);
-    ui_run_func_on_tag(screen, "not_paused", ui_enable_element);
+    uiRunFuncOnTag(screen, "coin_circle", uiEnableElement);
+    applyCoinSlotCount();
+    uiRunFuncOnTag(screenTop, "pause_menu", uiDisableElement);
+    uiRunFuncOnTag(screen, "paused", uiDisableElement);
+    uiRunFuncOnTag(screen, "not_paused", uiEnableElement);
     
-    if (!state.practice_mode || settingsState.hidePracticeButtons) {
-        ui_run_func_on_tag(screen, "practice_buttons", ui_disable_element);
+    if (!state.practiceMode || settingsState.hidePracticeButtons) {
+        uiRunFuncOnTag(screen, "practice_buttons", uiDisableElement);
     }
 }
 
-static void exit_level() {
-    if (game_paused){
-        exiting_level = true;
-        ui_stack_push_game_state(STATE_MENU);
+static void exitLevel() {
+    if (gamePaused){
+        exitingLevel = true;
+        uiStackPushGameState(STATE_MENU);
     }
 }
 
-static void restart_level() {
-    init_variables();
-    reload_level();
-    if (state.practice_mode) {
-        if (settingsState.autoCheckpoints && player_gamemode_is_flying(&state.death_player) && pseudo_checkpoint_exists) {
-            delete_last_checkpoint();
-            pseudo_checkpoint_exists = false;
+static void restartLevel() {
+    initVariables();
+    reloadLevel();
+    if (state.practiceMode) {
+        if (settingsState.autoCheckpoints && playerGamemodeIsFlying(&state.deathPlayer) && pseudoCheckpointExists) {
+            deleteLastCheckpoint();
+            pseudoCheckpointExists = false;
         }
         
-        if (get_checkpoint_count() > 0) {
-            restore_checkpoint();
+        if (getCheckpointCount() > 0) {
+            restoreCheckpoint();
         } else if (settingsState.practiceMusicSync) {
-            seek_mp3(level_info.song_offset);
+            seekMP3(levelInfo.songOffset);
         }
-    } else if (song_loaded) seek_mp3(level_info.song_offset);
+    } else if (songLoaded) seekMP3(levelInfo.songOffset);
 
-    reset_coins();
+    resetCoins();
 
-    unpause_game();
+    unpauseGame();
 }
 
-static void hide_menu() {
-    hide_pause_menu = !hide_pause_menu;
-    ui_image_set_tint((UIImage *) ui_get_element_by_tag(screen, "hide_btn"), C2D_Color32(255, 255, 255, hide_pause_menu ? 255 : 170));
+static void hideMenu() {
+    hidePauseMenu = !hidePauseMenu;
+    uiImageSetTint((UIImage *) uiGetElementByTag(screen, "hide_btn"), C2D_Color32(255, 255, 255, hidePauseMenu ? 255 : 170));
 
-    anim_time = 0.f;
+    animTime = 0.f;
 }
 
-static void action_pause(UIElement *e, const UIPropertyList *args) { 
-    pause_game();
+static void actionPause(UIElement *e, const UIPropertyList *args) { 
+    pauseGame();
 }
 
-static void action_unpause(UIElement *e, const UIPropertyList *args) {
-    unpause_game();
+static void actionUnpause(UIElement *e, const UIPropertyList *args) {
+    unpauseGame();
 }
 
-static void action_exit(UIElement *e, const UIPropertyList *args) {
-    exit_level();
+static void actionExit(UIElement *e, const UIPropertyList *args) {
+    exitLevel();
 }
 
-static void action_restart(UIElement *e, const UIPropertyList *args) {
-    restart_level();
+static void actionRestart(UIElement *e, const UIPropertyList *args) {
+    restartLevel();
 }
 
-static void action_practice_mode(UIElement *e, const UIPropertyList *args) {
-    if (!state.practice_mode) {
-        start_practice_mode();
+static void actionPracticeMode(UIElement *e, const UIPropertyList *args) {
+    if (!state.practiceMode) {
+        startPracticeMode();
     } else {
-        exit_practice_mode();
+        exitPracticeMode();
     }
 
-    action_unpause(e, NULL);
+    actionUnpause(e, NULL);
 }
 
-static void action_add_checkpoint(UIElement *e, const UIPropertyList *args) {
-    new_checkpoint();
+static void actionAddCheckpoint(UIElement *e, const UIPropertyList *args) {
+    newCheckpoint();
 }
-static void action_remove_checkpoint(UIElement *e, const UIPropertyList *args) {
-    delete_last_checkpoint();
+static void actionRemoveCheckpoint(UIElement *e, const UIPropertyList *args) {
+    deleteLastCheckpoint();
 }
-static void action_hide_menu(UIElement *e, const UIPropertyList *args) {
-    hide_menu();
+static void actionHideMenu(UIElement *e, const UIPropertyList *args) {
+    hideMenu();
 }
 
-static UIActionDef gameplay_actions[] = {
-    {"pause", action_pause },
-    {"unpause", action_unpause },
-    {"exit", action_exit },
-    {"restart", action_restart },
-    {"practice", action_practice_mode },
-    {"add_check", action_add_checkpoint },
-    {"remove_check", action_remove_checkpoint },
-    {"hide_menu", action_hide_menu}
+static UIActionDef gameplayActions[] = {
+    {"pause", actionPause },
+    {"unpause", actionUnpause },
+    {"exit", actionExit },
+    {"restart", actionRestart },
+    {"practice", actionPracticeMode },
+    {"add_check", actionAddCheckpoint },
+    {"remove_check", actionRemoveCheckpoint },
+    {"hide_menu", actionHideMenu}
 };
 
-void gameplay_init_top(UIScreen *s){
-    screen_top = s;
+void gameplayInitTop(UIScreen *s){
+    screenTop = s;
 
-    fps_label = (UILabel *) ui_get_element_by_tag(screen_top, "fps");
-    progress_bar = (UIProgressBar *) ui_get_element_by_tag(screen_top, "progressalert");
-    percent = (UILabel *) ui_get_element_by_tag(screen_top, "percent");
+    fpsLabel = (UILabel *) uiGetElementByTag(screenTop, "fps");
+    progressBar = (UIProgressBar *) uiGetElementByTag(screenTop, "progressalert");
+    percent = (UILabel *) uiGetElementByTag(screenTop, "percent");
 
-    pause_window = (UIWindow *) ui_get_element_by_tag(s, "bgwindow");
-    level_name = (UILabel *) ui_get_element_by_tag(screen_top, "level_title");
+    pauseWindow = (UIWindow *) uiGetElementByTag(s, "bgwindow");
+    levelName = (UILabel *) uiGetElementByTag(screenTop, "level_title");
 
-    Color color = get_white_if_black(p1_color);
+    Color color = getWhiteIfBlack(p1Color);
 
-    ui_progress_bar_set_tint(progress_bar, C2D_Color32(color.r, color.g, color.b, 255));
+    uiProgressBarSetTint(progressBar, C2D_Color32(color.r, color.g, color.b, 255));
 
-    ui_window_set_tint(pause_window, C2D_Color32(0, 0, 0, 150));
+    uiWindowSetTint(pauseWindow, C2D_Color32(0, 0, 0, 150));
 
-    ui_label_set_text(level_name, level_info.level_name);
+    uiLabelSetText(levelName, levelInfo.levelName);
 
-    normal_progress = (UIProgressBar *) ui_get_element_by_tag(screen_top, "normalprogress");
-    normal_progress_val = (UILabel *) ui_get_element_by_tag(screen_top, "normalprogressvalue");
-    practice_progress = (UIProgressBar *) ui_get_element_by_tag(screen_top, "practiceprogress");
-    practice_progress_val = (UILabel *) ui_get_element_by_tag(screen_top, "practiceprogressvalue");
+    normalProgress = (UIProgressBar *) uiGetElementByTag(screenTop, "normalprogress");
+    normalProgressVal = (UILabel *) uiGetElementByTag(screenTop, "normalprogressvalue");
+    practiceProgress = (UIProgressBar *) uiGetElementByTag(screenTop, "practiceprogress");
+    practiceProgressVal = (UILabel *) uiGetElementByTag(screenTop, "practiceprogressvalue");
     
-    ui_progress_bar_set_tint(normal_progress, C2D_Color32(0, 255, 0, 255));
-    ui_progress_bar_set_tint(practice_progress, C2D_Color32(0, 255, 255, 255));
+    uiProgressBarSetTint(normalProgress, C2D_Color32(0, 255, 0, 255));
+    uiProgressBarSetTint(practiceProgress, C2D_Color32(0, 255, 255, 255));
 
     // Hide pause menu
-    ui_run_func_on_tag(screen_top, "coin_1", ui_disable_element);
-    ui_run_func_on_tag(screen_top, "coin_2", ui_disable_element);
-    ui_run_func_on_tag(screen_top, "coin_3", ui_disable_element);
-    ui_run_func_on_tag(screen_top, "pause_menu", ui_disable_element);
+    uiRunFuncOnTag(screenTop, "coin_1", uiDisableElement);
+    uiRunFuncOnTag(screenTop, "coin_2", uiDisableElement);
+    uiRunFuncOnTag(screenTop, "coin_3", uiDisableElement);
+    uiRunFuncOnTag(screenTop, "pause_menu", uiDisableElement);
 
-    coin_1_top = (UIImage *) ui_get_element_by_tag(screen_top, "coin_1");
-    coin_2_top = (UIImage *) ui_get_element_by_tag(screen_top, "coin_2");
-    coin_3_top = (UIImage *) ui_get_element_by_tag(screen_top, "coin_3");
+    coin1Top = (UIImage *) uiGetElementByTag(screenTop, "coin_1");
+    coin2Top = (UIImage *) uiGetElementByTag(screenTop, "coin_2");
+    coin3Top = (UIImage *) uiGetElementByTag(screenTop, "coin_3");
 }
 
-void gameplay_init(UIScreen *s) {
+void gameplayInit(UIScreen *s) {
     screen = s;
-    hide_pause_menu = false;
+    hidePauseMenu = false;
 
-    level_unrated_online_refresh();
+    levelUnratedOnlineRefresh();
     
-    coin_1 = (UIImage *) ui_get_element_by_tag(s, "coin_1");
-    coin_2 = (UIImage *) ui_get_element_by_tag(s, "coin_2");
-    coin_3 = (UIImage *) ui_get_element_by_tag(s, "coin_3");
+    coin1 = (UIImage *) uiGetElementByTag(s, "coin_1");
+    coin2 = (UIImage *) uiGetElementByTag(s, "coin_2");
+    coin3 = (UIImage *) uiGetElementByTag(s, "coin_3");
     
-    coins_full[0] = (UIImage *) ui_get_element_by_tag(s, "coin_1_full");
-    coins_full[1] = (UIImage *) ui_get_element_by_tag(s, "coin_2_full");
-    coins_full[2] = (UIImage *) ui_get_element_by_tag(s, "coin_3_full");
+    coinsFull[0] = (UIImage *) uiGetElementByTag(s, "coin_1_full");
+    coinsFull[1] = (UIImage *) uiGetElementByTag(s, "coin_2_full");
+    coinsFull[2] = (UIImage *) uiGetElementByTag(s, "coin_3_full");
     
-    if (state.custom_level) {
-        bool unrated = level_has_unverified_coins();
-        UIImage *coin_slots[3] = { coin_1, coin_2, coin_3 };
+    if (state.customLevel) {
+        bool unrated = levelHasUnverifiedCoins();
+        UIImage *coinSlots[3] = { coin1, coin2, coin3 };
         for (int i = 0; i < 3; i++) {
-            ui_image_set_image(coin_slots[i], COIN_BIG_USER_ID, 0);
-            ui_element_set_scale((UIElement *) coin_slots[i], COIN_BIG_USER_SCALE);
-            ui_image_set_tint(coin_slots[i], unrated ? USER_COIN_UNRATED_EMPTY_TINT : C2D_Color32(165, 165, 165, 255));
-            ui_image_set_image(coins_full[i], COIN_BIG_USER_ID, 0);
-            ui_element_set_scale((UIElement *) coins_full[i], COIN_BIG_USER_SCALE);
-            if (unrated) ui_image_set_tint(coins_full[i], USER_COIN_UNRATED_TINT);
+            uiImageSetImage(coinSlots[i], COIN_BIG_USER_ID, 0);
+            uiElementSetScale((UIElement *) coinSlots[i], COIN_BIG_USER_SCALE);
+            uiImageSetTint(coinSlots[i], unrated ? USER_COIN_UNRATED_EMPTY_TINT : C2D_Color32(165, 165, 165, 255));
+            uiImageSetImage(coinsFull[i], COIN_BIG_USER_ID, 0);
+            uiElementSetScale((UIElement *) coinsFull[i], COIN_BIG_USER_SCALE);
+            if (unrated) uiImageSetTint(coinsFull[i], USER_COIN_UNRATED_TINT);
         }
     }
 
-    ui_window_set_tint((UIWindow *) ui_get_element_by_tag(s, "bgwindow"), C2D_Color32(0, 0, 0, 150));
-    ui_image_set_tint((UIImage *) ui_get_element_by_tag(s, "hide_btn"), C2D_Color32(255, 255, 255, 150));
+    uiWindowSetTint((UIWindow *) uiGetElementByTag(s, "bgwindow"), C2D_Color32(0, 0, 0, 150));
+    uiImageSetTint((UIImage *) uiGetElementByTag(s, "hide_btn"), C2D_Color32(255, 255, 255, 150));
 
-    pause_hide_btn = (UIElement *) ui_get_element_by_tag(s, "hide_btn");
-    pause_hide_btn_y = pause_hide_btn ? pause_hide_btn->y : 0.f;
-    pause_menu_count = 0;
-    pause_hide_offset = 0.f;
-    ui_run_func_on_tag(s, "paused", collect_pause_menu_element);
+    pauseHideBtn = (UIElement *) uiGetElementByTag(s, "hide_btn");
+    pauseHideBtnY = pauseHideBtn ? pauseHideBtn->y : 0.f;
+    pauseMenuCount = 0;
+    pauseHideOffset = 0.f;
+    uiRunFuncOnTag(s, "paused", collectPauseMenuElement);
 
-    ui_run_func_on_tag(s, "paused", ui_disable_element);
-    ui_run_func_on_tag(s, "practice_buttons", ui_disable_element);
+    uiRunFuncOnTag(s, "paused", uiDisableElement);
+    uiRunFuncOnTag(s, "practice_buttons", uiDisableElement);
     
-    reset_coins();
+    resetCoins();
 
-    apply_coin_slot_count();
+    applyCoinSlotCount();
 
-    music_slider_bar = (UISlider*) ui_get_element_by_tag(s, "music_slider");
-    sound_slider_bar = (UISlider*) ui_get_element_by_tag(s, "sound_slider");
+    musicSliderBar = (UISlider*) uiGetElementByTag(s, "music_slider");
+    soundSliderBar = (UISlider*) uiGetElementByTag(s, "sound_slider");
 
-    if (music_slider_bar) music_slider_bar->value = music_volume;
-    if (sound_slider_bar) sound_slider_bar->value = sound_volume;
+    if (musicSliderBar) musicSliderBar->value = musicVolume;
+    if (soundSliderBar) soundSliderBar->value = soundVolume;
 }
 
-void gameplay_update_top(UIScreen *s, UIInput *touch) { 
+void gameplayUpdateTop(UIScreen *s, UIInput *touch) { 
     decimal = 0;
-    float cpu_fps = 1000.f / (delta * 1000);
-    float gpu_fps = (16.667f / C3D_GetDrawingTime()) * 60;
+    float cpuFPS = 1000.f / (delta * 1000);
+    float gpuFPS = (16.667f / C3D_GetDrawingTime()) * 60;
     // float gpu_fps = 351.f;
-    fps = settingsState.vsync ? cpu_fps : MIN(cpu_fps, gpu_fps);
+    fps = settingsState.vsync ? cpuFPS : MIN(cpuFPS, gpuFPS);
     if (settingsState.decimalPercent) decimal = 2;
     if (settingsState.ultraDecimalPercent) decimal = MAX_DECIMAL_PERCENT;
 
-    bool is_golden = (int)state.level_progress > state.current_data.max_normal;
-    if (settingsState.goldenBest && is_golden && !state.practice_mode) {
+    bool isGolden = (int)state.levelProgress > state.currentData.maxNormal;
+    if (settingsState.goldenBest && isGolden && !state.practiceMode) {
         percent->font = 2;
         percent->base.y = 7.f;
         percent->base.scaleX = 0.57f;
@@ -444,124 +444,124 @@ void gameplay_update_top(UIScreen *s, UIInput *touch) {
         percent->base.scaleY = 0.45f;
     };
     // update fps counter but only when game isnt paused cuz otherwise it shows like a bajillion frame per sec ond
-    if(!game_paused) snprintf(fps_label->text, 32, "<#FFFFFF55>FPS: %.*f</>", 0, fps);
+    if(!gamePaused) snprintf(fpsLabel->text, 32, "<#FFFFFF55>FPS: %.*f</>", 0, fps);
 
-    progress_bar->value = state.level_progress;
-    snprintf(percent->text, 32, "%.*f%%", decimal, state.level_progress);
+    progressBar->value = state.levelProgress;
+    snprintf(percent->text, 32, "%.*f%%", decimal, state.levelProgress);
 
-    ui_run_func_on_tag(s, "progressalert", ui_disable_element);
-    ui_run_func_on_tag(s, "percent", ui_disable_element);
-    ui_run_func_on_tag(s, "fps", ui_disable_element);
+    uiRunFuncOnTag(s, "progressalert", uiDisableElement);
+    uiRunFuncOnTag(s, "percent", uiDisableElement);
+    uiRunFuncOnTag(s, "fps", uiDisableElement);
     percent->base.x = 200.f;
     percent->alignment = 0.5;
 
     if (settingsState.showProgressBar) {
-        ui_run_func_on_tag(s, "progressalert", ui_enable_element);
+        uiRunFuncOnTag(s, "progressalert", uiEnableElement);
         percent->base.x = 282.f;
         percent->alignment = 0;
     }
 
     if (settingsState.showProgressPercent) {
-        ui_run_func_on_tag(s, "percent", ui_enable_element);
+        uiRunFuncOnTag(s, "percent", uiEnableElement);
     }
 
     if (settingsState.showFpsCounter) {
-        ui_run_func_on_tag(s, "fps", ui_enable_element);
+        uiRunFuncOnTag(s, "fps", uiEnableElement);
     }
 
-    handle_hide_animation(delta);
+    handleHideAnimation(delta);
 }
 
-void gameplay_update(UIScreen *s, UIInput *touch) {
-    LevelData *level_data_sel = &current_level_entry->data;
+void gameplayUpdate(UIScreen *s, UIInput *touch) {
+    LevelData *levelDataSel = &currentLevelEntry->data;
 
-    coins_got[0] = state.current_data.coin1 && !level_data_sel->coin1;
-    coins_got[1] = state.current_data.coin2 && !level_data_sel->coin2;
-    coins_got[2] = state.current_data.coin3 && !level_data_sel->coin3;
+    coinsGot[0] = state.currentData.coin1 && !levelDataSel->coin1;
+    coinsGot[1] = state.currentData.coin2 && !levelDataSel->coin2;
+    coinsGot[2] = state.currentData.coin3 && !levelDataSel->coin3;
 
     for(int i = 0; i < 3; i++){
-        if(coins_got[i] && !game_paused){
-            float scale = easeValue(BOUNCE_OUT, 2.f, state.custom_level ? COIN_BIG_USER_SCALE : 0.65f, coin_anims[i], 0.35f, 1.f);
-            float opacity = easeValue(EASE_LINEAR, 0.f, 1.f, coin_anims[i], 0.1f, 1.f);
+        if(coinsGot[i] && !gamePaused){
+            float scale = easeValue(BOUNCE_OUT, 2.f, state.customLevel ? COIN_BIG_USER_SCALE : 0.65f, coinAnims[i], 0.35f, 1.f);
+            float opacity = easeValue(EASE_LINEAR, 0.f, 1.f, coinAnims[i], 0.1f, 1.f);
 
-            coins_full[i]->base.enabled = true;
-            ui_element_set_scale((UIElement *) coins_full[i], scale);
-            ui_image_set_tint(coins_full[i], level_has_unverified_coins()
+            coinsFull[i]->base.enabled = true;
+            uiElementSetScale((UIElement *) coinsFull[i], scale);
+            uiImageSetTint(coinsFull[i], levelHasUnverifiedCoins()
                 ? C2D_Color32(USER_COIN_UNRATED_R, USER_COIN_UNRATED_G, USER_COIN_UNRATED_B, (u8)(opacity * 255.f))
                 : C2D_Color32f(1, 1, 1, opacity));
 
-            if(coin_anims[i] >= 0.05f){
-                if(!coins_circles_spawned[i]){
-                    ui_set_use_effect_col(
-                        ui_add_use_effect(
-                            (UIUseEffect *) ui_get_element_by_tag(s, "coin_circle"), 
-                        coins_full[i]->base.x, coins_full[i]->base.y, &end_wall_firework_circle),
+            if(coinAnims[i] >= 0.05f){
+                if(!coinsCirclesSpawned[i]){
+                    uiSetUseEffectCol(
+                        uiAddUseEffect(
+                            (UIUseEffect *) uiGetElementByTag(s, "coin_circle"), 
+                        coinsFull[i]->base.x, coinsFull[i]->base.y, &endWallFireworkCircle),
                     1.f,
-                    level_has_unverified_coins() ? USER_COIN_UNRATED_G / 255.f : (state.custom_level ? 1.f : 0.75f),
-                    level_has_unverified_coins() ? USER_COIN_UNRATED_B / 255.f : (state.custom_level ? 1.f : 0.f));
+                    levelHasUnverifiedCoins() ? USER_COIN_UNRATED_G / 255.f : (state.customLevel ? 1.f : 0.75f),
+                    levelHasUnverifiedCoins() ? USER_COIN_UNRATED_B / 255.f : (state.customLevel ? 1.f : 0.f));
                     
-                    coins_circles_spawned[i] = true;
+                    coinsCirclesSpawned[i] = true;
                 }
             }
 
-            coin_anims[i] += delta;
+            coinAnims[i] += delta;
         }
     }
 
-    if (game_paused) {
-        if (music_slider_bar) music_volume = music_slider_bar->value;
-        if (sound_slider_bar) sound_volume = sound_slider_bar->value;
+    if (gamePaused) {
+        if (musicSliderBar) musicVolume = musicSliderBar->value;
+        if (soundSliderBar) soundVolume = soundSliderBar->value;
 
-        apply_volume_settings();
+        applyVolumeSettings();
     }
 
     //level end buttons retraction animation
-    float cutscene_timer = state.player.cutscene_timer;
-    float complete_y_offset = easeValue(EASE_IN, 20.f, -20.f, cutscene_timer, 0.3f, 1.3f);
-    float complete_y_offset_practice = easeValue(EASE_IN, 200.f, 270.f, cutscene_timer, 0.3f, 1.8f);
+    float cutsceneTimer = state.player.cutsceneTimer;
+    float completeYOffset = easeValue(EASE_IN, 20.f, -20.f, cutsceneTimer, 0.3f, 1.3f);
+    float completeYOffsetPractice = easeValue(EASE_IN, 200.f, 270.f, cutsceneTimer, 0.3f, 1.8f);
 
-    bool swap_coins = settingsState.swapGameplayScreens && !in_level_complete;
-    float coin_x = swap_coins ? 20.f - SWAP_SIDE_OFFSET_X : 20.f;
-    float coin_y = swap_coins ? SCREEN_HEIGHT - complete_y_offset : complete_y_offset;
-    UIImage *coin_slots[3] = { coin_1, coin_2, coin_3 };
+    bool swapCoins = settingsState.swapGameplayScreens && !inLevelComplete;
+    float coinX = swapCoins ? 20.f - SWAP_SIDE_OFFSET_X : 20.f;
+    float coinY = swapCoins ? SCREEN_HEIGHT - completeYOffset : completeYOffset;
+    UIImage *coinSlots[3] = { coin1, coin2, coin3 };
 
     for (int i = 0; i < 3; i++) {
-        coin_slots[i]->base.x = coin_x + 35.f * i;
-        coin_slots[i]->base.y = coin_y;
-        coins_full[i]->base.x = coin_x + 35.f * i;
-        coins_full[i]->base.y = coin_y;
+        coinSlots[i]->base.x = coinX + 35.f * i;
+        coinSlots[i]->base.y = coinY;
+        coinsFull[i]->base.x = coinX + 35.f * i;
+        coinsFull[i]->base.y = coinY;
     }
 
-    UIElement *pause_btn = ui_get_element_by_tag(s, "pause_btn");
-    pause_btn->y = complete_y_offset;
+    UIElement *pauseBtn = uiGetElementByTag(s, "pause_btn");
+    pauseBtn->y = completeYOffset;
     
-    UIElement *add_checkpoint = ui_get_element_by_tag(s, "add_checkpoint");
-    UIElement *remove_checkpoint = ui_get_element_by_tag(s, "remove_checkpoint");
-    add_checkpoint->y = complete_y_offset_practice;
-    remove_checkpoint->y = complete_y_offset_practice;
+    UIElement *addCheckpoint = uiGetElementByTag(s, "add_checkpoint");
+    UIElement *removeCheckpoint = uiGetElementByTag(s, "remove_checkpoint");
+    addCheckpoint->y = completeYOffsetPractice;
+    removeCheckpoint->y = completeYOffsetPractice;
 
-    if (state.practice_mode) {
-        ui_button_set_image((UIButton *) ui_get_element_by_tag(s, "practice_mode"), 124, 0);
+    if (state.practiceMode) {
+        uiButtonSetImage((UIButton *) uiGetElementByTag(s, "practice_mode"), 124, 0);
     } else {
-        ui_run_func_on_tag(s, "practice_buttons", ui_disable_element);
-        ui_button_set_image((UIButton *) ui_get_element_by_tag(s, "practice_mode"), 146, 0);
+        uiRunFuncOnTag(s, "practice_buttons", uiDisableElement);
+        uiButtonSetImage((UIButton *) uiGetElementByTag(s, "practice_mode"), 146, 0);
     }
 }
 
-extern const UIScreenDefPair gameplay_def = {
+extern const UIScreenDefPair gameplayDef = {
     .name = "gameplay",
     .top = {
         .path = "romfs:/menus/gameplay_top.txt",
-        .init = gameplay_init_top,
-        .update = gameplay_update_top
+        .init = gameplayInitTop,
+        .update = gameplayUpdateTop
     },
     .btm = {
         .path = "romfs:/menus/gameplay.txt",
-        .init = gameplay_init,
-        .update = gameplay_update,
-        .action_list = {
-            .actions = gameplay_actions,
-            .action_count = ARRAY_LEN(gameplay_actions)
+        .init = gameplayInit,
+        .update = gameplayUpdate,
+        .actionList = {
+            .actions = gameplayActions,
+            .actionCount = ARRAY_LEN(gameplayActions)
         }
     }
 };

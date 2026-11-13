@@ -28,18 +28,18 @@
 #include "menus/creator_menu/online/online_level_comments.hpp"
 #include "utils/utils.hpp"
 
-SearchEntry *search_entries = NULL;
-CreatorEntry *creator_entries = NULL;
-SongEntry *song_entries = NULL;
-PageEntry *page_entry = NULL;
+SearchEntry *searchEntries = NULL;
+CreatorEntry *creatorEntries = NULL;
+SongEntry *songEntries = NULL;
+PageEntry *pageEntry = NULL;
 
-LevelEntry *level_entry = NULL;
+LevelEntry *levelEntry = NULL;
 
-CommentEntry *comment_entries = NULL;
+CommentEntry *commentEntries = NULL;
 
 SearchFilters filters = { 0 };
 
-UpdateData *update_data = NULL;
+UpdateData *updateData = NULL;
 
 int searchEntriesLength = 0;
 int creatorEntriesLength = 0;
@@ -52,24 +52,24 @@ int commentEntriesLength = 0;
 char **latestCommits;
 int latestCommitCount = 0;
 
-static void fill_creator_entries(char **creatorStrings, int creatorStringCount) {
+static void fillCreatorEntries(char **creatorStrings, int creatorStringCount) {
     for (int i = 0; i < creatorStringCount; i++) {
         int stringCount;
-        char **creatorString = split_string(creatorStrings[i], ':', &stringCount, true);
+        char **creatorString = splitString(creatorStrings[i], ':', &stringCount, true);
         if (!creatorString) return;
 
-        creator_entries[i].accountId = atoi(creatorString[0]);
-        strncpy(creator_entries[i].creatorName, creatorString[1], sizeof(creator_entries[i].creatorName) - 1);
-        creator_entries[i].userId = atoi(creatorString[2]);
-        free_string_array(creatorString, stringCount);
+        creatorEntries[i].accountId = atoi(creatorString[0]);
+        strncpy(creatorEntries[i].creatorName, creatorString[1], sizeof(creatorEntries[i].creatorName) - 1);
+        creatorEntries[i].userId = atoi(creatorString[2]);
+        freeStringArray(creatorString, stringCount);
     }
 }
 
-static void fill_song_entries(char **songStrings, int songStringCount) {
+static void fillSongEntries(char **songStrings, int songStringCount) {
     for (int i = 0; i < songStringCount; i++) {
         int songKeyCount = 0;
 
-        char **songKeys = split_string_str_del(songStrings[i], "~|~", &songKeyCount, true);
+        char **songKeys = splitStringStrDel(songStrings[i], "~|~", &songKeyCount, true);
         if (!songKeys) return;
 
         for (int j = 0; j + 1 < songKeyCount; j += 2) {
@@ -78,34 +78,34 @@ static void fill_song_entries(char **songStrings, int songStringCount) {
             switch (key) {
                 case 1:
                     // song id
-                    song_entries[i].ngSongId = atoi(valStr);
+                    songEntries[i].ngSongId = atoi(valStr);
                     break;
                 case 2:
                     // song name
-                    strncpy(song_entries[i].songTitle, valStr, sizeof(song_entries[i].songTitle) - 1);
+                    strncpy(songEntries[i].songTitle, valStr, sizeof(songEntries[i].songTitle) - 1);
                     break;
                 case 4:
                     // artist name
-                    strncpy(song_entries[i].artistName, valStr, sizeof(song_entries[i].artistName) - 1);
+                    strncpy(songEntries[i].artistName, valStr, sizeof(songEntries[i].artistName) - 1);
                     break;
                 case 5:
                     // song size
-                    song_entries[i].songSize = atof(valStr);
+                    songEntries[i].songSize = atof(valStr);
                     break;
                 case 10:
                     // song link
-                    strncpy(song_entries[i].songLink, valStr, sizeof(song_entries[i].songLink) - 1);
+                    strncpy(songEntries[i].songLink, valStr, sizeof(songEntries[i].songLink) - 1);
                     break;
             }
         }
-        free_string_array(songKeys, songKeyCount);
+        freeStringArray(songKeys, songKeyCount);
     }
 }
 
-static void fill_song_entry(char *songString, SongEntry *targetEntry) {
+static void fillSongEntry(char *songString, SongEntry *targetEntry) {
         int songKeyCount = 0;
 
-        char **songKeys = split_string_str_del(songString, "~|~", &songKeyCount, true);
+        char **songKeys = splitStringStrDel(songString, "~|~", &songKeyCount, true);
         if (!songKeys) return;
 
         for (int i = 0; i + 1 < songKeyCount; i += 2) {
@@ -118,15 +118,15 @@ static void fill_song_entry(char *songString, SongEntry *targetEntry) {
                     break;
             }
         }
-        free_string_array(songKeys, songKeyCount);
+        freeStringArray(songKeys, songKeyCount);
     
 }
 
-static void fill_level_entries(char **levelsStrings, int songStringCount, int creatorStringCount, int levelStringCount) {
+static void fillLevelEntries(char **levelsStrings, int songStringCount, int creatorStringCount, int levelStringCount) {
     for (int i = 0; i < levelStringCount; i++) {
-        search_entries[i].coins = 0;
+        searchEntries[i].coins = 0;
         int levelKeyCount = 0;
-        char **levelKeys = split_string(levelsStrings[i], ':', &levelKeyCount, true);
+        char **levelKeys = splitString(levelsStrings[i], ':', &levelKeyCount, true);
         if (!levelKeys) return;
 
         for (int j = 0; j + 1 < levelKeyCount; j += 2) {
@@ -136,89 +136,89 @@ static void fill_level_entries(char **levelsStrings, int songStringCount, int cr
             switch (key) {
                 case 1: 
                     // level id
-                    search_entries[i].levelId = atoi(valStr);
+                    searchEntries[i].levelId = atoi(valStr);
                     break;
                 case 2: 
                     // level name
-                    strncpy(search_entries[i].name, valStr, sizeof(search_entries[i].name) - 1);
+                    strncpy(searchEntries[i].name, valStr, sizeof(searchEntries[i].name) - 1);
                     break;
                 case 3: {
                     // level description
                     if (valStr[0] == '\0') {
-                        search_entries[i].description = strdup("No description provided.");
+                        searchEntries[i].description = strdup("No description provided.");
                         break;
                     }
 
-                    fix_base64_url(valStr);
-                    search_entries[i].description = (char *)malloc(strlen(valStr) + 1);
-                    int decoded_len = base64_decode(valStr, (unsigned char *)search_entries[i].description);
-                    if (decoded_len > 0) {
-                        search_entries[i].description[decoded_len] = '\0';
+                    fixBase64URL(valStr);
+                    searchEntries[i].description = (char *)malloc(strlen(valStr) + 1);
+                    int decodedLen = base64Decode(valStr, (unsigned char *)searchEntries[i].description);
+                    if (decodedLen > 0) {
+                        searchEntries[i].description[decodedLen] = '\0';
                     }
                     break;
                 }
                 case 5: 
                     // level version
-                    search_entries[i].levelVersion = atoi(valStr);
+                    searchEntries[i].levelVersion = atoi(valStr);
                     break;
                 case 6:
                     // creator player id
-                    search_entries[i].creatorId = atoi(valStr);
+                    searchEntries[i].creatorId = atoi(valStr);
                     break;
                 case 9:
                     // level difficulty
-                    search_entries[i].difficulty = atoi(valStr) / 10;
+                    searchEntries[i].difficulty = atoi(valStr) / 10;
                     break;
                 case 10:
                     // level downloads
-                    search_entries[i].downloads = atoi(valStr);
+                    searchEntries[i].downloads = atoi(valStr);
                     break;
                 case 12:
                     // main level song, 0 if custom song is present
-                    search_entries[i].mainSongId = atoi(valStr);
+                    searchEntries[i].mainSongId = atoi(valStr);
                     break;
                 case 13:
                     // game version the level was uploaded in 
-                    search_entries[i].gameVersion = atoi (valStr);
+                    searchEntries[i].gameVersion = atoi (valStr);
                     break;
                 case 14:
                     // level likes, formula is likes - dislikes
-                    search_entries[i].likes = atoi(valStr);
+                    searchEntries[i].likes = atoi(valStr);
                     break;
                 case 15:
                     // level length
-                    search_entries[i].lengthNum = atoi(valStr);
+                    searchEntries[i].lengthNum = atoi(valStr);
                     break;
                 case 16:
                     // level dislikes, we have no use for this (formula is dislikes - likes)
                     break;
                 case 17:
                     // demon status
-                    search_entries[i].isDemon = parse_bool(valStr);
+                    searchEntries[i].isDemon = parseBool(valStr);
                     break;
                 case 18: 
                     // stars
-                    search_entries[i].stars = atoi(valStr);
+                    searchEntries[i].stars = atoi(valStr);
                     break;
                 case 19: 
                     // feature score
-                    search_entries[i].featureScore = atoi(valStr);
+                    searchEntries[i].featureScore = atoi(valStr);
                     break;
                 case 25:
                     // auto status
-                    search_entries[i].isAuto = parse_bool(valStr);
+                    searchEntries[i].isAuto = parseBool(valStr);
                     break;
                 case 30:
                     // if level is a copy, id of original level
-                    search_entries[i].originalId = atoi(valStr);
+                    searchEntries[i].originalId = atoi(valStr);
                     break;
                 case 31:
                     // two player status
-                    search_entries[i].isTwoPlayer = parse_bool(valStr);
+                    searchEntries[i].isTwoPlayer = parseBool(valStr);
                     break;
                 case 35:
                     // newgrounds song id
-                    search_entries[i].songId = atoi(valStr);
+                    searchEntries[i].songId = atoi(valStr);
                     break;
                 case 37:
                     // coins
@@ -226,60 +226,60 @@ static void fill_level_entries(char **levelsStrings, int songStringCount, int cr
                         int coins = atoi(valStr);
                         if (coins < 0) coins = 0;
                         if (coins > 3) coins = 3;
-                        search_entries[i].coins = coins;
+                        searchEntries[i].coins = coins;
                     }
                     break;
                 case 38: 
                     // verified coins
-                    search_entries[i].verifiedCoins = parse_bool(valStr);
+                    searchEntries[i].verifiedCoins = parseBool(valStr);
                     break;
                 case 39:
                     // stars requested
-                    search_entries[i].reqStars = atoi(valStr);
+                    searchEntries[i].reqStars = atoi(valStr);
                     break;
                 case 42:
                     //epic, legendary, mythic
-                    search_entries[i].epic = atoi(valStr);
+                    searchEntries[i].epic = atoi(valStr);
                 case 45:
                     // object count, caps at 65535
-                    search_entries[i].objCount = atoi(valStr);
+                    searchEntries[i].objCount = atoi(valStr);
                     break;
             }
         }
-        free_string_array(levelKeys, levelKeyCount);
+        freeStringArray(levelKeys, levelKeyCount);
 
-        int song_index;
-        int creator_index;
+        int songIndex;
+        int creatorIndex;
         
         bool found = false;
         // Find the song
-        for (song_index = 0; song_index < songStringCount; song_index++) {
-            if (search_entries[i].songId == song_entries[song_index].ngSongId) {
+        for (songIndex = 0; songIndex < songStringCount; songIndex++) {
+            if (searchEntries[i].songId == songEntries[songIndex].ngSongId) {
                 found = true;
                 break;
             }
         }
         
-        search_entries[i].songIndex = (found ? song_index : -1);
+        searchEntries[i].songIndex = (found ? songIndex : -1);
 
         found = false;
         // Find the creator
-        for (creator_index = 0; creator_index < creatorStringCount; creator_index++) {
-            if (search_entries[i].creatorId == creator_entries[creator_index].accountId) {
+        for (creatorIndex = 0; creatorIndex < creatorStringCount; creatorIndex++) {
+            if (searchEntries[i].creatorId == creatorEntries[creatorIndex].accountId) {
                 found = true;
                 break;
             }
         }
-        search_entries[i].creatorIndex = (found ? creator_index : -1);
+        searchEntries[i].creatorIndex = (found ? creatorIndex : -1);
     }
 }
 
-static void fill_level_entry(char **levelStrings, int levelStringsCount, bool fillSearchEntry, int searchId) {
+static void fillLevelEntry(char **levelStrings, int levelStringsCount, bool fillSearchEntry, int searchId) {
     int levelKeyCount = 0;
 
-    SavedLevelDataEntry *entry = get_saved_level_data(online_menu_level_id);
+    SavedLevelDataEntry *entry = getSavedLevelData(onlineMenuLevelID);
 
-    char **levelKeys = split_string(levelStrings[0], ':', &levelKeyCount, true);
+    char **levelKeys = splitString(levelStrings[0], ':', &levelKeyCount, true);
     if (!levelKeys) return;
     for (int j = 0; j + 1 < levelKeyCount; j += 2) {
         int key = atoi(levelKeys[j]);
@@ -288,12 +288,12 @@ static void fill_level_entry(char **levelStrings, int levelStringsCount, bool fi
         case 1:
             // level id
             if (fillSearchEntry)
-                current_search_entry->levelId = atoi(valStr);
+                currentSearchEntry->levelId = atoi(valStr);
             break;
         case 2:
             // level name
             if (fillSearchEntry)
-                strncpy(current_search_entry->name, valStr, sizeof(current_search_entry->name) - 1);
+                strncpy(currentSearchEntry->name, valStr, sizeof(currentSearchEntry->name) - 1);
             break;
         case 3:
             // level description
@@ -301,95 +301,95 @@ static void fill_level_entry(char **levelStrings, int levelStringsCount, bool fi
             {
                 if (valStr[0] == '\0')
                 {
-                    current_search_entry->description = strdup("No description provided.");
+                    currentSearchEntry->description = strdup("No description provided.");
                     break;
                 }
                 if (gdps) {
-                    current_search_entry->description = strdup(valStr);
+                    currentSearchEntry->description = strdup(valStr);
                     break;
                 };
-                fix_base64_url(valStr);
-                current_search_entry->description = (char *)malloc(strlen(valStr) + 1);
-                int decoded_len = base64_decode(valStr, (unsigned char *)current_search_entry->description);
-                if (decoded_len > 0)
+                fixBase64URL(valStr);
+                currentSearchEntry->description = (char *)malloc(strlen(valStr) + 1);
+                int decodedLen = base64Decode(valStr, (unsigned char *)currentSearchEntry->description);
+                if (decodedLen > 0)
                 {
-                    current_search_entry->description[decoded_len] = '\0';
+                    currentSearchEntry->description[decodedLen] = '\0';
                 }
             }
             break;
         case 5:
             // level version
             if (fillSearchEntry)
-                current_search_entry->levelVersion = atoi(valStr);
+                currentSearchEntry->levelVersion = atoi(valStr);
             break;
         case 6:
             // creator player id
             if (fillSearchEntry)
-                current_search_entry->creatorId = atoi(valStr);
+                currentSearchEntry->creatorId = atoi(valStr);
             break;
         case 9:
             // level difficulty
-            current_search_entry->difficulty = atoi(valStr) / 10;
+            currentSearchEntry->difficulty = atoi(valStr) / 10;
             break;
         case 10:
             // level downloads
             if (fillSearchEntry)
-                current_search_entry->downloads = atoi(valStr);
+                currentSearchEntry->downloads = atoi(valStr);
             break;
         case 12:
             // main level song, 0 if custom song is present
             if (fillSearchEntry)
-                current_search_entry->mainSongId = atoi(valStr);
+                currentSearchEntry->mainSongId = atoi(valStr);
             break;
         case 13:
             // game version the level was uploaded in
             if (fillSearchEntry)
-                current_search_entry->gameVersion = atoi(valStr);
+                currentSearchEntry->gameVersion = atoi(valStr);
             break;
         case 14:
             // level likes, formula is likes - dislikes
             if (fillSearchEntry)
-                current_search_entry->likes = atoi(valStr);
+                currentSearchEntry->likes = atoi(valStr);
             break;
         case 15:
             // level length
             if (fillSearchEntry)
-                current_search_entry->lengthNum = atoi(valStr);
+                currentSearchEntry->lengthNum = atoi(valStr);
             break;
         case 17:
             // demon status
             if (fillSearchEntry)
-                current_search_entry->isDemon = parse_bool(valStr);
+                currentSearchEntry->isDemon = parseBool(valStr);
             break;
         case 18:
             // stars
             if (fillSearchEntry)
-                current_search_entry->stars = atoi(valStr);
+                currentSearchEntry->stars = atoi(valStr);
             break;
         case 19:
             // feature score
             if (fillSearchEntry)
-                current_search_entry->featureScore = atoi(valStr);
+                currentSearchEntry->featureScore = atoi(valStr);
             break;
         case 25:
             // auto status
             if (fillSearchEntry)
-                current_search_entry->isAuto = parse_bool(valStr);
+                currentSearchEntry->isAuto = parseBool(valStr);
             break;
         case 30:
             // if level is a copy, id of original level
             if (fillSearchEntry)
-                current_search_entry->originalId = atoi(valStr);
+                currentSearchEntry->originalId = atoi(valStr);
             break;
         case 31:
             // two player status
             if (fillSearchEntry)
-                current_search_entry->isTwoPlayer = parse_bool(valStr);
+                currentSearchEntry->isTwoPlayer = parseBool(valStr);
             break;
         case 35:
             // newgrounds song id
             if (fillSearchEntry)
-                current_search_entry->songId = atoi(valStr);
+                currentSearchEntry->songId = atoi(valStr);
             break;
         case 37:
             // coins
@@ -397,76 +397,76 @@ static void fill_level_entry(char **levelStrings, int levelStringsCount, bool fi
                 int coins = atoi(valStr);
                 if (coins < 0) coins = 0;
                 if (coins > 3) coins = 3;
-                current_search_entry->coins = coins;
+                currentSearchEntry->coins = coins;
             }
             break;
         case 38:
             // verified coins
             if (fillSearchEntry)
-                current_search_entry->verifiedCoins = parse_bool(valStr);
+                currentSearchEntry->verifiedCoins = parseBool(valStr);
             break;
         case 39:
             // stars requested
             if (fillSearchEntry)
-                current_search_entry->reqStars = atoi(valStr);
+                currentSearchEntry->reqStars = atoi(valStr);
             break;
         case 42:
             // epic, legendary, mythic
             if (fillSearchEntry)
-                current_search_entry->epic = atoi(valStr);
+                currentSearchEntry->epic = atoi(valStr);
         case 45:
             // object count, caps at 65535
             if (fillSearchEntry)
-                current_search_entry->objCount = atoi(valStr);
+                currentSearchEntry->objCount = atoi(valStr);
             break;
         case 4:
             // base64 encoded probably compressed level string
-            level_entry->levelString = strdup(valStr);
+            levelEntry->levelString = strdup(valStr);
 
             // Save level string
-            save_saved_level(online_menu_level_id, gdps, level_entry->levelString);
+            saveSavedLevel(onlineMenuLevelID, gdps, levelEntry->levelString);
             break;
         case 28:
             // time since upload
-            strncpy(level_entry->uploadDate, valStr, sizeof(level_entry->uploadDate) - 1);
-            strncpy(entry->level_entry.uploadDate, valStr, sizeof(entry->level_entry.uploadDate) - 1);
+            strncpy(levelEntry->uploadDate, valStr, sizeof(levelEntry->uploadDate) - 1);
+            strncpy(entry->levelEntry.uploadDate, valStr, sizeof(entry->levelEntry.uploadDate) - 1);
             break;
         case 29:
             // time since last
-            strncpy(level_entry->updateDate, valStr, sizeof(level_entry->updateDate) - 1);
-            strncpy(entry->level_entry.updateDate, valStr, sizeof(entry->level_entry.updateDate) - 1);
+            strncpy(levelEntry->updateDate, valStr, sizeof(levelEntry->updateDate) - 1);
+            strncpy(entry->levelEntry.updateDate, valStr, sizeof(entry->levelEntry.updateDate) - 1);
             break;
         }
     }
     
     entry->version = SAVED_LEVELS_VERSION;
-    free_string_array(levelKeys, levelKeyCount);
+    freeStringArray(levelKeys, levelKeyCount);
 }
 
-void fill_page_entry(char *initialString) {
+void fillPageEntry(char *initialString) {
     int stringCount;
-    char **pageStrings = split_string(initialString, ':', &stringCount, true);
+    char **pageStrings = splitString(initialString, ':', &stringCount, true);
     if (!pageStrings) return;
 
-    page_entry->totalLevels = atoi(pageStrings[0]);
-    page_entry->currentOffset = atoi(pageStrings[1]);
-    page_entry->amount = atoi(pageStrings[2]);
-    page_entry->totalPages = (((page_entry->totalLevels + (page_entry->amount - 1)) / page_entry->amount));
-    free_string_array(pageStrings, stringCount);
+    pageEntry->totalLevels = atoi(pageStrings[0]);
+    pageEntry->currentOffset = atoi(pageStrings[1]);
+    pageEntry->amount = atoi(pageStrings[2]);
+    pageEntry->totalPages = (((pageEntry->totalLevels + (pageEntry->amount - 1)) / pageEntry->amount));
+    freeStringArray(pageStrings, stringCount);
 };
 
-void fill_comment_entries(char **commentStrings, int commentStringCount) {
+void fillCommentEntries(char **commentStrings, int commentStringCount) {
     for (int i = 0; i < commentStringCount; i++) {
         int commentKeyCount = 0;
 
-        char **commentKeys = split_string(commentStrings[i], ':', &commentKeyCount, true);
+        char **commentKeys = splitString(commentStrings[i], ':', &commentKeyCount, true);
         if (!commentKeys) return;
         
         for (int j = 0; j + 1 < commentKeyCount; j += 2) {
             int commentDataKeyCount = 0;
             int authorDataKeyCount = 0;
-            char **commentData = split_string(commentKeys[0], '~', &commentDataKeyCount, true);
-            char **authorData = split_string(commentKeys[1], '~', &authorDataKeyCount, true);
+            char **commentData = splitString(commentKeys[0], '~', &commentDataKeyCount, true);
+            char **authorData = splitString(commentKeys[1], '~', &authorDataKeyCount, true);
 
             // comment data entries
             for (int k = 0; k + 1 < commentDataKeyCount; k += 2) {
@@ -475,58 +475,58 @@ void fill_comment_entries(char **commentStrings, int commentStringCount) {
                 switch (key) {
                     case 1:
                         // id of level the comment comes from
-                        comment_entries[i].levelId = atoi(valStr);
+                        commentEntries[i].levelId = atoi(valStr);
                         break;
                     case 2: {
                         // base64 encoded comment text content
                         if (valStr[0] == '\0')
                         {
-                            comment_entries[i].content = strdup("No");
+                            commentEntries[i].content = strdup("No");
                             break;
                         }
 
-                        fix_base64_url(valStr);
-                        comment_entries[i].content = (char *)malloc(strlen(valStr) + 1);
-                        int decoded_len = base64_decode(valStr, (unsigned char *)comment_entries[i].content);
-                        if (decoded_len > 0)
+                        fixBase64URL(valStr);
+                        commentEntries[i].content = (char *)malloc(strlen(valStr) + 1);
+                        int decodedLen = base64Decode(valStr, (unsigned char *)commentEntries[i].content);
+                        if (decodedLen > 0)
                         {
-                            comment_entries[i].content[decoded_len] = '\0';
+                            commentEntries[i].content[decodedLen] = '\0';
                         }
                         break;
                     }
                     case 3:
                         // author's player id
-                        comment_entries[i].authorPlayerId = atoi(valStr);
+                        commentEntries[i].authorPlayerId = atoi(valStr);
                         break;
                     case 4:
                         // likes
-                        comment_entries[i].likes = atoi(valStr);
+                        commentEntries[i].likes = atoi(valStr);
                         break;
                     case 7:
                         // spam flag status
-                        comment_entries[i].isSpam = parse_bool(valStr);
+                        commentEntries[i].isSpam = parseBool(valStr);
                         break; 
                     case 9:
                         // time since comment was posted
-                        strncpy(comment_entries[i].commentAge, valStr, sizeof(comment_entries[i].commentAge) - 1);
+                        strncpy(commentEntries[i].commentAge, valStr, sizeof(commentEntries[i].commentAge) - 1);
                         break;
                     case 10:
                         // percent on source level
-                        comment_entries[i].percent = atoi(valStr);
+                        commentEntries[i].percent = atoi(valStr);
                         break;
                     case 11:
                         // mod badge status
-                        comment_entries[i].modBadge = atoi(valStr);
+                        commentEntries[i].modBadge = atoi(valStr);
                         break;
                     case 12: {
                         // color of username (if mod)
                         int rgbCount = 0;
-                        char **rgbData = split_string(valStr, ',', &rgbCount, true);
+                        char **rgbData = splitString(valStr, ',', &rgbCount, true);
                         if (!rgbData) break;
 
-                        snprintf(comment_entries[i].modCommentColor, sizeof(comment_entries[i].modCommentColor) - 1, "#%02X%02X%02X", atoi(rgbData[0]), atoi(rgbData[1]), atoi(rgbData[2]));
+                        snprintf(commentEntries[i].modCommentColor, sizeof(commentEntries[i].modCommentColor) - 1, "#%02X%02X%02X", atoi(rgbData[0]), atoi(rgbData[1]), atoi(rgbData[2]));
                 
-                        free_string_array(rgbData, rgbCount);
+                        freeStringArray(rgbData, rgbCount);
                         break;
                     }
                 }
@@ -538,50 +538,50 @@ void fill_comment_entries(char **commentStrings, int commentStringCount) {
                 switch (key) {
                     case 1:
                         // author username
-                        strncpy(comment_entries[i].name, valStr, sizeof(comment_entries[i].name) - 1);
+                        strncpy(commentEntries[i].name, valStr, sizeof(commentEntries[i].name) - 1);
                         break;
                     case 9:
                         // player icon index
-                        comment_entries[i].playerIcon = atoi(valStr);
+                        commentEntries[i].playerIcon = atoi(valStr);
                         break;
                     case 10:
                         // author icon primary color
-                        comment_entries[i].col1 = atoi(valStr);
+                        commentEntries[i].col1 = atoi(valStr);
                         break;
                     case 11:
                         // author icon secondary color
-                        comment_entries[i].col2 = atoi(valStr);
+                        commentEntries[i].col2 = atoi(valStr);
                         break;
                     case 14:
                         // icon type (gamemode)
-                        comment_entries[i].iconType = atoi(valStr);
+                        commentEntries[i].iconType = atoi(valStr);
                         break;
                     case 15:
                         // icon glow (why is 0 false but 2 true??????)
-                        comment_entries[i].glow = (atoi(valStr) == 2);
+                        commentEntries[i].glow = (atoi(valStr) == 2);
                         break;
                     case 16:
                     // author account id
-                        comment_entries[i].authorAccountId = atoi(valStr);
+                        commentEntries[i].authorAccountId = atoi(valStr);
                         break;
                     case 51:
                         // glow color 
-                        comment_entries[i].glowCol = atoi(valStr);
+                        commentEntries[i].glowCol = atoi(valStr);
                         break;
                 }
             }
-            free_string_array(commentData, commentDataKeyCount);
-            free_string_array(authorData, authorDataKeyCount);
+            freeStringArray(commentData, commentDataKeyCount);
+            freeStringArray(authorData, authorDataKeyCount);
 
         }
-        free_string_array(commentKeys, commentKeyCount);
+        freeStringArray(commentKeys, commentKeyCount);
     }
 }
 
-void fill_gdps_comment_entries(char **commentStrings, int commentStringCount) {
+void fillGdpsCommentEntries(char **commentStrings, int commentStringCount) {
     for (int i = 0; i < commentStringCount; i++) {
             int commentKeyCount = 0;
-            char **comments = split_string(commentStrings[i], '~', &commentKeyCount, true);
+            char **comments = splitString(commentStrings[i], '~', &commentKeyCount, true);
 
             for (int k = 0; k + 1 < commentKeyCount; k += 2) {
                 int key = atoi(comments[k]);
@@ -589,63 +589,63 @@ void fill_gdps_comment_entries(char **commentStrings, int commentStringCount) {
                 switch (key) {
                     case 1:
                         // id of level the comment comes from
-                        comment_entries[i].levelId = atoi(valStr);
+                        commentEntries[i].levelId = atoi(valStr);
                         break;
                     case 2:
                         // comment text content (not base64 encoded this time!!!)
                         if (valStr[0] == '\0') {
-                            comment_entries[i].content = strdup("");
+                            commentEntries[i].content = strdup("");
                             break;
                         }
-                        comment_entries[i].content = (char *)malloc(strlen(valStr) + 1);
-                        snprintf(comment_entries[i].content, strlen(valStr) + 1, "%s", valStr);
+                        commentEntries[i].content = (char *)malloc(strlen(valStr) + 1);
+                        snprintf(commentEntries[i].content, strlen(valStr) + 1, "%s", valStr);
                         break;
                     case 3:
                         // author's player id
-                        comment_entries[i].authorPlayerId = atoi(valStr);
+                        commentEntries[i].authorPlayerId = atoi(valStr);
                         break;
                     case 4:
                         // likes
-                        comment_entries[i].likes = atoi(valStr);
+                        commentEntries[i].likes = atoi(valStr);
                         break;
                     case 7:
                         // spam flag status
-                        comment_entries[i].isSpam = parse_bool(valStr);
+                        commentEntries[i].isSpam = parseBool(valStr);
                         break; 
                     case 9:
                         // time since comment was posted
-                        strncpy(comment_entries[i].commentAge, valStr, sizeof(comment_entries[i].commentAge) - 1);
+                        strncpy(commentEntries[i].commentAge, valStr, sizeof(commentEntries[i].commentAge) - 1);
                         break;
                     case 10:
                         // percent on source level
-                        comment_entries[i].percent = atoi(valStr);
+                        commentEntries[i].percent = atoi(valStr);
                         break;
                     case 11:
                         // mod badge status
-                        comment_entries[i].modBadge = atoi(valStr);
+                        commentEntries[i].modBadge = atoi(valStr);
                         break;
                     case 12:
                         // color of username (if mod)
 
                         int rgbCount = 0;
-                        char **rgbData = split_string(valStr, ',', &rgbCount, true);
+                        char **rgbData = splitString(valStr, ',', &rgbCount, true);
                         if (!rgbData) break;
 
-                        snprintf(comment_entries[i].modCommentColor, sizeof(comment_entries[i].modCommentColor) - 1, "#%02X%02X%02X", atoi(rgbData[0]), atoi(rgbData[1]), atoi(rgbData[2]));
+                        snprintf(commentEntries[i].modCommentColor, sizeof(commentEntries[i].modCommentColor) - 1, "#%02X%02X%02X", atoi(rgbData[0]), atoi(rgbData[1]), atoi(rgbData[2]));
         
-                        free_string_array(rgbData, rgbCount);
+                        freeStringArray(rgbData, rgbCount);
                         break;
                 
                 }
             }
-        free_string_array(comments, commentKeyCount);
+        freeStringArray(comments, commentKeyCount);
     }
 }
 
-void fill_gdps_comment_author_entries(char **authorStrings, int authorStringCount, int commentStringCount) {
+void fillGdpsCommentAuthorEntries(char **authorStrings, int authorStringCount, int commentStringCount) {
     for (int i = 0; i < authorStringCount; i++) {
         int stringCount;
-        char **authorString = split_string(authorStrings[i], ':', &stringCount, true);
+        char **authorString = splitString(authorStrings[i], ':', &stringCount, true);
         if (!authorString) return;
 
         char name[21];
@@ -657,18 +657,18 @@ void fill_gdps_comment_author_entries(char **authorStrings, int authorStringCoun
         
         // Find the song
         for (commentIndex = 0; commentIndex < commentStringCount; commentIndex++) {
-            if (playerId == comment_entries[commentIndex].authorPlayerId) {
-                snprintf(comment_entries[commentIndex].name, sizeof(comment_entries[commentIndex].name), "%s", name);
-                comment_entries[commentIndex].authorAccountId = userId;
+            if (playerId == commentEntries[commentIndex].authorPlayerId) {
+                snprintf(commentEntries[commentIndex].name, sizeof(commentEntries[commentIndex].name), "%s", name);
+                commentEntries[commentIndex].authorAccountId = userId;
                 break;
             }
         }
 
-        free_string_array(authorString, stringCount);
+        freeStringArray(authorString, stringCount);
     }
 }
 
-int parse_latest_commit(char *jsonString) {
+int parseLatestCommit(char *jsonString) {
     // parse response from github as json object 
     json_object *jsonObject = json_tokener_parse(jsonString);
     json_object *commitObject = NULL;
@@ -677,14 +677,14 @@ int parse_latest_commit(char *jsonString) {
 
     // check if we didnt get served garbage data
     if (!jsonObject) {
-        output_log("failure parsing commit data: response - %s", jsonString);
+        outputLog("failure parsing commit data: response - %s", jsonString);
         return -1;
     }
 
 
     if (json_object_object_get_ex(jsonObject, "status", &status)) {
       // check what github wants to tell us
-      output_log("status code: %d\n%s\n", json_object_get_int(status), jsonString);
+      outputLog("status code: %d\n%s\n", json_object_get_int(status), jsonString);
       json_object_put(jsonObject);
       return -4;
     }
@@ -694,12 +694,12 @@ int parse_latest_commit(char *jsonString) {
 
     // attempt to populate latest commit hash, ofc gotta check if it actually exists first cuz who knows 
     if (json_object_object_get_ex(commitObject, "sha", &hashObject)) {
-        snprintf(update_data->latestCommit, sizeof(update_data->latestCommit), "%s", json_object_get_string(hashObject));
+        snprintf(updateData->latestCommit, sizeof(updateData->latestCommit), "%s", json_object_get_string(hashObject));
 
-        update_data->isAvailable = (strcmp(CURRENT_COMMIT_HASH, update_data->latestCommit) != 0); 
+        updateData->isAvailable = (strcmp(CURRENT_COMMIT_HASH, updateData->latestCommit) != 0); 
 
         json_object_put(jsonObject);
-        if (!update_data->isAvailable) return -3;
+        if (!updateData->isAvailable) return -3;
     } else {
         json_object_put(jsonObject);
         return -1;
@@ -707,20 +707,20 @@ int parse_latest_commit(char *jsonString) {
     return 0;
 }
 
-int parse_commits_data(char *jsonString) {
+int parseCommitsData(char *jsonString) {
     // parse response from github as json object 
     json_object *jsonObject = json_tokener_parse(jsonString);
     json_object *status = NULL;
 
     // check if we didnt get served garbage data
     if (!jsonObject) {
-        output_log("failure parsing commit data: response - %s", jsonString);
+        outputLog("failure parsing commit data: response - %s", jsonString);
         return -1;
     }
 
     if (json_object_object_get_ex(jsonObject, "status", &status)) {
       // check what github wants to tell us
-      output_log("status code: %d\n%s\n", json_object_get_int(status), jsonString);
+      outputLog("status code: %d\n%s\n", json_object_get_int(status), jsonString);
       json_object_put(jsonObject);
       return -4;
     }
@@ -766,7 +766,7 @@ int parse_commits_data(char *jsonString) {
     return 0;
 }
 
-int parse_releases_data(char *jsonString) {
+int parseReleasesData(char *jsonString) {
     // parse response as json string string
     json_object *jsonObject = json_tokener_parse(jsonString);
     json_object *targetRelease = NULL; 
@@ -781,24 +781,24 @@ int parse_releases_data(char *jsonString) {
 
     if (json_object_object_get_ex(jsonObject, "status", &status)) {
       // check what github wants to tell us
-      output_log("status code: %d\n%s\n", json_object_get_int(status), jsonString);
+      outputLog("status code: %d\n%s\n", json_object_get_int(status), jsonString);
       json_object_put(jsonObject);
       return -4;
     }
 
         for (size_t i = 0; i < count; i++) {
-            json_object *curr_object;
+            json_object *currObject;
             json_object *prerelease = NULL;
             json_object *id = NULL;
 
-            curr_object = json_object_array_get_idx(jsonObject, i);
+            currObject = json_object_array_get_idx(jsonObject, i);
 
-            bool isPrerelease = json_object_object_get_ex(curr_object, "prerelease", &prerelease) && json_object_get_boolean(prerelease);
-            bool idGreaterThanCurrent = (json_object_object_get_ex(curr_object, "id", &id) && json_object_get_int(id) > CURRENT_LATEST_RELEASE_ID);
+            bool isPrerelease = json_object_object_get_ex(currObject, "prerelease", &prerelease) && json_object_get_boolean(prerelease);
+            bool idGreaterThanCurrent = (json_object_object_get_ex(currObject, "id", &id) && json_object_get_int(id) > CURRENT_LATEST_RELEASE_ID);
 
             if (!isPrerelease && idGreaterThanCurrent) {
-                targetRelease = curr_object;
-                update_data->isAvailable = true;
+                targetRelease = currObject;
+                updateData->isAvailable = true;
                 break;
             }
         }
@@ -810,13 +810,13 @@ int parse_releases_data(char *jsonString) {
         json_object *assets = NULL;
 
         // get release name
-        if (json_object_object_get_ex(targetRelease, "name", &name)) snprintf(update_data->releaseTitle, sizeof(update_data->releaseTitle), "%s", json_object_get_string(name));
+        if (json_object_object_get_ex(targetRelease, "name", &name)) snprintf(updateData->releaseTitle, sizeof(updateData->releaseTitle), "%s", json_object_get_string(name));
 
         // get release body
         if (json_object_object_get_ex(targetRelease, "body", &body)) {
             const char *tmp = json_object_get_string(body);
-            update_data->releaseBody = (char *)malloc(strlen(tmp) + 1);
-            strcpy(update_data->releaseBody, tmp);
+            updateData->releaseBody = (char *)malloc(strlen(tmp) + 1);
+            strcpy(updateData->releaseBody, tmp);
         }
 
         // get assets object and iterate it looking for either the .3dsx build or .cia bundle depending on what the user is running
@@ -828,15 +828,15 @@ int parse_releases_data(char *jsonString) {
 
                 if (json_object_object_get_ex(currAssetObject, "name", &assetNameObject)) {
                     const char *currAssetName = json_object_get_string(assetNameObject);
-                    if (strstr(currAssetName, is_3DSX ? ".3dsx" : ".cia")) {
+                    if (strstr(currAssetName, is3Dsx ? ".3dsx" : ".cia")) {
                         if (json_object_object_get_ex(currAssetObject, "browser_download_url", &url)) {
                             // we found the freaking download link lets go
                             const char *tempUrl = json_object_get_string(url);
-                            snprintf(update_data->releaseDownloadUrl, sizeof(update_data->releaseDownloadUrl), "%s", tempUrl);
+                            snprintf(updateData->releaseDownloadUrl, sizeof(updateData->releaseDownloadUrl), "%s", tempUrl);
                         }
                         if (json_object_object_get_ex(currAssetObject, "size", &size)) {
                             // also get the file size
-                            update_data->releaseFileSize = json_object_get_int(size);
+                            updateData->releaseFileSize = json_object_get_int(size);
                         }
                         json_object_put(jsonObject);
                         return 0;
@@ -851,11 +851,11 @@ int parse_releases_data(char *jsonString) {
     return -3;
 }
 
-int parse_actions_data(char *jsonString) {
+int parseActionsData(char *jsonString) {
     // parse response as json string string
     json_object *jsonObject = json_tokener_parse(jsonString);
     json_object *artifacts = NULL;
-    json_object *curr_object = NULL;
+    json_object *currObject = NULL;
     json_object *workflow_data_object = NULL;
     json_object *id_object = NULL;
     json_object *status = NULL;
@@ -864,7 +864,7 @@ int parse_actions_data(char *jsonString) {
     
     if (json_object_object_get_ex(jsonObject, "status", &status)) {
       // check what github wants to tell us
-      output_log("status code: %d\n%s\n", json_object_get_int(status), jsonString);
+      outputLog("status code: %d\n%s\n", json_object_get_int(status), jsonString);
       json_object_put(jsonObject);
       return -4;
     }
@@ -874,23 +874,23 @@ int parse_actions_data(char *jsonString) {
     size_t count = json_object_object_length(artifacts); 
     
     for (size_t i = 0; i < count; i++) {
-        curr_object = json_object_array_get_idx(artifacts, i);
+        currObject = json_object_array_get_idx(artifacts, i);
         
-        if (!json_object_object_get_ex(curr_object, "workflow_run", &workflow_data_object)) continue;
+        if (!json_object_object_get_ex(currObject, "workflow_run", &workflow_data_object)) continue;
         if (!json_object_object_get_ex(workflow_data_object, "head_sha", &id_object)) continue;
         
         const char *tmpString = json_object_get_string(id_object);
 
-        if (strcmp(tmpString, update_data->latestCommit) != 0) continue;
+        if (strcmp(tmpString, updateData->latestCommit) != 0) continue;
         
         json_object *artifact_id_object = NULL;
         json_object *expired_object = NULL;
 
-        if(!json_object_object_get_ex(curr_object, "expired", &expired_object) && json_object_get_boolean(expired_object)) return -1;
+        if(!json_object_object_get_ex(currObject, "expired", &expired_object) && json_object_get_boolean(expired_object)) return -1;
         
-        if(!json_object_object_get_ex(curr_object, "id", &artifact_id_object)) return -1;
+        if(!json_object_object_get_ex(currObject, "id", &artifact_id_object)) return -1;
         
-        snprintf(update_data->releaseDownloadUrl, sizeof(update_data->releaseDownloadUrl), "https://nightly.link/%s/%s/actions/artifacts/%s.zip", REPO_AUTHOR, REPO_NAME, json_object_get_string(artifact_id_object));
+        snprintf(updateData->releaseDownloadUrl, sizeof(updateData->releaseDownloadUrl), "https://nightly.link/%s/%s/actions/artifacts/%s.zip", REPO_AUTHOR, REPO_NAME, json_object_get_string(artifact_id_object));
         json_object_put(jsonObject);
         return 0;
     }
@@ -898,9 +898,9 @@ int parse_actions_data(char *jsonString) {
     return -2;
 }
 
-int search_levels_internal(GenericTask *task, bool useGdps) {
+int searchLevelsInternal(GenericTask *task, bool useGdps) {
     char *outdata;
-    int result = get_search_results(task, &outdata, 22, filters, useGdps);
+    int result = getSearchResults(task, &outdata, 22, filters, useGdps);
 
     if (result != 0) return result;
     // validate first two chars of response to make sure what we're parsing is the search results string
@@ -912,54 +912,54 @@ int search_levels_internal(GenericTask *task, bool useGdps) {
     int creatorStringCount = 0;
     int songStringCount = 0;
 
-    char **initialStrings = split_string(outdata, '#', &initialStringCount, true);
+    char **initialStrings = splitString(outdata, '#', &initialStringCount, true);
     if (!initialStrings) return -1;
 
-    char **levelsStrings = split_string(initialStrings[0], '|', &levelStringCount, true);
+    char **levelsStrings = splitString(initialStrings[0], '|', &levelStringCount, true);
     if (!levelsStrings) return -1;
 
-    char **creatorStrings = split_string(initialStrings[1], '|', &creatorStringCount, true);
+    char **creatorStrings = splitString(initialStrings[1], '|', &creatorStringCount, true);
     if (!creatorStrings) return -1;
     
-    char **songStrings = split_string_str_del(initialStrings[2], "~:~", &songStringCount, true);
+    char **songStrings = splitStringStrDel(initialStrings[2], "~:~", &songStringCount, true);
     // if (!songStrings && !filters.mainSong) return -1; 
     
-    search_entries = (SearchEntry *)malloc(levelStringCount * sizeof(SearchEntry));
-    if (!search_entries) return -1;
+    searchEntries = (SearchEntry *)malloc(levelStringCount * sizeof(SearchEntry));
+    if (!searchEntries) return -1;
 
-    creator_entries = (CreatorEntry *)malloc(creatorStringCount * sizeof(CreatorEntry));
-    if (!creator_entries) return -1;
+    creatorEntries = (CreatorEntry *)malloc(creatorStringCount * sizeof(CreatorEntry));
+    if (!creatorEntries) return -1;
 
     if (songStringCount > 0) {
-        song_entries = (SongEntry *)malloc(songStringCount * sizeof(SongEntry));
-        if (!song_entries) return -1;
+        songEntries = (SongEntry *)malloc(songStringCount * sizeof(SongEntry));
+        if (!songEntries) return -1;
     }
 
-    page_entry = (PageEntry *)malloc(sizeof(SongEntry));
-    if (!page_entry) return -1;
+    pageEntry = (PageEntry *)malloc(sizeof(SongEntry));
+    if (!pageEntry) return -1;
 
     // Initialize
-    memset(search_entries, 0, levelStringCount * sizeof(SearchEntry));
-    memset(creator_entries, 0, creatorStringCount * sizeof(CreatorEntry));
-    if (songStringCount > 0) memset(song_entries, 0, songStringCount * sizeof(SongEntry));
-    memset(page_entry, 0, sizeof(PageEntry));
+    memset(searchEntries, 0, levelStringCount * sizeof(SearchEntry));
+    memset(creatorEntries, 0, creatorStringCount * sizeof(CreatorEntry));
+    if (songStringCount > 0) memset(songEntries, 0, songStringCount * sizeof(SongEntry));
+    memset(pageEntry, 0, sizeof(PageEntry));
 
     // Fill creators
-    fill_creator_entries(creatorStrings, creatorStringCount);
+    fillCreatorEntries(creatorStrings, creatorStringCount);
 
     // Fill songs
-    if (songStringCount > 0) fill_song_entries(songStrings, songStringCount);
+    if (songStringCount > 0) fillSongEntries(songStrings, songStringCount);
     
     // Fill levels
-    fill_level_entries(levelsStrings, songStringCount, creatorStringCount, levelStringCount);
+    fillLevelEntries(levelsStrings, songStringCount, creatorStringCount, levelStringCount);
 
     // Fill pages
-    fill_page_entry(initialStrings[3]);
+    fillPageEntry(initialStrings[3]);
    
-    free_string_array(levelsStrings, levelStringCount);
-    free_string_array(creatorStrings, creatorStringCount);
-    if (songStringCount > 0) free_string_array(songStrings, songStringCount);    
-    free_string_array(initialStrings, initialStringCount);
+    freeStringArray(levelsStrings, levelStringCount);
+    freeStringArray(creatorStrings, creatorStringCount);
+    if (songStringCount > 0) freeStringArray(songStrings, songStringCount);    
+    freeStringArray(initialStrings, initialStringCount);
 
     free(outdata);
 
@@ -969,9 +969,9 @@ int search_levels_internal(GenericTask *task, bool useGdps) {
     return 0;
 }
 
-int get_level_data_internal(GenericTask *task, int id, bool refresh, int currentId, bool useGdps) {
+int getLevelDataInternal(GenericTask *task, int id, bool refresh, int currentId, bool useGdps) {
     char *outdata;
-    int result = get_level_from_id(task, &outdata, id, useGdps);
+    int result = getLevelFromID(task, &outdata, id, useGdps);
 
     if (result != 0) return result;
     // validate first two chars of response to make sure what we're parsing is the level string
@@ -979,18 +979,18 @@ int get_level_data_internal(GenericTask *task, int id, bool refresh, int current
 
     int initialStringCount = 0;
 
-    char **initialStrings = split_string(outdata, '#', &initialStringCount, true);
+    char **initialStrings = splitString(outdata, '#', &initialStringCount, true);
     if (!initialStrings) return -1;
 
-    level_entry = (LevelEntry *)malloc(initialStringCount * sizeof(LevelEntry));
-    if (!level_entry) return -1;
+    levelEntry = (LevelEntry *)malloc(initialStringCount * sizeof(LevelEntry));
+    if (!levelEntry) return -1;
 
     // Initialize
-    memset(level_entry, 0, initialStringCount * sizeof(LevelEntry));
+    memset(levelEntry, 0, initialStringCount * sizeof(LevelEntry));
 
-    fill_level_entry(initialStrings, 1, refresh, currentId);
+    fillLevelEntry(initialStrings, 1, refresh, currentId);
 
-    free_string_array(initialStrings, initialStringCount);
+    freeStringArray(initialStrings, initialStringCount);
 
     free(outdata);
 
@@ -998,7 +998,7 @@ int get_level_data_internal(GenericTask *task, int id, bool refresh, int current
     return 0;
 }
 
-float derive_gj_version(int version) {
+float deriveGJVersion(int version) {
     switch (version) {
         case 1:
             return 1.0;
@@ -1030,9 +1030,9 @@ float derive_gj_version(int version) {
     return 0;
 }
 
-int get_comments_internal(GenericTask *task, int id, int page, int sortType, bool useGdps) {
+int getCommentsInternal(GenericTask *task, int id, int page, int sortType, bool useGdps) {
     char *outdata;
-    int result = get_comments_from_id(task, &outdata, id, page, sortType, useGdps);
+    int result = getCommentsFromID(task, &outdata, id, page, sortType, useGdps);
 
     if (result != 0) return result;
     // validate first two chars of response to make sure what we're parsing is the comments string
@@ -1042,20 +1042,20 @@ int get_comments_internal(GenericTask *task, int id, int page, int sortType, boo
     if (!useGdps) {
         int commentStringCount = 0;
 
-        char **commentStrings = split_string(outdata, '|', &commentStringCount, true);
+        char **commentStrings = splitString(outdata, '|', &commentStringCount, true);
         if (!commentStrings)
             return -1;
 
-        comment_entries = (CommentEntry *)malloc(commentStringCount * sizeof(CommentEntry));
-        if (!comment_entries)
+        commentEntries = (CommentEntry *)malloc(commentStringCount * sizeof(CommentEntry));
+        if (!commentEntries)
             return -1;
 
         // Initialize
-        memset(comment_entries, 0, commentStringCount * sizeof(CommentEntry));
+        memset(commentEntries, 0, commentStringCount * sizeof(CommentEntry));
 
-        fill_comment_entries(commentStrings, commentStringCount);
+        fillCommentEntries(commentStrings, commentStringCount);
 
-        free_string_array(commentStrings, commentStringCount);
+        freeStringArray(commentStrings, commentStringCount);
 
         free(outdata);
 
@@ -1064,44 +1064,44 @@ int get_comments_internal(GenericTask *task, int id, int page, int sortType, boo
         // gdps exclusive slop
         int initialStringCount = 0;
 
-        char **initialStrings = split_string(outdata, '#', &initialStringCount, true);
+        char **initialStrings = splitString(outdata, '#', &initialStringCount, true);
         if (!initialStrings) return -1;
 
         int commentStringCount = 0;
         int commentAuthorStringCount = 0;
 
-        char **commentStrings = split_string(initialStrings[0], '|', &commentStringCount, true);
+        char **commentStrings = splitString(initialStrings[0], '|', &commentStringCount, true);
         if (!commentStrings) return -1;
 
-        char **commentAuthorStrings = split_string(initialStrings[1], '|', &commentAuthorStringCount, true);
+        char **commentAuthorStrings = splitString(initialStrings[1], '|', &commentAuthorStringCount, true);
         if (!commentAuthorStrings) return -1;
 
-        comment_entries = (CommentEntry *)malloc(commentStringCount * sizeof(CommentEntry));
-        if (!comment_entries) return -1;
+        commentEntries = (CommentEntry *)malloc(commentStringCount * sizeof(CommentEntry));
+        if (!commentEntries) return -1;
         
         commentEntriesLength = commentStringCount;
 
         // Initialize
-        memset(comment_entries, 0, commentStringCount * sizeof(CommentEntry));
+        memset(commentEntries, 0, commentStringCount * sizeof(CommentEntry));
 
         // Fill comment entries
-        fill_gdps_comment_entries(commentStrings, commentStringCount);
+        fillGdpsCommentEntries(commentStrings, commentStringCount);
 
         // Fill missing creator entries
-        fill_gdps_comment_author_entries(commentAuthorStrings, commentAuthorStringCount, commentStringCount);
+        fillGdpsCommentAuthorEntries(commentAuthorStrings, commentAuthorStringCount, commentStringCount);
 
-        free_string_array(commentStrings, commentStringCount);
-        free_string_array(commentAuthorStrings, commentAuthorStringCount);
-        free_string_array(initialStrings, initialStringCount);
+        freeStringArray(commentStrings, commentStringCount);
+        freeStringArray(commentAuthorStrings, commentAuthorStringCount);
+        freeStringArray(initialStrings, initialStringCount);
 
     }
 
     return 0;
 }
 
-int get_song_data_internal(GenericTask *task, int songId, SongEntry *targetSongEntry, bool useGdps) {
+int getSongDataInternal(GenericTask *task, int songId, SongEntry *targetSongEntry, bool useGdps) {
     char *outdata;
-    int result = get_song_info_from_id(task, &outdata, songId, useGdps);
+    int result = getSongInfoFromID(task, &outdata, songId, useGdps);
 
     if (result != 0) return result;
     // validate first two chars of response to make sure what we're parsing is the level string
@@ -1109,7 +1109,7 @@ int get_song_data_internal(GenericTask *task, int songId, SongEntry *targetSongE
 
     int initialStringCount = 0;
 
-    fill_song_entry(outdata, targetSongEntry);
+    fillSongEntry(outdata, targetSongEntry);
 
     free(outdata);
 
@@ -1117,30 +1117,30 @@ int get_song_data_internal(GenericTask *task, int songId, SongEntry *targetSongE
     return 0;
 }
 
-int get_latest_nightly_internal(GenericTask *task, const char *repoAuthor, const char *repoName, const char *repoBranch) {
+int getLatestNightlyInternal(GenericTask *task, const char *repoAuthor, const char *repoName, const char *repoBranch) {
     char *outdata;
     latestCommitCount = 0;
-    int result = get_commits(task, &outdata, repoAuthor, repoName, repoBranch);
+    int result = getCommits(task, &outdata, repoAuthor, repoName, repoBranch);
     if (result != 0) return result;
 
     // check for updates
-    int parserResult = parse_latest_commit(outdata);
+    int parserResult = parseLatestCommit(outdata);
     if (parserResult != 0) {
         free(outdata);
         return parserResult;
     }
     // populate commits since current
-    parserResult = parse_commits_data(outdata);
+    parserResult = parseCommitsData(outdata);
     if (parserResult != 0) {
         free(outdata);
         return parserResult;
     }
     // get repo actions
-    result = get_actions(task, &outdata, repoAuthor, repoName, is_3DSX ? "gd3ds-3dsx-zip" : "gd3ds-cia-zip");
+    result = getActions(task, &outdata, repoAuthor, repoName, is3Dsx ? "gd3ds-3dsx-zip" : "gd3ds-cia-zip");
     if (result != 0) return result;
 
     // parse actions and get download link
-    parserResult = parse_actions_data(outdata);
+    parserResult = parseActionsData(outdata);
     if (parserResult != 0) {
         free(outdata);
         return parserResult;
@@ -1150,33 +1150,33 @@ int get_latest_nightly_internal(GenericTask *task, const char *repoAuthor, const
     return 0;
 }
 
-int get_latest_release_internal(GenericTask *task, const char *repoAuthor, const char *repoName) {
+int getLatestReleaseInternal(GenericTask *task, const char *repoAuthor, const char *repoName) {
     char *outdata;
-    int result = get_releases(task, &outdata, repoAuthor, repoName);
+    int result = getReleases(task, &outdata, repoAuthor, repoName);
     if (result != 0) return result;
 
-    int parserResult = parse_releases_data(outdata);
+    int parserResult = parseReleasesData(outdata);
     if (parserResult != 0) return parserResult;
 
     free(outdata);
     return 0;
 }
 
-int check_for_updates_internal(GenericTask *task, const char *repoAuthor, const char *repoName, const char *repoBranch, bool useNightly) {
-    update_data = (UpdateData *)malloc(sizeof(UpdateData));
-    if (!update_data) return -1;
+int checkForUpdatesInternal(GenericTask *task, const char *repoAuthor, const char *repoName, const char *repoBranch, bool useNightly) {
+    updateData = (UpdateData *)malloc(sizeof(UpdateData));
+    if (!updateData) return -1;
 
     // Initialize
-    memset(update_data, 0, sizeof(UpdateData));
+    memset(updateData, 0, sizeof(UpdateData));
 
     int result;
 
     // nightly updates and regular updates behave very differently so we handle both in separate functions
     if (useNightly) {
-        result = get_latest_nightly_internal(task, repoAuthor, repoName, repoBranch);
+        result = getLatestNightlyInternal(task, repoAuthor, repoName, repoBranch);
         if (result != 0) return result;
     } else {
-        result = get_latest_release_internal(task, repoAuthor, repoName);
+        result = getLatestReleaseInternal(task, repoAuthor, repoName);
         if (result != 0) return result;
     }
 
@@ -1185,36 +1185,36 @@ int check_for_updates_internal(GenericTask *task, const char *repoAuthor, const 
     return 0;
 }
 
-int extract_update_internal(const char *target_path) {
-    int result = extract_zip(target_path, CONFIG_ROOT);
+int extractUpdateInternal(const char *targetPath) {
+    int result = extractZip(targetPath, CONFIG_ROOT);
     //clean up regardless of result
-    remove(target_path);
+    remove(targetPath);
     return result;
 }
 
-int install_update_internal(const char *updatePath) {
+int installUpdateInternal(const char *updatePath) {
     // 3dsx and cia rom installs are handled very differently 
     
-    if (is_3DSX) {
+    if (is3Dsx) {
         // ensure 3dsx path is present
-        if (!_3dsx_path) return -1;
+        if (!threeDsxPath) return -1;
         
         Result res = 0;
 
         // unmount romfs so we can modify current .3dsx
         res = romfsExit();
         if(R_FAILED(res)) {
-            output_log("failed to exit romfs - code: %d\n", res);
+            outputLog("failed to exit romfs - code: %d\n", res);
             return -1;
         }
 
         // filesystem operations
-        if (remove(_3dsx_path) != 0) {
-            output_log("failed to remove current .3dsx\n");
+        if (remove(threeDsxPath) != 0) {
+            outputLog("failed to remove current .3dsx\n");
             return -1;
         }
-        if (rename(updatePath, _3dsx_path) != 0) {
-            output_log("failed to move target .3dsx.\n");
+        if (rename(updatePath, threeDsxPath) != 0) {
+            outputLog("failed to move target .3dsx.\n");
             return -1;
         }
         // success
@@ -1228,7 +1228,7 @@ int install_update_internal(const char *updatePath) {
     // initialise application manager 
     res = amInit();
     if (R_FAILED(res)) {
-        output_log("failed to init application manager - code: %d\n", res);
+        outputLog("failed to init application manager - code: %d\n", res);
         return 2;
     }
     
@@ -1236,7 +1236,7 @@ int install_update_internal(const char *updatePath) {
     cia = fopen(updatePath, "rb");
     if (!cia) {
         amExit();
-        output_log("failed to open target .cia\n");
+        outputLog("failed to open target .cia\n");
         return 1;
     }
     
@@ -1245,7 +1245,7 @@ int install_update_internal(const char *updatePath) {
     if (R_FAILED(res)) {
         fclose(cia);
         amExit();
-        output_log("failed to start cia install: %d\n", res);
+        outputLog("failed to start cia install: %d\n", res);
         return 3;
     }
     
@@ -1265,7 +1265,7 @@ int install_update_internal(const char *updatePath) {
             free(buffer);
             fclose(cia);
             amExit();
-            output_log("failed during cia install - code: %d\n", res);
+            outputLog("failed during cia install - code: %d\n", res);
             return 4;
         }
         
@@ -1283,39 +1283,39 @@ int install_update_internal(const char *updatePath) {
 
 //intermediate functions
 
-int search_levels(GenericTask *task) {
-    int result = search_levels_internal(task, gdps);
+int searchLevels(GenericTask *task) {
+    int result = searchLevelsInternal(task, gdps);
     return result;
 }
 
-int get_level(GenericTask *task) {
-    int result = get_level_data_internal(task, online_menu_level_id, refresh, curr_search_id, gdps);
+int getLevel(GenericTask *task) {
+    int result = getLevelDataInternal(task, onlineMenuLevelID, refresh, currSearchID, gdps);
     return result;
 }
 
-int get_comments(GenericTask *task) {
-    int result = get_comments_internal(task, online_menu_level_id, current_comments_page, comments_sort_type, gdps);
+int getComments(GenericTask *task) {
+    int result = getCommentsInternal(task, onlineMenuLevelID, currentCommentsPage, commentsSortType, gdps);
     return result;
 }
 
-int get_song_data(GenericTask *task) {
-    int result = get_song_data_internal(task, current_search_entry->songId, current_song_entry, gdps);
+int getSongData(GenericTask *task) {
+    int result = getSongDataInternal(task, currentSearchEntry->songId, currentSongEntry, gdps);
     return result;
 }
 
-int check_for_updates(GenericTask *task) {
-    int result = check_for_updates_internal(task, REPO_AUTHOR, REPO_NAME, REPO_BRANCH, useNightlyBranch);
+int checkForUpdates(GenericTask *task) {
+    int result = checkForUpdatesInternal(task, REPO_AUTHOR, REPO_NAME, REPO_BRANCH, useNightlyBranch);
     return result;
 }
 
-int install_update(GenericTask *){
+int installUpdate(GenericTask *){
     char updatePath[512];
-    snprintf(updatePath, sizeof(updatePath), "%sGeometryDash3DS.%s", CONFIG_ROOT, is_3DSX ? "3dsx" : "cia");
-    int result = install_update_internal(updatePath);
+    snprintf(updatePath, sizeof(updatePath), "%sGeometryDash3DS.%s", CONFIG_ROOT, is3Dsx ? "3dsx" : "cia");
+    int result = installUpdateInternal(updatePath);
     return result;
 }
 
-int extract_update(GenericTask *){
-    int result = extract_update_internal(downloadedUpdateFilePath);
+int extractUpdate(GenericTask *){
+    int result = extractUpdateInternal(downloadedUpdateFilePath);
     return result;
 }

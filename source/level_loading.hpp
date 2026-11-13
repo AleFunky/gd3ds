@@ -18,7 +18,7 @@
 typedef struct Color {
     unsigned char r,g,b;
 
-    u32 to_color32(){
+    u32 toColor32(){
         return C2D_Color32(r, g, b, 255);
     }
 } Color;
@@ -46,174 +46,174 @@ typedef union {
     float f;
     bool b;
     HSV hsv;
-    short int_array[MAX_GROUPS_PER_OBJECT];
+    short intArray[MAX_GROUPS_PER_OBJECT];
     char *str;
 } GDValue;
 
 typedef struct {
-    bool spawn_triggered;
-    bool multi_triggered;
-    float trig_duration;
-    int target_group;
-    unsigned char trig_colorR, trig_colorG, trig_colorB;
-    bool p1_color, p2_color;
+    bool spawnTriggered;
+    bool multiTriggered;
+    float trigDuration;
+    int targetGroup;
+    unsigned char trigColorR, trigColorG, trigColorB;
+    bool p1Color, p2Color;
     bool tintGround;
     bool blending;
-    unsigned short target_color_id;
-    int copied_color_id;
+    unsigned short targetColorID;
+    int copiedColorID;
     float opacity;
-    HSV copied_hsv;
+    HSV copiedHSV;
 } ColorTrigger;
 
 typedef struct {
-    bool spawn_triggered;
-    bool multi_triggered;
-    bool target_mode;
-    float trig_duration;
-    int target_group;
-    int target_group2;
-    int center_group;
-    float move_offset_x;
-    float move_offset_y;
-    int move_easing;
-    bool lock_to_player_x;
-    bool lock_to_player_y;
+    bool spawnTriggered;
+    bool multiTriggered;
+    bool targetMode;
+    float trigDuration;
+    int targetGroup;
+    int targetGroup2;
+    int centerGroup;
+    float moveOffsetX;
+    float moveOffsetY;
+    int moveEasing;
+    bool lockToPlayerX;
+    bool lockToPlayerY;
 } MoveTrigger;
 
 typedef struct {
-    bool spawn_triggered;
-    bool multi_triggered;
-    bool activate_group;
-    bool multi_activate;
-    int target_group;
-    int item_id;
-    int target_count;
+    bool spawnTriggered;
+    bool multiTriggered;
+    bool activateGroup;
+    bool multiActivate;
+    int targetGroup;
+    int itemID;
+    int targetCount;
 } CountTrigger;
 
 typedef struct {
-    bool spawn_triggered;
-    bool multi_triggered;
-    bool activate_group;
-    int target_group;
-    int item_id;
-    int target_count;
-    int instant_count_mode;
+    bool spawnTriggered;
+    bool multiTriggered;
+    bool activateGroup;
+    int targetGroup;
+    int itemID;
+    int targetCount;
+    int instantCountMode;
 } InstantCountTrigger;
 
 #define COUNTER_LABEL 1615
 #define MAX_COUNTER_TEXT 12
 
 typedef struct {
-    int item_id;
-    int last_value;
+    int itemID;
+    int lastValue;
     char text[MAX_COUNTER_TEXT + 1];
-    unsigned char layout_done;
-    unsigned char glyph_count;
+    unsigned char layoutDone;
+    unsigned char glyphCount;
     TextGlyphPlacement glyphs[MAX_COUNTER_TEXT];
 } CounterLabel;
 
 typedef struct {
-    int item_id;
-    bool is_pickup;
-    bool sub_count;
+    int itemID;
+    bool isPickup;
+    bool subCount;
 } PickupItem;
 
 typedef struct {
-    bool spawn_triggered;
-    bool multi_triggered;
-    int target_group;
-    float follow_speed;
-    float follow_delay;
-    float follow_offset;
-    float follow_max_speed;
+    bool spawnTriggered;
+    bool multiTriggered;
+    int targetGroup;
+    float followSpeed;
+    float followDelay;
+    float followOffset;
+    float followMaxSpeed;
 } FollowPlayerYTrigger;
 
 typedef struct {
-    bool spawn_triggered;
-    bool multi_triggered;
-    int target_group;
-    int follow_group;
-    float x_mod;
-    float y_mod;
-    float trig_duration;
+    bool spawnTriggered;
+    bool multiTriggered;
+    int targetGroup;
+    int followGroup;
+    float xMod;
+    float yMod;
+    float trigDuration;
 } FollowTrigger;
 
 typedef struct {
-    bool spawn_triggered;
-    bool multi_triggered;
-    float trig_duration;
-    int target_group;
-    float trigger_opacity;
+    bool spawnTriggered;
+    bool multiTriggered;
+    float trigDuration;
+    int targetGroup;
+    float triggerOpacity;
 } AlphaTrigger;
 
 typedef struct {
-    bool spawn_triggered;
-    bool multi_triggered;
-    float trig_duration;
-    int target_group;
-    unsigned char trig_colorR, trig_colorG, trig_colorB;
-    unsigned short target_color_id;
+    bool spawnTriggered;
+    bool multiTriggered;
+    float trigDuration;
+    int targetGroup;
+    unsigned char trigColorR, trigColorG, trigColorB;
+    unsigned short targetColorID;
     float opacity;
-    int copied_color_id;
-    HSV copied_hsv;
+    int copiedColorID;
+    HSV copiedHSV;
 
-    float pulse_fade_in;
-    float pulse_hold;
-    float pulse_fade_out;
-    int pulse_mode;
+    float pulseFadeIn;
+    float pulseHold;
+    float pulseFadeOut;
+    int pulseMode;
 
-    int pulse_target_type;
-    bool pulse_main_only;
-    bool pulse_detail_only;
+    int pulseTargetType;
+    bool pulseMainOnly;
+    bool pulseDetailOnly;
 } PulseTrigger;
 
 typedef struct {
-    bool spawn_triggered;
-    bool multi_triggered;
-    int target_group;
-    bool activate_group;
-    bool spawn_only;
+    bool spawnTriggered;
+    bool multiTriggered;
+    int targetGroup;
+    bool activateGroup;
+    bool spawnOnly;
 } ToggleTrigger;
 
 typedef struct {
-    bool spawn_triggered;
-    bool multi_triggered;
-    bool hold_mode;
-    unsigned char toggle_mode;
-    int target_group;
+    bool spawnTriggered;
+    bool multiTriggered;
+    bool holdMode;
+    unsigned char toggleMode;
+    int targetGroup;
 } TouchTrigger;
 
 typedef struct {
-    bool spawn_triggered;
-    bool multi_triggered;
-    int target_group;
+    bool spawnTriggered;
+    bool multiTriggered;
+    int targetGroup;
 } StopTrigger;
 
 typedef struct {
-    bool spawn_triggered;
-    bool multi_triggered;
+    bool spawnTriggered;
+    bool multiTriggered;
     bool activate;
-    int target_group;
+    int targetGroup;
 } OnDeathTrigger;
 
 typedef struct {
-    bool spawn_triggered;
-    bool multi_triggered;
-    int target_group;
-    float spawn_delay;
-    float trig_duration;
+    bool spawnTriggered;
+    bool multiTriggered;
+    int targetGroup;
+    float spawnDelay;
+    float trigDuration;
 } SpawnTrigger;
 
 typedef struct {
-    bool spawn_triggered;
-    bool multi_triggered;
+    bool spawnTriggered;
+    bool multiTriggered;
 } SimpleTrigger;
 
 typedef struct {
     char text[MAX_TEXT_LEN + 1];
     unsigned char len;
-    unsigned char layout_done;
-    unsigned char glyph_count;
+    unsigned char layoutDone;
+    unsigned char glyphCount;
     TextGlyphPlacement glyphs[MAX_TEXT_LEN];
 } TextObject;
 
@@ -239,66 +239,66 @@ typedef struct {
 
     int *id;
     float *x, *y;
-    float *last_y;
+    float *lastY;
     float *rotation;
-    float *visual_rotation;
+    float *visualRotation;
     int *zlayer, *zorder;
     float *opacity;
-    float *alpha_trigger_opacity;
+    float *alphaTriggerOpacity;
 
     float *width, *height;
 
-    unsigned short *v1p9_col_channel;
-    unsigned short *col_channel;
-    unsigned short *detail_col_channel;
+    unsigned short *v1p9ColChannel;
+    unsigned short *colChannel;
+    unsigned short *detailColChannel;
 
-    int *trigger_index;
+    int *triggerIndex;
 
-    float *original_x;
-    float *original_y;
+    float *originalX;
+    float *originalY;
 
-    u8 *num_main_pulses;
-    u8 *num_detail_pulses;
-    bool *main_being_pulsed;
-    bool *detail_being_pulsed;
-    Color *main_non_pulse_color;
-    Color *detail_non_pulse_color;
-    Color *main_color;
-    Color *detail_color;
+    u8 *numMainPulses;
+    u8 *numDetailPulses;
+    bool *mainBeingPulsed;
+    bool *detailBeingPulsed;
+    Color *mainNonPulseColor;
+    Color *detailNonPulseColor;
+    Color *mainColor;
+    Color *detailColor;
 
-    bool *main_col_HSV_enabled;
-    bool *detail_col_HSV_enabled;
-    HSV *main_col_HSV;
-    HSV *detail_col_HSV;
+    bool *mainColHSVEnabled;
+    bool *detailColHSVEnabled;
+    HSV *mainColHSV;
+    HSV *detailColHSV;
 
-    Color *cached_main_hsv_src_color;
-    Color *cached_detail_hsv_src_color;
-    Color *cached_main_hsv_color;
-    Color *cached_detail_hsv_color;
-    bool *cached_main_hsv_valid;
-    bool *cached_detail_hsv_valid;
+    Color *cachedMainHSVSrcColor;
+    Color *cachedDetailHSVSrcColor;
+    Color *cachedMainHSVColor;
+    Color *cachedDetailHSVColor;
+    bool *cachedMainHSVValid;
+    bool *cachedDetailHSVValid;
 
-    float *scale_x, *scale_y;
-    float *original_scale_x, *original_scale_y;
+    float *scaleX, *scaleY;
+    float *originalScaleX, *originalScaleY;
 
-    int *child_object;
-    float *tp_y_offset;
-    int *section_x;
-    int *section_y;
+    int *childObject;
+    float *tpYOffset;
+    int *sectionX;
+    int *sectionY;
 
-    unsigned char *transition_applied;
+    unsigned char *transitionApplied;
     unsigned char *orientation;
-    unsigned char *hitbox_counter;
+    unsigned char *hitboxCounter;
     union {
-        bool *touch_triggered;
-        u8 *coin_id;
+        bool *touchTriggered;
+        u8 *coinID;
     };
     bool *flippedH, *flippedV;
 
     short (*groups)[MAX_GROUPS_PER_OBJECT];
-    int *group_combination_index;
+    int *groupCombinationIndex;
 
-    u8 *group_count;
+    u8 *groupCount;
     u8 *flags;
 
     u8 *activated;
@@ -333,8 +333,8 @@ typedef struct SectionTriggers {
 
 typedef struct Section {
     int *objects;
-    int object_count;
-    int object_capacity;
+    int objectCount;
+    int objectCapacity;
     SectionTriggers *triggers;
 
     int x, y; // Section coordinates
@@ -342,58 +342,58 @@ typedef struct Section {
 } Section;
 
 typedef struct {
-    float last_obj_x;
-    float wall_x;
-    float wall_y;
+    float lastObjX;
+    float wallX;
+    float wallY;
 
-    int pulsing_type;
-    size_t song_id;
-    int custom_song_id;
-    float song_offset;
+    int pulsingType;
+    size_t songID;
+    int customSongID;
+    float songOffset;
     bool completing;
-    int background_id;
-    int ground_id;
-    int initial_gamemode;
-    bool initial_mini;
-    unsigned char initial_speed;
-    bool initial_dual;
-    bool initial_upsidedown;
+    int backgroundID;
+    int groundID;
+    int initialGamemode;
+    bool initialMini;
+    unsigned char initialSpeed;
+    bool initialDual;
+    bool initialUpsidedown;
 
-    bool two_player_mode;
-    bool low_detail;
+    bool twoPlayerMode;
+    bool lowDetail;
 
-    char level_name[256];
-    char creator_name[256];
+    char levelName[256];
+    char creatorName[256];
 } LoadedLevelInfo;
 
 
 
 typedef struct {
-    unsigned char *compressed_data;
-    size_t compressed_len;
-    const char *raw_data;
+    unsigned char *compressedData;
+    size_t compressedLen;
+    const char *rawData;
 } LevelStreamInput;
 
 typedef int (*LevelStreamCallback)(const unsigned char *data, size_t len, void *context);
 
 typedef struct {
     char *section;
-    size_t section_len;
-    size_t section_capacity;
+    size_t sectionLen;
+    size_t sectionCapacity;
     char *metadata;
-    int section_count;
-    int high_detail_count;
-    int extra_slots;
-    int portal_match;
+    int sectionCount;
+    int highDetailCount;
+    int extraSlots;
+    int portalMatch;
 } LevelStreamScan;
 
 typedef struct {
     char *section;
-    size_t section_len;
-    size_t section_capacity;
-    int section_count;
-    int object_index;
-    int parse_capacity;
+    size_t sectionLen;
+    size_t sectionCapacity;
+    int sectionCount;
+    int objectIndex;
+    int parseCapacity;
 } LevelStreamParser;
 
 typedef enum {
@@ -407,87 +407,87 @@ typedef enum {
     LOAD_ERROR_COUNT,
 } LevelLoadError;
 
-extern TriggerPool col_pool;
-extern TriggerPool move_pool;
-extern TriggerPool alpha_pool;
-extern TriggerPool pulse_pool;
-extern TriggerPool toggle_pool;
-extern TriggerPool touch_pool;
-extern TriggerPool spawn_pool;
-extern bool has_follow_player_y;
+extern TriggerPool colPool;
+extern TriggerPool movePool;
+extern TriggerPool alphaPool;
+extern TriggerPool pulsePool;
+extern TriggerPool togglePool;
+extern TriggerPool touchPool;
+extern TriggerPool spawnPool;
+extern bool hasFollowPlayerY;
 
-ColorTrigger *get_color_trigger(int obj);
-StopTrigger *get_stop_trigger(int obj);
-OnDeathTrigger *get_on_death_trigger(int obj);
-PulseTrigger *get_pulse_trigger(int obj);
-AlphaTrigger *get_alpha_trigger(int obj);
-MoveTrigger *get_move_trigger(int obj);
-CountTrigger *get_count_trigger(int obj);
-InstantCountTrigger *get_instant_count_trigger(int obj);
-CounterLabel *get_counter_label(int obj);
-PickupItem *get_pickup_item(int obj);
-FollowPlayerYTrigger *get_follow_player_y_trigger(int obj);
-FollowTrigger *get_follow_trigger(int obj);
-ToggleTrigger *get_toggle_trigger(int obj);
-TouchTrigger *get_touch_trigger(int obj);
-SpawnTrigger *get_spawn_trigger(int obj);
-TextObject *get_text_object(int obj);
+ColorTrigger *getColorTrigger(int obj);
+StopTrigger *getStopTrigger(int obj);
+OnDeathTrigger *getOnDeathTrigger(int obj);
+PulseTrigger *getPulseTrigger(int obj);
+AlphaTrigger *getAlphaTrigger(int obj);
+MoveTrigger *getMoveTrigger(int obj);
+CountTrigger *getCountTrigger(int obj);
+InstantCountTrigger *getInstantCountTrigger(int obj);
+CounterLabel *getCounterLabel(int obj);
+PickupItem *getPickupItem(int obj);
+FollowPlayerYTrigger *getFollowPlayerYTrigger(int obj);
+FollowTrigger *getFollowTrigger(int obj);
+ToggleTrigger *getToggleTrigger(int obj);
+TouchTrigger *getTouchTrigger(int obj);
+SpawnTrigger *getSpawnTrigger(int obj);
+TextObject *getTextObject(int obj);
 
-bool is_simple_trigger_object(int id);
+bool isSimpleTriggerObject(int id);
 
-bool trigger_is_spawn_triggered(int id, int obj);
-bool trigger_is_multi_triggered(int id, int obj);
+bool triggerIsSpawnTriggered(int id, int obj);
+bool triggerIsMultiTriggered(int id, int obj);
 
-extern const char *error_strings[LOAD_ERROR_COUNT - 1];
+extern const char *errorStrings[LOAD_ERROR_COUNT - 1];
 
-extern LoadedLevelInfo level_info;
+extern LoadedLevelInfo levelInfo;
 
-extern const char *default_name;
+extern const char *defaultName;
 
-extern const char *level_lengths[5];
+extern const char *levelLengths[5];
 
 #define BG_COUNT 20
 #define G_COUNT 17
 
-extern char *curr_level_string;
+extern char *currLevelString;
 
 extern ObjectsArray objects;
 
 extern int channelCount;
 extern GDColorChannel *colorChannels;
 
-char *read_file(const char *filepath, size_t *out_size);
-char *read_file_arena(Arena *arena, const char *filepath, size_t *out_size);
-char *decompress_level(char *data, int *out_code);
+char *readFile(const char *filepath, size_t *outSize);
+char *readFileArena(Arena *arena, const char *filepath, size_t *outSize);
+char *decompressLevel(char *data, int *outCode);
 
-int load_level(const char *path);
-int load_online_level(char *level_string);
-void reload_level();
-void unload_level();
+int loadLevel(const char *path);
+int loadOnlineLevel(char *levelString);
+void reloadLevel();
+void unloadLevel();
 
-void fix_base64_url(char *b64);
-int base64_decode(const char *in, unsigned char *out);
+void fixBase64URL(char *b64);
+int base64Decode(const char *in, unsigned char *out);
 
-Section *get_section(int x, int y);
-Section *get_or_create_section(int x, int y);
-void assign_object_to_section(int obj);
-void update_object_section(int obj);
-bool obj_has_main(const GameObject *obj);
-bool obj_has_detail(const GameObject *obj);
+Section *getSection(int x, int y);
+Section *getOrCreateSection(int x, int y);
+void assignObjectToSection(int obj);
+void updateObjectSection(int obj);
+bool objHasMain(const GameObject *obj);
+bool objHasDetail(const GameObject *obj);
 
-bool is_valid_object(int id);
-bool is_trigger_object(int id);
-bool is_complex_trigger_object(int id);
-bool is_color_trigger(int id);
-int get_level_coin_count(void);
+bool isValidObject(int id);
+bool isTriggerObject(int id);
+bool isComplexTriggerObject(int id);
+bool isColorTrigger(int id);
+int getLevelCoinCount(void);
 
-char *get_level_name(char *data_ptr);
-char *load_user_song(int id, size_t *out_size); 
-bool check_song(int id);
-char *extract_gmd_key(const char *data, const char *key, const char *type);
+char *getLevelName(char *dataPtr);
+char *loadUserSong(int id, size_t *outSize); 
+bool checkSong(int id);
+char *extractGMDKey(const char *data, const char *key, const char *type);
 
-char **split_string(const char *str, char delimiter, int *outCount, bool ignoreZeroLength);
-char **split_string_str_del(const char *str, const char *delimiter, int *outCount, bool ignoreZeroLength);
-void free_string_array(char **arr, int count);
+char **splitString(const char *str, char delimiter, int *outCount, bool ignoreZeroLength);
+char **splitStringStrDel(const char *str, const char *delimiter, int *outCount, bool ignoreZeroLength);
+void freeStringArray(char **arr, int count);
 
-char *convert_if_gdlvl(char *gmd, const char *path);
+char *convertIfGdlvl(char *gmd, const char *path);

@@ -1,6 +1,6 @@
 #include "spider_anim_data.hpp"
 
-static const PlayerSpritePart spider_run_f001[] = {
+static const PlayerSpritePart spiderRunF001[] = {
     { 2, 6.1875f, -0.1125f, -335.9836f, -0.8837f, 0.8837f, 0 },
     { 2, 1.5500f, -1.6750f, -20.9863f, 0.8100f, 0.8837f, 1 },
     { 6, -1.8625f, 0.4500f, -21.7204f, 1.1588f, 0.9999f, 2 },
@@ -9,7 +9,7 @@ static const PlayerSpritePart spider_run_f001[] = {
     { 2, -0.5625f, -3.2250f, 0.0000f, 1.0000f, 1.0000f, 5 },
 };
 
-static const PlayerSpritePart spider_run_f002[] = {
+static const PlayerSpritePart spiderRunF002[] = {
     { 2, 7.1500f, -1.1250f, -12.9152f, -0.8837f, 0.9461f, 0 },
     { 2, -0.5375f, -3.5250f, -6.5614f, 0.8359f, 0.8838f, 1 },
     { 6, -3.5500f, 0.1000f, -5.2267f, 1.0500f, 0.9999f, 2 },
@@ -18,7 +18,7 @@ static const PlayerSpritePart spider_run_f002[] = {
     { 2, -2.9125f, -1.2500f, 20.2265f, 1.0000f, 1.0000f, 5 },
 };
 
-static const PlayerSpritePart spider_run_f003[] = {
+static const PlayerSpritePart spiderRunF003[] = {
     { 2, 5.8625f, -3.2750f, -3.4727f, -0.8457f, 1.0215f, 0 },
     { 2, -3.6375f, -2.2500f, 19.4040f, 0.7574f, 0.8838f, 1 },
     { 6, -3.6875f, -0.3875f, -9.3852f, 1.6811f, 1.0000f, 2 },
@@ -27,7 +27,7 @@ static const PlayerSpritePart spider_run_f003[] = {
     { 2, 1.2250f, -0.8875f, 22.1769f, 1.0000f, 1.0000f, 5 },
 };
 
-static const PlayerSpritePart spider_run_f004[] = {
+static const PlayerSpritePart spiderRunF004[] = {
     { 2, 1.5000f, -3.5750f, -350.5085f, -0.8837f, 0.8837f, 0 },
     { 2, -0.6375f, -0.9750f, 26.4551f, 0.8152f, 0.8463f, 1 },
     { 6, -4.0375f, 1.1000f, -5.9498f, 1.2185f, 1.0000f, 2 },
@@ -36,7 +36,7 @@ static const PlayerSpritePart spider_run_f004[] = {
     { 2, 5.3500f, 0.0000f, -27.7670f, 0.9999f, 0.9999f, 5 },
 };
 
-static const PlayerSpritePart spider_run_f005[] = {
+static const PlayerSpritePart spiderRunF005[] = {
     { 2, -1.6250f, -1.2250f, -312.3568f, -0.8837f, 0.8837f, 0 },
     { 2, 2.1750f, 0.5125f, 18.4260f, 0.7950f, 0.9433f, 1 },
     { 6, -3.0625f, 1.5000f, 0.7457f, 1.1499f, 1.0000f, 2 },
@@ -45,7 +45,7 @@ static const PlayerSpritePart spider_run_f005[] = {
     { 2, 7.2875f, -1.5875f, -50.8936f, 0.9999f, 0.9999f, 5 },
 };
 
-static const PlayerSpritePart spider_run_f006[] = {
+static const PlayerSpritePart spiderRunF006[] = {
     { 2, 1.0125f, -0.4875f, -314.8440f, -0.8837f, 0.8837f, 0 },
     { 2, 2.7500f, 0.5500f, -14.7122f, 0.8457f, 0.9764f, 1 },
     { 6, -2.4750f, 1.1375f, -5.2544f, 0.9999f, 0.9999f, 2 },
@@ -54,7 +54,7 @@ static const PlayerSpritePart spider_run_f006[] = {
     { 2, 6.3250f, -2.8625f, -27.1717f, 0.9999f, 0.9999f, 5 },
 };
 
-static const PlayerSpritePart spider_run_f007[] = {
+static const PlayerSpritePart spiderRunF007[] = {
     { 2, 4.2500f, -0.6250f, -298.9303f, -0.8239f, 0.9792f, 0 },
     { 2, 1.9375f, -0.6500f, -23.1839f, 0.8837f, 0.8837f, 1 },
     { 6, -1.6625f, 1.5250f, -37.6029f, 0.9999f, 0.9999f, 2 },
@@ -63,7 +63,7 @@ static const PlayerSpritePart spider_run_f007[] = {
     { 2, 3.6875f, -3.1375f, -1.1696f, 0.9999f, 0.9999f, 5 },
 };
 
-static const PlayerSpritePart spider_jump_f001[] = {
+static const PlayerSpritePart spiderJumpF001[] = {
     { 2, 7.5750f, -2.2375f, -24.2552f, -0.8838f, 0.8838f, 0 },
     { 2, 2.2250f, -2.2875f, 13.9951f, 0.8838f, 0.8838f, 1 },
     { 6, -2.2000f, 0.0375f, 11.0169f, 1.0000f, 1.0000f, 2 },
@@ -72,7 +72,7 @@ static const PlayerSpritePart spider_jump_f001[] = {
     { 2, -2.7375f, -2.6875f, 18.9595f, 1.0000f, 1.0000f, 5 },
 };
 
-static const PlayerSpritePart spider_fall_f001[] = {
+static const PlayerSpritePart spiderFallF001[] = {
     { 2, 5.0125f, -3.8375f, -322.2662f, -0.8837f, 0.8837f, 0 },
     { 2, 0.8500f, -2.6375f, -27.2104f, 0.8837f, 0.8837f, 1 },
     { 6, -2.1750f, -0.3375f, -38.6667f, 1.0000f, 1.0000f, 2 },
@@ -81,7 +81,7 @@ static const PlayerSpritePart spider_fall_f001[] = {
     { 2, -0.1375f, -3.8625f, -44.6279f, 0.9999f, 0.9999f, 5 },
 };
 
-static const PlayerSpritePart spider_fall_f002[] = {
+static const PlayerSpritePart spiderFallF002[] = {
     { 2, 4.9625f, -3.8625f, -316.1583f, -0.8822f, 0.8822f, 0 },
     { 2, 1.0625f, -2.7125f, -27.0928f, 0.8825f, 0.8825f, 1 },
     { 6, -2.2000f, -0.4000f, -38.6150f, 0.9983f, 0.9983f, 2 },
@@ -90,7 +90,7 @@ static const PlayerSpritePart spider_fall_f002[] = {
     { 2, 0.1750f, -3.8625f, -49.3599f, 0.9983f, 0.9983f, 5 },
 };
 
-static const PlayerSpritePart spider_fall_f003[] = {
+static const PlayerSpritePart spiderFallF003[] = {
     { 2, 4.9000f, -3.9000f, -312.3229f, -0.8837f, 0.8837f, 0 },
     { 2, 1.1875f, -2.7500f, -27.2104f, 0.8837f, 0.8837f, 1 },
     { 6, -2.1750f, -0.4500f, -38.6667f, 1.0000f, 1.0000f, 2 },
@@ -99,7 +99,7 @@ static const PlayerSpritePart spider_fall_f003[] = {
     { 2, 0.3250f, -3.8125f, -52.2689f, 0.9999f, 0.9999f, 5 },
 };
 
-static const PlayerSpritePart spider_fall_f004[] = {
+static const PlayerSpritePart spiderFallF004[] = {
     { 2, 4.9375f, -3.8750f, -316.6614f, -0.8816f, 0.8816f, 0 },
     { 2, 1.0250f, -2.7250f, -27.0768f, 0.8819f, 0.8819f, 1 },
     { 6, -2.2000f, -0.4000f, -38.6097f, 0.9975f, 0.9975f, 2 },
@@ -108,7 +108,7 @@ static const PlayerSpritePart spider_fall_f004[] = {
     { 2, 0.1125f, -3.8750f, -48.6585f, 0.9975f, 0.9975f, 5 },
 };
 
-static const PlayerSpritePart spider_fall_f005[] = {
+static const PlayerSpritePart spiderFallF005[] = {
     { 2, 4.9750f, -3.8375f, -321.1769f, -0.8823f, 0.8823f, 0 },
     { 2, 0.8625f, -2.6875f, -27.0914f, 0.8825f, 0.8825f, 1 },
     { 6, -2.2000f, -0.3750f, -38.6150f, 0.9983f, 0.9983f, 2 },
@@ -117,7 +117,7 @@ static const PlayerSpritePart spider_fall_f005[] = {
     { 2, -0.0625f, -3.9125f, -45.1362f, 0.9983f, 0.9983f, 5 },
 };
 
-static const PlayerSpritePart spider_walk_f001[] = {
+static const PlayerSpritePart spiderWalkF001[] = {
     { 2, 7.1750f, -3.3625f, 0.0000f, -0.8838f, 0.8838f, 0 },
     { 2, 2.5125f, -3.3625f, 0.0000f, 0.8838f, 0.8838f, 1 },
     { 6, -2.2250f, 0.0375f, -7.6821f, 1.0000f, 1.0000f, 2 },
@@ -126,7 +126,7 @@ static const PlayerSpritePart spider_walk_f001[] = {
     { 2, -1.0125f, -2.9875f, 0.0000f, 1.0000f, 1.0000f, 5 },
 };
 
-static const PlayerSpritePart spider_walk_f002[] = {
+static const PlayerSpritePart spiderWalkF002[] = {
     { 2, 4.9500f, -3.3250f, -358.9798f, -0.8838f, 0.8838f, 0 },
     { 2, 0.0375f, -3.3000f, 5.9558f, 0.8359f, 0.8838f, 1 },
     { 6, -3.4625f, -0.8250f, -7.2214f, 1.1753f, 1.0000f, 2 },
@@ -135,7 +135,7 @@ static const PlayerSpritePart spider_walk_f002[] = {
     { 2, -0.6000f, -2.1250f, 27.4395f, 1.0000f, 1.0000f, 5 },
 };
 
-static const PlayerSpritePart spider_walk_f003[] = {
+static const PlayerSpritePart spiderWalkF003[] = {
     { 2, 3.1250f, -3.3000f, -357.4881f, -0.8838f, 0.8838f, 0 },
     { 2, 0.8250f, -3.1500f, 30.4086f, 0.7574f, 0.8838f, 1 },
     { 6, -3.5875f, -0.6875f, -8.9071f, 1.5850f, 1.0000f, 2 },
@@ -144,7 +144,7 @@ static const PlayerSpritePart spider_walk_f003[] = {
     { 2, 2.8500f, -1.7250f, 5.6893f, 1.0000f, 1.0000f, 5 },
 };
 
-static const PlayerSpritePart spider_walk_f004[] = {
+static const PlayerSpritePart spiderWalkF004[] = {
     { 2, 3.4875f, -3.0625f, -334.5984f, -0.8837f, 0.8837f, 0 },
     { 2, 2.2500f, -2.1000f, 16.0395f, 0.8152f, 0.8463f, 1 },
     { 6, -3.4500f, -0.4000f, -5.9498f, 1.6866f, 1.0000f, 2 },
@@ -153,7 +153,7 @@ static const PlayerSpritePart spider_walk_f004[] = {
     { 2, 5.6750f, -2.7125f, -28.5370f, 0.9539f, 1.0235f, 5 },
 };
 
-static const PlayerSpritePart spider_walk_f005[] = {
+static const PlayerSpritePart spiderWalkF005[] = {
     { 2, 4.3625f, -2.1375f, -338.3883f, -0.8837f, 0.8837f, 0 },
     { 2, 3.3000f, -1.8750f, -19.9875f, 0.7950f, 0.9433f, 1 },
     { 6, -3.8000f, 0.1000f, -3.2427f, 1.0332f, 1.0000f, 2 },
@@ -162,7 +162,7 @@ static const PlayerSpritePart spider_walk_f005[] = {
     { 2, 4.4875f, -2.7125f, -8.2481f, 0.9879f, 1.0146f, 5 },
 };
 
-static const PlayerSpritePart spider_walk_f006[] = {
+static const PlayerSpritePart spiderWalkF006[] = {
     { 2, 6.4500f, -1.0500f, -343.5793f, -0.8837f, 0.8837f, 0 },
     { 2, 4.3250f, -2.7250f, -20.9353f, 0.8457f, 0.9764f, 1 },
     { 6, -2.9875f, 0.7500f, -13.1425f, 1.0000f, 1.0000f, 2 },
@@ -171,7 +171,7 @@ static const PlayerSpritePart spider_walk_f006[] = {
     { 2, 2.6250f, -2.8375f, -5.0584f, 0.9790f, 0.9991f, 5 },
 };
 
-static const PlayerSpritePart spider_walk_f007[] = {
+static const PlayerSpritePart spiderWalkF007[] = {
     { 2, 7.7375f, -2.9250f, -11.1062f, -0.8240f, 0.9792f, 0 },
     { 2, 3.8500f, -3.1250f, -10.2298f, 0.8838f, 0.8838f, 1 },
     { 6, -2.7625f, 0.3250f, -15.9304f, 1.0000f, 1.0000f, 2 },
@@ -180,7 +180,7 @@ static const PlayerSpritePart spider_walk_f007[] = {
     { 2, 0.8750f, -2.9250f, 0.0000f, 0.9782f, 1.0085f, 5 },
 };
 
-static const PlayerSpritePart spider_idle_f001[] = {
+static const PlayerSpritePart spiderIdleF001[] = {
     { 2, 2.5125f, -3.3625f, 0.0000f, 0.8838f, 0.8838f, 0 },
     { 2, 7.1750f, -3.3625f, 0.0000f, -0.8838f, 0.8838f, 1 },
     { 6, -2.2250f, 0.0375f, -7.6821f, 1.0000f, 1.0000f, 2 },
@@ -189,46 +189,46 @@ static const PlayerSpritePart spider_idle_f001[] = {
     { 2, -1.2375f, -2.9875f, 0.0000f, 1.0000f, 1.0000f, 5 },
 };
 
-static const PlayerFrame spider_run_frames[] = {
-    { spider_run_f001, 6, 0.040000f },
-    { spider_run_f002, 6, 0.040000f },
-    { spider_run_f003, 6, 0.040000f },
-    { spider_run_f004, 6, 0.040000f },
-    { spider_run_f005, 6, 0.040000f },
-    { spider_run_f006, 6, 0.040000f },
-    { spider_run_f007, 6, 0.040000f },
+static const PlayerFrame spiderRunFrames[] = {
+    { spiderRunF001, 6, 0.040000f },
+    { spiderRunF002, 6, 0.040000f },
+    { spiderRunF003, 6, 0.040000f },
+    { spiderRunF004, 6, 0.040000f },
+    { spiderRunF005, 6, 0.040000f },
+    { spiderRunF006, 6, 0.040000f },
+    { spiderRunF007, 6, 0.040000f },
 };
 
-static const PlayerFrame spider_jump_frames[] = {
-    { spider_jump_f001, 6, 0.040000f },
+static const PlayerFrame spiderJumpFrames[] = {
+    { spiderJumpF001, 6, 0.040000f },
 };
 
-static const PlayerFrame spider_fall_frames[] = {
-    { spider_fall_f001, 6, 0.050000f },
-    { spider_fall_f002, 6, 0.050000f },
-    { spider_fall_f003, 6, 0.050000f },
-    { spider_fall_f004, 6, 0.050000f },
-    { spider_fall_f005, 6, 0.050000f },
+static const PlayerFrame spiderFallFrames[] = {
+    { spiderFallF001, 6, 0.050000f },
+    { spiderFallF002, 6, 0.050000f },
+    { spiderFallF003, 6, 0.050000f },
+    { spiderFallF004, 6, 0.050000f },
+    { spiderFallF005, 6, 0.050000f },
 };
 
-static const PlayerFrame spider_walk_frames[] = {
-    { spider_walk_f001, 6, 0.030000f },
-    { spider_walk_f002, 6, 0.030000f },
-    { spider_walk_f003, 6, 0.030000f },
-    { spider_walk_f004, 6, 0.030000f },
-    { spider_walk_f005, 6, 0.030000f },
-    { spider_walk_f006, 6, 0.030000f },
-    { spider_walk_f007, 6, 0.030000f },
+static const PlayerFrame spiderWalkFrames[] = {
+    { spiderWalkF001, 6, 0.030000f },
+    { spiderWalkF002, 6, 0.030000f },
+    { spiderWalkF003, 6, 0.030000f },
+    { spiderWalkF004, 6, 0.030000f },
+    { spiderWalkF005, 6, 0.030000f },
+    { spiderWalkF006, 6, 0.030000f },
+    { spiderWalkF007, 6, 0.030000f },
 };
 
-static const PlayerFrame spider_idle_frames[] = {
-    { spider_idle_f001, 6, 0.040000f },
+static const PlayerFrame spiderIdleFrames[] = {
+    { spiderIdleF001, 6, 0.040000f },
 };
 
-const PlayerAnimation spider_animations[SPIDER_ANIM_COUNT] = {
-    { spider_run_frames, 7 },
-    { spider_jump_frames, 1 },
-    { spider_fall_frames, 5 },
-    { spider_walk_frames, 7 },
-    { spider_idle_frames, 1 },
+const PlayerAnimation spiderAnimations[SPIDER_ANIM_COUNT] = {
+    { spiderRunFrames, 7 },
+    { spiderJumpFrames, 1 },
+    { spiderFallFrames, 5 },
+    { spiderWalkFrames, 7 },
+    { spiderIdleFrames, 1 },
 };

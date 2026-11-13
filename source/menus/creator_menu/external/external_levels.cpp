@@ -38,15 +38,15 @@
 #include "utils/network.hpp"
 #include "utils/utils.hpp"
 
-static bool reload_pending;
-static char reload_path[320];
+static bool reloadPending;
+static char reloadPath[320];
 
-char current_path[320] = { 0 };
-char last_path[320] = { 1 };
+char currentPath[320] = { 0 };
+char lastPath[320] = { 1 };
 
 typedef struct {
     char path[256];
-    bool is_dir;
+    bool isDir;
 } LevelCardData;
 
 static UILabel *path_label = NULL;
@@ -58,223 +58,223 @@ static Thread thread;
 static FileOrFolder *entries = NULL;
 static int count = 0;
 
-static char *tmp_folder;
+static char *tmpFolder;
 
-static int load_levels(GenericTask *task) {
-    entries = load_folder(task, tmp_folder, &count);
+static int loadLevels(GenericTask *task) {
+    entries = loadFolder(task, tmpFolder, &count);
     return entries == NULL;
 }
 
 static GenericTask task = {
-    .func = load_levels
+    .func = loadLevels
 };
 
-static void open_folder(UIElement *e, const UIPropertyList* args);
+static void openFolder(UIElement *e, const UIPropertyList* args);
 
-static void open_external_popup(UIElement *e, const UIPropertyList* args) {
+static void openExternalPopup(UIElement *e, const UIPropertyList* args) {
     LevelCardData *entry = (LevelCardData *)e->userdata;
-    strcpy(state.custom_level_path, entry->path);
-    ui_stack_push(&external_popup_def, ANIM_ZOOM_SUBTLE, ANIM_ZOOM_SUBTLE, PUSH_NEXT);
+    strcpy(state.customLevelPath, entry->path);
+    uiStackPush(&externalPopupDef, ANIM_ZOOM_SUBTLE, ANIM_ZOOM_SUBTLE, PUSH_NEXT);
 }
 
-void start_load(char *folder, UIScreen *s) {
-    tmp_folder = folder;
+void startLoad(char *folder, UIScreen *s) {
+    tmpFolder = folder;
 
     char path[320+5];
-    sprintf(path, "Root/%s", current_path);
-    truncate_filename_start(path, 27, sizeof(path));
+    sprintf(path, "Root/%s", currentPath);
+    truncateFilenameStart(path, 27, sizeof(path));
     
-    ui_label_set_text(path_label,path);
-    thread = create_generic_thread(&task);
-    ui_list_reset(list);
-    ui_run_func_on_tag(s, "no_levels", ui_disable_element);
-    ui_run_func_on_tag(s, "spinner", ui_enable_element);
+    uiLabelSetText(path_label,path);
+    thread = createGenericThread(&task);
+    uiListReset(list);
+    uiRunFuncOnTag(s, "no_levels", uiDisableElement);
+    uiRunFuncOnTag(s, "spinner", uiEnableElement);
 }
 
-void load_level_folder(char *folder, UIScreen *s) { 
-    ui_run_func_on_tag(s, "spinner", ui_disable_element);
-    ui_run_func_on_tag(s, "no_levels", ui_disable_element);
+void loadLevelFolder(char *folder, UIScreen *s) { 
+    uiRunFuncOnTag(s, "spinner", uiDisableElement);
+    uiRunFuncOnTag(s, "no_levels", uiDisableElement);
 
-    char level_name[525];
+    char levelName[525];
 
-    ui_list_reset(list);
+    uiListReset(list);
     
     if (entries && list) {
         for (int i = 0; i < count; i++) {
             FileOrFolder *entry = &entries[i];
-            strncpy(level_name, entry->name, sizeof(level_name) - 1);
+            strncpy(levelName, entry->name, sizeof(levelName) - 1);
 
             UIElement *card = NULL;
 
             u32 color = (i & 1 ? C2D_Color32(50,50,50,255) :  C2D_Color32(75,75,75,255));
             char *name = NULL;
-            if (entry->is_dir) {
+            if (entry->isDir) {
                 // Folder
-                name = strip_filename(level_name);
-                truncate_filename(name, 16);
+                name = stripFilename(levelName);
+                truncateFilename(name, 16);
             } else {
                 // File
-                strip_extension(level_name);
-                name = strip_filename(level_name);
-                truncate_filename(name, 16);
+                stripExtension(levelName);
+                name = stripFilename(levelName);
+                truncateFilename(name, 16);
             }
 
-            float list_width = list->base.w * 0.5f;
+            float listWidth = list->base.w * 0.5f;
 
-            card = (UIElement *) ui_create_rectangle(s);
+            card = (UIElement *) uiCreateRectangle(s);
 
             if (card) {
-                ui_rectangle_set_color((UIRectangle *) card, color);
-                ui_element_set_size(card, 0, 28);
+                uiRectangleSetColor((UIRectangle *) card, color);
+                uiElementSetSize(card, 0, 28);
                 
-                UIButton *button = ui_create_button(s);
+                UIButton *button = uiCreateButton(s);
                 if (button) {
                     // Store in the user data
                     LevelCardData *data = (LevelCardData *)malloc(sizeof(*data));
 
                     strcpy(data->path, entry->name);
-                    data->is_dir = entry->is_dir;
+                    data->isDir = entry->isDir;
 
-                    ui_element_set_userdata((UIElement *) button, data);
+                    uiElementSetUserdata((UIElement *) button, data);
 
-                    ui_button_set_image(button, (entry->is_dir ? 7 : 6), 0);
-                    ui_element_set_position((UIElement *) button, list_width - 15, 0);
-                    ui_element_set_scale_xy((UIElement *) button, -0.5f, 0.5f);
-                    ui_element_set_action((UIElement *) button, (entry->is_dir ? open_folder : open_external_popup));
+                    uiButtonSetImage(button, (entry->isDir ? 7 : 6), 0);
+                    uiElementSetPosition((UIElement *) button, listWidth - 15, 0);
+                    uiElementSetScaleXy((UIElement *) button, -0.5f, 0.5f);
+                    uiElementSetAction((UIElement *) button, (entry->isDir ? openFolder : openExternalPopup));
 
-                    ui_element_add_child(card, (UIElement *) button);
+                    uiElementAddChild(card, (UIElement *) button);
                 }
 
-                UIImage *icon = ui_create_image(s);
+                UIImage *icon = uiCreateImage(s);
                 if (icon) {
-                    ui_image_set_image(icon, (entry->is_dir ? 320 : 420), 0);
-                    ui_element_set_position((UIElement *) icon, -list_width + 15, 0);
-                    ui_element_set_scale((UIElement *) icon, 0.58f);
+                    uiImageSetImage(icon, (entry->isDir ? 320 : 420), 0);
+                    uiElementSetPosition((UIElement *) icon, -listWidth + 15, 0);
+                    uiElementSetScale((UIElement *) icon, 0.58f);
 
-                    ui_element_add_child(card, (UIElement *) icon);
+                    uiElementAddChild(card, (UIElement *) icon);
                 }
 
                 // Name
-                UILabel *label = ui_create_label(s);
+                UILabel *label = uiCreateLabel(s);
                 if (label) {
-                    ui_label_set_text(label, name);
-                    ui_element_set_position((UIElement *) label, -list_width + 29, 1);
-                    ui_element_set_scale((UIElement *) label, 0.54f);
+                    uiLabelSetText(label, name);
+                    uiElementSetPosition((UIElement *) label, -listWidth + 29, 1);
+                    uiElementSetScale((UIElement *) label, 0.54f);
                     
-                    ui_element_add_child(card, (UIElement *) label);
+                    uiElementAddChild(card, (UIElement *) label);
                 }
 
-                ui_list_add(list, card);
+                uiListAdd(list, card);
             }
         }
         
         if (count == 0) {
-            ui_run_func_on_tag(s, "no_levels", ui_enable_element);
+            uiRunFuncOnTag(s, "no_levels", uiEnableElement);
         }
     } else {
-        ui_run_func_on_tag(s, "no_levels", ui_enable_element);
+        uiRunFuncOnTag(s, "no_levels", uiEnableElement);
     }
 
-    strncpy(last_path, current_path, sizeof(last_path));
+    strncpy(lastPath, currentPath, sizeof(lastPath));
 }
 
-static void action_go_back(UIElement *e, const UIPropertyList *args) {
-    if (strlen(current_path) > 0) {
+static void actionGoBack(UIElement *e, const UIPropertyList *args) {
+    if (strlen(currentPath) > 0) {
         if (task.running) {
             task.cancelled = true;
             threadJoin(thread, U64_MAX);
         }
-        go_back_directory(current_path);
-        start_load(current_path, e->screen);
+        goBackDirectory(currentPath);
+        startLoad(currentPath, e->screen);
     }
 }
 
-static void action_refresh(UIElement *e, const UIPropertyList *args) {
+static void actionRefresh(UIElement *e, const UIPropertyList *args) {
     if (task.running) {
         task.cancelled = true;
         threadJoin(thread, U64_MAX);
     }
-    reload_pending = true;
-    strcpy(reload_path, current_path);
+    reloadPending = true;
+    strcpy(reloadPath, currentPath);
 }
 
 // Go my warning suppresion gadget
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-truncation"
 
-static void open_folder(UIElement *e, const UIPropertyList* args) {
+static void openFolder(UIElement *e, const UIPropertyList* args) {
     LevelCardData *entry = (LevelCardData *)e->userdata;
     char tmp[320];
 
-    if (current_path[0] == '\0') {
+    if (currentPath[0] == '\0') {
         // First level: no leading slash
         snprintf(tmp, sizeof(tmp), "%s", entry->path);
     } else {
-        snprintf(tmp, sizeof(tmp), "%s/%s", current_path, entry->path);
+        snprintf(tmp, sizeof(tmp), "%s/%s", currentPath, entry->path);
     }
 
-    strncpy(current_path, tmp, sizeof(current_path) - 1);
-    current_path[sizeof(current_path) - 1] = '\0';
+    strncpy(currentPath, tmp, sizeof(currentPath) - 1);
+    currentPath[sizeof(currentPath) - 1] = '\0';
 
-    reload_pending = true;
-    strcpy(reload_path, current_path);
+    reloadPending = true;
+    strcpy(reloadPath, currentPath);
 }
 
 #pragma GCC diagnostic pop
 
-static UIActionDef external_actions[] = {
-    {"go_back", action_go_back },
-    {"refresh", action_refresh },
+static UIActionDef externalActions[] = {
+    {"go_back", actionGoBack },
+    {"refresh", actionRefresh },
 };
 
-static void external_levels_init(UIScreen *s) {
-    list = (UIList *) ui_get_element_by_tag(s, "list");
-    spinner = (UISpinner *) ui_get_element_by_tag(s, "spinner");
-    path_label = (UILabel *) ui_get_element_by_tag(s, "path");
+static void externalLevelsInit(UIScreen *s) {
+    list = (UIList *) uiGetElementByTag(s, "list");
+    spinner = (UISpinner *) uiGetElementByTag(s, "spinner");
+    path_label = (UILabel *) uiGetElementByTag(s, "path");
 
-    if (!is_citra()) {
-        UIElement *refresh_button = ui_get_element_by_tag(s, "refresh");
-        if (refresh_button) ui_disable_element(refresh_button);
+    if (!isCitra()) {
+        UIElement *refreshButton = uiGetElementByTag(s, "refresh");
+        if (refreshButton) uiDisableElement(refreshButton);
     }
 
-    start_load(current_path, s);
+    startLoad(currentPath, s);
 
-    play_menu_song();
+    playMenuSong();
 }
 
-static void external_levels_update(UIScreen *s, UIInput *i) {
-    if (reload_pending) {
-        start_load(reload_path, s);
+static void externalLevelsUpdate(UIScreen *s, UIInput *i) {
+    if (reloadPending) {
+        startLoad(reloadPath, s);
 
-        reload_pending = false;
+        reloadPending = false;
     }
 
     if (task.finished) {
-        load_level_folder(tmp_folder, s);
+        loadLevelFolder(tmpFolder, s);
         task.finished = false;
     }
 }
 
-static void external_levels_exit(UIScreen *s) {
+static void externalLevelsExit(UIScreen *s) {
     if (task.running) {
         task.cancelled = true;
         threadJoin(thread, U64_MAX);
     }
 }
 
-extern const UIScreenDefPair external_def = {
+extern const UIScreenDefPair externalDef = {
     .name = "external_menu",
     .top = {
         .path = "romfs:/menus/creator_menu/external/external_levels_top.txt",
     },
     .btm = {
         .path = "romfs:/menus/creator_menu/external/external_levels.txt",
-        .init = external_levels_init,
-        .update = external_levels_update,
-        .exit = external_levels_exit,
-        .action_list = {
-            .actions = external_actions,
-            .action_count = ARRAY_LEN(external_actions)
+        .init = externalLevelsInit,
+        .update = externalLevelsUpdate,
+        .exit = externalLevelsExit,
+        .actionList = {
+            .actions = externalActions,
+            .actionCount = ARRAY_LEN(externalActions)
         }
     }
 };

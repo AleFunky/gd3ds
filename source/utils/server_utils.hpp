@@ -92,28 +92,28 @@ typedef struct UpdateData {
     int releaseFileSize;
 } UpdateData;
 
-int search_levels(GenericTask *task);
-int get_level(GenericTask *task);
-int get_comments(GenericTask *task);
-int get_song_data(GenericTask *task);
-int check_for_updates(GenericTask *task);
-int install_update(GenericTask *);
-int extract_update(GenericTask *);
+int searchLevels(GenericTask *task);
+int getLevel(GenericTask *task);
+int getComments(GenericTask *task);
+int getSongData(GenericTask *task);
+int checkForUpdates(GenericTask *task);
+int installUpdate(GenericTask *);
+int extractUpdate(GenericTask *);
 
-float derive_gj_version(int version);
+float deriveGJVersion(int version);
 
-extern SearchEntry *search_entries;
-extern CreatorEntry *creator_entries;
-extern SongEntry *song_entries;
-extern PageEntry *page_entry;
+extern SearchEntry *searchEntries;
+extern CreatorEntry *creatorEntries;
+extern SongEntry *songEntries;
+extern PageEntry *pageEntry;
 
-extern LevelEntry *level_entry;
+extern LevelEntry *levelEntry;
 
-extern CommentEntry *comment_entries;
+extern CommentEntry *commentEntries;
 
 extern SearchFilters filters;
 
-extern UpdateData *update_data;
+extern UpdateData *updateData;
 
 extern int creatorEntriesLength;
 extern int songEntriesLength;

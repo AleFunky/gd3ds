@@ -42,7 +42,7 @@ static int cancelCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow, c
     return 0;
 }
 
-size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp) {
+size_t writeCallback(void *contents, size_t size, size_t nmemb, void *userp) {
     size_t realsize = size * nmemb;
     struct MemoryStruct *mem = (struct MemoryStruct *)userp;
 
@@ -59,7 +59,7 @@ size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp) {
     return realsize;
 }
 
-int soc_init() {
+int socInit() {
     int ret;
 
     // allocate buffer for SOC service
@@ -76,7 +76,7 @@ int soc_init() {
     return ret;
 }
 
-int get_level_from_id(GenericTask *task, char **out_data, int id, bool useGdps) {
+int getLevelFromID(GenericTask *task, char **outData, int id, bool useGdps) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -91,9 +91,9 @@ int get_level_from_id(GenericTask *task, char **out_data, int id, bool useGdps) 
         curl_easy_setopt(curl, CURLOPT_URL, useGdps ? GDPS_LEVEL_API : ROBTOP_LEVEL_API);
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
-        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0l); // Enable progress data
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
@@ -119,17 +119,17 @@ int get_level_from_id(GenericTask *task, char **out_data, int id, bool useGdps) 
             return atoi(chunk.memory);
         }
         
-        *out_data = chunk.memory;
+        *outData = chunk.memory;
 
         return 0;
     }
     return 2;
 }
 
-static void unpack_bitfield_digits(int field, int bit_count, char *string, int offset) {
+static void unpackBitfieldDigits(int field, int bitCount, char *string, int offset) {
     int pos = 0;
 
-    for (int i = 0; i < bit_count; i++) {
+    for (int i = 0; i < bitCount; i++) {
         if (field & (1 << i)) {
             if (pos > 0) {
                 string[pos++] = ',';
@@ -142,7 +142,7 @@ static void unpack_bitfield_digits(int field, int bit_count, char *string, int o
     string[pos] = '\0';
 }
 
-int get_search_results(GenericTask *task, char **out_data, int gameVer, SearchFilters f, bool useGdps) {
+int getSearchResults(GenericTask *task, char **outData, int gameVer, SearchFilters f, bool useGdps) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -157,9 +157,9 @@ int get_search_results(GenericTask *task, char **out_data, int gameVer, SearchFi
         curl_easy_setopt(curl, CURLOPT_URL, useGdps ? GDPS_SEARCH_API : ROBTOP_SEARCH_API);
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
-        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0l); // Enable progress data
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
@@ -184,7 +184,7 @@ int get_search_results(GenericTask *task, char **out_data, int gameVer, SearchFi
 
         if(f.lengthFilters){
             char lengths[15] = "";
-            unpack_bitfield_digits(f.lengthFilters, 5, lengths, 0);
+            unpackBitfieldDigits(f.lengthFilters, 5, lengths, 0);
             pos += snprintf(data + pos, sizeof(data) - pos, "&len=%s", lengths);
         }
 
@@ -197,12 +197,12 @@ int get_search_results(GenericTask *task, char **out_data, int gameVer, SearchFi
                 pos += snprintf(data + pos, sizeof(data) - pos, "&diff=%d", -2);
                 if(f.difficultyFilters){
                     char difficulties[16] = "";
-                    unpack_bitfield_digits(f.difficultyFilters, 5, difficulties, 1);
+                    unpackBitfieldDigits(f.difficultyFilters, 5, difficulties, 1);
                     pos += snprintf(data + pos, sizeof(data) - pos, "&demonFilter=%s", difficulties);
                 }
             } else{
                 char difficulties[16] = "";
-                unpack_bitfield_digits(f.difficultyFilters, 5, difficulties, 1);
+                unpackBitfieldDigits(f.difficultyFilters, 5, difficulties, 1);
                 pos += snprintf(data + pos, sizeof(data) - pos, "&diff=%s", difficulties);
             }
         }
@@ -237,14 +237,14 @@ int get_search_results(GenericTask *task, char **out_data, int gameVer, SearchFi
             return atoi(chunk.memory);
         }
         
-        *out_data = chunk.memory;
+        *outData = chunk.memory;
 
         return 0;
     }
     return 2;
 }
 
-int get_comments_from_id(GenericTask *task, char **out_data, int id, int page, int mode, bool useGdps) {
+int getCommentsFromID(GenericTask *task, char **outData, int id, int page, int mode, bool useGdps) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -259,9 +259,9 @@ int get_comments_from_id(GenericTask *task, char **out_data, int id, int page, i
         curl_easy_setopt(curl, CURLOPT_URL, useGdps ? GDPS_COMMENTS_API : ROBTOP_COMMENTS_API);
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
-        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0l); // Enable progress data
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
@@ -287,14 +287,14 @@ int get_comments_from_id(GenericTask *task, char **out_data, int id, int page, i
             return atoi(chunk.memory);
         }
         
-        *out_data = chunk.memory;
+        *outData = chunk.memory;
 
         return 0;
     }
     return 2;
 }
 
-int get_song_info_from_id(GenericTask *task, char **out_data, int songId, bool useGdps) {
+int getSongInfoFromID(GenericTask *task, char **outData, int songId, bool useGdps) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -309,9 +309,9 @@ int get_song_info_from_id(GenericTask *task, char **out_data, int songId, bool u
         curl_easy_setopt(curl, CURLOPT_URL, useGdps ? GDPS_SONGS_API : ROBTOP_SONGS_API);
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
-        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0l); // Enable progress data
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
@@ -337,7 +337,7 @@ int get_song_info_from_id(GenericTask *task, char **out_data, int songId, bool u
             return atoi(chunk.memory);
         }
         
-        *out_data = chunk.memory;
+        *outData = chunk.memory;
 
         return 0;
     }
@@ -354,12 +354,12 @@ static int progressCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow,
 
     u64 now = svcGetSystemTick();
 
-    u64 elapsed_ticks = now - task->last_time;
+    u64 elapsedTicks = now - task->lastTime;
     
-    float time = ((elapsed_ticks / CPU_TICKS_PER_MSEC));
+    float time = ((elapsedTicks / CPU_TICKS_PER_MSEC));
 
     if (time >= 1000.f) {
-        curl_off_t bytes = dlnow - task->last_bytes;
+        curl_off_t bytes = dlnow - task->lastBytes;
 
         float seconds = time / 1000.f;
 
@@ -367,8 +367,8 @@ static int progressCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow,
 
         task->speed = speed;
 
-        task->last_time = now;
-        task->last_bytes = dlnow;
+        task->lastTime = now;
+        task->lastBytes = dlnow;
     }
 
     if (dltotal > 0) {
@@ -379,33 +379,33 @@ static int progressCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow,
     return 0;
 }
 
-static int download_file(DownloadTask *task) {
+static int downloadFile(DownloadTask *task) {
     const char *path = task->path;
     const char *url = task->url;
-    char *file_name = task->file_name;
+    char *fileName = task->fileName;
     char *extension = task->extension;
     
     // Init
     CURL *curl = curl_easy_init();
 
     if (curl) {
-        char *decoded_url = url_decode(url);
+        char *decodedURL = urlDecode(url);
         // url_convert_to_http(decoded_url);
 
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "curl/8.4.0");
-        curl_easy_setopt(curl, CURLOPT_URL, decoded_url);
+        curl_easy_setopt(curl, CURLOPT_URL, decodedURL);
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, progressCallback);
-        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0l); // Enable progress data
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
 
-        char tmp_file[273];
-        snprintf(tmp_file, sizeof(tmp_file), "%s%s.%s.tmp", path, file_name, extension);
-        FILE* f = fopen(tmp_file, "wb");
+        char tmpFile[273];
+        snprintf(tmpFile, sizeof(tmpFile), "%s%s.%s.tmp", path, fileName, extension);
+        FILE* f = fopen(tmpFile, "wb");
         if (!f) {
-            free(decoded_url);
+            free(decodedURL);
             curl_easy_cleanup(curl);
             return -3;
         }
@@ -414,48 +414,48 @@ static int download_file(DownloadTask *task) {
 
         CURLcode code = curl_easy_perform(curl);
 
-        long http_code = 0;
-        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+        long httpCode = 0;
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
         
-        if (http_code != 200) {
-            remove(tmp_file);
-            free(decoded_url);
+        if (httpCode != 200) {
+            remove(tmpFile);
+            free(decodedURL);
             fclose(f);
             curl_easy_cleanup(curl);
             return -4;
         }
 
         if (code) {
-            remove(tmp_file);
-            free(decoded_url);
+            remove(tmpFile);
+            free(decodedURL);
             fclose(f);
             curl_easy_cleanup(curl);
             return code;
         }
 
-        free(decoded_url);
+        free(decodedURL);
         fclose(f);
         curl_easy_cleanup(curl);
         
-        char actual_file[273];
-        snprintf(actual_file, sizeof(actual_file), "%s%s.%s", path, file_name, extension);
-        rename(tmp_file, actual_file);
+        char actualFile[273];
+        snprintf(actualFile, sizeof(actualFile), "%s%s.%s", path, fileName, extension);
+        rename(tmpFile, actualFile);
 
         return 0;
     }
     return -2;
 }
 
-static void download_thread(void *arg) {
+static void downloadThread(void *arg) {
     DownloadTask *task = (DownloadTask *)arg;
 
-    task->result = download_file(task);
+    task->result = downloadFile(task);
 
     task->running = false;
     task->finished = true;
 }
 
-int get_commits(GenericTask *task, char **out_data, const char *repoOwner, const char *repoName, const char *repoBranch) {
+int getCommits(GenericTask *task, char **outData, const char *repoOwner, const char *repoName, const char *repoBranch) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -470,9 +470,9 @@ int get_commits(GenericTask *task, char **out_data, const char *repoOwner, const
         // github actually requires a useragent Whoops
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "curl/8.4.0");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
-        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0l); // Enable progress data
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
@@ -498,14 +498,14 @@ int get_commits(GenericTask *task, char **out_data, const char *repoOwner, const
             return atoi(chunk.memory);
         }
         
-        *out_data = chunk.memory;
+        *outData = chunk.memory;
 
         return 0;
     }
     return 2;
 }
 
-int get_releases(GenericTask *task, char **out_data, const char *repoOwner, const char *repoName) {
+int getReleases(GenericTask *task, char **outData, const char *repoOwner, const char *repoName) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -520,9 +520,9 @@ int get_releases(GenericTask *task, char **out_data, const char *repoOwner, cons
         // github requires a useragent 
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "curl/8.4.0");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
-        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0l); // Enable progress data
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
@@ -548,14 +548,14 @@ int get_releases(GenericTask *task, char **out_data, const char *repoOwner, cons
             return atoi(chunk.memory);
         }
         
-        *out_data = chunk.memory;
+        *outData = chunk.memory;
 
         return 0;
     }
     return 2;
 }
 
-int get_actions(GenericTask *task, char **out_data, const char *repoOwner, const char *repoName, const char *actionName) {
+int getActions(GenericTask *task, char **outData, const char *repoOwner, const char *repoName, const char *actionName) {
     // Init
     CURL *curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -570,9 +570,9 @@ int get_actions(GenericTask *task, char **out_data, const char *repoOwner, const
         // github actually requires a useragent Whoops
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "curl/8.4.0");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
-        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L); // Enable progress data
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0l); // Enable progress data
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cancelCallback);
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
@@ -598,14 +598,14 @@ int get_actions(GenericTask *task, char **out_data, const char *repoOwner, const
             return atoi(chunk.memory);
         }
         
-        *out_data = chunk.memory;
+        *outData = chunk.memory;
 
         return 0;
     }
     return 2;
 }
 
-Thread create_file_download_thread(DownloadTask *task) {
+Thread createFileDownloadThread(DownloadTask *task) {
     int32_t priority = 0x30;
     svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
     priority += 1;
@@ -614,24 +614,24 @@ Thread create_file_download_thread(DownloadTask *task) {
     
     task->progress = 0;
     task->speed = 0;
-    task->last_bytes = 0;
-    task->last_time = 0;
+    task->lastBytes = 0;
+    task->lastTime = 0;
     task->cancelled = false;
 
     task->finished = false;
     task->running = true;
     
     return threadCreate(
-        download_thread,
+        downloadThread,
         task,
         32 * 1024,
         priority,
-        (is_N3DS ? 2 : 0),
+        (isN3Ds ? 2 : 0),
         true
     );
 }
 
-void soc_exit() {
+void shutdownSoc() {
     close(sock);
     socExit();
     free(SOC_buffer);

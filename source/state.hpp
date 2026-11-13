@@ -19,12 +19,12 @@
 #define USER_COIN_UNRATED_EMPTY_B 48
 #define USER_COIN_UNRATED_EMPTY_TINT C2D_Color32(USER_COIN_UNRATED_EMPTY_R, USER_COIN_UNRATED_EMPTY_G, USER_COIN_UNRATED_EMPTY_B, 255)
 
-extern bool level_unrated_online;
-extern bool level_verified_coins;
-bool level_has_unverified_coins(void);
-void level_unrated_online_refresh(void);
+extern bool levelUnratedOnline;
+extern bool levelVerifiedCoins;
+bool levelHasUnverifiedCoins(void);
+void levelUnratedOnlineRefresh(void);
 
-u32 user_coin_icon_tint(bool collected, bool has_rate);
+u32 userCoinIconTint(bool collected, bool hasRate);
 
 typedef struct {
     float x;
@@ -32,7 +32,7 @@ typedef struct {
     float width;
     float height;
     float rotation;
-    InternalHitbox internal_hitbox;
+    InternalHitbox internalHitbox;
 } PlayerHitboxTrail;
 
 typedef struct KeyInput {
@@ -70,7 +70,7 @@ typedef struct {
     bool flashing;
     FlashState state;
     float timer;
-    bool use_lbg;
+    bool useLbg;
 } BGFlashData;
 
 typedef enum {
@@ -81,7 +81,7 @@ typedef enum {
 
 typedef struct {
     bool active;
-    bool hide_player;
+    bool hidePlayer;
     RespawnEffectState state;
     float timer;
     int remaining;
@@ -90,10 +90,10 @@ typedef struct {
 typedef struct {
     int attempts;
     int jumps;
-    float time_start;
-    float time_end;
-    int max_normal;
-    int max_practice;
+    float timeStart;
+    float timeEnd;
+    int maxNormal;
+    int maxPractice;
     bool coin1;
     bool coin2;
     bool coin3;
@@ -106,101 +106,101 @@ typedef struct {
 } ShakeData;
 
 typedef struct {
-    float unmod_cam_x;
-    float unmod_cam_y;
+    float unmodCamX;
+    float unmodCamY;
 
-    float camera_x;
-    float camera_y;
+    float cameraX;
+    float cameraY;
 
-    float old_camera_x;
-    float old_camera_y;
+    float oldCameraX;
+    float oldCameraY;
 
-    float camera_intended_y;
+    float cameraIntendedY;
 
-    float camera_x_middle;
-    float camera_y_middle;
+    float cameraXMiddle;
+    float cameraYMiddle;
 
-    float intermediate_camera_y;
+    float intermediateCameraY;
     
-    float camera_wall_timer;
-    float camera_wall_initial_y;
+    float cameraWallTimer;
+    float cameraWallInitialY;
 
-    float ground_x;
-    float ground_wall_initial_x;
+    float groundX;
+    float groundWallInitialX;
 
-    float background_x;
-    float background_wall_initial_x;
+    float backgroundX;
+    float backgroundWallInitialX;
     
     Player player;
     Player player2;
 
-    Vec2D attempt_text_pos;
+    Vec2D attemptTextPos;
 
-    unsigned char current_player;
+    unsigned char currentPlayer;
 
-    Player old_player;
-    Player death_player;
+    Player oldPlayer;
+    Player deathPlayer;
 
-    StateLevelData current_data;
+    StateLevelData currentData;
 
     bool mirroring;
-    int mirror_mult;    
-    float mirror_timer;
+    int mirrorMult;    
+    float mirrorTimer;
 
-    float original_mirror_factor;
-    float intended_mirror_factor;
+    float originalMirrorFactor;
+    float intendedMirrorFactor;
 
-    float mirror_speed_factor;
-    float mirror_factor;
+    float mirrorSpeedFactor;
+    float mirrorFactor;
 
-    float ground_y;
-    float ceiling_y;
-    float ground_y_gfx;
+    float groundY;
+    float ceilingY;
+    float groundYGfx;
 
-    float dual_portal_y;
+    float dualPortalY;
     unsigned char speed;
 
-    bool end_wall_anim_playing;
+    bool endWallAnimPlaying;
     
     bool noclip;
-    int hitbox_display;
+    int hitboxDisplay;
     bool dual;
     bool dead;
 
     bool profiling;
-    bool practice_mode;
+    bool practiceMode;
 
-    float level_progress;
+    float levelProgress;
 
     float timer;
-    float death_timer;
+    float deathTimer;
 
-    bool hitbox_enabled_when_dead;
-    bool pending_auto_checkpoint;
+    bool hitboxEnabledWhenDead;
+    bool pendingAutoCheckpoint;
 
-    bool show_player;
+    bool showPlayer;
 
-    bool online_level;
+    bool onlineLevel;
 
-    bool custom_level;
-    char custom_level_path[256];
+    bool customLevel;
+    char customLevelPath[256];
 
-    BGFlashData flash_data;
-    RespawnEffectData respawn_effect_data;
-    ShakeData shake_data;
+    BGFlashData flashData;
+    RespawnEffectData respawnEffectData;
+    ShakeData shakeData;
 
-    int last_hitbox_trail;
-    PlayerHitboxTrail hitbox_trail_players[2][HITBOX_TRAIL_SIZE];
+    int lastHitboxTrail;
+    PlayerHitboxTrail hitboxTrailPlayers[2][HITBOX_TRAIL_SIZE];
     
-    int p1_trail_pos[2];
-    P1Trail p1_trail_data[2][P1_TRAIL_LENGTH];
+    int p1TrailPos[2];
+    P1Trail p1TrailData[2][P1_TRAIL_LENGTH];
 
     KeyInput input;
-    KeyInput input_p2;
-    KeyInput old_input;
-    KeyInput old_input_p2;
+    KeyInput inputP2;
+    KeyInput oldInput;
+    KeyInput oldInputP2;
 
-    DeathReason death_reason;
+    DeathReason deathReason;
 } GamePlayState;
 
 #define CEILING_INVUL_TIME 0.1f
@@ -208,43 +208,43 @@ typedef struct {
 
 extern GamePlayState state;
 
-void set_intended_ceiling();
-void set_gamemode(Player *player, int gamemode);
-void set_mini(Player *player, bool mini);
-void first_load_init_variables();
-void init_variables();
-void run_camera();
+void setIntendedCeiling();
+void setGamemode(Player *player, int gamemode);
+void setMini(Player *player, bool mini);
+void firstLoadInitVariables();
+void initVariables();
+void runCamera();
 
-void handle_death(Player *player, bool pause_song);
+void handleDeath(Player *player, bool pauseSong);
 
-void start_bg_flash();
-void handle_bg_flash();
-void clear_bg_flash();
+void startBgFlash();
+void handleBgFlash();
+void clearBgFlash();
 
-void start_respawn_effect();
-void handle_respawn_effect();
-void clear_respawn_effect();
+void startRespawnEffect();
+void handleRespawnEffect();
+void clearRespawnEffect();
 
-void init_player(Player *player);
-void clear_p1_trail();
-void init_state();
-void init_trails(int trail);
-void init_wave_trails();
+void initPlayer(Player *player);
+void clearP1Trail();
+void initState();
+void initTrails(int trail);
+void initWaveTrails();
 
-void play_level_song(float seek);
-void play_practice_song();
-void play_menu_song();
-void update_attempt_text_pos();
+void playLevelSong(float seek);
+void playPracticeSong();
+void playMenuSong();
+void updateAttemptTextPos();
 
-bool is_coin_collected(int obj);
+bool isCoinCollected(int obj);
 
-void kill_player(DeathReason reason);
+void killPlayer(DeathReason reason);
 
-void set_camera_x(float x);
-void set_camera_y(float y);
+void setCameraX(float x);
+void setCameraY(float y);
 
-void init_shake();
-void start_shake(float duration, float strength);
-void handle_shake(float delta);
+void initShake();
+void startShake(float duration, float strength);
+void handleShake(float delta);
 
 extern bool disableHitboxesAfterRespawn;

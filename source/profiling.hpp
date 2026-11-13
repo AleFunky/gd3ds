@@ -10,61 +10,61 @@ typedef struct {
 
 typedef struct {
     // General
-    float frame_ms;
-    float cpu_ms;
-    float gpu_ms;
+    float frameMs;
+    float cpuMs;
+    float gpuMs;
 
     // Timers
-    float physics_ms;
-    float triggers_ms;
-    float collision_ms;
-    float particles_ms;
-    float rendering_ms;
+    float physicsMs;
+    float triggersMs;
+    float collisionMs;
+    float particlesMs;
+    float renderingMs;
 
     // Physics
-    float coll_ms;
-    float play_ms;
-    float handler_ms;
-    float step_trigger_ms;
+    float collMs;
+    float playMs;
+    float handlerMs;
+    float stepTriggerMs;
     int steps;
     int collisions;
-    int collision_checks;
+    int collisionChecks;
 
     // Rendering
-    float creating_ms;
-    float sorting_ms;
-    float tint_ms;
-    float drawing_ms;
-    int draw_count;
+    float creatingMs;
+    float sortingMs;
+    float tintMs;
+    float drawingMs;
+    int drawCount;
 
     // Touch
-    int input_x;
-    int input_y;
+    int inputX;
+    int inputY;
 
     // Player
     int tick;
-    float ply_pos_x;
-    float ply_pos_y;
-    float ply_vel_x;
-    float ply_vel_y;
+    float plyPosX;
+    float plyPosY;
+    float plyVelX;
+    float plyVelY;
 
     // Camera
-    float cam_pos_x;
-    float cam_pos_y;
-    float cam_itd_y;
+    float camPosX;
+    float camPosY;
+    float camItdY;
 
     // Heap
-    u32 linear_free;
-    u32 heap_used;
-    u32 heap_free;
-    u32 heap_total;
+    u32 linearFree;
+    u32 heapUsed;
+    u32 heapFree;
+    u32 heapTotal;
 
-    u32 level_arena_used;
-    u32 level_arena_free;
-    u32 level_arena_total;
+    u32 levelArenaUsed;
+    u32 levelArenaFree;
+    u32 levelArenaTotal;
 } ProfilerSnapshot;
 
 extern ProfilerSnapshot snapshot;
 
-void profiler_update(ProfilerUpdateData data);
-void profiler_draw();
+void profilerUpdate(ProfilerUpdateData data);
+void profilerDraw();

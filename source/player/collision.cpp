@@ -28,10 +28,10 @@
 #include "particles/lightning.hpp"
 #include "particles/gravity_sweep.hpp"
 
-Player *player_1 = &state.player;
-Player *player_2 = &state.player2;
+Player *player1 = &state.player;
+Player *player2 = &state.player2;
 
-const float jump_heights_table[SPEED_COUNT][JUMP_TYPES_COUNT][GAMEMODE_COUNT][2] = {
+const float jumpHeightsTable[SPEED_COUNT][JUMP_TYPES_COUNT][GAMEMODE_COUNT][2] = {
     { // SLOW                        CUBE                              SHIP                                BALL                               UFO            WAVE              ROBOT  },
     /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {573.48,   458.784},  {0, 0},   {864,      691.2}, {518.4, 414.72} },
     /* YELLOW ORB */ {{573.48,   458.784},  {573.48,   458.784},  {401.435993,  321.148795},  {573.48,   458.784},  {0, 0},   {516.132,  430.9056}, {401.436, 321.149} },
@@ -84,7 +84,7 @@ const float jump_heights_table[SPEED_COUNT][JUMP_TYPES_COUNT][GAMEMODE_COUNT][2]
     }
 };
 
-const float gamemode_heights[GAMEMODE_COUNT] = {
+const float gamemodeHeights[GAMEMODE_COUNT] = {
     999999,  // Cube
     300, // Ship
     240,  // Ball
@@ -94,7 +94,7 @@ const float gamemode_heights[GAMEMODE_COUNT] = {
     270 // Spider
 };
 
-const int dual_gamemode_heights[GAMEMODE_COUNT] = {
+const int dualGamemodeHeights[GAMEMODE_COUNT] = {
     9,  // Cube
     10, // Ship
     9,  // Ball
@@ -179,7 +179,7 @@ const Vec2D defaultSpeedSnaps[3] = {
     },
 };
 
-float snap_player(Vec2D diff, Player *player) {
+float snapPlayer(Vec2D diff, Player *player) {
     Vec2D stairs[3];
     float threshold;
     switch (state.speed) {
@@ -225,22 +225,22 @@ float snap_player(Vec2D diff, Player *player) {
 
 void trySnap(int block, Player *player) {
     Vec2D diff;
-    int snap_block = player->snap_data.object_id;
+    int snapBlock = player->snapData.objectID;
 
-    if (snap_block >= 0) {
-        diff.x = objects.x[block] - objects.x[snap_block];
-        diff.y = objects.y[block] - objects.y[snap_block];
+    if (snapBlock >= 0) {
+        diff.x = objects.x[block] - objects.x[snapBlock];
+        diff.y = objects.y[block] - objects.y[snapBlock];
         diff.y = grav(player, diff.y);
-        float threshold = snap_player(diff, player);
+        float threshold = snapPlayer(diff, player);
         if (threshold > 0) {
             // Snap the player up to threshold
             player->x = clampf(
-                objects.x[block] + player->snap_data.player_snap_diff,
+                objects.x[block] + player->snapData.playerSnapDiff,
                 player->x - threshold,
                 player->x + threshold
             );
 
-            player->snap_data.snapped_obj = block;
+            player->snapData.snappedObj = block;
         }
     }
 }
@@ -249,7 +249,7 @@ void trySnap(int block, Player *player) {
 #define N false
 
 // Table that says if gravity changes should affect the other gamemode
-static const bool gamemode_linked_gravity[GAMEMODE_COUNT][GAMEMODE_COUNT] = {
+static const bool gamemodeLinkedGravity[GAMEMODE_COUNT][GAMEMODE_COUNT] = {
     /* CUBE  */ { Y, N, N, N, Y, N, N},
     /* SHIP  */ { N, Y, N, N, N, N, N},
     /* BALL  */ { N, N, Y, N, N, N, N},
@@ -262,106 +262,106 @@ static const bool gamemode_linked_gravity[GAMEMODE_COUNT][GAMEMODE_COUNT] = {
 #undef Y
 #undef N
 
-void flip_other_player(int current_player) {
-    if (!level_info.two_player_mode && state.dual && gamemode_linked_gravity[state.player.gamemode][state.player2.gamemode] && state.player.upside_down == state.player2.upside_down) {
-        if (current_player == 0) {
-            state.player2.upside_down = !state.player.upside_down;
-            state.player2.vel_y /= -2;
-            state.player2.ceiling_inv_time = CEILING_INVUL_TIME;
+void flipOtherPlayer(int currentPlayer) {
+    if (!levelInfo.twoPlayerMode && state.dual && gamemodeLinkedGravity[state.player.gamemode][state.player2.gamemode] && state.player.upsideDown == state.player2.upsideDown) {
+        if (currentPlayer == 0) {
+            state.player2.upsideDown = !state.player.upsideDown;
+            state.player2.velY /= -2;
+            state.player2.ceilingInvTime = CEILING_INVUL_TIME;
         } else {
-            state.player.upside_down = !state.player2.upside_down;
-            state.player.vel_y /= -2;
-            state.player.ceiling_inv_time = CEILING_INVUL_TIME;
+            state.player.upsideDown = !state.player2.upsideDown;
+            state.player.velY /= -2;
+            state.player.ceilingInvTime = CEILING_INVUL_TIME;
         }
     }
 }
 
-void do_ball_reflection() {
-    Player *player_1 = &state.player;
-    Player *player_2 = &state.player2;
-    if (state.dual && player_1->gamemode == GAMEMODE_BALL && player_2->gamemode == GAMEMODE_BALL) {
-        if (player_1->upside_down == player_2->upside_down) {
+void doBallReflection() {
+    Player *player1 = &state.player;
+    Player *player2 = &state.player2;
+    if (state.dual && player1->gamemode == GAMEMODE_BALL && player2->gamemode == GAMEMODE_BALL) {
+        if (player1->upsideDown == player2->upsideDown) {
             bool ballsIntersecting = intersect(
-                player_1->x, player_1->y, player_1->width, player_1->height, 0,
-                player_2->x, player_2->y, player_2->width, player_2->height, 0
+                player1->x, player1->y, player1->width, player1->height, 0,
+                player2->x, player2->y, player2->width, player2->height, 0
             );
 
             if (ballsIntersecting) {
-                int current_player = state.current_player;
-                if (player_1->on_ground || player_1->on_ceiling) {
-                    state.current_player = 0;
+                int currentPlayer = state.currentPlayer;
+                if (player1->onGround || player1->onCeiling) {
+                    state.currentPlayer = 0;
 
-                    UseEffect *effect = add_use_effect(player_1->x, player_1->y, USE_EFFECT_OBJ_P1, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
+                    UseEffect *effect = addUseEffect(player1->x, player1->y, USE_EFFECT_OBJ_P1, &orbCollideEffect, getUseEffectArrayPtr(GFX_TOP));
                     if (effect) {
-                        Color p1_white = get_white_if_black(p1_color);
-                        effect->def.colorR = p1_white.r / 255.f;
-                        effect->def.colorG = p1_white.g / 255.f;
-                        effect->def.colorB = p1_white.b / 255.f;
+                        Color p1White = getWhiteIfBlack(p1Color);
+                        effect->def.colorR = p1White.r / 255.f;
+                        effect->def.colorG = p1White.g / 255.f;
+                        effect->def.colorB = p1White.b / 255.f;
                     }
 
-                    player_2->vel_y = jump_heights_table[state.speed][JUMP_BLUE_PAD][player_2->gamemode][player_2->mini];
-                    player_2->upside_down ^= 1;
-                } else if (player_2->on_ground || player_2->on_ceiling) {
-                    state.current_player = 1;
+                    player2->velY = jumpHeightsTable[state.speed][JUMP_BLUE_PAD][player2->gamemode][player2->mini];
+                    player2->upsideDown ^= 1;
+                } else if (player2->onGround || player2->onCeiling) {
+                    state.currentPlayer = 1;
 
-                    UseEffect *effect = add_use_effect(player_2->x, player_2->y, USE_EFFECT_OBJ_P2, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
+                    UseEffect *effect = addUseEffect(player2->x, player2->y, USE_EFFECT_OBJ_P2, &orbCollideEffect, getUseEffectArrayPtr(GFX_TOP));
                     if (effect) {
-                        Color p2_white = get_white_if_black(p2_color);
-                        effect->def.colorR = p2_white.r / 255.f;
-                        effect->def.colorG = p2_white.g / 255.f;
-                        effect->def.colorB = p2_white.b / 255.f;
+                        Color p2White = getWhiteIfBlack(p2Color);
+                        effect->def.colorR = p2White.r / 255.f;
+                        effect->def.colorG = p2White.g / 255.f;
+                        effect->def.colorB = p2White.b / 255.f;
                     }
 
 
-                    player_1->vel_y = jump_heights_table[state.speed][JUMP_BLUE_PAD][player_1->gamemode][player_1->mini];
-                    player_1->upside_down ^= 1;
+                    player1->velY = jumpHeightsTable[state.speed][JUMP_BLUE_PAD][player1->gamemode][player1->mini];
+                    player1->upsideDown ^= 1;
                 }
-                state.current_player = current_player;
+                state.currentPlayer = currentPlayer;
             }
         }   
     }
 }
 
-void set_dual_bounds() {
-    int height = MAX(dual_gamemode_heights[state.player.gamemode],
-                 dual_gamemode_heights[state.player2.gamemode]);
+void setDualBounds() {
+    int height = MAX(dualGamemodeHeights[state.player.gamemode],
+                 dualGamemodeHeights[state.player2.gamemode]);
 
-    float in_block_y = fmodf(state.dual_portal_y, 30);
-    int ground_offset = (ceilf(((float) height + 1) / 2) - 1) * 30;
-    state.ground_y = fmaxf(0, floorf((state.dual_portal_y - ground_offset) / 30.f)) * 30;
+    float inBlockY = fmodf(state.dualPortalY, 30);
+    int groundOffset = (ceilf(((float) height + 1) / 2) - 1) * 30;
+    state.groundY = fmaxf(0, floorf((state.dualPortalY - groundOffset) / 30.f)) * 30;
 
 
     // Shift down if odd height and in the top half
     if (height % 2 != 0) {
-        if (in_block_y < 15) {
-            state.ground_y = fmaxf(0, state.ground_y - 30);
+        if (inBlockY < 15) {
+            state.groundY = fmaxf(0, state.groundY - 30);
         }
     }
 
-    state.ceiling_y = state.ground_y + (height * 30.f);
-    set_intended_ceiling();
+    state.ceilingY = state.groundY + (height * 30.f);
+    setIntendedCeiling();
 }
 
-void setup_dual() {
+void setupDual() {
     memcpy(&state.player2, &state.player, sizeof(Player));
-    memset(&state.p1_trail_data[1], 0, sizeof(P1Trail) * P1_TRAIL_DURATION);
-    state.p1_trail_pos[1] = 0;
-    state.player2.upside_down = state.player.upside_down ^ 1;
-    UseEffect *effect = add_use_effect(player_1->x, player_1->y, USE_EFFECT_OBJ_P1, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+    memset(&state.p1TrailData[1], 0, sizeof(P1Trail) * P1_TRAIL_DURATION);
+    state.p1TrailPos[1] = 0;
+    state.player2.upsideDown = state.player.upsideDown ^ 1;
+    UseEffect *effect = addUseEffect(player1->x, player1->y, USE_EFFECT_OBJ_P1, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
     if (effect) {
-        effect->def.colorR = get_white_if_black(p1_color).r;
-        effect->def.colorG = get_white_if_black(p1_color).g;
-        effect->def.colorB = get_white_if_black(p1_color).b;
+        effect->def.colorR = getWhiteIfBlack(p1Color).r;
+        effect->def.colorG = getWhiteIfBlack(p1Color).g;
+        effect->def.colorB = getWhiteIfBlack(p1Color).b;
     }
-    UseEffect *effect2 = add_use_effect(player_2->x, player_2->y, USE_EFFECT_OBJ_P2, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+    UseEffect *effect2 = addUseEffect(player2->x, player2->y, USE_EFFECT_OBJ_P2, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
     if (effect2) {
-        effect2->def.colorR = get_white_if_black(p2_color).r;
-        effect2->def.colorG = get_white_if_black(p2_color).g;
-        effect2->def.colorB = get_white_if_black(p2_color).b;
+        effect2->def.colorR = getWhiteIfBlack(p2Color).r;
+        effect2->def.colorG = getWhiteIfBlack(p2Color).g;
+        effect2->def.colorB = getWhiteIfBlack(p2Color).b;
     }
 }
 
-static float snap_rotation_360(float rotation) {
+static float snapRotation360(float rotation) {
     if (rotation <= 180.f) {
         if (rotation < -180.f) rotation += 360.f;
     } else {
@@ -370,12 +370,12 @@ static float snap_rotation_360(float rotation) {
     return rotation;
 }
 
-static float dash_orb_angle(int obj) {
-    float rotation = adjust_angle_y(objects.rotation[obj], objects.flippedH[obj]);
+static float dashOrbAngle(int obj) {
+    float rotation = adjustAngleY(objects.rotation[obj], objects.flippedH[obj]);
 
-    float angle = snap_rotation_360(fmodf(-rotation, 360.f));
+    float angle = snapRotation360(fmodf(-rotation, 360.f));
 
-    if (fabsf(angle) > 90.f) angle = snap_rotation_360((angle <= 0.f ? -180.f : 180.f) - angle);
+    if (fabsf(angle) > 90.f) angle = snapRotation360((angle <= 0.f ? -180.f : 180.f) - angle);
 
     if (angle > 70.f) angle = (angle >= 180.f) ? -70.f : 70.f;
     else if (angle < -70.f) angle = (angle > -180.f) ? -70.f : 70.f;
@@ -383,72 +383,72 @@ static float dash_orb_angle(int obj) {
     return angle;
 }
 
-static void collect_pickup_item(int obj) {
-    PickupItem *pickup = get_pickup_item(obj);
-    if (!pickup || !pickup->is_pickup || (objects.flags[obj] & FLAG_TOGGLED)) return;
-    add_item_count(pickup->item_id, (pickup->sub_count ? -1 : 1));
+static void collectPickupItem(int obj) {
+    PickupItem *pickup = getPickupItem(obj);
+    if (!pickup || !pickup->isPickup || (objects.flags[obj] & FLAG_TOGGLED)) return;
+    addItemCount(pickup->itemID, (pickup->subCount ? -1 : 1));
 }
 
-static void spawn_collectable_fx(int obj) {
-    const GameObject *game_obj = &game_objects[objects.id[obj]];
-    int detail_tex = game_obj->child_count > 0 ? game_obj->children[0].texture : -1;
-    float detail_x = game_obj->child_count > 0 ? game_obj->children[0].x : 0.0f;
-    float detail_y = game_obj->child_count > 0 ? game_obj->children[0].y : 0.0f;
-    if (objects.id[obj] == KEY_OBJ) detail_y = 4.0f / 3.0f;
+static void spawnCollectableFx(int obj) {
+    const GameObject *gameObj = &gameObjects[objects.id[obj]];
+    int detailTex = gameObj->childCount > 0 ? gameObj->children[0].texture : -1;
+    float detailX = gameObj->childCount > 0 ? gameObj->children[0].x : 0.0f;
+    float detailY = gameObj->childCount > 0 ? gameObj->children[0].y : 0.0f;
+    if (objects.id[obj] == KEY_OBJ) detailY = 4.0f / 3.0f;
 
-    collectable_effect_spawn(objects.x[obj], objects.y[obj],
-                             game_obj->texture, detail_tex,
-                             objects.col_channel[obj],
-                             objects.detail_col_channel[obj],
-                             detail_x, detail_y,
-                             objects.scale_x[obj], objects.scale_y[obj],
+    collectableEffectSpawn(objects.x[obj], objects.y[obj],
+                             gameObj->texture, detailTex,
+                             objects.colChannel[obj],
+                             objects.detailColChannel[obj],
+                             detailX, detailY,
+                             objects.scaleX[obj], objects.scaleY[obj],
                              objects.flippedH[obj], objects.flippedV[obj]);
 
-    ParticleDefinition prev_cfg = brick_destroy_particles.cfg;
-    brick_destroy_particles.cfg.startColorRed = objects.main_color[obj].r / 255.f;
-    brick_destroy_particles.cfg.startColorGreen = objects.main_color[obj].g / 255.f;
-    brick_destroy_particles.cfg.startColorBlue = objects.main_color[obj].b / 255.f;
-    brick_destroy_particles.cfg.startColorAlpha = 127.0f / 255.0f;
-    brick_destroy_particles.emitterX = objects.x[obj];
-    brick_destroy_particles.emitterY = objects.y[obj];
-    spawnMultipleParticles(&brick_destroy_particles, 10);
-    brick_destroy_particles.cfg = prev_cfg;
+    ParticleDefinition prevCfg = brickDestroyParticles.cfg;
+    brickDestroyParticles.cfg.startColorRed = objects.mainColor[obj].r / 255.f;
+    brickDestroyParticles.cfg.startColorGreen = objects.mainColor[obj].g / 255.f;
+    brickDestroyParticles.cfg.startColorBlue = objects.mainColor[obj].b / 255.f;
+    brickDestroyParticles.cfg.startColorAlpha = 127.0f / 255.0f;
+    brickDestroyParticles.emitterX = objects.x[obj];
+    brickDestroyParticles.emitterY = objects.y[obj];
+    spawnMultipleParticles(&brickDestroyParticles, 10);
+    brickDestroyParticles.cfg = prevCfg;
 }
 
 // Handle collision with special objects (orbs, pads, portals)
-void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
+void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
     switch (objects.id[obj]) {
         case HEART_COLLECTABLE:
         case POTION_COLLECTABLE:
         case SKULL_COLLECTABLE:
         case KEY_OBJ:
             if (!GET_ACTIVATED(obj)) {
-                collect_pickup_item(obj);
+                collectPickupItem(obj);
                 SET_ACTIVATED(obj, true);
-                spawn_collectable_fx(obj);
+                spawnCollectableFx(obj);
                 objects.flags[obj] |= FLAG_TOGGLED;
             }
             break;
         case SMALL_COIN:
             if (!GET_ACTIVATED(obj)) {
-                collect_pickup_item(obj);
+                collectPickupItem(obj);
                 SET_ACTIVATED(obj, true);
                 objects.flags[obj] |= FLAG_TOGGLED;
             }
             break;
         case YELLOW_PAD: {
             if (!GET_ACTIVATED(obj) || ((objects.flags[obj] & FLAG_MULTI_ACTIVATE) && !GET_COLLIDED(obj))) {
-                if (state.show_player) MotionTrail_ResumeStroke(trail);
-                player->vel_y = jump_heights_table[state.speed][JUMP_YELLOW_PAD][player->gamemode][player->mini];
-                player->on_ground = false;
-                player->inverse_rotation = false;
-                player->left_ground = true;
+                if (state.showPlayer) motionTrailResumeStroke(trail);
+                player->velY = jumpHeightsTable[state.speed][JUMP_YELLOW_PAD][player->gamemode][player->mini];
+                player->onGround = false;
+                player->inverseRotation = false;
+                player->leftGround = true;
                 player->jumped = true;
-                if (player->gamemode == GAMEMODE_ROBOT) set_animation(player, ROBOT_ANIM_JUMP_START);
-                if (player->gamemode == GAMEMODE_SPIDER) set_animation(player, SPIDER_ANIM_FALL);
+                if (player->gamemode == GAMEMODE_ROBOT) setAnimation(player, ROBOT_ANIM_JUMP_START);
+                if (player->gamemode == GAMEMODE_SPIDER) setAnimation(player, SPIDER_ANIM_FALL);
                 SET_ACTIVATED(obj, true);
-                update_rotation_direction(player);
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &pad_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                updateRotationDirection(player);
+                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &padUseEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 255 / 255.f;
                     effect->def.colorG = 200 / 255.f;
@@ -459,17 +459,17 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         }
         case PINK_PAD: {
             if (!GET_ACTIVATED(obj) || ((objects.flags[obj] & FLAG_MULTI_ACTIVATE) && !GET_COLLIDED(obj))) {
-                if (state.show_player) MotionTrail_ResumeStroke(trail);
-                player->vel_y = jump_heights_table[state.speed][JUMP_PINK_PAD][player->gamemode][player->mini];
-                player->on_ground = false;
-                player->inverse_rotation = false;
-                player->left_ground = true;
+                if (state.showPlayer) motionTrailResumeStroke(trail);
+                player->velY = jumpHeightsTable[state.speed][JUMP_PINK_PAD][player->gamemode][player->mini];
+                player->onGround = false;
+                player->inverseRotation = false;
+                player->leftGround = true;
                 player->jumped = true;
-                if (player->gamemode == GAMEMODE_ROBOT) set_animation(player, ROBOT_ANIM_JUMP_START);
-                if (player->gamemode == GAMEMODE_SPIDER) set_animation(player, SPIDER_ANIM_FALL);
+                if (player->gamemode == GAMEMODE_ROBOT) setAnimation(player, ROBOT_ANIM_JUMP_START);
+                if (player->gamemode == GAMEMODE_SPIDER) setAnimation(player, SPIDER_ANIM_FALL);
                 SET_ACTIVATED(obj, true);
-                update_rotation_direction(player);
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &pad_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                updateRotationDirection(player);
+                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &padUseEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 255 / 255.f;
                     effect->def.colorG = 50 / 255.f;
@@ -481,18 +481,18 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         }
         case RED_PAD: {
             if (!GET_ACTIVATED(obj) || ((objects.flags[obj] & FLAG_MULTI_ACTIVATE) && !GET_COLLIDED(obj))) {
-                if (state.show_player) MotionTrail_ResumeStroke(trail);
-                player->vel_y = jump_heights_table[state.speed][JUMP_RED_PAD][player->gamemode][player->mini];
-                player->on_ground = false;
-                player->inverse_rotation = false;
-                player->left_ground = true;
+                if (state.showPlayer) motionTrailResumeStroke(trail);
+                player->velY = jumpHeightsTable[state.speed][JUMP_RED_PAD][player->gamemode][player->mini];
+                player->onGround = false;
+                player->inverseRotation = false;
+                player->leftGround = true;
                 player->jumped = true;
-                player->velocity_uncapped = true;
-                if (player->gamemode == GAMEMODE_ROBOT) set_animation(player, ROBOT_ANIM_JUMP_START);
-                if (player->gamemode == GAMEMODE_SPIDER) set_animation(player, SPIDER_ANIM_FALL);
+                player->velocityUncapped = true;
+                if (player->gamemode == GAMEMODE_ROBOT) setAnimation(player, ROBOT_ANIM_JUMP_START);
+                if (player->gamemode == GAMEMODE_SPIDER) setAnimation(player, SPIDER_ANIM_FALL);
                 SET_ACTIVATED(obj, true);
-                update_rotation_direction(player);
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &pad_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                updateRotationDirection(player);
+                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &padUseEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 255 / 255.f;
                     effect->def.colorG = 200 / 255.f;
@@ -502,39 +502,39 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         }
         case BLUE_PAD: {
-            if (GET_ACTIVATED(obj)) player->gravObj_id = obj;
+            if (GET_ACTIVATED(obj)) player->gravObjID = obj;
             if (!GET_ACTIVATED(obj) || ((objects.flags[obj] & FLAG_MULTI_ACTIVATE) && !GET_COLLIDED(obj))) {
-                float rotation = adjust_angle(objects.rotation[obj], objects.flippedV[obj], objects.flippedH[obj]);
-                if ((rotation < 90 || rotation > 270) && player->upside_down)
+                float rotation = adjustAngle(objects.rotation[obj], objects.flippedV[obj], objects.flippedH[obj]);
+                if ((rotation < 90 || rotation > 270) && player->upsideDown)
                     break;
                     
-                if ((rotation > 90 && rotation < 270) && !player->upside_down)
+                if ((rotation > 90 && rotation < 270) && !player->upsideDown)
                     break;
 
                 // No double flip in the same frame
-                if (state.old_player.upside_down != player->upside_down) 
+                if (state.oldPlayer.upsideDown != player->upsideDown) 
                     break;
 
-                if (state.show_player) MotionTrail_ResumeStroke(trail);
-                if (player->gamemode == GAMEMODE_WAVE) MotionTrail_AddWavePoint(wave_trail);
-                player->left_ground = true;
+                if (state.showPlayer) motionTrailResumeStroke(trail);
+                if (player->gamemode == GAMEMODE_WAVE) motionTrailAddWavePoint(waveTrail);
+                player->leftGround = true;
 
-                player->gravObj_id = obj;
-                update_rotation_direction(player);
+                player->gravObjID = obj;
+                updateRotationDirection(player);
 
-                player->vel_y = jump_heights_table[state.speed][JUMP_BLUE_PAD][player->gamemode][player->mini];
-                player->upside_down ^= 1;
+                player->velY = jumpHeightsTable[state.speed][JUMP_BLUE_PAD][player->gamemode][player->mini];
+                player->upsideDown ^= 1;
 
-                start_gravity_sweep(!player->upside_down);
+                startGravitySweep(!player->upsideDown);
 
-                flip_other_player(state.current_player);
-                player->on_ground = false;
-                player->inverse_rotation = false;
-                player->ceiling_inv_time = CEILING_INVUL_TIME;
+                flipOtherPlayer(state.currentPlayer);
+                player->onGround = false;
+                player->inverseRotation = false;
+                player->ceilingInvTime = CEILING_INVUL_TIME;
                 player->jumped = true;
-                player->robot_air_time = 999.f;
+                player->robotAirTime = 999.f;
 
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &pad_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &padUseEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 0 / 255.f;
                     effect->def.colorG = 255 / 255.f;
@@ -547,127 +547,127 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         }
         case YELLOW_ORB: {
-            if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
-                if (state.show_player) MotionTrail_ResumeStroke(trail);
-                player->vel_y = jump_heights_table[state.speed][JUMP_YELLOW_ORB][player->gamemode][player->mini];
+            if (!GET_COLLIDED(obj)) addUseEffect(objects.x[obj], objects.y[obj], obj, &orbCollideEffect, getUseEffectArrayPtr(GFX_TOP));
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (currInput.holdJump) && player->bufferingState == BUFFER_READY) {
+                if (state.showPlayer) motionTrailResumeStroke(trail);
+                player->velY = jumpHeightsTable[state.speed][JUMP_YELLOW_ORB][player->gamemode][player->mini];
                 
-                player->ball_rotation_speed = -BALL_SLOW_ROTATION;
+                player->ballRotationSpeed = -BALL_SLOW_ROTATION;
                 
-                player->on_ground = false;
-                player->on_ceiling = false;
-                player->inverse_rotation = false;
-                player->left_ground = true;
-                player->buffering_state = BUFFER_END;
+                player->onGround = false;
+                player->onCeiling = false;
+                player->inverseRotation = false;
+                player->leftGround = true;
+                player->bufferingState = BUFFER_END;
                 player->jumped = true;
-                update_rotation_direction(player);
-                if (player->gamemode == GAMEMODE_ROBOT) set_animation(player, ROBOT_ANIM_JUMP_START);
-                if (player->gamemode == GAMEMODE_SPIDER) set_animation(player, SPIDER_ANIM_JUMP);
+                updateRotationDirection(player);
+                if (player->gamemode == GAMEMODE_ROBOT) setAnimation(player, ROBOT_ANIM_JUMP_START);
+                if (player->gamemode == GAMEMODE_SPIDER) setAnimation(player, SPIDER_ANIM_JUMP);
                 
-                state.current_data.jumps++;
+                state.currentData.jumps++;
                 
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &orbUseEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 255 / 255.f;
                     effect->def.colorG = 200 / 255.f;
                     effect->def.colorB = 0;
                 }
                 
-                player->last_orb_pressed = obj;
+                player->lastOrbPressed = obj;
 
                 SET_ACTIVATED(obj, true);
             } 
             break;
         }
         case PINK_ORB: {
-            if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
-                if (state.show_player) MotionTrail_ResumeStroke(trail);
-                player->vel_y = jump_heights_table[state.speed][JUMP_PINK_ORB][player->gamemode][player->mini];
+            if (!GET_COLLIDED(obj)) addUseEffect(objects.x[obj], objects.y[obj], obj, &orbCollideEffect, getUseEffectArrayPtr(GFX_TOP));
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (currInput.holdJump) && player->bufferingState == BUFFER_READY) {
+                if (state.showPlayer) motionTrailResumeStroke(trail);
+                player->velY = jumpHeightsTable[state.speed][JUMP_PINK_ORB][player->gamemode][player->mini];
                 
-                player->ball_rotation_speed = -BALL_SLOW_ROTATION;
+                player->ballRotationSpeed = -BALL_SLOW_ROTATION;
                 
-                player->on_ground = false;
-                player->on_ceiling = false;
-                player->inverse_rotation = false;
-                player->left_ground = true;
-                player->buffering_state = BUFFER_END;
+                player->onGround = false;
+                player->onCeiling = false;
+                player->inverseRotation = false;
+                player->leftGround = true;
+                player->bufferingState = BUFFER_END;
                 player->jumped = true;
-                update_rotation_direction(player);
-                if (player->gamemode == GAMEMODE_ROBOT) set_animation(player, ROBOT_ANIM_JUMP_START);
-                if (player->gamemode == GAMEMODE_SPIDER) set_animation(player, SPIDER_ANIM_JUMP);
+                updateRotationDirection(player);
+                if (player->gamemode == GAMEMODE_ROBOT) setAnimation(player, ROBOT_ANIM_JUMP_START);
+                if (player->gamemode == GAMEMODE_SPIDER) setAnimation(player, SPIDER_ANIM_JUMP);
 
-                state.current_data.jumps++;
+                state.currentData.jumps++;
 
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &orbUseEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 255 / 255.f;
                     effect->def.colorG = 50 / 255.f;
                     effect->def.colorB = 255 / 255.f;
                 }
 
-                player->last_orb_pressed = obj;
+                player->lastOrbPressed = obj;
                 
                 SET_ACTIVATED(obj, true);
             } 
             break;
         }
         case RED_ORB: {
-            if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
-                if (state.show_player) MotionTrail_ResumeStroke(trail);
-                player->vel_y = jump_heights_table[state.speed][JUMP_RED_ORB][player->gamemode][player->mini];
+            if (!GET_COLLIDED(obj)) addUseEffect(objects.x[obj], objects.y[obj], obj, &orbCollideEffect, getUseEffectArrayPtr(GFX_TOP));
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (currInput.holdJump) && player->bufferingState == BUFFER_READY) {
+                if (state.showPlayer) motionTrailResumeStroke(trail);
+                player->velY = jumpHeightsTable[state.speed][JUMP_RED_ORB][player->gamemode][player->mini];
                 
-                player->ball_rotation_speed = -BALL_SLOW_ROTATION;
+                player->ballRotationSpeed = -BALL_SLOW_ROTATION;
                 
-                player->on_ground = false;
-                player->on_ceiling = false;
-                player->inverse_rotation = false;
-                player->left_ground = true;
-                player->buffering_state = BUFFER_END;
+                player->onGround = false;
+                player->onCeiling = false;
+                player->inverseRotation = false;
+                player->leftGround = true;
+                player->bufferingState = BUFFER_END;
                 player->jumped = true;
-                player->velocity_uncapped = true;
-                update_rotation_direction(player);
-                if (player->gamemode == GAMEMODE_ROBOT) set_animation(player, ROBOT_ANIM_JUMP_START);
-                if (player->gamemode == GAMEMODE_SPIDER) set_animation(player, SPIDER_ANIM_JUMP);
+                player->velocityUncapped = true;
+                updateRotationDirection(player);
+                if (player->gamemode == GAMEMODE_ROBOT) setAnimation(player, ROBOT_ANIM_JUMP_START);
+                if (player->gamemode == GAMEMODE_SPIDER) setAnimation(player, SPIDER_ANIM_JUMP);
                 
-                state.current_data.jumps++;
+                state.currentData.jumps++;
                 
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &orbUseEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 255 / 255.f;
                     effect->def.colorG = 100 / 255.f;
                     effect->def.colorB = 0;
                 }
                 
-                player->last_orb_pressed = obj;
+                player->lastOrbPressed = obj;
 
                 SET_ACTIVATED(obj, true);
             } 
             break;
         }
         case BLACK_ORB: {
-            if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
-                if (state.show_player) MotionTrail_ResumeStroke(trail);
-                float black_vel = (player->gamemode == GAMEMODE_UFO) ? -604.8f : (player_gamemode_is_flying(player) ? -756.f : -810.f);
-                player->vel_y = black_vel;
+            if (!GET_COLLIDED(obj)) addUseEffect(objects.x[obj], objects.y[obj], obj, &orbCollideEffect, getUseEffectArrayPtr(GFX_TOP));
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (currInput.holdJump) && player->bufferingState == BUFFER_READY) {
+                if (state.showPlayer) motionTrailResumeStroke(trail);
+                float blackVel = (player->gamemode == GAMEMODE_UFO) ? -604.8f : (playerGamemodeIsFlying(player) ? -756.f : -810.f);
+                player->velY = blackVel;
                 
-                player->ball_rotation_speed = -BALL_SLOW_ROTATION;
+                player->ballRotationSpeed = -BALL_SLOW_ROTATION;
                 
-                player->on_ground = false;
-                player->on_ceiling = false;
-                player->inverse_rotation = false;
-                player->left_ground = true;
-                player->buffering_state = BUFFER_END;
+                player->onGround = false;
+                player->onCeiling = false;
+                player->inverseRotation = false;
+                player->leftGround = true;
+                player->bufferingState = BUFFER_END;
                 player->jumped = true;
-                player->velocity_uncapped = true;
-                update_rotation_direction(player);
-                if (player->gamemode == GAMEMODE_ROBOT) set_animation(player, ROBOT_ANIM_JUMP_START);
+                player->velocityUncapped = true;
+                updateRotationDirection(player);
+                if (player->gamemode == GAMEMODE_ROBOT) setAnimation(player, ROBOT_ANIM_JUMP_START);
                 
-                state.current_data.jumps++;
+                state.currentData.jumps++;
                 
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &orbUseEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     Color color = channels[CHANNEL_LBG].color;
                     effect->def.colorR = color.r / 255.f;
@@ -675,195 +675,195 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     effect->def.colorB = color.b / 255.f;
                 }
 
-                player->last_orb_pressed = obj;
+                player->lastOrbPressed = obj;
 
                 SET_ACTIVATED(obj, true);
             } 
             break;
         }
         case DASH_ORB: {
-            if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY && !player->dashing) {
-                if (player->gamemode != GAMEMODE_WAVE) MotionTrail_StopStroke(trail);
+            if (!GET_COLLIDED(obj)) addUseEffect(objects.x[obj], objects.y[obj], obj, &orbCollideEffect, getUseEffectArrayPtr(GFX_TOP));
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (currInput.holdJump) && player->bufferingState == BUFFER_READY && !player->dashing) {
+                if (player->gamemode != GAMEMODE_WAVE) motionTrailStopStroke(trail);
 
-                player->on_ground = false;
-                player->on_ceiling = false;
-                player->inverse_rotation = false;
-                player->left_ground = true;
-                player->robot_air_time = 999.f;
-                player->buffering_state = BUFFER_END;
+                player->onGround = false;
+                player->onCeiling = false;
+                player->inverseRotation = false;
+                player->leftGround = true;
+                player->robotAirTime = 999.f;
+                player->bufferingState = BUFFER_END;
                 
                 player->dashing = true;
-                player->dash_angle = dash_orb_angle(obj);
-                player->dash_slope = sinf(DegToRad(player->dash_angle)) / fabsf(cosf(DegToRad(player->dash_angle)));
-                player->rotation = -player->dash_angle;
-                player->vel_y = 0;
+                player->dashAngle = dashOrbAngle(obj);
+                player->dashSlope = sinf(DegToRad(player->dashAngle)) / fabsf(cosf(DegToRad(player->dashAngle)));
+                player->rotation = -player->dashAngle;
+                player->velY = 0;
 
-                add_dash_boom(objects.x[obj], objects.y[obj], -player->dash_angle);
-                player_flash(player, 0.2f, 0.1f);
+                addDashBoom(objects.x[obj], objects.y[obj], -player->dashAngle);
+                playerFlash(player, 0.2f, 0.1f);
 
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &orbUseEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 0 / 255.f;
                     effect->def.colorG = 255 / 255.f;
                     effect->def.colorB = 0;
                 }
 
-                player->last_orb_pressed = obj;
+                player->lastOrbPressed = obj;
 
                 SET_ACTIVATED(obj, true);
             } 
             break;
         }
         case GRAVITY_DASH_ORB: {
-            if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY && !player->dashing) {
-                player->ceiling_inv_time = CEILING_INVUL_TIME;
-                if (player->gamemode != GAMEMODE_BALL && state.show_player) MotionTrail_ResumeStroke(trail);
-                if (player->gamemode == GAMEMODE_WAVE) MotionTrail_AddWavePoint(wave_trail);
-                player->vel_y /= -2;
-                player->upside_down = !player->upside_down;
-                update_rotation_direction(player);
-                player->robot_air_time = 999.f;
+            if (!GET_COLLIDED(obj)) addUseEffect(objects.x[obj], objects.y[obj], obj, &orbCollideEffect, getUseEffectArrayPtr(GFX_TOP));
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (currInput.holdJump) && player->bufferingState == BUFFER_READY && !player->dashing) {
+                player->ceilingInvTime = CEILING_INVUL_TIME;
+                if (player->gamemode != GAMEMODE_BALL && state.showPlayer) motionTrailResumeStroke(trail);
+                if (player->gamemode == GAMEMODE_WAVE) motionTrailAddWavePoint(waveTrail);
+                player->velY /= -2;
+                player->upsideDown = !player->upsideDown;
+                updateRotationDirection(player);
+                player->robotAirTime = 999.f;
                 
-                player->on_ground = false;
-                player->on_ceiling = false;
-                player->inverse_rotation = false;
-                player->left_ground = true;
-                player->buffering_state = BUFFER_END;
+                player->onGround = false;
+                player->onCeiling = false;
+                player->inverseRotation = false;
+                player->leftGround = true;
+                player->bufferingState = BUFFER_END;
 
                 if (player->gamemode == GAMEMODE_UFO)
                     player->rotation = 0;
                 else
-                    player->snap_rotation = true;
+                    player->snapRotation = true;
 
-                player->left_ground = true;
-                flip_other_player(state.current_player);
+                player->leftGround = true;
+                flipOtherPlayer(state.currentPlayer);
 
                 player->dashing = true;
-                player->dash_angle = dash_orb_angle(obj);
-                player->dash_slope = sinf(DegToRad(player->dash_angle)) / fabsf(cosf(DegToRad(player->dash_angle)));
-                player->rotation = -player->dash_angle;
-                player->vel_y = 0;
+                player->dashAngle = dashOrbAngle(obj);
+                player->dashSlope = sinf(DegToRad(player->dashAngle)) / fabsf(cosf(DegToRad(player->dashAngle)));
+                player->rotation = -player->dashAngle;
+                player->velY = 0;
 
-                add_gravity_dash_boom(objects.x[obj], objects.y[obj], -player->dash_angle);
-                player_flash(player, 0.2f, 0.1f);
+                addGravityDashBoom(objects.x[obj], objects.y[obj], -player->dashAngle);
+                playerFlash(player, 0.2f, 0.1f);
 
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &orbUseEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 255 / 255.f;
                     effect->def.colorG = 0 / 255.f;
                     effect->def.colorB = 255 / 255.f;
                 }
 
-                player->last_orb_pressed = obj;
+                player->lastOrbPressed = obj;
 
                 SET_ACTIVATED(obj, true);
             } 
             break;
         }
         case BLUE_ORB: {
-            if (GET_ACTIVATED(obj)) player->gravObj_id = obj;
-            if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {    
-                if (state.show_player) MotionTrail_ResumeStroke(trail);
-                if (player->gamemode == GAMEMODE_WAVE) MotionTrail_AddWavePoint(wave_trail);
-                player->gravObj_id = obj;
-                update_rotation_direction(player); 
+            if (GET_ACTIVATED(obj)) player->gravObjID = obj;
+            if (!GET_COLLIDED(obj)) addUseEffect(objects.x[obj], objects.y[obj], obj, &orbCollideEffect, getUseEffectArrayPtr(GFX_TOP));
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (currInput.holdJump) && player->bufferingState == BUFFER_READY) {    
+                if (state.showPlayer) motionTrailResumeStroke(trail);
+                if (player->gamemode == GAMEMODE_WAVE) motionTrailAddWavePoint(waveTrail);
+                player->gravObjID = obj;
+                updateRotationDirection(player); 
                 
-                player->vel_y = jump_heights_table[state.speed][JUMP_BLUE_ORB][player->gamemode][player->mini];
-                player->upside_down ^= 1;
+                player->velY = jumpHeightsTable[state.speed][JUMP_BLUE_ORB][player->gamemode][player->mini];
+                player->upsideDown ^= 1;
 
-                start_gravity_sweep(!player->upside_down);
+                startGravitySweep(!player->upsideDown);
 
-                flip_other_player(state.current_player);
+                flipOtherPlayer(state.currentPlayer);
                 
-                state.current_data.jumps++;
+                state.currentData.jumps++;
                 
-                player->ball_rotation_speed = -BALL_SLOW_ROTATION;
+                player->ballRotationSpeed = -BALL_SLOW_ROTATION;
                 
-                player->on_ground = false;
-                player->on_ceiling = false;
-                player->inverse_rotation = false;
-                player->left_ground = true;
-                player->buffering_state = BUFFER_END;
-                player->ceiling_inv_time = CEILING_INVUL_TIME;
+                player->onGround = false;
+                player->onCeiling = false;
+                player->inverseRotation = false;
+                player->leftGround = true;
+                player->bufferingState = BUFFER_END;
+                player->ceilingInvTime = CEILING_INVUL_TIME;
                 player->jumped = true;
-                if (player->gamemode == GAMEMODE_SPIDER) set_animation(player, SPIDER_ANIM_JUMP);
+                if (player->gamemode == GAMEMODE_SPIDER) setAnimation(player, SPIDER_ANIM_JUMP);
                 
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &orbUseEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 0 / 255.f;
                     effect->def.colorG = 255 / 255.f;
                     effect->def.colorB = 255 / 255.f;
                 }
 
-                player->last_orb_pressed = obj;
+                player->lastOrbPressed = obj;
 
                 SET_ACTIVATED(obj, true);
             } 
             break;
         }
         case GREEN_ORB: {
-            if (GET_ACTIVATED(obj)) player->gravObj_id = obj;
-            if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (curr_input.holdJump) && player->buffering_state == BUFFER_READY) {
-                if (state.show_player) MotionTrail_ResumeStroke(trail);
-                player->gravObj_id = obj;
+            if (GET_ACTIVATED(obj)) player->gravObjID = obj;
+            if (!GET_COLLIDED(obj)) addUseEffect(objects.x[obj], objects.y[obj], obj, &orbCollideEffect, getUseEffectArrayPtr(GFX_TOP));
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (currInput.holdJump) && player->bufferingState == BUFFER_READY) {
+                if (state.showPlayer) motionTrailResumeStroke(trail);
+                player->gravObjID = obj;
 
-                player->upside_down ^= 1;
+                player->upsideDown ^= 1;
 
-                start_gravity_sweep(!player->upside_down);
+                startGravitySweep(!player->upsideDown);
 
-                player->vel_y = jump_heights_table[state.speed][JUMP_YELLOW_ORB][player->gamemode][player->mini];
+                player->velY = jumpHeightsTable[state.speed][JUMP_YELLOW_ORB][player->gamemode][player->mini];
                 
-                update_rotation_direction(player);
+                updateRotationDirection(player);
 
-                if (player->gamemode == GAMEMODE_SHIP) player->vel_y *= 0.7f;
+                if (player->gamemode == GAMEMODE_SHIP) player->velY *= 0.7f;
 
-                flip_other_player(state.current_player);
+                flipOtherPlayer(state.currentPlayer);
 
-                state.current_data.jumps++;
+                state.currentData.jumps++;
 
-                player->ball_rotation_speed = -BALL_SLOW_ROTATION;
+                player->ballRotationSpeed = -BALL_SLOW_ROTATION;
                 
-                if (player->gamemode == GAMEMODE_ROBOT) set_animation(player, ROBOT_ANIM_JUMP_START);
-                if (player->gamemode == GAMEMODE_SPIDER) set_animation(player, SPIDER_ANIM_JUMP);
+                if (player->gamemode == GAMEMODE_ROBOT) setAnimation(player, ROBOT_ANIM_JUMP_START);
+                if (player->gamemode == GAMEMODE_SPIDER) setAnimation(player, SPIDER_ANIM_JUMP);
 
-                player->on_ground = false;
-                player->on_ceiling = false;
-                player->inverse_rotation = false;
-                player->left_ground = true;
-                player->buffering_state = BUFFER_END;
-                player->ceiling_inv_time = 0.5f;
+                player->onGround = false;
+                player->onCeiling = false;
+                player->inverseRotation = false;
+                player->leftGround = true;
+                player->bufferingState = BUFFER_END;
+                player->ceilingInvTime = 0.5f;
                 player->jumped = true;
 
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &orbUseEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 0;
                     effect->def.colorG = 255 / 255.f;
                     effect->def.colorB = 0;
                 }
 
-                player->last_orb_pressed = obj;
+                player->lastOrbPressed = obj;
 
                 SET_ACTIVATED(obj, true);
             } 
             break;
         }
         case TOGGLE_ORB: {
-            if (!GET_COLLIDED(obj)) add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, get_use_effect_array_ptr(GFX_TOP));
-            if (!GET_ACTIVATED(obj) && (curr_input.holdJump) && (player->buffering_state == BUFFER_READY || curr_input.pressedJump)) {
-                ToggleTrigger *trigger = get_toggle_trigger(obj);
+            if (!GET_COLLIDED(obj)) addUseEffect(objects.x[obj], objects.y[obj], obj, &orbCollideEffect, getUseEffectArrayPtr(GFX_TOP));
+            if (!GET_ACTIVATED(obj) && (currInput.holdJump) && (player->bufferingState == BUFFER_READY || currInput.pressedJump)) {
+                ToggleTrigger *trigger = getToggleTrigger(obj);
 
-                if (trigger->spawn_only) spawn_group(trigger->target_group);
-                else toggle_group(trigger->target_group, trigger->activate_group, true);
+                if (trigger->spawnOnly) spawnGroup(trigger->targetGroup);
+                else toggleGroup(trigger->targetGroup, trigger->activateGroup, true);
 
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &orbUseEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
-                    effect->def.colorR = objects.detail_color[obj].r / 255.f;
-                    effect->def.colorG = objects.detail_color[obj].g / 255.f;
-                    effect->def.colorB = objects.detail_color[obj].b / 255.f;
+                    effect->def.colorR = objects.detailColor[obj].r / 255.f;
+                    effect->def.colorG = objects.detailColor[obj].g / 255.f;
+                    effect->def.colorB = objects.detailColor[obj].b / 255.f;
                 }
 
                 SET_ACTIVATED(obj, true);
@@ -871,27 +871,27 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         }
         case BLUE_GRAVITY_PORTAL: {
-            player->gravObj_id = obj;
+            player->gravObjID = obj;
             if (!GET_ACTIVATED(obj)) {
-                start_gravity_sweep(true);
-                player->ceiling_inv_time = CEILING_INVUL_TIME;
-                if (player->upside_down) {
-                    if (player->gamemode != GAMEMODE_BALL && state.show_player) MotionTrail_ResumeStroke(trail);
-                    if (player->gamemode == GAMEMODE_WAVE) MotionTrail_AddWavePoint(wave_trail);
-                    player->vel_y /= -2;
-                    player->upside_down = false;
-                    player->inverse_rotation = false;
-                    player->robot_air_time = 999.f;
+                startGravitySweep(true);
+                player->ceilingInvTime = CEILING_INVUL_TIME;
+                if (player->upsideDown) {
+                    if (player->gamemode != GAMEMODE_BALL && state.showPlayer) motionTrailResumeStroke(trail);
+                    if (player->gamemode == GAMEMODE_WAVE) motionTrailAddWavePoint(waveTrail);
+                    player->velY /= -2;
+                    player->upsideDown = false;
+                    player->inverseRotation = false;
+                    player->robotAirTime = 999.f;
 
                     if (player->gamemode == GAMEMODE_UFO) 
                         player->rotation = 0;
                     else
-                        player->snap_rotation = true;
+                        player->snapRotation = true;
 
-                    flip_other_player(state.current_player);
-                    player->left_ground = true;
+                    flipOtherPlayer(state.currentPlayer);
+                    player->leftGround = true;
                     
-                    UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                    UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
                     if (effect) {
                         effect->def.colorR = 0 / 255.f;
                         effect->def.colorG = 200 / 255.f;
@@ -903,26 +903,26 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         }
         case YELLOW_GRAVITY_PORTAL: {
-            player->gravObj_id = obj;
+            player->gravObjID = obj;
             if (!GET_ACTIVATED(obj)) {
-                start_gravity_sweep(false);
-                player->ceiling_inv_time = CEILING_INVUL_TIME;
-                if (!player->upside_down) {
-                    if (player->gamemode != GAMEMODE_BALL && state.show_player) MotionTrail_ResumeStroke(trail);
-                    if (player->gamemode == GAMEMODE_WAVE) MotionTrail_AddWavePoint(wave_trail);
-                    player->vel_y /= -2;
-                    player->upside_down = true;
-                    player->inverse_rotation = false;
-                    player->robot_air_time = 999.f;
+                startGravitySweep(false);
+                player->ceilingInvTime = CEILING_INVUL_TIME;
+                if (!player->upsideDown) {
+                    if (player->gamemode != GAMEMODE_BALL && state.showPlayer) motionTrailResumeStroke(trail);
+                    if (player->gamemode == GAMEMODE_WAVE) motionTrailAddWavePoint(waveTrail);
+                    player->velY /= -2;
+                    player->upsideDown = true;
+                    player->inverseRotation = false;
+                    player->robotAirTime = 999.f;
 
                     if (player->gamemode == GAMEMODE_UFO) 
                         player->rotation = 0;
                     else
-                        player->snap_rotation = true;
+                        player->snapRotation = true;
                         
-                    flip_other_player(state.current_player);
-                    player->left_ground = true;
-                    UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                    flipOtherPlayer(state.currentPlayer);
+                    player->leftGround = true;
+                    UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
                     if (effect) {
                         effect->def.colorR = 255 / 255.f;
                         effect->def.colorG = 200 / 255.f;
@@ -935,14 +935,14 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         }
         case ORANGE_MIRROR_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
-                if (state.intended_mirror_factor != 1.f) {
-                    MotionTrail_StopStroke(trail);
+                if (state.intendedMirrorFactor != 1.f) {
+                    motionTrailStopStroke(trail);
                     state.mirroring = true;
-                    state.mirror_timer = 0;
-                    state.original_mirror_factor = state.mirror_factor;
-                    state.intended_mirror_factor = 1.f;
+                    state.mirrorTimer = 0;
+                    state.originalMirrorFactor = state.mirrorFactor;
+                    state.intendedMirrorFactor = 1.f;
                 }
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 255 / 255.f;
                     effect->def.colorG = 150 / 255.f;
@@ -954,15 +954,15 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         }
         case BLUE_MIRROR_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
-                if (state.intended_mirror_factor != 0.f) {
-                    MotionTrail_StopStroke(trail);
+                if (state.intendedMirrorFactor != 0.f) {
+                    motionTrailStopStroke(trail);
                     state.mirroring = true;
-                    state.mirror_timer = 0;
-                    state.original_mirror_factor = state.mirror_factor;
-                    state.intended_mirror_factor = 0.f;
+                    state.mirrorTimer = 0;
+                    state.originalMirrorFactor = state.mirrorFactor;
+                    state.intendedMirrorFactor = 0.f;
                 }
                 
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 0 / 255.f;
                     effect->def.colorG = 255 / 255.f;
@@ -977,28 +977,28 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         case BIG_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
                 if (player->mini) {
-                    start_bg_flash();
+                    startBgFlash();
 
-                    lightning_bolts.push_back(
+                    lightningBolts.push_back(
                         Lightning(
-                            objects.x[obj] + random_int(-25.0f, 25.0f) + 25.0f, state.camera_y + 50.0f + SCREEN_HEIGHT, 
+                            objects.x[obj] + randomInt(-25.0f, 25.0f) + 25.0f, state.cameraY + 50.0f + SCREEN_HEIGHT, 
                             objects.x[obj], objects.y[obj], 
                             LightningType::SIZE_NORMAL
                         )
                     );
 
-                    set_mini(player, false);
-                    UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                    setMini(player, false);
+                    UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
                     if (effect) {
                         effect->def.colorR = 0 / 255.f;
                         effect->def.colorG = 255 / 255.f;
                         effect->def.colorB = 50 / 255.f;
                     }
                     UseEffect *effect2;
-                    if (state.current_player == 0) {
-                        effect2 = add_use_effect(player_1->x, player_1->y, USE_EFFECT_OBJ_P1, &size_change_big_effect, get_use_effect_array_ptr(GFX_TOP));
+                    if (state.currentPlayer == 0) {
+                        effect2 = addUseEffect(player1->x, player1->y, USE_EFFECT_OBJ_P1, &sizeChangeBigEffect, getUseEffectArrayPtr(GFX_TOP));
                     } else {
-                        effect2 = add_use_effect(player_2->x, player_2->y, USE_EFFECT_OBJ_P2, &size_change_big_effect, get_use_effect_array_ptr(GFX_TOP));
+                        effect2 = addUseEffect(player2->x, player2->y, USE_EFFECT_OBJ_P2, &sizeChangeBigEffect, getUseEffectArrayPtr(GFX_TOP));
                     }                    
 
                     if (effect2) {
@@ -1014,32 +1014,32 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         case MINI_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
                 if (!player->mini){
-                    start_bg_flash();
+                    startBgFlash();
 
-                    lightning_bolts.push_back(
+                    lightningBolts.push_back(
                         Lightning(
-                            objects.x[obj] + random_int(-25.0f, 25.0f) + 25.0f, state.camera_y + 50.0f + SCREEN_HEIGHT, 
+                            objects.x[obj] + randomInt(-25.0f, 25.0f) + 25.0f, state.cameraY + 50.0f + SCREEN_HEIGHT, 
                             objects.x[obj], objects.y[obj], 
                             LightningType::SIZE_MINI
                         )
                     );
 
-                    set_mini(player, true);
-                    UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                    setMini(player, true);
+                    UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
                     if (effect) {
                         effect->def.colorR = 255 / 255.f;
                         effect->def.colorG = 31 / 255.f;
                         effect->def.colorB = 255 / 255.f;
                     }
-                    if (state.current_player == 0) {
-                        UseEffect *effect2 = add_use_effect(player_1->x, player_1->y, USE_EFFECT_OBJ_P1, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                    if (state.currentPlayer == 0) {
+                        UseEffect *effect2 = addUseEffect(player1->x, player1->y, USE_EFFECT_OBJ_P1, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
                         if (effect2) {
                             effect2->def.colorR = 255 / 255.f;
                             effect2->def.colorG = 31 / 255.f;
                             effect2->def.colorB = 255 / 255.f;
                         }
                     } else {
-                        UseEffect *effect2 = add_use_effect(player_2->x, player_2->y, USE_EFFECT_OBJ_P2, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                        UseEffect *effect2 = addUseEffect(player2->x, player2->y, USE_EFFECT_OBJ_P2, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
                         if (effect2) {
                             effect2->def.colorR = 255 / 255.f;
                             effect2->def.colorG = 31 / 255.f;
@@ -1054,7 +1054,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         case SLOW_SPEED_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
                 SET_ACTIVATED(obj, true);
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &speed_collide_effect, get_use_effect_array_ptr(GFX_TOP));
+                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &speedCollideEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 255 / 255.f;
                     effect->def.colorG = 255 / 255.f;
@@ -1062,7 +1062,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 }
                 if (state.speed != SPEED_SLOW) {
                     state.speed = SPEED_SLOW;
-                    slow_speed_particles_timer = 0.7f;
+                    slowSpeedParticlesTimer = 0.7f;
                 };
             }
             break;
@@ -1070,7 +1070,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         case NORMAL_SPEED_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
                 SET_ACTIVATED(obj, true);
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &speed_collide_effect, get_use_effect_array_ptr(GFX_TOP));
+                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &speedCollideEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 0 / 255.f;
                     effect->def.colorG = 190 / 255.f;
@@ -1078,7 +1078,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 }
                 if (state.speed != SPEED_NORMAL) {
                     state.speed = SPEED_NORMAL;
-                    normal_speed_particles_timer = 0.7f;
+                    normalSpeedParticlesTimer = 0.7f;
                 }
             }
             break;
@@ -1086,7 +1086,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         case FAST_SPEED_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
                 SET_ACTIVATED(obj, true);
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &speed_collide_effect, get_use_effect_array_ptr(GFX_TOP));
+                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &speedCollideEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 0 / 255.f;
                     effect->def.colorG = 255 / 255.f;
@@ -1094,7 +1094,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 }
                 if (state.speed != SPEED_FAST){
                     state.speed = SPEED_FAST;
-                    fast_speed_particles_timer = 0.7f;
+                    fastSpeedParticlesTimer = 0.7f;
                 }
             }
             break;
@@ -1103,7 +1103,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             if (!GET_ACTIVATED(obj)) {
                 SET_ACTIVATED(obj, true);
 
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &speed_collide_effect, get_use_effect_array_ptr(GFX_TOP));
+                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &speedCollideEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 230 / 255.f;
                     effect->def.colorG = 65  / 255.f;
@@ -1112,7 +1112,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 
                 if (state.speed != SPEED_FASTER) {
                     state.speed = SPEED_FASTER;
-                    faster_speed_particles_timer = 0.7f;
+                    fasterSpeedParticlesTimer = 0.7f;
                 }
             }
             break;
@@ -1121,7 +1121,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             if (!GET_ACTIVATED(obj)) {
                 SET_ACTIVATED(obj, true);
 
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &speed_collide_effect, get_use_effect_array_ptr(GFX_TOP));
+                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &speedCollideEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 255 / 255.f;
                     effect->def.colorG = 65  / 255.f;
@@ -1130,33 +1130,33 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
 
                 if (state.speed != SPEED_FASTEST) {
                     state.speed = SPEED_FASTEST;
-                    fastest_speed_particles_timer = 0.7f;
+                    fastestSpeedParticlesTimer = 0.7f;
                 }
             }
             break;
         }
         case CUBE_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
-                state.ground_y = 0;
-                state.ceiling_y = 999999;
+                state.groundY = 0;
+                state.ceilingY = 999999;
                 if (player->gamemode != GAMEMODE_PLAYER) {
                     if (player->gamemode != GAMEMODE_BALL && player->gamemode != GAMEMODE_ROBOT) {
-                        player->vel_y /= 2;
+                        player->velY /= 2;
                     }
 
-                    if (player->gamemode == GAMEMODE_WAVE) player->vel_y *= 0.9f;
+                    if (player->gamemode == GAMEMODE_WAVE) player->velY *= 0.9f;
                     
-                    player->ceiling_inv_time = GAMEMODE_INVUL_TIME;
-                    player->snap_rotation = true;
-                    set_gamemode(player, GAMEMODE_PLAYER);
-                    set_checkpoint_timer(0);
-                    pseudo_checkpoint_exists = false;
-                    flip_other_player(state.current_player ^ 1);
-                    update_rotation_direction(player);
+                    player->ceilingInvTime = GAMEMODE_INVUL_TIME;
+                    player->snapRotation = true;
+                    setGamemode(player, GAMEMODE_PLAYER);
+                    setCheckpointTimer(0);
+                    pseudoCheckpointExists = false;
+                    flipOtherPlayer(state.currentPlayer ^ 1);
+                    updateRotationDirection(player);
                 }
 
                 if (state.dual) {
-                    set_dual_bounds();
+                    setDualBounds();
                 } 
 
                 SET_ACTIVATED(obj, true);
@@ -1165,27 +1165,27 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         }
         case ROBOT_PORTAL: {
                 if (!GET_ACTIVATED(obj)) {
-                    state.ground_y = 0;
-                    state.ceiling_y = 999999;
+                    state.groundY = 0;
+                    state.ceilingY = 999999;
                     if (player->gamemode != GAMEMODE_ROBOT) {
                         if (player->gamemode != GAMEMODE_BALL && player->gamemode != GAMEMODE_PLAYER) {
-                            player->vel_y /= 2;
+                            player->velY /= 2;
                         }
-                        if (player->gamemode == GAMEMODE_WAVE) player->vel_y *= 0.9f;
+                        if (player->gamemode == GAMEMODE_WAVE) player->velY *= 0.9f;
 
-                        player->ceiling_inv_time = GAMEMODE_INVUL_TIME;
-                        player->snap_rotation = true;
-                        player->inverse_rotation = false;
-                        set_gamemode(player, GAMEMODE_ROBOT);
-                        set_checkpoint_timer(0);
-                        pseudo_checkpoint_exists = false;
-                        flip_other_player(state.current_player ^ 1);
-                        update_rotation_direction(player);
+                        player->ceilingInvTime = GAMEMODE_INVUL_TIME;
+                        player->snapRotation = true;
+                        player->inverseRotation = false;
+                        setGamemode(player, GAMEMODE_ROBOT);
+                        setCheckpointTimer(0);
+                        pseudoCheckpointExists = false;
+                        flipOtherPlayer(state.currentPlayer ^ 1);
+                        updateRotationDirection(player);
 
-                        set_animation(player, player->dashing ? ROBOT_ANIM_FALL_START : ROBOT_ANIM_JUMP_START);
-                        player->robot_air_time = 999.f;
+                        setAnimation(player, player->dashing ? ROBOT_ANIM_FALL_START : ROBOT_ANIM_JUMP_START);
+                        player->robotAirTime = 999.f;
 
-                        UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                        UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
                         if (effect) {
                             effect->def.colorR = 255 / 255.f;
                             effect->def.colorG = 100 / 255.f;
@@ -1194,7 +1194,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     }
 
                     if (state.dual) {
-                        set_dual_bounds();
+                        setDualBounds();
                     } 
 
                     SET_ACTIVATED(obj, true);
@@ -1203,28 +1203,28 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             }   
         case SPIDER_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
-                state.ground_y = fmaxf(0, ip1_ceilf((objects.original_y[obj] - ((gamemode_heights[GAMEMODE_SPIDER] + 60.f) / 2.f)) / 30.f)) * 30;
-                state.ceiling_y = state.ground_y + gamemode_heights[GAMEMODE_SPIDER];
-                set_intended_ceiling();
+                state.groundY = fmaxf(0, ip1Ceilf((objects.originalY[obj] - ((gamemodeHeights[GAMEMODE_SPIDER] + 60.f) / 2.f)) / 30.f)) * 30;
+                state.ceilingY = state.groundY + gamemodeHeights[GAMEMODE_SPIDER];
+                setIntendedCeiling();
 
                 if (player->gamemode != GAMEMODE_SPIDER) {
                     if (player->gamemode != GAMEMODE_BALL && player->gamemode != GAMEMODE_PLAYER) {
-                        player->vel_y /= 2;
+                        player->velY /= 2;
                     }
-                    if (player->gamemode == GAMEMODE_WAVE) player->vel_y *= 0.9f;
+                    if (player->gamemode == GAMEMODE_WAVE) player->velY *= 0.9f;
 
-                    player->ceiling_inv_time = GAMEMODE_INVUL_TIME;
-                    player->snap_rotation = true;
-                    player->inverse_rotation = false;
-                    set_gamemode(player, GAMEMODE_SPIDER);
-                    set_checkpoint_timer(0);
-                    pseudo_checkpoint_exists = false;
-                    flip_other_player(state.current_player ^ 1);
-                    update_rotation_direction(player);
+                    player->ceilingInvTime = GAMEMODE_INVUL_TIME;
+                    player->snapRotation = true;
+                    player->inverseRotation = false;
+                    setGamemode(player, GAMEMODE_SPIDER);
+                    setCheckpointTimer(0);
+                    pseudoCheckpointExists = false;
+                    flipOtherPlayer(state.currentPlayer ^ 1);
+                    updateRotationDirection(player);
 
-                    set_animation(player, player->dashing ? SPIDER_ANIM_FALL : SPIDER_ANIM_RUN);
+                    setAnimation(player, player->dashing ? SPIDER_ANIM_FALL : SPIDER_ANIM_RUN);
 
-                    UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                    UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
                     if (effect) {
                         effect->def.colorR = 255 / 255.f;
                         effect->def.colorG = 50 / 255.f;
@@ -1233,7 +1233,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 }
 
                 if (state.dual) {
-                    set_dual_bounds();
+                    setDualBounds();
                 }
 
                 SET_ACTIVATED(obj, true);
@@ -1242,9 +1242,9 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         }
         case BLUE_TP_PORTAL: {
             if (GET_ACTIVATED(obj)) break;
-            int oi = objects.child_object[obj];
+            int oi = objects.childObject[obj];
             if (oi >= 0) {
-                lightning_bolts.push_back(
+                lightningBolts.push_back(
                     Lightning(
                         objects.x[obj], objects.y[obj],
                         objects.x[oi], objects.y[oi], 
@@ -1253,28 +1253,28 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 );
 
                 player->y = objects.y[oi];
-                state.old_player.y = player->y;
+                state.oldPlayer.y = player->y;
 
-                float half_view = SCREEN_HEIGHT_AREA / 2.0f;
-                float player_screen_y = player->y - (state.camera_y + half_view - LEVEL_Y_OFFSET);
+                float halfView = SCREEN_HEIGHT_AREA / 2.0f;
+                float playerScreenY = player->y - (state.cameraY + halfView - LEVEL_Y_OFFSET);
 
-                float upside_down_offset = (player->upside_down ? -30.f : 0);
-                if (player_screen_y > half_view + 60.0f) {
+                float upsideDownOffset = (player->upsideDown ? -30.f : 0);
+                if (playerScreenY > halfView + 60.0f) {
                     // Top bound
-                    set_camera_y(player->y - (140.f + upside_down_offset));
-                } else if (player_screen_y < -(half_view + 60.0f)) {
+                    setCameraY(player->y - (140.f + upsideDownOffset));
+                } else if (playerScreenY < -(halfView + 60.0f)) {
                     // Bottom bound
-                    set_camera_y(player->y - (30.f + upside_down_offset));
+                    setCameraY(player->y - (30.f + upsideDownOffset));
                 }
 
-                UseEffect *eff1 = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                UseEffect *eff1 = addUseEffect(objects.x[obj], objects.y[obj], obj, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (eff1) {
                     eff1->def.colorR = 56 / 255.f;
                     eff1->def.colorG = 200 / 255.f;
                     eff1->def.colorB = 255 / 255.f;
                 }
 
-                UseEffect *eff2 = add_use_effect(objects.x[oi], objects.y[oi], oi, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                UseEffect *eff2 = addUseEffect(objects.x[oi], objects.y[oi], oi, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (eff2) {
                     eff2->def.colorR = 255 / 255.f;
                     eff2->def.colorG = 255 / 255.f;
@@ -1282,47 +1282,47 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 }
             }
             SET_ACTIVATED(obj, true);
-            player->just_teleported = true;
-            MotionTrail_Clear(trail);
-            MotionTrail_Clear(wave_trail);
+            player->justTeleported = true;
+            motionTrailClear(trail);
+            motionTrailClear(waveTrail);
             if (player->gamemode == GAMEMODE_WAVE) {
-                wave_trail->positionR = (Vec2D){player->x, player->y};  
-                wave_trail->startingPositionInitialized = true;
-                MotionTrail_ResumeStroke(wave_trail);
-                MotionTrail_AddWavePoint(wave_trail);
+                waveTrail->positionR = (Vec2D){player->x, player->y};  
+                waveTrail->startingPositionInitialized = true;
+                motionTrailResumeStroke(waveTrail);
+                motionTrailAddWavePoint(waveTrail);
             }
             break;
         }
         case SHIP_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
-                state.ground_y = fmaxf(0, ip1_ceilf((objects.original_y[obj] - ((gamemode_heights[GAMEMODE_SHIP] + 60.f) / 2.f)) / 30.f)) * 30;
-                state.ceiling_y = state.ground_y + gamemode_heights[GAMEMODE_SHIP];
-                set_intended_ceiling();
+                state.groundY = fmaxf(0, ip1Ceilf((objects.originalY[obj] - ((gamemodeHeights[GAMEMODE_SHIP] + 60.f) / 2.f)) / 30.f)) * 30;
+                state.ceilingY = state.groundY + gamemodeHeights[GAMEMODE_SHIP];
+                setIntendedCeiling();
 
                 if (player->gamemode != GAMEMODE_SHIP) {
-                    if (player->gamemode == GAMEMODE_WAVE) player->vel_y *= 0.9f;
-                    player->vel_y /= (player->gamemode == GAMEMODE_UFO || player->gamemode == GAMEMODE_WAVE) ? 4 : 2;
+                    if (player->gamemode == GAMEMODE_WAVE) player->velY *= 0.9f;
+                    player->velY /= (player->gamemode == GAMEMODE_UFO || player->gamemode == GAMEMODE_WAVE) ? 4 : 2;
                     
                     // No pseudo checkpoint if coming from non flying gamemode
-                    if (!player_gamemode_is_flying(player)) {
-                        pseudo_checkpoint_exists = false;
+                    if (!playerGamemodeIsFlying(player)) {
+                        pseudoCheckpointExists = false;
                     }
 
-                    set_gamemode(player, GAMEMODE_SHIP);
-                    set_checkpoint_timer(AUTO_CHECKPOINT_TIME);
-                    player->inverse_rotation = false;
+                    setGamemode(player, GAMEMODE_SHIP);
+                    setCheckpointTimer(AUTO_CHECKPOINT_TIME);
+                    player->inverseRotation = false;
                     player->rotation = 0;
-                    flip_other_player(state.current_player ^ 1);
+                    flipOtherPlayer(state.currentPlayer ^ 1);
                     
                     float min = player->mini ? -406.566f : -345.6f;
                     float max = player->mini ? 508.248f : 432.0f;
 
-                    if (player->vel_y < min) {
-                        player->vel_y = min;
-                    } else if (player->vel_y > max) {
-                        player->vel_y = max;
+                    if (player->velY < min) {
+                        player->velY = min;
+                    } else if (player->velY > max) {
+                        player->velY = max;
                     }
-                    UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                    UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
                     if (effect) {
                         effect->def.colorR = 255 / 255.f;
                         effect->def.colorG = 0 / 255.f;
@@ -1331,7 +1331,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 }
 
                 if (state.dual) {
-                    set_dual_bounds();
+                    setDualBounds();
                 } 
 
                 SET_ACTIVATED(obj, true);
@@ -1340,34 +1340,34 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         }
         case BALL_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
-                state.ground_y = fmaxf(0, ip1_ceilf((objects.original_y[obj] - ((gamemode_heights[GAMEMODE_BALL] + 60.f) / 2.f)) / 30.f)) * 30;
-                state.ceiling_y = state.ground_y + gamemode_heights[GAMEMODE_BALL];
-                set_intended_ceiling();
+                state.groundY = fmaxf(0, ip1Ceilf((objects.originalY[obj] - ((gamemodeHeights[GAMEMODE_BALL] + 60.f) / 2.f)) / 30.f)) * 30;
+                state.ceilingY = state.groundY + gamemodeHeights[GAMEMODE_BALL];
+                setIntendedCeiling();
 
                 if (player->gamemode != GAMEMODE_BALL) {
-                    player->ball_rotation_speed = -BALL_SLOW_ROTATION;
+                    player->ballRotationSpeed = -BALL_SLOW_ROTATION;
 
                     switch (player->gamemode) {
                         case GAMEMODE_WAVE:
-                            player->vel_y *= 0.9f;
-                            player->vel_y /= 2;
+                            player->velY *= 0.9f;
+                            player->velY /= 2;
                         case GAMEMODE_SHIP:
                         case GAMEMODE_UFO:
-                            player->vel_y /= 2;
+                            player->velY /= 2;
                             break;
                     }
-                    set_gamemode(player, GAMEMODE_BALL);
-                    set_checkpoint_timer(0);
-                    pseudo_checkpoint_exists = false;
+                    setGamemode(player, GAMEMODE_BALL);
+                    setCheckpointTimer(0);
+                    pseudoCheckpointExists = false;
 
-                    if (curr_input.holdJump && state.old_player.gamemode == GAMEMODE_SHIP) {
-                        player->buffering_state = BUFFER_READY;
+                    if (currInput.holdJump && state.oldPlayer.gamemode == GAMEMODE_SHIP) {
+                        player->bufferingState = BUFFER_READY;
                     }
 
-                    player->inverse_rotation = false;
-                    player->snap_rotation = true;
-                    flip_other_player(state.current_player ^ 1);
-                    UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                    player->inverseRotation = false;
+                    player->snapRotation = true;
+                    flipOtherPlayer(state.currentPlayer ^ 1);
+                    UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
                     if (effect) {
                         effect->def.colorG = 50 / 255.f;
                         effect->def.colorB = 50 / 255.f;
@@ -1376,7 +1376,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 }
 
                 if (state.dual) {
-                    set_dual_bounds();
+                    setDualBounds();
                 } 
                 
                 SET_ACTIVATED(obj, true);
@@ -1385,30 +1385,30 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         }
         case UFO_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
-                state.ground_y = fmaxf(0, ip1_ceilf((objects.original_y[obj] - ((gamemode_heights[GAMEMODE_UFO] + 60.f) / 2.f)) / 30.f)) * 30;
-                state.ceiling_y = state.ground_y + gamemode_heights[GAMEMODE_UFO];
-                set_intended_ceiling();
+                state.groundY = fmaxf(0, ip1Ceilf((objects.originalY[obj] - ((gamemodeHeights[GAMEMODE_UFO] + 60.f) / 2.f)) / 30.f)) * 30;
+                state.ceilingY = state.groundY + gamemodeHeights[GAMEMODE_UFO];
+                setIntendedCeiling();
                 
                 if (player->gamemode != GAMEMODE_UFO) {
-                    if (player->gamemode == GAMEMODE_WAVE) player->vel_y *= 0.9f;
-                    player->vel_y /= (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_WAVE) ? 4 : 2;
+                    if (player->gamemode == GAMEMODE_WAVE) player->velY *= 0.9f;
+                    player->velY /= (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_WAVE) ? 4 : 2;
                     
                     // No pseudo checkpoint if coming from non flying gamemode
-                    if (!player_gamemode_is_flying(player)) {
-                        pseudo_checkpoint_exists = false;
+                    if (!playerGamemodeIsFlying(player)) {
+                        pseudoCheckpointExists = false;
                     }
 
-                    set_gamemode(player, GAMEMODE_UFO);
-                    set_checkpoint_timer(AUTO_CHECKPOINT_TIME);
-                    player->inverse_rotation = false;
+                    setGamemode(player, GAMEMODE_UFO);
+                    setCheckpointTimer(AUTO_CHECKPOINT_TIME);
+                    player->inverseRotation = false;
                     player->rotation = 0;
-                    flip_other_player(state.current_player ^ 1);
+                    flipOtherPlayer(state.currentPlayer ^ 1);
 
-                    if (state.old_player.gamemode == GAMEMODE_SHIP || state.old_player.gamemode == GAMEMODE_WAVE) {
-                        player->buffering_state = BUFFER_READY;
+                    if (state.oldPlayer.gamemode == GAMEMODE_SHIP || state.oldPlayer.gamemode == GAMEMODE_WAVE) {
+                        player->bufferingState = BUFFER_READY;
                     }
 
-                    UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                    UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
                     if (effect) {
                         effect->def.colorR = 255 / 255.f;
                         effect->def.colorG = 150 / 255.f;
@@ -1416,7 +1416,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     }
                 }
                 if (state.dual) {
-                    set_dual_bounds();
+                    setDualBounds();
                 } 
 
                 SET_ACTIVATED(obj, true);
@@ -1425,42 +1425,42 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         }
         case WAVE_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
-                state.ground_y = fmaxf(0, ip1_ceilf((objects.original_y[obj] - ((gamemode_heights[GAMEMODE_WAVE] + 60.f) / 2.f)) / 30.f)) * 30;
-                state.ceiling_y = state.ground_y + gamemode_heights[GAMEMODE_WAVE];
-                set_intended_ceiling();
+                state.groundY = fmaxf(0, ip1Ceilf((objects.originalY[obj] - ((gamemodeHeights[GAMEMODE_WAVE] + 60.f) / 2.f)) / 30.f)) * 30;
+                state.ceilingY = state.groundY + gamemodeHeights[GAMEMODE_WAVE];
+                setIntendedCeiling();
 
                 if (player->gamemode != GAMEMODE_WAVE) {
                     // No pseudo checkpoint if coming from non flying gamemode
-                    if (!player_gamemode_is_flying(player)) {
-                        pseudo_checkpoint_exists = false;
+                    if (!playerGamemodeIsFlying(player)) {
+                        pseudoCheckpointExists = false;
                     }
                     
-                    set_gamemode(player, GAMEMODE_WAVE);
-                    set_checkpoint_timer(AUTO_CHECKPOINT_TIME);
-                    player->inverse_rotation = false;
-                    player->snap_rotation = true;
-                    UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                    setGamemode(player, GAMEMODE_WAVE);
+                    setCheckpointTimer(AUTO_CHECKPOINT_TIME);
+                    player->inverseRotation = false;
+                    player->snapRotation = true;
+                    UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
                     if (effect) {
                         effect->def.colorR = 255 / 255.f;
                         effect->def.colorG = 200 / 255.f;
                         effect->def.colorB = 0 / 255.f;
                     }
-                    UseEffect *effect2 = add_use_effect(objects.x[obj], objects.y[obj], obj, &wave_radius_effect, get_use_effect_array_ptr(GFX_TOP));
+                    UseEffect *effect2 = addUseEffect(objects.x[obj], objects.y[obj], obj, &waveRadiusEffect, getUseEffectArrayPtr(GFX_TOP));
                     if (effect2) {
-                        effect2->def.colorR = get_white_if_black(p1_color).r;
-                        effect2->def.colorG = get_white_if_black(p1_color).g;
-                        effect2->def.colorB = get_white_if_black(p1_color).b;
+                        effect2->def.colorR = getWhiteIfBlack(p1Color).r;
+                        effect2->def.colorG = getWhiteIfBlack(p1Color).g;
+                        effect2->def.colorB = getWhiteIfBlack(p1Color).b;
                     }
                 }
 
-                wave_trail->positionR = (Vec2D){player->x, player->y};  
-                wave_trail->startingPositionInitialized = true;
+                waveTrail->positionR = (Vec2D){player->x, player->y};  
+                waveTrail->startingPositionInitialized = true;
                 
-                MotionTrail_ResumeStroke(wave_trail);
-                MotionTrail_AddWavePoint(wave_trail);
+                motionTrailResumeStroke(waveTrail);
+                motionTrailAddWavePoint(waveTrail);
 
                 if (state.dual) {
-                    set_dual_bounds();
+                    setDualBounds();
                 }
 
                 SET_ACTIVATED(obj, true);
@@ -1468,25 +1468,25 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             break;
         }
         case DUAL_PORTAL: {
-            player->gravObj_id = obj;
+            player->gravObjID = obj;
             if (!GET_ACTIVATED(obj)) {
                 if (!state.dual){
-                    player->ceiling_inv_time = CEILING_INVUL_TIME;
+                    player->ceilingInvTime = CEILING_INVUL_TIME;
                     state.dual = true;
-                    state.dual_portal_y = objects.original_y[obj];
-                    setup_dual();
-                    if (state.current_player == 0) state.player2.x = state.old_player.x; // Sync them
+                    state.dualPortalY = objects.originalY[obj];
+                    setupDual();
+                    if (state.currentPlayer == 0) state.player2.x = state.oldPlayer.x; // Sync them
                 }
-                set_dual_bounds();
+                setDualBounds();
 
-                MotionTrail_Clear(&trail_p2);
+                motionTrailClear(&trailP2);
                 if (state.player2.gamemode == GAMEMODE_WAVE) {
-                    wave_trail_p2.positionR = (Vec2D){state.player2.x, state.player2.y};  
-                    wave_trail_p2.startingPositionInitialized = true;
-                    MotionTrail_Clear(&wave_trail_p2);
+                    waveTrailP2.positionR = (Vec2D){state.player2.x, state.player2.y};  
+                    waveTrailP2.startingPositionInitialized = true;
+                    motionTrailClear(&waveTrailP2);
                     
-                    MotionTrail_ResumeStroke(&wave_trail_p2);
-                    MotionTrail_AddWavePoint(&wave_trail_p2);
+                    motionTrailResumeStroke(&waveTrailP2);
+                    motionTrailAddWavePoint(&waveTrailP2);
                 }
                 SET_ACTIVATED(obj, true);                
             }
@@ -1496,31 +1496,31 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             if (!GET_ACTIVATED(obj)) {
                 if (state.dual){
                     state.dual = false;
-                    if (state.current_player == 1) {
+                    if (state.currentPlayer == 1) {
                         memcpy(&state.player, player, sizeof(Player));
 
-                        MotionTrail_CopyTrail(&trail_p1, &trail_p2);
-                        MotionTrail_CopyTrail(&wave_trail_p1, &wave_trail_p2);   
+                        motionTrailCopyTrail(&trailP1, &trailP2);
+                        motionTrailCopyTrail(&waveTrailP1, &waveTrailP2);   
                     }
                     switch (state.player.gamemode) {
                         case GAMEMODE_PLAYER:
                         case GAMEMODE_ROBOT:
-                            state.ground_y = 0;
-                            state.ceiling_y = 999999;
+                            state.groundY = 0;
+                            state.ceilingY = 999999;
                             break;
                         case GAMEMODE_SHIP:
                         case GAMEMODE_UFO:
                         case GAMEMODE_BALL:
                         case GAMEMODE_SPIDER:
-                            state.ground_y = fmaxf(0, ip1_ceilf((state.dual_portal_y - ((gamemode_heights[state.player.gamemode] + 60.f) / 2.f)) / 30.f)) * 30;
-                            state.ceiling_y = state.ground_y + gamemode_heights[state.player.gamemode];
-                            set_intended_ceiling();
+                            state.groundY = fmaxf(0, ip1Ceilf((state.dualPortalY - ((gamemodeHeights[state.player.gamemode] + 60.f) / 2.f)) / 30.f)) * 30;
+                            state.ceilingY = state.groundY + gamemodeHeights[state.player.gamemode];
+                            setIntendedCeiling();
                     }
                     
-                    MotionTrail_StopStroke(&trail_p2);
-                    MotionTrail_StopStroke(&wave_trail_p2);
+                    motionTrailStopStroke(&trailP2);
+                    motionTrailStopStroke(&waveTrailP2);
                     
-                    UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                    UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
                     if (effect) {
                         effect->def.colorR = 145 / 255.f;
                         effect->def.colorG = 255 / 255.f;
@@ -1536,40 +1536,40 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             if (!GET_ACTIVATED(obj)) {
                 SET_ACTIVATED(obj, true);
 
-                bool is_collected = is_coin_collected(obj);
+                bool isCollected = isCoinCollected(obj);
 
-                if (state.practice_mode) break;
+                if (state.practiceMode) break;
 
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &coin_use_effect, get_use_effect_array_ptr(GFX_TOP));
+                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &coinUseEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 1.f;
-                    effect->def.colorG = state.custom_level ? 1.f : 190 / 255.f;
-                    effect->def.colorB = state.custom_level ? 1.f : 0 / 255.f;
+                    effect->def.colorG = state.customLevel ? 1.f : 190 / 255.f;
+                    effect->def.colorB = state.customLevel ? 1.f : 0 / 255.f;
                 }
 
-                UseEffect *effect2 = add_use_effect(objects.x[obj], objects.y[obj], obj, &coin_radius_effect, get_use_effect_array_ptr(GFX_TOP));
+                UseEffect *effect2 = addUseEffect(objects.x[obj], objects.y[obj], obj, &coinRadiusEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect2) {
                     effect2->def.colorR = 1.f;
-                    effect2->def.colorG = state.custom_level ? 1.f : 190 / 255.f;
-                    effect2->def.colorB = state.custom_level ? 1.f : 0 / 255.f;
+                    effect2->def.colorG = state.customLevel ? 1.f : 190 / 255.f;
+                    effect2->def.colorB = state.customLevel ? 1.f : 0 / 255.f;
                 }
-                coin_pickup_particles.emitterX = objects.x[obj];
-                coin_pickup_particles.emitterY = objects.y[obj];
-                spawnMultipleParticles(&coin_pickup_particles, 40);
+                coinPickupParticles.emitterX = objects.x[obj];
+                coinPickupParticles.emitterY = objects.y[obj];
+                spawnMultipleParticles(&coinPickupParticles, 40);
 
                 
-                start_collect_effect(objects.x[obj], objects.y[obj], is_collected);
+                startCollectEffect(objects.x[obj], objects.y[obj], isCollected);
                 
-                int coin_id = objects.coin_id[obj];
-                switch (coin_id) {
+                int coinID = objects.coinID[obj];
+                switch (coinID) {
                     case 0:
-                        state.current_data.coin1 = true;
+                        state.currentData.coin1 = true;
                         break;
                     case 1:
-                        state.current_data.coin2 = true;
+                        state.currentData.coin2 = true;
                         break;
                     case 2:
-                        state.current_data.coin3 = true;
+                        state.currentData.coin3 = true;
                         break;
                 }
 
@@ -1579,21 +1579,21 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         }
         case S_MODIFIERBLOCK:
             if (player->dashing) {
-                stop_dashing(player);
-                player->holding_jump_cancelled = true;
+                stopDashing(player);
+                player->holdingJumpCancelled = true;
             }
             break;
 
         case D_MODIFIERBLOCK:
-            player->allow_dart_slide = true;
+            player->allowDartSlide = true;
             break;
 
         case J_MODIFIERBLOCK:
-            if (player->last_orb_pressed >= 0) player->holding_jump_cancelled = true;
+            if (player->lastOrbPressed >= 0) player->holdingJumpCancelled = true;
             break;
 
         case H_MODIFIERBLOCK:
-            player->allow_head_hit = true;
+            player->allowHeadHit = true;
             break;
 
         case 1329:
@@ -1604,30 +1604,30 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
     if (!GET_COLLIDED(obj)) SET_HITBOX_COUNTER(obj, GET_HITBOX_COUNTER(obj) + 1); 
 }
 
-void get_corners(float cx, float cy, float w, float h, float angle, Vec2D out[4]) {
+void getCorners(float cx, float cy, float w, float h, float angle, Vec2D out[4]) {
     float hw = w * 0.5f, hh = h * 0.5f;
     angle = -angle;
     float rad = C3D_AngleFromDegrees(angle);
-    float cos_a = cosf(rad), sin_a = sinf(rad);
+    float cosA = cosf(rad), sinA = sinf(rad);
     
     // Precompute rotated half-dimensions
-    float hw_cos = hw * cos_a, hw_sin = hw * sin_a;
-    float hh_cos = hh * cos_a, hh_sin = hh * sin_a;
+    float hwCos = hw * cosA, hwSin = hw * sinA;
+    float hhCos = hh * cosA, hhSin = hh * sinA;
     
-    out[0].x = cx - hw_cos + hh_sin;
-    out[0].y = cy - hw_sin - hh_cos;
+    out[0].x = cx - hwCos + hhSin;
+    out[0].y = cy - hwSin - hhCos;
     
-    out[1].x = cx + hw_cos + hh_sin;
-    out[1].y = cy + hw_sin - hh_cos;
+    out[1].x = cx + hwCos + hhSin;
+    out[1].y = cy + hwSin - hhCos;
     
-    out[2].x = cx + hw_cos - hh_sin;
-    out[2].y = cy + hw_sin + hh_cos;
+    out[2].x = cx + hwCos - hhSin;
+    out[2].y = cy + hwSin + hhCos;
     
-    out[3].x = cx - hw_cos - hh_sin;
-    out[3].y = cy - hw_sin + hh_cos;
+    out[3].x = cx - hwCos - hhSin;
+    out[3].y = cy - hwSin + hhCos;
 }
 
-static bool sat_overlap_exclusive(const Vec2D a[4], const Vec2D b[4]) {
+static bool satOverlapExclusive(const Vec2D a[4], const Vec2D b[4]) {
     // Test all axes (normals of edges)
     for (int shape = 0; shape < 2; ++shape) {
         const Vec2D *verts = (shape == 0) ? a : b;
@@ -1656,24 +1656,24 @@ static bool sat_overlap_exclusive(const Vec2D a[4], const Vec2D b[4]) {
     return true;
 }
 
-bool intersect_exclusive(float x1, float y1, float w1, float h1, float angle1,
+bool intersectExclusive(float x1, float y1, float w1, float h1, float angle1,
                     float x2, float y2, float w2, float h2, float angle2) {
     // Tighter AABB check
-    float max_extent = fmaxf(w1, h1) + fmaxf(w2, h2);
+    float maxExtent = fmaxf(w1, h1) + fmaxf(w2, h2);
     float dx = fabsf(x1 - x2);
     float dy = fabsf(y1 - y2);
     
-    if (dx > max_extent || dy > max_extent) {
+    if (dx > maxExtent || dy > maxExtent) {
         return false;
     }
     
     Vec2D rect1[4], rect2[4];
-    get_corners(x1, y1, w1, h1, angle1, rect1);
-    get_corners(x2, y2, w2, h2, angle2, rect2);
-    return sat_overlap_exclusive(rect1, rect2);
+    getCorners(x1, y1, w1, h1, angle1, rect1);
+    getCorners(x2, y2, w2, h2, angle2, rect2);
+    return satOverlapExclusive(rect1, rect2);
 }
 
-static bool sat_overlap(const Vec2D a[4], const Vec2D b[4]) {
+static bool satOverlap(const Vec2D a[4], const Vec2D b[4]) {
     // Test all axes (normals of edges)
     for (int shape = 0; shape < 2; ++shape) {
         const Vec2D *verts = (shape == 0) ? a : b;
@@ -1705,35 +1705,35 @@ static bool sat_overlap(const Vec2D a[4], const Vec2D b[4]) {
 bool intersect(float x1, float y1, float w1, float h1, float angle1,
                     float x2, float y2, float w2, float h2, float angle2) {
     // Tighter AABB check
-    float max_extent = fmaxf(w1, h1) + fmaxf(w2, h2);
+    float maxExtent = fmaxf(w1, h1) + fmaxf(w2, h2);
     float dx = fabsf(x1 - x2);
     float dy = fabsf(y1 - y2);
     
-    if (dx > max_extent || dy > max_extent) {
+    if (dx > maxExtent || dy > maxExtent) {
         return false;
     }
     
     Vec2D rect1[4], rect2[4];
-    get_corners(x1, y1, w1, h1, angle1, rect1);
-    get_corners(x2, y2, w2, h2, angle2, rect2);
-    return sat_overlap(rect1, rect2);
+    getCorners(x1, y1, w1, h1, angle1, rect1);
+    getCorners(x2, y2, w2, h2, angle2, rect2);
+    return satOverlap(rect1, rect2);
 }
 
-bool intersect_rect_circle(float rx, float ry, float rw, float rh, float rangle,
+bool intersectRectCircle(float rx, float ry, float rw, float rh, float rangle,
                           float cx, float cy, float cradius) {
     // If centers are too far apart, no collision
-    float max_dim = fmaxf(rw, rh);
-    float max_dist = (max_dim / 2.0f) + cradius;
-    if (fabsf(rx - cx) > max_dist || fabsf(ry - cy) > max_dist) {
+    float maxDim = fmaxf(rw, rh);
+    float maxDist = (maxDim / 2.0f) + cradius;
+    if (fabsf(rx - cx) > maxDist || fabsf(ry - cy) > maxDist) {
         return false;
     }
 
     // Transform circle center into rectangle's local space
     float rad = -C3D_AngleFromDegrees(rangle); // negative for inverse rotation
-    float cos_a = cosf(rad), sin_a = sinf(rad);
+    float cosA = cosf(rad), sinA = sinf(rad);
 
-    float local_cx = cos_a * (cx - rx) - sin_a * (cy - ry) + rx;
-    float local_cy = sin_a * (cx - rx) + cos_a * (cy - ry) + ry;
+    float localCx = cosA * (cx - rx) - sinA * (cy - ry) + rx;
+    float localCy = sinA * (cx - rx) + cosA * (cy - ry) + ry;
 
     // Rectangle bounds
     float left   = rx - rw / 2.0f;
@@ -1742,22 +1742,22 @@ bool intersect_rect_circle(float rx, float ry, float rw, float rh, float rangle,
     float bottom = ry + rh / 2.0f;
 
     // Find closest point on rectangle to circle center
-    float closest_x = fmaxf(left, fminf(local_cx, right));
-    float closest_y = fmaxf(top,  fminf(local_cy, bottom));
+    float closestX = fmaxf(left, fminf(localCx, right));
+    float closestY = fmaxf(top,  fminf(localCy, bottom));
 
     // Distance from circle center to closest point
-    float dx = local_cx - closest_x;
-    float dy = local_cy - closest_y;
-    float dist_sq = dx * dx + dy * dy;
+    float dx = localCx - closestX;
+    float dy = localCy - closestY;
+    float distSq = dx * dx + dy * dy;
 
-    return dist_sq <= cradius * cradius;
+    return distSq <= cradius * cradius;
 }
 // Dot product helper
 float dot(float x1, float y1, float x2, float y2) {
     return x1 * x2 + y1 * y2;
 }
 
-bool circle_rect_collision(float cx, float cy, float radius,
+bool circleRectCollision(float cx, float cy, float radius,
                            float x1, float y1, float x2, float y2) {
     // Vector from point 1 to circle center
     float dx = x2 - x1;
@@ -1765,8 +1765,8 @@ bool circle_rect_collision(float cx, float cy, float radius,
     float fx = cx - x1;
     float fy = cy - y1;
 
-    float len_sq = dx * dx + dy * dy;
-    float t = dot(fx, fy, dx, dy) / len_sq;
+    float lenSq = dx * dx + dy * dy;
+    float t = dot(fx, fy, dx, dy) / lenSq;
 
     // Clamp t to the [0,1] range to stay within the segment
     if (t < 0.0f) t = 0.0f;
@@ -1784,96 +1784,96 @@ bool circle_rect_collision(float cx, float cy, float radius,
     return distSq <= radius * radius;
 }
 
-static float moving_surface_velocity(Player *player, int obj) {
-    if (move_step_dt <= 0.f) return 0.f;
-    return grav(player, objects.y[obj] - objects.last_y[obj]) / move_step_dt;
+static float movingSurfaceVelocity(Player *player, int obj) {
+    if (moveStepDt <= 0.f) return 0.f;
+    return grav(player, objects.y[obj] - objects.lastY[obj]) / moveStepDt;
 }
 
-static bool moving_support_crossed(Player *player, int obj, float velocity) {
+static bool movingSupportCrossed(Player *player, int obj, float velocity) {
     if (velocity <= MINIMUM_OBJECT_SPEED || player->gamemode == GAMEMODE_WAVE ||
-        player->upside_down != state.old_player.upside_down || player->just_teleported) return false;
-    float old_top = grav(player, objects.last_y[obj]) + objects.height[obj] * .5f;
-    float new_top = obj_gravTop(player, obj);
-    return gravBottom(&state.old_player) >= old_top - .001f &&
-        gravBottom(player) <= new_top && player->vel_y <= velocity;
+        player->upsideDown != state.oldPlayer.upsideDown || player->justTeleported) return false;
+    float oldTop = grav(player, objects.lastY[obj]) + objects.height[obj] * .5f;
+    float newTop = objGravTop(player, obj);
+    return gravBottom(&state.oldPlayer) >= oldTop - .001f &&
+        gravBottom(player) <= newTop && player->velY <= velocity;
 }
 
-static void finish_moving_contact(Player *player) {
-    bool reset = state.dead || player->upside_down != state.old_player.upside_down || player->just_teleported ||
-        player->gamemode != state.old_player.gamemode || player->gamemode == GAMEMODE_WAVE ||
-        player->slope_data.slope_id >= 0;
+static void finishMovingContact(Player *player) {
+    bool reset = state.dead || player->upsideDown != state.oldPlayer.upsideDown || player->justTeleported ||
+        player->gamemode != state.oldPlayer.gamemode || player->gamemode == GAMEMODE_WAVE ||
+        player->slopeData.slopeID >= 0;
     float launch;
-    if (!reset && platform_launch(grav(player, player->last_platform_velocity), grav(player, player->platform_velocity),
-        player->vel_y, STEPS_DT, &launch)) {
-        player->vel_y = launch;
-        player->velocity_override = true;
-        player->on_ground = player->on_ceiling = false;
-        player->left_ground = true;
-        player->inverse_rotation = player->gamemode == GAMEMODE_PLAYER;
-        if (state.show_player) MotionTrail_ResumeStroke(trail);
+    if (!reset && platformLaunch(grav(player, player->lastPlatformVelocity), grav(player, player->platformVelocity),
+        player->velY, STEPS_DT, &launch)) {
+        player->velY = launch;
+        player->velocityOverride = true;
+        player->onGround = player->onCeiling = false;
+        player->leftGround = true;
+        player->inverseRotation = player->gamemode == GAMEMODE_PLAYER;
+        if (state.showPlayer) motionTrailResumeStroke(trail);
     }
-    player->last_platform_velocity = reset ? 0.f : player->platform_velocity;
+    player->lastPlatformVelocity = reset ? 0.f : player->platformVelocity;
 }
 
-void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
-    InternalHitbox internal = player->internal_hitbox;
+void handleCollision(Player *player, int obj, const ObjectHitbox *hitbox) {
+    InternalHitbox internal = player->internalHitbox;
 
     float clip = (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_UFO) ? 7 : 10;
-    switch (hitbox->collision_type) {
+    switch (hitbox->collisionType) {
         //case HITBOX_BREAKABLE_BLOCK:
         case HITBOX_SOLID: {
             bool gravSnap = false;
 
             float x = objects.x[obj];
             float y = objects.y[obj];
-            float object_raw_vel = moving_surface_velocity(player, obj);
-            bool moving_support = moving_support_crossed(player, obj, object_raw_vel);
+            float objectRawVel = movingSurfaceVelocity(player, obj);
+            bool movingSupport = movingSupportCrossed(player, obj, objectRawVel);
 
             // This is equal to using the old player y position (a frame of snap leeway)
-            clip += fabsf(player->vel_y) * STEPS_DT;
+            clip += fabsf(player->velY) * STEPS_DT;
 
-            bool mode_snap = state.old_player.gamemode != player->gamemode && state.old_player.gamemode == GAMEMODE_WAVE && player->allow_dart_slide;
+            bool modeSnap = state.oldPlayer.gamemode != player->gamemode && state.oldPlayer.gamemode == GAMEMODE_WAVE && player->allowDartSlide;
 
-            if (mode_snap) clip += (player->height - state.old_player.height) / 2;
+            if (modeSnap) clip += (player->height - state.oldPlayer.height) / 2;
             
-            if (player->ceiling_inv_time > 0) {
+            if (player->ceilingInvTime > 0) {
                 // Only do the funny grav snap if player is touching a gravity object and internal hitbox is touching block
                 bool internalCollidingBlock = intersect(
                     player->x, player->y, internal.width, internal.height, 0, 
                     x, y, objects.width[obj], objects.height[obj], objects.rotation[obj]
                 );
 
-                float diff = obj_gravBottom(player, obj) - gravInternalBottom(player);
+                float diff = objGravBottom(player, obj) - gravInternalBottom(player);
 
                 gravSnap = internalCollidingBlock && (diff >= 0 && diff <= clip);
             }
 
-            bool safeZone = player->mini && ((obj_gravTop(player, obj) - gravBottom(player) <= clip) || (gravTop(player) - obj_gravBottom(player, obj) <= clip));
+            bool safeZone = player->mini && ((objGravTop(player, obj) - gravBottom(player) <= clip) || (gravTop(player) - objGravBottom(player, obj) <= clip));
             
-            bool dart_slide = player->gamemode == GAMEMODE_WAVE && player->allow_dart_slide &&
+            bool dartSlide = player->gamemode == GAMEMODE_WAVE && player->allowDartSlide &&
                 objects.id[obj] != BREAKABLE_BLOCK &&
-                ((((obj_gravTop(player, obj) - gravBottom(player) <= clip) || moving_support) && player->vel_y <= fmaxf(object_raw_vel, 0)) ||
-                ((gravTop(player) - obj_gravBottom(player, obj) <= clip) && player->vel_y >= object_raw_vel));
+                ((((objGravTop(player, obj) - gravBottom(player) <= clip) || movingSupport) && player->velY <= fmaxf(objectRawVel, 0)) ||
+                ((gravTop(player) - objGravBottom(player, obj) <= clip) && player->velY >= objectRawVel));
 
-            bool land_face = ((obj_gravTop(player, obj) - gravBottom(player) <= clip) || moving_support) && player->vel_y <= fmaxf(object_raw_vel, 0);
-            bool ceil_face = (gravTop(player) - obj_gravBottom(player, obj) <= clip) && player->vel_y >= object_raw_vel;
-            float snap_gap = land_face ? (obj_gravTop(player, obj) - gravBottom(player)) : (gravTop(player) - obj_gravBottom(player, obj));
-            bool snap_grace = mode_snap && (land_face || ceil_face) && snap_gap > 0.f && snap_gap <= player->height / 2;
+            bool landFace = ((objGravTop(player, obj) - gravBottom(player) <= clip) || movingSupport) && player->velY <= fmaxf(objectRawVel, 0);
+            bool ceilFace = (gravTop(player) - objGravBottom(player, obj) <= clip) && player->velY >= objectRawVel;
+            float snapGap = landFace ? (objGravTop(player, obj) - gravBottom(player)) : (gravTop(player) - objGravBottom(player, obj));
+            bool snapGrace = modeSnap && (landFace || ceilFace) && snapGap > 0.f && snapGap <= player->height / 2;
 
             // Check collision with internal hitbox
-            if (!dart_slide && !snap_grace && (player->gamemode == GAMEMODE_WAVE || (!gravSnap && !safeZone && !moving_support)) && intersect(
+            if (!dartSlide && !snapGrace && (player->gamemode == GAMEMODE_WAVE || (!gravSnap && !safeZone && !movingSupport)) && intersect(
                 player->x, player->y, internal.width, internal.height, 0, 
                 x, y, objects.width[obj], objects.height[obj], 0
             )) {
                 if (objects.id[obj] == BREAKABLE_BLOCK) {
                     // Spawn breakable brick particles
-                    brick_destroy_particles.emitterX = x;
-                    brick_destroy_particles.emitterY = y;
-                    spawnMultipleParticles(&brick_destroy_particles, 25);
+                    brickDestroyParticles.emitterX = x;
+                    brickDestroyParticles.emitterY = y;
+                    spawnMultipleParticles(&brickDestroyParticles, 25);
                     objects.flags[obj] |= FLAG_TOGGLED;
                 } else {
                     // Not a brick, die
-                    kill_player(DEATH_BLOCK);
+                    killPlayer(DEATH_BLOCK);
                 }
 
                 return;
@@ -1882,8 +1882,8 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
             float bottom = gravBottom(player);
 
             // If you are on a slope, check more stuff (this is less shit than before)
-            if (player->slope_data.slope_id >= 0) {
-                int orient = grav_slope_orient(player->slope_data.slope_id, player);
+            if (player->slopeData.slopeID >= 0) {
+                int orient = gravSlopeOrient(player->slopeData.slopeID, player);
 
                 // Down slope must never exit
                 bool downSlope = (orient == ORIENT_NORMAL_DOWN || orient == ORIENT_UD_DOWN);
@@ -1891,155 +1891,155 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                     return;
                 }
                 // Check if block should collide with player, then bye bye slope
-                if (obj_getRight(obj) >= player->x) {
-                    clear_slope_data(player);
-                    clear_slope_data(&state.old_player);
-                    clear_coyote_slope_data(player);
-                    clear_coyote_slope_data(&state.old_player);
-                    player->on_ground = true;
+                if (objGetRight(obj) >= player->x) {
+                    clearSlopeData(player);
+                    clearSlopeData(&state.oldPlayer);
+                    clearCoyoteSlopeData(player);
+                    clearCoyoteSlopeData(&state.oldPlayer);
+                    player->onGround = true;
                 }
             }
 
             // Check for slopes so this block doesn't catch up a down going slope  
-            for (int i = 0; i < potential_slopes[state.current_player]; i++) {
-                int potential_slope = potential_slopes_buffer[state.current_player][i];
+            for (int i = 0; i < potentialSlopes[state.currentPlayer]; i++) {
+                int potentialSlope = potentialSlopesBuffer[state.currentPlayer][i];
 
-                unsigned char orient = objects.orientation[potential_slope];
-                float block_comp = orient < 2 ? obj_getTop(obj) : obj_getBottom(obj);
-                float slope_comp = orient < 2 ? obj_getBottom(potential_slope) : obj_getTop(potential_slope);
+                unsigned char orient = objects.orientation[potentialSlope];
+                float blockComp = orient < 2 ? objGetTop(obj) : objGetBottom(obj);
+                float slopeComp = orient < 2 ? objGetBottom(potentialSlope) : objGetTop(potentialSlope);
 
-                if (block_comp - slope_comp < 2) {
+                if (blockComp - slopeComp < 2) {
                     return;
                 }
             }
 
             // Check snap for player bottom
-            if ((obj_gravTop(player, obj) - bottom <= clip || moving_support) && player->vel_y <= fmaxf(object_raw_vel, 0) && (player->gamemode != GAMEMODE_WAVE || player->allow_dart_slide)) {
-                player->y = grav(player, obj_gravTop(player, obj)) + grav(player, player->height / 2);
-                if (player->vel_y <= 0) player->vel_y = 0;
-                player->on_ground = true;
-                player->inverse_rotation = false;
-                player->time_since_ground = 0;
-                player_non_flying_landing(player);
+            if ((objGravTop(player, obj) - bottom <= clip || movingSupport) && player->velY <= fmaxf(objectRawVel, 0) && (player->gamemode != GAMEMODE_WAVE || player->allowDartSlide)) {
+                player->y = grav(player, objGravTop(player, obj)) + grav(player, player->height / 2);
+                if (player->velY <= 0) player->velY = 0;
+                player->onGround = true;
+                player->inverseRotation = false;
+                player->timeSinceGround = 0;
+                playerNonFlyingLanding(player);
 
-                player->collided_block = obj;
-                player->platform_velocity = grav(player, fmaxf(0.f, object_raw_vel) * .9f);
-                if (object_raw_vel > MINIMUM_OBJECT_SPEED)
-                    player->vel_y = fmaxf(player->vel_y, object_raw_vel * .9f);
+                player->collidedBlock = obj;
+                player->platformVelocity = grav(player, fmaxf(0.f, objectRawVel) * .9f);
+                if (objectRawVel > MINIMUM_OBJECT_SPEED)
+                    player->velY = fmaxf(player->velY, objectRawVel * .9f);
 
                 if (player->gamemode == GAMEMODE_PLAYER) {
                     // Check for x snap
-                    if (!state.old_player.on_ground) {
-                        if (player->snap_data.player_frame > 0 && player->snap_data.player_frame + 1 < player->frame) {
+                    if (!state.oldPlayer.onGround) {
+                        if (player->snapData.playerFrame > 0 && player->snapData.playerFrame + 1 < player->frame) {
                             trySnap(obj, player);
                         }
                     }
 
-                    player->snap_data.player_frame = level_frame;
-                    player->snap_data.object_id = obj;
-                    player->snap_data.player_snap_diff = player->x - x;
+                    player->snapData.playerFrame = levelFrame;
+                    player->snapData.objectID = obj;
+                    player->snapData.playerSnapDiff = player->x - x;
                 }
             // Check snap for player top
-            } else if (player->gamemode != GAMEMODE_WAVE || player->allow_dart_slide) {
+            } else if (player->gamemode != GAMEMODE_WAVE || player->allowDartSlide) {
                 // Ufo can break breakable blocks from above, so dont use as a ceiling
                 if (player->gamemode == GAMEMODE_UFO && objects.id[obj] == BREAKABLE_BLOCK) {
                     break;
                 }
                 // Behave normally
-                if ((player->gamemode != GAMEMODE_PLAYER && player->gamemode != GAMEMODE_ROBOT && player->gamemode != GAMEMODE_SPIDER) || gravSnap || player->allow_head_hit) {
-                    if (((gravTop(player) - obj_gravBottom(player, obj) <= clip && player->vel_y >= object_raw_vel) || gravSnap)) {
-                        if (!gravSnap) player->on_ceiling = true;
-                        else player->vel_y = 0;
-                        player->inverse_rotation = false;
-                        player->time_since_ground = 0;
-                        player->y = grav(player, obj_gravBottom(player, obj)) - grav(player, player->height / 2);
-                        if (player->vel_y >= 0) player->vel_y = 0;
+                if ((player->gamemode != GAMEMODE_PLAYER && player->gamemode != GAMEMODE_ROBOT && player->gamemode != GAMEMODE_SPIDER) || gravSnap || player->allowHeadHit) {
+                    if (((gravTop(player) - objGravBottom(player, obj) <= clip && player->velY >= objectRawVel) || gravSnap)) {
+                        if (!gravSnap) player->onCeiling = true;
+                        else player->velY = 0;
+                        player->inverseRotation = false;
+                        player->timeSinceGround = 0;
+                        player->y = grav(player, objGravBottom(player, obj)) - grav(player, player->height / 2);
+                        if (player->velY >= 0) player->velY = 0;
                     }
                 }
             }
             break;
         }
         case HITBOX_HAZARD: {
-            kill_player(hitbox->type == COLLISION_CIRCLE ? DEATH_SAW : DEATH_SPIKE);
+            killPlayer(hitbox->type == COLLISION_CIRCLE ? DEATH_SAW : DEATH_SPIKE);
             break;
         }
         case HITBOX_SPECIAL: {
-            handle_special_hitbox(player, obj, hitbox);
+            handleSpecialHitbox(player, obj, hitbox);
             break;
         }
     }
 }
 
-void handle_moving_block(Player *player, int obj) {
+void handleMovingBlock(Player *player, int obj) {
     if (obj < 0 || obj >= objects.count || objects.flags[obj] & FLAG_TOGGLED ||
-        !state.old_player.on_ground || player->vel_y > 0.f || player->just_teleported ||
-        player->upside_down != state.old_player.upside_down) return;
+        !state.oldPlayer.onGround || player->velY > 0.f || player->justTeleported ||
+        player->upsideDown != state.oldPlayer.upsideDown) return;
     if (fabsf(player->x - objects.x[obj]) > (player->width + objects.width[obj]) * .5f) return;
-    float velocity = moving_surface_velocity(player, obj);
+    float velocity = movingSurfaceVelocity(player, obj);
     if (velocity < 0.f && velocity >= -MINIMUM_OBJECT_SPEED)
-        player->y += objects.y[obj] - objects.last_y[obj];
+        player->y += objects.y[obj] - objects.lastY[obj];
 }
 
-void collide_with_obj(Player *player, int obj) {
-    int obj_id = objects.id[obj];
-    const ObjectHitbox *hitbox = game_objects[obj_id].hitbox;
+void collideWithObj(Player *player, int obj) {
+    int objID = objects.id[obj];
+    const ObjectHitbox *hitbox = gameObjects[objID].hitbox;
 
     if (!hitbox || objects.flags[obj] & FLAG_TOGGLED) return;
 
-    snapshot.collision_checks++;
+    snapshot.collisionChecks++;
 
     // hitbox offset by object rotation
     float angle = -objects.rotation[obj];
-    float rot_rad = C3D_AngleFromDegrees(adjust_angle_y(angle, objects.flippedH[obj]));
-    float cos_r = cosf(rot_rad), sin_r = sinf(rot_rad);
+    float rot_rad = C3D_AngleFromDegrees(adjustAngleY(angle, objects.flippedH[obj]));
+    float cosR = cosf(rot_rad), sinR = sinf(rot_rad);
 
-    float raw_off_x = hitbox->x * objects.scale_x[obj];
-    float raw_off_y = hitbox->y * objects.scale_y[obj];
+    float rawOffX = hitbox->x * objects.scaleX[obj];
+    float rawOffY = hitbox->y * objects.scaleY[obj];
 
-    float off_x = raw_off_x * cos_r - raw_off_y * sin_r;
-    float off_y = raw_off_x * sin_r + raw_off_y * cos_r;
+    float offX = rawOffX * cosR - rawOffY * sinR;
+    float offY = rawOffX * sinR + rawOffY * cosR;
     
-    float x = objects.x[obj] + off_x;
-    float y = objects.y[obj] + off_y;
+    float x = objects.x[obj] + offX;
+    float y = objects.y[obj] + offY;
     float width = objects.width[obj];
     float height = objects.height[obj];
 
     if (UNLIKELY(hitbox->type == COLLISION_CIRCLE)) {
-        if (intersect_rect_circle(
+        if (intersectRectCircle(
             player->x, player->y, player->width, player->height, 0, 
             x, y, objects.width[obj]
         )) {
-            handle_collision(player, obj, hitbox);
+            handleCollision(player, obj, hitbox);
             SET_COLLIDED(obj, true);
             snapshot.collisions++;
         } else {
             SET_COLLIDED(obj, false);
         }
     } else {
-        float obj_rot = normalize_angle(objects.rotation[obj]);
+        float objRot = normalizeAngle(objects.rotation[obj]);
 
         // No rotation for solid hitboxes
-        if (hitbox->collision_type == HITBOX_SOLID) {
-            obj_rot = 0;
+        if (hitbox->collisionType == HITBOX_SOLID) {
+            objRot = 0;
         }
 
-        float rotation = (obj_rot == 0 || obj_rot == 90 || obj_rot == 180 || obj_rot == 270) ? 0 : player->rotation;
+        float rotation = (objRot == 0 || objRot == 90 || objRot == 180 || objRot == 270) ? 0 : player->rotation;
         
         bool checkColl = intersect(
             player->x, player->y, player->width, player->height, rotation, 
-            x, y, width, height, obj_rot
+            x, y, width, height, objRot
         );
 
         // Rotated hitboxes must also collide with the unrotated hitbox
         if (rotation != 0) {
             checkColl = checkColl && intersect(
                 player->x, player->y, player->width, player->height, 0, 
-                x, y, width, height, obj_rot
+                x, y, width, height, objRot
             );
         }
 
         if (checkColl) {
-            handle_collision(player, obj, hitbox);
+            handleCollision(player, obj, hitbox);
             SET_COLLIDED(obj, true);
             snapshot.collisions++;
         } else {
@@ -2048,41 +2048,41 @@ void collide_with_obj(Player *player, int obj) {
     }
 }
 
-void collide_with_slope(Player *player, int obj, bool has_slope) {
-    const ObjectHitbox *hitbox = game_objects[objects.id[obj]].hitbox;
+void collideWithSlope(Player *player, int obj, bool hasSlope) {
+    const ObjectHitbox *hitbox = gameObjects[objects.id[obj]].hitbox;
     
     if (!hitbox || objects.flags[obj] & FLAG_TOGGLED) return;
     
     float width = objects.width[obj];
     float height = objects.height[obj];
 
-    if (intersect_exclusive(
+    if (intersectExclusive(
         player->x, player->y, player->width, player->height, 0, 
         objects.x[obj], objects.y[obj], width, height, 0
     )) {
-        slope_collide(obj, player);
+        slopeCollide(obj, player);
     }
 }
 
-int slope_buffer[MAX_COLLIDED_OBJECTS];
-int slope_count = 0;
+int slopeBuffer[MAX_COLLIDED_OBJECTS];
+int slopeCount = 0;
 
-int block_buffer[MAX_COLLIDED_OBJECTS];
-int block_count = 0;
+int blockBuffer[MAX_COLLIDED_OBJECTS];
+int blockCount = 0;
 
-int hazard_buffer[MAX_COLLIDED_OBJECTS];
-int hazard_count = 0;
+int hazardBuffer[MAX_COLLIDED_OBJECTS];
+int hazardCount = 0;
 
-int potential_slopes_buffer[2][MAX_COLLIDED_OBJECTS];
-int potential_slopes[2];
+int potentialSlopesBuffer[2][MAX_COLLIDED_OBJECTS];
+int potentialSlopes[2];
 
-void collide_with_objects(Player *player) {
-    player->platform_velocity = 0.f;
-    player->last_collided_block = player->collided_block;
-    player->collided_block = -1;
+void collideWithObjects(Player *player) {
+    player->platformVelocity = 0.f;
+    player->lastCollidedBlock = player->collidedBlock;
+    player->collidedBlock = -1;
 
-    if (player->last_collided_block >= 0) {
-        handle_moving_block(player, player->last_collided_block);
+    if (player->lastCollidedBlock >= 0) {
+        handleMovingBlock(player, player->lastCollidedBlock);
     }
     
     int sx = (int)(player->x / SECTION_SIZE);
@@ -2090,66 +2090,66 @@ void collide_with_objects(Player *player) {
     
     for (int dx = -1; dx <= 1; dx++) {
         for (int dy = -1; dy <= 1; dy++) {
-            Section *sec = get_section(sx + dx, sy + dy);
-            for (int i = 0; i < sec->object_count; i++) {
+            Section *sec = getSection(sx + dx, sy + dy);
+            for (int i = 0; i < sec->objectCount; i++) {
                 int obj = sec->objects[i];
 
                 // Skip invalid objects
-                if (!is_valid_object(objects.id[obj])) continue;
+                if (!isValidObject(objects.id[obj])) continue;
 
-                const ObjectHitbox *hitbox = game_objects[objects.id[obj]].hitbox;
+                const ObjectHitbox *hitbox = gameObjects[objects.id[obj]].hitbox;
 
                 if (!hitbox) continue;
                 
                 // Save some types to buffer, so they can be checked in a type order
-                if (hitbox->collision_type == HITBOX_SOLID) {
+                if (hitbox->collisionType == HITBOX_SOLID) {
                     if (hitbox->type == COLLISION_SLOPE) {
-                        if (slope_count < MAX_COLLIDED_OBJECTS) {
-                            slope_buffer[slope_count++] = obj;
+                        if (slopeCount < MAX_COLLIDED_OBJECTS) {
+                            slopeBuffer[slopeCount++] = obj;
                         }
                     } else {
-                        if (block_count < MAX_COLLIDED_OBJECTS) {
-                            block_buffer[block_count++] = obj;
+                        if (blockCount < MAX_COLLIDED_OBJECTS) {
+                            blockBuffer[blockCount++] = obj;
                         }
                     }
-                } else if (hitbox->collision_type == HITBOX_HAZARD) {
-                    if (hazard_count < MAX_COLLIDED_OBJECTS) {
-                        hazard_buffer[hazard_count++] = obj;
+                } else if (hitbox->collisionType == HITBOX_HAZARD) {
+                    if (hazardCount < MAX_COLLIDED_OBJECTS) {
+                        hazardBuffer[hazardCount++] = obj;
                     }
                 } else { // HITBOX_SPECIAL
-                    collide_with_obj(player, obj);
+                    collideWithObj(player, obj);
                 }
             }
         }
     }
 
-    if (player->left_ground) {
-        clear_slope_data(player);
+    if (player->leftGround) {
+        clearSlopeData(player);
     }
 
     // Check blocks
-    for (int i = 0; i < block_count; i++) {
-        int obj = block_buffer[i];
-        collide_with_obj(player, obj);
+    for (int i = 0; i < blockCount; i++) {
+        int obj = blockBuffer[i];
+        collideWithObj(player, obj);
     }
-    potential_slopes[state.current_player] = 0;
+    potentialSlopes[state.currentPlayer] = 0;
 
     // Check slopes
-    bool has_slope = player->slope_data.slope_id >= 0;
-    for (int i = 0; i < slope_count; i++) {
-        int obj = slope_buffer[i];
-        collide_with_slope(player, obj, has_slope);
+    bool hasSlope = player->slopeData.slopeID >= 0;
+    for (int i = 0; i < slopeCount; i++) {
+        int obj = slopeBuffer[i];
+        collideWithSlope(player, obj, hasSlope);
     }
     
-    finish_moving_contact(player);
+    finishMovingContact(player);
     // Check hazards (spikes, saws)
-    for (int i = 0; i < hazard_count; i++) {
-        int obj = hazard_buffer[i];
-        collide_with_obj(player, obj);
+    for (int i = 0; i < hazardCount; i++) {
+        int obj = hazardBuffer[i];
+        collideWithObj(player, obj);
     }
 
-    player->touching_slope = false;
-    slope_count = 0;
-    block_count = 0;
-    hazard_count = 0;
+    player->touchingSlope = false;
+    slopeCount = 0;
+    blockCount = 0;
+    hazardCount = 0;
 }

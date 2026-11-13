@@ -6,37 +6,37 @@
 bool useNightlyBranch;
 bool doAutoUpdates;
 
-void action_set_nightly(UIElement* e, const UIPropertyList *args) {
+void actionSetNightly(UIElement* e, const UIPropertyList *args) {
     useNightlyBranch = ((UICheckBox *)e)->checked;
 }
 
-void action_set_auto_updates(UIElement* e, const UIPropertyList *args) {
+void actionSetAutoUpdates(UIElement* e, const UIPropertyList *args) {
     doAutoUpdates = ((UICheckBox *)e)->checked;
 }
 
-static void updater_settings_init(UIScreen *s) {
-    ui_set_checkbox_checked(((UICheckBox *)ui_get_element_by_tag(s, "chk_nightly")), useNightlyBranch);
-    ui_set_checkbox_checked(((UICheckBox *)ui_get_element_by_tag(s, "chk_auto_update")), doAutoUpdates);
+static void updaterSettingsInit(UIScreen *s) {
+    uiSetCheckboxChecked(((UICheckBox *)uiGetElementByTag(s, "chk_nightly")), useNightlyBranch);
+    uiSetCheckboxChecked(((UICheckBox *)uiGetElementByTag(s, "chk_auto_update")), doAutoUpdates);
 }
 
-static void updater_settings_exit(UIScreen *s) {
-    cfg_save();
+static void updaterSettingsExit(UIScreen *s) {
+    cfgSave();
 }
 
-static UIActionDef updater_settings_actions[] = {
-    { "nightly", action_set_nightly },
-    { "autoupdate", action_set_auto_updates },
+static UIActionDef updaterSettingsActions[] = {
+    { "nightly", actionSetNightly },
+    { "autoupdate", actionSetAutoUpdates },
 };
 
-extern const UIScreenDefPair updater_settings_def = {
+extern const UIScreenDefPair updaterSettingsDef = {
     .name = "updater_settings",
     .btm = {
         .path = "romfs:/menus/updater_settings.txt",
-        .init = updater_settings_init,
-        .exit = updater_settings_exit,
-        .action_list = {
-            .actions = updater_settings_actions,
-            .action_count = ARRAY_LEN(updater_settings_actions)
+        .init = updaterSettingsInit,
+        .exit = updaterSettingsExit,
+        .actionList = {
+            .actions = updaterSettingsActions,
+            .actionCount = ARRAY_LEN(updaterSettingsActions)
         }
     },
 };
