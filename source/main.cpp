@@ -41,6 +41,7 @@
 #include "particles/circles.hpp"
 #include "particles/lightning.hpp"
 #include "particles/gravity_sweep.hpp"
+#include "particles/divorce_effect.hpp"
 
 #include "level/main_levels.hpp"
 #include "menus/main_menu.hpp"
@@ -1323,6 +1324,9 @@ void gameLoop() {
                 if (state.deathTimer <= 0.f) {
                     initVariables();
                     reloadLevel(); 
+                    resetLightnings();
+                    reset_divorces();
+                    resetGravitySweeps();
                     //resets UI coins on gameplay screen
                     resetCoins();
 
@@ -1396,6 +1400,7 @@ void gameLoop() {
 
             updateAllLightning();
             updateGravitySweeps();
+            update_divorces();
 
             updateRays(delta);
 
@@ -1996,8 +2001,9 @@ int main(int argc, char* argv[]) {
     freeCachedSprites();
     iconCacheShutdown();
 
-    lightningBolts.clear();
-    lightningBolts.shrink_to_fit();
+    resetLightnings();
+    reset_divorces();
+    resetGravitySweeps();
 
     // Delete graphics
     C2D_SpriteSheetFree(spriteSheet);

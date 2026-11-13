@@ -29,6 +29,7 @@
 #include "particles/collectable_effect.hpp"
 
 #include "particles/gravity_sweep.hpp"
+#include "particles/divorce_effect.hpp"
 
 #include "menus/settings_hub/settings.hpp"
 
@@ -1835,25 +1836,59 @@ void updateTints() {
     snapshot.tintMs = ticks / CPU_TICKS_PER_MSEC;
 }
 
+constexpr int placeholderPlayer = -1;
+constexpr int placeholderShineBack = -2;
+constexpr int placeholderShineFront = -3;
 
-void createObjects() {
-    u64 start = svcGetSystemTick();
-
-    spriteCount = 0;
-
-    // Player sprite
-    // Only needs one as its only for sorting purposes
+void insertPlayer(){
     SpriteObject *vo = &viewableObjects[spriteCount];
 
     C2D_Sprite spr = { 0 };
     vo->spr = spr;
-    vo->obj = -1;
+    vo->obj = placeholderPlayer;
     vo->layer = 0;
     vo->colType = 0;
     vo->opacity = 1.f;
     vo->colChannel = 0;
     viewableObjectsPtr[spriteCount] = vo;
     spriteCount++;
+}
+
+void insertShines(){
+    SpriteObject *back = &viewableObjects[spriteCount];
+
+    C2D_Sprite backspr = { 0 };
+    back->spr = backspr;
+    back->obj = placeholderShineBack;
+    back->layer = 0;
+    back->colType = 0;
+    back->opacity = 1.f;
+    back->colChannel = 0;
+    viewableObjectsPtr[spriteCount] = back;
+    spriteCount++;
+
+    SpriteObject *front = &viewableObjects[spriteCount];
+
+    C2D_Sprite frontspr = { 0 };
+    front->spr = frontspr;
+    front->obj = placeholderShineFront;
+    front->layer = 0;
+    front->colType = 0;
+    front->opacity = 1.f;
+    front->colChannel = 0;
+    viewableObjectsPtr[spriteCount] = front;
+    spriteCount++;
+}
+
+
+void createObjects() {
+    u64 start = svcGetSystemTick();
+
+    spriteCount = 0;
+
+    //adds placeholder values which, upon being reached by the renderer, will render the player or shine fx instead
+    insertPlayer();
+    //insertShines();
 
     loadCurrentObject();
 
@@ -2315,6 +2350,7 @@ void drawPlayerGraphics() {
         changeBlending(false);
     }
 
+    draw_divorces();
     drawCheckpoints();
     if (state.showPlayer) {
         drawDashFire(&state.player);
@@ -2336,10 +2372,9 @@ void drawObjects() {
     // Draw
     for (size_t s = 0; s < spriteCount; s++) {
         SpriteObject *obj = viewableObjectsPtr[s];
+        if (obj->hidden) continue;
 
-        if (obj->obj != -1) {
-            if (obj->hidden) continue;
-
+        if (obj->obj >= 0) {
             changeBlending(obj->blending);
 
             if (isCollectableObject(objects.id[obj->obj])) {
@@ -2353,8 +2388,16 @@ void drawObjects() {
             } else {
                 c2dDrawImageFast(&obj->spr.image, &obj->params, &obj->spr.params, obj->tint);
             }
-        } else {   
-            drawPlayerGraphics();
+        } else {
+            switch(obj->obj){
+                case placeholderPlayer:
+                    drawPlayerGraphics();
+                    break;
+                case placeholderShineBack:
+                    break;
+                case placeholderShineFront:
+                    break;
+            }
         }
     }
 

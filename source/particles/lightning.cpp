@@ -152,4 +152,11 @@ void drawAllLightning(){
     }
 }
 
+void addLightning(float start_x, float start_y, float end_x, float end_y, LightningType type){
+    lightningBolts.push_back(Lightning(start_x, start_y, end_x, end_y, type));
+}
+
+void resetLightnings(){
+    lightningBolts.clear();
+    lightningBolts.shrink_to_fit();
 }

@@ -50,5 +50,6 @@ public:
 extern std::deque<Lightning> lightningBolts;
 void updateAllLightning();
 void drawAllLightning();
-
+void addLightning(float start_x, float start_y, float end_x, float end_y, LightningType type);
+void resetLightnings();
 }

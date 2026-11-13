@@ -31,5 +31,5 @@ public:
 void startGravitySweep(bool down);
 void updateGravitySweeps();
 void drawGravitySweeps();
-
+void resetGravitySweeps();
 }

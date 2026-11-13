@@ -68,11 +68,11 @@ bool GravitySweep::done(){
     return this->time > 0.4f;
 }
 
-std::array<GravitySweep, 2> upSweeps = {
+GravitySweep upSweeps[2] = {
     GravitySweep(false),
     GravitySweep(false)
 };
-std::array<GravitySweep, 2> downSweeps = {
+GravitySweep downSweeps[2] = {
     GravitySweep(true),
     GravitySweep(true)
 };
@@ -89,14 +89,10 @@ void startGravitySweep(bool down){
     }
 }
 
-
-void updateGravitySweeps(){
-    for(auto& sweep: upSweeps){
-        sweep.updateSweepTimer();
-    }
-
-    for(auto& sweep: downSweeps){
-        sweep.updateSweepTimer();
+void update_gravity_sweeps(){
+    for(int i = 0; i < 2; i++){
+        upSweeps[i].updateSweepTimer();
+        downSweeps[i].updateSweepTimer();
     }
 }
 
@@ -105,16 +101,18 @@ void drawGravitySweeps(){
     C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
     C2D_ViewScale(1/SCALE, 1/SCALE);
 
-    for(auto& sweep: upSweeps){
-        sweep.renderSweep();
-    }
-
-    for(auto& sweep: downSweeps){
-        sweep.renderSweep();
+    for(int i = 0; i < 2; i++){
+        upSweeps[i].renderSweep();
+        downSweeps[i].renderSweep();
     }
 
     C2D_ViewScale(SCALE, SCALE);
     C2D_ViewTranslate(0, CAM_Y_MTX_OFFSET);
 }
 
+void resetGravitySweeps(){
+    for(int i = 0; i < 2; i++){
+        upSweeps[i] = GravitySweep(false);
+        downSweeps[i] = GravitySweep(true);
+    }
 }

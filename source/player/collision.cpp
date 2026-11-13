@@ -27,6 +27,7 @@
 #include "menus/level_select.hpp"
 #include "particles/lightning.hpp"
 #include "particles/gravity_sweep.hpp"
+#include "particles/divorce_effect.hpp"
 
 namespace gd3ds
 {
@@ -1498,6 +1499,16 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         case DIVORCE_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
                 if (state.dual){
+                    add_divorce(
+                        state.currentPlayer, 
+                        player->gamemode, 
+                        player->x, 
+                        player->y, 
+                        player->rotation, 
+                        player->mini ? 0.6f : 1.0f, 
+                        player->upsideDown
+                    );
+                    
                     state.dual = false;
                     if (state.currentPlayer == 1) {
                         memcpy(&state.player, player, sizeof(Player));
