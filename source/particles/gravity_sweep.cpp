@@ -89,7 +89,7 @@ void startGravitySweep(bool down){
     }
 }
 
-void update_gravity_sweeps(){
+void updateGravitySweeps(){
     for(int i = 0; i < 2; i++){
         upSweeps[i].updateSweepTimer();
         downSweeps[i].updateSweepTimer();
