@@ -160,3 +160,5 @@ void resetLightnings(){
     lightningBolts.clear();
     lightningBolts.shrink_to_fit();
 }
+
+}
