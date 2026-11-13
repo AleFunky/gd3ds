@@ -1,6 +1,7 @@
 #pragma once
 #include "circles.hpp"
 #include <deque>
+namespace gd3ds {
 
 class DivorceEffect {
 private:
@@ -16,13 +17,15 @@ private:
 public:
     DivorceEffect(int player, int gamemode, float x, float y, float rotation, float scale, bool flipY);
 
-    void update_divorce();
-    void draw_divorce();
+    void updateDivorce();
+    void drawDivorce();
     bool done();
     ~DivorceEffect();
 };
 
-void update_divorces();
-void draw_divorces();
-void add_divorce(int player, int gamemode, float x, float y, float rotation, float scale, bool flipY);
-void reset_divorces();
+void updateDivorces();
+void drawDivorces();
+void addDivorce(int player, int gamemode, float x, float y, float rotation, float scale, bool flipY);
+void resetDivorces();
+
+}

@@ -4,6 +4,7 @@
 #include "utils/gfx.hpp"
 #include "state.hpp"
 #include "player/robot_anim_data.hpp"
+namespace gd3ds {
 
 DivorceEffect::DivorceEffect(int player, int gamemode, float x, float y, float rotation, float scale, bool flipY){
     this->player = player;
@@ -14,75 +15,75 @@ DivorceEffect::DivorceEffect(int player, int gamemode, float x, float y, float r
     this->scale = scale;
     this->flipY = flipY;
 
-    const UseEffectDefinition divorce_effect = {
-        .colorR = p1_color.r / 255.0f, 
-        .colorG = p1_color.g / 255.0f,
-        .colorB = p1_color.b / 255.0f,
+    const UseEffectDefinition divorceEffect = {
+        .colorR = p1Color.r / 255.0f, 
+        .colorG = p1Color.g / 255.0f,
+        .colorB = p1Color.b / 255.0f,
         .duration = 0.4f,
-        .start_opacity = .7f,
-        .end_opacity = 0,
-        .start_rad = 15,
-        .end_rad = 30,
+        .startOpacity = .7f,
+        .endOpacity = 0,
+        .startRad = 15,
+        .endRad = 30,
         .hollow = true,
         .trifading = false,
-        .line_thickness = 1.f
+        .lineThickness = 1.f
     };
 
-    init_use_effect_pool(&this->circle, 1);
-    add_use_effect(x, y, 0, &divorce_effect, &this->circle);
+    initUseEffectPool(&this->circle, 1);
+    addUseEffect(x, y, 0, &divorceEffect, &this->circle);
 }
 
-void DivorceEffect::update_divorce(){
+void DivorceEffect::updateDivorce(){
     this->time += delta;
 
-    update_use_effects(delta, &this->circle);
+    updateUseEffects(delta, &this->circle);
 }
 
-void DivorceEffect::draw_divorce(){
-    change_blending(true);
-    draw_use_effects(&this->circle);
-    change_blending(false);
+void DivorceEffect::drawDivorce(){
+    changeBlending(true);
+    drawUseEffects(&this->circle);
+    changeBlending(false);
     
-    int selected_icon = 0;
+    int selectedIcon = 0;
     switch(this->gamemode){
         case GAMEMODE_PLAYER:
-            selected_icon = selected_cube;
+            selectedIcon = selectedCube;
             break;
         case GAMEMODE_SHIP:
-            selected_icon = selected_ship;
+            selectedIcon = selectedShip;
             break;
         case GAMEMODE_BALL:
-            selected_icon = selected_ball;
+            selectedIcon = selectedBall;
             break;
         case GAMEMODE_UFO:
-            selected_icon = selected_ufo;
+            selectedIcon = selectedUfo;
             break;
         case GAMEMODE_WAVE:
-            selected_icon = selected_wave;
+            selectedIcon = selectedWave;
             break;
         case GAMEMODE_ROBOT:
-            selected_icon = selected_robot;
+            selectedIcon = selectedRobot;
             break;
     }
 
     float t = (time / 0.4f);
     float ti = 1.0f - t;
 
-    spawn_icon_at(
+    spawnIconAt(
         this->gamemode, 
-        selected_icon, false, 
-        get_mirror_x((this->x - state.camera_x), state.mirror_factor), 
-        (this->y - state.camera_y), 
+        selectedIcon, false, 
+        getMirrorX((this->x - state.cameraX), state.mirrorFactor), 
+        (this->y - state.cameraY), 
         (this->rotation) + (180.0f * t), 
-        (state.mirror_mult < 0),
+        (state.mirrorMult < 0),
         this->flipY,
         this->scale * ti,
-        (p1_color.to_color32() & 0x00FFFFFF) | ((u32)(ti * 255.0f) << 24), 
-        (p2_color.to_color32() & 0x00FFFFFF) | ((u32)(ti * 255.0f) << 24), 
+        (p1Color.toColor32() & 0x00FFFFFF) | ((u32)(ti * 255.0f) << 24), 
+        (p2Color.toColor32() & 0x00FFFFFF) | ((u32)(ti * 255.0f) << 24), 
         0, 
         (IconParameters) { 
-            .robot_anim_id = ROBOT_ANIM_IDLE,
-            .robot_anim_frame = 0
+            .animID = ROBOT_ANIM_IDLE,
+            .animFrame = 0
         }
     );
 }
@@ -99,27 +100,29 @@ DivorceEffect::~DivorceEffect() {
 
 std::deque<DivorceEffect> divorces;
 
-void update_divorces(){
+void updateDivorces(){
     while (!divorces.empty() && divorces.front().done()) {
         divorces.pop_front();
     }
 
     for(auto& divorce : divorces){
-        divorce.update_divorce();
+        divorce.updateDivorce();
     }
 }
 
-void draw_divorces(){
+void drawDivorces(){
     for(auto& divorce : divorces){
-        divorce.draw_divorce();
+        divorce.drawDivorce();
     }
 }
 
-void add_divorce(int player, int gamemode, float x, float y, float rotation, float scale, bool flipY){
+void addDivorce(int player, int gamemode, float x, float y, float rotation, float scale, bool flipY){
     divorces.push_back(DivorceEffect(player, gamemode, x, y, rotation, scale, flipY));
 }
 
-void reset_divorces(){
+void resetDivorces(){
     divorces.clear();
     divorces.shrink_to_fit();
+}
+
 }

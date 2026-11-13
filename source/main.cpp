@@ -1325,7 +1325,7 @@ void gameLoop() {
                     initVariables();
                     reloadLevel(); 
                     resetLightnings();
-                    reset_divorces();
+                    resetDivorces();
                     resetGravitySweeps();
                     //resets UI coins on gameplay screen
                     resetCoins();
@@ -1400,7 +1400,7 @@ void gameLoop() {
 
             updateAllLightning();
             updateGravitySweeps();
-            update_divorces();
+            updateDivorces();
 
             updateRays(delta);
 
@@ -2002,7 +2002,7 @@ int main(int argc, char* argv[]) {
     iconCacheShutdown();
 
     resetLightnings();
-    reset_divorces();
+    resetDivorces();
     resetGravitySweeps();
 
     // Delete graphics

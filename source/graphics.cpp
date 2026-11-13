@@ -2350,7 +2350,7 @@ void drawPlayerGraphics() {
         changeBlending(false);
     }
 
-    draw_divorces();
+    drawDivorces();
     drawCheckpoints();
     if (state.showPlayer) {
         drawDashFire(&state.player);

@@ -1499,7 +1499,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         case DIVORCE_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
                 if (state.dual){
-                    add_divorce(
+                    addDivorce(
                         state.currentPlayer, 
                         player->gamemode, 
                         player->x, 
