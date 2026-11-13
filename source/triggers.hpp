@@ -36,80 +36,80 @@ enum ColorChannelIDs {
     COL_CHANNEL_NUM = 1024,
 };
 
-extern int alpha_trigger_count;
-extern int move_trigger_count;
-extern int spawn_trigger_count;
-extern int pulse_trigger_count;
-extern int rotate_trigger_count;
-extern int follow_player_y_trigger_count;
-extern int rotate_trigger_capacity;
+extern int alphaTriggerCount;
+extern int moveTriggerCount;
+extern int spawnTriggerCount;
+extern int pulseTriggerCount;
+extern int rotateTriggerCount;
+extern int followPlayerYTriggerCount;
+extern int rotateTriggerCapacity;
 
 typedef struct {
     Color color;
-    Color non_pulse_color;
+    Color nonPulseColor;
     float alpha;
     bool blending;
     HSV hsv;
-    int copy_color_id;
-    int num_pulses;
+    int copyColorID;
+    int numPulses;
 } ColorChannel;
 
 typedef struct {
     bool active;
-    Color old_color;
-    Color new_color;
-    float old_alpha;
-    float new_alpha;
+    Color oldColor;
+    Color newColor;
+    float oldAlpha;
+    float newAlpha;
     float seconds;
-    float time_run;
-    int copied_color_id;
-    HSV copied_hsv;
-    int source_obj;
+    float timeRun;
+    int copiedColorID;
+    HSV copiedHSV;
+    int sourceObj;
 } ColTriggerBuffer;
 
 typedef struct {
     bool active;
-    bool restored_from_checkpoint;
-    int target_group;
-    int source_obj;
-    float old_alpha;
-    float new_alpha;
+    bool restoredFromCheckpoint;
+    int targetGroup;
+    int sourceObj;
+    float oldAlpha;
+    float newAlpha;
     float seconds;
-    float time_run;
+    float timeRun;
 } AlphaTriggerBuffer;
 
 typedef struct {
     bool active;
-    bool restored_from_checkpoint;
-    int target_group;
-    int source_obj;   // runtime identity of the trigger object
-    float offset_x;
-    float offset_y;
+    bool restoredFromCheckpoint;
+    int targetGroup;
+    int sourceObj;   // runtime identity of the trigger object
+    float offsetX;
+    float offsetY;
     int easing;
-    bool lock_to_player_x;
-    bool lock_to_player_y;
-    float move_last_x;
-    float move_last_y;
+    bool lockToPlayerX;
+    bool lockToPlayerY;
+    float moveLastX;
+    float moveLastY;
     float seconds;
-    float time_run;
+    float timeRun;
 } MoveTriggerBuffer;
 
 typedef struct {
     bool active;
-    bool restored_from_checkpoint;
-    bool activate_group;
-    bool multi_activate;
-    int target_group;
-    int item_id;
-    int target_count;
-    int previous_value;
-    int source_obj;
+    bool restoredFromCheckpoint;
+    bool activateGroup;
+    bool multiActivate;
+    int targetGroup;
+    int itemID;
+    int targetCount;
+    int previousValue;
+    int sourceObj;
 } CountTriggerBuffer;
 
 typedef struct {
     bool applied;
-    unsigned char held_mask;
-    int source_obj;
+    unsigned char heldMask;
+    int sourceObj;
 } TouchTriggerBuffer;
 
 typedef struct {
@@ -117,51 +117,51 @@ typedef struct {
     int value;
 } ItemCount;
 
-extern CountTriggerBuffer *count_trigger_buffer;
-extern int count_trigger_count;
-extern int count_trigger_capacity;
-extern TouchTriggerBuffer *touch_trigger_buffer;
-extern int touch_trigger_count;
-extern int touch_trigger_capacity;
-extern ItemCount *item_counter_buffer;
-extern int item_counter_count;
-extern int item_counter_capacity;
+extern CountTriggerBuffer *countTriggerBuffer;
+extern int countTriggerCount;
+extern int countTriggerCapacity;
+extern TouchTriggerBuffer *touchTriggerBuffer;
+extern int touchTriggerCount;
+extern int touchTriggerCapacity;
+extern ItemCount *itemCounterBuffer;
+extern int itemCounterCount;
+extern int itemCounterCapacity;
 
 typedef struct {
     bool active;
-    bool restored_from_checkpoint;
-    int target_group;
-    int source_obj;
+    bool restoredFromCheckpoint;
+    int targetGroup;
+    int sourceObj;
     float speed;
     float delay;
     float offset;
-    float max_speed;
-    float group_y;
+    float maxSpeed;
+    float groupY;
 } FollowPlayerYTriggerBuffer;
 
 typedef struct {
     bool active;
-    bool restored_from_checkpoint;
-    int target_group;
-    int follow_group;
-    int source_obj;
-    int ref_obj;
-    float x_mod;
-    float y_mod;
+    bool restoredFromCheckpoint;
+    int targetGroup;
+    int followGroup;
+    int sourceObj;
+    int refObj;
+    float xMod;
+    float yMod;
     float seconds;
-    float time_run;
-    float last_x;
-    float last_y;
+    float timeRun;
+    float lastX;
+    float lastY;
 } FollowTriggerBuffer;
 
 typedef struct {
     bool active;
     bool queued;
-    bool restored_from_checkpoint;
-    int target_group;
-    int source_obj;
+    bool restoredFromCheckpoint;
+    int targetGroup;
+    int sourceObj;
     float seconds;
-    float time_run;
+    float timeRun;
 } SpawnTriggerBuffer;
 
 #define PULSE_TARGET_CHANNEL 0
@@ -175,36 +175,36 @@ typedef struct {
 typedef struct {
     bool active;
     Color color;
-    int target_color_id;
-    float fade_in;
+    int targetColorID;
+    float fadeIn;
     float hold;
-    float fade_out;
-    int pulse_mode;
-    int copied_color_id;
-    HSV copied_hsv;
-    int target_group;
-    int pulse_target_type;
-    bool main_only;
-    bool detail_only;
-    int pulse_index;
+    float fadeOut;
+    int pulseMode;
+    int copiedColorID;
+    HSV copiedHSV;
+    int targetGroup;
+    int pulseTargetType;
+    bool mainOnly;
+    bool detailOnly;
+    int pulseIndex;
     float seconds;
-    float time_run;
+    float timeRun;
 
-    int source_obj;
-    bool restored_from_checkpoint;
+    int sourceObj;
+    bool restoredFromCheckpoint;
 } PulseTriggerBuffer;
 
 typedef struct {
-    bool spawn_triggered;
-    bool multi_triggered;
-    float trig_duration;
-    int target_group;
-    int center_group;
+    bool spawnTriggered;
+    bool multiTriggered;
+    float trigDuration;
+    int targetGroup;
+    int centerGroup;
     float degrees;
     int times360;
-    bool lock_object_rotation;
-    int rotate_easing;
-    float easing_rate;
+    bool lockObjectRotation;
+    int rotateEasing;
+    float easingRate;
 } RotateTrigger;
 
 typedef struct {
@@ -213,45 +213,45 @@ typedef struct {
 
 typedef struct {
     bool active;
-    bool restored_from_checkpoint;
-    bool use_center;
-    int center_obj;
-    int source_obj;
-    float total_degrees;
-    bool lock_object_rotation;
-    int easing_type;
-    float easing_rate;
+    bool restoredFromCheckpoint;
+    bool useCenter;
+    int centerObj;
+    int sourceObj;
+    float totalDegrees;
+    bool lockObjectRotation;
+    int easingType;
+    float easingRate;
     float seconds;
-    float time_run;
-    int target_group;
-    int target_count;
+    float timeRun;
+    int targetGroup;
+    int targetCount;
     RotateTargetState *targets;
 } RotateTriggerBuffer;
 
-void free_trigger_buffers();
-void restore_pulse_trigger(int obj, float time_run);
+void freeTriggerBuffers();
+void restorePulseTrigger(int obj, float timeRun);
 
 extern ColorChannel channels[COL_CHANNEL_NUM];
-extern ColTriggerBuffer col_trigger_buffer[COL_CHANNEL_NUM];
-extern AlphaTriggerBuffer *alpha_trigger_buffer;
-extern MoveTriggerBuffer *move_trigger_buffer;
-extern SpawnTriggerBuffer *spawn_trigger_buffer;
-extern PulseTriggerBuffer *pulse_trigger_buffer;
-extern RotateTriggerBuffer *rotate_trigger_buffer;
-extern FollowPlayerYTriggerBuffer *follow_player_y_trigger_buffer;
-extern FollowTriggerBuffer *follow_trigger_buffer;
-extern int follow_trigger_count;
-extern int follow_trigger_capacity;
-RotateTrigger *get_rotate_trigger(int obj);
-extern float move_lock_player_x_delta;
-extern float move_lock_player_y_delta;
-extern float move_step_dt;
+extern ColTriggerBuffer colTriggerBuffer[COL_CHANNEL_NUM];
+extern AlphaTriggerBuffer *alphaTriggerBuffer;
+extern MoveTriggerBuffer *moveTriggerBuffer;
+extern SpawnTriggerBuffer *spawnTriggerBuffer;
+extern PulseTriggerBuffer *pulseTriggerBuffer;
+extern RotateTriggerBuffer *rotateTriggerBuffer;
+extern FollowPlayerYTriggerBuffer *followPlayerYTriggerBuffer;
+extern FollowTriggerBuffer *followTriggerBuffer;
+extern int followTriggerCount;
+extern int followTriggerCapacity;
+RotateTrigger *getRotateTrigger(int obj);
+extern float moveLockPlayerXDelta;
+extern float moveLockPlayerYDelta;
+extern float moveStepDt;
 
-extern Color p1_color;
-extern Color p2_color;
-extern Color glow_color;
+extern Color p1Color;
+extern Color p2Color;
+extern Color glowColor;
 
-extern float trigger_dt;
+extern float triggerDt;
 
 #define BG_TRIGGER 29
 #define GROUND_TRIGGER 30
@@ -301,59 +301,59 @@ extern float trigger_dt;
 #define ON_DEATH_MAX 16
 
 typedef struct {
-    int source_obj;
-    int target_group;
+    int sourceObj;
+    int targetGroup;
     bool activate;
     bool multi;
 } OnDeathEntry;
 
-extern OnDeathEntry on_death_entries[ON_DEATH_MAX];
-extern int on_death_count;
+extern OnDeathEntry onDeathEntries[ON_DEATH_MAX];
+extern int onDeathCount;
 
-void run_on_death_triggers();
-void clear_on_death_triggers();
+void runOnDeathTriggers();
+void clearOnDeathTriggers();
 
-Color HSV_combine(Color base, HSV hsv);
+Color hsvCombine(Color base, HSV hsv);
 
 #define TRIGGER_AT(pool, type, id) (&((type *)(pool).data)[id])
 
 
-int trigger_pool_add(TriggerPool *pool, size_t element_size);
+int triggerPoolAdd(TriggerPool *pool, size_t elementSize);
 
-float get_group_opacities(int object);
-bool object_can_be_x_moved(int obj);
+float getGroupOpacities(int object);
+bool objectCanBeXMoved(int obj);
 
-void calculate_lbg();
-int get_col_channel_index(int channel);
-int get_col_channel_from_index(int index);
-void init_col_channels();
-void handle_col_channel(int chan);
-void handle_col_triggers(void);
-void handle_copy_channels();
-void handle_triggers(void);
-void upload_to_alpha_buffer(int obj);
-void handle_alpha_triggers(void);
-void upload_to_move_buffer(int obj);
-void handle_move_triggers(void);
-int get_item_count(int id);
-void add_item_count(int id, int delta);
-void upload_to_count_buffer(int obj);
-void handle_count_triggers(void);
-void upload_to_touch_buffer(int obj);
-void handle_touch_triggers(void);
-void upload_to_follow_player_y_buffer(int obj);
-void handle_follow_player_y_triggers(void);
-void upload_to_follow_buffer(int obj);
-void handle_follow_triggers(void);
-void handle_step_triggers(void);
-void upload_to_spawn_buffer(int obj, bool from_spawn);
-void handle_spawn_triggers(void);
-void toggle_group(int group, bool activate, bool spawn);
-void spawn_group(int group);
-void upload_to_pulse_buffer(int obj);
-void handle_pulse_triggers(void);
-void run_trigger(int obj, bool from_spawn);
-void upload_color_to_buffer(int channel, u32 color, float seconds);
-void upload_to_buffer(int obj, int channel);
-int convert_one_point_nine_channel(int channel);
-ColTriggerBuffer *get_buffer(int chan);
+void calculateLbg();
+int getColChannelIndex(int channel);
+int getColChannelFromIndex(int index);
+void initColChannels();
+void handleColChannel(int chan);
+void handleColTriggers(void);
+void handleCopyChannels();
+void handleTriggers(void);
+void uploadToAlphaBuffer(int obj);
+void handleAlphaTriggers(void);
+void uploadToMoveBuffer(int obj);
+void handleMoveTriggers(void);
+int getItemCount(int id);
+void addItemCount(int id, int delta);
+void uploadToCountBuffer(int obj);
+void handleCountTriggers(void);
+void uploadToTouchBuffer(int obj);
+void handleTouchTriggers(void);
+void uploadToFollowPlayerYBuffer(int obj);
+void handleFollowPlayerYTriggers(void);
+void uploadToFollowBuffer(int obj);
+void handleFollowTriggers(void);
+void handleStepTriggers(void);
+void uploadToSpawnBuffer(int obj, bool fromSpawn);
+void handleSpawnTriggers(void);
+void toggleGroup(int group, bool activate, bool spawn);
+void spawnGroup(int group);
+void uploadToPulseBuffer(int obj);
+void handlePulseTriggers(void);
+void runTrigger(int obj, bool fromSpawn);
+void uploadColorToBuffer(int channel, u32 color, float seconds);
+void uploadToBuffer(int obj, int channel);
+int convertOnePointNineChannel(int channel);
+ColTriggerBuffer *getBuffer(int chan);

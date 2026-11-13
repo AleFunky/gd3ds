@@ -3,5 +3,5 @@
 
 extern bool gotSogged;
 
-extern const UIScreenDefPair soggy_def;
+extern const UIScreenDefPair soggyDef;
 

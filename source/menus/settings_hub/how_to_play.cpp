@@ -6,11 +6,11 @@
 
 #include "menus/main_menu.hpp"
 
-static size_t current_page = 0;
+static size_t currentPage = 0;
 
-static UIWindowButton *next_button;
+static UIWindowButton *nextButton;
 
-const char *how_to_play_pages[] = {
+const char *howToPlayPages[] = {
     "page1",
     "page2",
     "page3",
@@ -22,56 +22,56 @@ const char *how_to_play_pages[] = {
 };
 
 
-void switch_page2(size_t page, UIScreen *s) {
-    for (size_t i = 0; i < ARRAY_LEN(how_to_play_pages); i++) {
+void switchPage2(size_t page, UIScreen *s) {
+    for (size_t i = 0; i < ARRAY_LEN(howToPlayPages); i++) {
         if (i == page) {
-            ui_run_func_on_tag(s, how_to_play_pages[page], ui_enable_element);
-            ui_run_func_on_tag(&s->pair->screens[SCREEN_TOP], how_to_play_pages[page], ui_enable_element);
+            uiRunFuncOnTag(s, howToPlayPages[page], uiEnableElement);
+            uiRunFuncOnTag(&s->pair->screens[SCREEN_TOP], howToPlayPages[page], uiEnableElement);
 
         } else {
-            ui_run_func_on_tag(s, how_to_play_pages[i], ui_disable_element);
-            ui_run_func_on_tag(&s->pair->screens[SCREEN_TOP], how_to_play_pages[i], ui_disable_element);
+            uiRunFuncOnTag(s, howToPlayPages[i], uiDisableElement);
+            uiRunFuncOnTag(&s->pair->screens[SCREEN_TOP], howToPlayPages[i], uiDisableElement);
         }
     }
 }
 
-void action_go_next(UIElement *e, const UIPropertyList *args) {
-    current_page++;
-    if (current_page >= ARRAY_LEN(how_to_play_pages)) {
-        ui_stack_pop();
+void actionGoNext(UIElement *e, const UIPropertyList *args) {
+    currentPage++;
+    if (currentPage >= ARRAY_LEN(howToPlayPages)) {
+        uiStackPop();
     }
 
-    switch_page2(current_page, e->screen);
+    switchPage2(currentPage, e->screen);
 }
 
 
-static UIActionDef how_to_play_actions[] = {
-    { "next", action_go_next}
+static UIActionDef howToPlayActions[] = {
+    { "next", actionGoNext}
 };
 
-void how_to_play_init(UIScreen *s) {
-    next_button = (UIWindowButton*) ui_get_element_by_tag(s, "nextbutton");
-    current_page = 0;
+void howToPlayInit(UIScreen *s) {
+    nextButton = (UIWindowButton*) uiGetElementByTag(s, "nextbutton");
+    currentPage = 0;
 
-    switch_page2(current_page, s);
+    switchPage2(currentPage, s);
 }
 
-static void how_to_play_update(UIScreen *s, UIInput *touch) {
-    if (current_page == 7) ui_button_set_text((UIButton *)next_button, "Exit");
+static void howToPlayUpdate(UIScreen *s, UIInput *touch) {
+    if (currentPage == 7) uiButtonSetText((UIButton *)nextButton, "Exit");
 }
 
-extern const UIScreenDefPair how_to_play_def = {
+extern const UIScreenDefPair howToPlayDef = {
     .name = "how_to_play",
     .top = {
         .path = "romfs:/menus/settings_hub/how_to_play_top.txt",
     },
     .btm = {
         .path = "romfs:/menus/settings_hub/how_to_play.txt",
-        .init = how_to_play_init,
-        .update = how_to_play_update,
-        .action_list = {
-            .actions = how_to_play_actions,
-            .action_count = ARRAY_LEN(how_to_play_actions)
+        .init = howToPlayInit,
+        .update = howToPlayUpdate,
+        .actionList = {
+            .actions = howToPlayActions,
+            .actionCount = ARRAY_LEN(howToPlayActions)
         }
     }
 };

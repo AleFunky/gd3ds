@@ -2,7 +2,7 @@
 
 #include <citro2d.h>
 
-void icon_cache_init(void);
-void icon_cache_shutdown(void);
-void icon_cache_begin_frame(void);
-C2D_SpriteSheet icon_cache_get(int gamemode, int id);
+void iconCacheInit(void);
+void iconCacheShutdown(void);
+void iconCacheBeginFrame(void);
+C2D_SpriteSheet iconCacheGet(int gamemode, int id);

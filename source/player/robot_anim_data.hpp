@@ -27,4 +27,4 @@ typedef enum {
     ROBOT_ANIM_COUNT      = 6,
 } RobotAnimId;
 
-extern const PlayerAnimation robot_animations[ROBOT_ANIM_COUNT];
+extern const PlayerAnimation robotAnimations[ROBOT_ANIM_COUNT];

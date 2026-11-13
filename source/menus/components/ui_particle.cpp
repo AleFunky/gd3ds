@@ -6,7 +6,7 @@
 #include "menus/core/ui_props.hpp"
 #include "graphics.hpp"
 
-void ui_particle_update_pos(UIParticle* e){
+void uiParticleUpdatePos(UIParticle* e){
     if (!e) return;
 
     ParticleSystem *p = &(e->particle);
@@ -15,28 +15,28 @@ void ui_particle_update_pos(UIParticle* e){
     p->emitterY = e->base.y;
 }
 
-void ui_particle_emit(UIParticle* e, int emitCount){
+void uiParticleEmit(UIParticle* e, int emitCount){
     if (!e) return;
 
     spawnMultipleParticles(&(e->particle), emitCount);
 }
 
-static void ui_particle_update(UIElement* e, UIInput* touch, UITransform *transform) {
+static void uiParticleUpdate(UIElement* e, UIInput* touch, UITransform *transform) {
     UIParticle *particle = (UIParticle *) e;
     ParticleSystem *p = &(particle->particle);
 
     updateParticleSystem(p, delta);
 }
 
-static void ui_particle_draw(UIElement* e, UITransform *transform) {
+static void uiParticleDraw(UIElement* e, UITransform *transform) {
     UIParticle *particle = (UIParticle *) e;
     
-    change_blending(true);
+    changeBlending(true);
     drawParticleSystem(&(particle->particle), 0, 0, 1);
-    change_blending(false);
+    changeBlending(false);
 }
 
-static void ui_particle_destroy(UIElement *e) {
+static void uiParticleDestroy(UIElement *e) {
     if (e) {
         UIParticle *particle = (UIParticle *) e;
         freeParticleData(&particle->particle.data);
@@ -47,7 +47,7 @@ static void ui_particle_destroy(UIElement *e) {
     }
 }
 
-void ui_init_particle_definition(UIParticle *e, const ParticleDefinition *def) {
+void uiInitParticleDefinition(UIParticle *e, const ParticleDefinition *def) {
     if (!e || !def) return;
 
     ParticleSystem *p = &(e->particle);
@@ -56,7 +56,7 @@ void ui_init_particle_definition(UIParticle *e, const ParticleDefinition *def) {
     p->stationary = true;
 }
 
-UIParticle *ui_create_particle(UIScreen *screen) {
+UIParticle *uiCreateParticle(UIScreen *screen) {
     UIParticle *e = new UIParticle{};
 
     if (!e) return NULL;
@@ -64,25 +64,25 @@ UIParticle *ui_create_particle(UIScreen *screen) {
     e->base.type = UI_PARTICLE;
     e->base.enabled = true;
 
-    e->base.update = ui_particle_update;
-    e->base.draw = ui_particle_draw;
-    e->base.destroy = ui_particle_destroy;
+    e->base.update = uiParticleUpdate;
+    e->base.draw = uiParticleDraw;
+    e->base.destroy = uiParticleDestroy;
     
-    ui_element_apply_default_properties(&e->base, screen);
+    uiElementApplyDefaultProperties(&e->base, screen);
 
     return e;
 }
 
-UIElement *ui_create_particle_from_props(UIScreen *screen, const UIPropertyList *props) {
-    UIParticle *particle = ui_create_particle(screen);
+UIElement *uiCreateParticleFromProps(UIScreen *screen, const UIPropertyList *props) {
+    UIParticle *particle = uiCreateParticle(screen);
 
     if (!particle) return NULL;
     
-    ui_element_apply_properties(&particle->base, screen, props);
+    uiElementApplyProperties(&particle->base, screen, props);
 
-    float r = ui_prop_float(props, "r", -1.f);
-    float g = ui_prop_float(props, "g", -1.f);
-    float b = ui_prop_float(props, "b", -1.f);
+    float r = uiPropFloat(props, "r", -1.f);
+    float g = uiPropFloat(props, "g", -1.f);
+    float b = uiPropFloat(props, "b", -1.f);
 
     ParticleSystem *p = &(particle->particle);
     //Do not override colors if invalid
@@ -95,17 +95,17 @@ UIElement *ui_create_particle_from_props(UIScreen *screen, const UIPropertyList 
         p->cfg.finishColorBlue = b;
     }
 
-    const char *def_name = ui_prop_string(props, "particleDef", "");
+    const char *defName = uiPropString(props, "particleDef", "");
 
     const ParticleDefinition *particleDef = NULL;
 
     for(int i = 0; i < PARTICLE_DEF_COUNT; i++){
-        if(strcmp(particleDefNames[i].name, def_name) == 0){
+        if(strcmp(particleDefNames[i].name, defName) == 0){
             particleDef = particleDefNames[i].def;
         }
     }
 
-    ui_init_particle_definition(particle, particleDef);
+    uiInitParticleDefinition(particle, particleDef);
 
     p->emitterX = particle->base.x;
     p->emitterY = particle->base.y;

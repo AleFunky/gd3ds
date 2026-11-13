@@ -32,113 +32,113 @@
 #define DEATH_WAITING_TIME 0.5f
 #define OFFSCREEN_BUFFER 240
 
-static UIButton *quit_game_button;
+static UIButton *quitGameButton;
 
-static Player title_screen_player;
-static bool title_screen_player_hold = false;
+static Player titleScreenPlayer;
+static bool titleScreenPlayerHold = false;
 
 static bool pressing = false;
-static bool old_pressing = false;
+static bool oldPressing = false;
 
 static bool started = false;
 static bool holding = false;
 
-static float death_wait_timer = 0;
+static float deathWaitTimer = 0;
 
-static int main_menu_color_index = 0;
+static int mainMenuColorIndex = 0;
 
-static float bg_scroll = 0;
+static float bgScroll = 0;
 
-bool old_wide;
-bool old_stereo;
+bool oldWide;
+bool oldStereo;
 
-static void action_open_quit_game_pop_up(UIElement *e, const UIPropertyList *args){
-    TwoOptionPopupData *quit_data = (TwoOptionPopupData *)malloc(sizeof(TwoOptionPopupData));
-    if(!quit_data) return;
+static void actionOpenQuitGamePopUp(UIElement *e, const UIPropertyList *args){
+    TwoOptionPopupData *quitData = (TwoOptionPopupData *)malloc(sizeof(TwoOptionPopupData));
+    if(!quitData) return;
 
-    quit_data->text = strdup("Are you sure you want to quit?");
-    quit_data->title = strdup("Quit Game");
-    quit_data->proceed_text = strdup("Quit");
-    quit_data->cancel_text = strdup("Cancel");
+    quitData->text = strdup("Are you sure you want to quit?");
+    quitData->title = strdup("Quit Game");
+    quitData->proceedText = strdup("Quit");
+    quitData->cancelText = strdup("Cancel");
 
-    ui_stack_push(&quit_pop_up_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
-    ui_stack_push_data(quit_data);
+    uiStackPush(&quitPopUpDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+    uiStackPushData(quitData);
 }
 
-void handle_title_screen_player(Player *player) {
+void handleTitleScreenPlayer(Player *player) {
     if (state.input.holdJump) {
-        if (player->buffering_state == BUFFER_NONE) {
-            player->buffering_state = BUFFER_READY;
+        if (player->bufferingState == BUFFER_NONE) {
+            player->bufferingState = BUFFER_READY;
         }
     } else {
-        player->buffering_state = BUFFER_NONE;
+        player->bufferingState = BUFFER_NONE;
     }
 
-    player->on_ground = false;
-    player->on_ceiling = false;
+    player->onGround = false;
+    player->onCeiling = false;
 
-    player->velocity_override = false;
+    player->velocityOverride = false;
 
-    player->gravObj_id = -1;
-    player->potentialSlope_id = -1;
+    player->gravObjID = -1;
+    player->potentialSlopeID = -1;
     
     player->timeElapsed += STEPS_DT;
 
-    player->upside_down = false;
+    player->upsideDown = false;
 
-    player->vel_x = player_speeds[state.speed]; 
-    player->x += player->vel_x * STEPS_DT;
-    player->y += player->vel_y * STEPS_DT;
+    player->velX = playerSpeeds[state.speed]; 
+    player->x += player->velX * STEPS_DT;
+    player->y += player->velY * STEPS_DT;
 
-    run_player(player);
+    runPlayer(player);
 }
 
-void reset_players() {
-    death_wait_timer = 0;
+void resetPlayers() {
+    deathWaitTimer = 0;
 
-    init_state();
-    level_info.wall_x = 9999999999999999999.f;
-    level_info.wall_y = 0;
-    init_player(&title_screen_player);
-    title_screen_player.x = -120;
-    title_screen_player.upside_down = false;
-    state.speed = random_int(0, SPEED_COUNT - 1);
-    title_screen_player.rotation = 0;
-    set_gamemode(&title_screen_player, random_int(0, GAMEMODE_COUNT - 1));
-    set_mini(&title_screen_player, random_int(0,1));
+    initState();
+    levelInfo.wallX = 9999999999999999999.f;
+    levelInfo.wallY = 0;
+    initPlayer(&titleScreenPlayer);
+    titleScreenPlayer.x = -120;
+    titleScreenPlayer.upsideDown = false;
+    state.speed = randomInt(0, SPEED_COUNT - 1);
+    titleScreenPlayer.rotation = 0;
+    setGamemode(&titleScreenPlayer, randomInt(0, GAMEMODE_COUNT - 1));
+    setMini(&titleScreenPlayer, randomInt(0,1));
 
-    title_screen_player.player_icons.cube = random_int(1, ICON_COUNT_PLAYER - 1);
-    title_screen_player.player_icons.ship = random_int(1, ICON_COUNT_SHIP - 1);
-    title_screen_player.player_icons.ball = random_int(1, ICON_COUNT_PLAYER_BALL - 1);
-    title_screen_player.player_icons.ufo  = random_int(1, ICON_COUNT_BIRD - 1);
-    title_screen_player.player_icons.wave = random_int(1, ICON_COUNT_DART - 1);
-    title_screen_player.player_icons.robot = random_int(1, ICON_COUNT_ROBOT - 1);
-    title_screen_player.player_icons.spider = random_int(1, ICON_COUNT_SPIDER - 1);
-    title_screen_player.player_icons.glow = false;
+    titleScreenPlayer.playerIcons.cube = randomInt(1, ICON_COUNT_PLAYER - 1);
+    titleScreenPlayer.playerIcons.ship = randomInt(1, ICON_COUNT_SHIP - 1);
+    titleScreenPlayer.playerIcons.ball = randomInt(1, ICON_COUNT_PLAYER_BALL - 1);
+    titleScreenPlayer.playerIcons.ufo  = randomInt(1, ICON_COUNT_BIRD - 1);
+    titleScreenPlayer.playerIcons.wave = randomInt(1, ICON_COUNT_DART - 1);
+    titleScreenPlayer.playerIcons.robot = randomInt(1, ICON_COUNT_ROBOT - 1);
+    titleScreenPlayer.playerIcons.spider = randomInt(1, ICON_COUNT_SPIDER - 1);
+    titleScreenPlayer.playerIcons.glow = false;
 
-    title_screen_player_hold = random_int(0,1);
-    title_screen_player.y = title_screen_player.height / 2;
+    titleScreenPlayerHold = randomInt(0,1);
+    titleScreenPlayer.y = titleScreenPlayer.height / 2;
     
-    Color p1 = get_color_abgr8(colors[random_int(0, NUM_COLORS - 1)]);
-    Color p2 = get_color_abgr8(colors[random_int(0, NUM_COLORS - 1)]);
+    Color p1 = getColorAbgr8(colors[randomInt(0, numColors - 1)]);
+    Color p2 = getColorAbgr8(colors[randomInt(0, numColors - 1)]);
 
-    title_screen_player.player_icons.p1_color = p1;
-    title_screen_player.player_icons.p2_color = p2;
+    titleScreenPlayer.playerIcons.p1Color = p1;
+    titleScreenPlayer.playerIcons.p2Color = p2;
     
-    init_particles(p1, p2);
-    init_trails(0);
+    initParticles(p1, p2);
+    initTrails(0);
     
-    trail_p1.color = (random_int(0, 1) ? p1 : p2);
+    trailP1.color = (randomInt(0, 1) ? p1 : p2);
     
-    wave_trail_p1.color = (random_int(0, 1) ? p1 : p2);
-    wave_trail_p1.blending = true;
-    wave_trail_p1.opacity = 1.f;
+    waveTrailP1.color = (randomInt(0, 1) ? p1 : p2);
+    waveTrailP1.blending = true;
+    waveTrailP1.opacity = 1.f;
 }
 
-static void handle_input() {
-    old_pressing = pressing;
+static void handleInput() {
+    oldPressing = pressing;
     pressing = false;
-    switch (title_screen_player.gamemode) {
+    switch (titleScreenPlayer.gamemode) {
         case GAMEMODE_PLAYER:
             // Press A 1/16 of time
             if (!(rand() & 0b1111)) pressing = true;
@@ -149,28 +149,28 @@ static void handle_input() {
             break;
         case GAMEMODE_WAVE:
             // Switch holding A 1/16 of time
-            if (!(rand() & 0b1111)) title_screen_player_hold ^= 1;
+            if (!(rand() & 0b1111)) titleScreenPlayerHold ^= 1;
 
-            if (title_screen_player_hold) {
+            if (titleScreenPlayerHold) {
                 pressing = true;
             }
             break;
         case GAMEMODE_SHIP:
             // Switch holding A 1/16 of time
-            if (!(rand() & 0b1111)) title_screen_player_hold ^= 1;
+            if (!(rand() & 0b1111)) titleScreenPlayerHold ^= 1;
 
-            if (title_screen_player_hold) {
+            if (titleScreenPlayerHold) {
                 pressing = true;
             }
             break;
         case GAMEMODE_ROBOT:
-            if (title_screen_player_hold) {
+            if (titleScreenPlayerHold) {
                 // If holding, 1/8 change to stop holding
-                if (!(rand() & 0b111)) title_screen_player_hold = 0;
+                if (!(rand() & 0b111)) titleScreenPlayerHold = 0;
                 pressing = true;
             } else {
                 // Else 1/16 change to start holding
-                if (!(rand() & 0b1111)) title_screen_player_hold = 0;
+                if (!(rand() & 0b1111)) titleScreenPlayerHold = 0;
             }
             break;
         case GAMEMODE_SPIDER:
@@ -178,273 +178,273 @@ static void handle_input() {
             break;
     }
 
-    started = !old_pressing && pressing;
+    started = !oldPressing && pressing;
     holding = pressing;
 }
 
-static void handle_players() {
-    state.old_player = title_screen_player;
-    handle_title_screen_player(&title_screen_player);
+static void handlePlayers() {
+    state.oldPlayer = titleScreenPlayer;
+    handleTitleScreenPlayer(&titleScreenPlayer);
 
-    bool wtrail_opacity_is_zero = (title_screen_player.gamemode == GAMEMODE_WAVE ? wave_trail_p1.opacity <= 0.f : true);
+    bool wtrailOpacityIsZero = (titleScreenPlayer.gamemode == GAMEMODE_WAVE ? waveTrailP1.opacity <= 0.f : true);
     
     // Wave trail needs to be invisible in order to despawn this player
-    if (wtrail_opacity_is_zero && title_screen_player.x >= SCREEN_WIDTH_AREA + OFFSCREEN_BUFFER) {
-        MotionTrail_UpdateWaveTrail(&wave_trail_p1, 1.f/60);
-        reset_players();
+    if (wtrailOpacityIsZero && titleScreenPlayer.x >= SCREEN_WIDTH_AREA + OFFSCREEN_BUFFER) {
+        motionTrailUpdateWaveTrail(&waveTrailP1, 1.f/60);
+        resetPlayers();
     }
 
     // Force the player go down by disabling control
-    if (title_screen_player.y >= SCREEN_HEIGHT_AREA * 2 - 90) {
+    if (titleScreenPlayer.y >= SCREEN_HEIGHT_AREA * 2 - 90) {
         pressing = false;
-        title_screen_player_hold = false;
+        titleScreenPlayerHold = false;
     }
 }
 
-static void main_menu_init(UIScreen *s){
-    init_col_channels();
-    play_menu_song();
+static void mainMenuInit(UIScreen *s){
+    initColChannels();
+    playMenuSong();
 
-    quit_game_button = (UIButton *)ui_get_element_by_tag(s, "quitbutton");
-    if (!is_3DSX) ui_disable_element((UIElement *)quit_game_button);
+    quitGameButton = (UIButton *)uiGetElementByTag(s, "quitbutton");
+    if (!is3Dsx) uiDisableElement((UIElement *)quitGameButton);
 
-    main_menu_color_index = 0;
-    u32 color = default_lvl_colors[main_menu_color_index % NUM_MENU_COLORS];
-    main_menu_color_index++;
+    mainMenuColorIndex = 0;
+    u32 color = defaultLvlColors[mainMenuColorIndex % numMenuColors];
+    mainMenuColorIndex++;
 
     Color col;
     col.r = GET_R(color);
     col.g = GET_G(color);
     col.b = GET_B(color);
 
-    int chan_bg = get_col_channel_index(CHANNEL_BG);
-    int chan_ground = get_col_channel_index(CHANNEL_GROUND);
-    int chan_ground_2 = get_col_channel_index(CHANNEL_GROUND_2);
-    int chan_line = get_col_channel_index(CHANNEL_LINE);
+    int chanBg = getColChannelIndex(CHANNEL_BG);
+    int chanGround = getColChannelIndex(CHANNEL_GROUND);
+    int chanGround2 = getColChannelIndex(CHANNEL_GROUND_2);
+    int chanLine = getColChannelIndex(CHANNEL_LINE);
 
-    channels[chan_bg].color = col;
-    channels[chan_ground].color = col;
-    channels[chan_ground_2].color = col;
-    channels[chan_line].color = white;
+    channels[chanBg].color = col;
+    channels[chanGround].color = col;
+    channels[chanGround2].color = col;
+    channels[chanLine].color = white;
 
-    get_buffer(CHANNEL_BG)->active = false;
-    get_buffer(CHANNEL_GROUND)->active = false;
-    get_buffer(CHANNEL_GROUND_2)->active = false;
-    get_buffer(CHANNEL_LINE)->active = false;
+    getBuffer(CHANNEL_BG)->active = false;
+    getBuffer(CHANNEL_GROUND)->active = false;
+    getBuffer(CHANNEL_GROUND_2)->active = false;
+    getBuffer(CHANNEL_LINE)->active = false;
 
-    allocate_particles();
-    init_variables();
-    reset_players();
+    allocateParticles();
+    initVariables();
+    resetPlayers();
 
-    state.current_player = 0;
-    trail = &trail_p1;
-    wave_trail = &wave_trail_p1;
+    state.currentPlayer = 0;
+    trail = &trailP1;
+    waveTrail = &waveTrailP1;
 
-    old_wide = settingsState.wideEnabled;
-    old_stereo = settingsState.stereoEnabled;
+    oldWide = settingsState.wideEnabled;
+    oldStereo = settingsState.stereoEnabled;
 
-    if (!is_N3DS && is_3DSX) {
-      InfoCardData *warning_data = (InfoCardData *)malloc(sizeof(InfoCardData));
-      if (!warning_data)
+    if (!isN3Ds && is3Dsx) {
+      InfoCardData *warningData = (InfoCardData *)malloc(sizeof(InfoCardData));
+      if (!warningData)
         return;
 
-      warning_data->text = strdup("The .3dsx release lacks RAM\non non-New 3DS hardware.\nPlease install the .cia.");
-      warning_data->title = strdup("Warning");
-      warning_data->copied = true;
-      ui_stack_push(&info_card_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
-      ui_stack_push_data(warning_data);
+      warningData->text = strdup("The .3dsx release lacks RAM\non non-New 3DS hardware.\nPlease install the .cia.");
+      warningData->title = strdup("Warning");
+      warningData->copied = true;
+      uiStackPush(&infoCardDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+      uiStackPushData(warningData);
     }
 
-    if (doAutoUpdates && !checkedForUpdate) updater_thread = create_generic_thread(&updater_task);
+    if (doAutoUpdates && !checkedForUpdate) updaterThread = createGenericThread(&updaterTask);
 }
 
-static void main_menu_init_top(UIScreen *s){
-    UIImage *title = (UIImage *) ui_get_element_by_tag(s, "title");
+static void mainMenuInitTop(UIScreen *s){
+    UIImage *title = (UIImage *) uiGetElementByTag(s, "title");
 
-    if (title && alt_title_screen) {
-        ui_image_set_image(title, 3, 1);
+    if (title && altTitleScreen) {
+        uiImageSetImage(title, 3, 1);
     }
 }
 
-static void main_menu_update(UIScreen *s, UIInput *input){
+static void mainMenuUpdate(UIScreen *s, UIInput *input){
 
-    if (settingsState.wideEnabled != old_wide || settingsState.stereoEnabled != old_stereo) {
+    if (settingsState.wideEnabled != oldWide || settingsState.stereoEnabled != oldStereo) {
         gspWaitForVBlank();
-        apply_screen_modes();
+        applyScreenModes();
         gspWaitForVBlank();
-        reinitialize_screens();
-        old_wide = settingsState.wideEnabled;
-        old_stereo = settingsState.stereoEnabled;
+        reinitializeScreens();
+        oldWide = settingsState.wideEnabled;
+        oldStereo = settingsState.stereoEnabled;
     }
 
-    state.old_input = state.input;
+    state.oldInput = state.input;
     state.input.pressedJump = (started) == true;
     state.input.holdJump = (state.input.pressedJump || holding) == true;
     
-    curr_input = state.input;
-    curr_old_input = state.old_input;
+    currInput = state.input;
+    currOldInput = state.oldInput;
 
     for (int i = 0; i < 2; i++) {
-        drag_particles[i].emitting = false;
-        drag_particles_2[i].stationary = true;
-        drag_particles_2[i].emitting = false;
-        ship_fire_particles[i].emitting = false;
-        secondary_particles[i].emitting = false;
-        ship_secondary_particles[i].emitting = false;
-        burst_particles[i].emitting = false;
-        land_particles[i].emitting = false;
+        dragParticles[i].emitting = false;
+        dragParticles2[i].stationary = true;
+        dragParticles2[i].emitting = false;
+        shipFireParticles[i].emitting = false;
+        secondaryParticles[i].emitting = false;
+        shipSecondaryParticles[i].emitting = false;
+        burstParticles[i].emitting = false;
+        landParticles[i].emitting = false;
     }
     
-    brick_destroy_particles.emitting = false;
-    slow_speed_particles_bottom.emitting = false;
-    normal_speed_particles_bottom.emitting = false;
-    fast_speed_particles_bottom.emitting = false;
-    faster_speed_particles_bottom.emitting = false;
-    fastest_speed_particles_bottom.emitting = false;
+    brickDestroyParticles.emitting = false;
+    slowSpeedParticlesBottom.emitting = false;
+    normalSpeedParticlesBottom.emitting = false;
+    fastSpeedParticlesBottom.emitting = false;
+    fasterSpeedParticlesBottom.emitting = false;
+    fastestSpeedParticlesBottom.emitting = false;
 
-    p1_trail = false;
-    clear_p1_trail();
+    p1Trail = false;
+    clearP1Trail();
 
-    handle_input();
+    handleInput();
 
     if (!state.dead) {
         for (int i = 0; i < 4; i++) {
-            handle_players();
+            handlePlayers();
         }
     }
     
-    glitter_particles.emitting = false;
-    glitter_particles_bottom.emitting = false;
+    glitterParticles.emitting = false;
+    glitterParticlesBottom.emitting = false;
 
     // Fade wave trail
-    if (title_screen_player.gamemode == GAMEMODE_WAVE && (state.dead || title_screen_player.x >= SCREEN_WIDTH_AREA)) {
-        if (wave_trail->opacity > 0) wave_trail->opacity -= 0.08f;
+    if (titleScreenPlayer.gamemode == GAMEMODE_WAVE && (state.dead || titleScreenPlayer.x >= SCREEN_WIDTH_AREA)) {
+        if (waveTrail->opacity > 0) waveTrail->opacity -= 0.08f;
         
-        if (wave_trail->opacity <= 0) {
-            wave_trail->opacity = 0;
-            wave_trail->nuPoints = 0;
+        if (waveTrail->opacity <= 0) {
+            waveTrail->opacity = 0;
+            waveTrail->nuPoints = 0;
         }
     }
 
-    MotionTrail_Update(&trail_p1, delta);
-    MotionTrail_UpdateWaveTrail(&wave_trail_p1, delta);
-    update_player_effects(delta);
-    update_use_effects(delta, get_use_effect_array_ptr(GFX_TOP));
+    motionTrailUpdate(&trailP1, delta);
+    motionTrailUpdateWaveTrail(&waveTrailP1, delta);
+    updatePlayerEffects(delta);
+    updateUseEffects(delta, getUseEffectArrayPtr(GFX_TOP));
 
     float touch_x = input->touchPos.px/SCALE;
     float touch_y = SCREEN_HEIGHT - input->touchPos.py/SCALE;
 
     bool kill = (hidKeysDown() & KEY_TOUCH) && intersect(
-        title_screen_player.x, title_screen_player.y, title_screen_player.width, title_screen_player.height, 0,
+        titleScreenPlayer.x, titleScreenPlayer.y, titleScreenPlayer.width, titleScreenPlayer.height, 0,
         touch_x, touch_y, 9, 9, 0
     );
 
     if (kill && !state.dead) {
-        kill_player(DEATH_TITLE_SCREEN_KILL);
-        players_destroyed++;
-        handle_death(&title_screen_player, false);
-        death_wait_timer = DEATH_WAITING_TIME;
+        killPlayer(DEATH_TITLE_SCREEN_KILL);
+        playersDestroyed++;
+        handleDeath(&titleScreenPlayer, false);
+        deathWaitTimer = DEATH_WAITING_TIME;
     } 
 
     // Wait to reset the player
-    if (death_wait_timer) {
-        death_wait_timer -= delta;
-        if (death_wait_timer <= 0) {
-            reset_players();
-            death_wait_timer = 0;
+    if (deathWaitTimer) {
+        deathWaitTimer -= delta;
+        if (deathWaitTimer <= 0) {
+            resetPlayers();
+            deathWaitTimer = 0;
             state.dead = false;
         }
     }
 
-    handle_col_channel(CHANNEL_BG);
-    handle_col_channel(CHANNEL_GROUND);
-    handle_col_channel(CHANNEL_GROUND_2);
+    handleColChannel(CHANNEL_BG);
+    handleColChannel(CHANNEL_GROUND);
+    handleColChannel(CHANNEL_GROUND_2);
 
-    ColTriggerBuffer *trig = get_buffer(CHANNEL_BG);
+    ColTriggerBuffer *trig = getBuffer(CHANNEL_BG);
     if (!trig->active) {
-        upload_color_to_buffer(CHANNEL_BG, default_lvl_colors[main_menu_color_index % NUM_MENU_COLORS], 4.f);
-        upload_color_to_buffer(CHANNEL_GROUND, default_lvl_colors[main_menu_color_index % NUM_MENU_COLORS], 4.f);
-        upload_color_to_buffer(CHANNEL_GROUND_2, default_lvl_colors[main_menu_color_index % NUM_MENU_COLORS], 4.f);
-        main_menu_color_index++;
+        uploadColorToBuffer(CHANNEL_BG, defaultLvlColors[mainMenuColorIndex % numMenuColors], 4.f);
+        uploadColorToBuffer(CHANNEL_GROUND, defaultLvlColors[mainMenuColorIndex % numMenuColors], 4.f);
+        uploadColorToBuffer(CHANNEL_GROUND_2, defaultLvlColors[mainMenuColorIndex % numMenuColors], 4.f);
+        mainMenuColorIndex++;
     }
     
-    bg_scroll += 5.19300155f;
+    bgScroll += 5.19300155f;
 }
 
 //bottom screen
-static void main_menu_draw(UIScreen *s, UIDrawPhase phase){
+static void mainMenuDraw(UIScreen *s, UIDrawPhase phase){
     if(phase == UI_DRAW_AFTER) return;
 
-    draw_background(bg_scroll / 8, SCREEN_HEIGHT);
+    drawBackground(bgScroll / 8, SCREEN_HEIGHT);
 
     C2D_ViewScale(SCALE, SCALE);
-    state.camera_x = 0;
-    state.camera_y = 0;
+    state.cameraX = 0;
+    state.cameraY = 0;
 
-    draw_player_effects();
+    drawPlayerEffects();
 
-    change_blending(true);
+    changeBlending(true);
 
-    draw_use_effects(get_use_effect_array_ptr(GFX_TOP));
+    drawUseEffects(getUseEffectArrayPtr(GFX_TOP));
 
-    change_blending(false);
-    draw_player(&title_screen_player);
-    draw_post_player_effects();
+    changeBlending(false);
+    drawPlayer(&titleScreenPlayer);
+    drawPostPlayerEffects();
 
-    draw_ground(bg_scroll, 0, 0, false, 320);
+    drawGround(bgScroll, 0, 0, false, 320);
 
     C2D_ViewScale(1/SCALE, 1/SCALE);
 }
 
-static void main_menu_draw_top(UIScreen *s, UIDrawPhase phase){
+static void mainMenuDrawTop(UIScreen *s, UIDrawPhase phase){
     if(phase == UI_DRAW_AFTER) return;
 
-    begin_eye_layer(DEPTH_BACKGROUND);
-    draw_background(-40 + (bg_scroll / 8), 0);
-    end_eye_layer();
+    beginEyeLayer(DEPTH_BACKGROUND);
+    drawBackground(-40 + (bgScroll / 8), 0);
+    endEyeLayer();
 
     C2D_ViewScale(SCALE, SCALE);
-    state.camera_x = -((SCREEN_WIDTH_AREA - SCREEN_WIDTH_AREA_BOT)/2);
-    state.camera_y = SCREEN_HEIGHT_AREA;
+    state.cameraX = -((SCREEN_WIDTH_AREA - SCREEN_WIDTH_AREA_BOT)/2);
+    state.cameraY = SCREEN_HEIGHT_AREA;
 
     // Same trick as in game, the player floats in front of the screen
-    begin_eye_layer(DEPTH_LEVEL);
-    draw_player_effects();
-    change_blending(true);
-    draw_use_effects(get_use_effect_array_ptr(GFX_TOP));
+    beginEyeLayer(DEPTH_LEVEL);
+    drawPlayerEffects();
+    changeBlending(true);
+    drawUseEffects(getUseEffectArrayPtr(GFX_TOP));
 
-    change_blending(false);
-    draw_player(&title_screen_player);
-    end_eye_layer();
+    changeBlending(false);
+    drawPlayer(&titleScreenPlayer);
+    endEyeLayer();
 
     C2D_ViewScale(1/SCALE, 1/SCALE);
 }
 
-static void main_menu_exit(UIScreen *s) {
-    free_particles();
+static void mainMenuExit(UIScreen *s) {
+    freeParticles();
 }
 
-const UIActionDef main_menu_actions[] = {
-    { "quit_game", action_open_quit_game_pop_up }
+const UIActionDef mainMenuActions[] = {
+    { "quit_game", actionOpenQuitGamePopUp }
 };
 
 
-extern const UIScreenDefPair main_menu_def = {
+extern const UIScreenDefPair mainMenuDef = {
     .name = "main_menu",
     .top = {
         .path = "romfs:/menus/main_menu_top.txt",
-        .init = main_menu_init_top,
-        .draw = main_menu_draw_top
+        .init = mainMenuInitTop,
+        .draw = mainMenuDrawTop
     },
     .btm = {
         .path = "romfs:/menus/main_menu.txt",
-        .init = main_menu_init,
-        .update = main_menu_update,
-        .draw = main_menu_draw,
-        .exit = main_menu_exit,
-        .action_list = {
-            .actions = main_menu_actions,
-            .action_count = ARRAY_LEN(main_menu_actions)
+        .init = mainMenuInit,
+        .update = mainMenuUpdate,
+        .draw = mainMenuDraw,
+        .exit = mainMenuExit,
+        .actionList = {
+            .actions = mainMenuActions,
+            .actionCount = ARRAY_LEN(mainMenuActions)
         }
     }
 };

@@ -8,24 +8,24 @@
 #include "math_helpers.hpp"
 #include "menus/creator_menu/search_menu.hpp"
 
-static void ui_bg_gradient_draw(UIElement* e, UITransform *transform) {
+static void uiBgGradientDraw(UIElement* e, UITransform *transform) {
     UIImage *image = (UIImage *) e;
 
-    C2D_SpriteFromSheet(&image->image.sprite, bg_gradient_sheet, gdps ? 1 : 0);
+    C2D_SpriteFromSheet(&image->image.sprite, bgGradientSheet, gdps ? 1 : 0);
 
     C2D_SpriteSetPos(&image->image.sprite, gdps ? 0.f : transform->x, gdps ? 0.f : transform->y);
     C2D_SpriteSetScale(&image->image.sprite, gdps ? 1.f : transform->scaleX, gdps ? 1.f : transform->scaleY);
     C2D_DrawSpriteTinted(&image->image.sprite, &image->image.tint);
 }
 
-static void ui_bg_gradient_destroy(UIElement *e) {
+static void uiBgGradientDestroy(UIElement *e) {
     if (e) {
         delete (UIImage *)e;
         e = NULL;
     }
 }
 
-UIImage *ui_create_bg_gradient(UIScreen *screen) {
+UIImage *uiCreateBgGradient(UIScreen *screen) {
     UIImage *e = new UIImage{};
 
     if (!e) return NULL;
@@ -35,36 +35,36 @@ UIImage *ui_create_bg_gradient(UIScreen *screen) {
     e->base.y = 0;
     e->base.enabled = true;
     
-    ui_element_apply_default_properties(&e->base, screen);
+    uiElementApplyDefaultProperties(&e->base, screen);
 
-    C2D_SpriteFromSheet(&e->image.sprite, bg_gradient_sheet, 0);
+    C2D_SpriteFromSheet(&e->image.sprite, bgGradientSheet, 0);
 
-    ui_element_set_scale_xy((UIElement *) e, BG_GRADIENT_XSCALE, BG_GRADIENT_YSCALE);
+    uiElementSetScaleXy((UIElement *) e, BG_GRADIENT_XSCALE, BG_GRADIENT_YSCALE);
 
     e->base.w = e->image.sprite.image.subtex->width;
     e->base.h = e->image.sprite.image.subtex->height;
 
-    ui_image_clear_tint(e);
+    uiImageClearTint(e);
 
-    e->base.draw = ui_bg_gradient_draw;
-    e->base.destroy = ui_bg_gradient_destroy;
+    e->base.draw = uiBgGradientDraw;
+    e->base.destroy = uiBgGradientDestroy;
 
     return e;
 }
 
-UIElement *ui_create_bg_gradient_from_props(UIScreen *screen, const UIPropertyList *props) {
-    UIImage *bg_gradient = ui_create_bg_gradient(screen);
+UIElement *uiCreateBgGradientFromProps(UIScreen *screen, const UIPropertyList *props) {
+    UIImage *bgGradient = uiCreateBgGradient(screen);
 
-    if (!bg_gradient) return NULL;
+    if (!bgGradient) return NULL;
     
-    ui_element_apply_properties(&bg_gradient->base, screen, props);
+    uiElementApplyProperties(&bgGradient->base, screen, props);
 
     // Those have to be hardcoded
-    ui_element_set_position((UIElement *) bg_gradient, 0, 0);
-    ui_element_set_scale_xy((UIElement *) bg_gradient, BG_GRADIENT_XSCALE, BG_GRADIENT_YSCALE);
+    uiElementSetPosition((UIElement *) bgGradient, 0, 0);
+    uiElementSetScaleXy((UIElement *) bgGradient, BG_GRADIENT_XSCALE, BG_GRADIENT_YSCALE);
 
     // Scale is hardcoded
-    ui_image_set_tint(bg_gradient, ui_prop_color(props, "color", ABGR8(255, 255, 255, 255)));
+    uiImageSetTint(bgGradient, uiPropColor(props, "color", ABGR8(255, 255, 255, 255)));
 
-    return &bg_gradient->base;
+    return &bgGradient->base;
 }

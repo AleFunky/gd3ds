@@ -31,22 +31,22 @@ typedef struct {
     int value;
 } UIIntEnumEntry;
 
-UIPropertyList ui_create_proplist(size_t capacity, bool duplicate);
-void ui_proplist_add(UIPropertyList *props, char* key, char* value);
-void ui_destroy_proplist(UIPropertyList *props);
+UIPropertyList uiCreateProplist(size_t capacity, bool duplicate);
+void uiProplistAdd(UIPropertyList *props, char* key, char* value);
+void uiDestroyProplist(UIPropertyList *props);
 
-const char *ui_prop_string(const UIPropertyList *props, const char *key, const char *default_value);
-int ui_prop_int(const UIPropertyList *props, const char *key, int default_value);
-float ui_prop_float(const UIPropertyList *props, const char *key, float default_value);
-bool ui_prop_bool(const UIPropertyList *props, const char *key, bool default_value);
-u32 ui_prop_bitfield(const UIPropertyList *props, const char *key, const UIBitfieldEntry *table, size_t count);
+const char *uiPropString(const UIPropertyList *props, const char *key, const char *defaultValue);
+int uiPropInt(const UIPropertyList *props, const char *key, int defaultValue);
+float uiPropFloat(const UIPropertyList *props, const char *key, float defaultValue);
+bool uiPropBool(const UIPropertyList *props, const char *key, bool defaultValue);
+u32 uiPropBitfield(const UIPropertyList *props, const char *key, const UIBitfieldEntry *table, size_t count);
 
-int ui_prop_int_enum(const UIPropertyList *props, const char *key, const UIIntEnumEntry *table, size_t count, int default_value);
-float ui_prop_float_enum(const UIPropertyList *props, const char *key, const UIFloatEnumEntry *table, size_t count, float default_value);
+int uiPropIntEnum(const UIPropertyList *props, const char *key, const UIIntEnumEntry *table, size_t count, int defaultValue);
+float uiPropFloatEnum(const UIPropertyList *props, const char *key, const UIFloatEnumEntry *table, size_t count, float defaultValue);
 
-u32 ui_prop_color(const UIPropertyList *props, const char *key, u32 default_value);
+u32 uiPropColor(const UIPropertyList *props, const char *key, u32 defaultValue);
 
-UIPropertyList ui_prop_list(const UIPropertyList *props, const char *key);
+UIPropertyList uiPropList(const UIPropertyList *props, const char *key);
 
-UIAction *parse_actions(const char *value, const UIActionDef *action_defs, const size_t actions_count, size_t *out_entry_count);
-UIAction *ui_prop_actions(const UIPropertyList *props, const UIActionDef *action_defs, const size_t actions_count, const char *key, size_t *out_entry_count);
+UIAction *parseActions(const char *value, const UIActionDef *actionDefs, const size_t actionsCount, size_t *outEntryCount);
+UIAction *uiPropActions(const UIPropertyList *props, const UIActionDef *actionDefs, const size_t actionsCount, const char *key, size_t *outEntryCount);

@@ -17,28 +17,28 @@ enum JumpType {
 #define MINIMUM_OBJECT_SPEED 315
 
 #define GET_ACTIVATED(obj) \
-    ((objects.activated[(obj)] >> state.current_player) & 1)
+    ((objects.activated[(obj)] >> state.currentPlayer) & 1)
 
 #define SET_ACTIVATED(obj, val) \
     (objects.activated[(obj)] = \
-        (objects.activated[(obj)] & ~(1 << state.current_player)) | \
-        (((val) & 1) << state.current_player))
+        (objects.activated[(obj)] & ~(1 << state.currentPlayer)) | \
+        (((val) & 1) << state.currentPlayer))
 
 #define GET_COLLIDED(obj) \
-    ((objects.collided[(obj)] >> state.current_player) & 1)
+    ((objects.collided[(obj)] >> state.currentPlayer) & 1)
 
 #define SET_COLLIDED(obj, val) \
     (objects.collided[(obj)] = \
-        (objects.collided[(obj)] & ~(1 << state.current_player)) | \
-        (((val) & 1) << state.current_player))
+        (objects.collided[(obj)] & ~(1 << state.currentPlayer)) | \
+        (((val) & 1) << state.currentPlayer))
 
 #define GET_HITBOX_COUNTER(obj) \
-    ((objects.hitbox_counter[(obj)] >> (state.current_player * 8)) & 0xff)
+    ((objects.hitboxCounter[(obj)] >> (state.currentPlayer * 8)) & 0xff)
 
 #define SET_HITBOX_COUNTER(obj, val) \
-    (objects.hitbox_counter[(obj)] = \
-        (objects.hitbox_counter[(obj)] & ~(0xff << (state.current_player * 8))) | \
-        (((val) & 0xff) << (state.current_player * 8)))
+    (objects.hitboxCounter[(obj)] = \
+        (objects.hitboxCounter[(obj)] & ~(0xff << (state.currentPlayer * 8))) | \
+        (((val) & 0xff) << (state.currentPlayer * 8)))
         
 #define YELLOW_PAD 35
 #define PINK_PAD 140
@@ -88,7 +88,7 @@ enum JumpType {
 #define SKULL_COLLECTABLE 1598
 #define SMALL_COIN 1614
 
-static inline bool is_collectable_object(int id) {
+static inline bool isCollectableObject(int id) {
     return id == KEY_OBJ || id == HEART_COLLECTABLE || id == POTION_COLLECTABLE || id == SKULL_COLLECTABLE;
 }
 
@@ -108,23 +108,23 @@ static inline bool is_collectable_object(int id) {
 
 #define MAX_COLLIDED_OBJECTS 512
 
-extern int potential_slopes_buffer[2][MAX_COLLIDED_OBJECTS];
-extern int potential_slopes[2];
+extern int potentialSlopesBuffer[2][MAX_COLLIDED_OBJECTS];
+extern int potentialSlopes[2];
 
-extern const float gamemode_heights[GAMEMODE_COUNT];
+extern const float gamemodeHeights[GAMEMODE_COUNT];
 
-void setup_dual();
-void set_dual_bounds();
-void do_ball_reflection();
+void setupDual();
+void setDualBounds();
+void doBallReflection();
 
-void collide_with_objects(Player *player);
+void collideWithObjects(Player *player);
 bool intersect(float x1, float y1, float w1, float h1, float angle1,
                float x2, float y2, float w2, float h2, float angle2);
-bool intersect_exclusive(float x1, float y1, float w1, float h1, float angle1,
+bool intersectExclusive(float x1, float y1, float w1, float h1, float angle1,
                float x2, float y2, float w2, float h2, float angle2);
 
-bool intersect_rect_circle(float rx, float ry, float rw, float rh, float rangle,
+bool intersectRectCircle(float rx, float ry, float rw, float rh, float rangle,
                           float cx, float cy, float cradius);
 
-bool circle_rect_collision(float cx, float cy, float radius,
+bool circleRectCollision(float cx, float cy, float radius,
                            float x1, float y1, float x2, float y2);

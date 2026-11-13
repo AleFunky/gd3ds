@@ -4,18 +4,18 @@
 #include "menus/creator_menu/soggy.hpp"
 #include "state.hpp"
 
-void creator_menu_init(UIScreen *s){
-    if (gotSogged) ui_button_set_image((UIButton *) ui_get_element_by_tag(s, "create_button"), 20, 1);
-    play_menu_song();
+void creatorMenuInit(UIScreen *s){
+    if (gotSogged) uiButtonSetImage((UIButton *) uiGetElementByTag(s, "create_button"), 20, 1);
+    playMenuSong();
 }
 
-extern const UIScreenDefPair creator_menu_def = {
+extern const UIScreenDefPair creatorMenuDef = {
     .name = "creator_menu",
     .top = {
         .path = "romfs:/menus/creator_menu/creator_menu_top.txt",
     },
     .btm = {
         .path = "romfs:/menus/creator_menu/creator_menu.txt",
-        .init = creator_menu_init,
+        .init = creatorMenuInit,
     }
 };

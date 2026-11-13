@@ -6,30 +6,30 @@
 #include "menus/components/ui_checkbox.hpp"
 #include "save/saving.hpp"
 
-static void action_toggle_ldm(UIElement *e, const UIPropertyList *args) {
-    if (!current_level_entry) return;
+static void actionToggleLdm(UIElement *e, const UIPropertyList *args) {
+    if (!currentLevelEntry) return;
 
-    current_level_entry->data.low_detail = ((UICheckBox *)e)->checked;
-    save_current_save_file(current_level_list);
+    currentLevelEntry->data.lowDetail = ((UICheckBox *)e)->checked;
+    saveCurrentSaveFile(currentLevelList);
 }
 
-static const UIActionDef online_level_options_actions[] = {
-    {"ldm", action_toggle_ldm},
+static const UIActionDef onlineLevelOptionsActions[] = {
+    {"ldm", actionToggleLdm},
 };
 
-static void online_level_options_init(UIScreen *s) {
-    UICheckBox *checkbox = (UICheckBox *) ui_get_element_by_tag(s, "chk_ldm");
-    if (checkbox) ui_set_checkbox_checked(checkbox, current_level_entry && current_level_entry->data.low_detail);
+static void onlineLevelOptionsInit(UIScreen *s) {
+    UICheckBox *checkbox = (UICheckBox *) uiGetElementByTag(s, "chk_ldm");
+    if (checkbox) uiSetCheckboxChecked(checkbox, currentLevelEntry && currentLevelEntry->data.lowDetail);
 }
 
-extern const UIScreenDefPair online_level_options_def = {
+extern const UIScreenDefPair onlineLevelOptionsDef = {
     .name = "online_level_options",
     .btm = {
         .path = "romfs:/menus/creator_menu/online/online_level_options_pop_up.txt",
-        .init = online_level_options_init,
-        .action_list = {
-            .actions = online_level_options_actions,
-            .action_count = ARRAY_LEN(online_level_options_actions)
+        .init = onlineLevelOptionsInit,
+        .actionList = {
+            .actions = onlineLevelOptionsActions,
+            .actionCount = ARRAY_LEN(onlineLevelOptionsActions)
         }
     }
 };

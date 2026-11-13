@@ -20,7 +20,7 @@
 #define DIED_TO_ID 3
 #define HARDER_THAN_ID 4
 
-const char *new_best_text[] = {
+const char *newBestText[] = {
     [NOT_100_ID] = "Not 100%",
     [IMPOSSIBLE_TIMING_ID] = "Impossible timing",
     [STORY_MADNESS_ID] = "Have you tried Story Madness yet?",
@@ -162,7 +162,7 @@ const char *new_best_text[] = {
     "You successed failfully"
 };
 
-const char *died_to_text[DEATH_REASON_COUNT] = {
+const char *diedToText[DEATH_REASON_COUNT] = {
     "Bro died magically",
     "Bro died to a <i646s3>spike",
     "Bro died to a <#000000><i639s3></>saw",
@@ -182,125 +182,125 @@ typedef struct {
     bool active;
 
     int progress;
-    int text_id;
+    int textID;
     
     NewBestState state;
 
     float scale;
 
-    float initial_scale;
-    float target_scale;
+    float initialScale;
+    float targetScale;
     float timer;
     float duration;
     EaseTypes ease;
 } NewBestPopup;
 
-static NewBestPopup new_best_popup;
+static NewBestPopup newBestPopup;
 
-void init_new_best_popup(int progress) {
-    new_best_popup.active = true;
-    new_best_popup.state = SCALE_IN;
-    new_best_popup.ease = ELASTIC_OUT;
+void initNewBestPopup(int progress) {
+    newBestPopup.active = true;
+    newBestPopup.state = SCALE_IN;
+    newBestPopup.ease = ELASTIC_OUT;
 
-    new_best_popup.text_id = random_int(0, ARRAY_LEN(new_best_text) - 1);
-    new_best_popup.progress = progress;
+    newBestPopup.textID = randomInt(0, ARRAY_LEN(newBestText) - 1);
+    newBestPopup.progress = progress;
     
 
     // 50% chance on >95% death to say "not 100%"
-    if (progress >= 95 && random_int(0, 100) <= 50) {
-        new_best_popup.text_id = NOT_100_ID;
+    if (progress >= 95 && randomInt(0, 100) <= 50) {
+        newBestPopup.textID = NOT_100_ID;
     }
 
     // Cycles impossible timing
-    if (progress == 42 && !state.custom_level && curr_level_id == 8 && state.player.y > 140) {
-        new_best_popup.text_id = IMPOSSIBLE_TIMING_ID;
+    if (progress == 42 && !state.customLevel && currLevelID == 8 && state.player.y > 140) {
+        newBestPopup.textID = IMPOSSIBLE_TIMING_ID;
     }
 
     // If on story madness, reroll to not say the story madness line
-    if (new_best_popup.text_id == STORY_MADNESS_ID && contains(level_info.level_name, "story madness")) {
+    if (newBestPopup.textID == STORY_MADNESS_ID && contains(levelInfo.levelName, "story madness")) {
         do {
-            new_best_popup.text_id = random_int(0, ARRAY_LEN(new_best_text) - 1);
-        } while(new_best_popup.text_id == STORY_MADNESS_ID);
+            newBestPopup.textID = randomInt(0, ARRAY_LEN(newBestText) - 1);
+        } while(newBestPopup.textID == STORY_MADNESS_ID);
     }
 
-    new_best_popup.timer = 0;
-    new_best_popup.duration = NEW_BEST_STATE_0_DURATION;
-    new_best_popup.initial_scale = 0.01;
-    new_best_popup.target_scale = NEW_BEST_STATE_0_TARGET_SCALE;
+    newBestPopup.timer = 0;
+    newBestPopup.duration = NEW_BEST_STATE_0_DURATION;
+    newBestPopup.initialScale = 0.01;
+    newBestPopup.targetScale = NEW_BEST_STATE_0_TARGET_SCALE;
 }
 
-void clear_new_best_popup() {
-    new_best_popup.active = false;
+void clearNewBestPopup() {
+    newBestPopup.active = false;
 }
 
-void handle_new_best_popup(float delta) {
-    if (new_best_popup.active) {
-        switch (new_best_popup.state) {
+void handleNewBestPopup(float delta) {
+    if (newBestPopup.active) {
+        switch (newBestPopup.state) {
             case SCALE_IN:
-                if (new_best_popup.timer > NEW_BEST_STATE_0_DURATION) {
-                    new_best_popup.state = WAITING;
-                    new_best_popup.ease = EASE_LINEAR;
+                if (newBestPopup.timer > NEW_BEST_STATE_0_DURATION) {
+                    newBestPopup.state = WAITING;
+                    newBestPopup.ease = EASE_LINEAR;
 
-                    new_best_popup.timer = 0;
-                    new_best_popup.duration = NEW_BEST_STATE_1_DURATION;
-                    new_best_popup.initial_scale = new_best_popup.scale;
-                    new_best_popup.target_scale = new_best_popup.scale;
+                    newBestPopup.timer = 0;
+                    newBestPopup.duration = NEW_BEST_STATE_1_DURATION;
+                    newBestPopup.initialScale = newBestPopup.scale;
+                    newBestPopup.targetScale = newBestPopup.scale;
                 }
                 break;
             case WAITING:
-                if (new_best_popup.timer > NEW_BEST_STATE_1_DURATION) {
-                    new_best_popup.state = SCALE_OUT;
-                    new_best_popup.ease = QUAD_IN;
+                if (newBestPopup.timer > NEW_BEST_STATE_1_DURATION) {
+                    newBestPopup.state = SCALE_OUT;
+                    newBestPopup.ease = QUAD_IN;
                     
-                    new_best_popup.timer = 0;
-                    new_best_popup.duration = NEW_BEST_STATE_2_DURATION;
-                    new_best_popup.initial_scale = new_best_popup.scale;
-                    new_best_popup.target_scale = NEW_BEST_STATE_2_TARGET_SCALE;
+                    newBestPopup.timer = 0;
+                    newBestPopup.duration = NEW_BEST_STATE_2_DURATION;
+                    newBestPopup.initialScale = newBestPopup.scale;
+                    newBestPopup.targetScale = NEW_BEST_STATE_2_TARGET_SCALE;
                 }
                 break;
             case SCALE_OUT:
-                if (new_best_popup.timer > NEW_BEST_STATE_2_DURATION) {
-                    new_best_popup.active = false;
+                if (newBestPopup.timer > NEW_BEST_STATE_2_DURATION) {
+                    newBestPopup.active = false;
                 }
                 break;
         }
-        new_best_popup.scale = easeValue(new_best_popup.ease, new_best_popup.initial_scale, new_best_popup.target_scale, new_best_popup.timer, new_best_popup.duration, 1.f);
+        newBestPopup.scale = easeValue(newBestPopup.ease, newBestPopup.initialScale, newBestPopup.targetScale, newBestPopup.timer, newBestPopup.duration, 1.f);
 
-        new_best_popup.timer += delta;
+        newBestPopup.timer += delta;
     }
 }
 
-void draw_new_best_popup() {
-    if (new_best_popup.active) {
-        float scale = new_best_popup.scale;
+void drawNewBestPopup() {
+    if (newBestPopup.active) {
+        float scale = newBestPopup.scale;
         char buf[256];
 
         if (settingsState.doNot) {
-            const char *text = new_best_text[new_best_popup.text_id];
+            const char *text = newBestText[newBestPopup.textID];
 
-            if (new_best_popup.text_id == DIED_TO_ID) {
-                text = died_to_text[state.death_reason];
+            if (newBestPopup.textID == DIED_TO_ID) {
+                text = diedToText[state.deathReason];
             } 
 
-            if (new_best_popup.text_id == HARDER_THAN_ID) {
-                snprintf(buf, sizeof(buf), text, new_best_popup.progress - 1);
+            if (newBestPopup.textID == HARDER_THAN_ID) {
+                snprintf(buf, sizeof(buf), text, newBestPopup.progress - 1);
             } else {
                 snprintf(buf, sizeof(buf), "%s", text);
             }
 
-            float text_scale = scale;
+            float textScale = scale;
 
             int width = 390;
-            float length = get_longest_line_length(&goldFont_fontCharset, NEW_BEST_STATE_0_TARGET_SCALE, buf);
+            float length = getLongestLineLength(&goldFontFontCharset, NEW_BEST_STATE_0_TARGET_SCALE, buf);
 
             if (width < length && length > 0) {
-                text_scale *= (width / length);
+                textScale *= (width / length);
             }
             
-            draw_text(&goldFont_fontCharset, &goldFont_sheet, SCREEN_WIDTH_AREA / 2, (SCREEN_HEIGHT_AREA / 2) - (NEW_BEST_SEPARATION * text_scale), text_scale, text_scale, 0.5f, true, buf);
+            drawText(&goldFontFontCharset, &goldFontSheet, SCREEN_WIDTH_AREA / 2, (SCREEN_HEIGHT_AREA / 2) - (NEW_BEST_SEPARATION * textScale), textScale, textScale, 0.5f, true, buf);
         } else {
             C2D_Sprite text = { 0 };
-            C2D_SpriteFromSheet(&text, ui_sheet, (NEW_BEST_IMAGE_ID));
+            C2D_SpriteFromSheet(&text, uiSheet, (NEW_BEST_IMAGE_ID));
             C3D_TexSetFilter(text.image.tex, GPU_LINEAR, GPU_LINEAR);
             C2D_SpriteSetCenter(&text, 0.5f, 0.5f);
             C2D_SpriteSetPos(&text, SCREEN_WIDTH_AREA / 2, (SCREEN_HEIGHT_AREA / 2) - (NEW_BEST_SEPARATION * scale));
@@ -309,6 +309,6 @@ void draw_new_best_popup() {
         }
 
         
-        draw_text(&bigFont_fontCharset, &bigFont_sheet, SCREEN_WIDTH_AREA / 2, (SCREEN_HEIGHT_AREA / 2) + (NEW_BEST_SEPARATION * scale), scale, scale, 0.5f, true, "%d%%", new_best_popup.progress);
+        drawText(&bigFontFontCharset, &bigFontSheet, SCREEN_WIDTH_AREA / 2, (SCREEN_HEIGHT_AREA / 2) + (NEW_BEST_SEPARATION * scale), scale, scale, 0.5f, true, "%d%%", newBestPopup.progress);
     }
 }

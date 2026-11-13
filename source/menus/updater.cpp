@@ -22,19 +22,19 @@
 static UIScreen *screen;
 
 static UIList *list;
-static UILabel *error_label;
-static UIButton *updater_button;
+static UILabel *errorLabel;
+static UIButton *updaterButton;
 static UISpinner *spinner;
 
-GenericTask updater_task = {
-    .func = check_for_updates
+GenericTask updaterTask = {
+    .func = checkForUpdates
 };
 
-Thread updater_thread;
+Thread updaterThread;
 bool checkedForUpdate = false;
 
-static void action_update(UIElement *e, const UIPropertyList *p) {
-    if (is_3DSX && is_citra() && !_3dsx_path) {
+static void actionUpdate(UIElement *e, const UIPropertyList *p) {
+    if (is3Dsx && isCitra() && !threeDsxPath) {
         InfoCardData *data = (InfoCardData *)malloc(sizeof(InfoCardData));
         if (!data) return;
 
@@ -43,24 +43,24 @@ static void action_update(UIElement *e, const UIPropertyList *p) {
         data->customTitle = true;
         data->copied = true;
 
-        ui_stack_push(&info_card_def, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
-        ui_stack_push_data(data);
+        uiStackPush(&infoCardDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+        uiStackPushData(data);
         return;
     }
-    if (update_data->isAvailable && checkedForUpdate) ui_stack_push(&updater_pop_up_def, ANIM_NONE, ANIM_ZOOM, PUSH_NEXT); 
+    if (updateData->isAvailable && checkedForUpdate) uiStackPush(&updaterPopUpDef, ANIM_NONE, ANIM_ZOOM, PUSH_NEXT); 
 }
 
-static void action_refresh_updates(UIElement *e, const UIPropertyList *p) {
-    if (updater_task.running) return;
-    ui_label_set_text(error_label, "");
-    ui_list_reset(list);
-    ui_enable_element((UIElement *) spinner);
-    ui_disable_element((UIElement *) updater_button);
+static void actionRefreshUpdates(UIElement *e, const UIPropertyList *p) {
+    if (updaterTask.running) return;
+    uiLabelSetText(errorLabel, "");
+    uiListReset(list);
+    uiEnableElement((UIElement *) spinner);
+    uiDisableElement((UIElement *) updaterButton);
     checkedForUpdate = false;
-    updater_thread = create_generic_thread(&updater_task);
+    updaterThread = createGenericThread(&updaterTask);
 }
 
-const char *handle_updater_error_codes(int code) {
+const char *handleUpdaterErrorCodes(int code) {
     switch (code) {
         case -4:
             return "Too many requests!\nPlease try again later.";
@@ -93,13 +93,13 @@ const char *handle_updater_error_codes(int code) {
     return "";
 }
 
-static UIActionDef updater_actions[] = {
-    {"update", action_update },
-    {"refresh", action_refresh_updates }
+static UIActionDef updaterActions[] = {
+    {"update", actionUpdate },
+    {"refresh", actionRefreshUpdates }
 };
 
-static void populate_info() {
-    int list_width = list->base.w / 2;
+static void populateInfo() {
+    int listWidth = list->base.w / 2;
     int textMarginX = 0;
     int textMarginY = 3;
     float textScale = 0.75;
@@ -109,160 +109,160 @@ static void populate_info() {
     if (useNightlyBranch && latestCommits) {
 
         // description card
-        UIElement *info = (UIElement *)ui_create_rectangle(screen);
+        UIElement *info = (UIElement *)uiCreateRectangle(screen);
         if (info) {
-            ui_rectangle_set_color((UIRectangle *)info, C2D_Color32(194, 114, 62, 0));
-            ui_element_set_size(info, list->base.w, lineHeight + textMarginY * 2);
+            uiRectangleSetColor((UIRectangle *)info, C2D_Color32(194, 114, 62, 0));
+            uiElementSetSize(info, list->base.w, lineHeight + textMarginY * 2);
             // label
-            UILabel *label = ui_create_label(screen);
+            UILabel *label = uiCreateLabel(screen);
             if (label) {
-                ui_label_set_text(label, "<#ffff00>Changes since last update:</>");
-                ui_element_set_scale((UIElement *)label, textScale);
-                ui_element_set_position((UIElement *)label, -list_width + textMarginX, 0);
+                uiLabelSetText(label, "<#ffff00>Changes since last update:</>");
+                uiElementSetScale((UIElement *)label, textScale);
+                uiElementSetPosition((UIElement *)label, -listWidth + textMarginX, 0);
                 label->font = 1;
-                ui_element_add_child(info, (UIElement *)label);
+                uiElementAddChild(info, (UIElement *)label);
             }
-            ui_list_add(list, info);
+            uiListAdd(list, info);
         }
 
         for (int i = 0; i < latestCommitCount; i++) {
-            float commit_scale = textScale * 0.9f;
-            char *buf = wrap_text(&chatFont_fontCharset, commit_scale, latestCommits[i], list->base.w - 2 * textMarginX);
-            float textHeight = get_text_height(&chatFont_fontCharset, &chatFont_sheet, commit_scale, true, buf);
+            float commitScale = textScale * 0.9f;
+            char *buf = wrapText(&chatFontFontCharset, commitScale, latestCommits[i], list->base.w - 2 * textMarginX);
+            float textHeight = getTextHeight(&chatFontFontCharset, &chatFontSheet, commitScale, true, buf);
 
-            UIElement *card = (UIElement *)ui_create_rectangle(screen);
+            UIElement *card = (UIElement *)uiCreateRectangle(screen);
             if (card && i < 30 - 1) {
-                ui_rectangle_set_color((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 0) : C2D_Color32(194, 114, 62, 63)));
-                ui_element_set_size(card, list->base.w, textHeight + textMarginY * 2);
+                uiRectangleSetColor((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 0) : C2D_Color32(194, 114, 62, 63)));
+                uiElementSetSize(card, list->base.w, textHeight + textMarginY * 2);
                 
                 // commit title
-                UILabel *title = ui_create_label(screen);
+                UILabel *title = uiCreateLabel(screen);
                 if (title) {
-                    ui_label_set_text(title, buf);
+                    uiLabelSetText(title, buf);
 
-                    ui_element_set_position((UIElement *)title, -list_width + textMarginX, 0);
-                    ui_element_set_scale((UIElement *)title, commit_scale );
+                    uiElementSetPosition((UIElement *)title, -listWidth + textMarginX, 0);
+                    uiElementSetScale((UIElement *)title, commitScale );
 
                     title->font = 1;
 
-                    ui_element_add_child(card, (UIElement *)title);
+                    uiElementAddChild(card, (UIElement *)title);
                 }
 
-                ui_list_add(list, card);
+                uiListAdd(list, card);
             } else if (card) {
-                ui_rectangle_set_color((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 0) : C2D_Color32(194, 114, 62, 63)));
-                ui_element_set_size(card, list->base.w, lineHeight + textMarginY * 2);
+                uiRectangleSetColor((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 0) : C2D_Color32(194, 114, 62, 63)));
+                uiElementSetSize(card, list->base.w, lineHeight + textMarginY * 2);
                 
                 // ... and more
-                UILabel *title = ui_create_label(screen);
+                UILabel *title = uiCreateLabel(screen);
                 if (title) {
-                    ui_label_set_text(title, "<#27ff00>... and more!</>");
+                    uiLabelSetText(title, "<#27ff00>... and more!</>");
 
-                    ui_element_set_position((UIElement *)title, -list_width + textMarginX, 0);
-                    ui_element_set_scale((UIElement *)title, textScale);
+                    uiElementSetPosition((UIElement *)title, -listWidth + textMarginX, 0);
+                    uiElementSetScale((UIElement *)title, textScale);
 
                     title->font = 1;
 
-                    ui_element_add_child(card, (UIElement *)title);
+                    uiElementAddChild(card, (UIElement *)title);
                 }
 
-                ui_list_add(list, card);
+                uiListAdd(list, card);
             }
         }
-    } else if (update_data->releaseBody) {
+    } else if (updateData->releaseBody) {
         int baseLineCount = 0;
-        char **infoText = split_string(update_data->releaseBody, '\n', &baseLineCount, true);
+        char **infoText = splitString(updateData->releaseBody, '\n', &baseLineCount, true);
         // description card
-        UIElement *info = (UIElement *)ui_create_rectangle(screen);
+        UIElement *info = (UIElement *)uiCreateRectangle(screen);
         if (info) {
-            ui_rectangle_set_color((UIRectangle *)info, C2D_Color32(194, 114, 62, 0));
-            ui_element_set_size(info, list->base.w, lineHeight + textMarginY * 2);
+            uiRectangleSetColor((UIRectangle *)info, C2D_Color32(194, 114, 62, 0));
+            uiElementSetSize(info, list->base.w, lineHeight + textMarginY * 2);
             // label
-            UILabel *label = ui_create_label(screen);
+            UILabel *label = uiCreateLabel(screen);
             if (label) {
-                ui_label_set_text(label, update_data->releaseTitle);
-                ui_element_set_scale((UIElement *)label, textScale * 1.2);
-                ui_element_set_position((UIElement *)label, -list_width + textMarginX, 0);
+                uiLabelSetText(label, updateData->releaseTitle);
+                uiElementSetScale((UIElement *)label, textScale * 1.2);
+                uiElementSetPosition((UIElement *)label, -listWidth + textMarginX, 0);
                 label->font = 1;
-                ui_element_add_child(info, (UIElement *)label);
+                uiElementAddChild(info, (UIElement *)label);
             }
-            ui_list_add(list, info);
+            uiListAdd(list, info);
         }
         // body 
         for (int i = 0; i < baseLineCount; i++) {
-            char *buf = wrap_text(&chatFont_fontCharset, textScale, infoText[i], list->base.w - 2 * textMarginX);
-            float textHeight = get_text_height(&chatFont_fontCharset, &chatFont_sheet, textScale, true, buf);
+            char *buf = wrapText(&chatFontFontCharset, textScale, infoText[i], list->base.w - 2 * textMarginX);
+            float textHeight = getTextHeight(&chatFontFontCharset, &chatFontSheet, textScale, true, buf);
 
-            UIElement *card = (UIElement *)ui_create_rectangle(screen);
+            UIElement *card = (UIElement *)uiCreateRectangle(screen);
             if (card) {
-                ui_rectangle_set_color((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 0) : C2D_Color32(161, 88, 48, 0)));
-                ui_element_set_size(card, list->base.w, textHeight + textMarginY * 2);
+                uiRectangleSetColor((UIRectangle *)card, (i & 1 ? C2D_Color32(194, 114, 62, 0) : C2D_Color32(161, 88, 48, 0)));
+                uiElementSetSize(card, list->base.w, textHeight + textMarginY * 2);
                 
                 // commit title
-                UILabel *title = ui_create_label(screen);
+                UILabel *title = uiCreateLabel(screen);
                 if (title) {
                     title->base.w = list->base.w - 2 * textMarginX; 
-                    ui_label_set_text(title, buf);
+                    uiLabelSetText(title, buf);
 
-                    ui_element_set_position((UIElement *)title, -list_width + textMarginX, 0);
-                    ui_element_set_scale((UIElement *)title, textScale);
+                    uiElementSetPosition((UIElement *)title, -listWidth + textMarginX, 0);
+                    uiElementSetScale((UIElement *)title, textScale);
 
                     title->font = 1;
 
-                    ui_element_add_child(card, (UIElement *)title);
+                    uiElementAddChild(card, (UIElement *)title);
                 }
 
-                ui_list_add(list, card);
+                uiListAdd(list, card);
             }   
         }
-        free_string_array(infoText, baseLineCount);
+        freeStringArray(infoText, baseLineCount);
     }
 }
 
-static void updater_init(UIScreen *s) {
+static void updaterInit(UIScreen *s) {
     screen = s;
-    list = (UIList *)ui_get_element_by_tag(s, "list");
-    updater_button = (UIButton *)ui_get_element_by_tag(s, "updatebutton");
-    spinner = (UISpinner *)ui_get_element_by_tag(s, "spinner");
-    error_label = (UILabel *)ui_get_element_by_tag(s, "errorlabel");
-    if (checkedForUpdate && update_data->isAvailable) {
-        ui_disable_element((UIElement *) spinner);
-        populate_info();
+    list = (UIList *)uiGetElementByTag(s, "list");
+    updaterButton = (UIButton *)uiGetElementByTag(s, "updatebutton");
+    spinner = (UISpinner *)uiGetElementByTag(s, "spinner");
+    errorLabel = (UILabel *)uiGetElementByTag(s, "errorlabel");
+    if (checkedForUpdate && updateData->isAvailable) {
+        uiDisableElement((UIElement *) spinner);
+        populateInfo();
     } else {
-        ui_disable_element((UIElement *) updater_button);
-        ui_enable_element((UIElement *) spinner);
-        if (!updater_task.running) updater_thread = create_generic_thread(&updater_task);
+        uiDisableElement((UIElement *) updaterButton);
+        uiEnableElement((UIElement *) spinner);
+        if (!updaterTask.running) updaterThread = createGenericThread(&updaterTask);
     }
 }
 
-static void updater_update(UIScreen *s, UIInput *i) {
+static void updaterUpdate(UIScreen *s, UIInput *i) {
     // Run when finished
-    if (updater_task.finished) {
-        ui_disable_element((UIElement *) spinner);
+    if (updaterTask.finished) {
+        uiDisableElement((UIElement *) spinner);
         // Handle result
-        if (updater_task.result == 0) {
-            if (update_data->isAvailable) {
-                ui_enable_element((UIElement *) updater_button);
-                populate_info();
+        if (updaterTask.result == 0) {
+            if (updateData->isAvailable) {
+                uiEnableElement((UIElement *) updaterButton);
+                populateInfo();
                 checkedForUpdate = true;
             }
         } else {
-            output_log(handle_updater_error_codes(updater_task.result));
-            ui_label_set_text(error_label, handle_updater_error_codes(updater_task.result));
+            outputLog(handleUpdaterErrorCodes(updaterTask.result));
+            uiLabelSetText(errorLabel, handleUpdaterErrorCodes(updaterTask.result));
         }
-        updater_task.finished = false;
+        updaterTask.finished = false;
     }
 }
 
-extern const UIScreenDefPair updater_def = {
+extern const UIScreenDefPair updaterDef = {
     .name = "updater",
     .btm = {
         .path = "romfs:/menus/updater.txt",
-        .init = updater_init,
-        .update = updater_update,
-        .action_list = {
-            .actions = updater_actions,
-            .action_count = ARRAY_LEN(updater_actions)
+        .init = updaterInit,
+        .update = updaterUpdate,
+        .actionList = {
+            .actions = updaterActions,
+            .actionCount = ARRAY_LEN(updaterActions)
         }
     },
 };

@@ -37,51 +37,51 @@
 #include "menus/updater_pop_up.hpp"
 
 const UIScreenDefPair *defs[] = {
-    &main_menu_def,
-    &icon_kit_def,
-    &level_select_def,
-    &gameplay_def,
-    &creator_menu_def,
-    &palette_kit_def,
-    &credits_def,
-    &soggy_def,
-    &search_menu_def,
-    &external_def,
-    &settings_hub_def,
-    &songs_def,
-    &statistics_def,
-    &how_to_play_def,
-    &settings_def,
-    &info_card_def,
-    &dim_screen_def,
-    &online_def,
-    &saved_levels_def,
-    &song_filter_def,
-    &length_filter_def,
-    &search_filters_def,
-    &server_switcher_def,
-    &two_option_pop_up_def,
-    &delete_pop_up_def,
-    &warning_pop_up_def,
-    &clear_filters_def,
-    &online_infobox_def,
-    &online_level_menu_def,
-    &online_level_comments_def,
-    &external_popup_def,
-    &external_infobox_def,
-    &updater_def,
-    &updater_settings_def,
-    &updater_pop_up_def,
-    &quit_pop_up_def,
-    &autoupdate_pop_up_def,
-    &online_level_options_def
+    &mainMenuDef,
+    &iconKitDef,
+    &levelSelectDef,
+    &gameplayDef,
+    &creatorMenuDef,
+    &paletteKitDef,
+    &creditsDef,
+    &soggyDef,
+    &searchMenuDef,
+    &externalDef,
+    &settingsHubDef,
+    &songsDef,
+    &statisticsDef,
+    &howToPlayDef,
+    &settingsDef,
+    &infoCardDef,
+    &dimScreenDef,
+    &onlineDef,
+    &savedLevelsDef,
+    &songFilterDef,
+    &lengthFilterDef,
+    &searchFiltersDef,
+    &serverSwitcherDef,
+    &twoOptionPopUpDef,
+    &deletePopUpDef,
+    &warningPopUpDef,
+    &clearFiltersDef,
+    &onlineInfoboxDef,
+    &onlineLevelMenuDef,
+    &onlineLevelCommentsDef,
+    &externalPopupDef,
+    &externalInfoboxDef,
+    &updaterDef,
+    &updaterSettingsDef,
+    &updaterPopUpDef,
+    &quitPopUpDef,
+    &autoupdatePopUpDef,
+    &onlineLevelOptionsDef
 };
 
-extern const UIScreenDefPair *ui_get_screen_def(const char* name){
+extern const UIScreenDefPair *uiGetScreenDef(const char* name){
     for(size_t i = 0; i < ARRAY_LEN(defs); i++){
         if(strcmp(name, defs[i]->name) == 0){
             return defs[i];
         }
     }
-    return &soggy_def;
+    return &soggyDef;
 }

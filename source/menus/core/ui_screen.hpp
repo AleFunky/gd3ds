@@ -50,10 +50,10 @@ typedef struct {
     float time;
     float duration;
     //determined based on the animation specified (only really applies to the slide down anim for out_duration = 0.5)
-    float in_duration;
-    float out_duration;
+    float inDuration;
+    float outDuration;
     //amount of time it takes the (fullscreen) darken to fade in/out relative to the screen opening animation
-    float darken_frac;
+    float darkenFrac;
 
     bool done;
 } UITransition;
@@ -66,14 +66,14 @@ typedef struct {
     void (*draw)(UIScreen *, UIDrawPhase);
     void (*exit)(UIScreen *);
 
-    UIActionList action_list;
+    UIActionList actionList;
 } UIScreenDefinition;
 
 typedef struct {
     const char *name;
     UIScreenDefinition top;
     UIScreenDefinition btm;
-    void (*free_data)(void *data);
+    void (*freeData)(void *data);
 } UIScreenDefPair;
 
 typedef struct UIScreen {
@@ -86,7 +86,7 @@ typedef struct UIScreen {
 
     UITransition transition;
     bool isBottom:1;
-    bool disable_element_update:1;
+    bool disableElementUpdate:1;
 
     bool loaded:1;
     bool closing:1;
@@ -96,48 +96,48 @@ typedef void (*UIElementVisitor)(UIElement *element, void *userdata);
 typedef bool (*UIElementPredicate)(UIElement *, void *);
 typedef UIElement *(*UICreateFn)(UIScreen *screen, const UIPropertyList *);
 
-extern C2D_SpriteSheet ui_sheet;
-extern C2D_SpriteSheet ui_2_sheet;
-extern C2D_SpriteSheet bigFont_sheet;
-extern C2D_SpriteSheet chatFont_sheet;
-extern C2D_SpriteSheet goldFont_sheet;
-extern C2D_SpriteSheet window_sheet;
-extern C2D_SpriteSheet bg_gradient_sheet;
-extern C2D_SpriteSheet bar_sheet;
+extern C2D_SpriteSheet uiSheet;
+extern C2D_SpriteSheet ui2Sheet;
+extern C2D_SpriteSheet bigFontSheet;
+extern C2D_SpriteSheet chatFontSheet;
+extern C2D_SpriteSheet goldFontSheet;
+extern C2D_SpriteSheet windowSheet;
+extern C2D_SpriteSheet bgGradientSheet;
+extern C2D_SpriteSheet barSheet;
 
-extern UIScreen default_screen;
-extern UIScreen default_screen_top;
+extern UIScreen defaultScreen;
+extern UIScreen defaultScreenTop;
 
 extern const LabelFont fonts[NUM_FONTS];
 
-extern const UIBitfieldEntry keybind_table[22];
+extern const UIBitfieldEntry keybindTable[22];
 
-void required_loading_screen_assets_init();
-void ui_assets_init();
+void requiredLoadingScreenAssetsInit();
+void uiAssetsInit();
 
-C2D_SpriteSheet get_sheet(int sheet);
+C2D_SpriteSheet getSheet(int sheet);
 
-void copy_tag_array(UIElement *e, const char *tags);
+void copyTagArray(UIElement *e, const char *tags);
 
-void finish_animation(UIScreen *screen);
+void finishAnimation(UIScreen *screen);
 
-void ui_screen_open(UIScreen *screen, UIAnimation animation);
-void ui_screen_close(UIScreen *screen);
+void uiScreenOpen(UIScreen *screen, UIAnimation animation);
+void uiScreenClose(UIScreen *screen);
 
-UIElement *ui_get_element_by_tag(UIScreen *screen, const char *tag);
-void ui_run_func_on_tag(UIScreen *screen, const char *tag, void (*func)(UIElement *e));
+UIElement *uiGetElementByTag(UIScreen *screen, const char *tag);
+void uiRunFuncOnTag(UIScreen *screen, const char *tag, void (*func)(UIElement *e));
 
-void ui_set_pos_on_tag(UIScreen *screen, float x, float y, const char *tag);
+void uiSetPosOnTag(UIScreen *screen, float x, float y, const char *tag);
 
-char* next_token(char** cursor);
-void collect_properties(UIPropertyList *props, char *token, char **cursor);
+char* nextToken(char** cursor);
+void collectProperties(UIPropertyList *props, char *token, char **cursor);
 
-void add_ui_particle_system(ParticleSystem *particle);
-void free_ui_particle_systems();
+void addUIParticleSystem(ParticleSystem *particle);
+void freeUIParticleSystems();
 
-void ui_load_screen(UIScreen* screen);
-void ui_load_screen_old(UIScreen* screen, const UIActionDef* actions, size_t action_count, const char* path);
-void ui_screen_update_transition(UIScreen *screen, float dt);
-void ui_screen_update(UIScreen* screen, UIInput* touch);
-void ui_screen_draw(UIScreen* screen);
-void ui_unload_screen(UIScreen *screen);
+void uiLoadScreen(UIScreen* screen);
+void uiLoadScreenOld(UIScreen* screen, const UIActionDef* actions, size_t actionCount, const char* path);
+void uiScreenUpdateTransition(UIScreen *screen, float dt);
+void uiScreenUpdate(UIScreen* screen, UIInput* touch);
+void uiScreenDraw(UIScreen* screen);
+void uiUnloadScreen(UIScreen *screen);

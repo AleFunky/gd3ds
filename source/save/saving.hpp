@@ -23,27 +23,27 @@
 #define SAVE_SAVED_LEVEL_KEY "saved_levels"
 
 typedef struct LevelData {
-    int level_id;
+    int levelID;
     int attempts;
     int jumps;
-    int normal_progress;
-    int practice_progress;
+    int normalProgress;
+    int practiceProgress;
     int stars;
     bool coin1;
     bool coin2;
     bool coin3;
-    bool low_detail;
+    bool lowDetail;
 } LevelData;
 
-bool level_has_rate(const LevelData *data);
+bool levelHasRate(const LevelData *data);
 
 typedef struct SavedLevelDataEntry {
     char *key;
     int version;
-    SearchEntry search_entry;
-    CreatorEntry creator_entry;
-    SongEntry song_entry;
-    LevelEntry level_entry;
+    SearchEntry searchEntry;
+    CreatorEntry creatorEntry;
+    SongEntry songEntry;
+    LevelEntry levelEntry;
 } SavedLevelDataEntry;
 
 typedef struct SavedLevelDataList {
@@ -64,13 +64,13 @@ typedef struct LevelDataList {
 } LevelDataList;
 
 typedef struct ServerFile {
-    LevelDataList online_levels;
-    LevelDataList main_levels;
-    SavedLevelDataList saved_levels;
+    LevelDataList onlineLevels;
+    LevelDataList mainLevels;
+    SavedLevelDataList savedLevels;
 } ServerFile;
 
 typedef struct ExternalLevelFile {
-    LevelDataList external_levels;  
+    LevelDataList externalLevels;  
 } ExternalLevelFile;
 
 typedef enum {
@@ -105,54 +105,54 @@ typedef enum {
 typedef struct SavingTask {
     struct json_object *root;
     unsigned char *data;
-    size_t data_len;
+    size_t dataLen;
     SavingError error;
     char file[256];
-    char tmp_file[256];
+    char tmpFile[256];
     volatile bool ready;
     volatile bool running;
 } SavingTask;
 
-void begin_saving(SaveType type);
-void process_saving();
-bool is_saving();
-void wait_for_saving();
+void beginSaving(SaveType type);
+void processSaving();
+bool isSaving();
+void waitForSaving();
 
-extern int total_stars;
-extern int total_coins;
-extern int total_user_coins;
-extern int total_attempts;
-extern int total_jumps;
-extern int total_demons;
-extern int completed_main_levels;
-extern int completed_external_levels;
-extern int players_destroyed;
+extern int totalStars;
+extern int totalCoins;
+extern int totalUserCoins;
+extern int totalAttempts;
+extern int totalJumps;
+extern int totalDemons;
+extern int completedMainLevels;
+extern int completedExternalLevels;
+extern int playersDestroyed;
 
-bool load_external_file(const char *path, ExternalLevelFile *save_data);
-SavingError save_external_file(const char *path, const ExternalLevelFile *save_data);
+bool loadExternalFile(const char *path, ExternalLevelFile *saveData);
+SavingError saveExternalFile(const char *path, const ExternalLevelFile *saveData);
 
-bool load_save_file(const char *path, ServerFile *save_data);
-SavingError save_save_file(const char *path, const ServerFile *save_data);
+bool loadSaveFile(const char *path, ServerFile *saveData);
+SavingError saveSaveFile(const char *path, const ServerFile *saveData);
 
-LevelDataEntry *get_or_add_level_to_external_file(ExternalLevelFile *save_data, const char *key);
-LevelDataEntry *get_or_add_level_to_server_file(ServerFile *save_data, const char *key, LevelListType type);
+LevelDataEntry *getOrAddLevelToExternalFile(ExternalLevelFile *saveData, const char *key);
+LevelDataEntry *getOrAddLevelToServerFile(ServerFile *saveData, const char *key, LevelListType type);
 
-extern LevelDataEntry *current_level_entry;
-extern LevelListType current_level_list;
+extern LevelDataEntry *currentLevelEntry;
+extern LevelListType currentLevelList;
 
-bool migrate_old_data();
+bool migrateOldData();
 
-LevelDataEntry *level_data_list_find(LevelDataList *level_data, const char *key);
-LevelDataEntry *get_online_level_data(int level_id);
-SavedLevelDataEntry *saved_level_data_list_find(SavedLevelDataList *level_data, const char *key);
-SavedLevelDataEntry *get_saved_level_data(int level_id);
-bool save_level_to_server_file(ServerFile *save_data, int level_id, const SearchEntry *search, const CreatorEntry *creator, const SongEntry *song);
-void save_current_save_file(LevelListType type);
+LevelDataEntry *levelDataListFind(LevelDataList *levelData, const char *key);
+LevelDataEntry *getOnlineLevelData(int levelID);
+SavedLevelDataEntry *savedLevelDataListFind(SavedLevelDataList *levelData, const char *key);
+SavedLevelDataEntry *getSavedLevelData(int levelID);
+bool saveLevelToServerFile(ServerFile *saveData, int levelID, const SearchEntry *search, const CreatorEntry *creator, const SongEntry *song);
+void saveCurrentSaveFile(LevelListType type);
 
-bool remove_saved_level(int level_id, bool gdps);
+bool removeSavedLevel(int levelID, bool gdps);
 
-bool saved_level_exists(int level_id, bool gdps);
-char *load_saved_level(int level_id, bool gdps, size_t *out_size);
-bool save_saved_level(int level_id, bool gdps, const char *data);
+bool savedLevelExists(int levelID, bool gdps);
+char *loadSavedLevel(int levelID, bool gdps, size_t *outSize);
+bool saveSavedLevel(int levelID, bool gdps, const char *data);
 
-void calculate_stats();
+void calculateStats();

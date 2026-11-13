@@ -19,22 +19,22 @@ typedef struct {
 
     float duration;
 
-    float start_opacity;
-    float end_opacity;
+    float startOpacity;
+    float endOpacity;
 
-    float start_rad;
-    float end_rad;
+    float startRad;
+    float endRad;
 
     bool hollow;
     bool trifading;
 
-    EaseTypes start_opacity_ease;
-    EaseTypes end_opacity_ease;
+    EaseTypes startOpacityEase;
+    EaseTypes endOpacityEase;
 
-    EaseTypes start_rad_ease;
-    EaseTypes end_rad_ease;
+    EaseTypes startRadEase;
+    EaseTypes endRadEase;
 
-    float line_thickness;
+    float lineThickness;
 } UseEffectDefinition;
 
 typedef struct {
@@ -46,8 +46,8 @@ typedef struct {
 
     float rad;
 
-    float mid_rad;
-    float mid_opacity;
+    float midRad;
+    float midOpacity;
     
     UseEffectDefinition def;
 
@@ -66,31 +66,31 @@ typedef struct {
     bool stationary;
 } UseEffectPool;
 
-extern const UseEffectDefinition pad_use_effect;
-extern const UseEffectDefinition orb_use_effect;
-extern const UseEffectDefinition orb_collide_effect;
-extern const UseEffectDefinition speed_collide_effect;
-extern const UseEffectDefinition portal_use_effect;
-extern const UseEffectDefinition death_effect;
-extern const UseEffectDefinition tap_effect;
-extern const UseEffectDefinition coin_use_effect;
-extern const UseEffectDefinition coin_radius_effect;
-extern const UseEffectDefinition wave_radius_effect;
-extern const UseEffectDefinition size_change_big_effect;
-extern const UseEffectDefinition end_wall_filled_first;
-extern const UseEffectDefinition end_wall_filled_second;
-extern const UseEffectDefinition end_wall_filled_title;
-extern const UseEffectDefinition end_wall_firework_circle;
-extern const UseEffectDefinition end_wall_circunference;
-extern const UseEffectDefinition respawn_effect;
-extern const UseEffectDefinition spider_in_effect;
-extern const UseEffectDefinition spider_out_effect;
+extern const UseEffectDefinition padUseEffect;
+extern const UseEffectDefinition orbUseEffect;
+extern const UseEffectDefinition orbCollideEffect;
+extern const UseEffectDefinition speedCollideEffect;
+extern const UseEffectDefinition portalUseEffect;
+extern const UseEffectDefinition deathEffect;
+extern const UseEffectDefinition tapEffect;
+extern const UseEffectDefinition coinUseEffect;
+extern const UseEffectDefinition coinRadiusEffect;
+extern const UseEffectDefinition waveRadiusEffect;
+extern const UseEffectDefinition sizeChangeBigEffect;
+extern const UseEffectDefinition endWallFilledFirst;
+extern const UseEffectDefinition endWallFilledSecond;
+extern const UseEffectDefinition endWallFilledTitle;
+extern const UseEffectDefinition endWallFireworkCircle;
+extern const UseEffectDefinition endWallCircunference;
+extern const UseEffectDefinition respawnEffect;
+extern const UseEffectDefinition spiderInEffect;
+extern const UseEffectDefinition spiderOutEffect;
 
 
-void init_default_use_effect_pools();
-void init_use_effect_pool(UseEffectPool *pool, int capacity);
-UseEffectPool *get_use_effect_array_ptr(int screen);
-UseEffect *add_use_effect(float x, float y, int obj, const UseEffectDefinition *def, UseEffectPool *pool);
-void update_use_effects(float delta, UseEffectPool *pool);
-void draw_use_effects(UseEffectPool *pool);
-void clear_use_effects(UseEffectPool *pool);
+void initDefaultUseEffectPools();
+void initUseEffectPool(UseEffectPool *pool, int capacity);
+UseEffectPool *getUseEffectArrayPtr(int screen);
+UseEffect *addUseEffect(float x, float y, int obj, const UseEffectDefinition *def, UseEffectPool *pool);
+void updateUseEffects(float delta, UseEffectPool *pool);
+void drawUseEffects(UseEffectPool *pool);
+void clearUseEffects(UseEffectPool *pool);

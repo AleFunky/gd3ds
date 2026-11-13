@@ -9,4 +9,4 @@ typedef struct {
     const char *title;
 } InfoCardData;
 
-extern const UIScreenDefPair info_card_def;
+extern const UIScreenDefPair infoCardDef;

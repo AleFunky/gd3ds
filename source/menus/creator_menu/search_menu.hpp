@@ -2,16 +2,16 @@
 #include "utils/network.hpp"
 #include "menus/core/ui_stack.hpp"
 
-void enable_demons(UIScreen *s);
-void disable_demons(UIScreen *s);
+void enableDemons(UIScreen *s);
+void disableDemons(UIScreen *s);
 
-void update_difficulty_tints(UIScreen *s);
+void updateDifficultyTints(UIScreen *s);
 
-extern bool search_needs_refresh;
+extern bool searchNeedsRefresh;
 extern bool gdps;
 
-bool user_coins_counter_visible(void);
+bool userCoinsCounterVisible(void);
 
 extern SearchFilters filters;
 
-extern const UIScreenDefPair search_menu_def;
+extern const UIScreenDefPair searchMenuDef;

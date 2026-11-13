@@ -1,6 +1,6 @@
 #include "bigFont.hpp"
 
-extern const Glyph bigFont_fontGlyphs[96] = {
+extern const Glyph bigFontFontGlyphs[96] = {
     {32, 498, 128, 0, 0, 0, 33, 15, -1},
     {33, 338, 39, 18, 29, 0, 5, 12, 0},
     {34, 385, 128, 20, 15, 0, 1, 14, 1},
@@ -99,8 +99,8 @@ extern const Glyph bigFont_fontGlyphs[96] = {
     {8226, 282, 128, 17, 17, 0, 12, 11, 94},
 };
 
-extern const Charset bigFont_fontCharset = {
-    bigFont_fontGlyphs,
+extern const Charset bigFontFontCharset = {
+    bigFontFontGlyphs,
     96,
     1
 };

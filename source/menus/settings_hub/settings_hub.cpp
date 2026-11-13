@@ -19,28 +19,28 @@
 #include "menus/settings_hub/credits.hpp"
 #include "menus/settings_hub/songs.hpp"
 
-static UISlider *music_slider_bar;
-static UISlider *sound_slider_bar;
+static UISlider *musicSliderBar;
+static UISlider *soundSliderBar;
 
-static void settings_hub_init(UIScreen *s) {
-    music_slider_bar = (UISlider*) ui_get_element_by_tag(s, "music_slider");
-    sound_slider_bar = (UISlider*) ui_get_element_by_tag(s, "sound_slider");
+static void settingsHubInit(UIScreen *s) {
+    musicSliderBar = (UISlider*) uiGetElementByTag(s, "music_slider");
+    soundSliderBar = (UISlider*) uiGetElementByTag(s, "sound_slider");
 
-    if (music_slider_bar) music_slider_bar->value = music_volume;
-    if (sound_slider_bar) sound_slider_bar->value = sound_volume;
+    if (musicSliderBar) musicSliderBar->value = musicVolume;
+    if (soundSliderBar) soundSliderBar->value = soundVolume;
 }
 
-static void settings_hub_update(UIScreen *s, UIInput *touch) {
-    if (music_slider_bar) music_volume = music_slider_bar->value;
-    if (sound_slider_bar) sound_volume = sound_slider_bar->value;
-    apply_volume_settings();
+static void settingsHubUpdate(UIScreen *s, UIInput *touch) {
+    if (musicSliderBar) musicVolume = musicSliderBar->value;
+    if (soundSliderBar) soundVolume = soundSliderBar->value;
+    applyVolumeSettings();
 }
 
-extern const UIScreenDefPair settings_hub_def = {
+extern const UIScreenDefPair settingsHubDef = {
     .name = "settings_hub",
     .btm = {
         .path = "romfs:/menus/settings_hub/settings_hub.txt",
-        .init = settings_hub_init,
-        .update = settings_hub_update,
+        .init = settingsHubInit,
+        .update = settingsHubUpdate,
     }
 };

@@ -14,7 +14,7 @@
 
 #define NEW_BEST_SEPARATION 25.f
 
-void init_new_best_popup(int progress);
-void handle_new_best_popup(float delta);
-void draw_new_best_popup();
-void clear_new_best_popup();
+void initNewBestPopup(int progress);
+void handleNewBestPopup(float delta);
+void drawNewBestPopup();
+void clearNewBestPopup();

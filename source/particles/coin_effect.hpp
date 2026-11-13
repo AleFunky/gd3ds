@@ -9,6 +9,6 @@
 #define COIN_VEL_Y 580.f
 #define COIN_GRAVITY -1800.f
 
-void start_collect_effect(float x, float y, bool outline);
-void update_collect_effect(float delta);
-void draw_collect_effect();
+void startCollectEffect(float x, float y, bool outline);
+void updateCollectEffect(float delta);
+void drawCollectEffect();

@@ -6,25 +6,25 @@
 #include "menus/settings_hub/settings.hpp"
 #include "utils/utils.hpp"
 
-void set_scissor(GPU_SCISSORMODE mode, int x, int y, int width, int height) {
-    int screen_width = GSP_SCREEN_HEIGHT_BOTTOM;
+void setScissor(GPU_SCISSORMODE mode, int x, int y, int width, int height) {
+    int screenWidth = GSP_SCREEN_HEIGHT_BOTTOM;
     int screen_height = GSP_SCREEN_WIDTH;
 
-    int inv_x = screen_width - (x + width);
-    int inv_y = screen_height - (y + height);
+    int invX = screenWidth - (x + width);
+    int invY = screen_height - (y + height);
 
     C2D_Flush();
     C3D_SetScissor(mode,
-        CLAMP(inv_y         , 0, screen_height), // left (Y min)
-        CLAMP(inv_x         , 0, screen_width),  // top (X min)
-        CLAMP(inv_y + height, 0, screen_height), // right (Y max)
-        CLAMP(inv_x + width , 0, screen_width)   // bottom (X max)
+        CLAMP(invY         , 0, screen_height), // left (Y min)
+        CLAMP(invX         , 0, screenWidth),  // top (X min)
+        CLAMP(invY + height, 0, screen_height), // right (Y max)
+        CLAMP(invX + width , 0, screenWidth)   // bottom (X max)
     );
     C2D_Prepare();
 }
 
 // Texture area selection
-Tex3DS_SubTexture select_box(const C2D_Image *image, int x, int y, int endX, int endY) {
+Tex3DS_SubTexture selectBox(const C2D_Image *image, int x, int y, int endX, int endY) {
     Tex3DS_SubTexture tex = *image->subtex;
     if (x != endX) {
         int deltaX  = endX - x;
@@ -44,10 +44,10 @@ Tex3DS_SubTexture select_box(const C2D_Image *image, int x, int y, int endX, int
 }
 
 // Helper macro to select tile from 3x3 grid
-#define TILE(ix, iy) select_box(&atlas, ix*b, iy*b, ix*b + b, iy*b + b)
+#define TILE(ix, iy) selectBox(&atlas, ix*b, iy*b, ix*b + b, iy*b + b)
 
 // Draw a 9 slice rectangle (useful for things like windows)
-void draw_9_slice(const C2D_Image atlas, const float x, const float y, const float sx, const float sy, const int width, const int height, const float border, const u32 color) {
+void draw9Slice(const C2D_Image atlas, const float x, const float y, const float sx, const float sy, const int width, const int height, const float border, const u32 color) {
     // Set color
     C2D_ImageTint tint;
     C2D_PlainImageTint(&tint, color, 1.f);
@@ -140,9 +140,9 @@ void draw_9_slice(const C2D_Image atlas, const float x, const float y, const flo
 #define DISPLAY_FLAGS (GX_TRANSFER_FLIP_VERT(0) | GX_TRANSFER_OUT_TILED(0) | GX_TRANSFER_RAW_COPY(0) | \
                 GX_TRANSFER_IN_FORMAT(GX_TRANSFER_FMT_RGBA8) | GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGB8))
 
-C3D_RenderTarget* C2D_CreateScreenTargetExt(gfxScreen_t screen, gfx3dSide_t side, bool aa) {
-    u8 model = get_model();
-    bool wide = settingsState.wideEnabled && model != CFG_MODEL_2DS && !is_citra() && screen == GFX_TOP;
+C3D_RenderTarget* c2dCreateScreenTargetExt(gfxScreen_t screen, gfx3dSide_t side, bool aa) {
+    u8 model = getModel();
+    bool wide = settingsState.wideEnabled && model != CFG_MODEL_2DS && !isCitra() && screen == GFX_TOP;
 
     int height;
     switch (screen)
@@ -171,7 +171,7 @@ C3D_RenderTarget* C2D_CreateScreenTargetExt(gfxScreen_t screen, gfx3dSide_t side
     return target;
 }
 
-int fade_status = FADE_STATUS_NONE;
+int fadeStatus = FADE_STATUS_NONE;
 float opacity = 0;
 
 // How far apart both eyes get at most, in pixels
@@ -183,119 +183,119 @@ float opacity = 0;
 // Wait a moment before freeing, so slider wiggles don't thrash VRAM
 #define STEREO_IDLE_FRAMES 60
 
-static int stereo_idle_frames = 0;
+static int stereoIdleFrames = 0;
 
 // The slider, snapped to 0 where 3D wouldn't show up anyway
-float get_stereo_slider() {
+float getStereoSlider() {
     if (!settingsState.stereoEnabled) return 0.f;
 
     float slider = osGet3DSliderState();
     return slider < STEREO_DEADZONE ? 0.f : slider;
 }
 
-void reinitialize_screens() {
+void reinitializeScreens() {
     if (top) C3D_RenderTargetDelete(top);
     if (bot) C3D_RenderTargetDelete(bot);
-    if (top_right) C3D_RenderTargetDelete(top_right);
+    if (topRight) C3D_RenderTargetDelete(topRight);
 
-    top = C2D_CreateScreenTargetExt(GFX_TOP, GFX_LEFT, false);
-    bot = C2D_CreateScreenTargetExt(GFX_BOTTOM, GFX_LEFT, false);
+    top = c2dCreateScreenTargetExt(GFX_TOP, GFX_LEFT, false);
+    bot = c2dCreateScreenTargetExt(GFX_BOTTOM, GFX_LEFT, false);
 
     // The second eye only gets VRAM once the slider asks for it
-    top_right = (get_stereo_slider() > 0.f ? C2D_CreateScreenTargetExt(GFX_TOP, GFX_RIGHT, false) : NULL);
-    stereo_idle_frames = 0;
+    topRight = (getStereoSlider() > 0.f ? c2dCreateScreenTargetExt(GFX_TOP, GFX_RIGHT, false) : NULL);
+    stereoIdleFrames = 0;
 }
 
 // Lends the right eye a target while the slider is up. Call outside a frame
-void update_stereo_target() {
-    if (get_stereo_slider() > 0.f) {
-        stereo_idle_frames = 0;
-        if (!top_right) top_right = C2D_CreateScreenTargetExt(GFX_TOP, GFX_RIGHT, false);
+void updateStereoTarget() {
+    if (getStereoSlider() > 0.f) {
+        stereoIdleFrames = 0;
+        if (!topRight) topRight = c2dCreateScreenTargetExt(GFX_TOP, GFX_RIGHT, false);
         return;
     }
 
-    if (!top_right) return;
+    if (!topRight) return;
 
-    if (++stereo_idle_frames < STEREO_IDLE_FRAMES) return;
+    if (++stereoIdleFrames < STEREO_IDLE_FRAMES) return;
 
-    C3D_RenderTargetDelete(top_right);
-    top_right = NULL;
+    C3D_RenderTargetDelete(topRight);
+    topRight = NULL;
 }
 
-void set_wide(bool wide) {
-    u8 model = get_model();
-    if (model != CFG_MODEL_2DS && !is_citra()) {
+void setWide(bool wide) {
+    u8 model = getModel();
+    if (model != CFG_MODEL_2DS && !isCitra()) {
         settingsState.wideEnabled = wide;
         gfxSetWide(wide);
     }
 }
 
 // Neither 2DS has a second eye
-bool stereo_supported() {
-    u8 model = get_model();
+bool stereoSupported() {
+    u8 model = getModel();
     return model != CFG_MODEL_2DS && model != CFG_MODEL_N2DSXL;
 }
 
-void set_stereo(bool stereo) {
-    settingsState.stereoEnabled = stereo && stereo_supported();
+void setStereo(bool stereo) {
+    settingsState.stereoEnabled = stereo && stereoSupported();
     gfxSet3D(settingsState.stereoEnabled);
 }
 
 // Wide and 3D can't share the top screen, so the old one has to go first
-void apply_screen_modes() {
+void applyScreenModes() {
     // A New 2DS XL keeps wide, so only give it up for real 3D
-    if (settingsState.stereoEnabled && stereo_supported()) {
-        set_wide(false);
-        set_stereo(true);
+    if (settingsState.stereoEnabled && stereoSupported()) {
+        setWide(false);
+        setStereo(true);
     } else {
-        set_stereo(false);
-        set_wide(settingsState.wideEnabled);
+        setStereo(false);
+        setWide(settingsState.wideEnabled);
     }
 }
 
 // How deep begin_eye_layer() calls can be nested
 #define MAX_EYE_LAYERS 8
 
-static float stereo_strength = 0.f;
-static int current_eye = EYE_LEFT;
-static bool drawing_top_eye = false;
+static float stereoStrength = 0.f;
+static int currentEye = EYE_LEFT;
+static bool drawingTopEye = false;
 
-static C3D_Mtx layer_views[MAX_EYE_LAYERS];
-static int layer_count = 0;
+static C3D_Mtx layerViews[MAX_EYE_LAYERS];
+static int layerCount = 0;
 
 // True only while the top screen is being drawn in 3D. Everything else bails out
 // early, so 2D and the bottom screen render exactly like they did before
-bool is_stereo_active() {
-    return drawing_top_eye && stereo_strength > 0.f;
+bool isStereoActive() {
+    return drawingTopEye && stereoStrength > 0.f;
 }
 
 // How much this eye moves something floating at the given depth
-float get_depth_shift(float depth) {
-    return (current_eye == EYE_LEFT ? 1.f : -1.f) * depth * MAX_EYE_SHIFT * stereo_strength;
+float getDepthShift(float depth) {
+    return (currentEye == EYE_LEFT ? 1.f : -1.f) * depth * MAX_EYE_SHIFT * stereoStrength;
 }
 
 // Sets the top screen up for one eye, returns false once every eye has been drawn
-bool begin_top_eye(int eye) {
-    return begin_top_eye_target(eye, top);
+bool beginTopEye(int eye) {
+    return beginTopEyeTarget(eye, top);
 }
 
-bool begin_top_eye_target(int eye, C3D_RenderTarget *primary) {
+bool beginTopEyeTarget(int eye, C3D_RenderTarget *primary) {
     // The slider only gets read once per frame so both eyes agree on the depth
     if (eye == EYE_LEFT) {
-        stereo_strength = (primary == top && top_right) ? get_stereo_slider() : 0.f;
+        stereoStrength = (primary == top && topRight) ? getStereoSlider() : 0.f;
     }
 
     // One eye is enough with the slider down
-    if (eye > (stereo_strength > 0.f ? EYE_RIGHT : EYE_LEFT)) {
-        current_eye = EYE_LEFT;
-        drawing_top_eye = false;
+    if (eye > (stereoStrength > 0.f ? EYE_RIGHT : EYE_LEFT)) {
+        currentEye = EYE_LEFT;
+        drawingTopEye = false;
         return false;
     }
 
-    current_eye = eye;
-    drawing_top_eye = true;
+    currentEye = eye;
+    drawingTopEye = true;
 
-    C3D_RenderTarget *target = (eye == EYE_RIGHT ? top_right : primary);
+    C3D_RenderTarget *target = (eye == EYE_RIGHT ? topRight : primary);
     
     C2D_SceneBegin(target);
     C2D_TargetClear(target, C2D_Color32(0, 0, 0, 255));
@@ -304,37 +304,37 @@ bool begin_top_eye_target(int eye, C3D_RenderTarget *primary) {
 }
 
 // True while redrawing the screen for another eye, so nothing gets updated twice
-bool is_extra_eye() {
-    return current_eye != EYE_LEFT;
+bool isExtraEye() {
+    return currentEye != EYE_LEFT;
 }
 
 // Shifts everything drawn after this to the given depth, pair it with end_eye_layer().
 // Does nothing in 2D, touching the view would split the batch for no reason
-void begin_eye_layer(float depth) {
-    if (!is_stereo_active()) return;
+void beginEyeLayer(float depth) {
+    if (!isStereoActive()) return;
 
     // Still count layers we have no room for, so the pairing keeps working
-    if (layer_count++ >= MAX_EYE_LAYERS) return;
+    if (layerCount++ >= MAX_EYE_LAYERS) return;
 
-    C3D_Mtx *saved = &layer_views[layer_count - 1];
+    C3D_Mtx *saved = &layerViews[layerCount - 1];
     C2D_ViewSave(saved);
 
     // The view can be scaled, so divide it out to keep the shift in screen pixels.
     // Whole pixels only, half pixel shifts get filtered and smear thin lines and text
     float scale = saved->r[0].x;
-    if (scale != 0.f) C2D_ViewTranslate(roundf(get_depth_shift(depth)) / scale, 0);
+    if (scale != 0.f) C2D_ViewTranslate(roundf(getDepthShift(depth)) / scale, 0);
 }
 
-void end_eye_layer() {
-    if (!is_stereo_active()) return;
+void endEyeLayer() {
+    if (!isStereoActive()) return;
 
-    if (layer_count <= 0) return;
+    if (layerCount <= 0) return;
 
-    if (--layer_count < MAX_EYE_LAYERS) C2D_ViewRestore(&layer_views[layer_count]);
+    if (--layerCount < MAX_EYE_LAYERS) C2D_ViewRestore(&layerViews[layerCount]);
 }
 
-float get_mirror_x(float x, float factor) {
-    float width = SCREEN_WIDTH_AREA_GAMEPLAY(settingsState.swapGameplayScreens && !in_level_complete);
+float getMirrorX(float x, float factor) {
+    float width = SCREEN_WIDTH_AREA_GAMEPLAY(settingsState.swapGameplayScreens && !inLevelComplete);
 
     if (factor == 0) return x;
     else if (factor == 1) return width - x;
@@ -344,7 +344,7 @@ float get_mirror_x(float x, float factor) {
 
 #include "c2d_internal.h"
 
-bool C2D_DrawTriangleUV(float x0, float y0, float u0, float v0, u32 clr0, float x1, float y1, float u1, float v1, u32 clr1, float x2, float y2, float u2, float v2, u32 clr2, float depth, C2D_Image img) {
+bool c2dDrawTriangleUV(float x0, float y0, float u0, float v0, u32 clr0, float x1, float y1, float u1, float v1, u32 clr1, float x2, float y2, float u2, float v2, u32 clr2, float depth, C2D_Image img) {
 	C2Di_Context* ctx = C2Di_GetContext();
 	if (!(ctx->flags & C2DiF_Active))
 		return false;
@@ -367,29 +367,29 @@ bool C2D_DrawTriangleUV(float x0, float y0, float u0, float v0, u32 clr0, float 
 #define TRIG_TABLE_MASK (TRIG_TABLE_SIZE - 1)
 #define TRIG_QUARTER (TRIG_TABLE_SIZE / 4)
 
-static float sin_table[TRIG_TABLE_SIZE];
+static float sinTable[TRIG_TABLE_SIZE];
 
-void init_trig_table() {
+void initTrigTable() {
     for (int i = 0; i < TRIG_TABLE_SIZE; i++)
-        sin_table[i] = sinf((M_PI * 2) * i / TRIG_TABLE_SIZE);
+        sinTable[i] = sinf((M_PI * 2) * i / TRIG_TABLE_SIZE);
 }
 
-float lut_sin(float angle) {
+float lutSin(float angle) {
     const float scaled = angle * (TRIG_TABLE_SIZE / (M_PI * 2));
     const int index = (int)(scaled) & TRIG_TABLE_MASK;
 
-    return sin_table[index];
+    return sinTable[index];
 }
 
-float lut_cos(float angle) {
+float lutCos(float angle) {
     const float scaled = angle * (TRIG_TABLE_SIZE / (M_PI * 2));
     const int index = (int)(scaled) & TRIG_TABLE_MASK;
     
-    return sin_table[(index + TRIG_QUARTER) & TRIG_TABLE_MASK];
+    return sinTable[(index + TRIG_QUARTER) & TRIG_TABLE_MASK];
 }
 
 
-void C2D_Fast_CalcQuad(C2Di_Quad* quad, const C2D_DrawParams* params) {
+void c2dFastCalcQuad(C2Di_Quad* quad, const C2D_DrawParams* params) {
     const float width = fabsf(params->pos.w);
     const float height = fabsf(params->pos.h);
     const float centerX = params->center.x;
@@ -412,8 +412,8 @@ void C2D_Fast_CalcQuad(C2Di_Quad* quad, const C2D_DrawParams* params) {
         heightX = 0.0f;
         heightY = height;
     } else {   
-        float sine = lut_sin(params->angle);
-        float cosine = lut_cos(params->angle);
+        float sine = lutSin(params->angle);
+        float cosine = lutCos(params->angle);
 
         topLeftX = positionX - centerX * cosine + centerY * sine;
         topLeftY = positionY - centerY * cosine - centerX * sine;
@@ -437,8 +437,8 @@ void C2D_Fast_CalcQuad(C2Di_Quad* quad, const C2D_DrawParams* params) {
     quad->botRight[1] = topLeftY + widthY + heightY;
 }
 
-void calc_quad_params(SpriteObject *vo) {
-    C2D_Fast_CalcQuad(&vo->params.quadr, &vo->spr.params);
+void calcQuadParams(SpriteObject *vo) {
+    c2dFastCalcQuad(&vo->params.quadr, &vo->spr.params);
 
     // Calculate texcoords
 	float tcTopLeft[2], tcTopRight[2], tcBotLeft[2], tcBotRight[2];
@@ -466,7 +466,7 @@ void calc_quad_params(SpriteObject *vo) {
     }
 }
 
-bool C2D_DrawImageFast(C2D_Image *img, const QuadParams *quad_params, const C2D_DrawParams *params, const u32 color) {
+bool c2dDrawImageFast(C2D_Image *img, const QuadParams *quadParams, const C2D_DrawParams *params, const u32 color) {
 	C2Di_Context* ctx = C2Di_GetContext();
 	if (!(ctx->flags & C2DiF_Active))
 		return false;
@@ -479,31 +479,31 @@ bool C2D_DrawImageFast(C2D_Image *img, const QuadParams *quad_params, const C2D_
 
 	// Calculate colors
 
-    const C2Di_Quad quadr = quad_params->quadr;
+    const C2Di_Quad quadr = quadParams->quadr;
 
 	C2Di_AppendQuad();
-	C2Di_AppendVtx(quadr.topLeft[0],  quadr.topLeft[1],  params->depth, quad_params->tcTopLeft[0],  quad_params->tcTopLeft[1],  0, 1, color);
-	C2Di_AppendVtx(quadr.topRight[0], quadr.topRight[1], params->depth, quad_params->tcTopRight[0], quad_params->tcTopRight[1], 0, 1, color);
-	C2Di_AppendVtx(quadr.botLeft[0],  quadr.botLeft[1],  params->depth, quad_params->tcBotLeft[0],  quad_params->tcBotLeft[1],  0, 1, color);
-	C2Di_AppendVtx(quadr.botRight[0], quadr.botRight[1], params->depth, quad_params->tcBotRight[0], quad_params->tcBotRight[1], 0, 1, color);
+	C2Di_AppendVtx(quadr.topLeft[0],  quadr.topLeft[1],  params->depth, quadParams->tcTopLeft[0],  quadParams->tcTopLeft[1],  0, 1, color);
+	C2Di_AppendVtx(quadr.topRight[0], quadr.topRight[1], params->depth, quadParams->tcTopRight[0], quadParams->tcTopRight[1], 0, 1, color);
+	C2Di_AppendVtx(quadr.botLeft[0],  quadr.botLeft[1],  params->depth, quadParams->tcBotLeft[0],  quadParams->tcBotLeft[1],  0, 1, color);
+	C2Di_AppendVtx(quadr.botRight[0], quadr.botRight[1], params->depth, quadParams->tcBotRight[0], quadParams->tcBotRight[1], 0, 1, color);
 	return true;
 }
 
-float calc_x_on_screen(float val) {
-    return get_mirror_x(val - state.camera_x, state.mirror_factor); 
+float calcXOnScreen(float val) {
+    return getMirrorX(val - state.cameraX, state.mirrorFactor); 
 }
 
 // Same as calc_x_on_screen but doesn't do the animation
-float mirror_x_on_screen(float val) {
-    return get_mirror_x(val - state.camera_x, state.mirror_factor >= 0.5f ? 1 : 0); 
+float mirrorXOnScreen(float val) {
+    return getMirrorX(val - state.cameraX, state.mirrorFactor >= 0.5f ? 1 : 0); 
 }
 
-float calc_y_on_screen(float val) {
-    return SCREEN_HEIGHT - ((val - state.camera_y));
+float calcYOnScreen(float val) {
+    return SCREEN_HEIGHT - ((val - state.cameraY));
 }
 
 
-bool is_ccw(Vec2D *poly, int n) {
+bool isCcw(Vec2D *poly, int n) {
     float sum = 0.0f;
     for (int i = 0; i < n; i++) {
         int j = (i + 1) % n;
@@ -512,39 +512,39 @@ bool is_ccw(Vec2D *poly, int n) {
     return sum < 0.0f; // CCW if sum < 0
 }
 
-void compute_mitered_offsets(Vec2D *poly, Vec2D *offsets, int n, float thickness, bool ccw) {
+void computeMiteredOffsets(Vec2D *poly, Vec2D *offsets, int n, float thickness, bool ccw) {
     for (int i = 0; i < n; i++) {
         int prev = (i + n - 1) % n;
         int next = (i + 1) % n;
 
         // Edge vectors
-        Vec2D e_prev = { poly[i].x - poly[prev].x, poly[i].y - poly[prev].y };
-        Vec2D e_next = { poly[next].x - poly[i].x, poly[next].y - poly[i].y };
+        Vec2D ePrev = { poly[i].x - poly[prev].x, poly[i].y - poly[prev].y };
+        Vec2D eNext = { poly[next].x - poly[i].x, poly[next].y - poly[i].y };
 
         // Normals
-        Vec2D n_prev = normalize(perpendicular(e_prev));
-        Vec2D n_next = normalize(perpendicular(e_next));
+        Vec2D nPrev = normalize(perpendicular(ePrev));
+        Vec2D nNext = normalize(perpendicular(eNext));
 
         // Flip to point inward if mirror
-        if (state.mirror_factor < 0.5f) { n_prev.x = -n_prev.x; n_prev.y = -n_prev.y; n_next.x = -n_next.x; n_next.y = -n_next.y; }
+        if (state.mirrorFactor < 0.5f) { nPrev.x = -nPrev.x; nPrev.y = -nPrev.y; nNext.x = -nNext.x; nNext.y = -nNext.y; }
 
         // Miter = normalize(n_prev + n_next)
-        Vec2D miter = normalize((Vec2D){ n_prev.x + n_next.x, n_prev.y + n_next.y });
+        Vec2D miter = normalize((Vec2D){ nPrev.x + nNext.x, nPrev.y + nNext.y });
 
         // Compute miter length to preserve thickness
-        float cos_half_angle = dot_vec(miter, n_next); // cos(theta/2)
-        float miter_length = thickness / cos_half_angle;
+        float cosHalfAngle = dotVec(miter, nNext); // cos(theta/2)
+        float miterLength = thickness / cosHalfAngle;
 
-        offsets[i].x = poly[i].x + miter.x * miter_length;
-        offsets[i].y = poly[i].y + miter.y * miter_length;
+        offsets[i].x = poly[i].x + miter.x * miterLength;
+        offsets[i].y = poly[i].y + miter.y * miterLength;
     }
 }
 
-void draw_polygon_inward_mitered(Vec2D *poly, int n, float thickness, u32 *color, float depth) {
-    bool ccw = is_ccw(poly, n);
+void drawPolygonInwardMitered(Vec2D *poly, int n, float thickness, u32 *color, float depth) {
+    bool ccw = isCcw(poly, n);
 
     Vec2D offsets[n];
-    compute_mitered_offsets(poly, offsets, n, thickness, ccw);
+    computeMiteredOffsets(poly, offsets, n, thickness, ccw);
 
     for (int i = 0; i < n; i++) {
         int j = (i + 1) % n;
@@ -577,7 +577,7 @@ void draw_polygon_inward_mitered(Vec2D *poly, int n, float thickness, u32 *color
     }
 }
 
-void draw_hitbox_line_inward(Vec2D rect[4], 
+void drawHitboxLineInward(Vec2D rect[4], 
                              const float x1, const float y1,
                              const float x2, const float y2,
                              const float thickness,
@@ -590,7 +590,7 @@ void draw_hitbox_line_inward(Vec2D rect[4],
 
     // Inward normal depends on winding
     float nx, ny;
-    if (is_ccw(rect, 4)) {
+    if (isCcw(rect, 4)) {
         nx = -ey / length;
         ny =  ex / length;
     } else {
@@ -599,7 +599,7 @@ void draw_hitbox_line_inward(Vec2D rect[4],
     }
 
     // Flip it to point inward if not mirror
-    if (state.mirror_factor < 0.5f) {
+    if (state.mirrorFactor < 0.5f) {
         nx = -nx;
         ny = -ny;
     }
@@ -636,7 +636,7 @@ void draw_hitbox_line_inward(Vec2D rect[4],
     );
 }
 
-void custom_ellipse(float x, float y, float radiusX,
+void customEllipse(float x, float y, float radiusX,
                     float radiusY, u32 color, bool filled,
                     float lineWidth) {
     int segments = (int)(MAX(radiusX, radiusY) * 0.75f);
@@ -685,12 +685,12 @@ void custom_ellipse(float x, float y, float radiusX,
     }
 }
 
-void custom_circle (const float x, const float y, const float radius,
+void customCircle (const float x, const float y, const float radius,
                      const u32 color) {
-    custom_ellipse(x, y, radius, radius, color, true, 1);
+    customEllipse(x, y, radius, radius, color, true, 1);
 }
 
-void custom_circunference (const float x, const float y, const float radius,
+void customCircunference (const float x, const float y, const float radius,
                      const u32 color, const float lineWidth) {
-    custom_ellipse(x, y, radius, radius, color, false, lineWidth);
+    customEllipse(x, y, radius, radius, color, false, lineWidth);
 }

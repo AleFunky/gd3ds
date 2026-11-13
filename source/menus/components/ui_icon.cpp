@@ -14,11 +14,11 @@
 
 #define FIRST_TRAIL_ID 27
 
-static void ui_icon_update(UIElement* e, UIInput* touch, UITransform *transform) {
-    ui_button_update(e, touch, transform);
+static void uiIconUpdate(UIElement* e, UIInput* touch, UITransform *transform) {
+    uiButtonUpdate(e, touch, transform);
 }
 
-static void ui_icon_draw(UIElement* e, UITransform *transform) {
+static void uiIconDraw(UIElement* e, UITransform *transform) {
     UIIcon *icon = (UIIcon *) e;
     UIButton *button = (UIButton *) e;
 
@@ -26,14 +26,14 @@ static void ui_icon_draw(UIElement* e, UITransform *transform) {
 
     if (icon->gamemode == TRAIL) {
         C2D_Sprite spr = { 0 };
-        C2D_SpriteFromSheet(&spr, ui_2_sheet, FIRST_TRAIL_ID + icon->index);
+        C2D_SpriteFromSheet(&spr, ui2Sheet, FIRST_TRAIL_ID + icon->index);
         C3D_TexSetFilter(spr.image.tex, GPU_LINEAR, GPU_LINEAR);
         C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
         C2D_SpriteSetPos(&spr, transform->x, transform->y);
         C2D_SpriteSetScale(&spr, transform->scaleX,  transform->scaleY);
         C2D_DrawSprite(&spr);
     } else {
-        spawn_icon_at(
+        spawnIconAt(
             icon->gamemode,
             icon->index,
             icon->glow,
@@ -42,12 +42,12 @@ static void ui_icon_draw(UIElement* e, UITransform *transform) {
             0,
             0,
             transform->scaleX,
-            icon->p1_color,
-            icon->p2_color,
-            icon->glow_color,
+            icon->p1Color,
+            icon->p2Color,
+            icon->glowColor,
             (IconParameters) { 
-                .anim_id = (icon->gamemode == (int)GAMEMODE_ROBOT ? (int)ROBOT_ANIM_IDLE : (int)SPIDER_ANIM_IDLE),
-                .anim_frame = 0
+                .animID = (icon->gamemode == (int)GAMEMODE_ROBOT ? (int)ROBOT_ANIM_IDLE : (int)SPIDER_ANIM_IDLE),
+                .animFrame = 0
             }
         );
     }
@@ -60,45 +60,45 @@ static void ui_icon_draw(UIElement* e, UITransform *transform) {
     }
 }
 
-static void ui_icon_destroy(UIElement *e) {
+static void uiIconDestroy(UIElement *e) {
     if (e) {
         delete (UIIcon *)e;
         e = NULL;
     }
 }
 
-void ui_icon_set_selected(UIIcon *e, bool selected) {
+void uiIconSetSelected(UIIcon *e, bool selected) {
     if (!e) return;
 
     e->isSelected = selected;
 }
 
-void ui_icon_set_gamemode_index(UIIcon *e, int gamemode, int index) {
+void uiIconSetGamemodeIndex(UIIcon *e, int gamemode, int index) {
     if (!e) return;
 
     e->gamemode = gamemode;
     e->index = index;
 }
 
-void ui_icon_set_p1(UIIcon *e, u32 color) {
+void uiIconSetP1(UIIcon *e, u32 color) {
     if (!e) return;
 
-    e->p1_color = color;
+    e->p1Color = color;
 }
 
-void ui_icon_set_p2(UIIcon *e, u32 color) {
+void uiIconSetP2(UIIcon *e, u32 color) {
     if (!e) return;
 
-    e->p2_color = color;
+    e->p2Color = color;
 }
 
-void ui_icon_set_glow(UIIcon *e, u32 color) {
+void uiIconSetGlow(UIIcon *e, u32 color) {
     if (!e) return;
 
-    e->glow_color = color;
+    e->glowColor = color;
 }
 
-UIIcon *ui_create_icon(UIScreen *screen) {
+UIIcon *uiCreateIcon(UIScreen *screen) {
     UIIcon *e = new UIIcon{};
 
     if (!e) return NULL;
@@ -108,45 +108,45 @@ UIIcon *ui_create_icon(UIScreen *screen) {
     button->base.type = UI_ICON;
     button->base.enabled = true;
 
-    button->base.update = ui_icon_update;
-    button->base.draw = ui_icon_draw;
-    button->base.destroy = ui_icon_destroy;
+    button->base.update = uiIconUpdate;
+    button->base.draw = uiIconDraw;
+    button->base.destroy = uiIconDestroy;
 
-    button->base.modify_transform = ui_button_modify_transform;
+    button->base.modifyTransform = uiButtonModifyTransform;
 
-    ui_element_apply_default_properties(&button->base, screen);
+    uiElementApplyDefaultProperties(&button->base, screen);
     
     button->hoverProgress = 1;
     button->hoverFactor = 1;
 
-    C2D_SpriteFromSheet(&button->image.sprite, ui_sheet, 175);
+    C2D_SpriteFromSheet(&button->image.sprite, uiSheet, 175);
     C3D_TexSetFilter(button->image.sprite.image.tex, GPU_LINEAR, GPU_LINEAR);
 
     return e;
 }
 
-UIElement *ui_create_icon_from_props(UIScreen *screen, const UIPropertyList *props) {
-    UIIcon *icon = ui_create_icon(screen);
+UIElement *uiCreateIconFromProps(UIScreen *screen, const UIPropertyList *props) {
+    UIIcon *icon = uiCreateIcon(screen);
 
     if (!icon) return NULL;
 
     UIButton *button = (UIButton *) icon;
 
-    ui_element_apply_properties(&button->base, screen, props);
+    uiElementApplyProperties(&button->base, screen, props);
 
-    ui_element_set_size(&button->base, 30, 30);
+    uiElementSetSize(&button->base, 30, 30);
     
-    button->hoverFactor = ui_prop_float(props, "hoverFactor", 1);    
+    button->hoverFactor = uiPropFloat(props, "hoverFactor", 1);    
 
-    ui_icon_set_gamemode_index(icon, 
-        ui_prop_int(props, "gamemode", 0), 
-        ui_prop_int(props, "id", 0));
+    uiIconSetGamemodeIndex(icon, 
+        uiPropInt(props, "gamemode", 0), 
+        uiPropInt(props, "id", 0));
 
-    icon->glow = ui_prop_bool(props, "glow", false);
+    icon->glow = uiPropBool(props, "glow", false);
 
-    ui_icon_set_p1(icon, ui_prop_color(props, "p1_color", ABGR8(175, 175, 175, 255)));
-    ui_icon_set_p2(icon, ui_prop_color(props, "p2_color", ABGR8(255, 255, 255, 255)));
-    ui_icon_set_glow(icon, ui_prop_color(props, "glow_color", ABGR8(255, 255, 255, 255)));
+    uiIconSetP1(icon, uiPropColor(props, "p1_color", ABGR8(175, 175, 175, 255)));
+    uiIconSetP2(icon, uiPropColor(props, "p2_color", ABGR8(255, 255, 255, 255)));
+    uiIconSetGlow(icon, uiPropColor(props, "glow_color", ABGR8(255, 255, 255, 255)));
 
     return &button->base;
 }

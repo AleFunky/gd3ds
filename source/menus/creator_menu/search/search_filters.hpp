@@ -1,5 +1,5 @@
 #pragma once
 
-void reset_search_filters();
+void resetSearchFilters();
 
-extern const UIScreenDefPair search_filters_def;
+extern const UIScreenDefPair searchFiltersDef;

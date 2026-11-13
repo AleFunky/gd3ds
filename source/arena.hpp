@@ -7,16 +7,16 @@ typedef struct {
     uint8_t *buffer;
     size_t capacity;
     size_t offset;
-    size_t prev_offset;
+    size_t prevOffset;
 } Arena;
 
-bool arena_init(Arena *a, size_t capacity);
-void *arena_alloc(Arena *a, size_t size);
-void *arena_calloc(Arena *a, size_t count, size_t size);
-void *arena_realloc(Arena *a, void *old_ptr, size_t old_size, size_t new_size);
-void arena_reset(Arena *a);
-void arena_clear(Arena *a);
+bool arenaInit(Arena *a, size_t capacity);
+void *arenaAlloc(Arena *a, size_t size);
+void *arenaCalloc(Arena *a, size_t count, size_t size);
+void *arenaRealloc(Arena *a, void *oldPtr, size_t oldSize, size_t newSize);
+void arenaReset(Arena *a);
+void arenaClear(Arena *a);
 
-size_t arena_total(Arena *a);
-size_t arena_used(Arena *a);
-size_t arena_available(Arena *a);
+size_t arenaTotal(Arena *a);
+size_t arenaUsed(Arena *a);
+size_t arenaAvailable(Arena *a);

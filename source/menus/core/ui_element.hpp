@@ -54,34 +54,34 @@ typedef struct UIActionDef {
 
 typedef struct {
     const UIActionDef *actions;
-    const size_t action_count;
+    const size_t actionCount;
 } UIActionList;
 
-void ui_element_set_userdata(UIElement *element, void *userdata);
+void uiElementSetUserdata(UIElement *element, void *userdata);
 
-bool ui_element_basic_bound_check(UIElement *e, UIInput *touch, UITransform *transform);
+bool uiElementBasicBoundCheck(UIElement *e, UIInput *touch, UITransform *transform);
 
-UITransform ui_transform_combine(UITransform *parent, UIElement *e);
+UITransform uiTransformCombine(UITransform *parent, UIElement *e);
 
-void ui_update_tree(UIElement *e, UIInput *input, UITransform *parent);
-void ui_draw_tree(UIElement *e, UITransform *parent);
-void ui_destroy_tree(UIElement *e);
+void uiUpdateTree(UIElement *e, UIInput *input, UITransform *parent);
+void uiDrawTree(UIElement *e, UITransform *parent);
+void uiDestroyTree(UIElement *e);
 
 // Premade functions for on "ui_run_func_on_tag"
-void ui_enable_element(UIElement *e);
-void ui_disable_element(UIElement *e);
+void uiEnableElement(UIElement *e);
+void uiDisableElement(UIElement *e);
 
-void ui_element_add_child(UIElement *parent, UIElement *child);
-void ui_element_remove(UIElement *element);
+void uiElementAddChild(UIElement *parent, UIElement *child);
+void uiElementRemove(UIElement *element);
 
-UIElement *ui_get_child_by_type(UIElement *parent, UIElementType type);
+UIElement *uiGetChildByType(UIElement *parent, UIElementType type);
 
-UIActionFn ui_find_action(const UIActionDef* actions, size_t count, const char* name);
+UIActionFn uiFindAction(const UIActionDef* actions, size_t count, const char* name);
 
-void ui_element_apply_default_properties(UIElement *e, UIScreen *screen);
-void ui_element_apply_properties(UIElement *e, UIScreen *screen, const UIPropertyList *props);
+void uiElementApplyDefaultProperties(UIElement *e, UIScreen *screen);
+void uiElementApplyProperties(UIElement *e, UIScreen *screen, const UIPropertyList *props);
 
-void perform_actions(UIElement *e);
+void performActions(UIElement *e);
 
 typedef struct UITransform {
     float x;
@@ -113,30 +113,30 @@ struct UIElement {
 
     bool enabled = true;
 
-    bool draws_children = false;
+    bool drawsChildren = false;
 
     //array of actions to call
     UIAction *actions = nullptr;
-    size_t action_count = 0;
+    size_t actionCount = 0;
 
     //old version (not as cool)
     UIActionFn action = nullptr;
 
     UIScreen *screen = nullptr;
 
-    UIPropertyList custom_properties = UIPropertyList{};
+    UIPropertyList customProperties = UIPropertyList{};
 
     // Useful for storing data inside an element
     void *userdata = nullptr;
-    void (*userdata_destroy)(void *) = nullptr;
+    void (*userdataDestroy)(void *) = nullptr;
     
     struct UIElement *parent = nullptr;
 
-    struct UIElement *first_child = nullptr;
-    struct UIElement *last_child = nullptr;
+    struct UIElement *firstChild = nullptr;
+    struct UIElement *lastChild = nullptr;
 
-    struct UIElement *next_sibling = nullptr;
-    struct UIElement *prev_sibling = nullptr;
+    struct UIElement *nextSibling = nullptr;
+    struct UIElement *prevSibling = nullptr;
 
     char tag[TAGS_PER_ELEMENT][TAG_LENGTH] = {};
 
@@ -144,10 +144,10 @@ struct UIElement {
     void (*draw)(UIElement*, UITransform *) = nullptr;
     void (*destroy)(UIElement*) = nullptr;
 
-    void (*modify_transform)(UIElement *, UITransform *) = nullptr;
+    void (*modifyTransform)(UIElement *, UITransform *) = nullptr;
     
-    void (*on_enable)(UIElement*) = nullptr;
-    void (*on_disable)(UIElement*) = nullptr;
+    void (*onEnable)(UIElement*) = nullptr;
+    void (*onDisable)(UIElement*) = nullptr;
 };
 
 typedef struct {
@@ -186,7 +186,7 @@ typedef struct {
     int font;
     char text[64];
 
-    UIActionFn pre_action;
+    UIActionFn preAction;
 
     float textScale;
 
@@ -218,7 +218,7 @@ typedef struct {
 
     char title[64];
     char text[128];
-    int character_limit;
+    int characterLimit;
     int border;
 } UITextbox;
 
@@ -229,7 +229,7 @@ typedef struct {
     float alignment;
 
     int font;
-    bool parse_tags;
+    bool parseTags;
 } UILabel;
 
 typedef struct {
@@ -237,9 +237,9 @@ typedef struct {
 
     int gamemode;
     int index;
-    u32 p1_color;
-    u32 p2_color;
-    u32 glow_color;
+    u32 p1Color;
+    u32 p2Color;
+    u32 glowColor;
 
     bool isSelected;
     bool glow;
@@ -249,7 +249,7 @@ typedef struct {
     UIButton base;
 
     int index;
-    int color_index;
+    int colorIndex;
 
     ImageData image;
 
@@ -283,9 +283,9 @@ typedef struct {
     int style;
 
     float value;
-    float max_value;
+    float maxValue;
 
-    bool flip_order;
+    bool flipOrder;
     bool useTint;
 } UIProgressBar;
 
@@ -300,7 +300,7 @@ typedef struct {
 
     int dpadHeldTime;
 
-    u32 background_color;
+    u32 backgroundColor;
 } UIList;
 
 typedef struct {
@@ -321,12 +321,12 @@ typedef struct {
 typedef struct {
     UIElement base;
 
-    float max_value;
+    float maxValue;
     float value;
 
     bool dragging;
 
-    C2D_Sprite track_frame;
+    C2D_Sprite trackFrame;
     C2D_Sprite track;
     C2D_Sprite button;
 } UISlider;
@@ -346,7 +346,7 @@ typedef struct {
 typedef struct {
     UIImage base;
 
-    float rotation_speed;
+    float rotationSpeed;
     bool blending;
 } UISpinner;
 /*

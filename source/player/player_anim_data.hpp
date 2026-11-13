@@ -1,20 +1,20 @@
 #pragma once
 
 typedef struct {
-    int   texture_idx;
+    int   textureIdx;
     float px, py;
     float rotation;
-    float scale_x, scale_y;
-    int   z_order;
+    float scaleX, scaleY;
+    int   zOrder;
 } PlayerSpritePart;
 
 typedef struct {
     const PlayerSpritePart *parts;
-    int   part_count;
+    int   partCount;
     float delay;
 } PlayerFrame;
 
 typedef struct {
     const PlayerFrame *frames;
-    int   frame_count;
+    int   frameCount;
 } PlayerAnimation;

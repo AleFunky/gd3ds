@@ -8,28 +8,28 @@
 #include "utils.hpp"
 #include "main.hpp"
 
-FileOrFolder sd_level_paths[MAX_SD_LEVELS];
-int sd_level_count = 0;
+FileOrFolder sdLevelPaths[MAX_SD_LEVELS];
+int sdLevelCount = 0;
 
-char current_level_name[255];
+char currentLevelName[255];
 
-char current_directory[256];
-int dir_level = 0;
+char currentDirectory[256];
+int dirLevel = 0;
 
-int compare_entries(const void *a, const void *b) {
+int compareEntries(const void *a, const void *b) {
     FileOrFolder *ea = (FileOrFolder*)a;
     FileOrFolder *eb = (FileOrFolder*)b;
 
     // Folders first
-    if (ea->is_dir != eb->is_dir)
-        return eb->is_dir - ea->is_dir;
+    if (ea->isDir != eb->isDir)
+        return eb->isDir - ea->isDir;
 
     // Alphabetical
     return strcasecmp(ea->name, eb->name);
 }
 
-FileOrFolder *load_folder(GenericTask *task, char *dir, int *count) {
-    sd_level_count = 0;
+FileOrFolder *loadFolder(GenericTask *task, char *dir, int *count) {
+    sdLevelCount = 0;
 
     char directory[256];
 
@@ -39,20 +39,20 @@ FileOrFolder *load_folder(GenericTask *task, char *dir, int *count) {
         strncpy(directory, USER_LEVELS_DIR, sizeof(directory));
     }
 
-    strncpy(current_directory, directory, sizeof(current_directory));
+    strncpy(currentDirectory, directory, sizeof(currentDirectory));
 
-    DIR *level_dir = opendir(directory);
-    if (!level_dir) {
-        output_log("Failed to open dir: %s\n", directory);
+    DIR *levelDir = opendir(directory);
+    if (!levelDir) {
+        outputLog("Failed to open dir: %s\n", directory);
         return NULL;
     }
 
-    output_log("Loaded folder: %s\n", directory);
+    outputLog("Loaded folder: %s\n", directory);
 
     struct dirent *pent;
     struct stat statbuf;
 
-    while ((pent = readdir(level_dir)) != NULL && sd_level_count < MAX_SD_LEVELS) {
+    while ((pent = readdir(levelDir)) != NULL && sdLevelCount < MAX_SD_LEVELS) {
         if (task->cancelled) {
             return NULL;
         }
@@ -67,39 +67,39 @@ FileOrFolder *load_folder(GenericTask *task, char *dir, int *count) {
         if (stat(fullpath, &statbuf) != 0)
             continue;
 
-        bool is_dir = S_ISDIR(statbuf.st_mode);
+        bool isDir = S_ISDIR(statbuf.st_mode);
 
-        if (is_dir) {
+        if (isDir) {
             // Folder
-            snprintf(sd_level_paths[sd_level_count].name, MAX_PATH_LEN, "%s", pent->d_name);
-            sd_level_paths[sd_level_count].is_dir = true;
-            sd_level_count++;
+            snprintf(sdLevelPaths[sdLevelCount].name, MAX_PATH_LEN, "%s", pent->d_name);
+            sdLevelPaths[sdLevelCount].isDir = true;
+            sdLevelCount++;
 
-            output_log("Folder: %s\n", pent->d_name);
+            outputLog("Folder: %s\n", pent->d_name);
         } else {
             // File
             const char *ext = strrchr(pent->d_name, '.');
             if (ext && (strcmp(ext, ".gmd") == 0 || strcmp(ext, ".gdlvl") == 0)) {
                 // Funny level
-                snprintf(sd_level_paths[sd_level_count].name, MAX_PATH_LEN, "%s/%s", current_directory, pent->d_name);
-                sd_level_paths[sd_level_count].is_dir = false;
-                sd_level_count++;
+                snprintf(sdLevelPaths[sdLevelCount].name, MAX_PATH_LEN, "%s/%s", currentDirectory, pent->d_name);
+                sdLevelPaths[sdLevelCount].isDir = false;
+                sdLevelCount++;
 
-                output_log("Level: %s (%llu)\n", pent->d_name, statbuf.st_size);
+                outputLog("Level: %s (%llu)\n", pent->d_name, statbuf.st_size);
             }
         }
     }
 
-    closedir(level_dir);
+    closedir(levelDir);
 
-    qsort(sd_level_paths, sd_level_count, sizeof(FileOrFolder), compare_entries);
+    qsort(sdLevelPaths, sdLevelCount, sizeof(FileOrFolder), compareEntries);
 
-    *count = sd_level_count;
+    *count = sdLevelCount;
 
-    return sd_level_paths;
+    return sdLevelPaths;
 }
 
-void go_back_directory(char *path) {
+void goBackDirectory(char *path) {
     size_t len = strlen(path);
     if (len == 0) return;
 
@@ -117,13 +117,13 @@ void go_back_directory(char *path) {
 }
 
 
-char *strip_filename(char *path) {
+char *stripFilename(char *path) {
     char *slash = strrchr(path, '/');
     return slash ? slash + 1 : path;
 };
 
 
-void strip_extension(char *path) {
+void stripExtension(char *path) {
     char *dot = strrchr(path, '.');
     char *slash = strrchr(path, '/');
 
@@ -133,37 +133,37 @@ void strip_extension(char *path) {
     }
 }
 
-void truncate_filename(char *name, size_t max_len) {
+void truncateFilename(char *name, size_t maxLen) {
     size_t len = strlen(name);
 
-    if (len > max_len) {
-        name[max_len] = '\0';
+    if (len > maxLen) {
+        name[maxLen] = '\0';
         strcat(name, "...");
     }
 }
 
-void truncate_filename_start(char *name, size_t max_len, size_t buffer_size) {
+void truncateFilenameStart(char *name, size_t maxLen, size_t bufferSize) {
     size_t len = strlen(name);
 
-    if (len > max_len) {
+    if (len > maxLen) {
         const char *ellipsis = "...";
-        size_t ellipsis_len = strlen(ellipsis);
+        size_t ellipsisLen = strlen(ellipsis);
 
-        if (max_len <= ellipsis_len) {
+        if (maxLen <= ellipsisLen) {
             // Not enough space, just truncate hard
-            name[max_len] = '\0';
+            name[maxLen] = '\0';
             return;
         }
 
-        size_t keep_len = max_len - ellipsis_len;
+        size_t keepLen = maxLen - ellipsisLen;
 
         // Move the last part of the string to the front
-        memmove(name, name + (len - keep_len), keep_len);
+        memmove(name, name + (len - keepLen), keepLen);
 
         // Add ellipsis at the start
-        memmove(name + ellipsis_len, name, keep_len);
-        memcpy(name, ellipsis, ellipsis_len);
+        memmove(name + ellipsisLen, name, keepLen);
+        memcpy(name, ellipsis, ellipsisLen);
 
-        name[max_len] = '\0';
+        name[maxLen] = '\0';
     }
 }

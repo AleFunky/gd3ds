@@ -43,53 +43,53 @@ typedef struct {
 } Vec2D;
 
 extern float delta;
-extern float frame_timer;
-extern unsigned int frame_counter;
+extern float frameTimer;
+extern unsigned int frameCounter;
 
 extern int steps;
-extern int last_steps;
-extern unsigned int level_frame;
+extern int lastSteps;
+extern unsigned int levelFrame;
 
-extern bool exiting_level;
+extern bool exitingLevel;
 
-extern bool song_loaded;
+extern bool songLoaded;
 
-extern bool alt_title_screen;
-extern bool is_N3DS;
-extern bool is_3DSX;
-extern bool is_nightly;
+extern bool altTitleScreen;
+extern bool isN3Ds;
+extern bool is3Dsx;
+extern bool isNightly;
 
-extern bool queued_restart;
+extern bool queuedRestart;
 
-extern bool _3dWarningPassed;
+extern bool threeDWarningPassed;
 
-extern char *_3dsx_path;
+extern char *threeDsxPath;
 
-extern float global_volume;
-extern float music_volume;
-extern float sound_volume;
-extern float dim_secondary_screen;
+extern float globalVolume;
+extern float musicVolume;
+extern float soundVolume;
+extern float dimSecondaryScreen;
 
-extern ParticleSystem touch_drag_particles;
-extern ParticleSystem touch_explosion_particles;
-extern ParticleSystem glitter_particles_bottom;
-extern ParticleSystem slow_speed_particles_bottom;
-extern ParticleSystem normal_speed_particles_bottom;
-extern ParticleSystem fast_speed_particles_bottom;
-extern ParticleSystem faster_speed_particles_bottom;
-extern ParticleSystem fastest_speed_particles_bottom;
-extern ParticleSystem end_wall_particles;
-extern ParticleSystem end_wall_firework;
-extern ParticleSystem level_complete_effect_p1;
-extern ParticleSystem level_complete_effect_p2;
+extern ParticleSystem touchDragParticles;
+extern ParticleSystem touchExplosionParticles;
+extern ParticleSystem glitterParticlesBottom;
+extern ParticleSystem slowSpeedParticlesBottom;
+extern ParticleSystem normalSpeedParticlesBottom;
+extern ParticleSystem fastSpeedParticlesBottom;
+extern ParticleSystem fasterSpeedParticlesBottom;
+extern ParticleSystem fastestSpeedParticlesBottom;
+extern ParticleSystem endWallParticles;
+extern ParticleSystem endWallFirework;
+extern ParticleSystem levelCompleteEffectP1;
+extern ParticleSystem levelCompleteEffectP2;
 
-extern float slow_speed_particles_timer;
-extern float normal_speed_particles_timer;
-extern float fast_speed_particles_timer;
-extern float faster_speed_particles_timer;
-extern float fastest_speed_particles_timer;
+extern float slowSpeedParticlesTimer;
+extern float normalSpeedParticlesTimer;
+extern float fastSpeedParticlesTimer;
+extern float fasterSpeedParticlesTimer;
+extern float fastestSpeedParticlesTimer;
 
-extern Arena level_arena;
+extern Arena levelArena;
 
 #define SCREEN_WIDTH  400
 #define SCREEN_BOT_WIDTH  320
@@ -113,52 +113,52 @@ typedef enum Screens {
     SCREEN_BTM
 } Screens;
 
-extern bool cheats_used[CHEAT_COUNT];
-extern const char *cheat_names[CHEAT_COUNT];
+extern bool cheatsUsed[CHEAT_COUNT];
+extern const char *cheatNames[CHEAT_COUNT];
 
 extern C3D_RenderTarget* top;
-extern C3D_RenderTarget* top_right;
+extern C3D_RenderTarget* topRight;
 extern C3D_RenderTarget* bot;
 
-extern int game_state;
-extern bool escape_state;
-extern bool playing_menu_loop;
-extern char menu_loop_path[32];
+extern int gameState;
+extern bool escapeState;
+extern bool playingMenuLoop;
+extern char menuLoopPath[32];
 
-extern int level_result;
+extern int levelResult;
 
 extern bool cheated;
 
-extern bool game_paused;
+extern bool gamePaused;
 
-extern bool in_level_complete;
+extern bool inLevelComplete;
 
 extern float accumulator;
-extern bool fixed_dt;
+extern bool fixedDt;
 
-void allocate_particles();
-void free_particles();
-void init_particles(Color p1_color, Color p2_color);
-void update_player_effects(float delta);
+void allocateParticles();
+void freeParticles();
+void initParticles(Color p1Color, Color p2Color);
+void updatePlayerEffects(float delta);
 
-void apply_volume_settings();
-float get_volume_slider();
+void applyVolumeSettings();
+float getVolumeSlider();
 
-int output_log(const char *fmt, ...);
-u32 jump_key_mask_p1(void);
-u32 jump_key_mask_p2(void);
-u32 jump_key_mask(void);
-void sync_precise_input(bool suppress_held);
+int outputLog(const char *fmt, ...);
+u32 jumpKeyMaskP1(void);
+u32 jumpKeyMaskP2(void);
+u32 jumpKeyMask(void);
+void syncPreciseInput(bool suppressHeld);
 
 void enterExclusiveState();
 void exitExclusiveState(bool force);
 
-bool is_citra();
+bool isCitra();
 
-void load_gdps_info();
+void loadGdpsInfo();
 
-extern ServerFile *current_server_file;
+extern ServerFile *currentServerFile;
 
-extern ExternalLevelFile external_file;
-extern ServerFile gd_server_file;
-extern ServerFile gdps_file;
+extern ExternalLevelFile externalFile;
+extern ServerFile gdServerFile;
+extern ServerFile gdpsFile;

@@ -20,7 +20,7 @@
 
 #define RAY_FADE_DURATION (400 / 1000.f)
 
-void rays_start();
-void rays_start_fade();
-void update_rays(float delta);
-void draw_rays();
+void raysStart();
+void raysStartFade();
+void updateRays(float delta);
+void drawRays();

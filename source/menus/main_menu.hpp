@@ -1,11 +1,11 @@
 #pragma once
 #include "menus/core/ui_stack.hpp"
 
-extern bool in_info_card;
+extern bool inInfoCard;
 
-void action_open_info_card(int id);
-void action_open_info_card_text(const char *text);
+void actionOpenInfoCard(int id);
+void actionOpenInfoCardText(const char *text);
 
-void open_soundtrack();
+void openSoundtrack();
 
-extern const UIScreenDefPair main_menu_def;
+extern const UIScreenDefPair mainMenuDef;

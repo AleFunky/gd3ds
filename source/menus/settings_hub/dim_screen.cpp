@@ -7,22 +7,22 @@
 
 #include "menus/settings_hub/dim_screen.hpp"
 
-static UISlider *dim_slider;
+static UISlider *dimSlider;
 
-static void dim_screen_init(UIScreen *s) {
-    dim_slider = (UISlider *) ui_get_element_by_tag(s, "dim_slider");
-    ui_slider_set_value(dim_slider, dim_secondary_screen);
+static void dimScreenInit(UIScreen *s) {
+    dimSlider = (UISlider *) uiGetElementByTag(s, "dim_slider");
+    uiSliderSetValue(dimSlider, dimSecondaryScreen);
 }
 
-static void dim_screen_update(UIScreen *s, UIInput *i) {
-    if (dim_slider) dim_secondary_screen = dim_slider->value;
+static void dimScreenUpdate(UIScreen *s, UIInput *i) {
+    if (dimSlider) dimSecondaryScreen = dimSlider->value;
 }
 
-extern const UIScreenDefPair dim_screen_def = {
+extern const UIScreenDefPair dimScreenDef = {
     .name = "dim_screen",
     .btm = {
         .path = "romfs:/menus/settings_hub/dim_screen.txt",
-        .init = dim_screen_init,
-        .update = dim_screen_update
+        .init = dimScreenInit,
+        .update = dimScreenUpdate
     }
 };

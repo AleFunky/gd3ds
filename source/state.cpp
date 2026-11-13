@@ -29,467 +29,467 @@
 
 GamePlayState state;
 
-bool level_unrated_online = false;
-bool level_verified_coins = false;
+bool levelUnratedOnline = false;
+bool levelVerifiedCoins = false;
 
-bool level_has_unverified_coins(void) {
-    if (state.custom_level && !state.online_level) return false; // External level
-    if (!state.custom_level) return false; // Main level
-    return level_unrated_online || !level_verified_coins;
+bool levelHasUnverifiedCoins(void) {
+    if (state.customLevel && !state.onlineLevel) return false; // External level
+    if (!state.customLevel) return false; // Main level
+    return levelUnratedOnline || !levelVerifiedCoins;
 }
 
-void level_unrated_online_refresh(void) {
-    level_unrated_online = state.online_level
-        && current_level_entry
-        && !level_has_rate(&current_level_entry->data);
+void levelUnratedOnlineRefresh(void) {
+    levelUnratedOnline = state.onlineLevel
+        && currentLevelEntry
+        && !levelHasRate(&currentLevelEntry->data);
 }
 
 
-u32 user_coin_icon_tint(bool collected, bool has_rate) {
-    if (collected) return has_rate ? C2D_Color32(255, 255, 255, 255) : USER_COIN_UNRATED_TINT;
-    return has_rate ? C2D_Color32(165, 165, 165, 255) : USER_COIN_UNRATED_EMPTY_TINT;
+u32 userCoinIconTint(bool collected, bool hasRate) {
+    if (collected) return hasRate ? C2D_Color32(255, 255, 255, 255) : USER_COIN_UNRATED_TINT;
+    return hasRate ? C2D_Color32(165, 165, 165, 255) : USER_COIN_UNRATED_EMPTY_TINT;
 }
 
-void set_camera_x(float x) {
-    state.camera_x = x;
-    state.unmod_cam_x = x;
+void setCameraX(float x) {
+    state.cameraX = x;
+    state.unmodCamX = x;
 }
 
-void set_camera_y(float y) {
-    state.camera_y = y;
-    state.unmod_cam_y = y;
+void setCameraY(float y) {
+    state.cameraY = y;
+    state.unmodCamY = y;
 }
 
-void run_camera() {
+void runCamera() {
     Player *player = &state.player;
-    float player_camera_x_offset = settingsState.swapGameplayScreens ? PLAYER_CAMERA_X_OFFSET_BOT : PLAYER_CAMERA_X_OFFSET;
-    state.old_camera_x = state.camera_x;
-    state.old_camera_y = state.camera_y;
+    float playerCameraXOffset = settingsState.swapGameplayScreens ? PLAYER_CAMERA_X_OFFSET_BOT : PLAYER_CAMERA_X_OFFSET;
+    state.oldCameraX = state.cameraX;
+    state.oldCameraY = state.cameraY;
 
-    float playable_height = state.ceiling_y - state.ground_y;
-    float calc_height = 0;
+    float playableHeight = state.ceilingY - state.groundY;
+    float calcHeight = 0;
 
     if ((player->gamemode != GAMEMODE_PLAYER && player->gamemode != GAMEMODE_ROBOT) || state.dual) {
-        calc_height = (SCREEN_HEIGHT_AREA - playable_height) / 2;
+        calcHeight = (SCREEN_HEIGHT_AREA - playableHeight) / 2;
     }
-    state.ground_y_gfx = ease_out(state.ground_y_gfx, calc_height, 0.02f);
+    state.groundYGfx = easeOut(state.groundYGfx, calcHeight, 0.02f);
 
-    if (level_info.wall_y == 0) {
-        if (state.camera_x + SCREEN_WIDTH_AREA >= level_info.wall_x - (4.5f * 30.f)) {
-            level_info.wall_y = MAX(state.camera_y_middle, 60 + ((SCREEN_HEIGHT_AREA / 2) - LEVEL_Y_OFFSET));
+    if (levelInfo.wallY == 0) {
+        if (state.cameraX + SCREEN_WIDTH_AREA >= levelInfo.wallX - (4.5f * 30.f)) {
+            levelInfo.wallY = MAX(state.cameraYMiddle, 60 + ((SCREEN_HEIGHT_AREA / 2) - LEVEL_Y_OFFSET));
         }
     }
 
-    float camera_x_right = state.camera_x + SCREEN_WIDTH_AREA;
+    float camera_x_right = state.cameraX + SCREEN_WIDTH_AREA;
 
     // Cap at camera_x
-    if (level_info.wall_y > 0 && (camera_x_right >= level_info.wall_x - CAMERA_X_WALL_OFFSET)) {
-        if (state.camera_wall_timer == 0) {
-            state.background_wall_initial_x = state.background_x;
-            state.ground_wall_initial_x = state.ground_x;
+    if (levelInfo.wallY > 0 && (camera_x_right >= levelInfo.wallX - CAMERA_X_WALL_OFFSET)) {
+        if (state.cameraWallTimer == 0) {
+            state.backgroundWallInitialX = state.backgroundX;
+            state.groundWallInitialX = state.groundX;
         }
-        state.background_x = easeValue(EASE_IN_OUT, state.background_wall_initial_x, state.background_wall_initial_x + CAMERA_X_WALL_OFFSET * state.mirror_speed_factor, state.camera_wall_timer, 1.f, 2.0f);            
-        state.ground_x = easeValue(EASE_IN_OUT, state.ground_wall_initial_x, state.ground_wall_initial_x + CAMERA_X_WALL_OFFSET * state.mirror_speed_factor, state.camera_wall_timer, 1.f, 2.0f);            
+        state.backgroundX = easeValue(EASE_IN_OUT, state.backgroundWallInitialX, state.backgroundWallInitialX + CAMERA_X_WALL_OFFSET * state.mirrorSpeedFactor, state.cameraWallTimer, 1.f, 2.0f);            
+        state.groundX = easeValue(EASE_IN_OUT, state.groundWallInitialX, state.groundWallInitialX + CAMERA_X_WALL_OFFSET * state.mirrorSpeedFactor, state.cameraWallTimer, 1.f, 2.0f);            
     }
 
-    if (level_info.wall_y > 0 && (camera_x_right >= level_info.wall_x - CAMERA_X_WALL_OFFSET)) {
-        if (state.camera_wall_timer == 0) {
-            state.camera_wall_initial_y = state.camera_y;
+    if (levelInfo.wallY > 0 && (camera_x_right >= levelInfo.wallX - CAMERA_X_WALL_OFFSET)) {
+        if (state.cameraWallTimer == 0) {
+            state.cameraWallInitialY = state.cameraY;
         }
 
-        float final_camera_x_wall = level_info.wall_x - (SCREEN_WIDTH_AREA);
-        float final_camera_y_wall = level_info.wall_y - ((SCREEN_HEIGHT_AREA / 2) - LEVEL_Y_OFFSET);   
+        float finalCameraXWall = levelInfo.wallX - (SCREEN_WIDTH_AREA);
+        float finalCameraYWall = levelInfo.wallY - ((SCREEN_HEIGHT_AREA / 2) - LEVEL_Y_OFFSET);   
 
-        set_camera_x(easeValue(EASE_IN_OUT, final_camera_x_wall - CAMERA_X_WALL_OFFSET, final_camera_x_wall, state.camera_wall_timer, CAMERA_WALL_ANIM_DURATION, 2.0f));
-        set_camera_y(easeValue(EASE_IN_OUT, state.camera_wall_initial_y, final_camera_y_wall, state.camera_wall_timer, CAMERA_WALL_ANIM_DURATION, 2.0f));
-        state.camera_wall_timer += STEPS_DT;
+        setCameraX(easeValue(EASE_IN_OUT, finalCameraXWall - CAMERA_X_WALL_OFFSET, finalCameraXWall, state.cameraWallTimer, CAMERA_WALL_ANIM_DURATION, 2.0f));
+        setCameraY(easeValue(EASE_IN_OUT, state.cameraWallInitialY, finalCameraYWall, state.cameraWallTimer, CAMERA_WALL_ANIM_DURATION, 2.0f));
+        state.cameraWallTimer += STEPS_DT;
     } else { 
-        float cam_y = state.camera_y;
+        float camY = state.cameraY;
 
-        float target_y = cam_y;
+        float targetY = camY;
 
         if ((player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_ROBOT) && !state.dual) {
-            float player_y = player->y;
+            float playerY = player->y;
 
-            float upside_down_offset = (player->upside_down ? -30.f : 0);
+            float upsideDownOffset = (player->upsideDown ? -30.f : 0);
 
-            if (player_y > cam_y + 140.f + upside_down_offset) { // Top margin
-                target_y = player_y - (140.f + upside_down_offset);
-            } else if (player_y < cam_y + 30.f + upside_down_offset) { // Bottom margin
-                target_y = player_y - (30.f + upside_down_offset);
+            if (playerY > camY + 140.f + upsideDownOffset) { // Top margin
+                targetY = playerY - (140.f + upsideDownOffset);
+            } else if (playerY < camY + 30.f + upsideDownOffset) { // Bottom margin
+                targetY = playerY - (30.f + upsideDownOffset);
             }
         } else {
-            target_y = state.camera_intended_y;
+            targetY = state.cameraIntendedY;
         }
             
-        if (target_y < 0) {
-            target_y = 0;
+        if (targetY < 0) {
+            targetY = 0;
         }
         
-        cam_y += (target_y - cam_y) / (10 / 0.25f);
+        camY += (targetY - camY) / (10 / 0.25f);
         
-        if (cam_y < 0) {
-            cam_y = 0;
+        if (camY < 0) {
+            camY = 0;
         }
         
-        if (cam_y > MAX_LEVEL_HEIGHT - SCREEN_HEIGHT_AREA) {
-            cam_y = MAX_LEVEL_HEIGHT - SCREEN_HEIGHT_AREA;
+        if (camY > MAX_LEVEL_HEIGHT - SCREEN_HEIGHT_AREA) {
+            camY = MAX_LEVEL_HEIGHT - SCREEN_HEIGHT_AREA;
         }
 
-        set_camera_y(cam_y);
+        setCameraY(camY);
 
-        set_camera_x(player->x - player_camera_x_offset/SCALE);
+        setCameraX(player->x - playerCameraXOffset/SCALE);
         
-        if (state.current_data.attempts == 1) {
-            if (state.camera_x < FIRST_ATTEMPT_CAMERA_OFFSET) {
-                set_camera_x(FIRST_ATTEMPT_CAMERA_OFFSET);
+        if (state.currentData.attempts == 1) {
+            if (state.cameraX < FIRST_ATTEMPT_CAMERA_OFFSET) {
+                setCameraX(FIRST_ATTEMPT_CAMERA_OFFSET);
             }
         }
 
-        if (state.current_data.attempts > 1 || player->x - player_camera_x_offset/SCALE >= FIRST_ATTEMPT_CAMERA_OFFSET) {
-            state.ground_x += player->vel_x * STEPS_DT * state.mirror_speed_factor;
-            state.background_x += player->vel_x * STEPS_DT * state.mirror_speed_factor;
+        if (state.currentData.attempts > 1 || player->x - playerCameraXOffset/SCALE >= FIRST_ATTEMPT_CAMERA_OFFSET) {
+            state.groundX += player->velX * STEPS_DT * state.mirrorSpeedFactor;
+            state.backgroundX += player->velX * STEPS_DT * state.mirrorSpeedFactor;
         }
     }
     
-    state.camera_x_middle = state.camera_x + (SCREEN_WIDTH_AREA / 2);
-    state.camera_y_middle = state.camera_y + (SCREEN_HEIGHT_AREA / 2) - LEVEL_Y_OFFSET;
+    state.cameraXMiddle = state.cameraX + (SCREEN_WIDTH_AREA / 2);
+    state.cameraYMiddle = state.cameraY + (SCREEN_HEIGHT_AREA / 2) - LEVEL_Y_OFFSET;
 }
 
-void set_hitbox_size(Player *player, int gamemode) {
+void setHitboxSize(Player *player, int gamemode) {
     float scale = (player->mini) ? 0.6f : 1.f;
     if (gamemode == GAMEMODE_SPIDER) {
         player->height = 27 * scale;
         player->width = 27 * scale;
 
-        player->internal_hitbox.width = 9;
-        player->internal_hitbox.height = 9;
+        player->internalHitbox.width = 9;
+        player->internalHitbox.height = 9;
     } else if (gamemode != GAMEMODE_WAVE) {
         player->height = 30 * scale;
         player->width = 30 * scale;
         
-        player->internal_hitbox.width = 9;
-        player->internal_hitbox.height = 9;
+        player->internalHitbox.width = 9;
+        player->internalHitbox.height = 9;
     } else {
         player->height = 10 * scale;
         player->width = 10 * scale;
 
-        player->internal_hitbox.width = 3;
-        player->internal_hitbox.height = 3;
+        player->internalHitbox.width = 3;
+        player->internalHitbox.height = 3;
     }
 }
 
-void set_intended_ceiling() {
-    float mid_point = (state.ground_y + state.ceiling_y) / 2;
-    state.camera_intended_y = mid_point - ((SCREEN_HEIGHT_AREA / 2) - LEVEL_Y_OFFSET);
+void setIntendedCeiling() {
+    float midPoint = (state.groundY + state.ceilingY) / 2;
+    state.cameraIntendedY = midPoint - ((SCREEN_HEIGHT_AREA / 2) - LEVEL_Y_OFFSET);
 }
 
-void set_gamemode(Player *player, int gamemode) {
-    if (player->gamemode != gamemode) player->platform_velocity = player->last_platform_velocity = 0.f;
-    player->ball_slope_rotation_mult = 1.f;
+void setGamemode(Player *player, int gamemode) {
+    if (player->gamemode != gamemode) player->platformVelocity = player->lastPlatformVelocity = 0.f;
+    player->ballSlopeRotationMult = 1.f;
     player->gamemode = gamemode;
-    set_hitbox_size(player, gamemode);
+    setHitboxSize(player, gamemode);
 }
 
-void set_mini(Player *player, bool mini) {
+void setMini(Player *player, bool mini) {
     player->mini = mini;
-    set_hitbox_size(player, player->gamemode);
+    setHitboxSize(player, player->gamemode);
 }
 
-void update_attempt_text_pos() {
+void updateAttemptTextPos() {
     // Set attempt text positions
-    if (state.current_data.attempts == 1) {
-        state.attempt_text_pos.x = SCREEN_WIDTH_AREA / 2;
+    if (state.currentData.attempts == 1) {
+        state.attemptTextPos.x = SCREEN_WIDTH_AREA / 2;
     } else {
-        state.attempt_text_pos.x = state.player.x + (5 * 30);
+        state.attemptTextPos.x = state.player.x + (5 * 30);
     }
 
-    state.attempt_text_pos.y = state.camera_y + (5 * 30);
+    state.attemptTextPos.y = state.cameraY + (5 * 30);
 }
 
-void clear_snap_data(Player *player) {
-    player->snap_data.snapped_obj = -1;
-    player->snap_data.player_frame = 0;
-    player->snap_data.player_snap_diff = 0;
-    player->snap_data.object_id = -1;
+void clearSnapData(Player *player) {
+    player->snapData.snappedObj = -1;
+    player->snapData.playerFrame = 0;
+    player->snapData.playerSnapDiff = 0;
+    player->snapData.objectID = -1;
 }
 
-void init_player(Player *player) {
+void initPlayer(Player *player) {
     memset(player, 0, sizeof(Player));
     
-    set_gamemode(player, level_info.initial_gamemode);
-    set_mini(player, level_info.initial_mini);
+    setGamemode(player, levelInfo.initialGamemode);
+    setMini(player, levelInfo.initialMini);
 
-    set_blend_timer(player, get_blend_duration(player));
+    setBlendTimer(player, getBlendDuration(player));
 
-    player->player_icons.cube = selected_cube;
-    player->player_icons.ship = selected_ship;
-    player->player_icons.ball = selected_ball;
-    player->player_icons.ufo  = selected_ufo;
-    player->player_icons.wave = selected_wave;
-    player->player_icons.robot = selected_robot;
-    player->player_icons.spider = selected_spider;
-    player->player_icons.glow = player_glow_enabled;
+    player->playerIcons.cube = selectedCube;
+    player->playerIcons.ship = selectedShip;
+    player->playerIcons.ball = selectedBall;
+    player->playerIcons.ufo  = selectedUfo;
+    player->playerIcons.wave = selectedWave;
+    player->playerIcons.robot = selectedRobot;
+    player->playerIcons.spider = selectedSpider;
+    player->playerIcons.glow = playerGlowEnabled;
 
-    player->player_icons.p1_color = p1_color;
-    player->player_icons.p2_color = p2_color;
-    player->player_icons.glow_color = glow_color;
+    player->playerIcons.p1Color = p1Color;
+    player->playerIcons.p2Color = p2Color;
+    player->playerIcons.glowColor = glowColor;
     
-    player->cutscene_timer = 0;
+    player->cutsceneTimer = 0;
     player->x = 0;
     player->y = 15;
-    player->vel_x = player_speeds[state.speed];  
-    player->vel_y = 0;
-    player->new_vel_y = __FLT_MAX__;
-    player->ball_slope_rotation_mult = 1.f;
-    player->platform_velocity = player->last_platform_velocity = 0.f;
+    player->velX = playerSpeeds[state.speed];  
+    player->velY = 0;
+    player->newVelY = __FLT_MAX__;
+    player->ballSlopeRotationMult = 1.f;
+    player->platformVelocity = player->lastPlatformVelocity = 0.f;
     player->frame = 0;
 
-    player->on_ground = true;
-    player->on_ceiling = false;
-    player->inverse_rotation = false;
-    player->upside_down = level_info.initial_upsidedown;
+    player->onGround = true;
+    player->onCeiling = false;
+    player->inverseRotation = false;
+    player->upsideDown = levelInfo.initialUpsidedown;
     player->timeElapsed = 0.f;
 
-    player->cutscene_initial_player_x = 0;
-    player->cutscene_initial_player_y = 0;
+    player->cutsceneInitialPlayerX = 0;
+    player->cutsceneInitialPlayerY = 0;
 
-    player->allow_dart_slide = false;
-    player->allow_head_hit = false;
-    player->last_orb_pressed = -1;
-    clear_slope_data(player);
-    clear_snap_data(player);
+    player->allowDartSlide = false;
+    player->allowHeadHit = false;
+    player->lastOrbPressed = -1;
+    clearSlopeData(player);
+    clearSnapData(player);
 }
 
-void clear_p1_trail() {
-    memset(state.p1_trail_data, 0, sizeof(state.p1_trail_data));
-    state.p1_trail_pos[0] = 0;
-    state.p1_trail_pos[1] = 0;
-    p1_trail_timer = 0;
+void clearP1Trail() {
+    memset(state.p1TrailData, 0, sizeof(state.p1TrailData));
+    state.p1TrailPos[0] = 0;
+    state.p1TrailPos[1] = 0;
+    p1TrailTimer = 0;
 }
 
-void init_state() {
-    state.current_player = 0;
+void initState() {
+    state.currentPlayer = 0;
 
-    state.camera_x = 0;
+    state.cameraX = 0;
 
-    state.camera_wall_timer = 0;
-    state.camera_wall_initial_y = 0;
+    state.cameraWallTimer = 0;
+    state.cameraWallInitialY = 0;
 
     state.mirroring = false;
-    state.original_mirror_factor = 0.f;
-    state.intended_mirror_factor = 0.f;
-    state.mirror_factor = 0.f;
-    state.mirror_speed_factor = 1.f;
-    state.mirror_mult = 1;
+    state.originalMirrorFactor = 0.f;
+    state.intendedMirrorFactor = 0.f;
+    state.mirrorFactor = 0.f;
+    state.mirrorSpeedFactor = 1.f;
+    state.mirrorMult = 1;
 
-    state.hitbox_enabled_when_dead = false;
-    state.death_timer = 0.f;
+    state.hitboxEnabledWhenDead = false;
+    state.deathTimer = 0.f;
 
     state.dual = false;
     state.dead = false;
-    state.mirror_mult = 1;
-    state.speed = level_info.initial_speed;
-    state.ground_y = 0;
-    state.ceiling_y = 999999;
+    state.mirrorMult = 1;
+    state.speed = levelInfo.initialSpeed;
+    state.groundY = 0;
+    state.ceilingY = 999999;
     
-    level_info.wall_y = 0;
+    levelInfo.wallY = 0;
 
-    state.end_wall_anim_playing = false;
+    state.endWallAnimPlaying = false;
     
-    clear_p1_trail();
+    clearP1Trail();
 
-    state.current_data.attempts++;
-    state.current_data.coin1 = false;
-    state.current_data.coin2 = false;
-    state.current_data.coin3 = false;
-    state.last_hitbox_trail = 0;
+    state.currentData.attempts++;
+    state.currentData.coin1 = false;
+    state.currentData.coin2 = false;
+    state.currentData.coin3 = false;
+    state.lastHitboxTrail = 0;
 
-    state.show_player = true;
+    state.showPlayer = true;
 
-    in_level_complete = false;
+    inLevelComplete = false;
 
     cheated = false;
     for (int i = 0; i < CHEAT_COUNT; i++) {
-        cheats_used[i] = false;
+        cheatsUsed[i] = false;
     }
 }
 
-void init_level_bounds() {
-    switch (level_info.initial_gamemode) {
+void initLevelBounds() {
+    switch (levelInfo.initialGamemode) {
         default:
-            state.ceiling_y = state.ground_y + gamemode_heights[level_info.initial_gamemode];
-            set_intended_ceiling();
+            state.ceilingY = state.groundY + gamemodeHeights[levelInfo.initialGamemode];
+            setIntendedCeiling();
             break;
         case GAMEMODE_PLAYER:
         case GAMEMODE_ROBOT:
-            state.camera_intended_y = 0;
+            state.cameraIntendedY = 0;
     }
     
-    if (level_info.initial_dual) {
+    if (levelInfo.initialDual) {
         state.dual = true;
-        state.dual_portal_y = 0.f;
-        setup_dual();
-        set_dual_bounds();
+        state.dualPortalY = 0.f;
+        setupDual();
+        setDualBounds();
     }
-    run_camera();
+    runCamera();
 
     // Set camera vertical pos
-    state.camera_y = state.camera_intended_y;
-    state.camera_y_middle = state.camera_y + ((SCREEN_HEIGHT_AREA / 2) - LEVEL_Y_OFFSET);
+    state.cameraY = state.cameraIntendedY;
+    state.cameraYMiddle = state.cameraY + ((SCREEN_HEIGHT_AREA / 2) - LEVEL_Y_OFFSET);
 
-    float playable_height = state.ceiling_y - state.ground_y;
-    float calc_height = 0;
+    float playableHeight = state.ceilingY - state.groundY;
+    float calcHeight = 0;
 
     if ((state.player.gamemode != GAMEMODE_PLAYER && state.player.gamemode != GAMEMODE_ROBOT) || state.dual) {
-        calc_height = (SCREEN_HEIGHT_AREA - playable_height) / 2;
+        calcHeight = (SCREEN_HEIGHT_AREA - playableHeight) / 2;
     }
     
-    state.ground_y_gfx = calc_height; 
+    state.groundYGfx = calcHeight; 
 
-    update_attempt_text_pos();
+    updateAttemptTextPos();
 }
 
-void first_load_init_variables() {
-    level_unrated_online_refresh();
-    memset(&state.current_data, 0, sizeof(StateLevelData));
+void firstLoadInitVariables() {
+    levelUnratedOnlineRefresh();
+    memset(&state.currentData, 0, sizeof(StateLevelData));
     
-    level_info.wall_x = roundf(level_info.last_obj_x / 30) * 30;
-    level_info.wall_y = 0;
+    levelInfo.wallX = roundf(levelInfo.lastObjX / 30) * 30;
+    levelInfo.wallY = 0;
 
-    state.background_x = 0;
-    state.ground_x = 0;
+    state.backgroundX = 0;
+    state.groundX = 0;
     
-    state.camera_x = 0;
-    state.camera_y = 0;
-    current_fading_effect = FADE_SIMPLE;
+    state.cameraX = 0;
+    state.cameraY = 0;
+    currentFadingEffect = FADE_SIMPLE;
 
-    slow_speed_particles_timer = 0;
-    normal_speed_particles_timer = 0;
-    fast_speed_particles_timer = 0;
-    faster_speed_particles_timer = 0;
-    fastest_speed_particles_timer = 0;
+    slowSpeedParticlesTimer = 0;
+    normalSpeedParticlesTimer = 0;
+    fastSpeedParticlesTimer = 0;
+    fasterSpeedParticlesTimer = 0;
+    fastestSpeedParticlesTimer = 0;
 
-    clear_new_best_popup();
-    init_variables();
+    clearNewBestPopup();
+    initVariables();
     
     // Run triggers behind the start
-    handle_triggers();
+    handleTriggers();
     
-    LevelData *level_data_sel = &current_level_entry->data;
-    state.current_data.time_start = svcGetSystemTick() / (CPU_TICKS_PER_MSEC * 1000);
-    state.current_data.max_normal = level_data_sel->normal_progress;
-    state.current_data.max_practice = level_data_sel->practice_progress;
+    LevelData *levelDataSel = &currentLevelEntry->data;
+    state.currentData.timeStart = svcGetSystemTick() / (CPU_TICKS_PER_MSEC * 1000);
+    state.currentData.maxNormal = levelDataSel->normalProgress;
+    state.currentData.maxPractice = levelDataSel->practiceProgress;
 }
 
-void init_wave_trails() {
+void initWaveTrails() {
     C2D_Image img = C2D_SpriteSheetGetImage(trailSheet, 0);
-    Color used_p1 = (settingsState.switchWaveTrailColor ? p1_color : p2_color);
-    Color used_p2 = (settingsState.switchWaveTrailColor ? p2_color : p1_color);
+    Color usedP1 = (settingsState.switchWaveTrailColor ? p1Color : p2Color);
+    Color usedP2 = (settingsState.switchWaveTrailColor ? p2Color : p1Color);
     
-    MotionTrail_Init(&wave_trail_p1, 0, 3.f, true, 10.0f, true, (used_p1.r | used_p1.g | used_p1.b && !settingsState.solidWaveTrail), false, used_p1, img);
-    MotionTrail_Init(&wave_trail_p2, 1, 3.f, true, 10.0f, true, (used_p2.r | used_p2.g | used_p2.b && !settingsState.solidWaveTrail), false, used_p2, img);
+    motionTrailInit(&waveTrailP1, 0, 3.f, true, 10.0f, true, (usedP1.r | usedP1.g | usedP1.b && !settingsState.solidWaveTrail), false, usedP1, img);
+    motionTrailInit(&waveTrailP2, 1, 3.f, true, 10.0f, true, (usedP2.r | usedP2.g | usedP2.b && !settingsState.solidWaveTrail), false, usedP2, img);
 }
 
-void init_trails(int trail) {
-    const MotionTrailConfig *config = &trail_properties[trail];
+void initTrails(int trail) {
+    const MotionTrailConfig *config = &trailProperties[trail];
 
     C2D_Image img = C2D_SpriteSheetGetImage(trailSheet, trail);
 
-    Color used_p1 = (settingsState.switchTrailColor ? p1_color : p2_color);
-    Color used_p2 = (settingsState.switchTrailColor ? p2_color : p1_color);
+    Color usedP1 = (settingsState.switchTrailColor ? p1Color : p2Color);
+    Color usedP2 = (settingsState.switchTrailColor ? p2Color : p1Color);
 
     if (!config->colored) {
-        used_p1 = white;
-        used_p2 = white;
+        usedP1 = white;
+        usedP2 = white;
     }
 
     C3D_TexSetFilter(img.tex, GPU_LINEAR, GPU_LINEAR);
-    MotionTrail_Init(&trail_p1, 0, config->fade, config->always_on, config->width, false, config->blending, config->stationary, used_p1, img);
-    MotionTrail_Init(&trail_p2, 1, config->fade, config->always_on, config->width, false, config->blending, config->stationary, used_p2, img);
+    motionTrailInit(&trailP1, 0, config->fade, config->alwaysOn, config->width, false, config->blending, config->stationary, usedP1, img);
+    motionTrailInit(&trailP2, 1, config->fade, config->alwaysOn, config->width, false, config->blending, config->stationary, usedP2, img);
 
-    MotionTrail_StopStroke(&trail_p1);
-    MotionTrail_StopStroke(&trail_p2);
+    motionTrailStopStroke(&trailP1);
+    motionTrailStopStroke(&trailP2);
 }
 
-void init_variables() {
-    level_frame = 0;
+void initVariables() {
+    levelFrame = 0;
    
-    init_trails(selected_trail);
-    init_wave_trails();
-    init_shake();
+    initTrails(selectedTrail);
+    initWaveTrails();
+    initShake();
 
-    clear_use_effects(get_use_effect_array_ptr(GFX_TOP));
+    clearUseEffects(getUseEffectArrayPtr(GFX_TOP));
 
-    current_fading_effect = FADE_SIMPLE;
-    level_info.completing = false;
+    currentFadingEffect = FADE_SIMPLE;
+    levelInfo.completing = false;
 
-    init_player(&state.player);
-    init_player(&state.player2);
+    initPlayer(&state.player);
+    initPlayer(&state.player2);
 
-    init_state();
+    initState();
 
-    init_level_bounds();
+    initLevelBounds();
 
-    clear_level_complete_popup();
+    clearLevelCompletePopup();
 
-    p1_trail = false;
+    p1Trail = false;
 
-    clear_bg_flash();
-    if (game_state == STATE_GAME && state.current_data.attempts != 1) start_respawn_effect();
+    clearBgFlash();
+    if (gameState == STATE_GAME && state.currentData.attempts != 1) startRespawnEffect();
 }
 
-void handle_death(Player *player, bool pause_song) {
-    state.death_player = state.player;
-    play_sfx(&explode_sound, 1);
-    if (song_loaded && pause_song) {
-        if (!state.practice_mode) {
-            pause_playback_mp3();
-            seek_mp3(level_info.song_offset);
+void handleDeath(Player *player, bool pauseSong) {
+    state.deathPlayer = state.player;
+    playSfx(&explodeSound, 1);
+    if (songLoaded && pauseSong) {
+        if (!state.practiceMode) {
+            pausePlaybackMP3();
+            seekMP3(levelInfo.songOffset);
         } else if (settingsState.practiceMusicSync) {
-            pause_playback_mp3();
+            pausePlaybackMP3();
         }
     }
 
-    if (state.show_player) {
+    if (state.showPlayer) {
         // Spawn death particles
-        UseEffect *effect = add_use_effect(player->x, player->y, USE_EFFECT_OBJ_NOTHING, &death_effect, get_use_effect_array_ptr(GFX_TOP));
+        UseEffect *effect = addUseEffect(player->x, player->y, USE_EFFECT_OBJ_NOTHING, &deathEffect, getUseEffectArrayPtr(GFX_TOP));
         if (effect) {
-            Color color_not_white = get_white_if_black((state.current_player == 1 ? p2_color : p1_color));
+            Color colorNotWhite = getWhiteIfBlack((state.currentPlayer == 1 ? p2Color : p1Color));
 
-            effect->def.colorR = color_not_white.r / 255.f;
-            effect->def.colorG = color_not_white.g / 255.f;
-            effect->def.colorB = color_not_white.b / 255.f;
+            effect->def.colorR = colorNotWhite.r / 255.f;
+            effect->def.colorG = colorNotWhite.g / 255.f;
+            effect->def.colorB = colorNotWhite.b / 255.f;
 
-            effect->def.end_rad *= (player->mini ? 0.6 : 1.0f);
-            effect->def.start_rad *= (player->mini ? 0.6 : 1.0f);
+            effect->def.endRad *= (player->mini ? 0.6 : 1.0f);
+            effect->def.startRad *= (player->mini ? 0.6 : 1.0f);
         }
 
-        explosion_particles[state.current_player].emitterX = player->x;
-        explosion_particles[state.current_player].emitterY = player->y;
-        explosion_particles[state.current_player].scale = (player->mini ? 0.6 : 1.0f);
-        spawnMultipleParticles(&explosion_particles[state.current_player], 90);
+        explosionParticles[state.currentPlayer].emitterX = player->x;
+        explosionParticles[state.currentPlayer].emitterY = player->y;
+        explosionParticles[state.currentPlayer].scale = (player->mini ? 0.6 : 1.0f);
+        spawnMultipleParticles(&explosionParticles[state.currentPlayer], 90);
     }
 
-    if (!state.practice_mode) start_shake(0.15f, 1.f);
+    if (!state.practiceMode) startShake(0.15f, 1.f);
     
     if (settingsState.hitboxesOnDeath) {
-        state.hitbox_enabled_when_dead = true;
+        state.hitboxEnabledWhenDead = true;
     }
 }
 
 // Size portal flashing
 
-void start_bg_flash() {
-    BGFlashData *data = &state.flash_data;
+void startBgFlash() {
+    BGFlashData *data = &state.flashData;
     data->flashing = true;
     data->timer = FLASH_TIME_1;
     data->state = FLASH_FIRST_LIGHT;
-    data->use_lbg = true;
+    data->useLbg = true;
 }
 
-void handle_bg_flash() {
-    BGFlashData *data = &state.flash_data;
+void handleBgFlash() {
+    BGFlashData *data = &state.flashData;
     if (!data->flashing) return;
 
     // Run flashing state
@@ -502,7 +502,7 @@ void handle_bg_flash() {
             if (data->timer <= 0) {
                 data->state = FLASH_UNLIGHTED;
                 data->timer = FLASH_TIME_2;
-                data->use_lbg = false;
+                data->useLbg = false;
             }
             break;
         case FLASH_UNLIGHTED:
@@ -510,7 +510,7 @@ void handle_bg_flash() {
             if (data->timer <= 0) {
                 data->state = FLASH_SECOND_LIGHT;
                 data->timer = FLASH_TIME_2;
-                data->use_lbg = true;
+                data->useLbg = true;
             }
             break;
         case FLASH_SECOND_LIGHT:
@@ -519,70 +519,70 @@ void handle_bg_flash() {
                 // End flash
                 data->state = FLASH_NONE;
                 data->timer = 0;
-                data->use_lbg = false;
+                data->useLbg = false;
                 data->flashing = false;
             }
             break;
     }
 }
 
-void clear_bg_flash() {
-    state.flash_data.flashing = false;
-    state.flash_data.use_lbg = false;
+void clearBgFlash() {
+    state.flashData.flashing = false;
+    state.flashData.useLbg = false;
 }
 
-void play_level_song(float seek) {
-    if (level_info.custom_song_id > 0 && state.custom_level) {
+void playLevelSong(float seek) {
+    if (levelInfo.customSongID > 0 && state.customLevel) {
         size_t sz = 0;
-        void *buf = load_user_song(level_info.custom_song_id, &sz);
+        void *buf = loadUserSong(levelInfo.customSongID, &sz);
         if (buf) {
-            song_loaded = play_mp3_buf(buf, sz, false, seek, false);
+            songLoaded = playMP3Buf(buf, sz, false, seek, false);
         } else {
-            song_loaded = false;
+            songLoaded = false;
         }
     } else {
-        size_t song_id = curr_level_id;
+        size_t songID = currLevelID;
 
-        if (state.custom_level) song_id = level_info.song_id;
+        if (state.customLevel) songID = levelInfo.songID;
 
-        if (song_id < current_main_level_pack->count) {
-            song_loaded = play_mp3(current_main_level_pack->levels[song_id].song_path, false, seek);
+        if (songID < currentMainLevelPack->count) {
+            songLoaded = playMP3(currentMainLevelPack->levels[songID].songPath, false, seek);
         } else {
-            song_loaded = false;
+            songLoaded = false;
         }
     }
 }
 
-void play_practice_song() {
-    play_mp3("romfs:/songs/StayInsideMe.mp3", true, 0);
+void playPracticeSong() {
+    playMP3("romfs:/songs/StayInsideMe.mp3", true, 0);
 }
 
-void play_menu_song() {
+void playMenuSong() {
     if (!settingsState.menuMusic) return;
 
-    if (!playing_menu_loop) {
-        size_t out_size;
-        void *buf = read_file_arena(&level_arena, menu_loop_path, &out_size);
+    if (!playingMenuLoop) {
+        size_t outSize;
+        void *buf = readFileArena(&levelArena, menuLoopPath, &outSize);
         if (buf) {
-            play_mp3_buf(buf, out_size, true, 0, false);
-            playing_menu_loop = true;
+            playMP3Buf(buf, outSize, true, 0, false);
+            playingMenuLoop = true;
         }
     }
 }
 
 // Respawn effect
 
-void start_respawn_effect() {
-    RespawnEffectData *data = &state.respawn_effect_data;
+void startRespawnEffect() {
+    RespawnEffectData *data = &state.respawnEffectData;
     data->active = true;
     data->timer = RESPAWN_EFFECT_DURATION;
     data->state = RESPAWN_EFFECT_HIDE_PLAYER;
     data->remaining = RESPAWN_EFFECT_REPEAT;
-    data->hide_player = true;
+    data->hidePlayer = true;
 }
 
-void handle_respawn_effect() {
-    RespawnEffectData *data = &state.respawn_effect_data;
+void handleRespawnEffect() {
+    RespawnEffectData *data = &state.respawnEffectData;
     if (!data->active) return;
 
     // Run respawn state
@@ -593,23 +593,23 @@ void handle_respawn_effect() {
         case RESPAWN_EFFECT_HIDE_PLAYER:
             // First frame
             if (data->timer == RESPAWN_EFFECT_DURATION) {
-                UseEffect *effect_p1 = add_use_effect(state.player.x, state.player.y, USE_EFFECT_OBJ_P1, &respawn_effect, get_use_effect_array_ptr(GFX_TOP));
-                if (effect_p1) {
-                    Color color_not_white = get_white_if_black(p1_color);
+                UseEffect *effectP1 = addUseEffect(state.player.x, state.player.y, USE_EFFECT_OBJ_P1, &respawnEffect, getUseEffectArrayPtr(GFX_TOP));
+                if (effectP1) {
+                    Color colorNotWhite = getWhiteIfBlack(p1Color);
 
-                    effect_p1->def.colorR = color_not_white.r / 255.f;
-                    effect_p1->def.colorG = color_not_white.g / 255.f;
-                    effect_p1->def.colorB = color_not_white.b / 255.f;
+                    effectP1->def.colorR = colorNotWhite.r / 255.f;
+                    effectP1->def.colorG = colorNotWhite.g / 255.f;
+                    effectP1->def.colorB = colorNotWhite.b / 255.f;
                 }
 
                 if (state.dual) {
-                    UseEffect *effect_p2 = add_use_effect(state.player2.x, state.player2.y, USE_EFFECT_OBJ_P2, &respawn_effect, get_use_effect_array_ptr(GFX_TOP));
-                    if (effect_p2) {
-                        Color color_not_white = get_white_if_black(p2_color);
+                    UseEffect *effectP2 = addUseEffect(state.player2.x, state.player2.y, USE_EFFECT_OBJ_P2, &respawnEffect, getUseEffectArrayPtr(GFX_TOP));
+                    if (effectP2) {
+                        Color colorNotWhite = getWhiteIfBlack(p2Color);
 
-                        effect_p2->def.colorR = color_not_white.r / 255.f;
-                        effect_p2->def.colorG = color_not_white.g / 255.f;
-                        effect_p2->def.colorB = color_not_white.b / 255.f;
+                        effectP2->def.colorR = colorNotWhite.r / 255.f;
+                        effectP2->def.colorG = colorNotWhite.g / 255.f;
+                        effectP2->def.colorB = colorNotWhite.b / 255.f;
                     }
                 }
             }
@@ -618,13 +618,13 @@ void handle_respawn_effect() {
             if (data->timer <= 0) {
                 data->state = RESPAWN_EFFECT_SHOW_PLAYER;
                 data->timer = RESPAWN_EFFECT_DURATION;
-                data->hide_player = false;
+                data->hidePlayer = false;
             }
             break;
         case RESPAWN_EFFECT_SHOW_PLAYER:
             data->timer -= STEPS_DT;
             if (data->timer <= 0) {
-                data->hide_player = true;
+                data->hidePlayer = true;
                 if (--data->remaining == 0) {
                     data->timer = 0;
                     data->state = RESPAWN_EFFECT_NONE;
@@ -639,29 +639,29 @@ void handle_respawn_effect() {
     }
 }
 
-void clear_respawn_effect() {
-    state.respawn_effect_data.active = false;
-    state.respawn_effect_data.hide_player = false;
+void clearRespawnEffect() {
+    state.respawnEffectData.active = false;
+    state.respawnEffectData.hidePlayer = false;
 }
 
-bool is_coin_collected(int obj) {
-    if (!current_level_entry) return false;
+bool isCoinCollected(int obj) {
+    if (!currentLevelEntry) return false;
 
     if (objects.id[obj] != SECRET_COIN) return false;
 
-    LevelData *level_data = &current_level_entry->data;
+    LevelData *levelData = &currentLevelEntry->data;
 
-    switch (objects.coin_id[obj]) {
+    switch (objects.coinID[obj]) {
         case 0:
-            if (level_data->coin1) 
+            if (levelData->coin1) 
                 return true;
             break;
         case 1:
-            if (level_data->coin2) 
+            if (levelData->coin2) 
                 return true;
             break;
         case 2:
-            if (level_data->coin3) 
+            if (levelData->coin3) 
                 return true;
             break;
     }
@@ -669,32 +669,32 @@ bool is_coin_collected(int obj) {
     return false;
 }
 
-void kill_player(DeathReason reason) {
+void killPlayer(DeathReason reason) {
     state.dead = true;
-    state.death_reason = reason;
+    state.deathReason = reason;
 }
 
-void init_shake() {
-    state.shake_data.active = false;
+void initShake() {
+    state.shakeData.active = false;
 }
 
-void start_shake(float duration, float strength) {
-    state.shake_data.timer = duration;
-    state.shake_data.strength = strength;
-    state.shake_data.active = true;
+void startShake(float duration, float strength) {
+    state.shakeData.timer = duration;
+    state.shakeData.strength = strength;
+    state.shakeData.active = true;
 }
 
-void handle_shake(float delta) {
-    if (state.shake_data.active) {
-        state.camera_x = state.unmod_cam_x + state.shake_data.strength * random_float(-1, 1);
-        state.camera_y = state.unmod_cam_y + state.shake_data.strength * random_float(-1, 1);
-        state.shake_data.timer -= delta;
+void handleShake(float delta) {
+    if (state.shakeData.active) {
+        state.cameraX = state.unmodCamX + state.shakeData.strength * randomFloat(-1, 1);
+        state.cameraY = state.unmodCamY + state.shakeData.strength * randomFloat(-1, 1);
+        state.shakeData.timer -= delta;
 
         // End of shake
-        if (state.shake_data.timer < 0) {
-            state.shake_data.active = false;
-            state.camera_x = state.unmod_cam_x;
-            state.camera_y = state.unmod_cam_y;
+        if (state.shakeData.timer < 0) {
+            state.shakeData.active = false;
+            state.cameraX = state.unmodCamX;
+            state.cameraY = state.unmodCamY;
         }
     }
 }

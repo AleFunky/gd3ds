@@ -4,19 +4,19 @@
 #include "menus/core/ui_props.hpp"
 #include "math_helpers.hpp"
 
-void ui_rectangle_set_color(UIRectangle* e, u32 color) {
+void uiRectangleSetColor(UIRectangle* e, u32 color) {
     if (!e) return;
 
     e->color = color;
 }
 
-void ui_rectangle_clear_color(UIRectangle* e) {
+void uiRectangleClearColor(UIRectangle* e) {
     if (!e) return;
     
     e->color = 0xffffffff;
 }
 
-static void ui_rectangle_draw(UIElement* e, UITransform *transform) {
+static void uiRectangleDraw(UIElement* e, UITransform *transform) {
     UIRectangle *rectangle = (UIRectangle *) e;
 
     float width = e->w * transform->scaleX;
@@ -25,14 +25,14 @@ static void ui_rectangle_draw(UIElement* e, UITransform *transform) {
     C2D_DrawRectangle(transform->x - width * 0.5f, transform->y - height * 0.5f, 0, width, height, rectangle->color, rectangle->color, rectangle->color, rectangle->color);
 }
 
-static void ui_rectangle_destroy(UIElement *e) {
+static void uiRectangleDestroy(UIElement *e) {
     if (e) {
         delete (UIRectangle *)e;
         e = NULL;
     }
 }
 
-UIRectangle *ui_create_rectangle(UIScreen *screen) {
+UIRectangle *uiCreateRectangle(UIScreen *screen) {
     UIRectangle *e = new UIRectangle{};
 
     if (!e) return NULL;
@@ -40,24 +40,24 @@ UIRectangle *ui_create_rectangle(UIScreen *screen) {
     e->base.type = UI_RECTANGLE;
     e->base.enabled = true;
     
-    ui_element_apply_default_properties(&e->base, screen);
+    uiElementApplyDefaultProperties(&e->base, screen);
 
-    ui_rectangle_clear_color(e);
+    uiRectangleClearColor(e);
 
-    e->base.draw = ui_rectangle_draw;
-    e->base.destroy = ui_rectangle_destroy;
+    e->base.draw = uiRectangleDraw;
+    e->base.destroy = uiRectangleDestroy;
 
     return e;
 }
 
-UIElement *ui_create_rectangle_from_props(UIScreen *screen, const UIPropertyList *props) {
-    UIRectangle *rectangle = ui_create_rectangle(screen);
+UIElement *uiCreateRectangleFromProps(UIScreen *screen, const UIPropertyList *props) {
+    UIRectangle *rectangle = uiCreateRectangle(screen);
 
     if (!rectangle) return NULL;
     
-    ui_element_apply_properties(&rectangle->base, screen, props);
+    uiElementApplyProperties(&rectangle->base, screen, props);
 
-    ui_rectangle_set_color(rectangle, ui_prop_color(props, "color", ABGR8(255, 255, 255, 255)));
+    uiRectangleSetColor(rectangle, uiPropColor(props, "color", ABGR8(255, 255, 255, 255)));
 
     return &rectangle->base;
 }

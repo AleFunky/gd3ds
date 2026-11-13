@@ -7,15 +7,15 @@
 
 typedef struct {
     char name[MAX_PATH_LEN];
-    bool is_dir;
+    bool isDir;
 } FileOrFolder;
 
 
 typedef struct GenericTask GenericTask;
 
-FileOrFolder *load_folder(GenericTask *task, char *dir, int *count);
-void go_back_directory(char *path);
-char *strip_filename(char *path);
-void strip_extension(char *path);
-void truncate_filename(char *name, size_t max_len);
-void truncate_filename_start(char *name, size_t max_len, size_t buffer_size);
+FileOrFolder *loadFolder(GenericTask *task, char *dir, int *count);
+void goBackDirectory(char *path);
+char *stripFilename(char *path);
+void stripExtension(char *path);
+void truncateFilename(char *name, size_t maxLen);
+void truncateFilenameStart(char *name, size_t maxLen, size_t bufferSize);

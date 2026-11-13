@@ -3,13 +3,13 @@
 
 #define ZLIB_CHUNK_SIZE 4096
 
-u8 get_model();
+u8 getModel();
 
-size_t get_uncompressed_size(unsigned char *data, int data_len);
-unsigned char *compress_data(const unsigned char *data, size_t data_len, size_t *out_len, int *out_code);
-char *decompress_data(unsigned char *data, size_t data_len, size_t *out_len, int *out_code);
+size_t getUncompressedSize(unsigned char *data, int dataLen);
+unsigned char *compressData(const unsigned char *data, size_t dataLen, size_t *outLen, int *outCode);
+char *decompressData(unsigned char *data, size_t dataLen, size_t *outLen, int *outCode);
 
-char *decompress_data_level(unsigned char *data, size_t data_len, size_t *out_len, int *out_code);
+char *decompressDataLevel(unsigned char *data, size_t dataLen, size_t *outLen, int *outCode);
 
 
 typedef struct GenericTask GenericTask;
@@ -25,6 +25,6 @@ typedef struct GenericTask {
     volatile bool cancelled;
 } GenericTask;
 
-Thread create_generic_thread(GenericTask *task);
+Thread createGenericThread(GenericTask *task);
 
-int extract_zip(const char *input_path, const char *destination_path);
+int extractZip(const char *inputPath, const char *destinationPath);

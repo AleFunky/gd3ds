@@ -57,14 +57,14 @@ void dump_leaks() {
     Allocation *a = head;
 
     if (!a) {
-        output_log("No leaks!\n");
+        outputLog("No leaks!\n");
         return;
     }
 
-    output_log("Leaks:\n");
+    outputLog("Leaks:\n");
 
     while (a) {
-        output_log("Gen %d :LEAK: %p (%u bytes) caller=%p\n",
+        outputLog("Gen %d :LEAK: %p (%u bytes) caller=%p\n",
             a->generation,
             a->ptr,
             (unsigned)a->size,
@@ -98,14 +98,14 @@ void __wrap_free(void *ptr) {
 
 void *__wrap_realloc(void *ptr, size_t size) {
     void *caller = __builtin_return_address(0);
-    void *new_ptr = __real_realloc(ptr, size);
+    void *newPtr = __real_realloc(ptr, size);
 
-    if (!new_ptr)
+    if (!newPtr)
         return NULL;
 
     if (!ptr) {
-        track_alloc(new_ptr, size, caller);
-        return new_ptr;
+        track_alloc(newPtr, size, caller);
+        return newPtr;
     }
 
     if (size == 0) {
@@ -114,9 +114,9 @@ void *__wrap_realloc(void *ptr, size_t size) {
     }
 
     track_free(ptr);
-    track_alloc(new_ptr, size, caller);
+    track_alloc(newPtr, size, caller);
 
-    return new_ptr;
+    return newPtr;
 }
 
 #endif

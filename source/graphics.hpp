@@ -21,12 +21,12 @@
 #define SCREEN_HEIGHT_AREA (320.f)
 #define SCREEN_WIDTH_AREA ((SCREEN_HEIGHT_AREA / SCREEN_HEIGHT) * SCREEN_WIDTH)
 #define SCREEN_WIDTH_AREA_BOT ((SCREEN_HEIGHT_AREA / SCREEN_HEIGHT) * SCREEN_BOT_WIDTH)
-#define SCREEN_WIDTH_AREA_GAMEPLAY(swap_screens) ((swap_screens) ? SCREEN_WIDTH_AREA_BOT : SCREEN_WIDTH_AREA)
+#define SCREEN_WIDTH_AREA_GAMEPLAY(swapScreens) ((swapScreens) ? SCREEN_WIDTH_AREA_BOT : SCREEN_WIDTH_AREA)
 
 #define SCALE (SCREEN_HEIGHT / SCREEN_HEIGHT_AREA)
 
 
-extern int current_pulserod_ball_image;
+extern int currentPulserodBallImage;
 
 typedef enum {
     FADE_STATUS_NONE,
@@ -46,8 +46,8 @@ typedef struct {
     float opacity;
     float rotation;
     int obj;
-    short col_channel;
-    unsigned char col_type;
+    short colChannel;
+    unsigned char colType;
     signed char zlayer;
     unsigned char layer;
     bool blending;
@@ -82,21 +82,21 @@ enum FadingEffects {
 };
 
 typedef struct {
-    C2D_Sprite parent_template;
-    C2D_Sprite glow_template;
-    int child_count;
-    C2D_Sprite *child_templates;
+    C2D_Sprite parentTemplate;
+    C2D_Sprite glowTemplate;
+    int childCount;
+    C2D_Sprite *childTemplates;
 } SpriteTemplate;
 
-void cache_all_sprites();
-void free_cached_sprites();
-void get_fade_vars(int obj, float x, float *fade_x, float *fade_y, float *fade_scale);
-float obj_edge_fade(float x, int right_edge);
-float get_special_fading_vars(int obj, float fade_val);
+void cacheAllSprites();
+void freeCachedSprites();
+void getFadeVars(int obj, float x, float *fadeX, float *fadeY, float *fadeScale);
+float objEdgeFade(float x, int rightEdge);
+float getSpecialFadingVars(int obj, float fadeVal);
 
-extern bool p1_trail;
-extern float p1_trail_timer;
-extern int current_fading_effect;
+extern bool p1Trail;
+extern float p1TrailTimer;
+extern int currentFadingEffect;
 
 extern C2D_SpriteSheet spriteSheet;
 extern C2D_SpriteSheet spriteSheet2;
@@ -106,7 +106,7 @@ extern C2D_SpriteSheet animatedSheet;
 extern C2D_SpriteSheet playerEffectsSheet;
 extern C2D_SpriteSheet glowSheet;
 extern C2D_SpriteSheet bgSheet;
-extern int loaded_bg_sheet;
+extern int loadedBgSheet;
 extern C2D_SpriteSheet groundSheet;
 extern C2D_SpriteSheet trailSheet;
 extern C2D_SpriteSheet particleSheet;
@@ -117,106 +117,106 @@ extern C2D_SpriteSheet particleSheet;
 #define PLAYER_EFFECTS_SPIDER_START 33
 #define PLAYER_EFFECTS_FIRE_BOOST 41
 
-extern SpriteTemplate sprite_templates[GAME_OBJECT_COUNT];
+extern SpriteTemplate spriteTemplates[GAME_OBJECT_COUNT];
 
 extern const Color white;
 
-inline float normalize_angle(float a)
+inline float normalizeAngle(float a)
 {
     while (a < 0.0f)   a += 360.0f;
     while (a >= 360.0f) a -= 360.0f;
     return a;
 }
 
-int compare_ids(const void *a, const void *b);
+int compareIds(const void *a, const void *b);
 
-void create_objects();
-void change_blending(bool blending);
-Color get_white_if_black(Color color);
-Color get_p1_if_black(Color color);
-Color get_p2_if_black(Color color);
-void draw_objects();
-void draw_attempt_text();
-void draw_end_wall(float delta);
-void draw_background(float x, float y);
-void draw_ground(float cam_x, float cam_y, float y, bool is_ceiling, int screen_width);
-void update_player_colors();
-void set_player_colors(Color p1, Color p2, Color glow);
+void createObjects();
+void changeBlending(bool blending);
+Color getWhiteIfBlack(Color color);
+Color getP1IfBlack(Color color);
+Color getP2IfBlack(Color color);
+void drawObjects();
+void drawAttemptText();
+void drawEndWall(float delta);
+void drawBackground(float x, float y);
+void drawGround(float camX, float camY, float y, bool isCeiling, int screenWidth);
+void updatePlayerColors();
+void setPlayerColors(Color p1, Color p2, Color glow);
 
 typedef struct {
-    int anim_id;
-    int anim_frame;
-    float anim_timer;
-    int blend_from_anim_id;
-    int blend_from_frame;
-    float blend_from_timer;
-    float blend_fraction;
-    float robot_fire_scale;
+    int animID;
+    int animFrame;
+    float animTimer;
+    int blendFromAnimID;
+    int blendFromFrame;
+    float blendFromTimer;
+    float blendFraction;
+    float robotFireScale;
 } IconParameters;
 
-void spawn_icon_at(
+void spawnIconAt(
     int gamemode,
     int id,
     bool glow,
     float x,
     float y,
     float deg,
-    unsigned char flip_x,
-    unsigned char flip_y,
+    unsigned char flipX,
+    unsigned char flipY,
     float scale,
-    u32 p1_color,
-    u32 p2_color,
-    u32 glow_color,
+    u32 p1Color,
+    u32 p2Color,
+    u32 glowColor,
     IconParameters params
 );
-void spawn_p1_layer_at(
+void spawnP1LayerAt(
     int gamemode,
     int id,
     float x,
     float y,
     float deg,
-    unsigned char flip_x,
-    unsigned char flip_y,
+    unsigned char flipX,
+    unsigned char flipY,
     float scale,
-    u32 p1_color,
+    u32 p1Color,
     IconParameters params
 );
 
-void spawn_glow_layer_at(
+void spawnGlowLayerAt(
     int gamemode,
     int id,
     float x,
     float y,
     float deg,
-    unsigned char flip_x,
-    unsigned char flip_y,
+    unsigned char flipX,
+    unsigned char flipY,
     float scale,
-    u32 glow_color,
+    u32 glowColor,
     IconParameters params
 );
 
-Color get_color_abgr8(u32 color);
+Color getColorAbgr8(u32 color);
 
-const SlotFrames* find_slot_frames(const GameObject* obj, int slot);
-size_t get_child_group(const GameObject* obj, size_t child_index);
-const Animation* get_animation_for_object(int id);
+const SlotFrames* findSlotFrames(const GameObject* obj, int slot);
+size_t getChildGroup(const GameObject* obj, size_t childIndex);
+const Animation* getAnimationForObject(int id);
 
-void handle_mirror_transition();
+void handleMirrorTransition();
 
-void draw_player_effects();
-void draw_post_player_effects();
-void draw_player_graphics();
+void drawPlayerEffects();
+void drawPostPlayerEffects();
+void drawPlayerGraphics();
 
-void add_dash_boom(float x, float y, float rotation);
-void add_gravity_dash_boom(float x, float y, float rotation);
-void add_spider_dash_effect(float x, float from_y, float to_y, bool upside_down, Color color);
-void update_dash_booms(float delta);
-void draw_dash_booms(void);
-int get_coin_texture(int tex, int ticks);
-C2D_SpriteSheet get_sprite_sheet_ex(int index, int *rel_index);
+void addDashBoom(float x, float y, float rotation);
+void addGravityDashBoom(float x, float y, float rotation);
+void addSpiderDashEffect(float x, float fromY, float toY, bool upsideDown, Color color);
+void updateDashBooms(float delta);
+void drawDashBooms(void);
+int getCoinTexture(int tex, int ticks);
+C2D_SpriteSheet getSpriteSheetEx(int index, int *relIndex);
 
-void update_touch_effect(float delta);
-void draw_touch_effect();
+void updateTouchEffect(float delta);
+void drawTouchEffect();
 
-void update_bottom_particles(float delta);
-void draw_bottom_particles();
+void updateBottomParticles(float delta);
+void drawBottomParticles();

@@ -16,17 +16,17 @@ bool GravitySweep::done(){
     return this->time > 0.4f;
 }
 
-void GravitySweep::render_sweep(){
+void GravitySweep::renderSweep(){
     if(this->done()) return;
 
     float t = clampf(this->time / 0.4f, 0.0f, 1.0f);
     float ti = (1.0f - t);
 
-    float y_offset;
+    float yOffset;
     if(this->down){
-        y_offset = t * ((SCREEN_HEIGHT / 2.0f) + 60.0f) + ti * ((-SCREEN_HEIGHT / 2.0f) - 60.0f);
+        yOffset = t * ((SCREEN_HEIGHT / 2.0f) + 60.0f) + ti * ((-SCREEN_HEIGHT / 2.0f) - 60.0f);
     } else{
-        y_offset = ti * ((SCREEN_HEIGHT / 2.0f) + 60.0f) + t * ((-SCREEN_HEIGHT / 2.0f) - 60.0f);
+        yOffset = ti * ((SCREEN_HEIGHT / 2.0f) + 60.0f) + t * ((-SCREEN_HEIGHT / 2.0f) - 60.0f);
     }
 
     for(const auto& l : this->lines){
@@ -42,13 +42,13 @@ void GravitySweep::render_sweep(){
 
         C2D_DrawImageAt(
             C2D_SpriteSheetGetImage(gravLineSheet, 0), 
-            l.x, l.y + y_offset, 0.0f, &tint, l.scaleX, l.scaleY);
+            l.x, l.y + yOffset, 0.0f, &tint, l.scaleX, l.scaleY);
     }
 
-    if(!game_paused) this->time += delta;
+    if(!gamePaused) this->time += delta;
 };
 
-void GravitySweep::start_sweep(){
+void GravitySweep::startSweep(){
     this->time = 0.0f;
     float spacing = (SCREEN_WIDTH - 30.0f) / 22.0f;
     for(int i = 0; i < 22; i++){
@@ -61,38 +61,38 @@ void GravitySweep::start_sweep(){
     }
 }
 
-std::array<GravitySweep, 2> up_sweeps = {
+std::array<GravitySweep, 2> upSweeps = {
     GravitySweep(false),
     GravitySweep(false)
 };
-std::array<GravitySweep, 2> down_sweeps = {
+std::array<GravitySweep, 2> downSweeps = {
     GravitySweep(true),
     GravitySweep(true)
 };
 
-void start_gravity_sweep(bool down){
+void startGravitySweep(bool down){
     if(settingsState.disableGravityEffect) return;
 
-    auto& sweeps = down ? down_sweeps : up_sweeps;
+    auto& sweeps = down ? downSweeps : upSweeps;
     for(auto& s : sweeps){
         if(s.done()){
-            s.start_sweep(); 
+            s.startSweep(); 
             break;
         }
     }
 }
 
-void draw_gravity_sweeps(){
+void drawGravitySweeps(){
     //temporary screen space wow
     C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
     C2D_ViewScale(1/SCALE, 1/SCALE);
 
-    for(auto& sweep: up_sweeps){
-        sweep.render_sweep();
+    for(auto& sweep: upSweeps){
+        sweep.renderSweep();
     }
 
-    for(auto& sweep: down_sweeps){
-        sweep.render_sweep();
+    for(auto& sweep: downSweeps){
+        sweep.renderSweep();
     }
 
     C2D_ViewScale(SCALE, SCALE);

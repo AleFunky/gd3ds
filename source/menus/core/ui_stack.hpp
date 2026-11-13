@@ -11,7 +11,7 @@ typedef struct UIScreenPair {
     bool root;
 
     void *data;
-    void (*free_data)(void *data);
+    void (*freeData)(void *data);
 } UIScreenPair;
 
 typedef enum {
@@ -24,60 +24,60 @@ typedef enum {
 
 typedef struct {
     const UIScreenDefPair *defs;
-    UIAnimation top_anim;
-    UIAnimation btm_anim;
+    UIAnimation topAnim;
+    UIAnimation btmAnim;
     UIStackPushType type;
-    bool push_now;
+    bool pushNow;
     void *data;
 } UIStackPush;
 
 typedef struct {
     //array of pointers to UIScreenPairs
-    UIScreenPair **screen_stack;
-    size_t stack_capacity;
+    UIScreenPair **screenStack;
+    size_t stackCapacity;
 
     //"root" ScreenPairs represent the lowest layer of the current UI context, such as the main menu, creator menu, or level select (as opposed to popups like settings, the color select, etc)
     //ScreenPairs which are below the current root will be unloaded and not updated; reloaded when the current root/context is exited
-    size_t current_root;
+    size_t currentRoot;
     //amount of ScreenPairs to update (starts at root and goes up)
-    size_t active_count;
+    size_t activeCount;
 
     //used for fade to/from black when changing roots
-    UITransitionState root_transition; //open or close
+    UITransitionState rootTransition; //open or close
     FadeStatus fade;
-    float fade_time;
+    float fadeTime;
 
     UIStackPush push;
 
-    int next_game_state;
+    int nextGameState;
 } UIStack;
 
-bool ui_stack_check_loaded_root(const UIScreenDefPair *screen);
-bool ui_stack_check_loaded_screen_in_root(const UIScreenDefPair *screen);
-UIScreenPair *ui_stack_get_loaded_screen(const UIScreenDefPair *screen);
+bool uiStackCheckLoadedRoot(const UIScreenDefPair *screen);
+bool uiStackCheckLoadedScreenInRoot(const UIScreenDefPair *screen);
+UIScreenPair *uiStackGetLoadedScreen(const UIScreenDefPair *screen);
 
-void ui_stack_set_stack(UIStack *set_stack);
+void uiStackSetStack(UIStack *setStack);
 
-void ui_stack_push(const UIScreenDefPair *defs, UIAnimation top_anim, UIAnimation btm_anim, UIStackPushType type);
-void ui_stack_push_name(const char *name, UIAnimation top_anim, UIAnimation btm_anim, UIStackPushType type);
-void ui_stack_push_data(void *data);
-void ui_stack_push_root_instant(const UIScreenDefPair *defs);
-void ui_stack_push_game_state(int game_state);
+void uiStackPush(const UIScreenDefPair *defs, UIAnimation topAnim, UIAnimation btmAnim, UIStackPushType type);
+void uiStackPushName(const char *name, UIAnimation topAnim, UIAnimation btmAnim, UIStackPushType type);
+void uiStackPushData(void *data);
+void uiStackPushRootInstant(const UIScreenDefPair *defs);
+void uiStackPushGameState(int gameState);
 
-void ui_stack_pop();
-void ui_stack_pop_context();
+void uiStackPop();
+void uiStackPopContext();
 
-void ui_stack_update(UIInput *input);
+void uiStackUpdate(UIInput *input);
 
-void draw_stack_debug();
-void draw_stack_fade();
-void ui_stack_draw(Screens target);
+void drawStackDebug();
+void drawStackFade();
+void uiStackDraw(Screens target);
 
-void ui_stack_clear();
+void uiStackClear();
 
-UIScreen *ui_stack_get_screen(const char *name, Screens screen);
-UIScreen *ui_stack_get_screen_from_pair(UIScreenPair *pair, Screens screen);
-UIScreen *ui_stack_get_screen_relative(UIScreen *screen, Screens which);
+UIScreen *uiStackGetScreen(const char *name, Screens screen);
+UIScreen *uiStackGetScreenFromPair(UIScreenPair *pair, Screens screen);
+UIScreen *uiStackGetScreenRelative(UIScreen *screen, Screens which);
 
-FadeStatus ui_stack_get_fade_status();
-const char *ui_stack_get_current_screen_name();
+FadeStatus uiStackGetFadeStatus();
+const char *uiStackGetCurrentScreenName();

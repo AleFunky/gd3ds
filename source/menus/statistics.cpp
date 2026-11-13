@@ -20,74 +20,74 @@ typedef struct StatisticEntries {
 } StatisticEntries;
 
 static const StatisticEntries stats[] = {
-    { "Total Jumps", &total_jumps },
-    { "Total Attempts", &total_attempts },
-    { "Collected Stars", &total_stars }, 
-    { "Completed Levels", &completed_main_levels },
-    { "Completed Ext. Levels", &completed_external_levels },
-    { "Completed Demon Levels", &total_demons },
-    { "Collected Secret Coins", &total_coins },
-    { "Collected User Coins", &total_user_coins },
-    { "Players Destroyed", &players_destroyed }
+    { "Total Jumps", &totalJumps },
+    { "Total Attempts", &totalAttempts },
+    { "Collected Stars", &totalStars }, 
+    { "Completed Levels", &completedMainLevels },
+    { "Completed Ext. Levels", &completedExternalLevels },
+    { "Completed Demon Levels", &totalDemons },
+    { "Collected Secret Coins", &totalCoins },
+    { "Collected User Coins", &totalUserCoins },
+    { "Players Destroyed", &playersDestroyed }
 };
 
-void statistics_init(UIScreen *s) {
-    list = (UIList *) ui_get_element_by_tag(s, "list");
+void statisticsInit(UIScreen *s) {
+    list = (UIList *) uiGetElementByTag(s, "list");
 
     if (list) {
-        float list_width = list->base.w * 0.5f;
+        float listWidth = list->base.w * 0.5f;
 
         for (size_t i = 0; i < ARRAY_LEN(stats); i++) {
-            if (stats[i].value == &total_user_coins && !user_coins_counter_visible()) continue;
+            if (stats[i].value == &totalUserCoins && !userCoinsCounterVisible()) continue;
 
             const char *name = stats[i].name;
             const int value = *stats[i].value;
 
-            UIElement *card = (UIElement *) ui_create_rectangle(s);
+            UIElement *card = (UIElement *) uiCreateRectangle(s);
 
             if (card) {
-                ui_rectangle_set_color((UIRectangle *) card, (i & 1 ? C2D_Color32(194,114,62,255) :  C2D_Color32(161,88,48,255)));
-                ui_element_set_size(card, 0, 28);
+                uiRectangleSetColor((UIRectangle *) card, (i & 1 ? C2D_Color32(194,114,62,255) :  C2D_Color32(161,88,48,255)));
+                uiElementSetSize(card, 0, 28);
 
                 // Stat name
-                UILabel *stat = ui_create_label(s);
+                UILabel *stat = uiCreateLabel(s);
                 if (stat) {
-                    ui_label_set_text(stat, name);
-                    ui_element_set_position((UIElement *) stat, -list_width + 6, 1);
-                    ui_element_set_scale((UIElement *) stat, 0.54f);
+                    uiLabelSetText(stat, name);
+                    uiElementSetPosition((UIElement *) stat, -listWidth + 6, 1);
+                    uiElementSetScale((UIElement *) stat, 0.54f);
                     
                     stat->font = 2;
 
-                    ui_element_add_child(card, (UIElement *) stat);
+                    uiElementAddChild(card, (UIElement *) stat);
                 }
 
                 // Value name
-                UILabel *stat_value = ui_create_label(s);
-                if (stat_value) {
-                    char tmp_value[16];
+                UILabel *statValue = uiCreateLabel(s);
+                if (statValue) {
+                    char tmpValue[16];
 
-                    snprintf(tmp_value, sizeof(tmp_value), "%d", value);
+                    snprintf(tmpValue, sizeof(tmpValue), "%d", value);
 
-                    ui_label_set_text(stat_value, tmp_value);
-                    ui_element_set_position((UIElement *) stat_value, list_width - 6, 1);
-                    ui_element_set_scale((UIElement *) stat_value, 0.54f);
+                    uiLabelSetText(statValue, tmpValue);
+                    uiElementSetPosition((UIElement *) statValue, listWidth - 6, 1);
+                    uiElementSetScale((UIElement *) statValue, 0.54f);
 
-                    stat_value->font = 2;
-                    stat_value->alignment = 1;
+                    statValue->font = 2;
+                    statValue->alignment = 1;
                     
-                    ui_element_add_child(card, (UIElement *) stat_value);
+                    uiElementAddChild(card, (UIElement *) statValue);
                 }
 
-                ui_list_add(list, card);
+                uiListAdd(list, card);
             }
         }
     }
 }
 
-extern const UIScreenDefPair statistics_def = {
+extern const UIScreenDefPair statisticsDef = {
     .name = "statistics",
     .btm = {
         .path = "romfs:/menus/statistics.txt",
-        .init = statistics_init,
+        .init = statisticsInit,
     }
 };

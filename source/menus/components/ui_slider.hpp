@@ -6,7 +6,7 @@
 
 extern bool sliding;
 
-UISlider *ui_create_slider(UIScreen *screen);
-UIElement *ui_create_slider_from_props(UIScreen *screen, const UIPropertyList *props);
-float ui_slider_get_percent(UISlider *e);
-void ui_slider_set_value(UISlider *e, float value);
+UISlider *uiCreateSlider(UIScreen *screen);
+UIElement *uiCreateSliderFromProps(UIScreen *screen, const UIPropertyList *props);
+float uiSliderGetPercent(UISlider *e);
+void uiSliderSetValue(UISlider *e, float value);

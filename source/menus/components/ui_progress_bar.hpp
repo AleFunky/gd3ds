@@ -2,7 +2,7 @@
 
 #include "menus/core/ui_screen.hpp"
 
-void ui_progress_bar_set_tint(UIProgressBar* e, u32 color);
-void ui_progress_bar_clear_tint(UIProgressBar* e);
-UIProgressBar *ui_create_progress_bar(UIScreen *screen);
-UIElement *ui_create_progress_bar_from_props(UIScreen *screen, const UIPropertyList *props);
+void uiProgressBarSetTint(UIProgressBar* e, u32 color);
+void uiProgressBarClearTint(UIProgressBar* e);
+UIProgressBar *uiCreateProgressBar(UIScreen *screen);
+UIElement *uiCreateProgressBarFromProps(UIScreen *screen, const UIPropertyList *props);

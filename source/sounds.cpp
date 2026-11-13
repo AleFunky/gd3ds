@@ -1,32 +1,32 @@
 #include "sounds.hpp"
 #include "string.h"
 
-SFX play_sound;
-SFX quit_sound;
-SFX explode_sound;
-SFX end_sound;
+SFX playSound;
+SFX quitSound;
+SFX explodeSound;
+SFX endSound;
 SFX honk;
-SFX coin_sound;
+SFX coinSound;
 
 SFXKVP sounds[] = {
-    { "play", &play_sound },
-    { "quit", &quit_sound },
-    { "explode", &explode_sound },
-    { "end", &end_sound },
+    { "play", &playSound },
+    { "quit", &quitSound },
+    { "explode", &explodeSound },
+    { "end", &endSound },
     { "boop", &honk },
-    { "coin", &coin_sound },
+    { "coin", &coinSound },
 };
 
-void load_sfx() {
-    load_wav("romfs:/sfx/playSound_01.wav", &play_sound);
-    load_wav("romfs:/sfx/quitSound_01.wav", &quit_sound);
-    load_wav("romfs:/sfx/explode_11.wav", &explode_sound);
-    load_wav("romfs:/sfx/endStart_02.wav", &end_sound);
-    load_wav("romfs:/sfx/honk.wav", &honk);
-    load_wav("romfs:/sfx/highscoreGet02.wav", &coin_sound);
+void loadSfx() {
+    loadWav("romfs:/sfx/playSound_01.wav", &playSound);
+    loadWav("romfs:/sfx/quitSound_01.wav", &quitSound);
+    loadWav("romfs:/sfx/explode_11.wav", &explodeSound);
+    loadWav("romfs:/sfx/endStart_02.wav", &endSound);
+    loadWav("romfs:/sfx/honk.wav", &honk);
+    loadWav("romfs:/sfx/highscoreGet02.wav", &coinSound);
 }
 
-SFX *get_sound(const char *name){
+SFX *getSound(const char *name){
     for(size_t i = 0; i < sizeof(sounds) / sizeof(sounds[0]); i++){
         if(strcmp(name, sounds[i].name) == 0){
             return sounds[i].sound;

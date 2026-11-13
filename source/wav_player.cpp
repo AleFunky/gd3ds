@@ -5,7 +5,7 @@
 #include "main.hpp"
 static ndspWaveBuf waveBufs[24];
 
-bool load_wav(const char* path, SFX* sfx) {
+bool loadWav(const char* path, SFX* sfx) {
     FILE* f = fopen(path, "rb");
     if (!f) return false;
 
@@ -68,7 +68,7 @@ bool load_wav(const char* path, SFX* sfx) {
     return false;
 }
 
-void play_sfx(SFX* sfx, int channel) {
+void playSfx(SFX* sfx, int channel) {
     ndspChnReset(channel);
 
     ndspChnSetInterp(channel, NDSP_INTERP_POLYPHASE);
@@ -87,5 +87,5 @@ void play_sfx(SFX* sfx, int channel) {
 
     ndspChnWaveBufAdd(channel, &waveBufs[channel]);
     
-    apply_volume_settings();
+    applyVolumeSettings();
 }

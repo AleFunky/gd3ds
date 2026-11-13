@@ -17,154 +17,154 @@
 
 // needed to re-create the runtime trigger buffers
 // after reload_level() frees them
-extern int alpha_trigger_capacity;
-extern int move_trigger_capacity;
-extern int spawn_trigger_capacity;
-extern int touch_trigger_capacity;
-extern int follow_player_y_trigger_capacity;
+extern int alphaTriggerCapacity;
+extern int moveTriggerCapacity;
+extern int spawnTriggerCapacity;
+extern int touchTriggerCapacity;
+extern int followPlayerYTriggerCapacity;
 
-bool restored_checkpoint = false;
+bool restoredCheckpoint = false;
 
-int used_count = 0;
-int channels_used[COL_CHANNEL_NUM];
+int usedCount = 0;
+int channelsUsed[COL_CHANNEL_NUM];
 
 #define MAX_CHECKPOINTS 100
 #define CHECKPOINT_GFX_ID 6
 
 typedef struct {
-    int source_obj;
-    float time_run;
+    int sourceObj;
+    float timeRun;
 } PulseSnapshot;
 
 typedef struct {
     int obj;
-    float rotation, visual_rotation;
+    float rotation, visualRotation;
 } RotateObjectSnapshot;
 
 typedef struct CheckpointData {
     Player p1;
     Player p2;
 
-    float camera_x;
-    float camera_y;
+    float cameraX;
+    float cameraY;
 
-    float camera_intended_y;
+    float cameraIntendedY;
 
-    float ground_y;
-    float ceiling_y;
-    float ground_y_gfx;
+    float groundY;
+    float ceilingY;
+    float groundYGfx;
 
-    float wall_y;
+    float wallY;
 
     bool mirroring;
-    int mirror_mult;    
-    float mirror_timer;
+    int mirrorMult;    
+    float mirrorTimer;
 
-    float original_mirror_factor;
-    float intended_mirror_factor;
+    float originalMirrorFactor;
+    float intendedMirrorFactor;
 
-    float mirror_speed_factor;
-    float mirror_factor;
+    float mirrorSpeedFactor;
+    float mirrorFactor;
     
     bool dual;
     
-    bool show_player;
+    bool showPlayer;
     
-    float dual_portal_y;
+    float dualPortalY;
     unsigned char speed;
 
-    int current_fading_effect;
-    bool p1_trail;
+    int currentFadingEffect;
+    bool p1Trail;
 
     // snapshot only of the color channels actually used by the level to avoid a 1024 entry copy per checkpoint
     // allocated dynamically in new_checkpoint() (tis is great)
-    int channel_snapshot_count;
-    ColorChannel *channel_snapshot;
-    ColTriggerBuffer *trigger_snapshot;
+    int channelSnapshotCount;
+    ColorChannel *channelSnapshot;
+    ColTriggerBuffer *triggerSnapshot;
 
-    MoveTriggerBuffer *move_triggers;
-    AlphaTriggerBuffer *alpha_triggers;
-    SpawnTriggerBuffer *spawn_triggers;
-    FollowPlayerYTriggerBuffer *follow_triggers;
-    FollowTriggerBuffer *follow_trigger_buffers;
-    RotateTriggerBuffer *rotate_triggers;
-    RotateTargetState *rotate_targets;
-    int *rotate_target_offsets;
-    RotateObjectSnapshot *rotate_obj_snapshot;
-    ItemCount *count_items;
-    CountTriggerBuffer *count_triggers;
-    TouchTriggerBuffer *touch_triggers;
-    int *collected_pickups;
-    int count_items_count;
-    int count_triggers_count;
-    int touch_triggers_count;
-    int collected_pickups_count;
-    int move_triggers_count;
-    int alpha_triggers_count;
-    int spawn_triggers_count;
-    int follow_triggers_count;
-    int follow_trigger_buffers_count;
-    int rotate_triggers_count;
-    int rotate_targets_count;
-    int rotate_obj_count;
+    MoveTriggerBuffer *moveTriggers;
+    AlphaTriggerBuffer *alphaTriggers;
+    SpawnTriggerBuffer *spawnTriggers;
+    FollowPlayerYTriggerBuffer *followTriggers;
+    FollowTriggerBuffer *followTriggerBuffers;
+    RotateTriggerBuffer *rotateTriggers;
+    RotateTargetState *rotateTargets;
+    int *rotateTargetOffsets;
+    RotateObjectSnapshot *rotateObjSnapshot;
+    ItemCount *countItems;
+    CountTriggerBuffer *countTriggers;
+    TouchTriggerBuffer *touchTriggers;
+    int *collectedPickups;
+    int countItemsCount;
+    int countTriggersCount;
+    int touchTriggersCount;
+    int collectedPickupsCount;
+    int moveTriggersCount;
+    int alphaTriggersCount;
+    int spawnTriggersCount;
+    int followTriggersCount;
+    int followTriggerBuffersCount;
+    int rotateTriggersCount;
+    int rotateTargetsCount;
+    int rotateObjCount;
 
     // per-object state for triggers that were active at checkpoint time, so they
     // can continue from the exact point instead of restarting. bounded by the
     // number of active move/alpha triggers so it's usually empty
-    int move_obj_count;
-    uint8_t *move_idx_stream;
-    int move_idx_bytes;
-    uint8_t *move_obj_x;
-    int move_x_bytes;
-    int move_x_fmt;
-    int move_x_u;
-    int move_cx;
-    uint8_t *move_obj_y;
-    int move_y_bytes;
-    int move_y_fmt;
-    int move_y_u;
-    int move_cy;
+    int moveObjCount;
+    uint8_t *moveIdxStream;
+    int moveIdxBytes;
+    uint8_t *moveObjX;
+    int moveXBytes;
+    int moveXFmt;
+    int moveXU;
+    int moveCx;
+    uint8_t *moveObjY;
+    int moveYBytes;
+    int moveYFmt;
+    int moveYU;
+    int moveCy;
 
-    int fired_move_count;
-    int *fired_move_index;
+    int firedMoveCount;
+    int *firedMoveIndex;
 
-    int key_count;
-    int *key_index;
+    int keyCount;
+    int *keyIndex;
 
-    int toggle_group_count;
-    int *toggle_group_id;
+    int toggleGroupCount;
+    int *toggleGroupID;
 
-    int alpha_group_count;
-    int *alpha_group_id;
-    float *alpha_group_alpha;
+    int alphaGroupCount;
+    int *alphaGroupID;
+    float *alphaGroupAlpha;
 
-    int pulse_snap_count;
-    PulseSnapshot *pulse_snap;
+    int pulseSnapCount;
+    PulseSnapshot *pulseSnap;
 
-    float song_offset;
+    float songOffset;
 
-    void *alloc_base;
+    void *allocBase;
 } CheckpointData;
 
 CheckpointData checkpoints[MAX_CHECKPOINTS];
 
-static bool is_pending_pseudo_checkpoint = false;
+static bool isPendingPseudoCheckpoint = false;
 
-int checkpoint_count = 0;
-int checkpoint_pointer = 0;
-float checkpoint_timer = 0;
-bool pseudo_checkpoint_exists = false;
+int checkpointCount = 0;
+int checkpointPointer = 0;
+float checkpointTimer = 0;
+bool pseudoCheckpointExists = false;
 
-static unsigned int ck_float_bits(float f);
-static int ck_varint_len(unsigned int v);
-static uint8_t *ck_varint_put(uint8_t *p, unsigned int v);
-static unsigned int ck_varint_get(const uint8_t **pp);
-static float ck_axis_get(const uint8_t *blob, int fmt, int u, int k);
+static unsigned int ckFloatBits(float f);
+static int ckVarintLen(unsigned int v);
+static uint8_t *ckVarintPut(uint8_t *p, unsigned int v);
+static unsigned int ckVarintGet(const uint8_t **pp);
+static float ckAxisGet(const uint8_t *blob, int fmt, int u, int k);
 
-static void add_used_channel(int *out, bool *seen, int *count, int channel) {
+static void addUsedChannel(int *out, bool *seen, int *count, int channel) {
     if (channel <= 0 || channel >= COL_CHANNEL_NUM) return;
 
-    int idx = get_col_channel_index(channel);
+    int idx = getColChannelIndex(channel);
     if (seen[idx]) return;
     seen[idx] = true;
     out[(*count)++] = idx;
@@ -173,73 +173,73 @@ static void add_used_channel(int *out, bool *seen, int *count, int channel) {
 
 // collects the array indices of every color channel that the level can touch
 // and returns how many unique indices were written to 'out'
-static int collect_used_channels(int *out) {
+static int collectUsedChannels(int *out) {
     int n = 0;
     bool seen[COL_CHANNEL_NUM] = { false };
 
     // normal player channels
-    add_used_channel(out, seen, &n, NONE);
-    add_used_channel(out, seen, &n, COL_1);
-    add_used_channel(out, seen, &n, COL_2);
-    add_used_channel(out, seen, &n, COL_3);
-    add_used_channel(out, seen, &n, COL_4);
+    addUsedChannel(out, seen, &n, NONE);
+    addUsedChannel(out, seen, &n, COL_1);
+    addUsedChannel(out, seen, &n, COL_2);
+    addUsedChannel(out, seen, &n, COL_3);
+    addUsedChannel(out, seen, &n, COL_4);
 
     // built-in special channels
     for (int id = CHANNEL_BG; id < COL_CHANNEL_LAST; id++) {
-        add_used_channel(out, seen, &n, id);
+        addUsedChannel(out, seen, &n, id);
     }
 
     // channels declared in the level
     for (int i = 0; i < channelCount && n < COL_CHANNEL_NUM; i++) {
-        add_used_channel(out, seen, &n, colorChannels[i].channelID);
-        add_used_channel(out, seen, &n, colorChannels[i].inheritedChannelID);
+        addUsedChannel(out, seen, &n, colorChannels[i].channelID);
+        addUsedChannel(out, seen, &n, colorChannels[i].inheritedChannelID);
     }
 
     // check for objects
     for (int i = 0; i < objects.count && n < COL_CHANNEL_NUM; i++) {
-        add_used_channel(out, seen, &n, objects.col_channel[i]);
-        add_used_channel(out, seen, &n, objects.detail_col_channel[i]);
-        add_used_channel(out, seen, &n, objects.v1p9_col_channel[i]);
+        addUsedChannel(out, seen, &n, objects.colChannel[i]);
+        addUsedChannel(out, seen, &n, objects.detailColChannel[i]);
+        addUsedChannel(out, seen, &n, objects.v1p9ColChannel[i]);
 
-        if (is_color_trigger(objects.id[i])) {
-            ColorTrigger *trigger = get_color_trigger(i);
-            add_used_channel(out, seen, &n, trigger->target_color_id);
-            add_used_channel(out, seen, &n, trigger->copied_color_id);
+        if (isColorTrigger(objects.id[i])) {
+            ColorTrigger *trigger = getColorTrigger(i);
+            addUsedChannel(out, seen, &n, trigger->targetColorID);
+            addUsedChannel(out, seen, &n, trigger->copiedColorID);
         } else if (objects.id[i] == PULSE_TRIGGER) {
-            PulseTrigger *trigger = get_pulse_trigger(i);
-            if (trigger->pulse_target_type == PULSE_TARGET_CHANNEL)
-                add_used_channel(out, seen, &n, trigger->target_group);
-            add_used_channel(out, seen, &n, trigger->copied_color_id);
+            PulseTrigger *trigger = getPulseTrigger(i);
+            if (trigger->pulseTargetType == PULSE_TARGET_CHANNEL)
+                addUsedChannel(out, seen, &n, trigger->targetGroup);
+            addUsedChannel(out, seen, &n, trigger->copiedColorID);
         }
     }
 
     return n;
 }
 
-void load_used_channels() {
-    used_count = collect_used_channels(channels_used);
+void loadUsedChannels() {
+    usedCount = collectUsedChannels(channelsUsed);
 }
 
 // frees the dynamic snapshot buffers of a checkpoint
 #define CK_ALIGN8(x) (((x) + 7u) & ~(size_t)7u)
 
-static unsigned int ck_float_bits(float f) {
+static unsigned int ckFloatBits(float f) {
     unsigned int u;
     memcpy(&u, &f, sizeof u);
     return u;
 }
 
-static int ck_varint_len(unsigned int v) {
+static int ckVarintLen(unsigned int v) {
     int n = 1;
     while (v >= 128u) { v >>= 7; n++; }
     return n;
 }
-static uint8_t *ck_varint_put(uint8_t *p, unsigned int v) {
+static uint8_t *ckVarintPut(uint8_t *p, unsigned int v) {
     while (v >= 128u) { *p++ = (uint8_t)(v | 0x80u); v >>= 7; }
     *p++ = (uint8_t)v;
     return p;
 }
-static unsigned int ck_varint_get(const uint8_t **pp) {
+static unsigned int ckVarintGet(const uint8_t **pp) {
     unsigned int v = 0;
     int shift = 0;
     const uint8_t *p = *pp;
@@ -253,15 +253,15 @@ static unsigned int ck_varint_get(const uint8_t **pp) {
     return v;
 }
 
-static uint32_t ck_next_pow2(uint32_t x) {
+static uint32_t ckNextPow2(uint32_t x) {
     uint32_t p = 1;
     while (p < x) p <<= 1;
     return p;
 }
 
-static int ck_dedup_put_h(int *h, uint32_t mask, float *tbl, int *n, float v) {
+static int ckDedupPutH(int *h, uint32_t mask, float *tbl, int *n, float v) {
     if (*n > 65536) return 0;
-    uint32_t bits = ck_float_bits(v);
+    uint32_t bits = ckFloatBits(v);
     uint32_t i = (bits * 2654435761u) & mask;
     for (;;) {
         int val = h[i];
@@ -270,27 +270,27 @@ static int ck_dedup_put_h(int *h, uint32_t mask, float *tbl, int *n, float v) {
             tbl[*n] = v;
             return (*n)++;
         }
-        if (ck_float_bits(tbl[val - 1]) == bits) return val - 1;
+        if (ckFloatBits(tbl[val - 1]) == bits) return val - 1;
         i = (i + 1) & mask;
     }
 }
 
-static void ck_axis_choose(int c, int u, int *fmt, int *bytes) {
+static void ckAxisChoose(int c, int u, int *fmt, int *bytes) {
     int best = (int)(sizeof(float) * (size_t)c);
-    int best_fmt = 0;
+    int bestFmt = 0;
     if (u > 0 && u <= 256) {
         int b = (int)(sizeof(float) * (size_t)u) + c;
-        if (b < best) { best = b; best_fmt = 1; }
+        if (b < best) { best = b; bestFmt = 1; }
     }
     if (u > 0 && u <= 65536) {
         int b = (int)(sizeof(float) * (size_t)u) + 2 * c;
-        if (b < best) { best = b; best_fmt = 2; }
+        if (b < best) { best = b; bestFmt = 2; }
     }
-    *fmt = best_fmt;
+    *fmt = bestFmt;
     *bytes = best;
 }
 
-static float ck_axis_get(const uint8_t *blob, int fmt, int u, int k) {
+static float ckAxisGet(const uint8_t *blob, int fmt, int u, int k) {
     if (fmt == 0) {
         float v;
         memcpy(&v, blob + (size_t)k * sizeof(float), sizeof v);
@@ -304,186 +304,186 @@ static float ck_axis_get(const uint8_t *blob, int fmt, int u, int k) {
     return tbl[idx];
 }
 
-static void free_checkpoint_snapshot(CheckpointData *check) {
-    if (check->alloc_base) { free(check->alloc_base); check->alloc_base = NULL; }
+static void freeCheckpointSnapshot(CheckpointData *check) {
+    if (check->allocBase) { free(check->allocBase); check->allocBase = NULL; }
 
-    memset(&check->channel_snapshot_count, 0,
-           (size_t)((char *)&check->pulse_snap + sizeof(check->pulse_snap)
-                    - (char *)&check->channel_snapshot_count));
+    memset(&check->channelSnapshotCount, 0,
+           (size_t)((char *)&check->pulseSnap + sizeof(check->pulseSnap)
+                    - (char *)&check->channelSnapshotCount));
 }
 
-void set_checkpoint_timer(float timer) {
-    if (state.practice_mode && settingsState.autoCheckpoints) {
+void setCheckpointTimer(float timer) {
+    if (state.practiceMode && settingsState.autoCheckpoints) {
         // Set auto checkpoints timer
-        checkpoint_timer = timer;
+        checkpointTimer = timer;
 
         // Quick checkpoints halves the timer
         if (settingsState.quickCheckpoints) {
-            checkpoint_timer /= 2;
+            checkpointTimer /= 2;
         }
     }
 }
 
-static bool is_checkpoint_pickup(int obj) {
-    PickupItem *pickup = get_pickup_item(obj);
+static bool isCheckpointPickup(int obj) {
+    PickupItem *pickup = getPickupItem(obj);
     return pickup && objects.id[obj] != KEY_OBJ;
 }
 
-static bool is_collected_pickup(int obj) {
-    return is_checkpoint_pickup(obj) &&
+static bool isCollectedPickup(int obj) {
+    return isCheckpointPickup(obj) &&
            (objects.flags[obj] & FLAG_TOGGLED) && (objects.activated[obj] & 3);
 }
 
-void new_checkpoint() {
+void newCheckpoint() {
     if (state.dead) return;
 
-    flush_group_combination_visual_moves();
+    flushGroupCombinationVisualMoves();
 
-    int next_checkpoint = checkpoint_pointer + 1;
-    if (next_checkpoint >= MAX_CHECKPOINTS) next_checkpoint = 0;
+    int nextCheckpoint = checkpointPointer + 1;
+    if (nextCheckpoint >= MAX_CHECKPOINTS) nextCheckpoint = 0;
 
-    CheckpointData *check = &checkpoints[next_checkpoint];
+    CheckpointData *check = &checkpoints[nextCheckpoint];
 
     // release the snapshot of the checkpoint we are about to overwrite
-    free_checkpoint_snapshot(check);
+    freeCheckpointSnapshot(check);
 
-    int move_cap = 0;
-    int move_cx = 0;
-    int move_cy = 0;
-    int move_idx_bytes = 0;
-    int prev_index = 0;
+    int moveCap = 0;
+    int moveCx = 0;
+    int moveCy = 0;
+    int moveIdxBytes = 0;
+    int prevIndex = 0;
     int *mv_list = NULL;
     if (objects.count > 0) mv_list = (int *)malloc(sizeof(int) * (size_t)objects.count);
     for (int i = 0; i < objects.count; i++) {
-        unsigned int bx = ck_float_bits(objects.x[i]) ^ ck_float_bits(objects.original_x[i]);
-        unsigned int by = ck_float_bits(objects.y[i]) ^ ck_float_bits(objects.original_y[i]);
+        unsigned int bx = ckFloatBits(objects.x[i]) ^ ckFloatBits(objects.originalX[i]);
+        unsigned int by = ckFloatBits(objects.y[i]) ^ ckFloatBits(objects.originalY[i]);
         if (!bx && !by) continue;
-        unsigned int gap = (unsigned int)(move_cap ? (i - prev_index) : i);
+        unsigned int gap = (unsigned int)(moveCap ? (i - prevIndex) : i);
         unsigned int flags = (bx ? 2u : 0u) | (by ? 1u : 0u);
-        move_idx_bytes += ck_varint_len((gap << 2) | flags);
-        prev_index = i;
-        if (mv_list) mv_list[move_cap] = i;
-        move_cap++;
-        if (bx) move_cx++;
-        if (by) move_cy++;
+        moveIdxBytes += ckVarintLen((gap << 2) | flags);
+        prevIndex = i;
+        if (mv_list) mv_list[moveCap] = i;
+        moveCap++;
+        if (bx) moveCx++;
+        if (by) moveCy++;
     }
 
-    int move_x_fmt = 0, move_y_fmt = 0, move_x_u = 0, move_y_u = 0;
-    int move_x_bytes = 0, move_y_bytes = 0;
+    int moveXFmt = 0, moveYFmt = 0, moveXU = 0, moveYU = 0;
+    int moveXBytes = 0, moveYBytes = 0;
     int *ck_hx = NULL, *ck_hy = NULL;
-    uint32_t ck_hx_slots = 0, ck_hy_slots = 0;
-    if (mv_list && (move_cx > 0 || move_cy > 0)) {
-        float *tbl = (float *)malloc(sizeof(float) * (size_t)(move_cx + move_cy));
+    uint32_t ckHxSlots = 0, ckHySlots = 0;
+    if (mv_list && (moveCx > 0 || moveCy > 0)) {
+        float *tbl = (float *)malloc(sizeof(float) * (size_t)(moveCx + moveCy));
         if (tbl) {
-            uint32_t xb = move_cx > 65537 ? 65537u : (uint32_t)move_cx;
-            uint32_t yb = move_cy > 65537 ? 65537u : (uint32_t)move_cy;
-            ck_hx_slots = xb ? ck_next_pow2(xb * 2u) : 0;
-            ck_hy_slots = yb ? ck_next_pow2(yb * 2u) : 0;
-            if (ck_hx_slots) { ck_hx = (int *)malloc(sizeof(int) * ck_hx_slots); if (ck_hx) memset(ck_hx, 0, sizeof(int) * ck_hx_slots); }
-            if (ck_hy_slots) { ck_hy = (int *)malloc(sizeof(int) * ck_hy_slots); if (ck_hy) memset(ck_hy, 0, sizeof(int) * ck_hy_slots); }
+            uint32_t xb = moveCx > 65537 ? 65537u : (uint32_t)moveCx;
+            uint32_t yb = moveCy > 65537 ? 65537u : (uint32_t)moveCy;
+            ckHxSlots = xb ? ckNextPow2(xb * 2u) : 0;
+            ckHySlots = yb ? ckNextPow2(yb * 2u) : 0;
+            if (ckHxSlots) { ck_hx = (int *)malloc(sizeof(int) * ckHxSlots); if (ck_hx) memset(ck_hx, 0, sizeof(int) * ckHxSlots); }
+            if (ckHySlots) { ck_hy = (int *)malloc(sizeof(int) * ckHySlots); if (ck_hy) memset(ck_hy, 0, sizeof(int) * ckHySlots); }
             float *tx = tbl;
-            float *ty = tbl + move_cx;
-            for (int e = 0; e < move_cap; e++) {
+            float *ty = tbl + moveCx;
+            for (int e = 0; e < moveCap; e++) {
                 int i = mv_list[e];
-                if (ck_hx && (ck_float_bits(objects.x[i]) ^ ck_float_bits(objects.original_x[i])))
-                    ck_dedup_put_h(ck_hx, ck_hx_slots - 1u, tx, &move_x_u, objects.x[i]);
-                if (ck_hy && (ck_float_bits(objects.y[i]) ^ ck_float_bits(objects.original_y[i])))
-                    ck_dedup_put_h(ck_hy, ck_hy_slots - 1u, ty, &move_y_u, objects.y[i]);
+                if (ck_hx && (ckFloatBits(objects.x[i]) ^ ckFloatBits(objects.originalX[i])))
+                    ckDedupPutH(ck_hx, ckHxSlots - 1u, tx, &moveXU, objects.x[i]);
+                if (ck_hy && (ckFloatBits(objects.y[i]) ^ ckFloatBits(objects.originalY[i])))
+                    ckDedupPutH(ck_hy, ckHySlots - 1u, ty, &moveYU, objects.y[i]);
             }
-            ck_axis_choose(move_cx, move_x_u, &move_x_fmt, &move_x_bytes);
-            ck_axis_choose(move_cy, move_y_u, &move_y_fmt, &move_y_bytes);
+            ckAxisChoose(moveCx, moveXU, &moveXFmt, &moveXBytes);
+            ckAxisChoose(moveCy, moveYU, &moveYFmt, &moveYBytes);
             free(tbl);
         }
     }
-    if (move_x_fmt == 0) move_x_bytes = (int)(sizeof(float) * (size_t)move_cx);
-    if (move_y_fmt == 0) move_y_bytes = (int)(sizeof(float) * (size_t)move_cy);
+    if (moveXFmt == 0) moveXBytes = (int)(sizeof(float) * (size_t)moveCx);
+    if (moveYFmt == 0) moveYBytes = (int)(sizeof(float) * (size_t)moveCy);
 
-    int fired_cap = 0;
-    int key_cap = 0;
+    int firedCap = 0;
+    int keyCap = 0;
     for (int i = 0; i < objects.count; i++) {
         if ((objects.id[i] == MOVE_TRIGGER || objects.id[i] == ROTATE_TRIGGER) && GET_ACTIVATED(i))
-            fired_cap++;
+            firedCap++;
         else if (objects.id[i] == KEY_OBJ && (objects.flags[i] & FLAG_TOGGLED)
                  && (objects.activated[i] & 3))
-            key_cap++;
+            keyCap++;
     }
 
-    int toggle_cap = 0;
+    int toggleCap = 0;
     for (int g = 1; g < MAX_GROUPS; g++) {
-        GroupNode *p = get_group(g);
-        if (p && p->toggled) toggle_cap++;
+        GroupNode *p = getGroup(g);
+        if (p && p->toggled) toggleCap++;
     }
 
-    int alpha_group_cap = 0;
+    int alphaGroupCap = 0;
     for (int g = 1; g < MAX_GROUPS; g++) {
-        GroupNode *p = get_group(g);
-        if (p && p->alpha != 1.0f) alpha_group_cap++;
+        GroupNode *p = getGroup(g);
+        if (p && p->alpha != 1.0f) alphaGroupCap++;
     }
 
-    int pulse_cap = 0;
-    for (int i = 0; i < pulse_trigger_count; i++)
-        if (pulse_trigger_buffer[i].active) pulse_cap++;
+    int pulseCap = 0;
+    for (int i = 0; i < pulseTriggerCount; i++)
+        if (pulseTriggerBuffer[i].active) pulseCap++;
 
-    int rotate_targets_total = 0;
-    for (int i = 0; i < rotate_trigger_count; i++)
-        rotate_targets_total += rotate_trigger_buffer[i].target_count;
+    int rotateTargetsTotal = 0;
+    for (int i = 0; i < rotateTriggerCount; i++)
+        rotateTargetsTotal += rotateTriggerBuffer[i].targetCount;
 
-    int rotate_obj_cap = 0;
+    int rotateObjCap = 0;
     for (int i = 0; i < objects.count; i++) {
         if (objects.id[i] != ROTATE_TRIGGER) continue;
-        RotateTrigger *rt = get_rotate_trigger(i);
-        GroupNode *target_group = get_group(rt->target_group);
-        GroupNode *center_group = get_group(rt->center_group);
-        if (target_group) rotate_obj_cap += target_group->count;
-        if (center_group) rotate_obj_cap += center_group->count;
+        RotateTrigger *rt = getRotateTrigger(i);
+        GroupNode *targetGroup = getGroup(rt->targetGroup);
+        GroupNode *centerGroup = getGroup(rt->centerGroup);
+        if (targetGroup) rotateObjCap += targetGroup->count;
+        if (centerGroup) rotateObjCap += centerGroup->count;
     }
 
-    int pickup_cap = 0;
+    int pickupCap = 0;
     for (int i = 0; i < objects.count; i++) {
-        if (is_collected_pickup(i)) pickup_cap++;
+        if (isCollectedPickup(i)) pickupCap++;
     }
 
-    void *ck_ptr[24];
-    size_t ck_size[24];
-    int ck_n = 0;
+    void *ckPtr[24];
+    size_t ckSize[24];
+    int ckN = 0;
     size_t total = 0;
     void *base = NULL;
 #define CK_ADD(pp, type, count) do { \
         if ((count) > 0) { \
             (pp) = NULL; \
-            ck_ptr[ck_n] = (void *)&(pp); \
-            ck_size[ck_n] = CK_ALIGN8(sizeof(type) * (size_t)(count)); \
-            total += ck_size[ck_n]; \
-            ck_n++; \
+            ckPtr[ckN] = (void *)&(pp); \
+            ckSize[ckN] = CK_ALIGN8(sizeof(type) * (size_t)(count)); \
+            total += ckSize[ckN]; \
+            ckN++; \
         } else { \
             (pp) = NULL; \
         } \
     } while (0)
 
-    CK_ADD(check->move_triggers,     MoveTriggerBuffer,  move_trigger_count);
-    CK_ADD(check->alpha_triggers,    AlphaTriggerBuffer, alpha_trigger_count);
-    CK_ADD(check->spawn_triggers,    SpawnTriggerBuffer, spawn_trigger_count);
-    CK_ADD(check->follow_triggers,   FollowPlayerYTriggerBuffer, follow_player_y_trigger_count);
-    CK_ADD(check->follow_trigger_buffers, FollowTriggerBuffer, follow_trigger_count);
-    CK_ADD(check->rotate_triggers,   RotateTriggerBuffer, rotate_trigger_count);
-    CK_ADD(check->rotate_targets,    RotateTargetState,   rotate_targets_total);
-    CK_ADD(check->rotate_target_offsets, int,            rotate_trigger_count);
-    CK_ADD(check->rotate_obj_snapshot, RotateObjectSnapshot, rotate_obj_cap);
-    CK_ADD(check->count_items,       ItemCount,           item_counter_count);
-    CK_ADD(check->count_triggers,    CountTriggerBuffer,  count_trigger_count);
-    CK_ADD(check->touch_triggers,    TouchTriggerBuffer,  touch_trigger_count);
-    CK_ADD(check->collected_pickups, int,                 pickup_cap);
-    CK_ADD(check->channel_snapshot,  ColorChannel,       used_count);
-    CK_ADD(check->trigger_snapshot,  ColTriggerBuffer,   used_count);
-    CK_ADD(check->move_idx_stream,   uint8_t,            move_idx_bytes);
-    CK_ADD(check->move_obj_x,        uint8_t,            move_x_bytes);
-    CK_ADD(check->move_obj_y,        uint8_t,            move_y_bytes);
-    CK_ADD(check->fired_move_index,  int,                fired_cap);
-    CK_ADD(check->key_index,         int,                key_cap);
-    CK_ADD(check->toggle_group_id,   int,                toggle_cap);
-    CK_ADD(check->alpha_group_id,    int,                alpha_group_cap);
-    CK_ADD(check->alpha_group_alpha, float,              alpha_group_cap);
-    CK_ADD(check->pulse_snap,        PulseSnapshot,      pulse_cap);
+    CK_ADD(check->moveTriggers,     MoveTriggerBuffer,  moveTriggerCount);
+    CK_ADD(check->alphaTriggers,    AlphaTriggerBuffer, alphaTriggerCount);
+    CK_ADD(check->spawnTriggers,    SpawnTriggerBuffer, spawnTriggerCount);
+    CK_ADD(check->followTriggers,   FollowPlayerYTriggerBuffer, followPlayerYTriggerCount);
+    CK_ADD(check->followTriggerBuffers, FollowTriggerBuffer, followTriggerCount);
+    CK_ADD(check->rotateTriggers,   RotateTriggerBuffer, rotateTriggerCount);
+    CK_ADD(check->rotateTargets,    RotateTargetState,   rotateTargetsTotal);
+    CK_ADD(check->rotateTargetOffsets, int,            rotateTriggerCount);
+    CK_ADD(check->rotateObjSnapshot, RotateObjectSnapshot, rotateObjCap);
+    CK_ADD(check->countItems,       ItemCount,           itemCounterCount);
+    CK_ADD(check->countTriggers,    CountTriggerBuffer,  countTriggerCount);
+    CK_ADD(check->touchTriggers,    TouchTriggerBuffer,  touchTriggerCount);
+    CK_ADD(check->collectedPickups, int,                 pickupCap);
+    CK_ADD(check->channelSnapshot,  ColorChannel,       usedCount);
+    CK_ADD(check->triggerSnapshot,  ColTriggerBuffer,   usedCount);
+    CK_ADD(check->moveIdxStream,   uint8_t,            moveIdxBytes);
+    CK_ADD(check->moveObjX,        uint8_t,            moveXBytes);
+    CK_ADD(check->moveObjY,        uint8_t,            moveYBytes);
+    CK_ADD(check->firedMoveIndex,  int,                firedCap);
+    CK_ADD(check->keyIndex,         int,                keyCap);
+    CK_ADD(check->toggleGroupID,   int,                toggleCap);
+    CK_ADD(check->alphaGroupID,    int,                alphaGroupCap);
+    CK_ADD(check->alphaGroupAlpha, float,              alphaGroupCap);
+    CK_ADD(check->pulseSnap,        PulseSnapshot,      pulseCap);
 #undef CK_ADD
 
     if (total > 0) {
@@ -492,194 +492,194 @@ void new_checkpoint() {
             free(mv_list);
             free(ck_hx);
             free(ck_hy);
-            free_checkpoint_snapshot(check);
+            freeCheckpointSnapshot(check);
             return;
         }
         size_t off = 0;
-        for (int k = 0; k < ck_n; k++) {
-            *(void **)ck_ptr[k] = (char *)base + off;
-            off += ck_size[k];
+        for (int k = 0; k < ckN; k++) {
+            *(void **)ckPtr[k] = (char *)base + off;
+            off += ckSize[k];
         }
     }
-    check->alloc_base = base;
+    check->allocBase = base;
 
-    checkpoint_pointer = next_checkpoint;
-    if (++checkpoint_count > MAX_CHECKPOINTS) checkpoint_count = MAX_CHECKPOINTS;
+    checkpointPointer = nextCheckpoint;
+    if (++checkpointCount > MAX_CHECKPOINTS) checkpointCount = MAX_CHECKPOINTS;
 
-    check->move_triggers_count  = move_trigger_count;
-    check->alpha_triggers_count = alpha_trigger_count;
-    check->spawn_triggers_count = spawn_trigger_count;
-    check->follow_triggers_count = follow_player_y_trigger_count;
-    check->follow_trigger_buffers_count = follow_trigger_count;
-    check->rotate_triggers_count = rotate_trigger_count;
-    check->rotate_targets_count = rotate_targets_total;
-    check->rotate_obj_count = 0;
-    check->count_items_count = item_counter_count;
-    check->count_triggers_count = count_trigger_count;
-    check->touch_triggers_count = touch_trigger_count;
-    check->collected_pickups_count = pickup_cap;
-    check->channel_snapshot_count = used_count;
+    check->moveTriggersCount  = moveTriggerCount;
+    check->alphaTriggersCount = alphaTriggerCount;
+    check->spawnTriggersCount = spawnTriggerCount;
+    check->followTriggersCount = followPlayerYTriggerCount;
+    check->followTriggerBuffersCount = followTriggerCount;
+    check->rotateTriggersCount = rotateTriggerCount;
+    check->rotateTargetsCount = rotateTargetsTotal;
+    check->rotateObjCount = 0;
+    check->countItemsCount = itemCounterCount;
+    check->countTriggersCount = countTriggerCount;
+    check->touchTriggersCount = touchTriggerCount;
+    check->collectedPickupsCount = pickupCap;
+    check->channelSnapshotCount = usedCount;
 
-    check->camera_x = state.camera_x;
-    check->camera_y = state.camera_y;
+    check->cameraX = state.cameraX;
+    check->cameraY = state.cameraY;
 
     check->p1 = state.player;
     check->p2 = state.player2;
 
-    check->camera_intended_y = state.camera_intended_y;
+    check->cameraIntendedY = state.cameraIntendedY;
 
-    check->ground_y = state.ground_y;
-    check->ceiling_y = state.ceiling_y;
-    check->ground_y_gfx = state.ground_y_gfx;
+    check->groundY = state.groundY;
+    check->ceilingY = state.ceilingY;
+    check->groundYGfx = state.groundYGfx;
 
     check->mirroring = state.mirroring;
-    check->mirror_mult = state.mirror_mult;
-    check->mirror_timer = state.mirror_timer;
-    check->original_mirror_factor = state.original_mirror_factor;
-    check->intended_mirror_factor = state.intended_mirror_factor;
-    check->mirror_speed_factor = state.mirror_speed_factor;
-    check->mirror_factor = state.mirror_factor;
+    check->mirrorMult = state.mirrorMult;
+    check->mirrorTimer = state.mirrorTimer;
+    check->originalMirrorFactor = state.originalMirrorFactor;
+    check->intendedMirrorFactor = state.intendedMirrorFactor;
+    check->mirrorSpeedFactor = state.mirrorSpeedFactor;
+    check->mirrorFactor = state.mirrorFactor;
 
     check->dual = state.dual;
-    check->dual_portal_y = state.dual_portal_y;
+    check->dualPortalY = state.dualPortalY;
 
-    check->show_player = state.show_player;
+    check->showPlayer = state.showPlayer;
 
     check->speed = state.speed;
 
-    check->current_fading_effect = current_fading_effect;
-    check->p1_trail = p1_trail;
+    check->currentFadingEffect = currentFadingEffect;
+    check->p1Trail = p1Trail;
 
-    check->wall_y = level_info.wall_y;
+    check->wallY = levelInfo.wallY;
 
-    check->song_offset = level_info.song_offset + state.player.timeElapsed;
+    check->songOffset = levelInfo.songOffset + state.player.timeElapsed;
 
     // snapshot only the channels used by this level
-    for (int i = 0; i < used_count; i++) {
-        int idx = channels_used[i];
-        check->channel_snapshot[i] = channels[idx];
-        check->trigger_snapshot[i] = col_trigger_buffer[idx];
+    for (int i = 0; i < usedCount; i++) {
+        int idx = channelsUsed[i];
+        check->channelSnapshot[i] = channels[idx];
+        check->triggerSnapshot[i] = colTriggerBuffer[idx];
     }
 
-    if (check->move_triggers)  memcpy(check->move_triggers,  move_trigger_buffer,  sizeof(MoveTriggerBuffer)  * move_trigger_count);
-    if (check->alpha_triggers) memcpy(check->alpha_triggers, alpha_trigger_buffer, sizeof(AlphaTriggerBuffer) * alpha_trigger_count);
-    if (check->spawn_triggers) memcpy(check->spawn_triggers, spawn_trigger_buffer, sizeof(SpawnTriggerBuffer) * spawn_trigger_count);
-    if (check->follow_triggers) memcpy(check->follow_triggers, follow_player_y_trigger_buffer, sizeof(FollowPlayerYTriggerBuffer) * follow_player_y_trigger_count);
-    if (check->follow_trigger_buffers) memcpy(check->follow_trigger_buffers, follow_trigger_buffer, sizeof(FollowTriggerBuffer) * follow_trigger_count);
-    if (check->rotate_triggers) memcpy(check->rotate_triggers, rotate_trigger_buffer, sizeof(RotateTriggerBuffer) * rotate_trigger_count);
-    if (check->count_items) memcpy(check->count_items, item_counter_buffer, sizeof(ItemCount) * item_counter_count);
-    if (check->count_triggers) memcpy(check->count_triggers, count_trigger_buffer, sizeof(CountTriggerBuffer) * count_trigger_count);
-    if (check->touch_triggers) memcpy(check->touch_triggers, touch_trigger_buffer, sizeof(TouchTriggerBuffer) * touch_trigger_count);
-    if (check->collected_pickups) {
+    if (check->moveTriggers)  memcpy(check->moveTriggers,  moveTriggerBuffer,  sizeof(MoveTriggerBuffer)  * moveTriggerCount);
+    if (check->alphaTriggers) memcpy(check->alphaTriggers, alphaTriggerBuffer, sizeof(AlphaTriggerBuffer) * alphaTriggerCount);
+    if (check->spawnTriggers) memcpy(check->spawnTriggers, spawnTriggerBuffer, sizeof(SpawnTriggerBuffer) * spawnTriggerCount);
+    if (check->followTriggers) memcpy(check->followTriggers, followPlayerYTriggerBuffer, sizeof(FollowPlayerYTriggerBuffer) * followPlayerYTriggerCount);
+    if (check->followTriggerBuffers) memcpy(check->followTriggerBuffers, followTriggerBuffer, sizeof(FollowTriggerBuffer) * followTriggerCount);
+    if (check->rotateTriggers) memcpy(check->rotateTriggers, rotateTriggerBuffer, sizeof(RotateTriggerBuffer) * rotateTriggerCount);
+    if (check->countItems) memcpy(check->countItems, itemCounterBuffer, sizeof(ItemCount) * itemCounterCount);
+    if (check->countTriggers) memcpy(check->countTriggers, countTriggerBuffer, sizeof(CountTriggerBuffer) * countTriggerCount);
+    if (check->touchTriggers) memcpy(check->touchTriggers, touchTriggerBuffer, sizeof(TouchTriggerBuffer) * touchTriggerCount);
+    if (check->collectedPickups) {
         int n = 0;
-        for (int i = 0; i < objects.count && n < check->collected_pickups_count; i++) {
-            if (is_collected_pickup(i)) check->collected_pickups[n++] = i;
+        for (int i = 0; i < objects.count && n < check->collectedPickupsCount; i++) {
+            if (isCollectedPickup(i)) check->collectedPickups[n++] = i;
         }
     }
 
-    if (check->rotate_triggers) {
+    if (check->rotateTriggers) {
         int offset = 0;
-        for (int i = 0; i < rotate_trigger_count; i++) {
-            check->rotate_target_offsets[i] = offset;
-            int count = rotate_trigger_buffer[i].target_count;
-            if (count > 0 && rotate_trigger_buffer[i].targets) {
-                memcpy(check->rotate_targets + offset, rotate_trigger_buffer[i].targets, sizeof(RotateTargetState) * count);
+        for (int i = 0; i < rotateTriggerCount; i++) {
+            check->rotateTargetOffsets[i] = offset;
+            int count = rotateTriggerBuffer[i].targetCount;
+            if (count > 0 && rotateTriggerBuffer[i].targets) {
+                memcpy(check->rotateTargets + offset, rotateTriggerBuffer[i].targets, sizeof(RotateTargetState) * count);
             }
             offset += count;
         }
     }
 
-    if (check->rotate_obj_snapshot) {
+    if (check->rotateObjSnapshot) {
         int n = 0;
-        for (int i = 0; i < objects.count && n < rotate_obj_cap; i++) {
+        for (int i = 0; i < objects.count && n < rotateObjCap; i++) {
             if (objects.id[i] != ROTATE_TRIGGER) continue;
-            RotateTrigger *rt = get_rotate_trigger(i);
-            GroupNode *target_group = get_group(rt->target_group);
-            GroupNode *center_group = get_group(rt->center_group);
-            if (target_group) {
-                for (int j = 0; j < target_group->count && n < rotate_obj_cap; j++) {
-                    int obj = target_group->objects[j];
-                    check->rotate_obj_snapshot[n].obj = obj;
-                    check->rotate_obj_snapshot[n].rotation = objects.rotation[obj];
-                    check->rotate_obj_snapshot[n].visual_rotation = objects.visual_rotation[obj];
+            RotateTrigger *rt = getRotateTrigger(i);
+            GroupNode *targetGroup = getGroup(rt->targetGroup);
+            GroupNode *centerGroup = getGroup(rt->centerGroup);
+            if (targetGroup) {
+                for (int j = 0; j < targetGroup->count && n < rotateObjCap; j++) {
+                    int obj = targetGroup->objects[j];
+                    check->rotateObjSnapshot[n].obj = obj;
+                    check->rotateObjSnapshot[n].rotation = objects.rotation[obj];
+                    check->rotateObjSnapshot[n].visualRotation = objects.visualRotation[obj];
                     n++;
                 }
             }
-            if (center_group) {
-                for (int j = 0; j < center_group->count && n < rotate_obj_cap; j++) {
-                    int obj = center_group->objects[j];
-                    check->rotate_obj_snapshot[n].obj = obj;
-                    check->rotate_obj_snapshot[n].rotation = objects.rotation[obj];
-                    check->rotate_obj_snapshot[n].visual_rotation = objects.visual_rotation[obj];
+            if (centerGroup) {
+                for (int j = 0; j < centerGroup->count && n < rotateObjCap; j++) {
+                    int obj = centerGroup->objects[j];
+                    check->rotateObjSnapshot[n].obj = obj;
+                    check->rotateObjSnapshot[n].rotation = objects.rotation[obj];
+                    check->rotateObjSnapshot[n].visualRotation = objects.visualRotation[obj];
                     n++;
                 }
             }
         }
-        check->rotate_obj_count = n;
+        check->rotateObjCount = n;
     }
 
-    check->move_obj_count = 0;
-    check->move_idx_bytes = 0;
-    check->move_cx = 0;
-    check->move_cy = 0;
-    check->move_x_fmt = move_x_fmt;
-    check->move_x_u = move_x_u;
-    check->move_x_bytes = move_x_bytes;
-    check->move_y_fmt = move_y_fmt;
-    check->move_y_u = move_y_u;
-    check->move_y_bytes = move_y_bytes;
-    if (move_cap > 0) {
+    check->moveObjCount = 0;
+    check->moveIdxBytes = 0;
+    check->moveCx = 0;
+    check->moveCy = 0;
+    check->moveXFmt = moveXFmt;
+    check->moveXU = moveXU;
+    check->moveXBytes = moveXBytes;
+    check->moveYFmt = moveYFmt;
+    check->moveYU = moveYU;
+    check->moveYBytes = moveYBytes;
+    if (moveCap > 0) {
         int n = 0, kx = 0, ky = 0, prev = 0, scan = 0, tux = 0, tuy = 0;
-        if (ck_hx && move_x_fmt != 0) memset(ck_hx, 0, sizeof(int) * ck_hx_slots);
-        if (ck_hy && move_y_fmt != 0) memset(ck_hy, 0, sizeof(int) * ck_hy_slots);
-        uint8_t *sp = check->move_idx_stream;
-        float *tblx = (float *)check->move_obj_x;
-        float *tbly = (float *)check->move_obj_y;
-        uint8_t  *ix8x  = check->move_obj_x ? (uint8_t  *)(check->move_obj_x + sizeof(float) * (size_t)move_x_u) : NULL;
-        uint16_t *ix16x = check->move_obj_x ? (uint16_t *)(check->move_obj_x + sizeof(float) * (size_t)move_x_u) : NULL;
-        uint8_t  *ix8y  = check->move_obj_y ? (uint8_t  *)(check->move_obj_y + sizeof(float) * (size_t)move_y_u) : NULL;
-        uint16_t *ix16y = check->move_obj_y ? (uint16_t *)(check->move_obj_y + sizeof(float) * (size_t)move_y_u) : NULL;
-        for (int e = 0; e < move_cap; e++) {
+        if (ck_hx && moveXFmt != 0) memset(ck_hx, 0, sizeof(int) * ckHxSlots);
+        if (ck_hy && moveYFmt != 0) memset(ck_hy, 0, sizeof(int) * ckHySlots);
+        uint8_t *sp = check->moveIdxStream;
+        float *tblx = (float *)check->moveObjX;
+        float *tbly = (float *)check->moveObjY;
+        uint8_t  *ix8x  = check->moveObjX ? (uint8_t  *)(check->moveObjX + sizeof(float) * (size_t)moveXU) : NULL;
+        uint16_t *ix16x = check->moveObjX ? (uint16_t *)(check->moveObjX + sizeof(float) * (size_t)moveXU) : NULL;
+        uint8_t  *ix8y  = check->moveObjY ? (uint8_t  *)(check->moveObjY + sizeof(float) * (size_t)moveYU) : NULL;
+        uint16_t *ix16y = check->moveObjY ? (uint16_t *)(check->moveObjY + sizeof(float) * (size_t)moveYU) : NULL;
+        for (int e = 0; e < moveCap; e++) {
             int i;
             if (mv_list) {
                 i = mv_list[e];
             } else {
                 do { i = scan++; } while (i < objects.count &&
-                        !(ck_float_bits(objects.x[i]) ^ ck_float_bits(objects.original_x[i])) &&
-                        !(ck_float_bits(objects.y[i]) ^ ck_float_bits(objects.original_y[i])));
+                        !(ckFloatBits(objects.x[i]) ^ ckFloatBits(objects.originalX[i])) &&
+                        !(ckFloatBits(objects.y[i]) ^ ckFloatBits(objects.originalY[i])));
             }
-            unsigned int bx = ck_float_bits(objects.x[i]) ^ ck_float_bits(objects.original_x[i]);
-            unsigned int by = ck_float_bits(objects.y[i]) ^ ck_float_bits(objects.original_y[i]);
+            unsigned int bx = ckFloatBits(objects.x[i]) ^ ckFloatBits(objects.originalX[i]);
+            unsigned int by = ckFloatBits(objects.y[i]) ^ ckFloatBits(objects.originalY[i]);
             unsigned int gap = (unsigned int)(n ? (i - prev) : i);
             unsigned int flags = (bx ? 2u : 0u) | (by ? 1u : 0u);
-            sp = ck_varint_put(sp, (gap << 2) | flags);
+            sp = ckVarintPut(sp, (gap << 2) | flags);
             prev = i;
             if (bx) {
                 float v = objects.x[i];
-                if (move_x_fmt == 0) {
+                if (moveXFmt == 0) {
                     tblx[kx] = v;
                 } else {
-                    int ix = ck_dedup_put_h(ck_hx, ck_hx_slots - 1u, tblx, &tux, v);
-                    if (move_x_fmt == 1) ix8x[kx] = (uint8_t)ix; else ix16x[kx] = (uint16_t)ix;
+                    int ix = ckDedupPutH(ck_hx, ckHxSlots - 1u, tblx, &tux, v);
+                    if (moveXFmt == 1) ix8x[kx] = (uint8_t)ix; else ix16x[kx] = (uint16_t)ix;
                 }
                 kx++;
             }
             if (by) {
                 float v = objects.y[i];
-                if (move_y_fmt == 0) {
+                if (moveYFmt == 0) {
                     tbly[ky] = v;
                 } else {
-                    int iy = ck_dedup_put_h(ck_hy, ck_hy_slots - 1u, tbly, &tuy, v);
-                    if (move_y_fmt == 1) ix8y[ky] = (uint8_t)iy; else ix16y[ky] = (uint16_t)iy;
+                    int iy = ckDedupPutH(ck_hy, ckHySlots - 1u, tbly, &tuy, v);
+                    if (moveYFmt == 1) ix8y[ky] = (uint8_t)iy; else ix16y[ky] = (uint16_t)iy;
                 }
                 ky++;
             }
             n++;
         }
-        check->move_obj_count = n;
-        check->move_idx_bytes = (int)(sp - check->move_idx_stream);
-        check->move_cx = kx;
-        check->move_cy = ky;
+        check->moveObjCount = n;
+        check->moveIdxBytes = (int)(sp - check->moveIdxStream);
+        check->moveCx = kx;
+        check->moveCy = ky;
     }
     free(mv_list);
     mv_list = NULL;
@@ -688,308 +688,308 @@ void new_checkpoint() {
     free(ck_hy);
     ck_hy = NULL;
 
-    check->fired_move_count = 0;
-    if (fired_cap > 0) {
+    check->firedMoveCount = 0;
+    if (firedCap > 0) {
         int n = 0;
         for (int i = 0; i < objects.count; i++) {
-            if (n >= fired_cap) break;
+            if (n >= firedCap) break;
             if ((objects.id[i] == MOVE_TRIGGER || objects.id[i] == ROTATE_TRIGGER) && GET_ACTIVATED(i))
-                check->fired_move_index[n++] = i;
+                check->firedMoveIndex[n++] = i;
         }
-        check->fired_move_count = n;
+        check->firedMoveCount = n;
     }
 
-    check->key_count = 0;
-    if (key_cap > 0) {
+    check->keyCount = 0;
+    if (keyCap > 0) {
         int n = 0;
         for (int i = 0; i < objects.count; i++) {
-            if (n >= key_cap) break;
+            if (n >= keyCap) break;
             if (objects.id[i] == KEY_OBJ && (objects.flags[i] & FLAG_TOGGLED)
                 && (objects.activated[i] & 3))
-                check->key_index[n++] = i;
+                check->keyIndex[n++] = i;
         }
-        check->key_count = n;
+        check->keyCount = n;
     }
 
-    check->toggle_group_count = 0;
-    if (toggle_cap > 0) {
+    check->toggleGroupCount = 0;
+    if (toggleCap > 0) {
         int n = 0;
-        for (int g = 1; g < MAX_GROUPS && n < toggle_cap; g++) {
-            GroupNode *p = get_group(g);
-            if (p && p->toggled) check->toggle_group_id[n++] = g;
+        for (int g = 1; g < MAX_GROUPS && n < toggleCap; g++) {
+            GroupNode *p = getGroup(g);
+            if (p && p->toggled) check->toggleGroupID[n++] = g;
         }
-        check->toggle_group_count = n;
+        check->toggleGroupCount = n;
     }
 
-    check->alpha_group_count = 0;
-    if (alpha_group_cap > 0) {
+    check->alphaGroupCount = 0;
+    if (alphaGroupCap > 0) {
         int n = 0;
-        for (int g = 1; g < MAX_GROUPS && n < alpha_group_cap; g++) {
-            GroupNode *p = get_group(g);
+        for (int g = 1; g < MAX_GROUPS && n < alphaGroupCap; g++) {
+            GroupNode *p = getGroup(g);
             if (p && p->alpha != 1.0f) {
-                check->alpha_group_id[n] = g;
-                check->alpha_group_alpha[n] = p->alpha;
+                check->alphaGroupID[n] = g;
+                check->alphaGroupAlpha[n] = p->alpha;
                 n++;
             }
         }
-        check->alpha_group_count = n;
+        check->alphaGroupCount = n;
     }
 
-    check->pulse_snap_count = 0;
-    if (pulse_cap > 0) {
+    check->pulseSnapCount = 0;
+    if (pulseCap > 0) {
         int n = 0;
-        for (int i = 0; i < pulse_trigger_count && n < pulse_cap; i++) {
-            PulseTriggerBuffer *pb = &pulse_trigger_buffer[i];
+        for (int i = 0; i < pulseTriggerCount && n < pulseCap; i++) {
+            PulseTriggerBuffer *pb = &pulseTriggerBuffer[i];
             if (!pb->active) continue;
-            check->pulse_snap[n].source_obj = pb->source_obj;
-            check->pulse_snap[n].time_run = pb->time_run;
+            check->pulseSnap[n].sourceObj = pb->sourceObj;
+            check->pulseSnap[n].timeRun = pb->timeRun;
             n++;
         }
-        check->pulse_snap_count = n;
+        check->pulseSnapCount = n;
     }
 
-    set_checkpoint_timer(AUTO_CHECKPOINT_TIME);
+    setCheckpointTimer(AUTO_CHECKPOINT_TIME);
 }
 
-void restore_checkpoint() {
-    CheckpointData *check = &checkpoints[checkpoint_pointer];
-    discard_group_combination_visual_moves();
+void restoreCheckpoint() {
+    CheckpointData *check = &checkpoints[checkpointPointer];
+    discardGroupCombinationVisualMoves();
 
-    state.camera_x = check->camera_x;
-    state.camera_y = check->camera_y;
+    state.cameraX = check->cameraX;
+    state.cameraY = check->cameraY;
 
     state.player = check->p1;
     state.player2 = check->p2;
-    state.player.platform_velocity = state.player.last_platform_velocity = 0.f;
-    state.player2.platform_velocity = state.player2.last_platform_velocity = 0.f;
+    state.player.platformVelocity = state.player.lastPlatformVelocity = 0.f;
+    state.player2.platformVelocity = state.player2.lastPlatformVelocity = 0.f;
 
-    state.player.buffering_state = (state.input.holdJump ? BUFFER_READY : BUFFER_NONE);
-    state.player2.buffering_state = (state.input.holdJump ? BUFFER_READY : BUFFER_NONE);
+    state.player.bufferingState = (state.input.holdJump ? BUFFER_READY : BUFFER_NONE);
+    state.player2.bufferingState = (state.input.holdJump ? BUFFER_READY : BUFFER_NONE);
 
-    state.player.buffer_ufo = true;
-    state.player2.buffer_ufo = true;
+    state.player.bufferUfo = true;
+    state.player2.bufferUfo = true;
 
-    state.camera_intended_y = check->camera_intended_y;
+    state.cameraIntendedY = check->cameraIntendedY;
 
-    state.ground_y = check->ground_y;
-    state.ceiling_y = check->ceiling_y;
-    state.ground_y_gfx = check->ground_y_gfx;
+    state.groundY = check->groundY;
+    state.ceilingY = check->ceilingY;
+    state.groundYGfx = check->groundYGfx;
 
     state.mirroring = check->mirroring;
-    state.mirror_mult = check->mirror_mult;
-    state.mirror_timer = check->mirror_timer;
-    state.original_mirror_factor = check->original_mirror_factor;
-    state.intended_mirror_factor = check->intended_mirror_factor;
-    state.mirror_speed_factor = check->mirror_speed_factor;
-    state.mirror_factor = check->mirror_factor;
+    state.mirrorMult = check->mirrorMult;
+    state.mirrorTimer = check->mirrorTimer;
+    state.originalMirrorFactor = check->originalMirrorFactor;
+    state.intendedMirrorFactor = check->intendedMirrorFactor;
+    state.mirrorSpeedFactor = check->mirrorSpeedFactor;
+    state.mirrorFactor = check->mirrorFactor;
     
     state.dual = check->dual;
-    state.dual_portal_y = check->dual_portal_y;
+    state.dualPortalY = check->dualPortalY;
     
-    state.show_player = check->show_player;
+    state.showPlayer = check->showPlayer;
 
     state.speed = check->speed;
 
-    level_info.wall_y = check->wall_y;
+    levelInfo.wallY = check->wallY;
 
-    current_fading_effect = check->current_fading_effect;
-    p1_trail = check->p1_trail;
+    currentFadingEffect = check->currentFadingEffect;
+    p1Trail = check->p1Trail;
     
-    if (settingsState.practiceMusicSync) seek_mp3(check->song_offset);
+    if (settingsState.practiceMusicSync) seekMP3(check->songOffset);
     
-    for (int i = 0; i < check->channel_snapshot_count; i++) {
-        int idx = channels_used[i];
-        channels[idx] = check->channel_snapshot[i];
-        col_trigger_buffer[idx] = check->trigger_snapshot[i];
+    for (int i = 0; i < check->channelSnapshotCount; i++) {
+        int idx = channelsUsed[i];
+        channels[idx] = check->channelSnapshot[i];
+        colTriggerBuffer[idx] = check->triggerSnapshot[i];
     }
 
-    if (check->move_triggers && check->move_triggers_count > 0) {
-        MoveTriggerBuffer *buf = (MoveTriggerBuffer *)realloc(move_trigger_buffer, sizeof(MoveTriggerBuffer) * check->move_triggers_count);
+    if (check->moveTriggers && check->moveTriggersCount > 0) {
+        MoveTriggerBuffer *buf = (MoveTriggerBuffer *)realloc(moveTriggerBuffer, sizeof(MoveTriggerBuffer) * check->moveTriggersCount);
         if (buf) {
-            move_trigger_buffer = buf;
-            move_trigger_capacity = check->move_triggers_count;
-            move_trigger_count = check->move_triggers_count;
-            memcpy(move_trigger_buffer, check->move_triggers, sizeof(MoveTriggerBuffer) * check->move_triggers_count);
+            moveTriggerBuffer = buf;
+            moveTriggerCapacity = check->moveTriggersCount;
+            moveTriggerCount = check->moveTriggersCount;
+            memcpy(moveTriggerBuffer, check->moveTriggers, sizeof(MoveTriggerBuffer) * check->moveTriggersCount);
         }
     }
-    if (check->alpha_triggers && check->alpha_triggers_count > 0) {
-        AlphaTriggerBuffer *buf = (AlphaTriggerBuffer *)realloc(alpha_trigger_buffer, sizeof(AlphaTriggerBuffer) * check->alpha_triggers_count);
+    if (check->alphaTriggers && check->alphaTriggersCount > 0) {
+        AlphaTriggerBuffer *buf = (AlphaTriggerBuffer *)realloc(alphaTriggerBuffer, sizeof(AlphaTriggerBuffer) * check->alphaTriggersCount);
         if (buf) {
-            alpha_trigger_buffer = buf;
-            alpha_trigger_capacity = check->alpha_triggers_count;
-            alpha_trigger_count = check->alpha_triggers_count;
-            memcpy(alpha_trigger_buffer, check->alpha_triggers, sizeof(AlphaTriggerBuffer) * check->alpha_triggers_count);
+            alphaTriggerBuffer = buf;
+            alphaTriggerCapacity = check->alphaTriggersCount;
+            alphaTriggerCount = check->alphaTriggersCount;
+            memcpy(alphaTriggerBuffer, check->alphaTriggers, sizeof(AlphaTriggerBuffer) * check->alphaTriggersCount);
         }
     }
-    if (check->spawn_triggers && check->spawn_triggers_count > 0) {
-        SpawnTriggerBuffer *buf = (SpawnTriggerBuffer *)realloc(spawn_trigger_buffer, sizeof(SpawnTriggerBuffer) * check->spawn_triggers_count);
+    if (check->spawnTriggers && check->spawnTriggersCount > 0) {
+        SpawnTriggerBuffer *buf = (SpawnTriggerBuffer *)realloc(spawnTriggerBuffer, sizeof(SpawnTriggerBuffer) * check->spawnTriggersCount);
         if (buf) {
-            spawn_trigger_buffer = buf;
-            spawn_trigger_capacity = check->spawn_triggers_count;
-            spawn_trigger_count = check->spawn_triggers_count;
-            memcpy(spawn_trigger_buffer, check->spawn_triggers, sizeof(SpawnTriggerBuffer) * check->spawn_triggers_count);
-        }
-    }
-
-    if (check->follow_triggers && check->follow_triggers_count > 0) {
-        FollowPlayerYTriggerBuffer *buf = (FollowPlayerYTriggerBuffer *)realloc(follow_player_y_trigger_buffer, sizeof(FollowPlayerYTriggerBuffer) * check->follow_triggers_count);
-        if (buf) {
-            follow_player_y_trigger_buffer = buf;
-            follow_player_y_trigger_capacity = check->follow_triggers_count;
-            follow_player_y_trigger_count = check->follow_triggers_count;
-            memcpy(follow_player_y_trigger_buffer, check->follow_triggers, sizeof(FollowPlayerYTriggerBuffer) * check->follow_triggers_count);
+            spawnTriggerBuffer = buf;
+            spawnTriggerCapacity = check->spawnTriggersCount;
+            spawnTriggerCount = check->spawnTriggersCount;
+            memcpy(spawnTriggerBuffer, check->spawnTriggers, sizeof(SpawnTriggerBuffer) * check->spawnTriggersCount);
         }
     }
 
-    follow_trigger_count = 0;
-    if (check->follow_trigger_buffers && check->follow_trigger_buffers_count > 0) {
-        FollowTriggerBuffer *buf = (FollowTriggerBuffer *)realloc(follow_trigger_buffer, sizeof(FollowTriggerBuffer) * check->follow_trigger_buffers_count);
+    if (check->followTriggers && check->followTriggersCount > 0) {
+        FollowPlayerYTriggerBuffer *buf = (FollowPlayerYTriggerBuffer *)realloc(followPlayerYTriggerBuffer, sizeof(FollowPlayerYTriggerBuffer) * check->followTriggersCount);
         if (buf) {
-            follow_trigger_buffer = buf;
-            follow_trigger_capacity = check->follow_trigger_buffers_count;
-            follow_trigger_count = check->follow_trigger_buffers_count;
-            memcpy(follow_trigger_buffer, check->follow_trigger_buffers, sizeof(FollowTriggerBuffer) * check->follow_trigger_buffers_count);
+            followPlayerYTriggerBuffer = buf;
+            followPlayerYTriggerCapacity = check->followTriggersCount;
+            followPlayerYTriggerCount = check->followTriggersCount;
+            memcpy(followPlayerYTriggerBuffer, check->followTriggers, sizeof(FollowPlayerYTriggerBuffer) * check->followTriggersCount);
         }
     }
 
-    for (int i = 0; i < rotate_trigger_count; i++) {
-        free(rotate_trigger_buffer[i].targets);
-        rotate_trigger_buffer[i].targets = NULL;
-    }
-    rotate_trigger_count = 0;
-    if (check->rotate_triggers && check->rotate_triggers_count > 0) {
-        RotateTriggerBuffer *buf = (RotateTriggerBuffer *)realloc(rotate_trigger_buffer, sizeof(RotateTriggerBuffer) * check->rotate_triggers_count);
+    followTriggerCount = 0;
+    if (check->followTriggerBuffers && check->followTriggerBuffersCount > 0) {
+        FollowTriggerBuffer *buf = (FollowTriggerBuffer *)realloc(followTriggerBuffer, sizeof(FollowTriggerBuffer) * check->followTriggerBuffersCount);
         if (buf) {
-            rotate_trigger_buffer = buf;
-            rotate_trigger_capacity = check->rotate_triggers_count;
-            rotate_trigger_count = check->rotate_triggers_count;
-            memcpy(rotate_trigger_buffer, check->rotate_triggers, sizeof(RotateTriggerBuffer) * check->rotate_triggers_count);
-            for (int i = 0; i < rotate_trigger_count; i++) {
-                RotateTriggerBuffer *rb = &rotate_trigger_buffer[i];
-                int count = rb->target_count;
-                int offset = check->rotate_target_offsets[i];
+            followTriggerBuffer = buf;
+            followTriggerCapacity = check->followTriggerBuffersCount;
+            followTriggerCount = check->followTriggerBuffersCount;
+            memcpy(followTriggerBuffer, check->followTriggerBuffers, sizeof(FollowTriggerBuffer) * check->followTriggerBuffersCount);
+        }
+    }
+
+    for (int i = 0; i < rotateTriggerCount; i++) {
+        free(rotateTriggerBuffer[i].targets);
+        rotateTriggerBuffer[i].targets = NULL;
+    }
+    rotateTriggerCount = 0;
+    if (check->rotateTriggers && check->rotateTriggersCount > 0) {
+        RotateTriggerBuffer *buf = (RotateTriggerBuffer *)realloc(rotateTriggerBuffer, sizeof(RotateTriggerBuffer) * check->rotateTriggersCount);
+        if (buf) {
+            rotateTriggerBuffer = buf;
+            rotateTriggerCapacity = check->rotateTriggersCount;
+            rotateTriggerCount = check->rotateTriggersCount;
+            memcpy(rotateTriggerBuffer, check->rotateTriggers, sizeof(RotateTriggerBuffer) * check->rotateTriggersCount);
+            for (int i = 0; i < rotateTriggerCount; i++) {
+                RotateTriggerBuffer *rb = &rotateTriggerBuffer[i];
+                int count = rb->targetCount;
+                int offset = check->rotateTargetOffsets[i];
                 rb->targets = NULL;
-                if (count > 0 && offset >= 0 && offset + count <= check->rotate_targets_count) {
+                if (count > 0 && offset >= 0 && offset + count <= check->rotateTargetsCount) {
                     rb->targets = (RotateTargetState *)malloc(sizeof(RotateTargetState) * count);
                     if (rb->targets) {
-                        memcpy(rb->targets, check->rotate_targets + offset, sizeof(RotateTargetState) * count);
+                        memcpy(rb->targets, check->rotateTargets + offset, sizeof(RotateTargetState) * count);
                     } else {
-                        rb->target_count = 0;
+                        rb->targetCount = 0;
                         rb->active = false;
                     }
                 } else {
-                    rb->target_count = 0;
+                    rb->targetCount = 0;
                 }
             }
         }
     }
 
     for (int i = 0; i < objects.count; i++) {
-        PickupItem *pickup = get_pickup_item(i);
+        PickupItem *pickup = getPickupItem(i);
         if (pickup) {
             objects.flags[i] &= ~FLAG_TOGGLED;
             objects.activated[i] = 0;
         }
     }
-    for (int i = 0; i < check->collected_pickups_count; i++) {
-        int obj = check->collected_pickups[i];
-        if (obj >= 0 && obj < objects.count && is_checkpoint_pickup(obj)) {
+    for (int i = 0; i < check->collectedPickupsCount; i++) {
+        int obj = check->collectedPickups[i];
+        if (obj >= 0 && obj < objects.count && isCheckpointPickup(obj)) {
             objects.flags[obj] |= FLAG_TOGGLED;
             objects.activated[obj] = 3;
         }
     }
 
-    if (check->count_items_count > 0) {
-        ItemCount *buf = (ItemCount *)realloc(item_counter_buffer, sizeof(ItemCount) * check->count_items_count);
+    if (check->countItemsCount > 0) {
+        ItemCount *buf = (ItemCount *)realloc(itemCounterBuffer, sizeof(ItemCount) * check->countItemsCount);
         if (buf) {
-            item_counter_buffer = buf;
-            item_counter_capacity = check->count_items_count;
-            item_counter_count = check->count_items_count;
-            memcpy(item_counter_buffer, check->count_items, sizeof(ItemCount) * check->count_items_count);
+            itemCounterBuffer = buf;
+            itemCounterCapacity = check->countItemsCount;
+            itemCounterCount = check->countItemsCount;
+            memcpy(itemCounterBuffer, check->countItems, sizeof(ItemCount) * check->countItemsCount);
         }
     } else {
-        item_counter_count = 0;
+        itemCounterCount = 0;
     }
-    if (check->count_triggers_count > 0) {
-        CountTriggerBuffer *buf = (CountTriggerBuffer *)realloc(count_trigger_buffer, sizeof(CountTriggerBuffer) * check->count_triggers_count);
+    if (check->countTriggersCount > 0) {
+        CountTriggerBuffer *buf = (CountTriggerBuffer *)realloc(countTriggerBuffer, sizeof(CountTriggerBuffer) * check->countTriggersCount);
         if (buf) {
-            count_trigger_buffer = buf;
-            count_trigger_capacity = check->count_triggers_count;
-            count_trigger_count = check->count_triggers_count;
-            memcpy(count_trigger_buffer, check->count_triggers, sizeof(CountTriggerBuffer) * check->count_triggers_count);
+            countTriggerBuffer = buf;
+            countTriggerCapacity = check->countTriggersCount;
+            countTriggerCount = check->countTriggersCount;
+            memcpy(countTriggerBuffer, check->countTriggers, sizeof(CountTriggerBuffer) * check->countTriggersCount);
         }
     } else {
-        count_trigger_count = 0;
+        countTriggerCount = 0;
     }
-    if (check->touch_triggers_count > 0) {
-        TouchTriggerBuffer *buf = (TouchTriggerBuffer *)realloc(touch_trigger_buffer, sizeof(TouchTriggerBuffer) * check->touch_triggers_count);
+    if (check->touchTriggersCount > 0) {
+        TouchTriggerBuffer *buf = (TouchTriggerBuffer *)realloc(touchTriggerBuffer, sizeof(TouchTriggerBuffer) * check->touchTriggersCount);
         if (buf) {
-            touch_trigger_buffer = buf;
-            touch_trigger_capacity = check->touch_triggers_count;
-            touch_trigger_count = check->touch_triggers_count;
-            memcpy(touch_trigger_buffer, check->touch_triggers, sizeof(TouchTriggerBuffer) * check->touch_triggers_count);
+            touchTriggerBuffer = buf;
+            touchTriggerCapacity = check->touchTriggersCount;
+            touchTriggerCount = check->touchTriggersCount;
+            memcpy(touchTriggerBuffer, check->touchTriggers, sizeof(TouchTriggerBuffer) * check->touchTriggersCount);
         }
     } else {
-        touch_trigger_count = 0;
+        touchTriggerCount = 0;
     }
 
-    for (int i = 0; i < count_trigger_count; i++)
-        count_trigger_buffer[i].restored_from_checkpoint = count_trigger_buffer[i].active;
+    for (int i = 0; i < countTriggerCount; i++)
+        countTriggerBuffer[i].restoredFromCheckpoint = countTriggerBuffer[i].active;
 
-    for (int i = 0; i < move_trigger_count; i++)
-        move_trigger_buffer[i].restored_from_checkpoint = move_trigger_buffer[i].active;
-    for (int i = 0; i < alpha_trigger_count; i++)
-        alpha_trigger_buffer[i].restored_from_checkpoint = alpha_trigger_buffer[i].active;
-    for (int i = 0; i < spawn_trigger_count; i++)
-        spawn_trigger_buffer[i].restored_from_checkpoint = spawn_trigger_buffer[i].active;
-    for (int i = 0; i < follow_player_y_trigger_count; i++)
-        follow_player_y_trigger_buffer[i].restored_from_checkpoint = follow_player_y_trigger_buffer[i].active;
-    for (int i = 0; i < follow_trigger_count; i++)
-        follow_trigger_buffer[i].restored_from_checkpoint = follow_trigger_buffer[i].active;
-    for (int i = 0; i < rotate_trigger_count; i++)
-        rotate_trigger_buffer[i].restored_from_checkpoint = rotate_trigger_buffer[i].active;
+    for (int i = 0; i < moveTriggerCount; i++)
+        moveTriggerBuffer[i].restoredFromCheckpoint = moveTriggerBuffer[i].active;
+    for (int i = 0; i < alphaTriggerCount; i++)
+        alphaTriggerBuffer[i].restoredFromCheckpoint = alphaTriggerBuffer[i].active;
+    for (int i = 0; i < spawnTriggerCount; i++)
+        spawnTriggerBuffer[i].restoredFromCheckpoint = spawnTriggerBuffer[i].active;
+    for (int i = 0; i < followPlayerYTriggerCount; i++)
+        followPlayerYTriggerBuffer[i].restoredFromCheckpoint = followPlayerYTriggerBuffer[i].active;
+    for (int i = 0; i < followTriggerCount; i++)
+        followTriggerBuffer[i].restoredFromCheckpoint = followTriggerBuffer[i].active;
+    for (int i = 0; i < rotateTriggerCount; i++)
+        rotateTriggerBuffer[i].restoredFromCheckpoint = rotateTriggerBuffer[i].active;
 
     {
         int kx = 0, ky = 0, oi = 0;
-        const uint8_t *sp = check->move_idx_stream;
-        const uint8_t *sp_end = sp + check->move_idx_bytes;
-        for (int i = 0; i < check->move_obj_count; i++) {
-            if (sp >= sp_end) break;
-            unsigned int v = ck_varint_get(&sp);
+        const uint8_t *sp = check->moveIdxStream;
+        const uint8_t *spEnd = sp + check->moveIdxBytes;
+        for (int i = 0; i < check->moveObjCount; i++) {
+            if (sp >= spEnd) break;
+            unsigned int v = ckVarintGet(&sp);
             unsigned int gap = v >> 2;
             unsigned int flags = v & 3u;
             oi = (i == 0) ? (int)gap : (oi + (int)gap);
             if (flags & 2u) {
-                float vx = ck_axis_get(check->move_obj_x, check->move_x_fmt, check->move_x_u, kx++);
+                float vx = ckAxisGet(check->moveObjX, check->moveXFmt, check->moveXU, kx++);
                 objects.x[oi] = vx;
             }
             if (flags & 1u) {
-                float vy = ck_axis_get(check->move_obj_y, check->move_y_fmt, check->move_y_u, ky++);
-                objects.y[oi] = vy; objects.last_y[oi] = vy;
+                float vy = ckAxisGet(check->moveObjY, check->moveYFmt, check->moveYU, ky++);
+                objects.y[oi] = vy; objects.lastY[oi] = vy;
             }
-            update_object_section(oi);
+            updateObjectSection(oi);
         }
     }
-    for (int i = 0; i < check->rotate_obj_count && check->rotate_obj_snapshot; i++) {
-        RotateObjectSnapshot *rs = &check->rotate_obj_snapshot[i];
-        objects.last_y[rs->obj] = objects.y[rs->obj];
+    for (int i = 0; i < check->rotateObjCount && check->rotateObjSnapshot; i++) {
+        RotateObjectSnapshot *rs = &check->rotateObjSnapshot[i];
+        objects.lastY[rs->obj] = objects.y[rs->obj];
         objects.rotation[rs->obj] = rs->rotation;
-        objects.visual_rotation[rs->obj] = rs->visual_rotation;
+        objects.visualRotation[rs->obj] = rs->visualRotation;
     }
-    for (int i = 0; i < check->alpha_group_count; i++) {
-        GroupNode *p = get_group(check->alpha_group_id[i]);
-        if (p) p->alpha = check->alpha_group_alpha[i];
+    for (int i = 0; i < check->alphaGroupCount; i++) {
+        GroupNode *p = getGroup(check->alphaGroupID[i]);
+        if (p) p->alpha = check->alphaGroupAlpha[i];
     }
-    for (int i = 0; i < check->alpha_group_count; i++) {
-        GroupNode *p = get_group(check->alpha_group_id[i]);
+    for (int i = 0; i < check->alphaGroupCount; i++) {
+        GroupNode *p = getGroup(check->alphaGroupID[i]);
         for (int i = 0; i < p->count; i++) {
             int object = p->objects[i];
-            objects.alpha_trigger_opacity[object] = get_group_opacities(object);
+            objects.alphaTriggerOpacity[object] = getGroupOpacities(object);
         }
     }
 
-    for (int i = 0; i < check->toggle_group_count; i++) {
-        GroupNode *p = get_group(check->toggle_group_id[i]);
+    for (int i = 0; i < check->toggleGroupCount; i++) {
+        GroupNode *p = getGroup(check->toggleGroupID[i]);
         if (!p) continue;
         p->toggled = true;
         for (int i = 0; i < p->count; i++) {
@@ -998,190 +998,190 @@ void restore_checkpoint() {
         }
     }
 
-    for (int i = 0; i < check->fired_move_count; i++) {
-        SET_ACTIVATED(check->fired_move_index[i], true);
+    for (int i = 0; i < check->firedMoveCount; i++) {
+        SET_ACTIVATED(check->firedMoveIndex[i], true);
     }
 
-    for (int i = 0; i < check->key_count; i++) {
-        SET_ACTIVATED(check->key_index[i], true);
-        objects.flags[check->key_index[i]] |= FLAG_TOGGLED;
+    for (int i = 0; i < check->keyCount; i++) {
+        SET_ACTIVATED(check->keyIndex[i], true);
+        objects.flags[check->keyIndex[i]] |= FLAG_TOGGLED;
     }
 
-    pulse_trigger_count = 0;
+    pulseTriggerCount = 0;
     for (int i = 0; i < objects.count; i++) {
-        objects.num_main_pulses[i] = 0;
-        objects.num_detail_pulses[i] = 0;
-        objects.main_being_pulsed[i] = false;
-        objects.detail_being_pulsed[i] = false;
+        objects.numMainPulses[i] = 0;
+        objects.numDetailPulses[i] = 0;
+        objects.mainBeingPulsed[i] = false;
+        objects.detailBeingPulsed[i] = false;
     }
     for (int i = 0; i < COL_CHANNEL_NUM; i++) {
-        channels[i].num_pulses = 0;
+        channels[i].numPulses = 0;
     }
 
-    for (int i = 0; i < check->pulse_snap_count; i++) {
-        PulseSnapshot *ps = &check->pulse_snap[i];
-        restore_pulse_trigger(ps->source_obj, ps->time_run);
+    for (int i = 0; i < check->pulseSnapCount; i++) {
+        PulseSnapshot *ps = &check->pulseSnap[i];
+        restorePulseTrigger(ps->sourceObj, ps->timeRun);
     }
 
-    update_attempt_text_pos();
+    updateAttemptTextPos();
 
-    set_checkpoint_timer(AUTO_CHECKPOINT_TIME);
-    restored_checkpoint = true;
+    setCheckpointTimer(AUTO_CHECKPOINT_TIME);
+    restoredCheckpoint = true;
 }
 
-void delete_last_checkpoint() {
-    if (checkpoint_count > 0) {
-        free_checkpoint_snapshot(&checkpoints[checkpoint_pointer]);
-        checkpoint_count--;
+void deleteLastCheckpoint() {
+    if (checkpointCount > 0) {
+        freeCheckpointSnapshot(&checkpoints[checkpointPointer]);
+        checkpointCount--;
 
         // Wrap around pointer
-        if (checkpoint_pointer-- == 0) {
-            checkpoint_pointer = MAX_CHECKPOINTS - 1;
+        if (checkpointPointer-- == 0) {
+            checkpointPointer = MAX_CHECKPOINTS - 1;
         }
     }
 }
 
-void clear_practice_mode() {
+void clearPracticeMode() {
     for (int i = 0; i < MAX_CHECKPOINTS; i++) {
-        free_checkpoint_snapshot(&checkpoints[i]);
+        freeCheckpointSnapshot(&checkpoints[i]);
     }
-    checkpoint_count = 0;
-    checkpoint_pointer = 0;
-    state.practice_mode = false;
+    checkpointCount = 0;
+    checkpointPointer = 0;
+    state.practiceMode = false;
 }
-void start_practice_mode() {
+void startPracticeMode() {
     for (int i = 0; i < MAX_CHECKPOINTS; i++) {
-        free_checkpoint_snapshot(&checkpoints[i]);
+        freeCheckpointSnapshot(&checkpoints[i]);
     }
-    checkpoint_count = 0;
-    checkpoint_pointer = 0;
-    pseudo_checkpoint_exists = false;
-    state.practice_mode = true;
+    checkpointCount = 0;
+    checkpointPointer = 0;
+    pseudoCheckpointExists = false;
+    state.practiceMode = true;
     
     if (!settingsState.practiceMusicSync) {
-        stop_mp3();
-        play_practice_song();
+        stopMP3();
+        playPracticeSong();
     }
 }
 
-void exit_practice_mode() {
-    state.practice_mode = false;
-    init_variables();
-    reload_level(); 
-    clear_practice_mode();
+void exitPracticeMode() {
+    state.practiceMode = false;
+    initVariables();
+    reloadLevel(); 
+    clearPracticeMode();
 
     if (settingsState.practiceMusicSync) {
-        seek_mp3(level_info.song_offset);
+        seekMP3(levelInfo.songOffset);
     } else {
-        stop_mp3();
-        play_level_song(level_info.song_offset);
+        stopMP3();
+        playLevelSong(levelInfo.songOffset);
     }
 }
 
-void run_pending_checkpoint() {
-    if (!state.pending_auto_checkpoint) {
-        is_pending_pseudo_checkpoint = false;
+void runPendingCheckpoint() {
+    if (!state.pendingAutoCheckpoint) {
+        isPendingPseudoCheckpoint = false;
         return;
     }
 
-    state.pending_auto_checkpoint = false;
+    state.pendingAutoCheckpoint = false;
 
-    bool is_pseudo = is_pending_pseudo_checkpoint;
-    is_pending_pseudo_checkpoint = false;
+    bool isPseudo = isPendingPseudoCheckpoint;
+    isPendingPseudoCheckpoint = false;
 
     if (state.dead) return;
 
-    new_checkpoint();
-    if (is_pseudo) pseudo_checkpoint_exists = true;
+    newCheckpoint();
+    if (isPseudo) pseudoCheckpointExists = true;
 }
 
-void handle_auto_checkpoints(float delta) {
+void handleAutoCheckpoints(float delta) {
     // Exit if not in practice mode with autocheckpoints enabled
-    if (!(state.practice_mode && settingsState.autoCheckpoints) || state.end_wall_anim_playing) return;
+    if (!(state.practiceMode && settingsState.autoCheckpoints) || state.endWallAnimPlaying) return;
     
-    if (checkpoint_timer <= 0) {
+    if (checkpointTimer <= 0) {
         switch (state.player.gamemode) {
             case GAMEMODE_PLAYER:
             case GAMEMODE_BALL:
             case GAMEMODE_ROBOT:
             case GAMEMODE_SPIDER:
-                if (state.player.landed_from_jump) {
-                    state.pending_auto_checkpoint = true;
+                if (state.player.landedFromJump) {
+                    state.pendingAutoCheckpoint = true;
                 }
                 break;
 
             case GAMEMODE_SHIP:
             case GAMEMODE_UFO:
             case GAMEMODE_WAVE:
-                state.pending_auto_checkpoint = true;
-                is_pending_pseudo_checkpoint = true;
+                state.pendingAutoCheckpoint = true;
+                isPendingPseudoCheckpoint = true;
                 break;
 
             default:
                 break;
         }
     } else {
-        checkpoint_timer -= delta;
+        checkpointTimer -= delta;
     }
 }
 
-void handle_practice_mode() {
-    if (!state.practice_mode) return;
+void handlePracticeMode() {
+    if (!state.practiceMode) return;
 
     u32 kDown = hidKeysDown();
     u32 kHeld = hidKeysHeld();
 
     if (((kDown & KEY_L) && !((kHeld & KEY_B) && settingsState.enableDebugBindings)) || (kDown & KEY_ZL)) {
-        if (settingsState.autoCheckpoints  && player_gamemode_is_flying(&state.player) && pseudo_checkpoint_exists) {
-            pseudo_checkpoint_exists = false;
-            delete_last_checkpoint();
+        if (settingsState.autoCheckpoints  && playerGamemodeIsFlying(&state.player) && pseudoCheckpointExists) {
+            pseudoCheckpointExists = false;
+            deleteLastCheckpoint();
         }
-        new_checkpoint();
+        newCheckpoint();
     }
 
     if (((kDown & KEY_R) && !((kHeld & KEY_B) && settingsState.enableDebugBindings)) || (kDown & KEY_ZR)) {
-        delete_last_checkpoint();
+        deleteLastCheckpoint();
     }
 }
 
-static void draw_checkpoint(float x, float y) {
+static void drawCheckpoint(float x, float y) {
     C2D_Sprite spr = { 0 };
     C2D_SpriteFromSheet(&spr, spriteSheet2, CHECKPOINT_GFX_ID);
     C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
     C3D_TexSetFilter(spr.image.tex, GPU_LINEAR, GPU_LINEAR);
 
-    C2D_SpriteSetPos(&spr, get_mirror_x(x, state.mirror_factor), y);
+    C2D_SpriteSetPos(&spr, getMirrorX(x, state.mirrorFactor), y);
 
     C2D_DrawSprite(&spr);
 }
 
-int get_checkpoint_count() {
-    int count = checkpoint_count;
-    if (settingsState.autoCheckpoints && player_gamemode_is_flying(&state.player) && pseudo_checkpoint_exists) {
+int getCheckpointCount() {
+    int count = checkpointCount;
+    if (settingsState.autoCheckpoints && playerGamemodeIsFlying(&state.player) && pseudoCheckpointExists) {
         count--;
     }
     return MAX(0, count);
 }
 
-void draw_checkpoints() {
-    if (!state.practice_mode) return;
+void drawCheckpoints() {
+    if (!state.practiceMode) return;
 
     int start = 0;
 
-    if (settingsState.autoCheckpoints && player_gamemode_is_flying(&state.player) && pseudo_checkpoint_exists)
+    if (settingsState.autoCheckpoints && playerGamemodeIsFlying(&state.player) && pseudoCheckpointExists)
         start++;
 
-    for (int checkpoint = start; checkpoint < checkpoint_count; checkpoint++) {
+    for (int checkpoint = start; checkpoint < checkpointCount; checkpoint++) {
         // Obtain buffer index
-        s32 index = WRAP((s32) (checkpoint_pointer - checkpoint), 0, MAX_CHECKPOINTS);
-        CheckpointData *curr_checkpoint = &checkpoints[index];
+        s32 index = WRAP((s32) (checkpointPointer - checkpoint), 0, MAX_CHECKPOINTS);
+        CheckpointData *currCheckpoint = &checkpoints[index];
 
-        float calc_x = (curr_checkpoint->p1.x - state.camera_x);
-        float calc_y = SCREEN_HEIGHT - ((curr_checkpoint->p1.y - state.camera_y));  
+        float calcX = (currCheckpoint->p1.x - state.cameraX);
+        float calcY = SCREEN_HEIGHT - ((currCheckpoint->p1.y - state.cameraY));  
 
-        if (calc_x < -60 || calc_x >= (SCREEN_WIDTH / SCALE) + 60) continue;
-        if (calc_y < -60 || calc_y >= (SCREEN_HEIGHT / SCALE) + 60) continue;
+        if (calcX < -60 || calcX >= (SCREEN_WIDTH / SCALE) + 60) continue;
+        if (calcY < -60 || calcY >= (SCREEN_HEIGHT / SCALE) + 60) continue;
 
-        draw_checkpoint(calc_x, calc_y);
+        drawCheckpoint(calcX, calcY);
     }
 }

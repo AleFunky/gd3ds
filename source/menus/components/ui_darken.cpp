@@ -4,19 +4,19 @@
 #include "menus/core/ui_screen.hpp"
 #include "menus/core/ui_props.hpp"
 
-void ui_darken_set_opacity(UIDarken* e, float opacity) {
+void uiDarkenSetOpacity(UIDarken* e, float opacity) {
     if (!e) return;
 
     C2D_PlainImageTint(&e->image.tint, C2D_Color32f(0, 0, 0, opacity), 1.0f);
 }
 
-void ui_darken_reset_opacity(UIDarken* e){
+void uiDarkenResetOpacity(UIDarken* e){
     if (!e) return;
 
     C2D_PlainImageTint(&e->image.tint, C2D_Color32f(0, 0, 0, e->base.opacity), 1.0f);
 }
 
-static void ui_darken_update(UIElement* e, UIInput* touch, UITransform *transform) {
+static void uiDarkenUpdate(UIElement* e, UIInput* touch, UITransform *transform) {
     UIDarken *darken = (UIDarken *) e;
 
     //there's not really a reason to animate non-fullscreen darkens tbh
@@ -24,7 +24,7 @@ static void ui_darken_update(UIElement* e, UIInput* touch, UITransform *transfor
         //hehe trans
         const UITransition *trans = &e->screen->transition;
 
-        float duration = trans->duration * trans->darken_frac;
+        float duration = trans->duration * trans->darkenFrac;
         float time = trans->time;
         if(time > duration){
             time = duration;
@@ -38,12 +38,12 @@ static void ui_darken_update(UIElement* e, UIInput* touch, UITransform *transfor
             float fade = 0.f;
             switch(e->screen->transition.state){
                 case UI_TRANSITION_OPENING:
-                    if(trans->in_duration > 0.f){
+                    if(trans->inDuration > 0.f){
                         fade = time / duration;
                     }
                     break;
                 case UI_TRANSITION_CLOSING:
-                    if(trans->out_duration > 0.f){
+                    if(trans->outDuration > 0.f){
                         fade = 1.f - (time / duration);
                     }
                     break;
@@ -61,11 +61,11 @@ static void ui_darken_update(UIElement* e, UIInput* touch, UITransform *transfor
     }
 }
 
-static void ui_darken_draw(UIElement* e, UITransform *transform) {
+static void uiDarkenDraw(UIElement* e, UITransform *transform) {
     UIDarken *darken = (UIDarken *) e;
 
     if(!e->screen->transition.done){
-        ui_darken_reset_opacity(darken);
+        uiDarkenResetOpacity(darken);
     }
 
     if (darken->fullScreen) {
@@ -78,14 +78,14 @@ static void ui_darken_draw(UIElement* e, UITransform *transform) {
     C2D_DrawSpriteTinted(&darken->image.sprite, &darken->image.tint);
 }
 
-static void ui_darken_destroy(UIElement *e) {
+static void uiDarkenDestroy(UIElement *e) {
     if (e) {
         delete (UIDarken *)e;
         e = NULL;
     }
 }
 
-UIDarken *ui_create_darken(UIScreen *screen) {
+UIDarken *uiCreateDarken(UIScreen *screen) {
     UIDarken *e = new UIDarken{};
 
     if (!e) return NULL;
@@ -96,30 +96,30 @@ UIDarken *ui_create_darken(UIScreen *screen) {
 
     e->opacity = 0.4f;
     
-    ui_element_apply_default_properties(&e->base, screen);
+    uiElementApplyDefaultProperties(&e->base, screen);
     
-    C2D_SpriteFromSheet(&e->image.sprite, ui_sheet, 416);
+    C2D_SpriteFromSheet(&e->image.sprite, uiSheet, 416);
     C2D_SpriteSetCenter(&e->image.sprite, 0.5f, 0.5f);
 
-    e->base.update = ui_darken_update;
-    e->base.draw = ui_darken_draw;
-    e->base.destroy = ui_darken_destroy;
+    e->base.update = uiDarkenUpdate;
+    e->base.draw = uiDarkenDraw;
+    e->base.destroy = uiDarkenDestroy;
 
     return e;
 }
 
-UIElement *ui_create_darken_from_props(UIScreen *screen, const UIPropertyList *props) {
-    UIDarken *darken = ui_create_darken(screen);
+UIElement *uiCreateDarkenFromProps(UIScreen *screen, const UIPropertyList *props) {
+    UIDarken *darken = uiCreateDarken(screen);
 
     if (!darken) return NULL;
 
-    ui_element_apply_properties(&darken->base, screen, props);
+    uiElementApplyProperties(&darken->base, screen, props);
 
     if (darken->base.w == 0 || darken->base.h == 0) {
         darken->fullScreen = true;
     }
 
-    darken->opacity = ui_prop_float(props, "opacity", 0.4f);
+    darken->opacity = uiPropFloat(props, "opacity", 0.4f);
 
     C2D_PlainImageTint(&darken->image.tint, C2D_Color32f(0.f, 0.f, 0.f, darken->base.opacity), 1.0f);
 

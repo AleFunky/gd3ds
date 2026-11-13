@@ -1,6 +1,6 @@
 #include "text.hpp"
 
-extern const Glyph goldFont_fontGlyphs[96] = {
+extern const Glyph goldFontFontGlyphs[96] = {
     {32, 123, 203, 0, 0, 0, 28, 11, -1},
     {33, 37, 57, 16, 25, 0, 4, 9, 0},
     {34, 23, 203, 18, 14, -1, 1, 10, 1},
@@ -99,8 +99,8 @@ extern const Glyph goldFont_fontGlyphs[96] = {
     {8226, 164, 180, 16, 16, -1, 9, 8, 94},
 };
 
-extern const Charset goldFont_fontCharset = {
-    goldFont_fontGlyphs,
+extern const Charset goldFontFontCharset = {
+    goldFontFontGlyphs,
     96,
     1
 };

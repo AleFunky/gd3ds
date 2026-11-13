@@ -3,255 +3,255 @@
 
 // level_id property defines the save entry id
 
-MainLevelDefinition robtop_main_levels[] = {
+MainLevelDefinition robtopMainLevels[] = {
     {
-        .level_id = 0,
-        .level_name = "Stereo Madness",
-        .gmd_path = "romfs:/main_levels/StereoMadness.gmd",
-        .song_path = "romfs:/songs/StereoMadness.mp3",
+        .levelID = 0,
+        .levelName = "Stereo Madness",
+        .gmdPath = "romfs:/main_levels/StereoMadness.gmd",
+        .songPath = "romfs:/songs/StereoMadness.mp3",
         .difficulty = MAIN_DIFF_EASY,
         .stars = 1,
-        .song_data = {
+        .songData = {
             .title = "Stereo Madness", 
             .artist = "ForeverBound" 
         }
     },
     {
-        .level_id = 1,
-        .level_name = "Back On Track",
-        .gmd_path = "romfs:/main_levels/BackOnTrack.gmd",
-        .song_path = "romfs:/songs/BackOnTrack.mp3",
+        .levelID = 1,
+        .levelName = "Back On Track",
+        .gmdPath = "romfs:/main_levels/BackOnTrack.gmd",
+        .songPath = "romfs:/songs/BackOnTrack.mp3",
         .difficulty = MAIN_DIFF_EASY,
         .stars = 2,
-        .song_data = {
+        .songData = {
             .title = "Back on Track", 
             .artist = "DJVI" 
         }
     },
     {
-        .level_id = 2,
-        .level_name = "Polargeist",
-        .gmd_path = "romfs:/main_levels/Polargeist.gmd",
-        .song_path = "romfs:/songs/Polargeist.mp3",
+        .levelID = 2,
+        .levelName = "Polargeist",
+        .gmdPath = "romfs:/main_levels/Polargeist.gmd",
+        .songPath = "romfs:/songs/Polargeist.mp3",
         .difficulty = MAIN_DIFF_NORMAL,
         .stars = 3,
-        .song_data = {
+        .songData = {
             .title = "Polargeist", 
             .artist = "Step" 
         }
     },
     {
-        .level_id = 3,
-        .level_name = "Dry Out",
-        .gmd_path = "romfs:/main_levels/DryOut.gmd",
-        .song_path = "romfs:/songs/DryOut.mp3",
+        .levelID = 3,
+        .levelName = "Dry Out",
+        .gmdPath = "romfs:/main_levels/DryOut.gmd",
+        .songPath = "romfs:/songs/DryOut.mp3",
         .difficulty = MAIN_DIFF_NORMAL,
         .stars = 4,
-        .song_data = {
+        .songData = {
             .title = "Dry Out", 
             .artist = "DJVI" 
         }
     },
     {
-        .level_id = 4,
-        .level_name = "Base After Base",
-        .gmd_path = "romfs:/main_levels/BaseAfterBase.gmd",
-        .song_path = "romfs:/songs/BaseAfterBase.mp3",
+        .levelID = 4,
+        .levelName = "Base After Base",
+        .gmdPath = "romfs:/main_levels/BaseAfterBase.gmd",
+        .songPath = "romfs:/songs/BaseAfterBase.mp3",
         .difficulty = MAIN_DIFF_HARD,
         .stars = 5,
-        .song_data = {
+        .songData = {
             .title = "Base after Base", 
             .artist = "DJVI" 
         }
     },
     {
-        .level_id = 5,
-        .level_name = "Cant Let Go",
-        .gmd_path = "romfs:/main_levels/CantLetGo.gmd",
-        .song_path = "romfs:/songs/CantLetGo.mp3",
+        .levelID = 5,
+        .levelName = "Cant Let Go",
+        .gmdPath = "romfs:/main_levels/CantLetGo.gmd",
+        .songPath = "romfs:/songs/CantLetGo.mp3",
         .difficulty = MAIN_DIFF_HARD,
         .stars = 6,
-        .song_data = {
+        .songData = {
             .title = "Cant let Go",
             .artist = "DJVI" 
         }
     },
     {
-        .level_id = 6,
-        .level_name = "Jumper",
-        .gmd_path = "romfs:/main_levels/Jumper.gmd",
-        .song_path = "romfs:/songs/Jumper.mp3",
+        .levelID = 6,
+        .levelName = "Jumper",
+        .gmdPath = "romfs:/main_levels/Jumper.gmd",
+        .songPath = "romfs:/songs/Jumper.mp3",
         .difficulty = MAIN_DIFF_HARDER,
         .stars = 7,
-        .song_data = {
+        .songData = {
             .title = "Jumper", 
             .artist = "Waterflame"
         }
     },
     {
-        .level_id = 7,
-        .level_name = "Time Machine",
-        .gmd_path = "romfs:/main_levels/TimeMachine.gmd",
-        .song_path = "romfs:/songs/TimeMachine.mp3",
+        .levelID = 7,
+        .levelName = "Time Machine",
+        .gmdPath = "romfs:/main_levels/TimeMachine.gmd",
+        .songPath = "romfs:/songs/TimeMachine.mp3",
         .difficulty = MAIN_DIFF_HARDER,
         .stars = 8,
-        .song_data = {
+        .songData = {
             .title = "Time Machine", 
             .artist = "Waterflame"
         }
     },
     {
-        .level_id = 8,
-        .level_name = "Cycles",
-        .gmd_path = "romfs:/main_levels/Cycles.gmd",
-        .song_path = "romfs:/songs/Cycles.mp3",
+        .levelID = 8,
+        .levelName = "Cycles",
+        .gmdPath = "romfs:/main_levels/Cycles.gmd",
+        .songPath = "romfs:/songs/Cycles.mp3",
         .difficulty = MAIN_DIFF_HARDER,
         .stars = 9,
-        .song_data = {
+        .songData = {
             .title = "Cycles",  
             .artist = "DJVI" 
         }
     },
     {
-        .level_id = 9,
-        .level_name = "xStep",
-        .gmd_path = "romfs:/main_levels/xStep.gmd",
-        .song_path = "romfs:/songs/xStep.mp3",
+        .levelID = 9,
+        .levelName = "xStep",
+        .gmdPath = "romfs:/main_levels/xStep.gmd",
+        .songPath = "romfs:/songs/xStep.mp3",
         .difficulty = MAIN_DIFF_INSANE,
         .stars = 10,
-        .song_data = {
+        .songData = {
             .title = "xStep", 
             .artist = "DJVI"
         }
     },
     {
-        .level_id = 10,
-        .level_name = "Clutterfunk",
-        .gmd_path = "romfs:/main_levels/Clutterfunk.gmd",
-        .song_path = "romfs:/songs/Clutterfunk.mp3",
+        .levelID = 10,
+        .levelName = "Clutterfunk",
+        .gmdPath = "romfs:/main_levels/Clutterfunk.gmd",
+        .songPath = "romfs:/songs/Clutterfunk.mp3",
         .difficulty = MAIN_DIFF_INSANE,
         .stars = 11,
-        .song_data = {
+        .songData = {
             .title = "Clutterfunk", 
             .artist = "Waterflame"
         }
     },
     {
-        .level_id = 11,
-        .level_name = "Theory of Everything",
-        .gmd_path = "romfs:/main_levels/TheoryofEverything.gmd",
-        .song_path = "romfs:/songs/TheoryOfEverything.mp3",
+        .levelID = 11,
+        .levelName = "Theory of Everything",
+        .gmdPath = "romfs:/main_levels/TheoryofEverything.gmd",
+        .songPath = "romfs:/songs/TheoryOfEverything.mp3",
         .difficulty = MAIN_DIFF_INSANE,
         .stars = 12,
-        .song_data = {
+        .songData = {
             .title = "Theory of Everything", 
             .artist = "DJ-Nate"
         }
     },
     {
-        .level_id = 12,
-        .level_name = "Electroman Adventures",
-        .gmd_path = "romfs:/main_levels/Electroman.gmd",
-        .song_path = "romfs:/songs/Electroman.mp3",
+        .levelID = 12,
+        .levelName = "Electroman Adventures",
+        .gmdPath = "romfs:/main_levels/Electroman.gmd",
+        .songPath = "romfs:/songs/Electroman.mp3",
         .difficulty = MAIN_DIFF_INSANE,
         .stars = 10,
-        .song_data = {
+        .songData = {
             .title = "Electroman Adventures", 
             .artist = "Waterflame"
         }
     },
     {
-        .level_id = 13,
-        .level_name = "Clubstep",
-        .gmd_path = "romfs:/main_levels/Clubstep.gmd",
-        .song_path = "romfs:/songs/Clubstep.mp3",
+        .levelID = 13,
+        .levelName = "Clubstep",
+        .gmdPath = "romfs:/main_levels/Clubstep.gmd",
+        .songPath = "romfs:/songs/Clubstep.mp3",
         .difficulty = MAIN_DIFF_DEMON,
         .stars = 14,
-        .song_data = {
+        .songData = {
             .title = "Clubstep", 
             .artist = "DJ-Nate"
         }
     },
     {
-        .level_id = 14,
-        .level_name = "Electrodynamix",
-        .gmd_path = "romfs:/main_levels/Electrodynamix.gmd",
-        .song_path = "romfs:/songs/Electrodynamix.mp3",
+        .levelID = 14,
+        .levelName = "Electrodynamix",
+        .gmdPath = "romfs:/main_levels/Electrodynamix.gmd",
+        .songPath = "romfs:/songs/Electrodynamix.mp3",
         .difficulty = MAIN_DIFF_INSANE,
         .stars = 12,
-        .song_data = {
+        .songData = {
             .title = "Electrodynamix", 
             .artist = "DJ-Nate"
         }
     },
     {
-        .level_id = 15,
-        .level_name = "Hexagon Force",
-        .gmd_path = "romfs:/main_levels/HexagonForce.gmd",
-        .song_path = "romfs:/songs/HexagonForce.mp3",
+        .levelID = 15,
+        .levelName = "Hexagon Force",
+        .gmdPath = "romfs:/main_levels/HexagonForce.gmd",
+        .songPath = "romfs:/songs/HexagonForce.mp3",
         .difficulty = MAIN_DIFF_INSANE,
         .stars = 12,
-        .song_data = {
+        .songData = {
             .title = "Hexagon Force", 
             .artist = "Waterflame" 
         }
     },
     {
-        .level_id = 16,
-        .level_name = "Blast Processing",
-        .gmd_path = "romfs:/main_levels/BlastProcessing.gmd",
-        .song_path = "romfs:/songs/BlastProcessing.mp3",
+        .levelID = 16,
+        .levelName = "Blast Processing",
+        .gmdPath = "romfs:/main_levels/BlastProcessing.gmd",
+        .songPath = "romfs:/songs/BlastProcessing.mp3",
         .difficulty = MAIN_DIFF_HARDER,
         .stars = 10,
-        .song_data = {
+        .songData = {
             .title = "Blast Processing", 
             .artist = "Waterflame"
         }
     },
     {
-        .level_id = 17,
-        .level_name = "Theory of Everything 2",
-        .gmd_path = "romfs:/main_levels/TheoryofEverything2.gmd",
-        .song_path = "romfs:/songs/TheoryOfEverything2.mp3",
+        .levelID = 17,
+        .levelName = "Theory of Everything 2",
+        .gmdPath = "romfs:/main_levels/TheoryofEverything2.gmd",
+        .songPath = "romfs:/songs/TheoryOfEverything2.mp3",
         .difficulty = MAIN_DIFF_DEMON,
         .stars = 14,
-        .song_data = {
+        .songData = {
             .title = "Theory of Everything 2", 
             .artist = "DJ-Nate"
         }
     },
     {
-        .level_id = 18,
-        .level_name = "Geometrical Dominator",
-        .gmd_path = "romfs:/main_levels/GeometricalDominator.gmd",
-        .song_path = "romfs:/songs/GeometricalDominator.mp3",
+        .levelID = 18,
+        .levelName = "Geometrical Dominator",
+        .gmdPath = "romfs:/main_levels/GeometricalDominator.gmd",
+        .songPath = "romfs:/songs/GeometricalDominator.mp3",
         .difficulty = MAIN_DIFF_HARDER,
         .stars = 10,
-        .song_data = {
+        .songData = {
             .title = "Geometrical Dominator",
             .artist = "Waterflame"
         }
     },
     {
-        .level_id = 19,
-        .level_name = "Deadlocked",
-        .gmd_path = "romfs:/main_levels/Deadlocked.gmd",
-        .song_path = "romfs:/songs/Deadlocked.mp3",
+        .levelID = 19,
+        .levelName = "Deadlocked",
+        .gmdPath = "romfs:/main_levels/Deadlocked.gmd",
+        .songPath = "romfs:/songs/Deadlocked.mp3",
         .difficulty = MAIN_DIFF_DEMON,
         .stars = 15,
-        .song_data = {
+        .songData = {
             .title = "Deadlocked",
             .artist = "F-777"
         }
     },
     {
-        .level_id = 20,
-        .level_name = "Fingerdash",
-        .gmd_path = "romfs:/main_levels/Fingerdash.gmd",
-        .song_path = "romfs:/songs/Fingerdash.mp3",
+        .levelID = 20,
+        .levelName = "Fingerdash",
+        .gmdPath = "romfs:/main_levels/Fingerdash.gmd",
+        .songPath = "romfs:/songs/Fingerdash.mp3",
         .difficulty = MAIN_DIFF_INSANE,
         .stars = 12,
-        .song_data = {
+        .songData = {
             .title = "Fingerdash",
             .artist = "MDK"
         }
@@ -259,293 +259,293 @@ MainLevelDefinition robtop_main_levels[] = {
 };
 
 
-MainLevelDefinition gdps_main_levels[] = {
+MainLevelDefinition gdpsMainLevels[] = {
     {
-        .level_id = 0,
-        .level_name = "Stereo Madness",
-        .gmd_path = "romfs:/main_levels/StereoMadness.gmd",
-        .song_path = "romfs:/songs/StereoMadness.mp3",
+        .levelID = 0,
+        .levelName = "Stereo Madness",
+        .gmdPath = "romfs:/main_levels/StereoMadness.gmd",
+        .songPath = "romfs:/songs/StereoMadness.mp3",
         .difficulty = MAIN_DIFF_EASY,
         .stars = 1,
-        .song_data = {
+        .songData = {
             .title = "Stereo Madness", 
             .artist = "ForeverBound" 
         }
     },
     {
-        .level_id = 1,
-        .level_name = "Back On Track",
-        .gmd_path = "romfs:/main_levels/BackOnTrack.gmd",
-        .song_path = "romfs:/songs/BackOnTrack.mp3",
+        .levelID = 1,
+        .levelName = "Back On Track",
+        .gmdPath = "romfs:/main_levels/BackOnTrack.gmd",
+        .songPath = "romfs:/songs/BackOnTrack.mp3",
         .difficulty = MAIN_DIFF_EASY,
         .stars = 2,
-        .song_data = {
+        .songData = {
             .title = "Back on Track", 
             .artist = "DJVI" 
         }
     },
     {
-        .level_id = 2,
-        .level_name = "Polargeist",
-        .gmd_path = "romfs:/main_levels/Polargeist.gmd",
-        .song_path = "romfs:/songs/Polargeist.mp3",
+        .levelID = 2,
+        .levelName = "Polargeist",
+        .gmdPath = "romfs:/main_levels/Polargeist.gmd",
+        .songPath = "romfs:/songs/Polargeist.mp3",
         .difficulty = MAIN_DIFF_NORMAL,
         .stars = 3,
-        .song_data = {
+        .songData = {
             .title = "Polargeist", 
             .artist = "Step" 
         }
     },
     {
-        .level_id = 3,
-        .level_name = "Dry Out",
-        .gmd_path = "romfs:/main_levels/DryOut.gmd",
-        .song_path = "romfs:/songs/DryOut.mp3",
+        .levelID = 3,
+        .levelName = "Dry Out",
+        .gmdPath = "romfs:/main_levels/DryOut.gmd",
+        .songPath = "romfs:/songs/DryOut.mp3",
         .difficulty = MAIN_DIFF_NORMAL,
         .stars = 4,
-        .song_data = {
+        .songData = {
             .title = "Dry Out", 
             .artist = "DJVI" 
         }
     },
     {
-        .level_id = 4,
-        .level_name = "Base After Base",
-        .gmd_path = "romfs:/main_levels/BaseAfterBase.gmd",
-        .song_path = "romfs:/songs/BaseAfterBase.mp3",
+        .levelID = 4,
+        .levelName = "Base After Base",
+        .gmdPath = "romfs:/main_levels/BaseAfterBase.gmd",
+        .songPath = "romfs:/songs/BaseAfterBase.mp3",
         .difficulty = MAIN_DIFF_HARD,
         .stars = 5,
-        .song_data = {
+        .songData = {
             .title = "Base after Base", 
             .artist = "DJVI" 
         }
     },
     {
-        .level_id = 5,
-        .level_name = "Cant Let Go",
-        .gmd_path = "romfs:/main_levels/CantLetGo.gmd",
-        .song_path = "romfs:/songs/CantLetGo.mp3",
+        .levelID = 5,
+        .levelName = "Cant Let Go",
+        .gmdPath = "romfs:/main_levels/CantLetGo.gmd",
+        .songPath = "romfs:/songs/CantLetGo.mp3",
         .difficulty = MAIN_DIFF_HARD,
         .stars = 6,
-        .song_data = {
+        .songData = {
             .title = "Cant let Go",
             .artist = "DJVI" 
         }
     },
     {
-        .level_id = 6,
-        .level_name = "Jumper",
-        .gmd_path = "romfs:/main_levels/Jumper.gmd",
-        .song_path = "romfs:/songs/Jumper.mp3",
+        .levelID = 6,
+        .levelName = "Jumper",
+        .gmdPath = "romfs:/main_levels/Jumper.gmd",
+        .songPath = "romfs:/songs/Jumper.mp3",
         .difficulty = MAIN_DIFF_HARDER,
         .stars = 7,
-        .song_data = {
+        .songData = {
             .title = "Jumper", 
             .artist = "Waterflame"
         }
     },
     {
-        .level_id = 7,
-        .level_name = "Time Machine",
-        .gmd_path = "romfs:/main_levels/TimeMachine.gmd",
-        .song_path = "romfs:/songs/TimeMachine.mp3",
+        .levelID = 7,
+        .levelName = "Time Machine",
+        .gmdPath = "romfs:/main_levels/TimeMachine.gmd",
+        .songPath = "romfs:/songs/TimeMachine.mp3",
         .difficulty = MAIN_DIFF_HARDER,
         .stars = 8,
-        .song_data = {
+        .songData = {
             .title = "Time Machine", 
             .artist = "Waterflame"
         }
     },
     {
-        .level_id = 8,
-        .level_name = "Cycles",
-        .gmd_path = "romfs:/main_levels/Cycles.gmd",
-        .song_path = "romfs:/songs/Cycles.mp3",
+        .levelID = 8,
+        .levelName = "Cycles",
+        .gmdPath = "romfs:/main_levels/Cycles.gmd",
+        .songPath = "romfs:/songs/Cycles.mp3",
         .difficulty = MAIN_DIFF_HARDER,
         .stars = 9,
-        .song_data = {
+        .songData = {
             .title = "Cycles",  
             .artist = "DJVI" 
         }
     },
     {
-        .level_id = 9,
-        .level_name = "xStep",
-        .gmd_path = "romfs:/main_levels/xStep.gmd",
-        .song_path = "romfs:/songs/xStep.mp3",
+        .levelID = 9,
+        .levelName = "xStep",
+        .gmdPath = "romfs:/main_levels/xStep.gmd",
+        .songPath = "romfs:/songs/xStep.mp3",
         .difficulty = MAIN_DIFF_INSANE,
         .stars = 10,
-        .song_data = {
+        .songData = {
             .title = "xStep", 
             .artist = "DJVI"
         }
     },
     {
-        .level_id = 10,
-        .level_name = "Clutterfunk",
-        .gmd_path = "romfs:/main_levels/Clutterfunk.gmd",
-        .song_path = "romfs:/songs/Clutterfunk.mp3",
+        .levelID = 10,
+        .levelName = "Clutterfunk",
+        .gmdPath = "romfs:/main_levels/Clutterfunk.gmd",
+        .songPath = "romfs:/songs/Clutterfunk.mp3",
         .difficulty = MAIN_DIFF_INSANE,
         .stars = 11,
-        .song_data = {
+        .songData = {
             .title = "Clutterfunk", 
             .artist = "Waterflame"
         }
     },
     {
-        .level_id = 11,
-        .level_name = "Theory of Everything",
-        .gmd_path = "romfs:/main_levels/TheoryofEverything.gmd",
-        .song_path = "romfs:/songs/TheoryOfEverything.mp3",
+        .levelID = 11,
+        .levelName = "Theory of Everything",
+        .gmdPath = "romfs:/main_levels/TheoryofEverything.gmd",
+        .songPath = "romfs:/songs/TheoryOfEverything.mp3",
         .difficulty = MAIN_DIFF_INSANE,
         .stars = 12,
-        .song_data = {
+        .songData = {
             .title = "Theory of Everything", 
             .artist = "DJ-Nate"
         }
     },
     {
-        .level_id = 12,
-        .level_name = "Electroman Adventures",
-        .gmd_path = "romfs:/main_levels/Electroman.gmd",
-        .song_path = "romfs:/songs/Electroman.mp3",
+        .levelID = 12,
+        .levelName = "Electroman Adventures",
+        .gmdPath = "romfs:/main_levels/Electroman.gmd",
+        .songPath = "romfs:/songs/Electroman.mp3",
         .difficulty = MAIN_DIFF_INSANE,
         .stars = 10,
-        .song_data = {
+        .songData = {
             .title = "Electroman Adventures", 
             .artist = "Waterflame"
         }
     },
     {
-        .level_id = 13,
-        .level_name = "Clubstep",
-        .gmd_path = "romfs:/main_levels/Clubstep.gmd",
-        .song_path = "romfs:/songs/Clubstep.mp3",
+        .levelID = 13,
+        .levelName = "Clubstep",
+        .gmdPath = "romfs:/main_levels/Clubstep.gmd",
+        .songPath = "romfs:/songs/Clubstep.mp3",
         .difficulty = MAIN_DIFF_DEMON,
         .stars = 14,
-        .song_data = {
+        .songData = {
             .title = "Clubstep", 
             .artist = "DJ-Nate"
         }
     },
     {
-        .level_id = 14,
-        .level_name = "Electrodynamix",
-        .gmd_path = "romfs:/main_levels/Electrodynamix.gmd",
-        .song_path = "romfs:/songs/Electrodynamix.mp3",
+        .levelID = 14,
+        .levelName = "Electrodynamix",
+        .gmdPath = "romfs:/main_levels/Electrodynamix.gmd",
+        .songPath = "romfs:/songs/Electrodynamix.mp3",
         .difficulty = MAIN_DIFF_INSANE,
         .stars = 12,
-        .song_data = {
+        .songData = {
             .title = "Electrodynamix", 
             .artist = "DJ-Nate"
         }
     },
     {
-        .level_id = 15,
-        .level_name = "Hexagon Force",
-        .gmd_path = "romfs:/main_levels/HexagonForce.gmd",
-        .song_path = "romfs:/songs/HexagonForce.mp3",
+        .levelID = 15,
+        .levelName = "Hexagon Force",
+        .gmdPath = "romfs:/main_levels/HexagonForce.gmd",
+        .songPath = "romfs:/songs/HexagonForce.mp3",
         .difficulty = MAIN_DIFF_INSANE,
         .stars = 12,
-        .song_data = {
+        .songData = {
             .title = "Hexagon Force", 
             .artist = "Waterflame" 
         }
     },
     {
-        .level_id = 16,
-        .level_name = "Blast Processing",
-        .gmd_path = "romfs:/main_levels/BlastProcessing.gmd",
-        .song_path = "romfs:/songs/BlastProcessing.mp3",
+        .levelID = 16,
+        .levelName = "Blast Processing",
+        .gmdPath = "romfs:/main_levels/BlastProcessing.gmd",
+        .songPath = "romfs:/songs/BlastProcessing.mp3",
         .difficulty = MAIN_DIFF_HARDER,
         .stars = 10,
-        .song_data = {
+        .songData = {
             .title = "Blast Processing", 
             .artist = "Waterflame"
         }
     },
     {
-        .level_id = 17,
-        .level_name = "Theory of Everything 2",
-        .gmd_path = "romfs:/main_levels/TheoryofEverything2.gmd",
-        .song_path = "romfs:/songs/TheoryOfEverything2.mp3",
+        .levelID = 17,
+        .levelName = "Theory of Everything 2",
+        .gmdPath = "romfs:/main_levels/TheoryofEverything2.gmd",
+        .songPath = "romfs:/songs/TheoryOfEverything2.mp3",
         .difficulty = MAIN_DIFF_DEMON,
         .stars = 14,
-        .song_data = {
+        .songData = {
             .title = "Theory of Everything 2", 
             .artist = "DJ-Nate"
         }
     },
     {
-        .level_id = 18,
-        .level_name = "Thumper",
-        .gmd_path = "romfs:/main_levels/Thumper.gmd",
-        .song_path = "romfs:/songs/Thumper.mp3",
+        .levelID = 18,
+        .levelName = "Thumper",
+        .gmdPath = "romfs:/main_levels/Thumper.gmd",
+        .songPath = "romfs:/songs/Thumper.mp3",
         .difficulty = MAIN_DIFF_HARDER,
         .stars = 10,
-        .song_data = {
+        .songData = {
             .title = "Thumper", 
             .artist = "Waterflame"
         }
     },
     {
-        .level_id = 19,
-        .level_name = "Clutterfunk 2",
-        .gmd_path = "romfs:/main_levels/Clutterfunk2.gmd",
-        .song_path = "romfs:/songs/Clutterfunk2.mp3",
+        .levelID = 19,
+        .levelName = "Clutterfunk 2",
+        .gmdPath = "romfs:/main_levels/Clutterfunk2.gmd",
+        .songPath = "romfs:/songs/Clutterfunk2.mp3",
         .difficulty = MAIN_DIFF_DEMON,
         .stars = 16,
-        .song_data = {
+        .songData = {
             .title = "Clutterfunk 2", 
             .artist = "Waterflame"
         }
     },
     {
-        .level_id = 20,
-        .level_name = "Aura",
-        .gmd_path = "romfs:/main_levels/Aura.gmd",
-        .song_path = "romfs:/songs/Aura.mp3",
+        .levelID = 20,
+        .levelName = "Aura",
+        .gmdPath = "romfs:/main_levels/Aura.gmd",
+        .songPath = "romfs:/songs/Aura.mp3",
         .difficulty = MAIN_DIFF_INSANE,
         .stars = 11,
-        .song_data = {
+        .songData = {
             .title = "Aura", 
             .artist = "Creo"
         }
     },
     {
-        .level_id = 21,
-        .level_name = "Jack Russel",
-        .gmd_path = "romfs:/main_levels/JackRussel.gmd",
-        .song_path = "romfs:/songs/JackRussel.mp3",
+        .levelID = 21,
+        .levelName = "Jack Russel",
+        .gmdPath = "romfs:/main_levels/JackRussel.gmd",
+        .songPath = "romfs:/songs/JackRussel.mp3",
         .difficulty = MAIN_DIFF_INSANE,
         .stars = 12,
-        .song_data = {
+        .songData = {
             .title = "Jack Russel", 
             .artist = "Bossfight"
         }
     },
     {
-        .level_id = 22,
-        .level_name = "Streetwise",
-        .gmd_path = "romfs:/main_levels/Streetwise.gmd",
-        .song_path = "romfs:/songs/Streetwise.mp3",
+        .levelID = 22,
+        .levelName = "Streetwise",
+        .gmdPath = "romfs:/main_levels/Streetwise.gmd",
+        .songPath = "romfs:/songs/Streetwise.mp3",
         .difficulty = MAIN_DIFF_INSANE,
         .stars = 12,
-        .song_data = {
+        .songData = {
             .title = "Streetwise", 
             .artist = "Waterflame"
         }
     },
 };
 
-const MainLevelPack *current_main_level_pack = NULL;
+const MainLevelPack *currentMainLevelPack = NULL;
 
-extern const MainLevelPack robtop_levels = {
-    .levels = robtop_main_levels,
-    .count = ARRAY_LEN(robtop_main_levels)
+extern const MainLevelPack robtopLevels = {
+    .levels = robtopMainLevels,
+    .count = ARRAY_LEN(robtopMainLevels)
 };
 
-extern const MainLevelPack gdps_levels = {
-    .levels = gdps_main_levels,
-    .count = ARRAY_LEN(gdps_main_levels)
+extern const MainLevelPack gdpsLevels = {
+    .levels = gdpsMainLevels,
+    .count = ARRAY_LEN(gdpsMainLevels)
 };

@@ -1,4 +1,4 @@
 #pragma once
 #include "menus/core/ui_stack.hpp"
 
-extern const UIScreenDefPair online_infobox_def;
+extern const UIScreenDefPair onlineInfoboxDef;

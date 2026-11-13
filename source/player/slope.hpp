@@ -12,14 +12,14 @@ enum SlopeOrientations {
 
 #define SLOPE_HEAD_TOLERANCE 2.f
 
-float slope_angle(int obj, Player *player);
-void slope_collide(int obj, Player *player);
-int grav_slope_orient(int obj, Player *player);
-void clear_slope_data(Player *player);
-void clear_coyote_slope_data(Player *player);
-void slope_calc(int obj, Player *player);
-bool slope_touching(int obj, Player *player);
-float slope_snap_angle(int obj, Player *player);
-bool is_spike_slope(int obj);
+float slopeAngle(int obj, Player *player);
+void slopeCollide(int obj, Player *player);
+int gravSlopeOrient(int obj, Player *player);
+void clearSlopeData(Player *player);
+void clearCoyoteSlopeData(Player *player);
+void slopeCalc(int obj, Player *player);
+bool slopeTouching(int obj, Player *player);
+float slopeSnapAngle(int obj, Player *player);
+bool isSpikeSlope(int obj);
 
-int get_player_touching_slopes(Player *player);
+int getPlayerTouchingSlopes(Player *player);

@@ -1,6 +1,6 @@
 #include "robot_anim_data.hpp"
 
-static const PlayerSpritePart robot_run_f001[] = {
+static const PlayerSpritePart robotRunF001[] = {
     { 4, -3.7500f, -2.5875f, 100.2628f, 0.9988f, 0.9994f, 0 },
     { 2, -1.8250f, -0.9750f, 26.5609f, 0.9974f, 0.9987f, 1 },
     { 6, -7.2500f, -2.4625f, 114.5518f, 0.9975f, 0.9987f, 2 },
@@ -10,7 +10,7 @@ static const PlayerSpritePart robot_run_f001[] = {
     { 6, 3.0500f, -4.0375f, -36.5981f, 0.9968f, 0.9984f, 6 },
 };
 
-static const PlayerSpritePart robot_run_f002[] = {
+static const PlayerSpritePart robotRunF002[] = {
     { 4, -2.3125f, -2.9125f, 89.7456f, 1.0000f, 1.0000f, 0 },
     { 2, -0.9875f, -1.2000f, 4.2568f, 0.9995f, 0.9998f, 1 },
     { 6, -6.1125f, -3.3125f, 108.5283f, 0.9980f, 0.9990f, 2 },
@@ -20,7 +20,7 @@ static const PlayerSpritePart robot_run_f002[] = {
     { 6, 2.4750f, -4.8125f, -18.2764f, 0.9980f, 0.9990f, 6 },
 };
 
-static const PlayerSpritePart robot_run_f003[] = {
+static const PlayerSpritePart robotRunF003[] = {
     { 4, -0.8750f, -3.2375f, 78.7356f, 0.9987f, 0.9994f, 0 },
     { 2, -0.1500f, -1.4125f, -17.5347f, 0.9981f, 0.9990f, 1 },
     { 6, -4.9875f, -4.1500f, 102.7622f, 0.9986f, 0.9993f, 2 },
@@ -30,7 +30,7 @@ static const PlayerSpritePart robot_run_f003[] = {
     { 6, 1.9250f, -5.6125f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const PlayerSpritePart robot_run_f004[] = {
+static const PlayerSpritePart robotRunF004[] = {
     { 4, 0.3875f, -2.3250f, 63.4496f, 0.9974f, 0.9987f, 0 },
     { 2, 0.7125f, -0.1375f, -28.0606f, 0.9973f, 0.9986f, 1 },
     { 6, -2.4875f, -4.0875f, 73.4780f, 0.9982f, 0.9991f, 2 },
@@ -40,7 +40,7 @@ static const PlayerSpritePart robot_run_f004[] = {
     { 6, -0.9125f, -5.6125f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const PlayerSpritePart robot_run_f005[] = {
+static const PlayerSpritePart robotRunF005[] = {
     { 4, 1.2125f, -1.0375f, 26.3955f, 0.9967f, 0.9983f, 0 },
     { 2, -0.4500f, 1.6500f, -38.6070f, 0.9968f, 0.9984f, 1 },
     { 6, 0.0250f, -4.0125f, 44.1224f, 0.9967f, 0.9983f, 2 },
@@ -50,7 +50,7 @@ static const PlayerSpritePart robot_run_f005[] = {
     { 6, -3.7500f, -5.6125f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const PlayerSpritePart robot_run_f006[] = {
+static const PlayerSpritePart robotRunF006[] = {
     { 4, 2.3000f, -1.3750f, -4.7581f, 0.9995f, 0.9997f, 0 },
     { 2, -0.5625f, 1.2125f, -40.8589f, 0.9967f, 0.9984f, 1 },
     { 6, 3.0625f, -3.2875f, -2.2536f, 0.9997f, 0.9999f, 2 },
@@ -60,7 +60,7 @@ static const PlayerSpritePart robot_run_f006[] = {
     { 6, -6.7625f, -4.3375f, 41.6134f, 0.9968f, 0.9984f, 6 },
 };
 
-static const PlayerSpritePart robot_run_f007[] = {
+static const PlayerSpritePart robotRunF007[] = {
     { 4, 2.9750f, -1.3125f, -58.1830f, 0.9971f, 0.9985f, 0 },
     { 2, -0.9250f, 1.4000f, -42.8697f, 0.9967f, 0.9983f, 1 },
     { 6, 6.1000f, -2.5875f, -48.8875f, 0.9967f, 0.9983f, 2 },
@@ -70,7 +70,7 @@ static const PlayerSpritePart robot_run_f007[] = {
     { 6, -9.2250f, -2.2625f, 83.4921f, 0.9992f, 0.9996f, 6 },
 };
 
-static const PlayerSpritePart robot_run_f008[] = {
+static const PlayerSpritePart robotRunF008[] = {
     { 4, 1.6625f, -2.1625f, -57.6788f, 0.9970f, 0.9985f, 0 },
     { 2, -1.0500f, 0.7000f, -8.5065f, 0.9990f, 0.9995f, 1 },
     { 6, 4.9750f, -3.3250f, -42.8659f, 0.9967f, 0.9984f, 2 },
@@ -80,7 +80,7 @@ static const PlayerSpritePart robot_run_f008[] = {
     { 6, -9.1000f, -1.9625f, 99.0086f, 0.9989f, 0.9995f, 6 },
 };
 
-static const PlayerSpritePart robot_run_f009[] = {
+static const PlayerSpritePart robotRunF009[] = {
     { 4, 0.3250f, -3.0000f, -56.9297f, 0.9970f, 0.9985f, 0 },
     { 2, -1.4125f, 0.0500f, 14.5510f, 0.9974f, 0.9987f, 1 },
     { 6, 3.8375f, -4.0375f, -36.5981f, 0.9968f, 0.9984f, 2 },
@@ -90,7 +90,7 @@ static const PlayerSpritePart robot_run_f009[] = {
     { 6, -8.9375f, -1.6750f, 114.5518f, 0.9975f, 0.9987f, 6 },
 };
 
-static const PlayerSpritePart robot_run_f010[] = {
+static const PlayerSpritePart robotRunF010[] = {
     { 4, -0.6250f, -3.6000f, -52.1597f, 0.9969f, 0.9984f, 0 },
     { 2, -1.5875f, -0.7000f, 36.8435f, 0.9969f, 0.9984f, 1 },
     { 6, 2.4750f, -4.8250f, -18.2764f, 0.9980f, 0.9990f, 2 },
@@ -100,7 +100,7 @@ static const PlayerSpritePart robot_run_f010[] = {
     { 6, -8.0875f, -2.8750f, 108.5283f, 0.9980f, 0.9990f, 6 },
 };
 
-static const PlayerSpritePart robot_run_f011[] = {
+static const PlayerSpritePart robotRunF011[] = {
     { 4, -1.5875f, -4.1750f, -47.6303f, 0.9967f, 0.9984f, 0 },
     { 2, -1.9375f, -1.3750f, 48.1437f, 0.9967f, 0.9984f, 1 },
     { 6, 1.1375f, -5.6125f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -110,7 +110,7 @@ static const PlayerSpritePart robot_run_f011[] = {
     { 6, -7.2375f, -4.0875f, 102.7622f, 0.9986f, 0.9993f, 6 },
 };
 
-static const PlayerSpritePart robot_run_f012[] = {
+static const PlayerSpritePart robotRunF012[] = {
     { 4, -2.6000f, -3.6375f, -11.0135f, 0.9988f, 0.9994f, 0 },
     { 2, -2.0125f, -0.6375f, 33.8293f, 0.9970f, 0.9985f, 1 },
     { 6, -1.2250f, -5.6125f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -120,7 +120,7 @@ static const PlayerSpritePart robot_run_f012[] = {
     { 6, -5.4750f, -4.2750f, 81.7417f, 0.9990f, 0.9995f, 6 },
 };
 
-static const PlayerSpritePart robot_run_f013[] = {
+static const PlayerSpritePart robotRunF013[] = {
     { 4, -3.6000f, -3.0625f, 25.0503f, 0.9975f, 0.9987f, 0 },
     { 2, -2.0500f, 0.1375f, 19.2872f, 0.9980f, 0.9990f, 1 },
     { 6, -3.5875f, -5.6125f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -130,7 +130,7 @@ static const PlayerSpritePart robot_run_f013[] = {
     { 6, -3.3875f, -4.7625f, 53.9724f, 0.9971f, 0.9986f, 6 },
 };
 
-static const PlayerSpritePart robot_run_f014[] = {
+static const PlayerSpritePart robotRunF014[] = {
     { 4, -4.8375f, -2.0875f, 47.1364f, 0.9967f, 0.9983f, 0 },
     { 2, -2.4875f, 0.5250f, 36.8419f, 0.9969f, 0.9984f, 1 },
     { 6, -5.8625f, -3.9125f, 41.6134f, 0.9968f, 0.9984f, 2 },
@@ -140,7 +140,7 @@ static const PlayerSpritePart robot_run_f014[] = {
     { 6, 0.6125f, -5.1750f, 5.7542f, 0.9994f, 0.9997f, 6 },
 };
 
-static const PlayerSpritePart robot_run_f015[] = {
+static const PlayerSpritePart robotRunF015[] = {
     { 4, -6.0625f, -1.1000f, 69.2098f, 0.9978f, 0.9989f, 0 },
     { 2, -2.9250f, 0.9250f, 54.4157f, 0.9969f, 0.9984f, 1 },
     { 6, -8.1625f, -2.2125f, 83.4921f, 0.9992f, 0.9996f, 2 },
@@ -150,7 +150,7 @@ static const PlayerSpritePart robot_run_f015[] = {
     { 6, 4.8625f, -3.0375f, -48.8875f, 0.9967f, 0.9983f, 6 },
 };
 
-static const PlayerSpritePart robot_run_f016[] = {
+static const PlayerSpritePart robotRunF016[] = {
     { 4, -4.9000f, -1.8500f, 84.7482f, 0.9994f, 0.9997f, 0 },
     { 2, -2.3750f, -0.0375f, 40.6064f, 0.9968f, 0.9983f, 1 },
     { 6, -7.7000f, -2.3375f, 99.0086f, 0.9989f, 0.9995f, 2 },
@@ -160,26 +160,26 @@ static const PlayerSpritePart robot_run_f016[] = {
     { 6, 3.9625f, -3.5375f, -42.8659f, 0.9967f, 0.9984f, 6 },
 };
 
-static const PlayerFrame robot_run_frames[] = {
-    { robot_run_f001, 7, 0.0275f },
-    { robot_run_f002, 7, 0.0275f },
-    { robot_run_f003, 7, 0.0275f },
-    { robot_run_f004, 7, 0.0275f },
-    { robot_run_f005, 7, 0.0275f },
-    { robot_run_f006, 7, 0.0275f },
-    { robot_run_f007, 7, 0.0275f },
-    { robot_run_f008, 7, 0.0275f },
-    { robot_run_f009, 7, 0.0275f },
-    { robot_run_f010, 7, 0.0275f },
-    { robot_run_f011, 7, 0.0275f },
-    { robot_run_f012, 7, 0.0275f },
-    { robot_run_f013, 7, 0.0275f },
-    { robot_run_f014, 7, 0.0275f },
-    { robot_run_f015, 7, 0.0275f },
-    { robot_run_f016, 7, 0.0275f },
+static const PlayerFrame robotRunFrames[] = {
+    { robotRunF001, 7, 0.0275f },
+    { robotRunF002, 7, 0.0275f },
+    { robotRunF003, 7, 0.0275f },
+    { robotRunF004, 7, 0.0275f },
+    { robotRunF005, 7, 0.0275f },
+    { robotRunF006, 7, 0.0275f },
+    { robotRunF007, 7, 0.0275f },
+    { robotRunF008, 7, 0.0275f },
+    { robotRunF009, 7, 0.0275f },
+    { robotRunF010, 7, 0.0275f },
+    { robotRunF011, 7, 0.0275f },
+    { robotRunF012, 7, 0.0275f },
+    { robotRunF013, 7, 0.0275f },
+    { robotRunF014, 7, 0.0275f },
+    { robotRunF015, 7, 0.0275f },
+    { robotRunF016, 7, 0.0275f },
 };
 
-static const PlayerSpritePart robot_jump_start_f001[] = {
+static const PlayerSpritePart robotJumpStartF001[] = {
     { 4, -3.4375f, -3.7875f, 28.6307f, 0.9988f, 0.9994f, 0 },
     { 2, -1.7625f, -0.9000f, 26.5609f, 0.9974f, 0.9987f, 1 },
     { 6, -4.7625f, -6.3625f, 48.4160f, 0.9975f, 0.9987f, 2 },
@@ -189,7 +189,7 @@ static const PlayerSpritePart robot_jump_start_f001[] = {
     { 6, 2.6750f, -4.3500f, -36.5981f, 0.9968f, 0.9984f, 6 },
 };
 
-static const PlayerSpritePart robot_jump_start_f002[] = {
+static const PlayerSpritePart robotJumpStartF002[] = {
     { 4, -3.3125f, -3.5375f, 18.3961f, 0.9988f, 0.9994f, 0 },
     { 2, -1.8125f, -0.6250f, 26.5609f, 0.9973f, 0.9986f, 1 },
     { 6, -4.2125f, -6.1000f, 42.2372f, 0.9974f, 0.9987f, 2 },
@@ -199,7 +199,7 @@ static const PlayerSpritePart robot_jump_start_f002[] = {
     { 6, 1.9125f, -4.4375f, -27.8334f, 0.9968f, 0.9984f, 6 },
 };
 
-static const PlayerSpritePart robot_jump_start_f003[] = {
+static const PlayerSpritePart robotJumpStartF003[] = {
     { 4, -3.0500f, -2.9625f, -4.4385f, 0.9988f, 0.9994f, 0 },
     { 2, -1.9000f, -0.0250f, 26.5609f, 0.9973f, 0.9986f, 1 },
     { 6, -3.0000f, -5.4875f, 28.4479f, 0.9974f, 0.9987f, 2 },
@@ -209,7 +209,7 @@ static const PlayerSpritePart robot_jump_start_f003[] = {
     { 6, 0.2375f, -4.6375f, -8.2789f, 0.9968f, 0.9983f, 6 },
 };
 
-static const PlayerSpritePart robot_jump_start_f004[] = {
+static const PlayerSpritePart robotJumpStartF004[] = {
     { 4, -2.7500f, -2.3750f, -27.9372f, 0.9988f, 0.9993f, 0 },
     { 2, -1.9875f, 0.5875f, 26.5609f, 0.9973f, 0.9986f, 1 },
     { 6, -1.7250f, -4.8500f, 14.2582f, 0.9975f, 0.9987f, 2 },
@@ -219,7 +219,7 @@ static const PlayerSpritePart robot_jump_start_f004[] = {
     { 6, -1.5125f, -4.8250f, 11.8442f, 0.9968f, 0.9984f, 6 },
 };
 
-static const PlayerSpritePart robot_jump_start_f005[] = {
+static const PlayerSpritePart robotJumpStartF005[] = {
     { 4, -2.6250f, -2.0875f, -39.0474f, 0.9988f, 0.9994f, 0 },
     { 2, -2.0125f, 0.9000f, 26.5609f, 0.9974f, 0.9987f, 1 },
     { 6, -1.1250f, -4.5375f, 7.5507f, 0.9975f, 0.9987f, 2 },
@@ -229,15 +229,15 @@ static const PlayerSpritePart robot_jump_start_f005[] = {
     { 6, -2.3250f, -4.9375f, 21.3581f, 0.9968f, 0.9984f, 6 },
 };
 
-static const PlayerFrame robot_jump_start_frames[] = {
-    { robot_jump_start_f001, 7, 0.02f },
-    { robot_jump_start_f002, 7, 0.02f },
-    { robot_jump_start_f003, 7, 0.02f },
-    { robot_jump_start_f004, 7, 0.02f },
-    { robot_jump_start_f005, 7, 0.02f },
+static const PlayerFrame robotJumpStartFrames[] = {
+    { robotJumpStartF001, 7, 0.02f },
+    { robotJumpStartF002, 7, 0.02f },
+    { robotJumpStartF003, 7, 0.02f },
+    { robotJumpStartF004, 7, 0.02f },
+    { robotJumpStartF005, 7, 0.02f },
 };
 
-static const PlayerSpritePart robot_jump_f001[] = {
+static const PlayerSpritePart robotJumpF001[] = {
     { 4, -2.6250f, -2.0875f, -39.0474f, 0.9988f, 0.9994f, 0 },
     { 2, -2.0125f, 0.9000f, 26.5609f, 0.9974f, 0.9987f, 1 },
     { 6, -1.1250f, -4.5375f, 7.5507f, 0.9975f, 0.9987f, 2 },
@@ -247,7 +247,7 @@ static const PlayerSpritePart robot_jump_f001[] = {
     { 6, -2.3250f, -4.9375f, 21.3581f, 0.9968f, 0.9984f, 6 },
 };
 
-static const PlayerSpritePart robot_jump_f002[] = {
+static const PlayerSpritePart robotJumpF002[] = {
     { 4, -2.9375f, -2.1000f, -31.8568f, 0.9988f, 0.9993f, 0 },
     { 2, -2.0125f, 0.9000f, 26.5609f, 0.9974f, 0.9987f, 1 },
     { 6, -1.5500f, -4.6250f, 9.8237f, 0.9975f, 0.9987f, 2 },
@@ -257,7 +257,7 @@ static const PlayerSpritePart robot_jump_f002[] = {
     { 6, -2.5500f, -5.1625f, 18.8601f, 0.9968f, 0.9983f, 6 },
 };
 
-static const PlayerSpritePart robot_jump_f003[] = {
+static const PlayerSpritePart robotJumpF003[] = {
     { 4, -3.2625f, -2.1375f, -23.3042f, 0.9988f, 0.9994f, 0 },
     { 2, -2.0125f, 0.9000f, 26.5609f, 0.9974f, 0.9987f, 1 },
     { 6, -2.0125f, -4.7000f, 12.5267f, 0.9975f, 0.9987f, 2 },
@@ -267,7 +267,7 @@ static const PlayerSpritePart robot_jump_f003[] = {
     { 6, -2.8250f, -5.4375f, 15.8851f, 0.9968f, 0.9984f, 6 },
 };
 
-static const PlayerSpritePart robot_jump_f004[] = {
+static const PlayerSpritePart robotJumpF004[] = {
     { 4, -3.1500f, -2.1125f, -28.5276f, 0.9982f, 0.9988f, 0 },
     { 2, -2.0250f, 0.9000f, 26.5588f, 0.9969f, 0.9982f, 1 },
     { 6, -1.8000f, -4.6750f, 11.7160f, 0.9973f, 0.9986f, 2 },
@@ -277,7 +277,7 @@ static const PlayerSpritePart robot_jump_f004[] = {
     { 6, -2.7125f, -5.3250f, 17.1060f, 0.9964f, 0.9980f, 6 },
 };
 
-static const PlayerSpritePart robot_jump_f005[] = {
+static const PlayerSpritePart robotJumpF005[] = {
     { 4, -2.9250f, -2.0500f, -39.0864f, 0.9972f, 0.9978f, 0 },
     { 2, -2.0125f, 0.9000f, 26.5532f, 0.9960f, 0.9974f, 1 },
     { 6, -1.2750f, -4.6125f, 9.7779f, 0.9970f, 0.9982f, 2 },
@@ -287,15 +287,15 @@ static const PlayerSpritePart robot_jump_f005[] = {
     { 6, -2.4625f, -5.0875f, 19.5741f, 0.9958f, 0.9973f, 6 },
 };
 
-static const PlayerFrame robot_jump_frames[] = {
-    { robot_jump_f001, 7, 0.05f },
-    { robot_jump_f002, 7, 0.05f },
-    { robot_jump_f003, 7, 0.05f },
-    { robot_jump_f004, 7, 0.05f },
-    { robot_jump_f005, 7, 0.05f },
+static const PlayerFrame robotJumpFrames[] = {
+    { robotJumpF001, 7, 0.05f },
+    { robotJumpF002, 7, 0.05f },
+    { robotJumpF003, 7, 0.05f },
+    { robotJumpF004, 7, 0.05f },
+    { robotJumpF005, 7, 0.05f },
 };
 
-static const PlayerSpritePart robot_fall_start_f001[] = {
+static const PlayerSpritePart robotFallStartF001[] = {
     { 4, -2.6250f, -2.0875f, -39.0474f, 0.9988f, 0.9994f, 0 },
     { 2, -2.0125f, 0.9000f, 26.5609f, 0.9974f, 0.9987f, 1 },
     { 6, -1.1250f, -4.5375f, 7.5507f, 0.9975f, 0.9987f, 2 },
@@ -305,7 +305,7 @@ static const PlayerSpritePart robot_fall_start_f001[] = {
     { 6, -2.3250f, -4.9375f, 21.3581f, 0.9968f, 0.9984f, 6 },
 };
 
-static const PlayerSpritePart robot_fall_start_f002[] = {
+static const PlayerSpritePart robotFallStartF002[] = {
     { 4, -2.5000f, -2.2250f, -38.6497f, 0.9986f, 0.9993f, 0 },
     { 2, -2.0000f, 0.8125f, 27.2823f, 0.9973f, 0.9986f, 1 },
     { 6, -0.9500f, -4.6250f, 5.4815f, 0.9975f, 0.9987f, 2 },
@@ -315,7 +315,7 @@ static const PlayerSpritePart robot_fall_start_f002[] = {
     { 6, -2.3250f, -5.0000f, 18.8319f, 0.9968f, 0.9984f, 6 },
 };
 
-static const PlayerSpritePart robot_fall_start_f003[] = {
+static const PlayerSpritePart robotFallStartF003[] = {
     { 4, -2.1000f, -2.5500f, -37.6309f, 0.9983f, 0.9991f, 0 },
     { 2, -1.8875f, 0.5500f, 29.1275f, 0.9972f, 0.9986f, 1 },
     { 6, -0.4875f, -4.8250f, 0.1888f, 0.9976f, 0.9988f, 2 },
@@ -325,7 +325,7 @@ static const PlayerSpritePart robot_fall_start_f003[] = {
     { 6, -2.2875f, -5.1875f, 12.3641f, 0.9971f, 0.9985f, 6 },
 };
 
-static const PlayerSpritePart robot_fall_start_f004[] = {
+static const PlayerSpritePart robotFallStartF004[] = {
     { 4, -1.5875f, -3.0125f, -36.2738f, 0.9978f, 0.9989f, 0 },
     { 2, -1.7750f, 0.2125f, 31.5823f, 0.9970f, 0.9985f, 1 },
     { 6, 0.1375f, -5.0750f, -6.8537f, 0.9977f, 0.9988f, 2 },
@@ -335,7 +335,7 @@ static const PlayerSpritePart robot_fall_start_f004[] = {
     { 6, -2.2500f, -5.4125f, 3.7618f, 0.9973f, 0.9986f, 6 },
 };
 
-static const PlayerSpritePart robot_fall_start_f005[] = {
+static const PlayerSpritePart robotFallStartF005[] = {
     { 4, -1.0625f, -3.4875f, -34.8897f, 0.9973f, 0.9987f, 0 },
     { 2, -1.6375f, -0.1250f, 34.0891f, 0.9969f, 0.9984f, 1 },
     { 6, 0.7500f, -5.3500f, -14.0404f, 0.9978f, 0.9989f, 2 },
@@ -345,7 +345,7 @@ static const PlayerSpritePart robot_fall_start_f005[] = {
     { 6, -2.2125f, -5.6500f, -5.0168f, 0.9976f, 0.9988f, 6 },
 };
 
-static const PlayerSpritePart robot_fall_start_f006[] = {
+static const PlayerSpritePart robotFallStartF006[] = {
     { 4, -0.6375f, -3.8375f, -33.8063f, 0.9970f, 0.9984f, 0 },
     { 2, -1.5125f, -0.3875f, 36.0488f, 0.9968f, 0.9984f, 1 },
     { 6, 1.2500f, -5.5625f, -19.6633f, 0.9979f, 0.9990f, 2 },
@@ -355,7 +355,7 @@ static const PlayerSpritePart robot_fall_start_f006[] = {
     { 6, -2.1875f, -5.8375f, -11.8869f, 0.9979f, 0.9989f, 6 },
 };
 
-static const PlayerSpritePart robot_fall_start_f007[] = {
+static const PlayerSpritePart robotFallStartF007[] = {
     { 4, -0.4625f, -4.0000f, -33.3683f, 0.9969f, 0.9984f, 0 },
     { 2, -1.4625f, -0.5125f, 36.8435f, 0.9969f, 0.9984f, 1 },
     { 6, 1.4750f, -5.6250f, -21.9442f, 0.9980f, 0.9990f, 2 },
@@ -365,17 +365,17 @@ static const PlayerSpritePart robot_fall_start_f007[] = {
     { 6, -2.1750f, -5.9000f, -14.6689f, 0.9980f, 0.9990f, 6 },
 };
 
-static const PlayerFrame robot_fall_start_frames[] = {
-    { robot_fall_start_f001, 7, 0.02f },
-    { robot_fall_start_f002, 7, 0.02f },
-    { robot_fall_start_f003, 7, 0.02f },
-    { robot_fall_start_f004, 7, 0.02f },
-    { robot_fall_start_f005, 7, 0.02f },
-    { robot_fall_start_f006, 7, 0.02f },
-    { robot_fall_start_f007, 7, 0.02f },
+static const PlayerFrame robotFallStartFrames[] = {
+    { robotFallStartF001, 7, 0.02f },
+    { robotFallStartF002, 7, 0.02f },
+    { robotFallStartF003, 7, 0.02f },
+    { robotFallStartF004, 7, 0.02f },
+    { robotFallStartF005, 7, 0.02f },
+    { robotFallStartF006, 7, 0.02f },
+    { robotFallStartF007, 7, 0.02f },
 };
 
-static const PlayerSpritePart robot_fall_f001[] = {
+static const PlayerSpritePart robotFallF001[] = {
     { 4, -0.4625f, -4.0000f, -33.3683f, 0.9969f, 0.9984f, 0 },
     { 2, -1.4625f, -0.5125f, 36.8435f, 0.9969f, 0.9984f, 1 },
     { 6, 1.4750f, -5.6250f, -21.9442f, 0.9980f, 0.9990f, 2 },
@@ -385,7 +385,7 @@ static const PlayerSpritePart robot_fall_f001[] = {
     { 6, -2.1750f, -5.9000f, -14.6689f, 0.9980f, 0.9990f, 6 },
 };
 
-static const PlayerSpritePart robot_fall_f002[] = {
+static const PlayerSpritePart robotFallF002[] = {
     { 4, -0.5875f, -3.8500f, -35.6403f, 0.9968f, 0.9984f, 0 },
     { 2, -1.4750f, -0.4000f, 39.7231f, 0.9968f, 0.9984f, 1 },
     { 6, 1.4375f, -5.5000f, -26.5343f, 0.9980f, 0.9989f, 2 },
@@ -395,7 +395,7 @@ static const PlayerSpritePart robot_fall_f002[] = {
     { 6, -2.1375f, -5.8250f, -18.7512f, 0.9980f, 0.9989f, 6 },
 };
 
-static const PlayerSpritePart robot_fall_f003[] = {
+static const PlayerSpritePart robotFallF003[] = {
     { 4, -0.7125f, -3.6875f, -38.0632f, 0.9969f, 0.9984f, 0 },
     { 2, -1.4625f, -0.2625f, 42.8006f, 0.9969f, 0.9984f, 1 },
     { 6, 1.4125f, -5.3125f, -31.4380f, 0.9980f, 0.9990f, 2 },
@@ -405,7 +405,7 @@ static const PlayerSpritePart robot_fall_f003[] = {
     { 6, -2.1125f, -5.7125f, -23.1100f, 0.9980f, 0.9990f, 6 },
 };
 
-static const PlayerSpritePart robot_fall_f004[] = {
+static const PlayerSpritePart robotFallF004[] = {
     { 4, -0.6625f, -3.7625f, -36.8799f, 0.9963f, 0.9979f, 0 },
     { 2, -1.4750f, -0.3375f, 41.2892f, 0.9963f, 0.9978f, 1 },
     { 6, 1.4125f, -5.4000f, -29.0807f, 0.9975f, 0.9985f, 2 },
@@ -415,7 +415,7 @@ static const PlayerSpritePart robot_fall_f004[] = {
     { 6, -2.1250f, -5.7625f, -20.9612f, 0.9977f, 0.9986f, 6 },
 };
 
-static const PlayerSpritePart robot_fall_f005[] = {
+static const PlayerSpritePart robotFallF005[] = {
     { 4, -0.5375f, -3.9125f, -34.6004f, 0.9953f, 0.9969f, 0 },
     { 2, -1.4500f, -0.4625f, 38.3788f, 0.9952f, 0.9968f, 1 },
     { 6, 1.4625f, -5.5375f, -24.5452f, 0.9968f, 0.9977f, 2 },
@@ -425,15 +425,15 @@ static const PlayerSpritePart robot_fall_f005[] = {
     { 6, -2.1750f, -5.8500f, -16.8236f, 0.9971f, 0.9980f, 6 },
 };
 
-static const PlayerFrame robot_fall_frames[] = {
-    { robot_fall_f001, 7, 0.05f },
-    { robot_fall_f002, 7, 0.05f },
-    { robot_fall_f003, 7, 0.05f },
-    { robot_fall_f004, 7, 0.05f },
-    { robot_fall_f005, 7, 0.05f },
+static const PlayerFrame robotFallFrames[] = {
+    { robotFallF001, 7, 0.05f },
+    { robotFallF002, 7, 0.05f },
+    { robotFallF003, 7, 0.05f },
+    { robotFallF004, 7, 0.05f },
+    { robotFallF005, 7, 0.05f },
 };
 
-static const PlayerSpritePart robot_idle_f001[] = {
+static const PlayerSpritePart robotIdleF001[] = {
     { 4, -3.5875f, -3.4375f, -29.6729f, 0.9969f, 0.9984f, 0 },
     { 2, -3.5875f, -0.5125f, 57.9682f, 0.9968f, 0.9984f, 1 },
     { 6, -1.3375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 2 },
@@ -443,15 +443,15 @@ static const PlayerSpritePart robot_idle_f001[] = {
     { 6, 1.1375f, -5.4500f, 0.0000f, 1.0000f, 1.0000f, 6 },
 };
 
-static const PlayerFrame robot_idle_frames[] = {
-    { robot_idle_f001, 7, 0.041667f },
+static const PlayerFrame robotIdleFrames[] = {
+    { robotIdleF001, 7, 0.041667f },
 };
 
-const PlayerAnimation robot_animations[ROBOT_ANIM_COUNT] = {
-    { robot_run_frames, 16 },  // ROBOT_ANIM_RUN
-    { robot_jump_start_frames, 5 },  // ROBOT_ANIM_JUMP_START
-    { robot_jump_frames, 5 },  // ROBOT_ANIM_JUMP
-    { robot_fall_start_frames, 7 },  // ROBOT_ANIM_FALL_START
-    { robot_fall_frames, 5 },  // ROBOT_ANIM_FALL
-    { robot_idle_frames, 1 },  // ROBOT_ANIM_IDLE
+const PlayerAnimation robotAnimations[ROBOT_ANIM_COUNT] = {
+    { robotRunFrames, 16 },  // ROBOT_ANIM_RUN
+    { robotJumpStartFrames, 5 },  // ROBOT_ANIM_JUMP_START
+    { robotJumpFrames, 5 },  // ROBOT_ANIM_JUMP
+    { robotFallStartFrames, 7 },  // ROBOT_ANIM_FALL_START
+    { robotFallFrames, 5 },  // ROBOT_ANIM_FALL
+    { robotIdleFrames, 1 },  // ROBOT_ANIM_IDLE
 };

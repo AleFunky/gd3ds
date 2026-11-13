@@ -5,22 +5,22 @@
 
 bool gotSogged = false;
 
-static void soggy_menu_init(UIScreen *s) {
+static void soggyMenuInit(UIScreen *s) {
     gotSogged = true;
-    cfg_save(); // You got sogged
+    cfgSave(); // You got sogged
 
-    stop_mp3();
-    playing_menu_loop = false;
-    play_mp3("romfs:/songs/SogLoop.mp3", true, 0);
+    stopMP3();
+    playingMenuLoop = false;
+    playMP3("romfs:/songs/SogLoop.mp3", true, 0);
 }
 
-extern const UIScreenDefPair soggy_def = {
+extern const UIScreenDefPair soggyDef = {
     .name = "soggy",
     .top = {
         .path = "romfs:/menus/creator_menu/soggy_top.txt"
     },
     .btm = {
         .path = "romfs:/menus/creator_menu/soggy.txt",
-        .init = soggy_menu_init
+        .init = soggyMenuInit
     },
 };

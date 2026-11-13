@@ -1,4 +1,4 @@
 #pragma once
 #include "menus/core/ui_stack.hpp"
 
-extern const UIScreenDefPair creator_menu_def;
+extern const UIScreenDefPair creatorMenuDef;

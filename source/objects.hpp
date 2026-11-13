@@ -38,12 +38,12 @@ typedef enum {
 typedef struct {
     int texture;
     float x, y;
-    float scale_x, scale_y;
-    int flip_x, flip_y;
+    float scaleX, scaleY;
+    int flipX, flipY;
     int z;
-    int z_layer_offset;
+    int zLayerOffset;
     float rot;
-    int color_type;
+    int colorType;
     float opacity;
 } ChildSprite;
 
@@ -54,7 +54,7 @@ typedef struct {
 
 typedef struct {
     int texture;
-    int flip_x, flip_y;
+    int flipX, flipY;
 } SwapFrame;
 
 typedef struct {
@@ -65,7 +65,7 @@ typedef struct {
 } SlotFrames;
 
 typedef struct {
-   int collision_type;
+   int collisionType;
    float x, y;
    float width, height;
    int type;
@@ -73,28 +73,28 @@ typedef struct {
 
 typedef struct {
     int texture;
-    int glow_frame;
+    int glowFrame;
     float x, y;
-    int z_layer;
-    int z_order;
-    int base_color;
-    int detail_color;
-    int color_type;
-    int swap_base_detail;
-    int animation_type;
+    int zLayer;
+    int zOrder;
+    int baseColor;
+    int detailColor;
+    int colorType;
+    int swapBaseDetail;
+    int animationType;
     float opacity;
-    size_t child_count;
+    size_t childCount;
     const ChildSprite* children;
-    size_t group_count;
+    size_t groupCount;
     const ChildGroup* groups;
-    size_t frame_count;
-    const SwapFrame*  swap_frames;
-    size_t slot_count;
-    const SlotFrames* slot_frames;
+    size_t frameCount;
+    const SwapFrame*  swapFrames;
+    size_t slotCount;
+    const SlotFrames* slotFrames;
     const ObjectHitbox* hitbox;
 } GameObject;
 
 #define TEXTURE_COUNT 2472
 #define GAME_OBJECT_COUNT 1912
 
-extern const GameObject game_objects[GAME_OBJECT_COUNT];
+extern const GameObject gameObjects[GAME_OBJECT_COUNT];

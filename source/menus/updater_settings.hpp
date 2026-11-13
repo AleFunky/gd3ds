@@ -3,4 +3,4 @@
 extern bool useNightlyBranch;
 extern bool doAutoUpdates;
 
-extern const UIScreenDefPair updater_settings_def;
+extern const UIScreenDefPair updaterSettingsDef;

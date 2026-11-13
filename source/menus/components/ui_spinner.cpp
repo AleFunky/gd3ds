@@ -7,18 +7,18 @@
 #include "ui_image.hpp"
 #include "math_helpers.hpp"
 
-static void ui_spinner_draw(UIElement* e, UITransform *transform) {
+static void uiSpinnerDraw(UIElement* e, UITransform *transform) {
     UIImage *image = (UIImage *) e;
     UISpinner *spinner = (UISpinner *) image;
     
-    C2D_SpriteRotate(&image->image.sprite, C3D_AngleFromDegrees(spinner->rotation_speed * DT)); // Cloud pls save us all and do screen rewrite //Why would that help this
+    C2D_SpriteRotate(&image->image.sprite, C3D_AngleFromDegrees(spinner->rotationSpeed * DT)); // Cloud pls save us all and do screen rewrite //Why would that help this
     
-    change_blending(spinner->blending);
-    ui_image_draw(e, transform);
-    change_blending(false);
+    changeBlending(spinner->blending);
+    uiImageDraw(e, transform);
+    changeBlending(false);
 }
 
-void ui_spinner_destroy(UIElement *e) {
+void uiSpinnerDestroy(UIElement *e) {
     if (e) {
         delete (UISpinner *)e;
         e = NULL;
@@ -26,7 +26,7 @@ void ui_spinner_destroy(UIElement *e) {
 }
 
 
-UISpinner *ui_create_spinner(UIScreen *s) {
+UISpinner *uiCreateSpinner(UIScreen *s) {
     UISpinner *e = new UISpinner{};
 
     if (!e) return NULL;
@@ -36,37 +36,37 @@ UISpinner *ui_create_spinner(UIScreen *s) {
     image->base.type = UI_IMAGE;
     image->base.enabled = true;
 
-    ui_element_apply_default_properties(&image->base, s);
+    uiElementApplyDefaultProperties(&image->base, s);
 
-    ui_image_clear_tint(image);
-    ui_image_set_image(image, 53, 1);
+    uiImageClearTint(image);
+    uiImageSetImage(image, 53, 1);
 
     e->blending = true;
 
-    image->base.draw = ui_spinner_draw;
-    image->base.destroy = ui_spinner_destroy;
+    image->base.draw = uiSpinnerDraw;
+    image->base.destroy = uiSpinnerDestroy;
 
     return e;
 }
 
-UIElement *ui_create_spinner_from_props(UIScreen *s, const UIPropertyList *props) {
-    UISpinner *spinner = ui_create_spinner(s);
+UIElement *uiCreateSpinnerFromProps(UIScreen *s, const UIPropertyList *props) {
+    UISpinner *spinner = uiCreateSpinner(s);
     
     if (!spinner) return NULL;
 
     UIImage *image = (UIImage *) spinner;
 
-    ui_element_apply_properties(&image->base, s, props);
+    uiElementApplyProperties(&image->base, s, props);
 
-    ui_image_set_image(image, 
-        ui_prop_int(props, "id", 53),
-        ui_prop_int(props, "sheet", 1)
+    uiImageSetImage(image, 
+        uiPropInt(props, "id", 53),
+        uiPropInt(props, "sheet", 1)
     );
     
-    ui_image_set_tint(image, ui_prop_color(props, "color", ABGR8(255, 255, 255, 200)));
+    uiImageSetTint(image, uiPropColor(props, "color", ABGR8(255, 255, 255, 200)));
 
-    spinner->rotation_speed = ui_prop_float(props, "speed", 360);
-    spinner->blending = ui_prop_bool(props, "blending", true);
+    spinner->rotationSpeed = uiPropFloat(props, "speed", 360);
+    spinner->blending = uiPropBool(props, "blending", true);
 
     return &image->base;
 }

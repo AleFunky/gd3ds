@@ -17,15 +17,15 @@ typedef struct SongEntries {
 } SongEntries;
 
 typedef struct {
-    int level_id;
+    int levelID;
     
-    const char *level_name;
-    const char *gmd_path;
-    const char *song_path;
+    const char *levelName;
+    const char *gmdPath;
+    const char *songPath;
 
     int difficulty;
     int stars;
-    SongEntries song_data;
+    SongEntries songData;
 } MainLevelDefinition;
 
 typedef struct {
@@ -33,7 +33,7 @@ typedef struct {
     size_t count;
 } MainLevelPack;
 
-extern const MainLevelPack *current_main_level_pack;
+extern const MainLevelPack *currentMainLevelPack;
 
-extern const MainLevelPack robtop_levels;
-extern const MainLevelPack gdps_levels;
+extern const MainLevelPack robtopLevels;
+extern const MainLevelPack gdpsLevels;

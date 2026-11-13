@@ -2,7 +2,7 @@
 #include "bigFont.hpp"
 #include "level_fonts.hpp"
 
-extern const Glyph gjFont01_fontGlyphs[67] = {
+extern const Glyph gjFont01FontGlyphs[67] = {
     {32, 58, 227, 0, 0, 0, 38, 12, -1},
     {33, 0, 191, 14, 36, 1, 2, 8, 0},
     {34, 147, 191, 25, 19, 1, 3, 19, 1},
@@ -72,13 +72,13 @@ extern const Glyph gjFont01_fontGlyphs[67] = {
     {8226, 78, 191, 25, 25, 1, 8, 19, 65},
 };
 
-extern const Charset gjFont01_fontCharset = {
-    gjFont01_fontGlyphs,
+extern const Charset gjFont01FontCharset = {
+    gjFont01FontGlyphs,
     67,
     1
 };
 
-extern const Glyph gjFont02_fontGlyphs[83] = {
+extern const Glyph gjFont02FontGlyphs[83] = {
     {32, 176, 230, 0, 0, 0, 27, 10, -1},
     {33, 225, 202, 17, 28, -2, -1, 7, 0},
     {37, 135, 0, 32, 30, -1, -2, 22, 1},
@@ -164,13 +164,13 @@ extern const Glyph gjFont02_fontGlyphs[83] = {
     {8226, 60, 230, 19, 19, -1, 5, 9, 81},
 };
 
-extern const Charset gjFont02_fontCharset = {
-    gjFont02_fontGlyphs,
+extern const Charset gjFont02FontCharset = {
+    gjFont02FontGlyphs,
     83,
     1
 };
 
-extern const Glyph gjFont03_fontGlyphs[88] = {
+extern const Glyph gjFont03FontGlyphs[88] = {
     {32, 38, 239, 0, 0, 0, 26, 8, -1},
     {33, 228, 188, 13, 28, 0, -2, 7, 0},
     {34, 165, 216, 19, 16, 0, -7, 12, 1},
@@ -261,13 +261,13 @@ extern const Glyph gjFont03_fontGlyphs[88] = {
     {8226, 13, 216, 20, 21, 0, 2, 13, 86},
 };
 
-extern const Charset gjFont03_fontCharset = {
-    gjFont03_fontGlyphs,
+extern const Charset gjFont03FontCharset = {
+    gjFont03FontGlyphs,
     88,
     1
 };
 
-extern const Glyph gjFont04_fontGlyphs[89] = {
+extern const Glyph gjFont04FontGlyphs[89] = {
     {32, 249, 219, 0, 0, 0, 21, 12, -1},
     {33, 63, 192, 18, 27, 5, -6, 24, 0},
     {34, 66, 219, 24, 18, -1, -9, 24, 1},
@@ -359,13 +359,13 @@ extern const Glyph gjFont04_fontGlyphs[89] = {
     {8226, 210, 219, 15, 15, 2, 3, 12, 87},
 };
 
-extern const Charset gjFont04_fontCharset = {
-    gjFont04_fontGlyphs,
+extern const Charset gjFont04FontCharset = {
+    gjFont04FontGlyphs,
     89,
     1
 };
 
-extern const Glyph gjFont05_fontGlyphs[95] = {
+extern const Glyph gjFont05FontGlyphs[95] = {
     {32, 85, 234, 0, 0, 0, 26, 6, -1},
     {33, 110, 66, 16, 31, 0, -4, 7, 0},
     {34, 176, 209, 18, 20, 0, -5, 9, 1},
@@ -463,13 +463,13 @@ extern const Glyph gjFont05_fontGlyphs[95] = {
     {8226, 194, 209, 19, 19, -1, 1, 9, 93},
 };
 
-extern const Charset gjFont05_fontCharset = {
-    gjFont05_fontGlyphs,
+extern const Charset gjFont05FontCharset = {
+    gjFont05FontGlyphs,
     95,
     1
 };
 
-extern const Glyph gjFont06_fontGlyphs[93] = {
+extern const Glyph gjFont06FontGlyphs[93] = {
     {32, 30, 235, 0, 0, 0, 26, 8, -1},
     {33, 19, 166, 19, 30, -1, -4, 10, 0},
     {34, 124, 217, 15, 13, 0, -4, 8, 1},
@@ -565,13 +565,13 @@ extern const Glyph gjFont06_fontGlyphs[93] = {
     {8226, 187, 217, 12, 12, 1, 11, 6, 91},
 };
 
-extern const Charset gjFont06_fontCharset = {
-    gjFont06_fontGlyphs,
+extern const Charset gjFont06FontCharset = {
+    gjFont06FontGlyphs,
     93,
     1
 };
 
-extern const Glyph gjFont07_fontGlyphs[93] = {
+extern const Glyph gjFont07FontGlyphs[93] = {
     {32, 150, 236, 0, 0, 0, 25, 8, -1},
     {33, 221, 154, 13, 29, 1, -4, 10, 0},
     {34, 191, 211, 19, 18, 0, -5, 14, 1},
@@ -667,13 +667,13 @@ extern const Glyph gjFont07_fontGlyphs[93] = {
     {8226, 28, 236, 16, 16, 0, 2, 11, 91},
 };
 
-extern const Charset gjFont07_fontCharset = {
-    gjFont07_fontGlyphs,
+extern const Charset gjFont07FontCharset = {
+    gjFont07FontGlyphs,
     93,
     1
 };
 
-extern const Glyph gjFont08_fontGlyphs[93] = {
+extern const Glyph gjFont08FontGlyphs[93] = {
     {32, 149, 223, 0, 0, 0, 22, 13, -1},
     {33, 147, 199, 12, 24, 0, -2, 6, 0},
     {34, 30, 223, 14, 13, 0, -2, 9, 1},
@@ -769,13 +769,13 @@ extern const Glyph gjFont08_fontGlyphs[93] = {
     {8226, 44, 223, 13, 13, 3, 3, 14, 91},
 };
 
-extern const Charset gjFont08_fontCharset = {
-    gjFont08_fontGlyphs,
+extern const Charset gjFont08FontCharset = {
+    gjFont08FontGlyphs,
     93,
     1
 };
 
-extern const Glyph gjFont09_fontGlyphs[87] = {
+extern const Glyph gjFont09FontGlyphs[87] = {
     {32, 244, 224, 0, 0, 0, 27, 9, -1},
     {33, 84, 165, 16, 32, 0, -5, 9, 0},
     {34, 56, 224, 25, 18, 0, -5, 19, 1},
@@ -865,13 +865,13 @@ extern const Glyph gjFont09_fontGlyphs[87] = {
     {8226, 173, 224, 14, 14, 2, 10, 12, 85},
 };
 
-extern const Charset gjFont09_fontCharset = {
-    gjFont09_fontGlyphs,
+extern const Charset gjFont09FontCharset = {
+    gjFont09FontGlyphs,
     87,
     1
 };
 
-extern const Glyph gjFont10_fontGlyphs[69] = {
+extern const Glyph gjFont10FontGlyphs[69] = {
     {32, 94, 235, 0, 0, 0, 27, 16, -1},
     {33, 1, 41, 16, 33, -1, -6, 10, 0},
     {34, 234, 206, 15, 14, -1, -5, 8, 1},
@@ -943,13 +943,13 @@ extern const Glyph gjFont10_fontGlyphs[69] = {
     {8226, 183, 206, 16, 16, 3, 7, 16, 67},
 };
 
-extern const Charset gjFont10_fontCharset = {
-    gjFont10_fontGlyphs,
+extern const Charset gjFont10FontCharset = {
+    gjFont10FontGlyphs,
     69,
     1
 };
 
-extern const Glyph gjFont11_fontGlyphs[80] = {
+extern const Glyph gjFont11FontGlyphs[80] = {
     {32, 185, 195, 0, 0, 0, 21, 16, -1},
     {33, 1, 93, 15, 27, -2, -6, 7, 0},
     {34, 21, 195, 20, 14, -2, -4, 13, 1},
@@ -1032,13 +1032,13 @@ extern const Glyph gjFont11_fontGlyphs[80] = {
     {8226, 151, 195, 13, 12, -1, 1, 6, 78},
 };
 
-extern const Charset gjFont11_fontCharset = {
-    gjFont11_fontGlyphs,
+extern const Charset gjFont11FontCharset = {
+    gjFont11FontGlyphs,
     80,
     1
 };
 
-extern const Glyph gjFont12_fontGlyphs[96] = {
+extern const Glyph gjFont12FontGlyphs[96] = {
     {32, 44, 241, 0, 0, 1, 35, 10, -1},
     {33, 196, 70, 17, 31, 2, 4, 11, 0},
     {34, 182, 216, 16, 15, 1, 4, 9, 1},
@@ -1137,24 +1137,24 @@ extern const Glyph gjFont12_fontGlyphs[96] = {
     {8226, 198, 216, 14, 15, 1, 13, 9, 94},
 };
 
-extern const Charset gjFont12_fontCharset = {
-    gjFont12_fontGlyphs,
+extern const Charset gjFont12FontCharset = {
+    gjFont12FontGlyphs,
     96,
     1
 };
 
-const Charset *level_font_charsets[LEVEL_FONT_COUNT] = {
-    &bigFont_fontCharset,
-    &gjFont01_fontCharset,
-    &gjFont02_fontCharset,
-    &gjFont03_fontCharset,
-    &gjFont04_fontCharset,
-    &gjFont05_fontCharset,
-    &gjFont06_fontCharset,
-    &gjFont07_fontCharset,
-    &gjFont08_fontCharset,
-    &gjFont09_fontCharset,
-    &gjFont10_fontCharset,
-    &gjFont11_fontCharset,
-    &gjFont12_fontCharset,
+const Charset *levelFontCharsets[LEVEL_FONT_COUNT] = {
+    &bigFontFontCharset,
+    &gjFont01FontCharset,
+    &gjFont02FontCharset,
+    &gjFont03FontCharset,
+    &gjFont04FontCharset,
+    &gjFont05FontCharset,
+    &gjFont06FontCharset,
+    &gjFont07FontCharset,
+    &gjFont08FontCharset,
+    &gjFont09FontCharset,
+    &gjFont10FontCharset,
+    &gjFont11FontCharset,
+    &gjFont12FontCharset,
 };

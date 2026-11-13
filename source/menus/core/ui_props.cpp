@@ -5,26 +5,26 @@
 #include "utils/string_helpers.hpp"
 #include "ui_actions.hpp"
 
-static char **split_string_nobrackets(const char *str, char delimiter, size_t *outCount) {
+static char **splitStringNobrackets(const char *str, char delimiter, size_t *outCount) {
     char **result = NULL;
     int count = 0;
     const char *start = str;
     const char *ptr = str;
 
-    int inside_brackets = 0;
+    int insideBrackets = 0;
 
     while (*ptr) {
         if (*ptr == '[') {
-            inside_brackets++;
+            insideBrackets++;
         } else if(*ptr == ']'){
-            inside_brackets--;
+            insideBrackets--;
         }
 
-        if(inside_brackets < 0){
-            inside_brackets = 0;
+        if(insideBrackets < 0){
+            insideBrackets = 0;
         }
 
-        if(!inside_brackets){
+        if(!insideBrackets){
             if (*ptr == delimiter) {
                 int len = ptr - start;
                 if (len >= 0) {
@@ -55,7 +55,7 @@ static char **split_string_nobrackets(const char *str, char delimiter, size_t *o
     return result;
 }
 
-UIPropertyList ui_create_proplist(size_t capacity, bool duplicate) {
+UIPropertyList uiCreateProplist(size_t capacity, bool duplicate) {
     UIPropertyList props;
     props.properties = (UIProperty *)malloc(sizeof(UIProperty) * capacity);
     props.count = 0;
@@ -63,7 +63,7 @@ UIPropertyList ui_create_proplist(size_t capacity, bool duplicate) {
     return props;
 }
 
-void ui_proplist_add(UIPropertyList *props, char* key, char* value){
+void uiProplistAdd(UIPropertyList *props, char* key, char* value){
     if(props->duplicate){
         key = strdup(key);
         value = strdup(value);
@@ -75,7 +75,7 @@ void ui_proplist_add(UIPropertyList *props, char* key, char* value){
     };
 }
 
-void ui_destroy_proplist(UIPropertyList *props) {
+void uiDestroyProplist(UIPropertyList *props) {
     //if the UIPropertyList's properties are duplicated, they must be freed explicitly
     if(props->duplicate){
         for(size_t i = 0; i < props->count; i++) {
@@ -90,34 +90,34 @@ void ui_destroy_proplist(UIPropertyList *props) {
     props->count = 0;
 }
 
-const char *ui_prop_string(const UIPropertyList *props, const char *key, const char *default_value) {
-    if(!props) return default_value ? default_value : "null";
+const char *uiPropString(const UIPropertyList *props, const char *key, const char *defaultValue) {
+    if(!props) return defaultValue ? defaultValue : "null";
 
     for (size_t i = 0; i < props->count; i++) {
         if (strcmp(props->properties[i].key, key) == 0)
             return props->properties[i].value;
     }
 
-    return default_value;
+    return defaultValue;
 }
 
-int ui_prop_int(const UIPropertyList *props, const char *key, int default_value) {
-    const char *prop = ui_prop_string(props, key, NULL);
-    return prop ? atoi(prop) : default_value;
+int uiPropInt(const UIPropertyList *props, const char *key, int defaultValue) {
+    const char *prop = uiPropString(props, key, NULL);
+    return prop ? atoi(prop) : defaultValue;
 }
 
-float ui_prop_float(const UIPropertyList *props, const char *key, float default_value) {
-    const char *prop = ui_prop_string(props, key, NULL);
-    return prop ? atoff(prop) : default_value;
+float uiPropFloat(const UIPropertyList *props, const char *key, float defaultValue) {
+    const char *prop = uiPropString(props, key, NULL);
+    return prop ? atoff(prop) : defaultValue;
 }
 
-bool ui_prop_bool(const UIPropertyList *props, const char *key, bool default_value) {
-    const char *prop = ui_prop_string(props, key, NULL);
-    return prop ? parse_bool(prop) : default_value;
+bool uiPropBool(const UIPropertyList *props, const char *key, bool defaultValue) {
+    const char *prop = uiPropString(props, key, NULL);
+    return prop ? parseBool(prop) : defaultValue;
 }
 
-u32 ui_prop_bitfield(const UIPropertyList *props, const char *key, const UIBitfieldEntry *table, size_t count) {
-    const char *prop = ui_prop_string(props, key, NULL);
+u32 uiPropBitfield(const UIPropertyList *props, const char *key, const UIBitfieldEntry *table, size_t count) {
+    const char *prop = uiPropString(props, key, NULL);
     if (!prop) return 0;
 
     char buffer[128];
@@ -142,85 +142,85 @@ u32 ui_prop_bitfield(const UIPropertyList *props, const char *key, const UIBitfi
     return result;
 }
 
-int ui_prop_int_enum(const UIPropertyList *props, const char *key, const UIIntEnumEntry *table, size_t count, int default_value) {
-    const char *value = ui_prop_string(props, key, NULL);
-    if (!value) return default_value;
+int uiPropIntEnum(const UIPropertyList *props, const char *key, const UIIntEnumEntry *table, size_t count, int defaultValue) {
+    const char *value = uiPropString(props, key, NULL);
+    if (!value) return defaultValue;
 
     for (size_t i = 0; i < count; i++) {
         if (strcmp(value, table[i].name) == 0)
             return table[i].value;
     }
 
-    return default_value;
+    return defaultValue;
 }
 
-float ui_prop_float_enum(const UIPropertyList *props, const char *key, const UIFloatEnumEntry *table, size_t count, float default_value) {
-    const char *value = ui_prop_string(props, key, NULL);
-    if (!value) return default_value;
+float uiPropFloatEnum(const UIPropertyList *props, const char *key, const UIFloatEnumEntry *table, size_t count, float defaultValue) {
+    const char *value = uiPropString(props, key, NULL);
+    if (!value) return defaultValue;
 
     for (size_t i = 0; i < count; i++) {
         if (strcmp(value, table[i].name) == 0)
             return table[i].value;
     }
 
-    return default_value;
+    return defaultValue;
 }
 
-u32 ui_prop_color(const UIPropertyList *props, const char *key, u32 default_value) {
-    const char *value = ui_prop_string(props, key, NULL);
-    if (!value) return default_value;
+u32 uiPropColor(const UIPropertyList *props, const char *key, u32 defaultValue) {
+    const char *value = uiPropString(props, key, NULL);
+    if (!value) return defaultValue;
 
     u32 color;
 
-    bool parsed = parse_hex_color(value, &color);
+    bool parsed = parseHexColor(value, &color);
 
-    return parsed ? color : default_value;
+    return parsed ? color : defaultValue;
 }
 
-UIPropertyList ui_parse_prop_list(char *value){
+UIPropertyList uiParsePropList(char *value){
     char *copy = strdup(value);
 
     char* cursor = copy;
     char* token = NULL;
     size_t count = 0;
 
-    while ((token = next_token(&cursor)) != NULL)
+    while ((token = nextToken(&cursor)) != NULL)
         count++;
 
     free(copy);
 
-    UIPropertyList property_list = ui_create_proplist(count, true);
+    UIPropertyList propertyList = uiCreateProplist(count, true);
 
     cursor = value;
-    collect_properties(&property_list, token, &cursor);
+    collectProperties(&propertyList, token, &cursor);
 
-    return property_list;
+    return propertyList;
 }
 
-UIPropertyList ui_prop_list(const UIPropertyList *props, const char *key){
-    char *value = (char *) ui_prop_string(props, key, NULL);
+UIPropertyList uiPropList(const UIPropertyList *props, const char *key){
+    char *value = (char *) uiPropString(props, key, NULL);
 
     if(!value) return (UIPropertyList){ 0 };
 
-    return ui_parse_prop_list(value);
+    return uiParsePropList(value);
 }
 
-UIAction *parse_actions(const char *value, const UIActionDef *action_defs, const size_t actions_count, size_t *out_entry_count) {
-    char **entries = split_string_nobrackets(value, ',', out_entry_count);
+UIAction *parseActions(const char *value, const UIActionDef *actionDefs, const size_t actionsCount, size_t *outEntryCount) {
+    char **entries = splitStringNobrackets(value, ',', outEntryCount);
 
-    if(!entries || *out_entry_count == 0){
+    if(!entries || *outEntryCount == 0){
         return NULL;
     }
 
-    UIAction *actions = (UIAction *)calloc(*out_entry_count, sizeof(UIAction));
+    UIAction *actions = (UIAction *)calloc(*outEntryCount, sizeof(UIAction));
 
     if(!actions){
-        free_string_array(entries, *out_entry_count);
-        *out_entry_count = 0;
+        freeStringArray(entries, *outEntryCount);
+        *outEntryCount = 0;
         return NULL;
     }
 
-    for(size_t i = 0; i < *out_entry_count; i++){
+    for(size_t i = 0; i < *outEntryCount; i++){
         char *entry = entries[i];
 
         if(!entry || !*entry) continue;
@@ -230,18 +230,18 @@ UIAction *parse_actions(const char *value, const UIActionDef *action_defs, const
         char *bracket = strchr(entry, '[');
         char *props_start = NULL;
         char *props_end = NULL;
-        int in_brackets = 0;
+        int inBrackets = 0;
 
         while(bracket && *bracket){
             if(*bracket == '['){
-                if(!in_brackets){
+                if(!inBrackets){
                     props_start = bracket;
                 }
-                in_brackets++;
+                inBrackets++;
             }
             if(*bracket == ']'){
-                in_brackets--;
-                if(!in_brackets){
+                inBrackets--;
+                if(!inBrackets){
                     props_end = bracket;
                 }
             }
@@ -252,28 +252,28 @@ UIAction *parse_actions(const char *value, const UIActionDef *action_defs, const
         if (props_start && props_end) {
             *props_start = '\0';
             *props_end = '\0';
-            actions[i].args = ui_parse_prop_list(++props_start);
+            actions[i].args = uiParsePropList(++props_start);
         }
 
-        actions[i].action = ui_find_action(base_actions, BASE_ACTION_COUNT, entry);
+        actions[i].action = uiFindAction(baseActions, BASE_ACTION_COUNT, entry);
 
         //if not found in base actions, search in provided actions
         if(!actions[i].action){
-            actions[i].action = ui_find_action(action_defs, actions_count, entry);
+            actions[i].action = uiFindAction(actionDefs, actionsCount, entry);
         }
     }
 
-    free_string_array(entries, *out_entry_count);
+    freeStringArray(entries, *outEntryCount);
 
     return actions;
 }
 
-UIAction *ui_prop_actions(const UIPropertyList *props, const UIActionDef *action_defs, const size_t actions_count, const char *key, size_t *out_entry_count) {
-    char *value = (char *) ui_prop_string(props, key, NULL);
+UIAction *uiPropActions(const UIPropertyList *props, const UIActionDef *actionDefs, const size_t actionsCount, const char *key, size_t *outEntryCount) {
+    char *value = (char *) uiPropString(props, key, NULL);
 
     if(!value) return NULL;
 
-    UIAction *actions = parse_actions(value, action_defs, actions_count, out_entry_count);
+    UIAction *actions = parseActions(value, actionDefs, actionsCount, outEntryCount);
 
     if(!actions) return NULL;
     

@@ -29,12 +29,12 @@ bool contains(const char *first, const char *second) {
     return false;
 }
 
-bool parse_bool(const char *str) {
+bool parseBool(const char *str) {
     return (str[0] == '1' && str[1] == '\0');
 }
 
 // Returns number but only using 3 significant digits, make sure to free this
-char *truncate_number(int number) {
+char *truncateNumber(int number) {
     char *buffer = (char *)malloc(20);
 
     if (!buffer) return NULL;
@@ -57,7 +57,7 @@ char *truncate_number(int number) {
     return buffer;
 }
 
-char *truncate_speed(size_t bytes) {
+char *truncateSpeed(size_t bytes) {
     char *buffer = (char *)malloc(20);
 
     if (!buffer) return NULL;
@@ -75,7 +75,7 @@ char *truncate_speed(size_t bytes) {
     return buffer;
 }
 
-void strip_character(char* s, char character) {
+void stripCharacter(char* s, char character) {
     size_t length = strlen(s);
 
     if (length < 2)
@@ -88,7 +88,7 @@ void strip_character(char* s, char character) {
 }
 
 // This strips any bracket or quote characters enclosing the value
-void strip_enclosures(char* s) {
+void stripEnclosures(char* s) {
     size_t length = strlen(s);
 
     if (length < 2)
@@ -102,7 +102,7 @@ void strip_enclosures(char* s) {
     }
 }
 
-void url_convert_to_http(char *str) {
+void urlConvertToHTTP(char *str) {
     size_t length = strlen(str);
 
     if (strncmp(str, "https", 5) == 0) {
@@ -111,7 +111,7 @@ void url_convert_to_http(char *str) {
 }
 
 // Taken from: https://github.com/abejfehr/URLDecode/blob/master/urldecode.c
-char *url_decode(const char *str) {
+char *urlDecode(const char *str) {
     int d = 0; /* whether or not the string is decoded */
 
     char *dStr = (char *)malloc(strlen(str) + 1);
@@ -153,7 +153,7 @@ char *url_decode(const char *str) {
 }
 
 // Taken from: https://stackoverflow.com/a/8733511
-void remove_char(char *str, char character) {
+void removeChar(char *str, char character) {
     char *src, *dst;
     for (src = dst = str; *src != '\0'; src++) {
         *dst = *src;
@@ -163,7 +163,7 @@ void remove_char(char *str, char character) {
 }
 
 // Taken from: https://stackoverflow.com/a/5309508
-const char *get_filename_ext(const char *filename) {
+const char *getFilenameExt(const char *filename) {
     const char *dot = strrchr(filename, '.');
     if(!dot || dot == filename) return "";
     return dot + 1;

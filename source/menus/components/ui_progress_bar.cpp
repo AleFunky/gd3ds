@@ -5,21 +5,21 @@
 #include "math_helpers.hpp"
 #include "utils/gfx.hpp"
 
-static void draw_frame(UIProgressBar *e, UITransform *transform) {
+static void drawFrame(UIProgressBar *e, UITransform *transform) {
     C2D_SpriteSetCenter(&e->frame.sprite, 0.5f, 0.5f);
     C2D_SpriteSetPos(&e->frame.sprite, transform->x, transform->y);
     C2D_SpriteSetScale(&e->frame.sprite, transform->scaleX, transform->scaleY);
     C2D_DrawSpriteTinted(&e->frame.sprite, &e->frame.tint);
 }
 
-static void draw_bar(UIProgressBar *e, UITransform *transform) {
-    float bar_width = e->bar.sprite.image.subtex->width;
+static void drawBar(UIProgressBar *e, UITransform *transform) {
+    float barWidth = e->bar.sprite.image.subtex->width;
     
-    int pixels = (e->value / e->max_value) * bar_width;
+    int pixels = (e->value / e->maxValue) * barWidth;
 
     if (pixels > 0) {
-        if (pixels > bar_width) {
-            pixels = bar_width;
+        if (pixels > barWidth) {
+            pixels = barWidth;
         }
 
         C2D_Sprite spr;
@@ -29,21 +29,21 @@ static void draw_bar(UIProgressBar *e, UITransform *transform) {
         float sx = transform->scaleX;
         float sy = transform->scaleY;
 
-        float width_scaled = e->base.w * sx;
-        float height_scaled = e->base.h * sy;
+        float widthScaled = e->base.w * sx;
+        float heightScaled = e->base.h * sy;
 
         if (e->style == 0) {
             // Add 1 pixel of margin
-            sx *= ((float)(width_scaled - 2) / (float)width_scaled);
-            sy *= ((float)(height_scaled - 2) / (float)height_scaled);
+            sx *= ((float)(widthScaled - 2) / (float)widthScaled);
+            sy *= ((float)(heightScaled - 2) / (float)heightScaled);
         }
         
-        float x = transform->x - (width_scaled / 2);
+        float x = transform->x - (widthScaled / 2);
         if (e->style == 0) {
             x += 2.f * transform->scaleX;
         }
 
-        sub = select_box(&e->bar.sprite.image, 0, 0, pixels, e->bar.sprite.image.subtex->height);
+        sub = selectBox(&e->bar.sprite.image, 0, 0, pixels, e->bar.sprite.image.subtex->height);
         img = e->bar.sprite.image; img.subtex = &sub;
         C2D_SpriteFromImage(&spr, img);
         C2D_SpriteSetCenter(&spr, 0.f, 0.5f);
@@ -53,40 +53,40 @@ static void draw_bar(UIProgressBar *e, UITransform *transform) {
     }
 }
 
-static void ui_progress_bar_draw(UIElement* e, UITransform *transform) {
-    UIProgressBar *progress_bar = (UIProgressBar *) e;
-    if (progress_bar->flip_order) {
-        draw_bar(progress_bar, transform);
-        draw_frame(progress_bar, transform);
+static void uiProgressBarDraw(UIElement* e, UITransform *transform) {
+    UIProgressBar *progressBar = (UIProgressBar *) e;
+    if (progressBar->flipOrder) {
+        drawBar(progressBar, transform);
+        drawFrame(progressBar, transform);
     } else {
-        draw_frame(progress_bar, transform);
-        draw_bar(progress_bar, transform);
+        drawFrame(progressBar, transform);
+        drawBar(progressBar, transform);
     }
 }
 
-static void ui_progress_bar_destroy(UIElement *e) {
+static void uiProgressBarDestroy(UIElement *e) {
     if (e) {
         delete (UIProgressBar *)e;
         e = NULL;
     }
 }
 
-void ui_progress_bar_set_tint(UIProgressBar* e, u32 color) {
+void uiProgressBarSetTint(UIProgressBar* e, u32 color) {
     if (!e) return;
 
     C2D_PlainImageTint(&e->bar.tint, color, 1.0f);
 }
 
-void ui_progress_bar_clear_tint(UIProgressBar* e) {
+void uiProgressBarClearTint(UIProgressBar* e) {
     if (!e) return;
 
     C2D_PlainImageTint(&e->bar.tint, 0xffffffff, 1.0f);
 }
 
-void ui_progress_bar_set_images(UIProgressBar *e, int style) {
+void uiProgressBarSetImages(UIProgressBar *e, int style) {
     switch (style) {
         case 0:
-            C2D_SpriteFromSheet(&e->bar.sprite, bar_sheet, 0);
+            C2D_SpriteFromSheet(&e->bar.sprite, barSheet, 0);
             C3D_TexSetFilter(e->bar.sprite.image.tex, GPU_LINEAR, GPU_LINEAR);
             
             C2D_PlainImageTint(&e->frame.tint, C2D_Color32(0, 0, 0, 127), 1.0f);
@@ -96,13 +96,13 @@ void ui_progress_bar_set_images(UIProgressBar *e, int style) {
             e->base.w = e->bar.sprite.image.subtex->width;
             e->base.h = e->bar.sprite.image.subtex->height;
 
-            e->flip_order = false;
+            e->flipOrder = false;
             break;
         case 1:
-            C2D_SpriteFromSheet(&e->bar.sprite, bar_sheet, 3);
+            C2D_SpriteFromSheet(&e->bar.sprite, barSheet, 3);
             C3D_TexSetFilter(e->bar.sprite.image.tex, GPU_LINEAR, GPU_LINEAR);
 
-            C2D_SpriteFromSheet(&e->frame.sprite, bar_sheet, 2);
+            C2D_SpriteFromSheet(&e->frame.sprite, barSheet, 2);
             C3D_TexSetFilter(e->frame.sprite.image.tex, GPU_LINEAR, GPU_LINEAR);
             
             C2D_PlainImageTint(&e->frame.tint, C2D_Color32(255, 255, 255, 255), 1.0f);
@@ -110,13 +110,13 @@ void ui_progress_bar_set_images(UIProgressBar *e, int style) {
             e->base.w = e->bar.sprite.image.subtex->width;
             e->base.h = e->bar.sprite.image.subtex->height;
 
-            e->flip_order = true;
+            e->flipOrder = true;
             break;
         case 2:
-            C2D_SpriteFromSheet(&e->bar.sprite, bar_sheet, 3);
+            C2D_SpriteFromSheet(&e->bar.sprite, barSheet, 3);
             C3D_TexSetFilter(e->bar.sprite.image.tex, GPU_LINEAR, GPU_LINEAR);
 
-            C2D_SpriteFromSheet(&e->frame.sprite, bar_sheet, 1);
+            C2D_SpriteFromSheet(&e->frame.sprite, barSheet, 1);
             C3D_TexSetFilter(e->frame.sprite.image.tex, GPU_LINEAR, GPU_LINEAR);
             
             C2D_PlainImageTint(&e->frame.tint, C2D_Color32(255, 255, 255, 255), 1.0f);
@@ -124,12 +124,12 @@ void ui_progress_bar_set_images(UIProgressBar *e, int style) {
             e->base.w = e->bar.sprite.image.subtex->width;
             e->base.h = e->bar.sprite.image.subtex->height;
 
-            e->flip_order = true;
+            e->flipOrder = true;
             break;
     }
 }
 
-UIProgressBar *ui_create_progress_bar(UIScreen *screen) {
+UIProgressBar *uiCreateProgressBar(UIScreen *screen) {
     UIProgressBar *e = new UIProgressBar{};
 
     if (!e) return NULL;
@@ -138,36 +138,36 @@ UIProgressBar *ui_create_progress_bar(UIScreen *screen) {
     e->base.enabled = true;
     e->useTint = false;
 
-    ui_element_apply_default_properties(&e->base, screen);
+    uiElementApplyDefaultProperties(&e->base, screen);
 
     e->value = 0;
-    e->max_value = 100;
+    e->maxValue = 100;
 
-    e->base.draw = ui_progress_bar_draw;
-    e->base.destroy = ui_progress_bar_destroy;
+    e->base.draw = uiProgressBarDraw;
+    e->base.destroy = uiProgressBarDestroy;
 
     return e;
 }
 
-UIElement *ui_create_progress_bar_from_props(UIScreen *screen, const UIPropertyList *props) {
-    UIProgressBar *progress_bar = ui_create_progress_bar(screen);
+UIElement *uiCreateProgressBarFromProps(UIScreen *screen, const UIPropertyList *props) {
+    UIProgressBar *progressBar = uiCreateProgressBar(screen);
 
-    if (!progress_bar) return NULL;
+    if (!progressBar) return NULL;
 
-    ui_element_apply_properties(&progress_bar->base, screen, props);
+    uiElementApplyProperties(&progressBar->base, screen, props);
     
-    progress_bar->style = ui_prop_int(props, "style", 0);
+    progressBar->style = uiPropInt(props, "style", 0);
 
-    progress_bar->max_value = ui_prop_float(props, "max_value", 100);
+    progressBar->maxValue = uiPropFloat(props, "max_value", 100);
 
     // Please no divisions by zero, thanks
-    if (progress_bar->max_value == 0) {
-        progress_bar->max_value = 100;
+    if (progressBar->maxValue == 0) {
+        progressBar->maxValue = 100;
     }
 
-    ui_progress_bar_set_images(progress_bar, progress_bar->style);
+    uiProgressBarSetImages(progressBar, progressBar->style);
 
-    ui_progress_bar_set_tint(progress_bar, ui_prop_color(props, "barColor", ABGR8(255, 255, 255, 255)));
+    uiProgressBarSetTint(progressBar, uiPropColor(props, "barColor", ABGR8(255, 255, 255, 255)));
     
-    return &progress_bar->base;
+    return &progressBar->base;
 }
