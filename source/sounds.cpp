@@ -1,6 +1,9 @@
 #include "sounds.hpp"
 #include "string.h"
 
+namespace gd3ds
+{
+
 SFX playSound;
 SFX quitSound;
 SFX explodeSound;
@@ -33,4 +36,6 @@ SFX *getSound(const char *name){
         }
     }
     return &honk;
+}
+
 }

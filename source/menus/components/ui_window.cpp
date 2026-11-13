@@ -9,6 +9,9 @@
 #include "menus/core/ui_screen.hpp"
 #include "math_helpers.hpp"
 
+namespace gd3ds
+{
+
 void uiWindowSetTint(UIWindow* e, u32 color) {
     if (!e) return;
 
@@ -68,4 +71,6 @@ UIElement *uiCreateWindowFromProps(UIScreen *screen, const UIPropertyList *props
     uiWindowSetTint(window, uiPropColor(props, "color", ABGR8(255, 255, 255, 255)));
 
     return &window->base;
+}
+
 }

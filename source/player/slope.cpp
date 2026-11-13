@@ -15,6 +15,9 @@
 #include "math_helpers.hpp"
 #include "main.hpp"
 
+namespace gd3ds
+{
+
 const float falls[SPEED_COUNT] = {
     226.044054,
     280.422108,
@@ -738,4 +741,6 @@ bool slopeTouching(int obj, Player *player) {
         default:
             return false;
     }
+}
+
 }

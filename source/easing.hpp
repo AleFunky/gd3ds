@@ -1,5 +1,8 @@
 #pragma once
 
+namespace gd3ds
+{
+
 typedef enum {
     EASE_LINEAR,
 
@@ -106,3 +109,5 @@ float bounceEaseInOut(float time);
 float quadraticIn(float time);
 float quadraticOut(float time);
 float quadraticInOut(float time);
+
+}

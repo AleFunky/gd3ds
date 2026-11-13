@@ -48,6 +48,9 @@
 #define USER_COIN_ROW_Y_RATED   131.f
 #define USER_COIN_ROW_Y_UNRATED 123.f
 
+namespace gd3ds
+{
+
 const int demonFaces1[] = {
     NA_FACE,
     EASY_DEMON_FACE_1,
@@ -863,3 +866,5 @@ extern const UIScreenDefPair onlineLevelMenuDef = {
         }
     }
 };
+
+}

@@ -36,6 +36,9 @@
 #include "menus/updater_settings.hpp"
 #include "menus/updater_pop_up.hpp"
 
+namespace gd3ds
+{
+
 const UIScreenDefPair *defs[] = {
     &mainMenuDef,
     &iconKitDef,
@@ -84,4 +87,6 @@ extern const UIScreenDefPair *uiGetScreenDef(const char* name){
         }
     }
     return &soggyDef;
+}
+
 }

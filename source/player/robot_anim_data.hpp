@@ -6,6 +6,9 @@
 #define ROBOT_BLEND_DURATION 0.05f
 #define SPIDER_BLEND_DURATION 0.05f
 
+namespace gd3ds
+{
+
 typedef enum {
     ROBOT_PART1_COLOR = 0,
     ROBOT_PART1_GLOW  = 1,
@@ -28,3 +31,5 @@ typedef enum {
 } RobotAnimId;
 
 extern const PlayerAnimation robotAnimations[ROBOT_ANIM_COUNT];
+
+}

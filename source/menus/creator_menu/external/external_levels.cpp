@@ -38,6 +38,9 @@
 #include "utils/network.hpp"
 #include "utils/utils.hpp"
 
+namespace gd3ds
+{
+
 static bool reloadPending;
 static char reloadPath[320];
 
@@ -278,3 +281,5 @@ extern const UIScreenDefPair externalDef = {
         }
     }
 };
+
+}

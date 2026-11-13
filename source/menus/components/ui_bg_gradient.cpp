@@ -8,6 +8,9 @@
 #include "math_helpers.hpp"
 #include "menus/creator_menu/search_menu.hpp"
 
+namespace gd3ds
+{
+
 static void uiBgGradientDraw(UIElement* e, UITransform *transform) {
     UIImage *image = (UIImage *) e;
 
@@ -67,4 +70,6 @@ UIElement *uiCreateBgGradientFromProps(UIScreen *screen, const UIPropertyList *p
     uiImageSetTint(bgGradient, uiPropColor(props, "color", ABGR8(255, 255, 255, 255)));
 
     return &bgGradient->base;
+}
+
 }

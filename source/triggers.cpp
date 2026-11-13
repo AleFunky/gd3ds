@@ -23,6 +23,9 @@
 
 #define LAUNCH_CAP 1080.f
 
+namespace gd3ds
+{
+
 Color p1Color;
 Color p2Color;
 Color glowColor;
@@ -2193,4 +2196,6 @@ void calculateLbg() {
     channels[chanLbg].color.g = g;
     channels[chanLbg].color.b = b;
     channels[chanLbg].blending = true;
+}
+
 }

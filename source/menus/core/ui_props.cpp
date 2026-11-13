@@ -5,6 +5,9 @@
 #include "utils/string_helpers.hpp"
 #include "ui_actions.hpp"
 
+namespace gd3ds
+{
+
 static char **splitStringNobrackets(const char *str, char delimiter, size_t *outCount) {
     char **result = NULL;
     int count = 0;
@@ -278,4 +281,6 @@ UIAction *uiPropActions(const UIPropertyList *props, const UIActionDef *actionDe
     if(!actions) return NULL;
     
     return actions;
+}
+
 }

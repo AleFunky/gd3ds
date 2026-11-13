@@ -40,6 +40,9 @@
 #include "particles/rays.hpp"
 #include "practice.hpp"
 
+namespace gd3ds
+{
+
 extern const Color white = { 255, 255, 255 };
 
 #define COLLECTABLE_FLOAT_AMP 1.5f
@@ -2905,4 +2908,6 @@ void handleMirrorTransition() {
             state.mirrorMult = 1;
         }
     }
+}
+
 }

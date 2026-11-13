@@ -11,6 +11,9 @@
 #include "main.hpp"
 #include "ui_slider.hpp"
 
+namespace gd3ds
+{
+
 static void uiColorButtonUpdate(UIElement* e, UIInput* touch, UITransform *transform) {
     uiButtonUpdate(e, touch, transform);
 }
@@ -100,4 +103,6 @@ UIElement *uiCreateColorButtonFromProps(UIScreen *screen, const UIPropertyList *
         uiPropInt(props, "color_index", 0));
 
     return &button->base;
+}
+
 }

@@ -5,6 +5,9 @@
 #include "menus/settings_hub/settings.hpp"
 #include <array>
 
+namespace gd3ds
+{
+
 C2D_SpriteSheet gravLineSheet;
 
 GravitySweep::GravitySweep(bool down){
@@ -97,4 +100,6 @@ void drawGravitySweeps(){
 
     C2D_ViewScale(SCALE, SCALE);
     C2D_ViewTranslate(0, CAM_Y_MTX_OFFSET);
+}
+
 }

@@ -6,6 +6,9 @@
 #include "menus/components/ui_checkbox.hpp"
 #include "save/saving.hpp"
 
+namespace gd3ds
+{
+
 static void actionToggleLdm(UIElement *e, const UIPropertyList *args) {
     if (!currentLevelEntry) return;
 
@@ -33,3 +36,5 @@ extern const UIScreenDefPair onlineLevelOptionsDef = {
         }
     }
 };
+
+}

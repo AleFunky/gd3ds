@@ -5,6 +5,9 @@
 #include "menus/core/ui_screen.hpp"
 #include "search_filters.hpp"
 
+namespace gd3ds
+{
+
 void actionClearSearchFilters(UIElement* e, const UIPropertyList *args) {
     resetSearchFilters();
 }
@@ -23,3 +26,5 @@ extern const UIScreenDefPair clearFiltersDef = {
         }
     }
 };
+
+}

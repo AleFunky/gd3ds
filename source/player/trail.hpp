@@ -1,7 +1,6 @@
 // Adapted from OpenGD
 
-#ifndef MOTION_TRAIL_H
-#define MOTION_TRAIL_H
+#pragma once
 
 #include <citro2d.h>
 #include "objects.hpp"
@@ -13,6 +12,9 @@
 #define MAX_TRAIL_POINTS 128
 #define TRAIL_CLEAR_DISTANCE 30.f
 #define STATIONARY_TRAIL_CHUNK_SIZE 64.f
+
+namespace gd3ds
+{
 
 typedef struct {
     float u, v;
@@ -86,4 +88,4 @@ void motionTrailCopyTrail(MotionTrail *dst, MotionTrail *src);
 
 void motionTrailAddWavePoint(MotionTrail* trail);
 
-#endif
+}

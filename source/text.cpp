@@ -12,6 +12,9 @@
 
 #include "menus/core/ui_screen.hpp"
 
+namespace gd3ds
+{
+
 static const u32 white_c = ABGR8(255, 255, 255, 255);
 static char wrapBuffer[4096];
 
@@ -734,4 +737,6 @@ unsigned char textObjectLayout(const Charset *font, const char *text, TextGlyphP
     }
 
     return count;
+}
+
 }

@@ -36,6 +36,9 @@
 #define COIN_UNCOLLECTED_CUSTOM_SHEET 4
 #define COIN_UNCOLLECTED_CUSTOM_SCALE 0.968f
 
+namespace gd3ds
+{
+
 static bool yesExit = false;
 static bool restart = false;
 static bool init = false;
@@ -667,4 +670,6 @@ void drawLevelCompleteTop() {
     if (init) {
         uiScreenDraw(&screenTop);
     }
+}
+
 }

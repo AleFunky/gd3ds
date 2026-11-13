@@ -11,6 +11,9 @@
 #define TAGS_PER_ELEMENT 5
 #define TAG_LENGTH 32
 
+namespace gd3ds
+{
+
 typedef enum {
     UI_ELEMENT,
     UI_BUTTON,
@@ -386,3 +389,5 @@ typedef struct {
     UIImageData length_icon;
 } UIOnlineLevelCardData;
 */
+
+}

@@ -1,6 +1,9 @@
 #pragma once
 #include <3ds/types.h>
 
+namespace gd3ds
+{
+
 typedef struct UIAction UIAction;
 typedef struct UIActionDef UIActionDef;
 
@@ -50,3 +53,5 @@ UIPropertyList uiPropList(const UIPropertyList *props, const char *key);
 
 UIAction *parseActions(const char *value, const UIActionDef *actionDefs, const size_t actionsCount, size_t *outEntryCount);
 UIAction *uiPropActions(const UIPropertyList *props, const UIActionDef *actionDefs, const size_t actionsCount, const char *key, size_t *outEntryCount);
+
+}

@@ -8,6 +8,9 @@
 #include "utils.hpp"
 #include "main.hpp"
 
+namespace gd3ds
+{
+
 FileOrFolder sdLevelPaths[MAX_SD_LEVELS];
 int sdLevelCount = 0;
 
@@ -166,4 +169,6 @@ void truncateFilenameStart(char *name, size_t maxLen, size_t bufferSize) {
 
         name[maxLen] = '\0';
     }
+}
+
 }

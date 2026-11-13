@@ -10,6 +10,9 @@
 #include "utils/folders.hpp"
 #include "utils/string_helpers.hpp"
 
+namespace gd3ds
+{
+
 static UILabel *statusLabel;
 static UILabel *speedLabel;
 static UILabel *timeLabel;
@@ -270,3 +273,5 @@ extern const UIScreenDefPair updaterPopUpDef = {
         }
     },
 };
+
+}

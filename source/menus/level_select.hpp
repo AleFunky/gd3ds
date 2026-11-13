@@ -7,8 +7,13 @@
 #define MENU_COIN_FILLED_ID 33
 #define MENU_COIN_UNFILLED_ID 34
 
+namespace gd3ds
+{
+
 extern const size_t numMenuColors;
 extern const u32 defaultLvlColors[];
 extern int currLevelID;
 
 extern const UIScreenDefPair levelSelectDef;
+
+}

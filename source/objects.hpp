@@ -8,6 +8,9 @@
 #define SPRITESHEET4_START (SPRITESHEET3_START + 601)
 #define ANIMATEDSHEET_START (SPRITESHEET4_START + 673)
 
+namespace gd3ds
+{
+
 typedef enum {
    COLLISION_NONE = 0,
    COLLISION_BOX,
@@ -98,3 +101,5 @@ typedef struct {
 #define GAME_OBJECT_COUNT 1912
 
 extern const GameObject gameObjects[GAME_OBJECT_COUNT];
+
+}

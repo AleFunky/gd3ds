@@ -28,6 +28,9 @@
 #define SAVED_LEVELS_NAME "saved_levels"
 #define SAVED_LEVELS_DIR CONFIG_ROOT SAVED_LEVELS_NAME
 
+namespace gd3ds
+{
+
 typedef struct {
     struct json_object* root;
     char path[256];
@@ -51,3 +54,5 @@ void configInitString(Config* cfg, const char* path, const char* def);
 void configInitBool(Config* cfg, const char* path, bool def);
 void configInitInt(Config* cfg, const char* path, int def);
 void configInitFloat(Config* cfg, const char* path, float def);
+
+}

@@ -6,6 +6,9 @@
 #include "level_loading.hpp"
 #include <stdlib.h>
 
+namespace gd3ds
+{
+
 extern const UseEffectDefinition padUseEffect = {
     .colorR = 1, 
     .colorG = 1,
@@ -522,4 +525,6 @@ void drawUseEffects(UseEffectPool *pool) {
             }
         }
     }
+}
+
 }

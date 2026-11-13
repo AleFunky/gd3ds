@@ -19,6 +19,9 @@
 #include "menus/settings_hub/credits.hpp"
 #include "menus/settings_hub/songs.hpp"
 
+namespace gd3ds
+{
+
 static UISlider *musicSliderBar;
 static UISlider *soundSliderBar;
 
@@ -44,3 +47,5 @@ extern const UIScreenDefPair settingsHubDef = {
         .update = settingsHubUpdate,
     }
 };
+
+}

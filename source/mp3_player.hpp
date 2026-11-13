@@ -10,6 +10,9 @@
 
 #define POWER_THRESH_MULTIPLIER 0.75f
 
+namespace gd3ds
+{
+
 extern volatile float amplitude;
 
 void audioInit();
@@ -21,3 +24,5 @@ void togglePlaybackMP3();
 void pausePlaybackMP3();
 void unpausePlaybackMP3();
 void fadeToAmplitude(float newAmplitude);
+
+}

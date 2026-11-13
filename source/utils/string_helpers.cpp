@@ -8,6 +8,9 @@
 #include <string.h>
 
 // WHY DOESN'T C STANDARD CONTAIN STRCASESTR
+namespace gd3ds
+{
+
 bool contains(const char *first, const char *second) {
     if (*second == '\0')
         return true;
@@ -167,4 +170,6 @@ const char *getFilenameExt(const char *filename) {
     const char *dot = strrchr(filename, '.');
     if(!dot || dot == filename) return "";
     return dot + 1;
+}
+
 }

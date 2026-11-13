@@ -24,6 +24,9 @@
 #define SOC_ALIGN       0x1000
 #define SOC_BUFFERSIZE  0x100000
 
+namespace gd3ds
+{
+
 static u32 *SOC_buffer = NULL;
 s32 sock = -1, csock = -1;
 
@@ -70,7 +73,7 @@ int socInit() {
     }
 
     // Now intialise soc:u service
-    if ((ret = socInit(SOC_buffer, SOC_BUFFERSIZE)) != 0) {
+    if ((ret = ::socInit(SOC_buffer, SOC_BUFFERSIZE)) != 0) {
         printf("socInit: 0x%08X\n", (unsigned int)ret);
     }
     return ret;
@@ -635,4 +638,6 @@ void shutdownSoc() {
     close(sock);
     socExit();
     free(SOC_buffer);
+}
+
 }

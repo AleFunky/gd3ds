@@ -27,6 +27,9 @@
 
 #include "state.hpp"
 
+namespace gd3ds
+{
+
 const char *errorStrings[LOAD_ERROR_COUNT - 1] = {
     "Invalid gmd.",
     "Invalid level data.",
@@ -610,3 +613,5 @@ extern const UIScreenDefPair levelSelectDef = {
         }
     }
 };
+
+}

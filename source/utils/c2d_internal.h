@@ -1,6 +1,11 @@
+#pragma once
+
+#include <c2d/base.h>
+
+namespace gd3ds
+{
+
 extern "C" {
-	#pragma once
-	#include <c2d/base.h>
 	typedef struct
 	{
 		float pos[3];
@@ -134,4 +139,6 @@ extern "C" {
 	void C2Di_AppendVtx(float x, float y, float z, float u, float v, float ptx, float pty, u32 color);
 	void C2Di_FlushVtxBuf(void);
 	void C2Di_Update(void);
+}
+
 }

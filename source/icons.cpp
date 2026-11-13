@@ -1,5 +1,8 @@
 #include "icons.hpp"
 
+namespace gd3ds
+{
+
 static const IconPart player0[] = {
  { 0, 0, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0.00, ICON_COLOR_P1, 1.00, 0 },
  { 0, 1, 0.00, 0.00, 1.00, 1.00, 0, 0, 0, 0.00, ICON_COLOR_P2, 1.00, 0 },
@@ -10344,3 +10347,5 @@ const Icon* icons[ICON_GAMEMODE_COUNT] = {
     iconsRobot,
     iconsSpider,
 };
+
+}

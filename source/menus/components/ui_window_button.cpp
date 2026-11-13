@@ -9,6 +9,9 @@
 #include "main.hpp"
 #include "utils/gfx.hpp"
 
+namespace gd3ds
+{
+
 //if a button has been pressed with a keybind, no other button should be pressed after
 static int pressedKey;
 
@@ -104,4 +107,6 @@ UIElement *uiCreateWindowButtonFromProps(UIScreen *screen, const UIPropertyList 
     button->keyBinds = uiPropBitfield(props, "keyBinds", keybindTable, ARRAY_LEN(keybindTable));
 
     return &button->base;
+}
+
 }

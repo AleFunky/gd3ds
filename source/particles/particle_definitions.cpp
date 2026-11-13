@@ -1,5 +1,8 @@
 #include "particle_definitions.hpp"
 
+namespace gd3ds
+{
+
 extern const ParticleDefenitionName particleDefNames[PARTICLE_DEF_COUNT] = {
     { "drag_effect", &dragEffect },
     { "ring_effect", &ringEffect },
@@ -1707,3 +1710,5 @@ extern const ParticleDefinition burstEffect2 = {
     .tangentialAcceleration = 0.0f,
     .textureFileName = TEXTURE_SQUARE_PNG
 };
+
+}

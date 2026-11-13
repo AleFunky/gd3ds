@@ -12,6 +12,9 @@
 #define FADE_DURATION 0.25f
 #define FADE_SPEED (255 / FADE_DURATION)
 
+namespace gd3ds
+{
+
 enum StereoEye {
     EYE_LEFT,
     EYE_RIGHT
@@ -76,3 +79,5 @@ void customCircle (const float x, const float y, const float radius,
 
 void calcQuadParams(SpriteObject *vo);
 bool c2dDrawImageFast(C2D_Image *img, const QuadParams *quadParams, const C2D_DrawParams *params, const u32 color);
+
+}

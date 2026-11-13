@@ -7,6 +7,9 @@
 #include "main.hpp"
 #include "triggers.hpp"
 
+namespace gd3ds
+{
+
 typedef struct GroupCombination {
     short groups[MAX_GROUPS_PER_OBJECT];
     unsigned char groupCount;
@@ -539,4 +542,6 @@ void sortGroup(int g) {
     GroupNode *gr = &groups[g];
     // Sort array
     qsort(gr->objects, gr->count, sizeof(int), compareObjects);
+}
+
 }

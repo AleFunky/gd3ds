@@ -3,6 +3,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
+namespace gd3ds
+{
+
 typedef struct {
     uint8_t *buffer;
     size_t capacity;
@@ -20,3 +23,5 @@ void arenaClear(Arena *a);
 size_t arenaTotal(Arena *a);
 size_t arenaUsed(Arena *a);
 size_t arenaAvailable(Arena *a);
+
+}

@@ -75,6 +75,9 @@
 #define CITRA_TYPE 0x20000
 #define CITRA_VERSION 11
 
+namespace gd3ds
+{
+
 Arena levelArena;
 
 u32 ctruLinearHeapSize __asm__("__ctru_linear_heap_size") = 34 << 20;
@@ -1830,7 +1833,11 @@ static void initLevelArena() {
     if (!could) outputLog("Couldn't allocate level arena\n");
 }
 
+}
+
 int main(int argc, char* argv[]) {
+    using namespace gd3ds;
+
     // Init libs
     initTrigTable();
 

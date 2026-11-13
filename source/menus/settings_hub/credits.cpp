@@ -9,6 +9,9 @@
 #include "main.hpp"
 #include "menus/settings_hub/credits.hpp"
 
+namespace gd3ds
+{
+
 typedef struct CreditsEntries {
     const char *contributor;
     const char *contribution;
@@ -92,3 +95,5 @@ extern const UIScreenDefPair creditsDef = {
         .init = creditsInit
     }
 };
+
+}

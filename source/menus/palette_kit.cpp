@@ -12,6 +12,9 @@
 #include "palette_kit.hpp"
 #include "menus/components/ui_checkbox.hpp"
 
+namespace gd3ds
+{
+
 extern const u32 colors[] = {
     // Reds
     ABGR8(253, 212, 206, 255),
@@ -471,3 +474,5 @@ extern const UIScreenDefPair paletteKitDef = {
         }
     }
 };
+
+}

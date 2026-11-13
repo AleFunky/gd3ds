@@ -9,6 +9,11 @@
 #define COIN_VEL_Y 580.f
 #define COIN_GRAVITY -1800.f
 
+namespace gd3ds
+{
+
 void startCollectEffect(float x, float y, bool outline);
 void updateCollectEffect(float delta);
 void drawCollectEffect();
+
+}

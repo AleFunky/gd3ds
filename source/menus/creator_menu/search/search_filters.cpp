@@ -13,6 +13,9 @@
 #include "save/config.hpp"
 #include "save/saving.hpp"
 
+namespace gd3ds
+{
+
 static void toggleGdps(UIScreen *s){
     if(gdps){
         uiRunFuncOnTag(s, "gdps", uiEnableElement);
@@ -114,3 +117,5 @@ extern const UIScreenDefPair searchFiltersDef = {
         }
     }
 };
+
+}

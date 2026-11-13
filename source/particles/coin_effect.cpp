@@ -6,6 +6,9 @@
 #include "utils/gfx.hpp"
 #include "easing.hpp"
 
+namespace gd3ds
+{
+
 typedef struct {
     float x;
     float velX;
@@ -97,4 +100,6 @@ void drawCollectEffect() {
             C2D_DrawSpriteTinted(&spr, &tint);
         }
     }
+}
+
 }

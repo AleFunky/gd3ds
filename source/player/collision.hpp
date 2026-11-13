@@ -2,6 +2,9 @@
 
 #include "player.hpp"
 
+namespace gd3ds
+{
+
 enum JumpType {
     JUMP_YELLOW_PAD,
     JUMP_YELLOW_ORB,
@@ -128,3 +131,5 @@ bool intersectRectCircle(float rx, float ry, float rw, float rh, float rangle,
 
 bool circleRectCollision(float cx, float cy, float radius,
                            float x1, float y1, float x2, float y2);
+
+}

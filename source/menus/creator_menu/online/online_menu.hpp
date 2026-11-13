@@ -13,6 +13,9 @@
 #define LEGENDARY_GLOW 69
 #define MYTHIC_GLOW 70
 
+namespace gd3ds
+{
+
 extern int currSearchID;
 extern int redownload;
 
@@ -32,3 +35,5 @@ typedef struct {
     int levelId;
     int redownload;
 } OnlineCardData;
+
+}

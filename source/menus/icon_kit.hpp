@@ -4,6 +4,9 @@
 
 #define ICONS_PER_PAGE 21
 
+namespace gd3ds
+{
+
 extern const int gamemodeIconCount[ICON_GAMEMODE_COUNT + 1];
 
 extern int selectedCube;
@@ -26,3 +29,5 @@ extern int *currentIcons[ICON_GAMEMODE_COUNT + 1];
 extern int *currentColors[3];
 
 extern const UIScreenDefPair iconKitDef;
+
+}

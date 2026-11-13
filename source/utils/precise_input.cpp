@@ -15,6 +15,9 @@
 #define TOUCH_RING_OFFSET 0x20
 #define WORD_INDEX(byte_offset) ((byte_offset) / sizeof(u32))
 
+namespace gd3ds
+{
+
 bool piEnabled = false;
 
 static u32 frameStart;
@@ -390,4 +393,6 @@ static u32 substepCutoff(u32 substep) {
     u64 scaledSpan = (u64)span * slicesDone;
     u32 offsetIntoFrame = (u32)(scaledSpan / frameSubsteps);
     return frameStart + offsetIntoFrame;
+}
+
 }

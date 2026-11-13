@@ -14,6 +14,9 @@
 
 #define FIRST_TRAIL_ID 27
 
+namespace gd3ds
+{
+
 static void uiIconUpdate(UIElement* e, UIInput* touch, UITransform *transform) {
     uiButtonUpdate(e, touch, transform);
 }
@@ -149,4 +152,6 @@ UIElement *uiCreateIconFromProps(UIScreen *screen, const UIPropertyList *props) 
     uiIconSetGlow(icon, uiPropColor(props, "glow_color", ABGR8(255, 255, 255, 255)));
 
     return &button->base;
+}
+
 }

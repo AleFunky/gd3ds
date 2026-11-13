@@ -27,6 +27,9 @@
 #define PLAYER_CAMERA_X_OFFSET 125.0f
 #define PLAYER_CAMERA_X_OFFSET_BOT (PLAYER_CAMERA_X_OFFSET * (SCREEN_BOT_WIDTH / (float)SCREEN_WIDTH))
 
+namespace gd3ds
+{
+
 GamePlayState state;
 
 bool levelUnratedOnline = false;
@@ -697,4 +700,6 @@ void handleShake(float delta) {
             state.cameraY = state.unmodCamY;
         }
     }
+}
+
 }

@@ -8,6 +8,9 @@
 #include "utils/gfx.hpp"
 #include "easing.hpp"
 
+namespace gd3ds
+{
+
 typedef struct {
     float x, y;
     float velX, velY;
@@ -114,4 +117,6 @@ void drawCollectableEffect() {
         drawCollectableLayer(e->baseTex, px, py, e->mainChannel, e->opacity, e->scaleX, e->scaleY);
         drawCollectableLayer(e->detailTex, detailPx, detailPy, e->detailChannel, e->opacity, e->scaleX, e->scaleY);
     }
+}
+
 }

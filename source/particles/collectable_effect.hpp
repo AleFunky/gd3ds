@@ -10,6 +10,9 @@
 #define COLLECTABLE_EFFECT_LIFE        3.0f
 #define COLLECTABLE_EFFECT_DRAW_OFFSET 6.0f
 
+namespace gd3ds
+{
+
 void collectableEffectSpawn(float x, float y, int baseTex, int detailTex,
                               int mainChannel, int detailChannel,
                               float detailX, float detailY,
@@ -17,3 +20,5 @@ void collectableEffectSpawn(float x, float y, int baseTex, int detailTex,
                               unsigned char flipX, unsigned char flipY);
 void updateCollectableEffect(float delta);
 void drawCollectableEffect();
+
+}

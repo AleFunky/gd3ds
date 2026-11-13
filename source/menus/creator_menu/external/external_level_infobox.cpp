@@ -4,6 +4,9 @@
 #include "menus/components/ui_label.hpp"
 #include "save/saving.hpp"
 
+namespace gd3ds
+{
+
 static void externalLevelInfoboxInit(UIScreen *s) {
     UILabel *name = (UILabel *) uiGetElementByTag(s, "levelname");
 
@@ -36,3 +39,5 @@ extern const UIScreenDefPair externalInfoboxDef = {
         .init = externalLevelInfoboxInit
     }
 };
+
+}

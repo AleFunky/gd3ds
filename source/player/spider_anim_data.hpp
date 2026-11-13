@@ -4,6 +4,9 @@
 
 #define SPIDER_SPRITE_COUNT 13
 
+namespace gd3ds
+{
+
 typedef enum {
     SPIDER_ANIM_RUN = 0,
     SPIDER_ANIM_JUMP = 1,
@@ -14,3 +17,5 @@ typedef enum {
 } SpiderAnimId;
 
 extern const PlayerAnimation spiderAnimations[SPIDER_ANIM_COUNT];
+
+}

@@ -4,6 +4,9 @@
 
 #define MAX_OBJECT_PS 48
 
+namespace gd3ds
+{
+
 typedef struct {
     ParticleSystem ps;
     int id;
@@ -25,3 +28,5 @@ void drawObjectParticles();
 void spawnObjectParticles(int obj);
 void updateObjectParticles(float dt);
 void freeObjectParticles();
+
+}

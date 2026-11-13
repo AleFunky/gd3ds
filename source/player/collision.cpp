@@ -28,6 +28,9 @@
 #include "particles/lightning.hpp"
 #include "particles/gravity_sweep.hpp"
 
+namespace gd3ds
+{
+
 Player *player1 = &state.player;
 Player *player2 = &state.player2;
 
@@ -2152,4 +2155,6 @@ void collideWithObjects(Player *player) {
     slopeCount = 0;
     blockCount = 0;
     hazardCount = 0;
+}
+
 }

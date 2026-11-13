@@ -1,6 +1,9 @@
 #pragma once
 #include <3ds.h>
 
+namespace gd3ds
+{
+
 typedef struct {
     int16_t* data;
     u32 sampleCount;
@@ -10,3 +13,5 @@ typedef struct {
 
 bool loadWav(const char* path, SFX* sfx);
 void playSfx(SFX* sfx, int channel);
+
+}

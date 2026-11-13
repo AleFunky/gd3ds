@@ -5,6 +5,9 @@
 #include "graphics.hpp"
 #include "particles/circles.hpp"
 
+namespace gd3ds
+{
+
 void uiUseEffectClear(UIUseEffect* e){
     if (!e) return;
 
@@ -105,4 +108,6 @@ UIElement *uiCreateUseEffectFromProps(UIScreen *screen, const UIPropertyList *pr
     uiElementApplyProperties(&useEffect->base, screen, props);
 
     return &useEffect->base;
+}
+
 }

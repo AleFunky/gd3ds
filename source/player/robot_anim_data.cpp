@@ -1,5 +1,8 @@
 #include "robot_anim_data.hpp"
 
+namespace gd3ds
+{
+
 static const PlayerSpritePart robotRunF001[] = {
     { 4, -3.7500f, -2.5875f, 100.2628f, 0.9988f, 0.9994f, 0 },
     { 2, -1.8250f, -0.9750f, 26.5609f, 0.9974f, 0.9987f, 1 },
@@ -455,3 +458,5 @@ const PlayerAnimation robotAnimations[ROBOT_ANIM_COUNT] = {
     { robotFallFrames, 5 },  // ROBOT_ANIM_FALL
     { robotIdleFrames, 1 },  // ROBOT_ANIM_IDLE
 };
+
+}

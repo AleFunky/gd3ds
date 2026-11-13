@@ -5,6 +5,9 @@
 
 #include <3ds.h>
 
+namespace gd3ds
+{
+
 typedef struct {
     char name[MAX_PATH_LEN];
     bool isDir;
@@ -19,3 +22,5 @@ char *stripFilename(char *path);
 void stripExtension(char *path);
 void truncateFilename(char *name, size_t maxLen);
 void truncateFilenameStart(char *name, size_t maxLen, size_t bufferSize);
+
+}

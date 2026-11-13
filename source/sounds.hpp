@@ -2,6 +2,9 @@
 #include "wav_player.hpp"
 #include "mp3_player.hpp"
 
+namespace gd3ds
+{
+
 typedef struct {
     const char *name;
     SFX *sound;
@@ -18,3 +21,5 @@ extern SFXKVP sounds[];
 
 void loadSfx();
 SFX *getSound(const char *name);
+
+}

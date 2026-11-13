@@ -23,6 +23,9 @@
 
 #include "utils/utils.hpp"
 
+namespace gd3ds
+{
+
 bool commentsNeedRefresh = true;
 int commentsSortType = 1;
 int currentCommentsPage = 0;
@@ -358,3 +361,5 @@ extern const UIScreenDefPair onlineLevelCommentsDef = {
         }
     }
 };
+
+}

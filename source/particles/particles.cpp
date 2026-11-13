@@ -11,6 +11,9 @@
 #include "utils/gfx.hpp"
 #include "menus/settings_hub/settings.hpp"
 
+namespace gd3ds
+{
+
 static float randf() {
     return (float)rand() / RAND_MAX;
 }
@@ -587,4 +590,6 @@ void drawParticleSystem(ParticleSystem* ps, float xOffset, float yOffset, float 
             size / 32.f
         );
     }
+}
+
 }

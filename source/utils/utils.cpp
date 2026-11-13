@@ -10,6 +10,9 @@
 #include <sys/types.h>
 #include <minizip/unzip.h>
 
+namespace gd3ds
+{
+
 u8 getModel() {
     u8 model = 0;
     if (R_FAILED(CFGU_GetSystemModel(&model))) return CFG_MODEL_3DS;
@@ -297,3 +300,5 @@ int extractZip(const char *inputPath, const char *destinationDir) {
     unzClose(zipFile);
     return 0;
 };
+
+}

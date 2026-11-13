@@ -17,6 +17,9 @@
 
 #include "menus/settings_hub/settings.hpp"
 
+namespace gd3ds
+{
+
 extern const MotionTrailConfig trailProperties[TRAIL_COUNT] = {
     //default trail
     {. fade = 0.3f, .width = 10.f, .alwaysOn = false, .colored = true,  .stationary = false, .blending = true},
@@ -559,4 +562,6 @@ void motionTrailDrawWaveTrail(MotionTrail *trail) {
             0
         );
     }
+}
+
 }

@@ -12,6 +12,9 @@
 // Stupid hack lmao
 #define GFX_TOP_BUT_ABOVE_LEVEL (2)
 
+namespace gd3ds
+{
+
 typedef struct {
     float colorR;
     float colorG;
@@ -94,3 +97,5 @@ UseEffect *addUseEffect(float x, float y, int obj, const UseEffectDefinition *de
 void updateUseEffects(float delta, UseEffectPool *pool);
 void drawUseEffects(UseEffectPool *pool);
 void clearUseEffects(UseEffectPool *pool);
+
+}

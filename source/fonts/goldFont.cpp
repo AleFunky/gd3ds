@@ -1,5 +1,8 @@
 #include "text.hpp"
 
+namespace gd3ds
+{
+
 extern const Glyph goldFontFontGlyphs[96] = {
     {32, 123, 203, 0, 0, 0, 28, 11, -1},
     {33, 37, 57, 16, 25, 0, 4, 9, 0},
@@ -104,3 +107,5 @@ extern const Charset goldFontFontCharset = {
     96,
     1
 };
+
+}

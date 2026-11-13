@@ -32,6 +32,9 @@
 #define DEATH_WAITING_TIME 0.5f
 #define OFFSCREEN_BUFFER 240
 
+namespace gd3ds
+{
+
 static UIButton *quitGameButton;
 
 static Player titleScreenPlayer;
@@ -448,3 +451,5 @@ extern const UIScreenDefPair mainMenuDef = {
         }
     }
 };
+
+}

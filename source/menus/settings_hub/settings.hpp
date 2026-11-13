@@ -2,6 +2,9 @@
 #include "menus/core/ui_screen.hpp"
 #include <3ds.h>
 
+namespace gd3ds
+{
+
 typedef enum {
     PAGE_GRAPHICS,
     PAGE_INPUT,
@@ -78,3 +81,5 @@ extern const UIScreenDefPair settingsDef;
 
 bool conditionSupports3D();
 void turnOffSetting(const char *id, bool *var);
+
+}

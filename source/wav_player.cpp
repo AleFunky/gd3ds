@@ -3,6 +3,9 @@
 #include <string.h>
 #include "wav_player.hpp"
 #include "main.hpp"
+namespace gd3ds
+{
+
 static ndspWaveBuf waveBufs[24];
 
 bool loadWav(const char* path, SFX* sfx) {
@@ -88,4 +91,6 @@ void playSfx(SFX* sfx, int channel) {
     ndspChnWaveBufAdd(channel, &waveBufs[channel]);
     
     applyVolumeSettings();
+}
+
 }

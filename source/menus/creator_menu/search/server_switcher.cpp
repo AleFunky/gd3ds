@@ -17,6 +17,9 @@
 #include "state.hpp"
 #include "menus/creator_menu/search_menu.hpp"
 
+namespace gd3ds
+{
+
 static void darkenText(UIElement* e){
     UILabel *l = (UILabel *)e;
 
@@ -100,3 +103,5 @@ extern const UIScreenDefPair serverSwitcherDef = {
         }
     }
 };
+
+}

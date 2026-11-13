@@ -10,6 +10,9 @@
 
 #define ICON_WIDTH 30
 
+namespace gd3ds
+{
+
 static void uiPaletteIconsDraw(UIElement* e, UITransform *transform) {
     UIPaletteIcons *paletteIcons = (UIPaletteIcons *) e;
 
@@ -67,4 +70,6 @@ UIElement *uiCreatePaletteIconsFromProps(UIScreen *screen, const UIPropertyList 
     paletteIcons->spacing = uiPropFloat(props, "spacing", 20);
 
     return &paletteIcons->base;
+}
+
 }

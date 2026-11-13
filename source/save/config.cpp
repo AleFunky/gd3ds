@@ -17,6 +17,9 @@
 
 #include "utils/server_utils.hpp"
 
+namespace gd3ds
+{
+
 Config cfg;
 
 void initUserConfig(Config *cfg) {
@@ -223,4 +226,6 @@ void cfgSave() {
 
 void cfgFini() {
     configFree(&cfg);
+}
+
 }

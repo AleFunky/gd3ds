@@ -15,6 +15,9 @@
 
 #define MAX_TEXT_LEN 64
 
+namespace gd3ds
+{
+
 typedef struct Color {
     unsigned char r,g,b;
 
@@ -491,3 +494,5 @@ char **splitStringStrDel(const char *str, const char *delimiter, int *outCount, 
 void freeStringArray(char **arr, int count);
 
 char *convertIfGdlvl(char *gmd, const char *path);
+
+}

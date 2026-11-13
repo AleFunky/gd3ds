@@ -14,6 +14,9 @@
 #include "save/saving.hpp"
 #include "menus/settings_hub/songs.hpp"
 
+namespace gd3ds
+{
+
 static UIList *list;
 
 static void addEntry(const char *title, const char *artist, float listWidth, UIScreen *s, int i) {
@@ -76,3 +79,5 @@ extern const UIScreenDefPair songsDef = {
         .init = songsInit,
     }
 };
+
+}

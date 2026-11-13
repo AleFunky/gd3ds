@@ -5,6 +5,9 @@
 
 #define TRIGGER_BUFFER_SIZE 2048
 
+namespace gd3ds
+{
+
 enum ColorChannelIDs {
     NONE,
     COL_1,
@@ -357,3 +360,5 @@ void uploadColorToBuffer(int channel, u32 color, float seconds);
 void uploadToBuffer(int obj, int channel);
 int convertOnePointNineChannel(int channel);
 ColTriggerBuffer *getBuffer(int chan);
+
+}

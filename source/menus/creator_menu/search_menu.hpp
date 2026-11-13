@@ -2,6 +2,9 @@
 #include "utils/network.hpp"
 #include "menus/core/ui_stack.hpp"
 
+namespace gd3ds
+{
+
 void enableDemons(UIScreen *s);
 void disableDemons(UIScreen *s);
 
@@ -15,3 +18,5 @@ bool userCoinsCounterVisible(void);
 extern SearchFilters filters;
 
 extern const UIScreenDefPair searchMenuDef;
+
+}

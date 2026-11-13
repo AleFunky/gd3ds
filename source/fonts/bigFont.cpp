@@ -1,5 +1,8 @@
 #include "bigFont.hpp"
 
+namespace gd3ds
+{
+
 extern const Glyph bigFontFontGlyphs[96] = {
     {32, 498, 128, 0, 0, 0, 33, 15, -1},
     {33, 338, 39, 18, 29, 0, 5, 12, 0},
@@ -104,3 +107,5 @@ extern const Charset bigFontFontCharset = {
     96,
     1
 };
+
+}
