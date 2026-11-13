@@ -8,6 +8,9 @@
 #include "menus/settings_hub/settings.hpp"
 #include "state.hpp"
 
+namespace gd3ds
+{
+
 ProfilerSnapshot snapshot;
 static ProfilerSnapshot internalSnapshot;
 
@@ -422,3 +425,5 @@ void profilerDraw(void) {
 }
 
 #undef BG_COL
+
+}

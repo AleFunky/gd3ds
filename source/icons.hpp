@@ -2,6 +2,9 @@
 
 #include <stddef.h>
 
+namespace gd3ds
+{
+
 typedef enum {
  ICON_COLOR_WHITE = 0,
  ICON_COLOR_P1,
@@ -61,3 +64,5 @@ typedef enum {
 #define TRAIL_COUNT 17
 
 extern const Icon* icons[ICON_GAMEMODE_COUNT];
+
+}

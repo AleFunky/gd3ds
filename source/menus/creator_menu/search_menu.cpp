@@ -22,6 +22,9 @@
 #include "menus/creator_menu/search/clear_search_filters.hpp"
 #include "menus/creator_menu/search/song_filter.hpp"
 
+namespace gd3ds
+{
+
 bool searchNeedsRefresh = true;
 bool gdps = false;
 
@@ -177,3 +180,5 @@ extern const UIScreenDefPair searchMenuDef = {
         }
     }
 };
+
+}

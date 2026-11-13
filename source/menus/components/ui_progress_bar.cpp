@@ -5,6 +5,9 @@
 #include "math_helpers.hpp"
 #include "utils/gfx.hpp"
 
+namespace gd3ds
+{
+
 static void drawFrame(UIProgressBar *e, UITransform *transform) {
     C2D_SpriteSetCenter(&e->frame.sprite, 0.5f, 0.5f);
     C2D_SpriteSetPos(&e->frame.sprite, transform->x, transform->y);
@@ -170,4 +173,6 @@ UIElement *uiCreateProgressBarFromProps(UIScreen *screen, const UIPropertyList *
     uiProgressBarSetTint(progressBar, uiPropColor(props, "barColor", ABGR8(255, 255, 255, 255)));
     
     return &progressBar->base;
+}
+
 }

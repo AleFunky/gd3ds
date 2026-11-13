@@ -11,6 +11,9 @@
 
 #include "main.hpp"
 
+namespace gd3ds
+{
+
 static void setCheckboxTexture(UICheckBox* e, bool enabled) {
     if (!e) return;
     UIButton *button = (UIButton *) e;
@@ -109,4 +112,6 @@ UIElement *uiCreateCheckboxFromProps(UIScreen *screen, const UIPropertyList *pro
     setCheckboxTexture(checkbox, checkbox->checked);
 
     return &button->base;
+}
+
 }

@@ -40,6 +40,9 @@
 #include "utils/gfx.hpp"
 #include "utils/string_helpers.hpp"
 
+namespace gd3ds
+{
+
 C2D_SpriteSheet uiSheet;
 C2D_SpriteSheet ui2Sheet;
 C2D_SpriteSheet windowSheet;
@@ -852,4 +855,6 @@ void uiLoadScreenOld(UIScreen* screen, const UIActionDef* actions, size_t action
     }
     
     fclose(f);
+}
+
 }

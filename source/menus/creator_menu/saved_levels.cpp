@@ -41,6 +41,9 @@
 #include "fonts/goldFont.hpp"
 #include "utils/utils.hpp"
 
+namespace gd3ds
+{
+
 static UILabel *listTitle;
 static UILabel *topTitle;
 static UILabel *pageInfoLabel;
@@ -491,3 +494,5 @@ extern const UIScreenDefPair savedLevelsDef = {
         }
     }
 };
+
+}

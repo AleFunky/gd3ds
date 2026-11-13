@@ -3,6 +3,9 @@
 #include "ui_screen.hpp"
 #include "graphics.hpp"
 
+namespace gd3ds
+{
+
 typedef struct UIScreenPair {
     const char* name;
     //top and bottom screen
@@ -81,3 +84,5 @@ UIScreen *uiStackGetScreenRelative(UIScreen *screen, Screens which);
 
 FadeStatus uiStackGetFadeStatus();
 const char *uiStackGetCurrentScreenName();
+
+}

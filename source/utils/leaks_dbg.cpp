@@ -3,6 +3,9 @@
 #include "main.hpp"
 #include "leaks_dbg.hpp"
 
+namespace gd3ds
+{
+
 typedef struct Allocation {
     void *ptr;
     size_t size;
@@ -74,7 +77,7 @@ void dump_leaks() {
     }
 }
 
-void *__wrap_malloc(size_t size) {
+extern "C" void *__wrap_malloc(size_t size) {
     void *ptr = __real_malloc(size);
     if (!tracking) {
         tracking++;
@@ -86,7 +89,7 @@ void *__wrap_malloc(size_t size) {
     return ptr;
 }
 
-void __wrap_free(void *ptr) {
+extern "C" void __wrap_free(void *ptr) {
     if (!tracking) {
         tracking++;
         track_free(ptr);
@@ -96,7 +99,7 @@ void __wrap_free(void *ptr) {
     __real_free(ptr);
 }
 
-void *__wrap_realloc(void *ptr, size_t size) {
+extern "C" void *__wrap_realloc(void *ptr, size_t size) {
     void *caller = __builtin_return_address(0);
     void *newPtr = __real_realloc(ptr, size);
 
@@ -119,4 +122,6 @@ void *__wrap_realloc(void *ptr, size_t size) {
     return newPtr;
 }
 
+
+}
 #endif

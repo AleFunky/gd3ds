@@ -34,6 +34,9 @@
 #include "fonts/goldFont.hpp"
 #include "utils/utils.hpp"
 
+namespace gd3ds
+{
+
 int currSearchID;
 int redownload = false;
 
@@ -589,3 +592,5 @@ extern const UIScreenDefPair onlineDef = {
         }
     }
 };
+
+}

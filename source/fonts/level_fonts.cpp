@@ -2,6 +2,9 @@
 #include "bigFont.hpp"
 #include "level_fonts.hpp"
 
+namespace gd3ds
+{
+
 extern const Glyph gjFont01FontGlyphs[67] = {
     {32, 58, 227, 0, 0, 0, 38, 12, -1},
     {33, 0, 191, 14, 36, 1, 2, 8, 0},
@@ -1158,3 +1161,5 @@ const Charset *levelFontCharsets[LEVEL_FONT_COUNT] = {
     &gjFont11FontCharset,
     &gjFont12FontCharset,
 };
+
+}

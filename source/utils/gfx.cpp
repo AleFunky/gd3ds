@@ -6,6 +6,9 @@
 #include "menus/settings_hub/settings.hpp"
 #include "utils/utils.hpp"
 
+namespace gd3ds
+{
+
 void setScissor(GPU_SCISSORMODE mode, int x, int y, int width, int height) {
     int screenWidth = GSP_SCREEN_HEIGHT_BOTTOM;
     int screen_height = GSP_SCREEN_WIDTH;
@@ -693,4 +696,6 @@ void customCircle (const float x, const float y, const float radius,
 void customCircunference (const float x, const float y, const float radius,
                      const u32 color, const float lineWidth) {
     customEllipse(x, y, radius, radius, color, false, lineWidth);
+}
+
 }

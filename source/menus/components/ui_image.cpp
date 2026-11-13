@@ -4,6 +4,9 @@
 #include "menus/core/ui_props.hpp"
 #include "math_helpers.hpp"
 
+namespace gd3ds
+{
+
 void uiImageDraw(UIElement* e, UITransform *transform) {
     UIImage *image = (UIImage *) e;
 
@@ -76,4 +79,6 @@ UIElement *uiCreateImageFromProps(UIScreen *screen, const UIPropertyList *props)
     uiImageSetTint(image, uiPropColor(props, "color", ABGR8(255, 255, 255, 255)));
 
     return &image->base;
+}
+
 }

@@ -4,6 +4,9 @@
 #include "menus/core/ui_screen.hpp"
 #include "menus/core/ui_props.hpp"
 
+namespace gd3ds
+{
+
 static const UIFloatEnumEntry alignmentTable[] = {
     { "LEFT",   0.f },
     { "CENTER", 0.5f },
@@ -79,4 +82,6 @@ UIElement *uiCreateLabelFromProps(UIScreen *screen, const UIPropertyList *props)
     label->parseTags = uiPropBool(props, "parseTags", true);
 
     return &label->base;
+}
+
 }

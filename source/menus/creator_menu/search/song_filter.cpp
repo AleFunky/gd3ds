@@ -11,6 +11,9 @@
 #include "menus/creator_menu/search/search_filters.hpp"
 #include "menus/settings_hub/songs.hpp"
 
+namespace gd3ds
+{
+
 static UITextbox *songInput;
 static UIWindowButton *customButton;
 static UIWindowButton *normalButton;
@@ -134,3 +137,5 @@ extern const UIScreenDefPair songFilterDef = {
         }
     }
 };
+
+}

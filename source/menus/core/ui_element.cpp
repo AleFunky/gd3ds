@@ -1,6 +1,9 @@
 #include "ui_element.hpp"
 #include "ui_screen.hpp"
 
+namespace gd3ds
+{
+
 static_assert(
     offsetof(UIElement, update) == 0xFC,
     "Unexpected UIElement layout!"
@@ -230,4 +233,6 @@ void performActions(UIElement *e){
             }
         }
     }
+}
+
 }

@@ -13,11 +13,13 @@
 #define DEMON_FACE  258
 
 #define DISLIKE_ICON 56
-
-extern const int difficultyStars[MAX_STARS + 1];
-
 #define MAX_DESCRIPTION_WIDTH 300
+
+namespace gd3ds
+{
+extern const int difficultyStars[MAX_STARS + 1];
 
 void showLevelLoadErrorMessage();
 
 extern const UIScreenDefPair externalPopupDef;
+}

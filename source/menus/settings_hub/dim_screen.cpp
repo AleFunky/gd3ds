@@ -7,6 +7,9 @@
 
 #include "menus/settings_hub/dim_screen.hpp"
 
+namespace gd3ds
+{
+
 static UISlider *dimSlider;
 
 static void dimScreenInit(UIScreen *s) {
@@ -26,3 +29,5 @@ extern const UIScreenDefPair dimScreenDef = {
         .update = dimScreenUpdate
     }
 };
+
+}

@@ -3,6 +3,9 @@
 #include "arena.hpp"
 #include "math_helpers.hpp"
 
+namespace gd3ds
+{
+
 bool arenaInit(Arena *a, size_t capacity) {
     a->buffer = (uint8_t *)malloc(capacity);
     if (!a->buffer) return false;
@@ -77,4 +80,6 @@ size_t arenaUsed(Arena *a) {
 
 size_t arenaAvailable(Arena *a) {
     return MAX(a->capacity - a->offset, 0);
+}
+
 }

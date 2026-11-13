@@ -25,6 +25,9 @@
 #include "menus/settings_hub/info_card.hpp"
 #include "menus/creator_menu/online/two_option_pop_up.hpp"
 
+namespace gd3ds
+{
+
 static int currentPage = 0;
 
 SettingState settingsState;
@@ -737,3 +740,5 @@ extern const UIScreenDefPair settingsDef = {
         }
     }
 };
+
+}

@@ -1,5 +1,8 @@
 #include "spider_anim_data.hpp"
 
+namespace gd3ds
+{
+
 static const PlayerSpritePart spiderRunF001[] = {
     { 2, 6.1875f, -0.1125f, -335.9836f, -0.8837f, 0.8837f, 0 },
     { 2, 1.5500f, -1.6750f, -20.9863f, 0.8100f, 0.8837f, 1 },
@@ -232,3 +235,5 @@ const PlayerAnimation spiderAnimations[SPIDER_ANIM_COUNT] = {
     { spiderWalkFrames, 7 },
     { spiderIdleFrames, 1 },
 };
+
+}

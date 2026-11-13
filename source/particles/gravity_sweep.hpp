@@ -2,6 +2,9 @@
 #include <citro2d.h>
 #include "3ds/types.h"
 
+namespace gd3ds
+{
+
 extern C2D_SpriteSheet gravLineSheet;
 
 struct GravityLine {
@@ -26,3 +29,5 @@ public:
 
 void startGravitySweep(bool down);
 void drawGravitySweeps();
+
+}

@@ -27,8 +27,10 @@
 #include "menus/gameplay.hpp"
 
 #include "practice.hpp"
-
 #include "save/saving.hpp"
+
+namespace gd3ds
+{
 
 bool gamePaused, inLevelComplete = false;
 static float animTime, targetPos, currentPos;
@@ -565,3 +567,5 @@ extern const UIScreenDefPair gameplayDef = {
         }
     }
 };
+
+}

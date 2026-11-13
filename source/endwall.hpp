@@ -28,8 +28,13 @@
 #define LVL_COMPLETE_STATE_2_DURATION 0.22f
 #define LVL_COMPLETE_STATE_2_TARGET_SCALE 0.01f
 
+namespace gd3ds
+{
+
 int handleWallCutscene(float delta, UIInput *touch);
 
 void clearLevelCompletePopup();
 void handleLevelCompletePopup(float delta);
 void drawLevelCompletePopup();
+
+}

@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+namespace gd3ds
+{
+
 static struct json_object* getPathObject(struct json_object* root, const char* path) {
     char buffer[256];
     strncpy(buffer, path, sizeof(buffer) - 1);
@@ -178,4 +181,6 @@ void configInitString(Config* cfg, const char* path, const char* def) {
 void configFree(Config* cfg) {
     json_object_put(cfg->root);
     cfg->root = NULL;
+}
+
 }

@@ -9,6 +9,9 @@
 #include "utils/gfx.hpp"
 #include <string.h>
 
+namespace gd3ds
+{
+
 static UIStack *stack = NULL;
 
 void uiStackSetStack(UIStack *setStack){
@@ -583,4 +586,6 @@ FadeStatus uiStackGetFadeStatus(){
 
 const char *uiStackGetCurrentScreenName() {
     return stack->screenStack[uiStackMaxIndex()]->name;
+}
+
 }

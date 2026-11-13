@@ -14,7 +14,12 @@
 
 #define NEW_BEST_SEPARATION 25.f
 
+namespace gd3ds
+{
+
 void initNewBestPopup(int progress);
 void handleNewBestPopup(float delta);
 void drawNewBestPopup();
 void clearNewBestPopup();
+
+}

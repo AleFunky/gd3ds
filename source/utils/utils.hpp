@@ -3,6 +3,9 @@
 
 #define ZLIB_CHUNK_SIZE 4096
 
+namespace gd3ds
+{
+
 u8 getModel();
 
 size_t getUncompressedSize(unsigned char *data, int dataLen);
@@ -28,3 +31,5 @@ typedef struct GenericTask {
 Thread createGenericThread(GenericTask *task);
 
 int extractZip(const char *inputPath, const char *destinationPath);
+
+}

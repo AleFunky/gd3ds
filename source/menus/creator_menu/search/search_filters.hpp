@@ -1,5 +1,9 @@
 #pragma once
 
-void resetSearchFilters();
+namespace gd3ds
+{
 
+void resetSearchFilters();
 extern const UIScreenDefPair searchFiltersDef;
+
+}

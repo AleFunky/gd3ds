@@ -30,6 +30,9 @@
 #include "menus/creator_menu/online/online_level_menu.hpp"
 #include "save/saving.hpp"
 
+namespace gd3ds
+{
+
 ObjectsArray objects = { 0 };
 
 Section emptySection = { 0 };
@@ -3499,4 +3502,6 @@ char *convertIfGdlvl(char *gmd, const char *path) {
         return decompressed;
     }
     return gmd;
+}
+
 }

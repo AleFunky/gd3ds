@@ -28,6 +28,9 @@
 #include "menus/creator_menu/online/online_level_comments.hpp"
 #include "utils/utils.hpp"
 
+namespace gd3ds
+{
+
 SearchEntry *searchEntries = NULL;
 CreatorEntry *creatorEntries = NULL;
 SongEntry *songEntries = NULL;
@@ -1318,4 +1321,6 @@ int installUpdate(GenericTask *){
 int extractUpdate(GenericTask *){
     int result = extractUpdateInternal(downloadedUpdateFilePath);
     return result;
+}
+
 }

@@ -3,6 +3,9 @@
 
 // level_id property defines the save entry id
 
+namespace gd3ds
+{
+
 MainLevelDefinition robtopMainLevels[] = {
     {
         .levelID = 0,
@@ -549,3 +552,5 @@ extern const MainLevelPack gdpsLevels = {
     .levels = gdpsMainLevels,
     .count = ARRAY_LEN(gdpsMainLevels)
 };
+
+}

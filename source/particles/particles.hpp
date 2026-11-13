@@ -3,6 +3,9 @@
 #include <3ds.h>
 #include "particle_definitions.hpp"
 
+namespace gd3ds
+{
+
 // Struct of arrays my beloved
 typedef struct {
     int count;
@@ -93,3 +96,5 @@ void initParticleSystem(ParticleSystem* ps, const ParticleDefinition* cfg);
 void spawnMultipleParticles(ParticleSystem* ps, int emitCount);
 void drawParticleSystem(ParticleSystem* ps, float xOffset, float yOffset, float opacity);
 void freeParticleData(ParticleData* d);
+
+}

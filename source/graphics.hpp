@@ -26,6 +26,9 @@
 #define SCALE (SCREEN_HEIGHT / SCREEN_HEIGHT_AREA)
 
 
+namespace gd3ds
+{
+
 extern int currentPulserodBallImage;
 
 typedef enum {
@@ -220,3 +223,5 @@ void drawTouchEffect();
 
 void updateBottomParticles(float delta);
 void drawBottomParticles();
+
+}

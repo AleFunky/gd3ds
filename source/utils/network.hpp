@@ -15,6 +15,9 @@
 
 #define TIMEOUT_DURATION 15
 
+namespace gd3ds
+{
+
 typedef struct SearchFilters {
     bool uncompleted:1;
     bool completed:1;
@@ -79,3 +82,5 @@ int getReleases(GenericTask *task, char **outData, const char *repoOwner, const 
 int getActions(GenericTask *task, char **outData, const char *repoOwner, const char *repoName, const char *actionName);
 
 void shutdownSoc();
+
+}

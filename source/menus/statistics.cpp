@@ -12,6 +12,9 @@
 #include "save/saving.hpp"
 #include "menus/creator_menu/search_menu.hpp"
 
+namespace gd3ds
+{
+
 static UIList *list;
 
 typedef struct StatisticEntries {
@@ -91,3 +94,5 @@ extern const UIScreenDefPair statisticsDef = {
         .init = statisticsInit,
     }
 };
+
+}

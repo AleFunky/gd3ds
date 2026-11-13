@@ -6,6 +6,9 @@
 #include "state.hpp"
 #include "utils/gfx.hpp"
 
+namespace gd3ds
+{
+
 constexpr u32 lightningSizeMiniCol = C2D_Color32f(1.0f, 31 / 255.f, 1.0f, 1.0f);
 constexpr u32 lightningSizeNormalCol = C2D_Color32f(0.0f, 1.0f, 50.f / 255.f, 1.0f);
 
@@ -135,4 +138,6 @@ void drawAllLightning(){
     for(auto& bolt : lightningBolts){
         bolt.renderLightning();
     }
+}
+
 }

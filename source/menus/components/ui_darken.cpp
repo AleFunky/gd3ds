@@ -4,6 +4,9 @@
 #include "menus/core/ui_screen.hpp"
 #include "menus/core/ui_props.hpp"
 
+namespace gd3ds
+{
+
 void uiDarkenSetOpacity(UIDarken* e, float opacity) {
     if (!e) return;
 
@@ -124,4 +127,6 @@ UIElement *uiCreateDarkenFromProps(UIScreen *screen, const UIPropertyList *props
     C2D_PlainImageTint(&darken->image.tint, C2D_Color32f(0.f, 0.f, 0.f, darken->base.opacity), 1.0f);
 
     return &darken->base;
+}
+
 }

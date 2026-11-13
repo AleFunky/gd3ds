@@ -5,6 +5,9 @@
 
 #define MAX_ELEMENT_PROPERTIES 64
 
+namespace gd3ds
+{
+
 typedef struct UIScreenPair UIScreenPair;
 
 typedef struct {
@@ -141,3 +144,5 @@ void uiScreenUpdateTransition(UIScreen *screen, float dt);
 void uiScreenUpdate(UIScreen* screen, UIInput* touch);
 void uiScreenDraw(UIScreen* screen);
 void uiUnloadScreen(UIScreen *screen);
+
+}

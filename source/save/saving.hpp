@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include "json-c/json.h"
 #include "level/main_levels.hpp"
 #include "utils/server_utils.hpp"
 
@@ -21,6 +22,9 @@
 #define SAVE_MAIN_LEVEL_KEY "main_levels"
 #define SAVE_EXTERNAL_KEY "external_levels"
 #define SAVE_SAVED_LEVEL_KEY "saved_levels"
+
+namespace gd3ds
+{
 
 typedef struct LevelData {
     int levelID;
@@ -156,3 +160,5 @@ char *loadSavedLevel(int levelID, bool gdps, size_t *outSize);
 bool saveSavedLevel(int levelID, bool gdps, const char *data);
 
 void calculateStats();
+
+}

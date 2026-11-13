@@ -6,6 +6,9 @@
 #include "menus/core/ui_props.hpp"
 #include "graphics.hpp"
 
+namespace gd3ds
+{
+
 void uiParticleUpdatePos(UIParticle* e){
     if (!e) return;
 
@@ -112,4 +115,6 @@ UIElement *uiCreateParticleFromProps(UIScreen *screen, const UIPropertyList *pro
     p->scale = particle->base.scaleX;
 
     return &particle->base;
+}
+
 }

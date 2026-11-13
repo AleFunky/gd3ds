@@ -4,6 +4,9 @@
 
 #define AUTO_CHECKPOINT_TIME 1.f
 
+namespace gd3ds
+{
+
 extern int checkpointCount;
 extern int checkpointPointer;
 extern bool pseudoCheckpointExists;
@@ -27,3 +30,5 @@ void runPendingCheckpoint();
 void setCheckpointTimer(float timer);
 
 void loadUsedChannels();
+
+}

@@ -5,6 +5,9 @@
 #include "utils/gfx.hpp"
 #include "easing.hpp"
 
+namespace gd3ds
+{
+
 typedef struct {
     Vec2D position;
     
@@ -195,4 +198,6 @@ void drawRays() {
             drawRay(x, y, length, startWidth, endWidth, data->angle, t, color);
         }
     }
+}
+
 }

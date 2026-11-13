@@ -4,6 +4,9 @@
 #include "menus/creator_menu/soggy.hpp"
 #include "state.hpp"
 
+namespace gd3ds
+{
+
 void creatorMenuInit(UIScreen *s){
     if (gotSogged) uiButtonSetImage((UIButton *) uiGetElementByTag(s, "create_button"), 20, 1);
     playMenuSong();
@@ -19,3 +22,5 @@ extern const UIScreenDefPair creatorMenuDef = {
         .init = creatorMenuInit,
     }
 };
+
+}

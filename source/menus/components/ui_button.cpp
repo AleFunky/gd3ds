@@ -12,6 +12,9 @@
 #include "main.hpp"
 #include "ui_slider.hpp"
 
+namespace gd3ds
+{
+
 const UIIntEnumEntry buttonAnimEnum[] = {
     { "normal", BUTTON_ANIM_NORMAL },
     { "pull", BUTTON_ANIM_PULL },
@@ -274,4 +277,6 @@ UIElement *uiCreateButtonFromProps(UIScreen *screen, const UIPropertyList *props
     button->animType = (ButtonAnimType)uiPropIntEnum(props, "anim", buttonAnimEnum, ARRAY_LEN(buttonAnimEnum), BUTTON_ANIM_NORMAL);
     
     return &button->base;
+}
+
 }

@@ -1,5 +1,8 @@
 #include "objects.hpp"
 
+namespace gd3ds
+{
+
 const ObjectHitbox hitbox1[] = {
     { HITBOX_SOLID, 0.00, 0.00, 30.00, 30.00, COLLISION_BOX }
 };
@@ -7331,3 +7334,5 @@ const GameObject gameObjects[GAME_OBJECT_COUNT] = {
 /* Object 1910 */ { 650, 39, 0.00, 0.00, 5, 2, 1004, 1, COLOR_TYPE_BASE, 0, ANIMATION_NONE, 1.00, 1, children1910, 0, NULL, 0, NULL, 0, NULL, hitbox1910 },
 /* Object 1911 */ { 622, 59, 0.00, 0.00, 5, 2, 0, 0, COLOR_TYPE_WHITE, 0, ANIMATION_NONE, 1.00, 0, NULL, 0, NULL, 0, NULL, 0, NULL, hitbox1911 },
 };
+
+}

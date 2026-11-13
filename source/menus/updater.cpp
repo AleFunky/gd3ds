@@ -19,6 +19,9 @@
 #include "utils/utils.hpp"
 #include "utils/folders.hpp"
 
+namespace gd3ds
+{
+
 static UIScreen *screen;
 
 static UIList *list;
@@ -266,3 +269,5 @@ extern const UIScreenDefPair updaterDef = {
         }
     },
 };
+
+}

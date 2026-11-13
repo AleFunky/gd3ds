@@ -19,6 +19,9 @@
 #define USER_COIN_UNRATED_EMPTY_B 48
 #define USER_COIN_UNRATED_EMPTY_TINT C2D_Color32(USER_COIN_UNRATED_EMPTY_R, USER_COIN_UNRATED_EMPTY_G, USER_COIN_UNRATED_EMPTY_B, 255)
 
+namespace gd3ds
+{
+
 extern bool levelUnratedOnline;
 extern bool levelVerifiedCoins;
 bool levelHasUnverifiedCoins(void);
@@ -248,3 +251,5 @@ void startShake(float duration, float strength);
 void handleShake(float delta);
 
 extern bool disableHitboxesAfterRespawn;
+
+}

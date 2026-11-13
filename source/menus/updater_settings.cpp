@@ -3,6 +3,9 @@
 #include "menus/components/ui_checkbox.hpp"
 #include "menus/updater_settings.hpp"
 
+namespace gd3ds
+{
+
 bool useNightlyBranch;
 bool doAutoUpdates;
 
@@ -40,3 +43,5 @@ extern const UIScreenDefPair updaterSettingsDef = {
         }
     },
 };
+
+}

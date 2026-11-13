@@ -4,6 +4,9 @@
 #include "utils/gfx.hpp"
 #include "ui_slider.hpp"
 
+namespace gd3ds
+{
+
 // If currently using an slider
 bool sliding;
 
@@ -204,4 +207,6 @@ UIElement *uiCreateSliderFromProps(UIScreen *screen, const UIPropertyList *props
     uiSliderInitGraphics(slider);
 
     return &slider->base;
+}
+
 }

@@ -14,6 +14,9 @@
 #include "fonts/goldFont.hpp"
 #include "save/config.hpp"
 
+namespace gd3ds
+{
+
 static void twoOptionPopUpInit(UIScreen *s) {
     TwoOptionPopupData *popUpData = (TwoOptionPopupData *)s->pair->data;
     if(!popUpData) return;
@@ -183,3 +186,5 @@ extern const UIScreenDefPair threeDWarningPopUpDef = {
     },
     .freeData = twoOptionPopUpFreeData,
 };
+
+}

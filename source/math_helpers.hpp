@@ -24,6 +24,9 @@
 
 #define CCRANDOM_0_1() ((float)rand()/RAND_MAX)
 
+namespace gd3ds
+{
+
 typedef struct Matrix2x2 {
     float m[2][2];
 } Matrix2x2;
@@ -65,3 +68,5 @@ float randomf();
 float randomFloat(float min, float max);
 int randomInt(int min, int max);
 bool platformLaunch(float previous, float current, float velocity, float dt, float *launch);
+
+}

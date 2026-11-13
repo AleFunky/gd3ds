@@ -3,6 +3,9 @@
 #include "mp3_player.hpp"
 #include "save/config.hpp"
 
+namespace gd3ds
+{
+
 bool gotSogged = false;
 
 static void soggyMenuInit(UIScreen *s) {
@@ -24,3 +27,5 @@ extern const UIScreenDefPair soggyDef = {
         .init = soggyMenuInit
     },
 };
+
+}

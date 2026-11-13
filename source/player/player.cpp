@@ -31,6 +31,9 @@
 #define SPIDER_DASH_SCALE_START 0.4f
 #define SPIDER_DASH_ELASTIC_PERIOD 0.35f
 
+namespace gd3ds
+{
+
 inline float gravFloor(Player *player) { return player->upsideDown ? -state.ceilingY : state.groundY; }
 
 void animPlayerToWall(Player *player);
@@ -2039,4 +2042,6 @@ void pushPlayerAction(void (*func)(Player *)) {
     if (count < MAX_ACTIONS) {
         playerActions[state.currentPlayer][numActions[state.currentPlayer]++].func = func;
     }
+}
+
 }

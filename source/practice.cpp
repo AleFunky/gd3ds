@@ -17,6 +17,9 @@
 
 // needed to re-create the runtime trigger buffers
 // after reload_level() frees them
+namespace gd3ds
+{
+
 extern int alphaTriggerCapacity;
 extern int moveTriggerCapacity;
 extern int spawnTriggerCapacity;
@@ -1184,4 +1187,6 @@ void drawCheckpoints() {
 
         drawCheckpoint(calcX, calcY);
     }
+}
+
 }

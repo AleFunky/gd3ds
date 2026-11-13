@@ -1,5 +1,8 @@
 #pragma once
 
+namespace gd3ds
+{
+
 typedef struct {
     int   textureIdx;
     float px, py;
@@ -18,3 +21,5 @@ typedef struct {
     const PlayerFrame *frames;
     int   frameCount;
 } PlayerAnimation;
+
+}

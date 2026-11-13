@@ -24,6 +24,9 @@
 
 #include "fonts/chatFont.hpp"
 
+namespace gd3ds
+{
+
 static UIScreen *screen;
 static UIScreen *screenTop;
 
@@ -391,3 +394,5 @@ extern const UIScreenDefPair externalPopupDef = {
         }
     }
 };
+
+}

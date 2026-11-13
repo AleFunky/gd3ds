@@ -38,6 +38,9 @@
 // Increment this every time new properties are added to the server entries
 #define SAVED_LEVELS_VERSION 2
 
+namespace gd3ds
+{
+
 typedef struct {
     float x, y;
 } Vec2D;
@@ -162,3 +165,5 @@ extern ServerFile *currentServerFile;
 extern ExternalLevelFile externalFile;
 extern ServerFile gdServerFile;
 extern ServerFile gdpsFile;
+
+}

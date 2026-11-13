@@ -9,6 +9,9 @@
 #endif
 
 
+namespace gd3ds
+{
+
 float executeEase(EaseTypes ease, float time, float period) {
     switch (ease) {
         case EASE_LINEAR:
@@ -459,4 +462,6 @@ float quadraticInOut(float time)
         resultTime = -0.5f * (time * (time - 2) - 1);
     }
     return resultTime;
+}
+
 }

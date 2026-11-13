@@ -8,6 +8,9 @@
 #include "player/collision.hpp"
 #include "math_helpers.hpp"
 
+namespace gd3ds
+{
+
 ObjectParticles objectParticle[MAX_OBJECT_PS];
 
 ParticleSystem brickDestroyParticles;
@@ -699,4 +702,6 @@ void spawnObjectParticles(int obj) {
             }
             break;
     }
+}
+
 }

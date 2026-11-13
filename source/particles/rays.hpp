@@ -20,7 +20,12 @@
 
 #define RAY_FADE_DURATION (400 / 1000.f)
 
+namespace gd3ds
+{
+
 void raysStart();
 void raysStartFade();
 void updateRays(float delta);
 void drawRays();
+
+}

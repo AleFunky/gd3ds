@@ -1,5 +1,8 @@
 #include "animations.hpp"
 
+namespace gd3ds
+{
+
 static const AnimSprite blackSludgeLoopFrame000[] = {
     { 0, 0.000000f, 0.000000f, 1.000000f, 1.000000f, 0, 0, 0.000000f, 0 },
     { 1, 7.250000f, 6.875000f, 1.016660f, 1.325000f, 0, 0, 0.000000f, 1 },
@@ -572,3 +575,5 @@ extern const Animation animations[ANIMATION_COUNT] = {
     { gJBeast03Idle01Frames, 9, 18 },  /* ANIM_GJBEAST03_IDLE01 */
     { gJBeast03Idle02Frames, 9, 18 },  /* ANIM_GJBEAST03_IDLE02 */
 };
+
+}

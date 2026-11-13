@@ -11,8 +11,13 @@
 #define COIN_BIG_USER_ID 417
 #define COIN_BIG_USER_SCALE 0.325f
 
+namespace gd3ds
+{
+
 void resetCoins();
 void unpauseGame();
 void pauseGame();
 
 extern const UIScreenDefPair gameplayDef;
+
+}

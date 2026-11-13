@@ -11,6 +11,9 @@
 #include "graphics.hpp"
 #include "utils/gfx.hpp"
 
+namespace gd3ds
+{
+
 static UIProgressBar *progressbar;
 static UILabel *splashtext;
 
@@ -292,4 +295,6 @@ void loadingScreenUpdate(float progress, int fade) {
 
     C2D_ViewReset();
     C3D_FrameEnd(0);
+}
+
 }

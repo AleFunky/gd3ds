@@ -2,6 +2,9 @@
 #include <3ds.h>
 #include <stdbool.h>
 
+namespace gd3ds
+{
+
 typedef enum {
     PI_PLAYER_1,
     PI_PLAYER_2,
@@ -30,3 +33,5 @@ u32 piPadEventCount(PreciseInputPlayer player);
 PreciseInputEvent piPadEventGet(PreciseInputPlayer player, u32 index);
 u32 piTouchEventCount(PreciseInputPlayer player);
 PreciseInputEvent piTouchEventGet(PreciseInputPlayer player, u32 index);
+
+}

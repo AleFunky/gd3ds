@@ -4,6 +4,9 @@
 #include "menus/core/ui_props.hpp"
 #include "math_helpers.hpp"
 
+namespace gd3ds
+{
+
 void uiRectangleSetColor(UIRectangle* e, u32 color) {
     if (!e) return;
 
@@ -60,4 +63,6 @@ UIElement *uiCreateRectangleFromProps(UIScreen *screen, const UIPropertyList *pr
     uiRectangleSetColor(rectangle, uiPropColor(props, "color", ABGR8(255, 255, 255, 255)));
 
     return &rectangle->base;
+}
+
 }

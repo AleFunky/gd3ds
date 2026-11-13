@@ -3,6 +3,9 @@
 #include <stdbool.h>
 #include "player.hpp"
 
+namespace gd3ds
+{
+
 enum SlopeOrientations {
     ORIENT_NORMAL_UP,
     ORIENT_NORMAL_DOWN,
@@ -23,3 +26,5 @@ float slopeSnapAngle(int obj, Player *player);
 bool isSpikeSlope(int obj);
 
 int getPlayerTouchingSlopes(Player *player);
+
+}

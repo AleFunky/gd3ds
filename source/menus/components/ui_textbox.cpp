@@ -12,6 +12,9 @@
 
 #include "utils/keyboard.hpp"
 
+namespace gd3ds
+{
+
 static void uiTextboxUpdate(UIElement* e, UIInput* touch, UITransform *transform) {
     UITextbox *textbox = (UITextbox *) e;
 
@@ -89,4 +92,6 @@ UIElement *uiCreateTextboxFromProps(UIScreen *screen, const UIPropertyList *prop
     strncpy(textbox->title, uiPropString(props, "title", "Enter text:"), sizeof(textbox->title) - 1);
 
     return &textbox->base;
+}
+
 }

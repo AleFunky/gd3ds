@@ -10,6 +10,9 @@
 #include "menus/creator_menu/search_menu.hpp"
 #include "online_level_menu.hpp"
 
+namespace gd3ds
+{
+
 static UILabel *levelName;
 static UILabel *levelCreator;
 static UILabel *uploadedAgo;
@@ -119,3 +122,5 @@ extern const UIScreenDefPair onlineInfoboxDef = {
         .init = onlineLevelInfoboxInit,
     }
 };
+
+}

@@ -7,6 +7,9 @@
 #include "ui_image.hpp"
 #include "math_helpers.hpp"
 
+namespace gd3ds
+{
+
 static void uiSpinnerDraw(UIElement* e, UITransform *transform) {
     UIImage *image = (UIImage *) e;
     UISpinner *spinner = (UISpinner *) image;
@@ -69,4 +72,6 @@ UIElement *uiCreateSpinnerFromProps(UIScreen *s, const UIPropertyList *props) {
     spinner->blending = uiPropBool(props, "blending", true);
 
     return &image->base;
+}
+
 }

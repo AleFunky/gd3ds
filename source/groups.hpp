@@ -4,6 +4,9 @@
 
 #include <stdbool.h>
 
+namespace gd3ds
+{
+
 struct Matrix2x2;
 
 typedef struct GroupNode {
@@ -37,3 +40,5 @@ void addToGroup(int obj, int g);
 void resetGroupData(int g);
 
 void sortGroup(int g);
+
+}

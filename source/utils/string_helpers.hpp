@@ -3,6 +3,9 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+namespace gd3ds
+{
+
 bool contains(const char *first, const char *second);
 bool parseBool(const char *str);
 char *truncateNumber(int number);
@@ -13,3 +16,5 @@ char *urlDecode(const char *str);
 void urlConvertToHTTP(char *str);
 void removeChar(char *str, char character);
 const char *getFilenameExt(const char *filename);
+
+}

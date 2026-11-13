@@ -20,6 +20,9 @@
 #define DIED_TO_ID 3
 #define HARDER_THAN_ID 4
 
+namespace gd3ds
+{
+
 const char *newBestText[] = {
     [NOT_100_ID] = "Not 100%",
     [IMPOSSIBLE_TIMING_ID] = "Impossible timing",
@@ -311,4 +314,6 @@ void drawNewBestPopup() {
         
         drawText(&bigFontFontCharset, &bigFontSheet, SCREEN_WIDTH_AREA / 2, (SCREEN_HEIGHT_AREA / 2) + (NEW_BEST_SEPARATION * scale), scale, scale, 0.5f, true, "%d%%", newBestPopup.progress);
     }
+}
+
 }

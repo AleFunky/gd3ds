@@ -26,6 +26,9 @@
 #include "state.hpp"
 #include "menus/creator_menu/search_menu.hpp"
 
+namespace gd3ds
+{
+
 static int gamemodePage = 0;
 
 // Page handling 
@@ -277,3 +280,5 @@ extern const UIScreenDefPair iconKitDef = {
         }
     }
 };
+
+}

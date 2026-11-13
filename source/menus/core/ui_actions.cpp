@@ -3,6 +3,9 @@
 #include "wav_player.hpp"
 #include "ui_actions.hpp"
 
+namespace gd3ds
+{
+
 const UIIntEnumEntry animEnum[] = {
     { "none", ANIM_NONE },
     { "slide_down", ANIM_SLIDE_DOWN },
@@ -68,3 +71,5 @@ extern const UIActionDef baseActions[] = {
     { "enable_tag", actionEnableTag },
     { "play_sound", actionPlaySound }
 };
+
+}

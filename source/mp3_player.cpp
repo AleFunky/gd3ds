@@ -16,6 +16,9 @@
 #define MP3_BUF_SIZE 4096
 #define NUM_BUFS 4
 
+namespace gd3ds
+{
+
 static u32 *audioBuffer;
 static LightEvent soundEvent;
 static LightEvent seekEvent;
@@ -498,4 +501,6 @@ void stopMP3() {
     song_buf = NULL;
     songSz = 0;
     songPos = 0;
+}
+
 }

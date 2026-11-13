@@ -16,6 +16,9 @@
 #include "menus/level_select.hpp"
 #include "wav_player.hpp"
 
+namespace gd3ds
+{
+
 static int fireworksSpawned = 0;
 static int circunferencesSpawned = 0;
 static float circunferenceTimer = 0.0f;
@@ -329,4 +332,6 @@ void drawLevelCompletePopup() {
         C2D_SpriteSetScale(&text, scale, scale);
         C2D_DrawSprite(&text);
     }
+}
+
 }

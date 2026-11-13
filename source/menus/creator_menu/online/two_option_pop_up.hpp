@@ -1,6 +1,9 @@
 #pragma once
 #include "menus/core/ui_stack.hpp"
 
+namespace gd3ds
+{
+
 typedef struct {
     const char *text;
     const char *title;
@@ -14,3 +17,5 @@ extern const UIScreenDefPair deletePopUpDef;
 extern const UIScreenDefPair quitPopUpDef;
 extern const UIScreenDefPair autoupdatePopUpDef;
 extern const UIScreenDefPair threeDWarningPopUpDef;
+
+}

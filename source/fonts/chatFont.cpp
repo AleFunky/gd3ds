@@ -1,4 +1,8 @@
 #include "text.hpp"
+
+namespace gd3ds
+{
+
 extern const Glyph chatFontFontGlyphs[634] = {
     {30, 0, 0, 0, 0, 21, 20, 42, -1},
     {32, 240, 288, 0, 0, 0, 31, 8, -1},
@@ -641,3 +645,5 @@ extern const Charset chatFontFontCharset = {
     634,
     0.6
 };
+
+}

@@ -2,6 +2,9 @@
 
 #include <3ds.h>
 
+namespace gd3ds
+{
+
 enum MainLevelDifficulties {
     MAIN_DIFF_EASY,
     MAIN_DIFF_NORMAL,
@@ -37,3 +40,5 @@ extern const MainLevelPack *currentMainLevelPack;
 
 extern const MainLevelPack robtopLevels;
 extern const MainLevelPack gdpsLevels;
+
+}

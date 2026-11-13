@@ -3,6 +3,9 @@
 
 #include <3ds.h>
 
+namespace gd3ds
+{
+
 typedef struct SearchEntry {
     char name[20+1];
     char *description;
@@ -125,3 +128,5 @@ extern int commentEntriesLength;
 
 extern char **latestCommits;
 extern int latestCommitCount;
+
+}

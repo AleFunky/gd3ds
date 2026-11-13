@@ -3,6 +3,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
+namespace gd3ds
+{
+
 typedef struct {
     size_t childSlot;
     float x, y;
@@ -39,3 +42,5 @@ typedef enum {
 #define ANIMATION_COUNT 10
 
 extern const Animation animations[ANIMATION_COUNT];
+
+}

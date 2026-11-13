@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <float.h>
 
+namespace gd3ds
+{
+
 Matrix2x2 matrix2x2Identity(void) {
     return (Matrix2x2){ { { 1.f, 0.f }, { 0.f, 1.f } } };
 }
@@ -275,4 +278,6 @@ bool platformLaunch(float previous, float current, float velocity, float dt, flo
     if (speed < velocity) return false;
     *launch = speed;
     return true;
+}
+
 }

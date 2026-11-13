@@ -4,6 +4,9 @@
 
 #define PARTICLE_DEF_COUNT (30)
 
+namespace gd3ds
+{
+
 typedef enum {
     TEXTURE_SQUARE_PNG,
     TEXTURE_CIRCLE_PNG,
@@ -102,3 +105,5 @@ extern const ParticleDefinition touchExplosionEffect;
 extern const ParticleDefinition touchDragEffect;
 extern const ParticleDefinition starEffect;
 extern const ParticleDefinition burstEffect2;
+
+}

@@ -5,6 +5,9 @@
 #include "menus/core/ui_screen.hpp"
 #include "utils/server_utils.hpp"
 
+namespace gd3ds
+{
+
 static void updateLengthTint(UIElement *e){
     UILabel *l = (UILabel *)e;
     int opacity = (filters.lengthFilters & (uiPropInt(&e->customProperties, "lengthval", 0))) > 0 ? 255 : 127;
@@ -48,3 +51,5 @@ extern const UIScreenDefPair lengthFilterDef = {
         }
     }
 };
+
+}

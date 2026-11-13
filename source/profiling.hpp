@@ -1,6 +1,9 @@
 #pragma once
 #include <3ds.h>
 
+namespace gd3ds
+{
+
 typedef struct {
     touchPosition touchPos;
     u32 kDown;
@@ -68,3 +71,5 @@ extern ProfilerSnapshot snapshot;
 
 void profilerUpdate(ProfilerUpdateData data);
 void profilerDraw();
+
+}

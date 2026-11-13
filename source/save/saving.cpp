@@ -26,6 +26,9 @@
 #include "utils/server_utils.hpp"
 #include "utils/utils.hpp"
 
+namespace gd3ds
+{
+
 LevelDataEntry *currentLevelEntry;
 LevelListType currentLevelList = LEVEL_LIST_MAIN_LEVELS;
 
@@ -1622,4 +1625,6 @@ bool savedLevelExists(int levelID, bool gdps) {
 
     fclose(file);
     return true;
+}
+
 }

@@ -8,6 +8,9 @@
 
 #include "menus/settings_hub/info_card.hpp"
 
+namespace gd3ds
+{
+
 void setInfoTitle(const char *text, UIScreen *s) {
     UILabel *title = (UILabel *) uiGetElementByTag(s, "title");
     uiLabelSetText(title, text);
@@ -42,3 +45,4 @@ extern const UIScreenDefPair infoCardDef = {
     .freeData = infoCardFreeData
 };
 
+}

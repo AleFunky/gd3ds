@@ -12,6 +12,9 @@
 #define ICON_CACHE_CAPACITY 64
 #define ICON_ARCHIVE_MAGIC 0x4E434947u
 
+namespace gd3ds
+{
+
 typedef struct {
     int key;
     C2D_SpriteSheet sheet;
@@ -177,4 +180,6 @@ C2D_SpriteSheet iconCacheGet(int gamemode, int id) {
     cache[index].pinned = false;
     cache[index].used = true;
     return sheet;
+}
+
 }

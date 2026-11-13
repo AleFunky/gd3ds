@@ -2,6 +2,9 @@
 #include <3ds.h>
 #include <citro2d.h>
 
+namespace gd3ds
+{
+
 typedef struct {
     unsigned short id;
     unsigned short x;
@@ -37,3 +40,5 @@ float getLongestLineLength(const Charset *font, const float zoomX, const char *t
 char *wrapText(const Charset *font, float zoomX, const char *text, float maxWidth);
 int countLines(const char *text, bool parseTags);
 float getTextHeight(const Charset *font, C2D_SpriteSheet *sheet, const float scaleY, bool parseTags, const char *text);
+
+}

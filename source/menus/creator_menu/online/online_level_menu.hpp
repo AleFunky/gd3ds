@@ -3,6 +3,9 @@
 #include "menus/level_options.hpp"
 #include "utils/server_utils.hpp"
 
+namespace gd3ds
+{
+
 void deleteLevel();
 void checkWarningsAndPlay();
 
@@ -14,3 +17,5 @@ extern SongEntry *currentSongEntry;
 extern bool refresh;
 
 extern const UIScreenDefPair onlineLevelMenuDef;
+
+}

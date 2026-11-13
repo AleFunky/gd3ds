@@ -2,6 +2,9 @@
 #include <3ds.h>
 #include "menus/core/ui_screen.hpp"
 
+namespace gd3ds
+{
+
 typedef struct {
     bool copied;
     const char *text;
@@ -10,3 +13,5 @@ typedef struct {
 } InfoCardData;
 
 extern const UIScreenDefPair infoCardDef;
+
+}

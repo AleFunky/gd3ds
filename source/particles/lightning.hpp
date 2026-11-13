@@ -3,6 +3,9 @@
 #include <deque>
 #include <vector>
 
+namespace gd3ds
+{
+
 enum class LightningType{
     SIZE_MINI,
     SIZE_NORMAL,
@@ -45,3 +48,5 @@ public:
 
 extern std::deque<Lightning> lightningBolts;
 void drawAllLightning();
+
+}

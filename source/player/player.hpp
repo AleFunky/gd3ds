@@ -32,6 +32,9 @@
 #define END_ANIMATION_TIME 1.f
 #define END_ANIMATION_X_START (10.f * 30.f)
 
+namespace gd3ds
+{
+
 typedef struct {
     int slopeID;
     float elapsed;
@@ -338,3 +341,5 @@ float getBlendDuration(Player *player);
 void setBlendTimer(Player *player, float timer);
 
 void stopDashing(Player *player);
+
+}

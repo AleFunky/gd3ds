@@ -1,6 +1,9 @@
 #include "ui_screen.hpp"
 #include "ui_element.hpp"
 
+namespace gd3ds
+{
+
 void uiElementSetPosition(UIElement *e, float x, float y) {
     e->x = x;
     e->y = y;
@@ -34,4 +37,6 @@ void uiElementSetScaleXy(UIElement *e, float x, float y) {
 
 void uiElementSetAction(UIElement *e, UIActionFn action) {
     e->action = action;
+}
+
 }

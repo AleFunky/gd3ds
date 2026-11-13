@@ -13,6 +13,9 @@
 #include "utils/gfx.hpp"
 #include <stdlib.h>
 
+namespace gd3ds
+{
+
 void uiListReset(UIList *list) {
     if (!list) return;
     
@@ -205,4 +208,6 @@ UIElement *uiCreateListFromProps(UIScreen *screen, const UIPropertyList *props) 
     uiListSetBgColor(list, uiPropColor(props, "bgColor", ABGR8(0, 0, 0, 0)));
 
     return &list->base;
+}
+
 }

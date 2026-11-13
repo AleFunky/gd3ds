@@ -6,6 +6,9 @@
 
 #include "menus/main_menu.hpp"
 
+namespace gd3ds
+{
+
 static size_t currentPage = 0;
 
 static UIWindowButton *nextButton;
@@ -75,3 +78,5 @@ extern const UIScreenDefPair howToPlayDef = {
         }
     }
 };
+
+}
