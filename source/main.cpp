@@ -999,6 +999,7 @@ void game_loop() {
     }
 
     bool being_faded = true;
+    float level_start_delay = 1.f;
 
     first_load_init_variables();
 
@@ -1134,6 +1135,11 @@ void game_loop() {
                 }
                 accumulator += physics_delta;
                 
+                if (level_start_delay > 0.f) {
+                    level_start_delay -= delta;
+                    accumulator = 0.f;
+                }
+
                 last_steps = steps;
                 steps = 0;
 
@@ -1700,7 +1706,7 @@ void game_loop() {
             C3D_FrameEnd(0);
         }
 
-        if (being_faded) {
+        if (being_faded && level_start_delay <= 0.f) {
             if (song_loaded) unpause_playback_mp3();
             being_faded = false;
         }
