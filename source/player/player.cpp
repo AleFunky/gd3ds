@@ -189,14 +189,15 @@ void player_flash(Player *player, float duration, float delay) {
 }
 
 float convert_to_closest_rotation(float rotation, float angle) {
-    float rot = (int)rotation % 360;
+    int rot = (int)rotation % 360;
 
     if (rot < 0)
-        rot += 360.0f;
+        rot += 360;
 
-    float snapped = roundf((rot - angle) / 90.0f) * 90.0f + angle;
+    float x = ((float) rot - angle) / 90.0f;
+    float k = (x >= 0.f) ? ceilf(x - 0.5f) : floorf(x + 0.5f);
 
-    snapped = fmodf(snapped, 360.0f);
+    float snapped = fmodf(k * 90.0f + angle, 360.0f);
 
     if (snapped < 0)
         snapped += 360.0f;
