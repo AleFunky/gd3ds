@@ -12,6 +12,7 @@
 #include "menus/settings_hub/how_to_play.hpp"
 #include "menus/icon_kit.hpp"
 #include "menus/settings_hub/info_card.hpp"
+#include "menus/settings_hub/dim_screen.hpp"
 #include "menus/creator_menu/search/length_filter.hpp"
 #include "menus/level_complete.hpp"
 #include "menus/level_select.hpp"
@@ -52,6 +53,7 @@ const UIScreenDefPair *defs[] = {
     &how_to_play_def,
     &settings_def,
     &info_card_def,
+    &dim_screen_def,
     &online_def,
     &saved_levels_def,
     &song_filter_def,
