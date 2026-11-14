@@ -81,14 +81,14 @@ void Lightning::renderLightning(){
 
         alpha = clampf(alpha, 0.0f, 1.0f);
 
-        u32 color = (m_color & 0x00FFFFFF) |((u32)(alpha * 255.0f) << 24);
+        u32 color = (m_color & 0x00FFFFFF) | ((u32)(alpha * (u32)255) << 24);
 
         float topX = s.startX - state.cameraX;
         float btmX = s.endX - state.cameraX;
         float topY = SCREEN_HEIGHT - (s.startY - state.cameraY);
         float btmY = SCREEN_HEIGHT - (s.endY  - state.cameraY);
 
-        C2D_DrawLine(topX, topY, color, btmX, btmY, color, 2, 0.0f);
+        C2D_DrawLine(getMirrorX(topX, state.mirrorFactor), topY, color, getMirrorX(btmX, state.mirrorFactor), btmY, color, 2, 0.0f);
     }
 }
 

@@ -30,6 +30,7 @@
 
 #include "particles/gravity_sweep.hpp"
 #include "particles/divorce_effect.hpp"
+#include "particles/portal_shine.hpp"
 
 #include "menus/settings_hub/settings.hpp"
 
@@ -1045,39 +1046,19 @@ void spawnObjectAt(
 }
 
 constexpr int kPlaceholderPlayer = -1;
-constexpr int kPlaceholderShineBack = -2;
-constexpr int kPlaceholderShineFront = -3;
-
-const GameObject portalShineBack = {
-    .zLayer = -1,
-    .zOrder = 99999
-};
-
-const GameObject portalShineFront = {
-    .zLayer = 1,
-    .zOrder = 99999
-};
 
 static inline uint32_t makeSortKey(SpriteObject *s)
 {
     const int obj = s->obj;
 
-    // Player sprite is -1 so handle it there
+    // Handle placeholders
     if (obj == kPlaceholderPlayer) {
         return ((4 + 8) << 18) | (2 << 16) | (255 << 8) | 128;
     }
 
-    const int id = obj >= 0 ? objects.id[obj] : 0;
-    const GameObject *gameObj = nullptr;
+    const int id = objects.id[obj];
+    const GameObject *gameObj = &gameObjects[id];
 
-    if(obj == kPlaceholderShineFront){
-        gameObj = &portalShineBack;
-    } else if(obj == kPlaceholderShineBack){
-        gameObj = &portalShineFront;
-    } else {
-        gameObj = (const GameObject*)&gameObjects[id];
-    }
-    
     int zlayer = objects.zlayer[obj];
     int zorder = objects.zorder[obj];
 
@@ -1873,41 +1854,12 @@ void insertPlayer(){
     spriteCount++;
 }
 
-void insertShines(){
-    SpriteObject *back = &viewableObjects[spriteCount];
-
-    C2D_Sprite backspr = { 0 };
-    back->spr = backspr;
-    back->obj = kPlaceholderShineBack;
-    back->layer = -1;
-    back->colType = 0;
-    back->opacity = 1.f;
-    back->colChannel = 0;
-    viewableObjectsPtr[spriteCount] = back;
-    spriteCount++;
-
-    SpriteObject *front = &viewableObjects[spriteCount];
-
-    C2D_Sprite frontspr = { 0 };
-    front->spr = frontspr;
-    front->obj = kPlaceholderShineFront;
-    front->layer = 1;
-    front->colType = 0;
-    front->opacity = 1.f;
-    front->colChannel = 0;
-    viewableObjectsPtr[spriteCount] = front;
-    spriteCount++;
-}
-
-
 void createObjects() {
     u64 start = svcGetSystemTick();
 
     spriteCount = 0;
 
-    //adds placeholder values which, upon being reached by the renderer, will render the player or shine fx instead
     insertPlayer();
-    //insertShines();
 
     loadCurrentObject();
 
@@ -2388,8 +2340,10 @@ void drawObjects() {
     u64 start = svcGetSystemTick();
 
     // Draw
+    int lastZLayer = 0;
     for (size_t s = 0; s < spriteCount; s++) {
         SpriteObject *obj = viewableObjectsPtr[s];
+
         if (obj->hidden) continue;
 
         if (obj->obj >= 0) {
@@ -2406,17 +2360,9 @@ void drawObjects() {
             } else {
                 c2dDrawImageFast(&obj->spr.image, &obj->params, &obj->spr.params, obj->tint);
             }
-        } else {
-            switch(obj->obj){
-                case kPlaceholderPlayer:
-                    drawPlayerGraphics();
-                    break;
-                case kPlaceholderShineBack:
-                    break;
-                case kPlaceholderShineFront:
-                    break;
-            }
-        }
+
+            lastZLayer = obj->zlayer;
+        } else if(obj->obj == -1) drawPlayerGraphics();
     }
 
     changeBlending(true);

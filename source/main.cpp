@@ -42,6 +42,7 @@
 #include "particles/lightning.hpp"
 #include "particles/gravity_sweep.hpp"
 #include "particles/divorce_effect.hpp"
+#include "particles/portal_shine.hpp"
 
 #include "level/main_levels.hpp"
 #include "menus/main_menu.hpp"
@@ -1326,6 +1327,7 @@ void gameLoop() {
                     reloadLevel(); 
                     resetLightnings();
                     resetDivorces();
+                    resetShines();
                     resetGravitySweeps();
                     //resets UI coins on gameplay screen
                     resetCoins();
@@ -1401,6 +1403,7 @@ void gameLoop() {
             updateAllLightning();
             updateGravitySweeps();
             updateDivorces();
+            updateShines();
 
             updateRays(delta);
 
@@ -2006,6 +2009,7 @@ int main(int argc, char* argv[]) {
     resetLightnings();
     resetDivorces();
     resetGravitySweeps();
+    resetShines();
 
     // Delete graphics
     C2D_SpriteSheetFree(spriteSheet);
