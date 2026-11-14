@@ -11,7 +11,7 @@ DivorceEffect::DivorceEffect(int player, int gamemode, float x, float y, float r
     this->gamemode = gamemode;
     //initial X position should be in world space, but not the subsequent animation (robert code)
     this->x = getMirrorX(x - state.cameraX, state.mirrorFactor);
-    this->y = SCREEN_HEIGHT - (this->y - state.cameraY);
+    this->y = SCREEN_HEIGHT - (y - state.cameraY);
     this->rotation = rotation;
     this->scale = scale;
     this->mirrored = (state.mirrorMult < 0);
