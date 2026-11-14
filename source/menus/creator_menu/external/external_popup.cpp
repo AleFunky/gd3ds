@@ -66,9 +66,6 @@ const int difficultyStars[MAX_STARS + 1] = {
     DEMON_FACE
 };
 
-static char *gmd = NULL;
-
-
 static void openLevel(UIElement *e, const UIPropertyList *args) {
     state.customLevel = true;
     state.onlineLevel = false;
@@ -281,19 +278,22 @@ static void setDifficulty() {
 
 static int loadGMD(GenericTask *task) {
     size_t outSize;
-    gmd = readFile(state.customLevelPath, &outSize);
-    
-    if (gmd == NULL) return 1;
+    char *data = readFile(state.customLevelPath, &outSize);
 
-    gmd = convertIfGdlvl(gmd, state.customLevelPath);
+    if (data == NULL) return 1;
 
-    setNameCreator(gmd);
-    setDescription(gmd);
-    setDownloadsLikes(gmd);
-    setStars(gmd);
+    data = convertIfGdlvl(data, state.customLevelPath);
+    if (data == NULL) return 1;
+
+    setNameCreator(data);
+    setDescription(data);
+    setDownloadsLikes(data);
+    setStars(data);
     setDifficulty();
-    setLevelID(gmd);
-    setSongID(gmd);
+    setLevelID(data);
+    setSongID(data);
+
+    free(data);
 
     return 0;
 }
@@ -362,8 +362,6 @@ void externalPopupInit(UIScreen *s) {
 
     thread = createGenericThread(&task);
     uiRunFuncOnTag(screen, "info", uiDisableElement);
-
-    free(gmd);
 }
 
 void externalPopupUpdateTop(UIScreen *s, UIInput *u) {

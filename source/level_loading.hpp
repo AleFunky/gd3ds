@@ -465,6 +465,7 @@ char *decompressLevel(char *data, int *outCode);
 
 int loadLevel(const char *path);
 int loadOnlineLevel(char *levelString);
+bool isLevelArenaPtr(const void *ptr);
 void reloadLevel();
 void unloadLevel();
 
@@ -490,6 +491,7 @@ bool checkSong(int id);
 char *extractGMDKey(const char *data, const char *key, const char *type);
 
 char **splitString(const char *str, char delimiter, int *outCount, bool ignoreZeroLength);
+char **splitStringInPlace(char *str, char delimiter, int *outCount, bool ignoreZeroLength);
 char **splitStringStrDel(const char *str, const char *delimiter, int *outCount, bool ignoreZeroLength);
 void freeStringArray(char **arr, int count);
 

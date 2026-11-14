@@ -362,17 +362,17 @@ char *readFileArena(Arena *arena, const char *filepath, size_t *outSize) {
     return buffer;
 }
 
-char *extractGMDKey(const char *data, const char *key, const char *type) {
+static const char *findGMDValue(const char *data, const char *key, const char *type, const char **outEnd) {
     char keyTag[32];
     snprintf(keyTag, sizeof(keyTag), "<k>%s</k>", key);
-    
-    char *keyPos = strstr(data, keyTag);
+
+    const char *keyPos = strstr(data, keyTag);
     if (!keyPos) {
         return NULL;
     }
 
     // Move past the key tag
-    char *start = keyPos + strlen(keyTag);
+    const char *start = keyPos + strlen(keyTag);
 
     // Skip whitespace (spaces, tabs, newlines, etc.)
     while (*start && isspace((unsigned char)*start)) {
@@ -394,9 +394,20 @@ char *extractGMDKey(const char *data, const char *key, const char *type) {
     // Find the end tag
     char typeEndTag[16];
     snprintf(typeEndTag, sizeof(typeEndTag), "</%s>", type);
-    char *end = strstr(start, typeEndTag);
+    const char *end = strstr(start, typeEndTag);
     if (!end) {
         outputLog("Could not find end tag '%s'\n", typeEndTag);
+        return NULL;
+    }
+
+    *outEnd = end;
+    return start;
+}
+
+char *extractGMDKey(const char *data, const char *key, const char *type) {
+    const char *end;
+    const char *start = findGMDValue(data, key, type, &end);
+    if (!start) {
         return NULL;
     }
 
@@ -410,6 +421,16 @@ char *extractGMDKey(const char *data, const char *key, const char *type) {
     strncpy(value, start, len);
     value[len] = '\0';
     return value;
+}
+
+static char *extractGMDKeyInPlace(char *data, const char *key, const char *type, char **outEnd) {
+    const char *end;
+    const char *start = findGMDValue(data, key, type, &end);
+    if (!start) return NULL;
+
+    *outEnd = (char *) end;
+    *(char *) end = '\0';
+    return (char *) start;
 }
 
 bool isAscii(const unsigned char *data, int len) {
@@ -569,6 +590,24 @@ char *decompressLevel(char *data, int *outCode) {
     return decompressed;
 }
 
+static bool appendSplitToken(char ***result, int *count, const char *src, int len) {
+    char *token = (char *)malloc(len + 1);
+    if (!token) return false;
+
+    strncpy(token, src, len);
+    token[len] = '\0';
+
+    char **grown = (char **)realloc(*result, sizeof(char *) * (*count + 1));
+    if (!grown) {
+        free(token);
+        return false;
+    }
+
+    *result = grown;
+    (*result)[(*count)++] = token;
+    return true;
+}
+
 char **splitStringStrDel(const char *str, const char *delimiter, int *outCount, bool ignoreZeroLength) {
     char **result = NULL;
     int count = 0;
@@ -581,13 +620,10 @@ char **splitStringStrDel(const char *str, const char *delimiter, int *outCount, 
             int len = ptr - start;
 
             if (len > (ignoreZeroLength ? -1 : 0)) {
-                char *token = (char *)malloc(len + 1);
-                if (!token) return NULL;
-                strncpy(token, start, len);
-                token[len] = '\0';
-                result = (char **)realloc(result, sizeof(char *) * (count + 1));
-                if (!result) return NULL;
-                result[count++] = token;
+                if (!appendSplitToken(&result, &count, start, len)) {
+                    freeStringArray(result, count);
+                    return NULL;
+                }
             }
 
             ptr += delimiterLen;
@@ -600,13 +636,10 @@ char **splitStringStrDel(const char *str, const char *delimiter, int *outCount, 
     if (ptr > start) {
         int len = ptr - start;
         if (len > (ignoreZeroLength ? -1 : 0)) {
-            char *token = (char *)malloc(len + 1);
-            if (!token) return NULL;
-            strncpy(token, start, len);
-            token[len] = '\0';
-            result = (char **)realloc(result, sizeof(char *) * (count + 1));
-            if (!result) return NULL;
-            result[count++] = token;
+            if (!appendSplitToken(&result, &count, start, len)) {
+                freeStringArray(result, count);
+                return NULL;
+            }
         }
     }
 
@@ -624,16 +657,10 @@ char **splitString(const char *str, char delimiter, int *outCount, bool ignoreZe
         if (*ptr == delimiter) {
             int len = ptr - start;
             if (len > (ignoreZeroLength ? -1 : 0)) {
-                char *token = (char *)malloc(len + 1);
-                if (!token) return NULL;
-
-                strncpy(token, start, len);
-                token[len] = '\0';
-
-                result = (char **)realloc(result, sizeof(char*) * (count + 1));
-                if (!result) return NULL;
-
-                result[count++] = token;
+                if (!appendSplitToken(&result, &count, start, len)) {
+                    freeStringArray(result, count);
+                    return NULL;
+                }
             }
             start = ptr + 1;
         }
@@ -642,20 +669,42 @@ char **splitString(const char *str, char delimiter, int *outCount, bool ignoreZe
     if (ptr > start) {
         int len = ptr - start;
         if (len > (ignoreZeroLength ? -1 : 0)) {
-            char *token = (char *)malloc(len + 1);
-            if (!token) return NULL;
-
-            strncpy(token, start, len);
-            token[len] = '\0';
-
-            result = (char **)realloc(result, sizeof(char*) * (count + 1));
-            if (!result) return NULL;
-
-            result[count++] = token;
+            if (!appendSplitToken(&result, &count, start, len)) {
+                freeStringArray(result, count);
+                return NULL;
+            }
         }
     }
 
     *outCount = count;
+    return result;
+}
+
+char **splitStringInPlace(char *str, char delimiter, int *outCount, bool ignoreZeroLength) {
+    *outCount = 0;
+
+    int count = 1;
+    for (char *p = str; *p; p++) {
+        if (*p == delimiter) count++;
+    }
+
+    char **result = (char **)malloc(sizeof(char *) * (count + 1));
+    if (!result) return NULL;
+
+    int n = 0;
+    char *start = str;
+    for (char *p = str;; p++) {
+        if (*p == delimiter) {
+            *p = '\0';
+            if (ignoreZeroLength || p > start) result[n++] = start;
+            start = p + 1;
+        } else if (*p == '\0') {
+            if (p > start) result[n++] = start;
+            break;
+        }
+    }
+
+    *outCount = n;
     return result;
 }
 
@@ -2057,7 +2106,7 @@ static bool isHighDetailObject(const char *section, const char *end, float *outX
     return highDetail;
 }
 
-int parseGdObject(const char *objStr, const char *objEnd, int obj, int capacity) {
+int parseGdObject(char *objStr, char *objEnd, int obj, int capacity) {
     float highDetailX = 0.f;
 
     if (isHighDetailObject(objStr, objEnd, &highDetailX)) {
@@ -2069,9 +2118,9 @@ int parseGdObject(const char *objStr, const char *objEnd, int obj, int capacity)
 
     int count = 0;
     // Split object into each key
-    char **tokens = splitString(objStr, ',', &count, false);
+    char **tokens = splitStringInPlace(objStr, ',', &count, false);
     if (count < 1) {
-        freeStringArray(tokens, count);
+        free(tokens);
         return 0;
     }
 
@@ -2212,7 +2261,7 @@ int parseGdObject(const char *objStr, const char *objEnd, int obj, int capacity)
         objects.flags[obj] |= FLAG_CAN_BE_X_MOVED;
     }
 
-    freeStringArray(tokens, count);
+    free(tokens);
     return 1;
 }
 
@@ -2492,7 +2541,7 @@ int parseString(char *levelString, int extraSlots, int *outObjectCount) {
     int sectionCount = 0;
 
     // Count sections
-    const char *sectionStart = levelString;
+    char *sectionStart = levelString;
     char *cursor = levelString;
     int highDetailCount = 0;
     while(true) {
@@ -2661,7 +2710,7 @@ static int streamLevelInput(const LevelStreamInput *input, LevelStreamCallback c
 static bool reserveCharBuffer(char **buffer, size_t *capacity, size_t needed) {
     if (needed <= *capacity) return true;
 
-    size_t newCapacity = *capacity ? *capacity : 256;
+    size_t newCapacity = *capacity ? *capacity * 2 : 4096;
     if (newCapacity < needed) {
         newCapacity = needed;
     }
@@ -3176,8 +3225,24 @@ static void generateOrangePortals(int orangeStart) {
     objects.count = nextOrange;
 }
 
+bool isLevelArenaPtr(const void *ptr) {
+    const char *p = (const char *) ptr;
+    return levelArena.buffer && p >= (const char *) levelArena.buffer &&
+        p < (const char *) levelArena.buffer + levelArena.capacity;
+}
+
 int loadOnlineLevel(char *levelString) {
-    arenaReset(&levelArena);
+    bool inArena = isLevelArenaPtr(levelString);
+
+    if (inArena) {
+        size_t len = strlen(levelString);
+        memmove(levelArena.buffer, levelString, len + 1);
+        levelArena.offset = len + 1;
+        levelArena.prevOffset = 0;
+        levelString = (char *) levelArena.buffer;
+    } else {
+        arenaReset(&levelArena);
+    }
 
     LevelStreamInput input = {0};
     unsigned char *decoded = NULL;
@@ -3188,14 +3253,21 @@ int loadOnlineLevel(char *levelString) {
         fixBase64URL(levelString);
         removeChar(levelString, ',');
 
-        size_t encodedLen = strlen(levelString);
-        decoded = (unsigned char *)malloc(encodedLen);
-        if (!decoded) return LOAD_OUT_OF_MEMORY;
+        int decodedLen;
 
-        int decodedLen = base64Decode(levelString, decoded);
+        if (inArena) {
+            decodedLen = base64Decode(levelString, (unsigned char *) levelString);
+            decoded = (unsigned char *) levelString;
+            levelArena.offset = ((size_t) decodedLen + 3) & ~(size_t) 3;
+            levelArena.prevOffset = 0;
+        } else {
+            decoded = (unsigned char *)arenaAlloc(&levelArena, strlen(levelString));
+            if (!decoded) return LOAD_OUT_OF_MEMORY;
+            decodedLen = base64Decode(levelString, decoded);
+        }
+
         if (decodedLen <= 0) {
             outputLog("Failed to decode base64\n");
-            free(decoded);
             return LOAD_INVALID_BASE64;
         }
         input.compressedData = decoded;
@@ -3203,7 +3275,6 @@ int loadOnlineLevel(char *levelString) {
     }
 
     int result = loadLevelStream(&input, NULL, true);
-    free(decoded);
     return result;
 }
 
@@ -3245,54 +3316,99 @@ void loadLevelInfo(char *data, char *levelString) {
     }
 }
 
+static char *buildGMDInfo(char *level, char *valueStart, char *valueEnd, size_t levelSize) {
+    size_t prefixLen = (size_t)(valueStart - level);
+    size_t tailLen = levelSize - (size_t)(valueEnd - level);
+
+    char *info = (char *)malloc(prefixLen + tailLen + 1);
+    if (!info) return NULL;
+
+    memcpy(info, level, prefixLen);
+    memcpy(info + prefixLen, valueEnd, tailLen);
+    info[prefixLen + tailLen] = '\0';
+
+    return info;
+}
+
 int loadLevel(const char *path) {
     int outCode = LOAD_NO_ERROR;
 
     arenaReset(&levelArena);
 
+    bool inArena = strcmp(getFilenameExt(path), "gmd") == 0;
+
     size_t out;
-    char *level = readFile(path, &out);
+    char *level = inArena ? readFileArena(&levelArena, path, &out) : readFile(path, &out);
     if (!level) return 1;
 
-    level = convertIfGdlvl(level, path);
-    if (!level) {
-        return LOAD_OUT_OF_MEMORY;
+    if (!inArena) {
+        level = convertIfGdlvl(level, path);
+        if (!level) {
+            return LOAD_OUT_OF_MEMORY;
+        }
     }
 
-    char *b64 = extractGMDKey((const char *)level, "k4", "s");
+    char *k4End = NULL;
+    char *b64 = extractGMDKeyInPlace(level, "k4", "s", &k4End);
     if (b64) {
         LevelStreamInput input = {0};
         unsigned char *decoded = NULL;
+        char *uncompressed = NULL;
+        char *info = level;
 
         if (strchr(b64, ';')) {
             // Not even compressed
-            input.rawData = b64;
+            if (inArena) {
+                info = buildGMDInfo(level, b64, k4End, out);
+                if (!info) return LOAD_OUT_OF_MEMORY;
+                input.rawData = b64;
+            } else {
+                uncompressed = strdup(b64);
+                if (k4End) *k4End = '<';
+                if (!uncompressed) {
+                    free(level);
+                    return LOAD_OUT_OF_MEMORY;
+                }
+                input.rawData = uncompressed;
+            }
         } else {
             fixBase64URL(b64);
-            size_t encodedLen = strlen(b64);
-            decoded = (unsigned char *)malloc(encodedLen);
-            if (!decoded) {
-                free(b64);
-                free(level);
-                return LOAD_OUT_OF_MEMORY;
+
+            if (inArena) {
+                info = buildGMDInfo(level, b64, k4End, out);
+                if (!info) return LOAD_OUT_OF_MEMORY;
+                decoded = (unsigned char *) b64;
+            } else {
+                decoded = (unsigned char *)arenaAlloc(&levelArena, strlen(b64));
+                if (!decoded) {
+                    free(level);
+                    return LOAD_OUT_OF_MEMORY;
+                }
             }
 
             int decodedLen = base64Decode(b64, decoded);
             if (decodedLen <= 0) {
                 outputLog("Failed to decode base64\n");
-                free(decoded);
-                free(b64);
-                free(level);
+                if (inArena) free(info);
+                else free(level);
                 return LOAD_INVALID_BASE64;
             }
+
+            if (inArena) {
+                levelArena.offset = ((size_t)((char *) decoded - (char *) levelArena.buffer) + decodedLen + 3) & ~(size_t) 3;
+                levelArena.prevOffset = 0;
+            } else if (k4End) {
+                *k4End = '<';
+            }
+
             input.compressedData = decoded;
             input.compressedLen = (size_t)decodedLen;
         }
 
-        int result = loadLevelStream(&input, level, false);
-        free(decoded);
-        free(b64);
-        free(level);
+        int result = loadLevelStream(&input, info, false);
+        free(uncompressed);
+        if (inArena) free(info);
+        else free(level);
         return result;
     }
 
@@ -3300,7 +3416,7 @@ int loadLevel(const char *path) {
 
     char *data = decompressLevel(level, &outCode);
     if (!data) {
-        free(level);
+        if (!inArena) free(level);
         return outCode;
     }
 
@@ -3309,7 +3425,7 @@ int loadLevel(const char *path) {
     if (metaStr) {
         channelCount = parseColorChannels(metaStr, &colorChannels, &outCode);
         if (outCode) {
-            free(level);
+            if (!inArena) free(level);
             free(metaStr);
             return outCode;
         }
@@ -3318,13 +3434,13 @@ int loadLevel(const char *path) {
     else {
         channelCount = parseOldChannels(data, &colorChannels, &outCode);
         if (outCode) {
-            free(level);
+            if (!inArena) free(level);
             return outCode;
         }
     }
 
     loadLevelInfo(level, data);
-    free(level);
+    if (!inArena) free(level);
 
     // Minimum size
     levelInfo.lastObjX = 570.f;
@@ -3437,6 +3553,8 @@ void unloadLevel() {
     freeSections();
     freeObjectParticles();
     initColChannels();
+
+    currLevelString = NULL;
 
     arenaReset(&levelArena);
     

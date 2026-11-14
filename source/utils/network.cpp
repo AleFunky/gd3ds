@@ -33,6 +33,8 @@ s32 sock = -1, csock = -1;
 struct MemoryStruct {
     char *memory;
     size_t size;
+    size_t capacity;
+    bool arena;
 };
 
 static int cancelCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
@@ -49,11 +51,24 @@ size_t writeCallback(void *contents, size_t size, size_t nmemb, void *userp) {
     size_t realsize = size * nmemb;
     struct MemoryStruct *mem = (struct MemoryStruct *)userp;
 
-    char *ptr = (char *)realloc(mem->memory, mem->size + realsize + 1);
-    if(ptr == NULL)
-        return 0;  // out of memory
+    if (mem->size + realsize + 1 > mem->capacity) {
+        size_t capacity = mem->size + realsize + 1;
 
-    mem->memory = ptr;
+        char *ptr;
+        if (mem->arena) {
+            size_t arenaCapacity = mem->capacity ? mem->capacity * 2 : 262144;
+            if (arenaCapacity > capacity) capacity = arenaCapacity;
+            ptr = (char *) arenaRealloc(&levelArena, mem->memory, mem->capacity, capacity);
+        } else {
+            ptr = (char *) realloc(mem->memory, capacity);
+        }
+
+        if(ptr == NULL)
+            return 0;  // out of memory
+
+        mem->memory = ptr;
+        mem->capacity = capacity;
+    }
 
     memcpy(&(mem->memory[mem->size]), contents, realsize);
     mem->size += realsize;
@@ -85,9 +100,25 @@ int getLevelFromID(GenericTask *task, char **outData, int id, bool useGdps) {
     struct curl_slist *headers = NULL;
 
     if (curl) {
-        struct MemoryStruct chunk;
-        chunk.memory = (char *)malloc(1);
-        chunk.size = 0;
+        size_t arenaMark = levelArena.offset;
+
+        struct MemoryStruct chunk = {0};
+        chunk.memory = (char *)arenaAlloc(&levelArena, 262144);
+        bool inArena = chunk.memory != NULL;
+
+        if (inArena) {
+            chunk.capacity = 262144;
+            chunk.arena = true;
+            chunk.memory[0] = 0;
+        } else {
+            chunk.memory = (char *)malloc(65536);
+        }
+
+        if (!chunk.memory) {
+            curl_easy_cleanup(curl);
+            return -1;
+        }
+
         headers = curl_slist_append(headers,
             "Content-Type: application/x-www-form-urlencoded");
 
@@ -108,23 +139,39 @@ int getLevelFromID(GenericTask *task, char **outData, int id, bool useGdps) {
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
 
         CURLcode code = curl_easy_perform(curl);
-        
+
         curl_slist_free_all(headers);
         curl_easy_cleanup(curl);
 
+        int result = 0;
+
         if (code) {
-            return code;
+            result = code;
+        } else if (chunk.memory[0] == '-') {
+            result = atoi(chunk.memory);
+        } else if (inArena) {
+            *outData = chunk.memory;
+        } else {
+            *outData = (char *)malloc(chunk.size + 1);
+            if (*outData) {
+                memcpy(*outData, chunk.memory, chunk.size + 1);
+            } else {
+                result = -1;
+            }
         }
 
-        printf("(code %d) Response (%d): %s\n", code, chunk.size, chunk.memory);
-
-        if (chunk.memory[0] == '-') {
-            return atoi(chunk.memory);
+        if (inArena) {
+            if (result == 0) {
+                levelArena.offset = arenaMark + (((chunk.size + 1) + 3) & ~(size_t) 3);
+            } else {
+                levelArena.offset = arenaMark;
+            }
+            levelArena.prevOffset = arenaMark;
+        } else {
+            free(chunk.memory);
         }
-        
-        *outData = chunk.memory;
 
-        return 0;
+        return result;
     }
     return 2;
 }
@@ -151,9 +198,8 @@ int getSearchResults(GenericTask *task, char **outData, int gameVer, SearchFilte
     struct curl_slist *headers = NULL;
 
     if (curl) {
-        struct MemoryStruct chunk;
+        struct MemoryStruct chunk = {0};
         chunk.memory = (char *)malloc(1);
-        chunk.size = 0;
         headers = curl_slist_append(headers,
             "Content-Type: application/x-www-form-urlencoded");
 
@@ -253,9 +299,8 @@ int getCommentsFromID(GenericTask *task, char **outData, int id, int page, int m
     struct curl_slist *headers = NULL;
 
     if (curl) {
-        struct MemoryStruct chunk;
+        struct MemoryStruct chunk = {0};
         chunk.memory = (char *)malloc(1);
-        chunk.size = 0;
         headers = curl_slist_append(headers,
             "Content-Type: application/x-www-form-urlencoded");
 
@@ -303,9 +348,8 @@ int getSongInfoFromID(GenericTask *task, char **outData, int songId, bool useGdp
     struct curl_slist *headers = NULL;
 
     if (curl) {
-        struct MemoryStruct chunk;
+        struct MemoryStruct chunk = {0};
         chunk.memory = (char *)malloc(1);
-        chunk.size = 0;
         headers = curl_slist_append(headers,
             "Content-Type: application/x-www-form-urlencoded");
 
@@ -464,9 +508,8 @@ int getCommits(GenericTask *task, char **outData, const char *repoOwner, const c
     struct curl_slist *headers = NULL;
 
     if (curl) {
-        struct MemoryStruct chunk;
+        struct MemoryStruct chunk = {0};
         chunk.memory = (char *)malloc(1);
-        chunk.size = 0;
         headers = curl_slist_append(headers, "Accept: application/vnd.github+json");
         headers = curl_slist_append(headers, "X-GitHub-Api_Version: 2026-03-10");
 
@@ -514,9 +557,8 @@ int getReleases(GenericTask *task, char **outData, const char *repoOwner, const 
     struct curl_slist *headers = NULL;
 
     if (curl) {
-        struct MemoryStruct chunk;
+        struct MemoryStruct chunk = {0};
         chunk.memory = (char *)malloc(1);
-        chunk.size = 0;
         headers = curl_slist_append(headers, "Accept: application/vnd.github+json");
         headers = curl_slist_append(headers, "X-GitHub-Api_Version: 2026-03-10");
 
@@ -564,9 +606,8 @@ int getActions(GenericTask *task, char **outData, const char *repoOwner, const c
     struct curl_slist *headers = NULL;
 
     if (curl) {
-        struct MemoryStruct chunk;
+        struct MemoryStruct chunk = {0};
         chunk.memory = (char *)malloc(1);
-        chunk.size = 0;
         headers = curl_slist_append(headers, "Accept: application/vnd.github+json");
         headers = curl_slist_append(headers, "X-GitHub-Api_Version: 2026-03-10");
 

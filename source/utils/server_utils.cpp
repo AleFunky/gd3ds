@@ -277,12 +277,12 @@ static void fillLevelEntries(char **levelsStrings, int songStringCount, int crea
     }
 }
 
-static void fillLevelEntry(char **levelStrings, int levelStringsCount, bool fillSearchEntry, int searchId) {
+static void fillLevelEntry(char *levelString, bool fillSearchEntry, int searchId) {
     int levelKeyCount = 0;
 
     SavedLevelDataEntry *entry = getSavedLevelData(onlineMenuLevelID);
 
-    char **levelKeys = splitString(levelStrings[0], ':', &levelKeyCount, true);
+    char **levelKeys = splitStringInPlace(levelString, ':', &levelKeyCount, true);
     if (!levelKeys) return;
     for (int j = 0; j + 1 < levelKeyCount; j += 2) {
         int key = atoi(levelKeys[j]);
@@ -424,7 +424,7 @@ static void fillLevelEntry(char **levelStrings, int levelStringsCount, bool fill
             break;
         case 4:
             // base64 encoded probably compressed level string
-            levelEntry->levelString = strdup(valStr);
+            levelEntry->levelString = valStr;
 
             // Save level string
             saveSavedLevel(onlineMenuLevelID, gdps, levelEntry->levelString);
@@ -443,7 +443,7 @@ static void fillLevelEntry(char **levelStrings, int levelStringsCount, bool fill
     }
     
     entry->version = SAVED_LEVELS_VERSION;
-    freeStringArray(levelKeys, levelKeyCount);
+    free(levelKeys);
 }
 
 void fillPageEntry(char *initialString) {
@@ -973,31 +973,51 @@ int searchLevelsInternal(GenericTask *task, bool useGdps) {
 }
 
 int getLevelDataInternal(GenericTask *task, int id, bool refresh, int currentId, bool useGdps) {
+    bool prevInArena = levelEntry && levelEntry->levelString && isLevelArenaPtr(levelEntry->levelString);
+
+    if (levelEntry) {
+        if (!prevInArena && levelEntry->levelString != currLevelString) free(levelEntry->levelString);
+        free(levelEntry);
+        levelEntry = NULL;
+    }
+
+    if (prevInArena) arenaReset(&levelArena);
+
     char *outdata;
     int result = getLevelFromID(task, &outdata, id, useGdps);
 
     if (result != 0) return result;
     // validate first two chars of response to make sure what we're parsing is the level string
-    if (!(outdata[0] >= '0' && outdata[0] <= '9' && outdata[1] == ':')) return -2;
+    if (!(outdata[0] >= '0' && outdata[0] <= '9' && outdata[1] == ':')) {
+        if (!isLevelArenaPtr(outdata)) free(outdata);
+        return -2;
+    }
 
-    int initialStringCount = 0;
+    char *firstHash = strchr(outdata, '#');
+    if (firstHash) *firstHash = '\0';
 
-    char **initialStrings = splitString(outdata, '#', &initialStringCount, true);
-    if (!initialStrings) return -1;
-
-    levelEntry = (LevelEntry *)malloc(initialStringCount * sizeof(LevelEntry));
-    if (!levelEntry) return -1;
+    levelEntry = (LevelEntry *)malloc(sizeof(LevelEntry));
+    if (!levelEntry) {
+        if (!isLevelArenaPtr(outdata)) free(outdata);
+        return -1;
+    }
 
     // Initialize
-    memset(levelEntry, 0, initialStringCount * sizeof(LevelEntry));
+    memset(levelEntry, 0, sizeof(LevelEntry));
 
-    fillLevelEntry(initialStrings, 1, refresh, currentId);
+    fillLevelEntry(outdata, refresh, currentId);
 
-    freeStringArray(initialStrings, initialStringCount);
+    if (!levelEntry->levelString) {
+        if (!isLevelArenaPtr(outdata)) free(outdata);
+        return -1;
+    }
 
-    free(outdata);
+    if (!isLevelArenaPtr(outdata)) {
+        size_t levelStringLen = strlen(levelEntry->levelString);
+        memmove(outdata, levelEntry->levelString, levelStringLen + 1);
+        levelEntry->levelString = outdata;
+    }
 
-    levelEntryLength = initialStringCount;
     return 0;
 }
 

@@ -78,6 +78,9 @@ SongEntry *currentSongEntry = NULL;
 
 int getSavedLevel(GenericTask *task) {
     size_t outSize;
+    if (loaded_level_string && loaded_level_string != currLevelString) {
+        free(loaded_level_string);
+    }
     loaded_level_string = loadSavedLevel(onlineMenuLevelID, gdps, &outSize);
     return loaded_level_string == NULL;
 }
@@ -537,7 +540,7 @@ static void handleErrors(int code) {
         case 42:
             break;
         default:
-            snprintf(errorMessage, sizeof(errorMessage), "An unknown error has occurred.\nError code: %d", result);
+            snprintf(errorMessage, sizeof(errorMessage), "An unknown error has occurred.\nError code: %d", code);
             break;
     }
     InfoCardData *data = (InfoCardData *)malloc(sizeof(InfoCardData));
@@ -818,10 +821,17 @@ static void onlineLevelMenuUpdate(UIScreen *s, UIInput *i) {
 
 static void onlineLevelMenuExit(UIScreen *s) {
     if (levelEntry) {
-        if (levelEntry->levelString) free(levelEntry->levelString);
+        if (levelEntry->levelString && !isLevelArenaPtr(levelEntry->levelString))
+            free(levelEntry->levelString);
         free(levelEntry);
         levelEntry = NULL;
     }
+
+    if (loaded_level_string && loaded_level_string != currLevelString) {
+        free(loaded_level_string);
+    }
+    loaded_level_string = NULL;
+    hasSavedLevel = false;
     
     if (commentEntries) {
         free(commentEntries);
