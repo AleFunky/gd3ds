@@ -22,7 +22,6 @@ struct LightningSegment {
     float startY;
     float endX;
     float endY;
-    u32 color;
 };
 
 class Lightning {
@@ -34,6 +33,7 @@ public:
 private:
     std::vector<LightningSegment> m_segments;
     float m_time;
+    u32 m_color;
 
     std::vector<LightningSegment> generateLightingRecursive(
         const std::vector<LightningPoint>& points, 

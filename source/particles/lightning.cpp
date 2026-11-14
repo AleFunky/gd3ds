@@ -9,11 +9,8 @@
 namespace gd3ds
 {
 
-constexpr u32 lightningSizeMiniCol = C2D_Color32f(1.0f, 31 / 255.f, 1.0f, 1.0f);
-constexpr u32 lightningSizeNormalCol = C2D_Color32f(0.0f, 1.0f, 50.f / 255.f, 1.0f);
-
-constexpr u32 lightningTeleInCol = C2D_Color32f(56 / 255.f, 200 / 255.f, 1.0f, 1.0f);
-constexpr u32 lightningTeleOutCol = C2D_Color32f(1.0f, 1.0f, 0.0f, 1.0f);
+constexpr u32 kLightningSizeMiniCol = C2D_Color32f(1.0f, 31 / 255.f, 1.0f, 1.0f);
+constexpr u32 kLightningSizeNormalCol = C2D_Color32f(0.0f, 1.0f, 50.f / 255.f, 1.0f);
 
 static unsigned int lightningRand(unsigned long long& seed){
     seed = seed * 1103515245 + 12345;
@@ -59,27 +56,11 @@ std::vector<LightningSegment> Lightning::generateLightingRecursive(
         segments.reserve(segmentCount);
 
         for(unsigned int i = 0; i < segmentCount; i++){
-            u32 color = 0;
-            switch(type){
-                case LightningType::SizeMini:
-                    color = lightningSizeMiniCol;
-                    break;
-                case LightningType::SizeNormal:
-                    color = lightningSizeNormalCol;
-                    break;
-                case LightningType::Teleport:
-                    color = p1Color.toColor32();
-                    break;
-                default:
-                    break;
-            }
-
             segments.push_back((LightningSegment){
                 nextPoints[i].x, 
                 nextPoints[i].y, 
                 nextPoints[i + 1].x,
-                nextPoints[i + 1].y,
-                color
+                nextPoints[i + 1].y
             });
         }
 
@@ -100,7 +81,7 @@ void Lightning::renderLightning(){
 
         alpha = clampf(alpha, 0.0f, 1.0f);
 
-        u32 color = (s.color & 0x00FFFFFF) |((u32)(alpha * 255.0f) << 24);
+        u32 color = (m_color & 0x00FFFFFF) |((u32)(alpha * 255.0f) << 24);
 
         float topX = s.startX - state.cameraX;
         float btmX = s.endX - state.cameraX;
@@ -116,6 +97,20 @@ bool Lightning::done(){
 }
 
 Lightning::Lightning(float startX, float startY, float endX, float endY, LightningType type){
+    switch(type){
+        case LightningType::SizeMini:
+            m_color = kLightningSizeMiniCol;
+            break;
+        case LightningType::SizeNormal:
+            m_color = kLightningSizeNormalCol;
+            break;
+        case LightningType::Teleport:
+            m_color = p1Color.toColor32();
+            break;
+        default:
+            break;
+    }
+
     std::vector<LightningPoint> segmentPoints = {
         (LightningPoint){
             startX, startY

@@ -1044,9 +1044,9 @@ void spawnObjectAt(
     }
 }
 
-constexpr int placeholderPlayer = -1;
-constexpr int placeholderShineBack = -2;
-constexpr int placeholderShineFront = -3;
+constexpr int kPlaceholderPlayer = -1;
+constexpr int kPlaceholderShineBack = -2;
+constexpr int kPlaceholderShineFront = -3;
 
 const GameObject portalShineBack = {
     .zLayer = -1,
@@ -1063,16 +1063,16 @@ static inline uint32_t makeSortKey(SpriteObject *s)
     const int obj = s->obj;
 
     // Player sprite is -1 so handle it there
-    if (obj == placeholderPlayer) {
+    if (obj == kPlaceholderPlayer) {
         return ((4 + 8) << 18) | (2 << 16) | (255 << 8) | 128;
     }
 
     const int id = obj >= 0 ? objects.id[obj] : 0;
     const GameObject *gameObj = nullptr;
 
-    if(obj == placeholderShineFront){
+    if(obj == kPlaceholderShineFront){
         gameObj = &portalShineBack;
-    } else if(obj == placeholderShineBack){
+    } else if(obj == kPlaceholderShineBack){
         gameObj = &portalShineFront;
     } else {
         gameObj = (const GameObject*)&gameObjects[id];
@@ -1864,7 +1864,7 @@ void insertPlayer(){
 
     C2D_Sprite spr = { 0 };
     vo->spr = spr;
-    vo->obj = placeholderPlayer;
+    vo->obj = kPlaceholderPlayer;
     vo->layer = 0;
     vo->colType = 0;
     vo->opacity = 1.f;
@@ -1878,7 +1878,7 @@ void insertShines(){
 
     C2D_Sprite backspr = { 0 };
     back->spr = backspr;
-    back->obj = placeholderShineBack;
+    back->obj = kPlaceholderShineBack;
     back->layer = -1;
     back->colType = 0;
     back->opacity = 1.f;
@@ -1890,7 +1890,7 @@ void insertShines(){
 
     C2D_Sprite frontspr = { 0 };
     front->spr = frontspr;
-    front->obj = placeholderShineFront;
+    front->obj = kPlaceholderShineFront;
     front->layer = 1;
     front->colType = 0;
     front->opacity = 1.f;
@@ -2408,12 +2408,12 @@ void drawObjects() {
             }
         } else {
             switch(obj->obj){
-                case placeholderPlayer:
+                case kPlaceholderPlayer:
                     drawPlayerGraphics();
                     break;
-                case placeholderShineBack:
+                case kPlaceholderShineBack:
                     break;
-                case placeholderShineFront:
+                case kPlaceholderShineFront:
                     break;
             }
         }
