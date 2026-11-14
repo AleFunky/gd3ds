@@ -138,7 +138,7 @@ static void actionSearch(UIElement* e, const UIPropertyList *args) {
     filters.searchType = uiPropInt(&e->customProperties, "type", 0);
     filters.currentPage = 0;
     searchNeedsRefresh = true;
-    uiStackPush(&onlineDef, ANIM_NONE, ANIM_NONE, PUSH_ROOT);
+    uiStackPush(&onlineDef, UIAnimation::AnimNone, UIAnimation::AnimNone, UIStackPushType::PushRoot);
 }
 
 static UIActionDef searchActions[] = {

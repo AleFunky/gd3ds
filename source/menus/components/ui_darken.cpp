@@ -40,17 +40,17 @@ static void uiDarkenUpdate(UIElement* e, UIInput* touch, UITransform *transform)
         if(!e->screen->transition.done){
             float fade = 0.f;
             switch(e->screen->transition.state){
-                case UI_TRANSITION_OPENING:
+                case UITransitionState::UiTransitionOpening:
                     if(trans->inDuration > 0.f){
                         fade = time / duration;
                     }
                     break;
-                case UI_TRANSITION_CLOSING:
+                case UITransitionState::UiTransitionClosing:
                     if(trans->outDuration > 0.f){
                         fade = 1.f - (time / duration);
                     }
                     break;
-                case UI_TRANSITION_NONE:
+                case UITransitionState::UiTransitionNone:
                     fade = 0.f;
                     break;
             }
@@ -93,7 +93,7 @@ UIDarken *uiCreateDarken(UIScreen *screen) {
 
     if (!e) return NULL;
 
-    e->base.type = UI_DARKEN;
+    e->base.type = UIElementType::UiDarken;
     e->base.enabled = true;
     e->base.opacity = 0.0f;
 

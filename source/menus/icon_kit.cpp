@@ -120,9 +120,9 @@ static void setIconIndex(UIElement *e) {
         uiIconSetSelected((UIIcon *) e, *currentIcons[gamemodePage] == newIndex);
         uiIconSetGamemodeIndex((UIIcon *) e, gamemodePage, newIndex);
 
-        if (gamemodePage == GAMEMODE_SHIP || gamemodePage == GAMEMODE_UFO || gamemodePage == GAMEMODE_SPIDER) {
+        if (gamemodePage == static_cast<int>(IconGamemode::GamemodeShip) || gamemodePage == static_cast<int>(IconGamemode::GamemodeUfo) || gamemodePage == static_cast<int>(IconGamemode::GamemodeSpider)) {
             uiElementSetScale(e, .7f);
-        } else if (gamemodePage == GAMEMODE_WAVE) {
+        } else if (gamemodePage == static_cast<int>(IconGamemode::GamemodeWave)) {
             uiElementSetScale(e, .95f);
         } else {
             uiElementSetScale(e, .8f);

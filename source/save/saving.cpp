@@ -30,15 +30,15 @@ namespace gd3ds
 {
 
 LevelDataEntry *currentLevelEntry;
-LevelListType currentLevelList = LEVEL_LIST_MAIN_LEVELS;
+LevelListType currentLevelList = LevelListType::LevelListMainLevels;
 
 static CreatorEntry emptyCreator = (CreatorEntry) {
     .userId = 0,
     .creatorName = "-"
 };
 
-static SavingTask tasks[SAVE_TYPE_COUNT] = { 0 };
-static Thread savingThreads[SAVE_TYPE_COUNT] = { 0 };
+static SavingTask tasks[static_cast<int>(SaveType::SaveTypeCount)] = { 0 };
+static Thread savingThreads[static_cast<int>(SaveType::SaveTypeCount)] = { 0 };
 
 int totalStars = 0;
 int totalCoins = 0;
@@ -141,7 +141,7 @@ static void calculateStatsLevelList(LevelDataList *list, bool isMainLevel, const
                 totalCoins += data->coin3;
 
                 // Check for demon
-                if (pack->levels[i].difficulty == MAIN_DIFF_DEMON) {
+                if (pack->levels[i].difficulty == Difficulty::Demon) {
                     totalDemons++;
                 }
             } else {
@@ -1003,9 +1003,9 @@ LevelDataEntry *getOrAddLevelToServerFile(ServerFile *saveData, const char *key,
     snprintf(hash, sizeof(hash), "%016llX", fnv1a64(key));
 
     switch (type) {
-        case LEVEL_LIST_MAIN_LEVELS:
+        case LevelListType::LevelListMainLevels:
             return levelDataListGetOrAdd(&saveData->mainLevels, hash);
-        case LEVEL_LIST_ONLINE:
+        case LevelListType::LevelListOnline:
             return levelDataListGetOrAdd(&saveData->onlineLevels, hash);
         default:
             break;
@@ -1027,7 +1027,7 @@ bool loadSaveFile(const char *path, ServerFile *saveData) {
     char *file = readFile(path, &outSize);
     if (!file) {
         serverFileInit(saveData);
-        return saveSaveFile(path, saveData);
+        return saveSaveFile(path, saveData) != SavingError::SaveErrorNone;
     }
 
     size_t outLen;
@@ -1093,7 +1093,7 @@ bool loadExternalFile(const char *path, ExternalLevelFile *saveData) {
     char *file = readFile(path, &outSize);
     if (!file) {
         externalFileInit(saveData);
-        return saveExternalFile(path, saveData);
+        return saveExternalFile(path, saveData) != SavingError::SaveErrorNone;
     }
 
     size_t outLen;
@@ -1134,13 +1134,13 @@ bool loadExternalFile(const char *path, ExternalLevelFile *saveData) {
 SavingError saveSaveFile(const char *path, const ServerFile *saveData) {
     struct json_object *root = json_object_new_object();
     if (!root) {
-        return SAVE_ERROR_JSON_FAIL;
+        return SavingError::SaveErrorJsonFail;
     }
 
     struct json_object *online = makeLevelDataListJSON(&saveData->onlineLevels);
     if (!online) {
         json_object_put(root);
-        return SAVE_ERROR_MAKE_DATA_LIST;
+        return SavingError::SaveErrorMakeDataList;
     }
 
     json_object_object_add(root, SAVE_ONLINE_KEY, online);
@@ -1149,7 +1149,7 @@ SavingError saveSaveFile(const char *path, const ServerFile *saveData) {
 
     if (!mainLevels) {
         json_object_put(root);
-        return SAVE_ERROR_MAKE_DATA_LIST;
+        return SavingError::SaveErrorMakeDataList;
     }
 
     json_object_object_add(root, SAVE_MAIN_LEVEL_KEY, mainLevels);
@@ -1158,15 +1158,15 @@ SavingError saveSaveFile(const char *path, const ServerFile *saveData) {
 
     if (!savedLevels) {
         json_object_put(root);
-        return SAVE_ERROR_MAKE_SAVE_DATA_LIST;
+        return SavingError::SaveErrorMakeSaveDataList;
     }
 
     json_object_object_add(root, SAVE_SAVED_LEVEL_KEY, savedLevels);
 
 
-    SaveType type = (saveData == &gdpsFile ? SAVE_1P9_GDPS : SAVE_ROBTOP);
+    SaveType type = (saveData == &gdpsFile ? SaveType::Save1p9Gdps : SaveType::SaveRobtop);
 
-    SavingTask *task = &tasks[type];
+    SavingTask *task = &tasks[static_cast<int>(type)];
 
     char tmpPath[250];
     snprintf(tmpPath, sizeof(tmpPath), "%s", path);
@@ -1179,24 +1179,24 @@ SavingError saveSaveFile(const char *path, const ServerFile *saveData) {
     
     beginSaving(type);
 
-    return SAVE_ERROR_NONE;
+    return SavingError::SaveErrorNone;
 }
 
 SavingError saveExternalFile(const char *path, const ExternalLevelFile *saveData) {
     struct json_object *root = json_object_new_object();
     if (!root) {
-        return SAVE_ERROR_JSON_FAIL;
+        return SavingError::SaveErrorJsonFail;
     }
 
     struct json_object *external = makeLevelDataListJSON(&saveData->externalLevels);
     if (!external) {
         json_object_put(root);
-        return SAVE_ERROR_MAKE_DATA_LIST;
+        return SavingError::SaveErrorMakeDataList;
     }
 
     json_object_object_add(root, SAVE_EXTERNAL_KEY, external);
 
-    SavingTask *task = &tasks[SAVE_EXTERNAL];
+    SavingTask *task = &tasks[static_cast<int>(SaveType::SaveExternal)];
 
     char tmpPath[250];
     snprintf(tmpPath, sizeof(tmpPath), "%s", path);
@@ -1207,19 +1207,19 @@ SavingError saveExternalFile(const char *path, const ExternalLevelFile *saveData
 
     task->root = root;
     
-    beginSaving(SAVE_EXTERNAL);
+    beginSaving(SaveType::SaveExternal);
 
-    return SAVE_ERROR_NONE;
+    return SavingError::SaveErrorNone;
 }
 
 void saveCurrentSaveFile(LevelListType type) {
     const char *path = (gdps ? SAVE_1P9_SERVER_FILE : SAVE_ROBTOP_SERVER_FILE);
     switch (type) {
-        case LEVEL_LIST_MAIN_LEVELS:
-        case LEVEL_LIST_ONLINE:
+        case LevelListType::LevelListMainLevels:
+        case LevelListType::LevelListOnline:
             saveSaveFile(path, currentServerFile);
             break;
-        case LEVEL_LIST_EXTERNAL:
+        case LevelListType::LevelListExternal:
             saveExternalFile(SAVE_EXTERNAL_LEVELS_FILE, &externalFile);
             break;
     }
@@ -1410,20 +1410,20 @@ bool migrateOldData() {
         
         
         SavingError errorCode = saveSaveFile(SAVE_ROBTOP_SERVER_FILE, &gdServerFile);
-        if (errorCode) {
-            outputLog("Failed to migrate robtop: %x\n", errorCode);
+        if (errorCode != SavingError::SaveErrorNone) {
+            outputLog("Failed to migrate robtop: %x\n", static_cast<int>(errorCode));
             return false;
         }
 
         errorCode = saveSaveFile(SAVE_1P9_SERVER_FILE, &gdpsFile);
-        if (errorCode) {
-            outputLog("Failed to migrate gdps: %x\n", errorCode);
+        if (errorCode != SavingError::SaveErrorNone) {
+            outputLog("Failed to migrate gdps: %x\n", static_cast<int>(errorCode));
             return false;
         }
         
         errorCode = saveExternalFile(SAVE_EXTERNAL_LEVELS_FILE, &externalFile);
-        if (errorCode) {
-            outputLog("Failed to migrate external: %x\n", errorCode);
+        if (errorCode != SavingError::SaveErrorNone) {
+            outputLog("Failed to migrate external: %x\n", static_cast<int>(errorCode));
             return false;
         }
 
@@ -1440,22 +1440,22 @@ bool migrateOldData() {
 static SavingError compressSave(SavingTask *task) {
     const char *json = json_object_to_json_string_ext(task->root, JSON_C_TO_STRING_PLAIN);
     if (!json) {
-        return SAVE_ERROR_OUTOFMEM;
+        return SavingError::SaveErrorOutofmem;
     }
 
     int outCode;
     task->data = compressData((const unsigned char *) json, strlen(json), &task->dataLen, &outCode);
     if (!task->data) {
-        return SAVE_ERROR_COMPRESS;
+        return SavingError::SaveErrorCompress;
     }
 
-    return SAVE_ERROR_NONE;
+    return SavingError::SaveErrorNone;
 }
 
 static SavingError writeSave(SavingTask *task) {
     FILE *file = fopen(task->tmpFile, "wb");
     if (!file) {
-        return SAVE_ERROR_OPEN_FILE;
+        return SavingError::SaveErrorOpenFile;
     }
 
     bool success = true;
@@ -1469,7 +1469,7 @@ static SavingError writeSave(SavingTask *task) {
     }
 
     if (!success) {
-        return SAVE_ERROR_WRITING_FILE;
+        return SavingError::SaveErrorWritingFile;
     }
 
     if (remove(task->file) != 0) {
@@ -1481,7 +1481,7 @@ static SavingError writeSave(SavingTask *task) {
                 strerror(errno)
             );
             remove(task->tmpFile);
-            return SAVE_ERROR_REMOVE_FILE;
+            return SavingError::SaveErrorRemoveFile;
         }
     }
 
@@ -1495,10 +1495,10 @@ static SavingError writeSave(SavingTask *task) {
             errno
         );
         remove(task->tmpFile);
-        return SAVE_ERROR_RENAME_FILE;
+        return SavingError::SaveErrorRenameFile;
     }
 
-    return SAVE_ERROR_NONE;
+    return SavingError::SaveErrorNone;
 }
 
 static void savingThread(void *arg) {
@@ -1511,32 +1511,32 @@ static void savingThread(void *arg) {
 }
 
 void processSaving() {
-    for (int i = 0; i < (int)SAVE_TYPE_COUNT; i++) {
+    for (int i = 0; i < (int)static_cast<int>(SaveType::SaveTypeCount); i++) {
         SavingTask *task = &tasks[i];
         if (!task->ready) continue;
 
-        SavingError error = task->error ? task->error : writeSave(task);
+        SavingError error = task->error != SavingError::SaveErrorNone ? task->error : writeSave(task);
 
         free(task->data);
         task->data = NULL;
         task->ready = false;
         task->running = false;
 
-        if (error) {
-            outputLog("An error has occured while saving: %d\n", error);
+        if (error != SavingError::SaveErrorNone) {
+            outputLog("An error has occured while saving: %d\n", static_cast<int>(error));
         }
     }
 }
 
 bool isSaving() {
-    for (int i = 0; i < (int)SAVE_TYPE_COUNT; i++) {
+    for (int i = 0; i < (int)static_cast<int>(SaveType::SaveTypeCount); i++) {
         if (tasks[i].running) return true;
     }
     return false;
 }
 
 void waitForSaving() {
-    for (int i = 0; i < (int)SAVE_TYPE_COUNT; i++) {
+    for (int i = 0; i < (int)static_cast<int>(SaveType::SaveTypeCount); i++) {
         if (!savingThreads[i]) continue;
 
         threadJoin(savingThreads[i], U64_MAX);
@@ -1547,26 +1547,26 @@ void waitForSaving() {
 }
 
 void beginSaving(SaveType type) {
-    if (type == SAVE_CONFIG) {
+    if (type == SaveType::SaveConfig) {
         configSave(&cfg);
         return;
     }
 
-    if (!tasks[type].running) {   
+    if (!tasks[static_cast<int>(type)].running) {
         int32_t priority = 0x30;
         svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
         priority += 1;
         priority = priority < 0x18 ? 0x18 : priority;
         priority = priority > 0x3F ? 0x3F : priority;
 
-        tasks[type].data = NULL;
-        tasks[type].error = SAVE_ERROR_NONE;
-        tasks[type].ready = false;
-        tasks[type].running = true;
+        tasks[static_cast<int>(type)].data = NULL;
+        tasks[static_cast<int>(type)].error = SavingError::SaveErrorNone;
+        tasks[static_cast<int>(type)].ready = false;
+        tasks[static_cast<int>(type)].running = true;
     
-        savingThreads[type] = threadCreate(
+        savingThreads[static_cast<int>(type)] = threadCreate(
             savingThread,
-            &tasks[type],
+            &tasks[static_cast<int>(type)],
             32 * 1024,
             priority,
             (isN3Ds ? 2 : 0),

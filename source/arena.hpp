@@ -6,12 +6,12 @@
 namespace gd3ds
 {
 
-typedef struct {
+struct Arena {
     uint8_t *buffer;
     size_t capacity;
     size_t offset;
     size_t prevOffset;
-} Arena;
+};
 
 bool arenaInit(Arena *a, size_t capacity);
 void *arenaAlloc(Arena *a, size_t size);

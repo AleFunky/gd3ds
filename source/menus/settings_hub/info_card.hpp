@@ -5,12 +5,12 @@
 namespace gd3ds
 {
 
-typedef struct {
+struct InfoCardData {
     bool copied;
     const char *text;
     bool customTitle;
     const char *title;
-} InfoCardData;
+};
 
 extern const UIScreenDefPair infoCardDef;
 

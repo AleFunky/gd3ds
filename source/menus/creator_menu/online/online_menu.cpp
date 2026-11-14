@@ -107,7 +107,7 @@ static void actionOpenOnlineLevelMenu(UIElement* e, const UIPropertyList *args) 
     currSearchID = entry->entryId;
     onlineMenuLevelID = entry->levelId;
     redownload = entry->redownload; 
-    uiStackPush(&onlineLevelMenuDef, ANIM_NONE, ANIM_NONE, PUSH_ROOT);
+    uiStackPush(&onlineLevelMenuDef, UIAnimation::AnimNone, UIAnimation::AnimNone, UIStackPushType::PushRoot);
 }
 
 static void updateArrows(UIScreen *s) {
@@ -162,7 +162,7 @@ static void actionVersionWarning(UIElement* e, const UIPropertyList *args){
     data->customTitle = true;
     data->copied = true;
 
-    uiStackPush(&infoCardDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+    uiStackPush(&infoCardDef, UIAnimation::AnimZoom, UIAnimation::AnimZoom, UIStackPushType::PushNext);
     uiStackPushData(data);
 }
 
@@ -533,7 +533,7 @@ static void onlineMenuInit(UIScreen *s) {
 
     list = (UIList *) uiGetElementByTag(s, "list");
     errorLabel = (UILabel *)uiGetElementByTag(s, "errorLabel");
-    pageInfoLabel = (UILabel *)uiGetElementByTag(&s->pair->screens[SCREEN_TOP], "pageinfo");
+    pageInfoLabel = (UILabel *)uiGetElementByTag(&s->pair->screens[static_cast<int>(Screens::ScreenTop)], "pageinfo");
 
     uiRunFuncOnTag(s, "nextpage", uiDisableElement);
     uiRunFuncOnTag(s, "prevpage", uiDisableElement);

@@ -30,7 +30,7 @@
 namespace gd3ds
 {
 
-const char *errorStrings[LOAD_ERROR_COUNT - 1] = {
+const char *errorStrings[static_cast<int>(LevelLoadError::LoadErrorCount) - 1] = {
     "Invalid gmd.",
     "Invalid level data.",
     "Level string missing sections.",
@@ -120,8 +120,8 @@ UIScreen *btm_screen = NULL;
 static void updateCurrentLevel(int level) {
     char key[18];
     snprintf(key, sizeof(key), "main_%d", level);
-    currentLevelEntry = getOrAddLevelToServerFile(currentServerFile, key, LEVEL_LIST_MAIN_LEVELS);
-    currentLevelList = LEVEL_LIST_MAIN_LEVELS;
+    currentLevelEntry = getOrAddLevelToServerFile(currentServerFile, key, LevelListType::LevelListMainLevels);
+    currentLevelList = LevelListType::LevelListMainLevels;
     currentLevelEntry->data.stars = currentMainLevelPack->levels[level].stars;
 }
 
@@ -235,7 +235,7 @@ void updateLevelFace(int level) {
     if (level < 0) level = (int)currentMainLevelPack->count-1;
     if (level >= (int)currentMainLevelPack->count) level = 0;
 
-    uiImageSetImage(level_card_face, 239 + currentMainLevelPack->levels[level].difficulty, 0);
+    uiImageSetImage(level_card_face, 239 + (int)currentMainLevelPack->levels[level].difficulty, 0);
 }
 void updateLevelTop(int level){
     updateCurrentLevel(currentMainLevelPack->levels[level].levelID);
@@ -286,7 +286,7 @@ void handleCardMovement() {
         float start = (scrollDir == 0) ? dragDistance : dragDistance * scrollDir;
         float end = (scrollDir == 0) ? 0 : 320;
 
-        float fadeValue = easeValue(ELASTIC_OUT, start, end, animTime, animDuration, 0.6f);
+        float fadeValue = easeValue(EaseTypes::ElasticOut, start, end, animTime, animDuration, 0.6f);
 
         float value = (scrollDir == 0) ? 160 + fadeValue : 160 + fadeValue * scrollDir;
         animTime += 0.016666f;
@@ -300,7 +300,7 @@ void lerpLevelColors(u32 color1, u32 color2){
     float frac = abs(dragDistance) / 320.f;
     frac = clampf(frac, 0.f, 1.f);
     u32 lerpCol = colorLerpU32(color1, color2, frac);
-    uploadColorToBuffer(CHANNEL_BG, lerpCol, 0);
+    uploadColorToBuffer(static_cast<int>(ColorChannelIDs::ChannelBg), lerpCol, 0);
 }
 
 void peekRight(){
@@ -334,7 +334,7 @@ void peekLeft(){
 }
 
 void tintGround(UIElement *e) {
-    ColorChannel channel = channels[CHANNEL_BG];
+    ColorChannel channel = channels[static_cast<int>(ColorChannelIDs::ChannelBg)];
     uiImageSetTint((UIImage *) e, C2D_Color32(channel.color.r, channel.color.g, channel.color.b, 255));
 }
 
@@ -342,7 +342,7 @@ void actionOpenLevel(UIElement* e, const UIPropertyList *args) {
     recenter();
     stopMP3();
     playingMenuLoop = false;
-    uiStackPushGameState(STATE_GAME);
+    uiStackPushGameState(static_cast<int>(GameState::StateGame));
 }
 
 void actionMoveRight(UIElement* e, const UIPropertyList *args) { 
@@ -357,7 +357,7 @@ void actionMoveRight(UIElement* e, const UIPropertyList *args) {
     uiRunFuncOnTag(btm_screen, "level_card_2", enableCard2);
     uiRunFuncOnTag(btm_screen, "level_card_2", levelCardMoveRight);
     
-    uploadColorToBuffer(CHANNEL_BG, defaultLvlColors[currLevelID % numMenuColors], COLOR_FADE_DURATION);
+    uploadColorToBuffer(static_cast<int>(ColorChannelIDs::ChannelBg), defaultLvlColors[currLevelID % numMenuColors], COLOR_FADE_DURATION);
 
     updateLevelName(currLevelID - 1, 0);
     updateLevelStars(currLevelID - 1, 0);
@@ -383,7 +383,7 @@ void actionMoveLeft(UIElement* e, const UIPropertyList *args) {
     uiRunFuncOnTag(btm_screen, "level_card_2", enableCard2);
     uiRunFuncOnTag(btm_screen, "level_card_2", levelCardMoveLeft);
 
-    uploadColorToBuffer(CHANNEL_BG, defaultLvlColors[currLevelID % numMenuColors], COLOR_FADE_DURATION);
+    uploadColorToBuffer(static_cast<int>(ColorChannelIDs::ChannelBg), defaultLvlColors[currLevelID % numMenuColors], COLOR_FADE_DURATION);
 
     updateLevelName(currLevelID + 1, 0);
     updateLevelStars(currLevelID + 1, 0);
@@ -463,7 +463,7 @@ void levelSelectInit(UIScreen *s){
     uiRunFuncOnTag(s, "level_card_2", disableCard2);
 
     u32 color = defaultLvlColors[currLevelID % numMenuColors];
-    uploadColorToBuffer(CHANNEL_BG, color, 0);
+    uploadColorToBuffer(static_cast<int>(ColorChannelIDs::ChannelBg), color, 0);
 
     dragging = false;
     dragDistance = 0;
@@ -493,18 +493,18 @@ void levelSelectUpdate(UIScreen *s, UIInput *input){
         dragging = false;
         uiRunFuncOnTag(s, "level_card_2", disableCard2);
         recenter();
-        uploadColorToBuffer(CHANNEL_BG, defaultLvlColors[currLevelID % numMenuColors], 0);
+        uploadColorToBuffer(static_cast<int>(ColorChannelIDs::ChannelBg), defaultLvlColors[currLevelID % numMenuColors], 0);
         updateLevelTop(currLevelID);
     }
     exitingLevel = false;
     
     if(!scrollDir && !dragging){
-        uploadColorToBuffer(CHANNEL_BG, defaultLvlColors[currLevelID % numMenuColors], 0);
+        uploadColorToBuffer(static_cast<int>(ColorChannelIDs::ChannelBg), defaultLvlColors[currLevelID % numMenuColors], 0);
     }
 
-    handleColChannel(CHANNEL_BG);
+    handleColChannel(static_cast<int>(ColorChannelIDs::ChannelBg));
 
-    ColorChannel channel = channels[CHANNEL_BG];
+    ColorChannel channel = channels[static_cast<int>(ColorChannelIDs::ChannelBg)];
 
     uiImageSetTint(bgGradient, C2D_Color32(channel.color.r, channel.color.g, channel.color.b, 255));
     uiImageSetTint(bg_gradient_top, C2D_Color32(channel.color.r, channel.color.g, channel.color.b, 255));
@@ -591,7 +591,7 @@ void levelSelectUpdate(UIScreen *s, UIInput *input){
 }
 
 void levelSelectDrawTop(UIScreen *s, UIDrawPhase phase){
-    if(phase == UI_DRAW_BEFORE) return;
+    if(phase == UIDrawPhase::UiDrawBefore) return;
 
     drawDots(currLevelID);
 }

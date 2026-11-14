@@ -15,9 +15,9 @@
 namespace gd3ds
 {
 
-enum StereoEye {
-    EYE_LEFT,
-    EYE_RIGHT
+enum class StereoEye {
+    EyeLeft,
+    EyeRight
 };
 
 void initTrigTable();

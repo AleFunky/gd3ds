@@ -15,10 +15,10 @@ char *decompressData(unsigned char *data, size_t dataLen, size_t *outLen, int *o
 char *decompressDataLevel(unsigned char *data, size_t dataLen, size_t *outLen, int *outCode);
 
 
-typedef struct GenericTask GenericTask;
+struct GenericTask;
 typedef int (*GenericFunc)(GenericTask *);
 
-typedef struct GenericTask {
+struct GenericTask {
     GenericFunc func;
 
     volatile int result;
@@ -26,7 +26,7 @@ typedef struct GenericTask {
     volatile bool running;
     volatile bool finished;
     volatile bool cancelled;
-} GenericTask;
+};
 
 Thread createGenericThread(GenericTask *task);
 

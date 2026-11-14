@@ -64,7 +64,7 @@ static void actionSwitchServer(UIElement* e, const UIPropertyList *args) {
 
         if (uiStackCheckLoadedRoot(&searchMenuDef)) {
             UIScreenPair *screenPair = uiStackGetLoadedScreen(&searchMenuDef);
-            UIScreen *screen = &screenPair->screens[SCREEN_BTM];
+            UIScreen *screen = &screenPair->screens[static_cast<int>(Screens::ScreenBtm)];
             if(gdps){
                 disableDemons(screen);
             } else if(!gdps && filters.isDemon){

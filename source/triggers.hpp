@@ -8,35 +8,35 @@
 namespace gd3ds
 {
 
-enum ColorChannelIDs {
-    NONE,
-    COL_1,
-    COL_2,
-    COL_3,
-    COL_4,
-    CHANNEL_NORMAL_END,
-    CHANNEL_SPECIAL_START = 1000,
-    CHANNEL_BG = CHANNEL_SPECIAL_START,
-    CHANNEL_GROUND,
-    CHANNEL_LINE,
-    CHANNEL_3DL,
-    CHANNEL_OBJ,
-    CHANNEL_P1,
-    CHANNEL_P2,
-    CHANNEL_LBG,
-    CHANNEL_LBG_NOLERP,
-    CHANNEL_GROUND_2,
-    CHANNEL_BLACK,
-    CHANNEL_WHITE,
-    CHANNEL_LIGHTER,
-    CHANNEL_BLUE_GLOW,
-    CHANNEL_PINK_GLOW,
-    CHANNEL_INVISIBLE_GLOW,
-    CHANNEL_WHITE_GLOW,
-    CHANNEL_OBJ_BLENDING,
-    CHANNEL_YELLOW_GLOW_INTERNAL,
-    COL_CHANNEL_LAST,
-    COL_CHANNEL_NUM = 1024,
+enum class ColorChannelIDs {
+    None,
+    Col1,
+    Col2,
+    Col3,
+    Col4,
+    ChannelNormalEnd,
+    ChannelSpecialStart = 1000,
+    ChannelBg = static_cast<int>(ColorChannelIDs::ChannelSpecialStart),
+    ChannelGround,
+    ChannelLine,
+    Channel3dl,
+    ChannelObj,
+    ChannelP1,
+    ChannelP2,
+    ChannelLbg,
+    ChannelLbgNolerp,
+    ChannelGround2,
+    ChannelBlack,
+    ChannelWhite,
+    ChannelLighter,
+    ChannelBlueGlow,
+    ChannelPinkGlow,
+    ChannelInvisibleGlow,
+    ChannelWhiteGlow,
+    ChannelObjBlending,
+    ChannelYellowGlowInternal,
+    ColChannelLast,
+    ColChannelNum = 1024,
 };
 
 extern int alphaTriggerCount;
@@ -47,7 +47,7 @@ extern int rotateTriggerCount;
 extern int followPlayerYTriggerCount;
 extern int rotateTriggerCapacity;
 
-typedef struct {
+struct ColorChannel {
     Color color;
     Color nonPulseColor;
     float alpha;
@@ -55,9 +55,9 @@ typedef struct {
     HSV hsv;
     int copyColorID;
     int numPulses;
-} ColorChannel;
+};
 
-typedef struct {
+struct ColTriggerBuffer {
     bool active;
     Color oldColor;
     Color newColor;
@@ -68,9 +68,9 @@ typedef struct {
     int copiedColorID;
     HSV copiedHSV;
     int sourceObj;
-} ColTriggerBuffer;
+};
 
-typedef struct {
+struct AlphaTriggerBuffer {
     bool active;
     bool restoredFromCheckpoint;
     int targetGroup;
@@ -79,9 +79,9 @@ typedef struct {
     float newAlpha;
     float seconds;
     float timeRun;
-} AlphaTriggerBuffer;
+};
 
-typedef struct {
+struct MoveTriggerBuffer {
     bool active;
     bool restoredFromCheckpoint;
     int targetGroup;
@@ -95,9 +95,9 @@ typedef struct {
     float moveLastY;
     float seconds;
     float timeRun;
-} MoveTriggerBuffer;
+};
 
-typedef struct {
+struct CountTriggerBuffer {
     bool active;
     bool restoredFromCheckpoint;
     bool activateGroup;
@@ -107,18 +107,18 @@ typedef struct {
     int targetCount;
     int previousValue;
     int sourceObj;
-} CountTriggerBuffer;
+};
 
-typedef struct {
+struct TouchTriggerBuffer {
     bool applied;
     unsigned char heldMask;
     int sourceObj;
-} TouchTriggerBuffer;
+};
 
-typedef struct {
+struct ItemCount {
     int id;
     int value;
-} ItemCount;
+};
 
 extern CountTriggerBuffer *countTriggerBuffer;
 extern int countTriggerCount;
@@ -130,7 +130,7 @@ extern ItemCount *itemCounterBuffer;
 extern int itemCounterCount;
 extern int itemCounterCapacity;
 
-typedef struct {
+struct FollowPlayerYTriggerBuffer {
     bool active;
     bool restoredFromCheckpoint;
     int targetGroup;
@@ -140,9 +140,9 @@ typedef struct {
     float offset;
     float maxSpeed;
     float groupY;
-} FollowPlayerYTriggerBuffer;
+};
 
-typedef struct {
+struct FollowTriggerBuffer {
     bool active;
     bool restoredFromCheckpoint;
     int targetGroup;
@@ -155,9 +155,9 @@ typedef struct {
     float timeRun;
     float lastX;
     float lastY;
-} FollowTriggerBuffer;
+};
 
-typedef struct {
+struct SpawnTriggerBuffer {
     bool active;
     bool queued;
     bool restoredFromCheckpoint;
@@ -165,7 +165,7 @@ typedef struct {
     int sourceObj;
     float seconds;
     float timeRun;
-} SpawnTriggerBuffer;
+};
 
 #define PULSE_TARGET_CHANNEL 0
 #define PULSE_TARGET_GROUP 1
@@ -175,7 +175,7 @@ typedef struct {
 #define INSTANT_COUNT_MODE_LARGER 1
 #define INSTANT_COUNT_MODE_SMALLER 2
 
-typedef struct {
+struct PulseTriggerBuffer {
     bool active;
     Color color;
     int targetColorID;
@@ -195,9 +195,9 @@ typedef struct {
 
     int sourceObj;
     bool restoredFromCheckpoint;
-} PulseTriggerBuffer;
+};
 
-typedef struct {
+struct RotateTrigger {
     bool spawnTriggered;
     bool multiTriggered;
     float trigDuration;
@@ -208,13 +208,13 @@ typedef struct {
     bool lockObjectRotation;
     int rotateEasing;
     float easingRate;
-} RotateTrigger;
+};
 
-typedef struct {
+struct RotateTargetState {
     int obj;
-} RotateTargetState;
+};
 
-typedef struct {
+struct RotateTriggerBuffer {
     bool active;
     bool restoredFromCheckpoint;
     bool useCenter;
@@ -229,13 +229,13 @@ typedef struct {
     int targetGroup;
     int targetCount;
     RotateTargetState *targets;
-} RotateTriggerBuffer;
+};
 
 void freeTriggerBuffers();
 void restorePulseTrigger(int obj, float timeRun);
 
-extern ColorChannel channels[COL_CHANNEL_NUM];
-extern ColTriggerBuffer colTriggerBuffer[COL_CHANNEL_NUM];
+extern ColorChannel channels[static_cast<int>(ColorChannelIDs::ColChannelNum)];
+extern ColTriggerBuffer colTriggerBuffer[static_cast<int>(ColorChannelIDs::ColChannelNum)];
 extern AlphaTriggerBuffer *alphaTriggerBuffer;
 extern MoveTriggerBuffer *moveTriggerBuffer;
 extern SpawnTriggerBuffer *spawnTriggerBuffer;
@@ -303,12 +303,12 @@ extern float triggerDt;
 
 #define ON_DEATH_MAX 16
 
-typedef struct {
+struct OnDeathEntry {
     int sourceObj;
     int targetGroup;
     bool activate;
     bool multi;
-} OnDeathEntry;
+};
 
 extern OnDeathEntry onDeathEntries[ON_DEATH_MAX];
 extern int onDeathCount;

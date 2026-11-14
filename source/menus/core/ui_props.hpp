@@ -4,35 +4,35 @@
 namespace gd3ds
 {
 
-typedef struct UIAction UIAction;
-typedef struct UIActionDef UIActionDef;
+struct UIAction;
+struct UIActionDef;
 
-typedef struct {
+struct UIProperty {
     const char *key;
     const char *value;
-} UIProperty;
+};
 
-typedef struct {
+struct UIPropertyList {
     UIProperty *properties;
     size_t count;
     //This is used for UIPropertyLists whose properties should survive outside of the .txt file
     bool duplicate;
-} UIPropertyList;
+};
 
-typedef struct {
+struct UIBitfieldEntry {
     const char *name;
     u32 value;
-} UIBitfieldEntry;
+};
 
-typedef struct {
+struct UIFloatEnumEntry {
     const char *name;
     float value;
-} UIFloatEnumEntry;
+};
 
-typedef struct {
+struct UIIntEnumEntry {
     const char *name;
     int value;
-} UIIntEnumEntry;
+};
 
 UIPropertyList uiCreateProplist(size_t capacity, bool duplicate);
 void uiProplistAdd(UIPropertyList *props, char* key, char* value);

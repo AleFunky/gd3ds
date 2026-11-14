@@ -7,30 +7,30 @@ namespace gd3ds
 {
 
 const UIIntEnumEntry animEnum[] = {
-    { "none", ANIM_NONE },
-    { "slide_down", ANIM_SLIDE_DOWN },
-    { "slide_right", ANIM_SLIDE_RIGHT },
-    { "zoom", ANIM_ZOOM },
-    { "zoom_subtle", ANIM_ZOOM_SUBTLE },
-    { "bounce_down", ANIM_BOUNCE_DOWN },
-    { "bounce_down_slow", ANIM_BOUNCE_DOWN_SLOW },
+    { "none", static_cast<int>(UIAnimation::AnimNone) },
+    { "slide_down", static_cast<int>(UIAnimation::AnimSlideDown) },
+    { "slide_right", static_cast<int>(UIAnimation::AnimSlideRight) },
+    { "zoom", static_cast<int>(UIAnimation::AnimZoom) },
+    { "zoom_subtle", static_cast<int>(UIAnimation::AnimZoomSubtle) },
+    { "bounce_down", static_cast<int>(UIAnimation::AnimBounceDown) },
+    { "bounce_down_slow", static_cast<int>(UIAnimation::AnimBounceDownSlow) },
 };
 
 const UIIntEnumEntry screenEnum[] = {
-    { "top", SCREEN_TOP },
-    { "btm", SCREEN_BTM }
+    { "top", static_cast<int>(Screens::ScreenTop) },
+    { "btm", static_cast<int>(Screens::ScreenBtm) }
 };
 
 const UIIntEnumEntry pushEnum[] = {
-    { "next", PUSH_NEXT },
-    { "after_close", PUSH_AFTER_CLOSE },
-    { "root", PUSH_ROOT }
+    { "next", static_cast<int>(UIStackPushType::PushNext) },
+    { "after_close", static_cast<int>(UIStackPushType::PushAfterClose) },
+    { "root", static_cast<int>(UIStackPushType::PushRoot) }
 };
 
 static void actionOpenMenu(UIElement *e, const UIPropertyList *args){
-    UIAnimation topAnim = (UIAnimation)uiPropIntEnum(args, "top_anim", animEnum, ARRAY_LEN(animEnum), ANIM_NONE);
-    UIAnimation btmAnim = (UIAnimation)uiPropIntEnum(args, "btm_anim", animEnum, ARRAY_LEN(animEnum), ANIM_NONE);
-    uiStackPushName(uiPropString(args, "screen", "soggy"), topAnim, btmAnim, (UIStackPushType)uiPropIntEnum(args, "type", pushEnum, ARRAY_LEN(pushEnum), PUSH_NEXT));
+    UIAnimation topAnim = (UIAnimation)uiPropIntEnum(args, "top_anim", animEnum, ARRAY_LEN(animEnum), static_cast<int>(UIAnimation::AnimNone));
+    UIAnimation btmAnim = (UIAnimation)uiPropIntEnum(args, "btm_anim", animEnum, ARRAY_LEN(animEnum), static_cast<int>(UIAnimation::AnimNone));
+    uiStackPushName(uiPropString(args, "screen", "soggy"), topAnim, btmAnim, (UIStackPushType)uiPropIntEnum(args, "type", pushEnum, ARRAY_LEN(pushEnum), static_cast<int>(UIStackPushType::PushNext)));
 }
 
 static void actionCloseMenu(UIElement *e, const UIPropertyList *args){

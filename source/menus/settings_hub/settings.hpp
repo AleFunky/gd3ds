@@ -5,15 +5,15 @@
 namespace gd3ds
 {
 
-typedef enum {
-    PAGE_GRAPHICS,
-    PAGE_INPUT,
-    PAGE_MISC,
-    PAGE_GAMEPLAY,
-    PAGE_COSMETIC
-} SettingPage;
+enum class SettingPage {
+    PageGraphics,
+    PageInput,
+    PageMisc,
+    PageGameplay,
+    PageCosmetic
+};
 
-typedef struct {
+struct Setting {
     const char *id;      
     const char *label;          // Setting name
     const char *additionalInfo; // Extra info popup message
@@ -32,9 +32,9 @@ typedef struct {
     int buttonIcon;
     int buttonSheet;
     const char *buttonActions;
-} Setting;
+};
 
-typedef struct {
+struct SettingState {
     bool wideEnabled;
     bool stereoEnabled;
     bool particlesDisabled;
@@ -72,7 +72,7 @@ typedef struct {
     bool showFpsCounter;
     bool goldenBest;
     bool swapGameplayScreens;
-} SettingState;
+};
 
 extern Setting settings[39];
 extern SettingState settingsState;

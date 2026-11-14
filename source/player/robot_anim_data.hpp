@@ -9,27 +9,27 @@
 namespace gd3ds
 {
 
-typedef enum {
-    ROBOT_PART1_COLOR = 0,
-    ROBOT_PART1_GLOW  = 1,
-    ROBOT_PART2_COLOR = 2,
-    ROBOT_PART2_GLOW  = 3,
-    ROBOT_PART3_COLOR = 4,
-    ROBOT_PART3_GLOW  = 5,
-    ROBOT_PART4_COLOR = 6,
-    ROBOT_PART4_GLOW  = 7,
-} RobotSpriteIdx;
+enum class RobotSpriteIdx {
+    RobotPart1Color = 0,
+    RobotPart1Glow  = 1,
+    RobotPart2Color = 2,
+    RobotPart2Glow  = 3,
+    RobotPart3Color = 4,
+    RobotPart3Glow  = 5,
+    RobotPart4Color = 6,
+    RobotPart4Glow  = 7,
+};
 
-typedef enum {
-    ROBOT_ANIM_RUN        = 0,
-    ROBOT_ANIM_JUMP_START = 1,
-    ROBOT_ANIM_JUMP       = 2,
-    ROBOT_ANIM_FALL_START = 3,
-    ROBOT_ANIM_FALL       = 4,
-    ROBOT_ANIM_IDLE       = 5,
-    ROBOT_ANIM_COUNT      = 6,
-} RobotAnimId;
+enum class RobotAnimId {
+    RobotAnimRun        = 0,
+    RobotAnimJumpStart = 1,
+    RobotAnimJump       = 2,
+    RobotAnimFallStart = 3,
+    RobotAnimFall       = 4,
+    RobotAnimIdle       = 5,
+    RobotAnimCount      = 6,
+};
 
-extern const PlayerAnimation robotAnimations[ROBOT_ANIM_COUNT];
+extern const PlayerAnimation robotAnimations[static_cast<int>(RobotAnimId::RobotAnimCount)];
 
 }

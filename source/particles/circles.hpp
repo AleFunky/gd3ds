@@ -15,7 +15,7 @@
 namespace gd3ds
 {
 
-typedef struct {
+struct UseEffectDefinition {
     float colorR;
     float colorG;
     float colorB;
@@ -38,9 +38,9 @@ typedef struct {
     EaseTypes endRadEase;
 
     float lineThickness;
-} UseEffectDefinition;
+};
 
-typedef struct {
+struct UseEffect {
     float x;
     float y;
 
@@ -60,14 +60,14 @@ typedef struct {
     int index;
 
     bool active;
-} UseEffect;
+};
 
-typedef struct {
+struct UseEffectPool {
     UseEffect *pool;
     size_t capacity;
     //whether the effect should have mirror, fading, and world-space transforms
     bool stationary;
-} UseEffectPool;
+};
 
 extern const UseEffectDefinition padUseEffect;
 extern const UseEffectDefinition orbUseEffect;

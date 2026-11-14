@@ -84,7 +84,7 @@ u32 ctruLinearHeapSize __asm__("__ctru_linear_heap_size") = 34 << 20;
 
 bool inExclusiveState = false;
 
-int gameState = STATE_MENU;
+int gameState = static_cast<int>(GameState::StateMenu);
 bool escapeState;
 
 bool exitingLevel;
@@ -104,9 +104,9 @@ float dimSecondaryScreen;
 int steps = 0;
 int lastSteps = 0;
 
-bool cheatsUsed[CHEAT_COUNT];
+bool cheatsUsed[static_cast<int>(Cheats::CheatCount)];
 
-const char *cheatNames[CHEAT_COUNT] = {
+const char *cheatNames[static_cast<int>(Cheats::CheatCount)] = {
     "Noclip",
     "Hitboxes"
 };
@@ -735,15 +735,15 @@ static void handleGameplayInput(touchPosition touchPos, u32 kDown, u32 kHeld) {
 
 void syncPreciseInput(bool suppressHeld) {
     if (levelInfo.twoPlayerMode) {
-        piSetJumpKeys(PI_PLAYER_1, jumpKeyMaskP1());
-        piSetTouchFilter(PI_PLAYER_1, touchJumpFilterP1);
-        piSetJumpKeys(PI_PLAYER_2, jumpKeyMaskP2());
-        piSetTouchFilter(PI_PLAYER_2, touchJumpFilterP2);
+        piSetJumpKeys(PreciseInputPlayer::PiPlayer1, jumpKeyMaskP1());
+        piSetTouchFilter(PreciseInputPlayer::PiPlayer1, touchJumpFilterP1);
+        piSetJumpKeys(PreciseInputPlayer::PiPlayer2, jumpKeyMaskP2());
+        piSetTouchFilter(PreciseInputPlayer::PiPlayer2, touchJumpFilterP2);
     } else {
-        piSetJumpKeys(PI_PLAYER_1, jumpKeyMask());
-        piSetTouchFilter(PI_PLAYER_1, touchJumpFilter);
-        piSetJumpKeys(PI_PLAYER_2, 0);
-        piSetTouchFilter(PI_PLAYER_2, touchJumpFilterNone);
+        piSetJumpKeys(PreciseInputPlayer::PiPlayer1, jumpKeyMask());
+        piSetTouchFilter(PreciseInputPlayer::PiPlayer1, touchJumpFilter);
+        piSetJumpKeys(PreciseInputPlayer::PiPlayer2, 0);
+        piSetTouchFilter(PreciseInputPlayer::PiPlayer2, touchJumpFilterNone);
     }
     piReset();
     if (suppressHeld) {
@@ -787,7 +787,7 @@ void uiLoop(){
         uiStackUpdate(&touch);
 
         // autoupdater pop up stuff
-        if (updaterTask.finished && !checkedForUpdate && uiStackGetFadeStatus() == FADE_STATUS_NONE && strcmp("updater", uiStackGetCurrentScreenName()) != 0 && strcmp("3d_warning_pop_up", uiStackGetCurrentScreenName()) != 0 && strcmp("info_card", uiStackGetCurrentScreenName()) != 0 && strcmp("updater_settings", uiStackGetCurrentScreenName()) != 0)
+        if (updaterTask.finished && !checkedForUpdate && uiStackGetFadeStatus() == FadeStatus::FadeStatusNone && strcmp("updater", uiStackGetCurrentScreenName()) != 0 && strcmp("3d_warning_pop_up", uiStackGetCurrentScreenName()) != 0 && strcmp("info_card", uiStackGetCurrentScreenName()) != 0 && strcmp("updater_settings", uiStackGetCurrentScreenName()) != 0)
         {
             // Handle result
             if (updaterTask.result == 0)
@@ -803,7 +803,7 @@ void uiLoop(){
                     autoupdateData->title = strdup("Updates Found");
                     autoupdateData->proceedText = strdup("Open");
                     autoupdateData->cancelText = strdup("Later");
-                    uiStackPush(&autoupdatePopUpDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+                    uiStackPush(&autoupdatePopUpDef, UIAnimation::AnimZoom, UIAnimation::AnimZoom, UIStackPushType::PushNext);
                     uiStackPushData(autoupdateData);
                 }
                 else
@@ -814,7 +814,7 @@ void uiLoop(){
 
         // 3d first time use warning pop up stuff
 
-        if (stereoSupported() && settingsState.stereoEnabled && uiStackGetFadeStatus() == FADE_STATUS_NONE && !threeDWarningPassed && getStereoSlider() > 0.f && strcmp("settings", uiStackGetCurrentScreenName()) != 0)
+        if (stereoSupported() && settingsState.stereoEnabled && uiStackGetFadeStatus() == FadeStatus::FadeStatusNone && !threeDWarningPassed && getStereoSlider() > 0.f && strcmp("settings", uiStackGetCurrentScreenName()) != 0)
         {
             TwoOptionPopupData *threeDWarningData = (TwoOptionPopupData *)malloc(sizeof(TwoOptionPopupData));
             if (!threeDWarningData)
@@ -824,7 +824,7 @@ void uiLoop(){
             threeDWarningData->title = strdup("Disclaimer");
             threeDWarningData->proceedText = strdup("Enable");
             threeDWarningData->cancelText = strdup("Cancel");
-            uiStackPush(&threeDWarningPopUpDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+            uiStackPush(&threeDWarningPopUpDef, UIAnimation::AnimZoom, UIAnimation::AnimZoom, UIStackPushType::PushNext);
             uiStackPushData(threeDWarningData);
             threeDWarningPassed = true;
         }
@@ -841,7 +841,7 @@ void uiLoop(){
         C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
         C2D_SceneBegin(bot);
 
-        uiStackDraw(SCREEN_BTM);
+        uiStackDraw(Screens::ScreenBtm);
 
         if(isSaving()) {
             drawText(&bigFontFontCharset, &bigFontSheet, 0, 234, 0.5f, 0.5f, 0, false, "Saving...");
@@ -856,7 +856,7 @@ void uiLoop(){
         // Top screen, drawn once per eye when 3D is on
         for (int eye = 0; beginTopEye(eye); eye++) {
             beginEyeLayer(DEPTH_UI);
-            uiStackDraw(SCREEN_TOP);
+            uiStackDraw(Screens::ScreenTop);
             drawStackFade();
             //draw_stack_debug();
             endEyeLayer();
@@ -874,10 +874,10 @@ void uiLoop(){
 
 #define SWAP_CENTER_SHIFT (SWAP_SIDE_OFFSET_X / SCALE)
 
-typedef struct {
+struct SwapElement {
     UIElement *element;
     bool enabled;
-} SwapElement;
+};
 
 static SwapElement swapHideTag(UIScreen *screen, const char *tag) {
     SwapElement state = { screen ? uiGetElementByTag(screen, tag) : NULL, false };
@@ -922,7 +922,7 @@ static void swapDrawPauseWindow(UIScreen *screen) {
     SwapElement percent = swapHideTag(screen, "percent");
     SwapElement fps = swapHideTag(screen, "fps");
 
-    uiStackDraw(SCREEN_TOP);
+    uiStackDraw(Screens::ScreenTop);
 
     swapRestoreElement(fps);
     swapRestoreElement(percent);
@@ -948,7 +948,7 @@ void gameLoop() {
 
     uiStackSetStack(&gameplayStack);
     uiStackClear();
-    uiStackPush(&gameplayDef, ANIM_NONE, ANIM_NONE, PUSH_ROOT);
+    uiStackPush(&gameplayDef, UIAnimation::AnimNone, UIAnimation::AnimNone, UIStackPushType::PushRoot);
 
     updatePlayerColors();
 
@@ -962,7 +962,7 @@ void gameLoop() {
         if (returned) {
             outputLog("Failed %d\n", returned);
 
-            uiStackPushGameState(STATE_MENU);
+            uiStackPushGameState(static_cast<int>(GameState::StateMenu));
             uiStackUpdate(&touch);
             state.onlineLevel = false;
             exitingLevel = true;
@@ -982,7 +982,7 @@ void gameLoop() {
         if (returned) {
             outputLog("Failed %d\n", returned);
             
-            uiStackPushGameState(STATE_MENU);
+            uiStackPushGameState(static_cast<int>(GameState::StateMenu));
             uiStackUpdate(&touch);
             exitingLevel = true;
             unloadLevel();
@@ -1051,7 +1051,7 @@ void gameLoop() {
 
         if (state.noclip) {
             cheated = true;
-            cheatsUsed[CHEAT_NOCLIP] = true;
+            cheatsUsed[static_cast<int>(Cheats::CheatNoclip)] = true;
         }
 
         if ((touch.down & KEY_L) && (touch.held & KEY_B) && settingsState.enableDebugBindings)
@@ -1059,7 +1059,7 @@ void gameLoop() {
 
         if ((touch.down & KEY_R) && (touch.held & KEY_B) && settingsState.enableDebugBindings) {
             cheated = true;
-            cheatsUsed[CHEAT_HITBOX_DISPLAY] = true;
+            cheatsUsed[static_cast<int>(Cheats::CheatHitboxDisplay)] = true;
             if (settingsState.hitboxesEnabled && settingsState.hitboxTrail) {
                 settingsState.hitboxesEnabled = false;
                 settingsState.hitboxTrail = false;
@@ -1079,7 +1079,7 @@ void gameLoop() {
 
         if (settingsState.hitboxesEnabled || settingsState.hitboxTrail) {
             cheated = true;
-            cheatsUsed[CHEAT_HITBOX_DISPLAY] = true;
+            cheatsUsed[static_cast<int>(Cheats::CheatHitboxDisplay)] = true;
         }
         
         kHeldPaused &= ~touch.up;
@@ -1170,17 +1170,17 @@ void gameLoop() {
                         state.oldInput = state.input;
                         state.oldInputP2 = state.inputP2;
 
-                        state.input.pressedJump = piPressed(PI_PLAYER_1);
-                        state.input.holdJump = piHold(PI_PLAYER_1) || state.input.pressedJump;
+                        state.input.pressedJump = piPressed(PreciseInputPlayer::PiPlayer1);
+                        state.input.holdJump = piHold(PreciseInputPlayer::PiPlayer1) || state.input.pressedJump;
 
                         if (levelInfo.twoPlayerMode) {
-                            state.inputP2.pressedJump = piPressed(PI_PLAYER_2);
-                            state.inputP2.holdJump = piHold(PI_PLAYER_2) || state.inputP2.pressedJump;
+                            state.inputP2.pressedJump = piPressed(PreciseInputPlayer::PiPlayer2);
+                            state.inputP2.holdJump = piHold(PreciseInputPlayer::PiPlayer2) || state.inputP2.pressedJump;
                         } else {
                             state.inputP2 = state.input;
                         }
 
-                        if (piPressed(PI_PLAYER_1) || piPressed(PI_PLAYER_2)) {
+                        if (piPressed(PreciseInputPlayer::PiPlayer1) || piPressed(PreciseInputPlayer::PiPlayer2)) {
                             piSubstepPresses[steps < PI_SUBSTEP_BUCKETS ? steps : PI_SUBSTEP_BUCKETS - 1]++;
                         }
                     }
@@ -1300,7 +1300,7 @@ void gameLoop() {
 
                 fadeToAmplitude(0);
 
-                if (state.player.gamemode == GAMEMODE_WAVE) {
+                if (state.player.gamemode == static_cast<int>(IconGamemode::GamemodeWave)) {
                     if (waveTrailP1.opacity > 0) waveTrailP1.opacity -= 0.02f * 4;
             
                     if (waveTrailP1.opacity <= 0) {
@@ -1309,7 +1309,7 @@ void gameLoop() {
                     }
                 }
 
-                if (state.player2.gamemode == GAMEMODE_WAVE) {
+                if (state.player2.gamemode == static_cast<int>(IconGamemode::GamemodeWave)) {
                     if (waveTrailP2.opacity > 0) waveTrailP2.opacity -= 0.02f * 4;
 
                     if (waveTrailP2.opacity <= 0) {
@@ -1359,12 +1359,12 @@ void gameLoop() {
                     state.mirrorSpeedFactor = 1 - 2*state.mirrorFactor;
 
                     // When mirror transition ends, put a wave trail point
-                    if (state.player.gamemode == GAMEMODE_WAVE) {
+                    if (state.player.gamemode == static_cast<int>(IconGamemode::GamemodeWave)) {
                         waveTrailP1.positionR = (Vec2D){ state.player.x, state.player.y };
                         motionTrailResumeStroke(&waveTrailP1);
                         motionTrailAddWavePoint(&waveTrailP1);
                     }
-                    if (state.dual && state.player2.gamemode == GAMEMODE_WAVE) {
+                    if (state.dual && state.player2.gamemode == static_cast<int>(IconGamemode::GamemodeWave)) {
                         waveTrailP2.positionR = (Vec2D){ state.player2.x, state.player2.y };
                         
                         motionTrailResumeStroke(&waveTrailP2);
@@ -1484,7 +1484,7 @@ void gameLoop() {
 
         uiStackUpdate(&touch);
 
-        if (stereoSupported() && settingsState.stereoEnabled && !threeDWarningPassed && getStereoSlider() > 0.f && strcmp("3d_warning_pop_up", uiStackGetCurrentScreenName()) != 0 && uiStackGetFadeStatus() == FADE_STATUS_NONE) {
+        if (stereoSupported() && settingsState.stereoEnabled && !threeDWarningPassed && getStereoSlider() > 0.f && strcmp("3d_warning_pop_up", uiStackGetCurrentScreenName()) != 0 && uiStackGetFadeStatus() == FadeStatus::FadeStatusNone) {
             if (!gamePaused) pauseGame();
             if (!gamePaused) return; 
             TwoOptionPopupData *threeDWarningData = (TwoOptionPopupData *)malloc(sizeof(TwoOptionPopupData));
@@ -1494,7 +1494,7 @@ void gameLoop() {
             threeDWarningData->title = strdup("Disclaimer");
             threeDWarningData->proceedText = strdup("Enable");
             threeDWarningData->cancelText = strdup("Disable");
-            uiStackPush(&threeDWarningPopUpDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+            uiStackPush(&threeDWarningPopUpDef, UIAnimation::AnimZoom, UIAnimation::AnimZoom, UIStackPushType::PushNext);
             uiStackPushData(threeDWarningData);
             threeDWarningPassed = true;
         }
@@ -1518,7 +1518,7 @@ void gameLoop() {
             // Exiting
             if (status == 1) {
                 exitingLevel = true;
-                uiStackPushGameState(STATE_MENU);
+                uiStackPushGameState(static_cast<int>(GameState::StateMenu));
                 // Restarting level
             } else if (status == 2) {
                 levelInfo.completing = false;
@@ -1537,8 +1537,8 @@ void gameLoop() {
         bool swapScreens = settingsState.swapGameplayScreens && !inLevelComplete;
         C3D_RenderTarget *playScreen = swapScreens ? bot : top;
         C3D_RenderTarget *sideScreen = swapScreens ? top : bot;
-        UIScreen *swap_gameplay_screen = swapScreens ? uiStackGetScreen("gameplay", SCREEN_BTM) : NULL;
-        UIScreen *swap_gameplay_top = swapScreens ? uiStackGetScreen("gameplay", SCREEN_TOP) : NULL;
+        UIScreen *swap_gameplay_screen = swapScreens ? uiStackGetScreen("gameplay", Screens::ScreenBtm) : NULL;
+        UIScreen *swap_gameplay_top = swapScreens ? uiStackGetScreen("gameplay", Screens::ScreenTop) : NULL;
         int world_width = swapScreens ? SCREEN_BOT_WIDTH : SCREEN_WIDTH;
 
         if(C3D_FrameBegin(settingsState.vsync ? C3D_FRAME_SYNCDRAW : C3D_FRAME_NONBLOCK)){
@@ -1608,7 +1608,7 @@ void gameLoop() {
                     swapDrawHud(swap_gameplay_top);
 
                     if (gamePaused) {
-                        uiStackDraw(SCREEN_BTM);
+                        uiStackDraw(Screens::ScreenBtm);
                     } else if (swap_gameplay_screen) {
                         uiRunFuncOnTag(swap_gameplay_screen, "pause_btn", swapDrawIdentity);
                         uiRunFuncOnTag(swap_gameplay_screen, "practice_buttons", swapDrawIdentity);
@@ -1618,7 +1618,7 @@ void gameLoop() {
                     drawTouchEffect();
                     changeBlending(false);
                 } else {
-                    uiStackDraw(SCREEN_TOP);
+                    uiStackDraw(Screens::ScreenTop);
                 }
                 drawLevelCompleteTop();
                 drawStackFade();
@@ -1664,7 +1664,7 @@ void gameLoop() {
                         SwapElement removeCheck = swapHideTag(swap_gameplay_screen, "remove_checkpoint");
 
                         C2D_ViewTranslate(SWAP_SIDE_OFFSET_X, 0);
-                        uiStackDraw(SCREEN_BTM);
+                        uiStackDraw(Screens::ScreenBtm);
                         C2D_ViewTranslate(-SWAP_SIDE_OFFSET_X, 0);
 
                         swapRestoreElement(removeCheck);
@@ -1672,7 +1672,7 @@ void gameLoop() {
                         swapRestoreElement(pauseBtn);
                     }
                 } else {
-                    uiStackDraw(SCREEN_BTM);
+                    uiStackDraw(Screens::ScreenBtm);
                 }
 
                 drawLevelComplete();
@@ -1683,7 +1683,7 @@ void gameLoop() {
                     changeBlending(false);
                 }
 
-                if (state.profiling && eye == EYE_LEFT) {
+                if (state.profiling && eye == static_cast<int>(StereoEye::EyeLeft)) {
                     float processingTime = ticks / CPU_TICKS_PER_MSEC;
                     ProfilerUpdateData data = {
                         .touchPos = touchPos,
@@ -1737,11 +1737,11 @@ void gameLoop() {
     totalJumps += state.currentData.jumps;
 
     if (state.onlineLevel) {
-        saveCurrentSaveFile(LEVEL_LIST_ONLINE);
+        saveCurrentSaveFile(LevelListType::LevelListOnline);
     } else if (state.customLevel) {
-        saveCurrentSaveFile(LEVEL_LIST_EXTERNAL);
+        saveCurrentSaveFile(LevelListType::LevelListExternal);
     } else {
-        saveCurrentSaveFile(LEVEL_LIST_MAIN_LEVELS);
+        saveCurrentSaveFile(LevelListType::LevelListMainLevels);
     }
 
     cfgSave();
@@ -1967,13 +1967,13 @@ int main(int argc, char* argv[]) {
         fastestSpeedParticlesBottom.cfg.startColorBlue = 65 / 255.f;
 
         switch (gameState) {
-            case STATE_MENU:
+            case static_cast<int>(GameState::StateMenu):
                 uiLoop();
                 break;
-            case STATE_GAME:
+            case static_cast<int>(GameState::StateGame):
                 gameLoop();
                 break;
-            case STATE_EXIT:
+            case static_cast<int>(GameState::StateExit):
                 exit = true;
                 break;
         }

@@ -14,91 +14,91 @@ namespace gd3ds
 
 float executeEase(EaseTypes ease, float time, float period) {
     switch (ease) {
-        case EASE_LINEAR:
+        case EaseTypes::EaseLinear:
             return linear(time);
 
-        case EASE_IN:
+        case EaseTypes::EaseIn:
             return easeIn(time, period);
-        case EASE_OUT:
+        case EaseTypes::EaseOut:
             return easeOut(time, period);
-        case EASE_IN_OUT:
+        case EaseTypes::EaseInOut:
             return easeInOut(time, period);
 
-        case SINE_IN:
+        case EaseTypes::SineIn:
             return sineEaseIn(time);
-        case SINE_OUT:
+        case EaseTypes::SineOut:
             return sineEaseOut(time);
-        case SINE_IN_OUT:
+        case EaseTypes::SineInOut:
             return sineEaseInOut(time);
 
-        case QUAD_IN:
+        case EaseTypes::QuadIn:
             return quadEaseIn(time);
-        case QUAD_OUT:
+        case EaseTypes::QuadOut:
             return quadEaseOut(time);
-        case QUAD_INT_OUT:
+        case EaseTypes::QuadIntOut:
             return quadEaseInOut(time);
 
-        case CUBIC_IN:
+        case EaseTypes::CubicIn:
             return cubicEaseIn(time);
-        case CUBIC_OUT:
+        case EaseTypes::CubicOut:
             return cubicEaseOut(time);
-        case CUBIC_IN_OUT:
+        case EaseTypes::CubicInOut:
             return cubicEaseInOut(time);
 
-        case QUART_IN:
+        case EaseTypes::QuartIn:
             return quartEaseIn(time);
-        case QUART_OUT:
+        case EaseTypes::QuartOut:
             return quartEaseOut(time);
-        case QUART_IN_OUT:
+        case EaseTypes::QuartInOut:
             return quartEaseInOut(time);
 
-        case QUINT_IN:
+        case EaseTypes::QuintIn:
             return quintEaseIn(time);
-        case QUINT_OUT:
+        case EaseTypes::QuintOut:
             return quintEaseOut(time);
-        case QUINT_IN_OUT:
+        case EaseTypes::QuintInOut:
             return quintEaseInOut(time);
 
-        case EXPO_IN:
+        case EaseTypes::ExpoIn:
             return expoEaseIn(time);
-        case EXPO_OUT:
+        case EaseTypes::ExpoOut:
             return expoEaseOut(time);
-        case EXPO_IN_OUT:
+        case EaseTypes::ExpoInOut:
             return expoEaseInOut(time);
 
-        case CIRC_IN:
+        case EaseTypes::CircIn:
             return circEaseIn(time);
-        case CIRC_OUT:
+        case EaseTypes::CircOut:
             return circEaseOut(time);
-        case CIRC_IN_OUT:
+        case EaseTypes::CircInOut:
             return circEaseInOut(time);
 
-        case ELASTIC_IN:
+        case EaseTypes::ElasticIn:
             return elasticEaseIn(time, period);
-        case ELASTIC_OUT:
+        case EaseTypes::ElasticOut:
             return elasticEaseOut(time, period);
-        case ELASTIC_IN_OUT:
+        case EaseTypes::ElasticInOut:
             return elasticEaseInOut(time, period);
 
-        case BACK_IN:
+        case EaseTypes::BackIn:
             return backEaseIn(time);
-        case BACK_OUT:
+        case EaseTypes::BackOut:
             return backEaseOut(time);
-        case BACK_IN_OUT:
+        case EaseTypes::BackInOut:
             return backEaseInOut(time);
 
-        case BOUNCE_IN:
+        case EaseTypes::BounceIn:
             return bounceEaseIn(time);
-        case BOUNCE_OUT:
+        case EaseTypes::BounceOut:
             return bounceEaseOut(time);
-        case BOUNCE_IN_OUT:
+        case EaseTypes::BounceInOut:
             return bounceEaseInOut(time);
 
-        case QUADRATIC_IN:
+        case EaseTypes::QuadraticIn:
             return quadraticIn(time);
-        case QUADRATIC_OUT:
+        case EaseTypes::QuadraticOut:
             return quadraticOut(time);
-        case QUADRATIC_IN_OUT:
+        case EaseTypes::QuadraticInOut:
             return quadraticInOut(time);
         
         default:

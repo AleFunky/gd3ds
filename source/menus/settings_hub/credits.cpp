@@ -12,11 +12,11 @@
 namespace gd3ds
 {
 
-typedef struct CreditsEntries {
+struct CreditsEntries {
     const char *contributor;
     const char *contribution;
     const float nameScale;
-} CreditsEntries;
+};
 
 static const CreditsEntries credits[] = {
     {"<i400s0>", "Geometry Dash", 0.7f}, // Robert

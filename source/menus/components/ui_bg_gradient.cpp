@@ -33,7 +33,7 @@ UIImage *uiCreateBgGradient(UIScreen *screen) {
 
     if (!e) return NULL;
 
-    e->base.type = UI_IMAGE;
+    e->base.type = UIElementType::UiImage;
     e->base.x = 0;
     e->base.y = 0;
     e->base.enabled = true;

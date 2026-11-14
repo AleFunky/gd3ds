@@ -18,42 +18,42 @@
 namespace gd3ds
 {
 
-typedef struct Color {
+struct Color {
     unsigned char r,g,b;
 
     u32 toColor32(){
         return C2D_Color32(r, g, b, 255);
     }
-} Color;
+};
 
-typedef struct {
+struct HSV {
     float h;
     float s;
     float v;
     bool sChecked;
     bool vChecked;
-} HSV;
+};
 
-typedef enum {
-    GD_VAL_INT,
-    GD_VAL_FLOAT,
-    GD_VAL_BOOL,
-    GD_VAL_HSV,
-    GD_VAL_INT_ARRAY,
-    GD_VAL_STRING,
-    GD_VAL_UNKNOWN
-} GDValueType;
+enum class GDValueType {
+    GdValInt,
+    GdValFloat,
+    GdValBool,
+    GdValHsv,
+    GdValIntArray,
+    GdValString,
+    GdValUnknown
+};
 
-typedef union {
+union GDValue {
     int i;
     float f;
     bool b;
     HSV hsv;
     short intArray[MAX_GROUPS_PER_OBJECT];
     char *str;
-} GDValue;
+};
 
-typedef struct {
+struct ColorTrigger {
     bool spawnTriggered;
     bool multiTriggered;
     float trigDuration;
@@ -66,9 +66,9 @@ typedef struct {
     int copiedColorID;
     float opacity;
     HSV copiedHSV;
-} ColorTrigger;
+};
 
-typedef struct {
+struct MoveTrigger {
     bool spawnTriggered;
     bool multiTriggered;
     bool targetMode;
@@ -81,9 +81,9 @@ typedef struct {
     int moveEasing;
     bool lockToPlayerX;
     bool lockToPlayerY;
-} MoveTrigger;
+};
 
-typedef struct {
+struct CountTrigger {
     bool spawnTriggered;
     bool multiTriggered;
     bool activateGroup;
@@ -91,9 +91,9 @@ typedef struct {
     int targetGroup;
     int itemID;
     int targetCount;
-} CountTrigger;
+};
 
-typedef struct {
+struct InstantCountTrigger {
     bool spawnTriggered;
     bool multiTriggered;
     bool activateGroup;
@@ -101,27 +101,27 @@ typedef struct {
     int itemID;
     int targetCount;
     int instantCountMode;
-} InstantCountTrigger;
+};
 
 #define COUNTER_LABEL 1615
 #define MAX_COUNTER_TEXT 12
 
-typedef struct {
+struct CounterLabel {
     int itemID;
     int lastValue;
     char text[MAX_COUNTER_TEXT + 1];
     unsigned char layoutDone;
     unsigned char glyphCount;
     TextGlyphPlacement glyphs[MAX_COUNTER_TEXT];
-} CounterLabel;
+};
 
-typedef struct {
+struct PickupItem {
     int itemID;
     bool isPickup;
     bool subCount;
-} PickupItem;
+};
 
-typedef struct {
+struct FollowPlayerYTrigger {
     bool spawnTriggered;
     bool multiTriggered;
     int targetGroup;
@@ -129,9 +129,9 @@ typedef struct {
     float followDelay;
     float followOffset;
     float followMaxSpeed;
-} FollowPlayerYTrigger;
+};
 
-typedef struct {
+struct FollowTrigger {
     bool spawnTriggered;
     bool multiTriggered;
     int targetGroup;
@@ -139,17 +139,17 @@ typedef struct {
     float xMod;
     float yMod;
     float trigDuration;
-} FollowTrigger;
+};
 
-typedef struct {
+struct AlphaTrigger {
     bool spawnTriggered;
     bool multiTriggered;
     float trigDuration;
     int targetGroup;
     float triggerOpacity;
-} AlphaTrigger;
+};
 
-typedef struct {
+struct PulseTrigger {
     bool spawnTriggered;
     bool multiTriggered;
     float trigDuration;
@@ -168,74 +168,74 @@ typedef struct {
     int pulseTargetType;
     bool pulseMainOnly;
     bool pulseDetailOnly;
-} PulseTrigger;
+};
 
-typedef struct {
+struct ToggleTrigger {
     bool spawnTriggered;
     bool multiTriggered;
     int targetGroup;
     bool activateGroup;
     bool spawnOnly;
-} ToggleTrigger;
+};
 
-typedef struct {
+struct TouchTrigger {
     bool spawnTriggered;
     bool multiTriggered;
     bool holdMode;
     unsigned char toggleMode;
     int targetGroup;
-} TouchTrigger;
+};
 
-typedef struct {
+struct StopTrigger {
     bool spawnTriggered;
     bool multiTriggered;
     int targetGroup;
-} StopTrigger;
+};
 
-typedef struct {
+struct OnDeathTrigger {
     bool spawnTriggered;
     bool multiTriggered;
     bool activate;
     int targetGroup;
-} OnDeathTrigger;
+};
 
-typedef struct {
+struct SpawnTrigger {
     bool spawnTriggered;
     bool multiTriggered;
     int targetGroup;
     float spawnDelay;
     float trigDuration;
-} SpawnTrigger;
+};
 
-typedef struct {
+struct SimpleTrigger {
     bool spawnTriggered;
     bool multiTriggered;
-} SimpleTrigger;
+};
 
-typedef struct {
+struct TextObject {
     char text[MAX_TEXT_LEN + 1];
     unsigned char len;
     unsigned char layoutDone;
     unsigned char glyphCount;
     TextGlyphPlacement glyphs[MAX_TEXT_LEN];
-} TextObject;
+};
 
-typedef struct {
+struct TriggerPool {
     void *data;
     size_t count;
     size_t capacity;
-} TriggerPool;
+};
 
-typedef enum {
-    FLAG_TOGGLED    = (1 << 0),
-    FLAG_DONT_FADE  = (1 << 1),
-    FLAG_DONT_ENTER = (1 << 2),
-    FLAG_CAN_BE_X_MOVED = (1 << 3),
-    FLAG_MULTI_ACTIVATE = (1 << 4),
-    FLAG_PICKUP = (1 << 5)
-} ObjectFlags;
+enum class ObjectFlags {
+    FlagToggled    = (1 << 0),
+    FlagDontFade  = (1 << 1),
+    FlagDontEnter = (1 << 2),
+    FlagCanBeXMoved = (1 << 3),
+    FlagMultiActivate = (1 << 4),
+    FlagPickup = (1 << 5)
+};
 
-typedef struct {
+struct ObjectsArray {
     int count;
 
     int *random;
@@ -306,9 +306,9 @@ typedef struct {
 
     u8 *activated;
     u8 *collided;
-} ObjectsArray;
+};
 
-typedef struct {
+struct GDColorChannel {
     int fromRed;
     int fromGreen;
     int fromBlue;
@@ -326,15 +326,15 @@ typedef struct {
     float toOpacity;
     float duration;
     bool copyOpacity;
-} GDColorChannel;
+};
 
 
-typedef struct SectionTriggers {
+struct SectionTriggers {
     int count, capacity;
     int indices[];
-} SectionTriggers;
+};
 
-typedef struct Section {
+struct Section {
     int *objects;
     int objectCount;
     int objectCapacity;
@@ -342,9 +342,9 @@ typedef struct Section {
 
     int x, y; // Section coordinates
     struct Section *next; // For chaining in hash map
-} Section;
+};
 
-typedef struct {
+struct LoadedLevelInfo {
     float lastObjX;
     float wallX;
     float wallY;
@@ -367,19 +367,19 @@ typedef struct {
 
     char levelName[256];
     char creatorName[256];
-} LoadedLevelInfo;
+};
 
 
 
-typedef struct {
+struct LevelStreamInput {
     unsigned char *compressedData;
     size_t compressedLen;
     const char *rawData;
-} LevelStreamInput;
+};
 
 typedef int (*LevelStreamCallback)(const unsigned char *data, size_t len, void *context);
 
-typedef struct {
+struct LevelStreamScan {
     char *section;
     size_t sectionLen;
     size_t sectionCapacity;
@@ -388,27 +388,27 @@ typedef struct {
     int highDetailCount;
     int extraSlots;
     int portalMatch;
-} LevelStreamScan;
+};
 
-typedef struct {
+struct LevelStreamParser {
     char *section;
     size_t sectionLen;
     size_t sectionCapacity;
     int sectionCount;
     int objectIndex;
     int parseCapacity;
-} LevelStreamParser;
+};
 
-typedef enum {
-    LOAD_NO_ERROR,
-    LOAD_INVALID_GMD,
-    LOAD_INVALID_COMPRESSED_DATA,
-    LOAD_LEVEL_STRING_MISSING_SECTIONS,
-    LOAD_OUT_OF_MEMORY,
-    LOAD_COULDNT_PARSE_OBJECTS,
-    LOAD_INVALID_BASE64,
-    LOAD_ERROR_COUNT,
-} LevelLoadError;
+enum class LevelLoadError {
+    LoadNoError,
+    LoadInvalidGmd,
+    LoadInvalidCompressedData,
+    LoadLevelStringMissingSections,
+    LoadOutOfMemory,
+    LoadCouldntParseObjects,
+    LoadInvalidBase64,
+    LoadErrorCount,
+};
 
 extern TriggerPool colPool;
 extern TriggerPool movePool;
@@ -441,7 +441,7 @@ bool isSimpleTriggerObject(int id);
 bool triggerIsSpawnTriggered(int id, int obj);
 bool triggerIsMultiTriggered(int id, int obj);
 
-extern const char *errorStrings[LOAD_ERROR_COUNT - 1];
+extern const char *errorStrings[static_cast<int>(LevelLoadError::LoadErrorCount) - 1];
 
 extern LoadedLevelInfo levelInfo;
 

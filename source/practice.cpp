@@ -29,22 +29,22 @@ extern int followPlayerYTriggerCapacity;
 bool restoredCheckpoint = false;
 
 int usedCount = 0;
-int channelsUsed[COL_CHANNEL_NUM];
+int channelsUsed[static_cast<int>(ColorChannelIDs::ColChannelNum)];
 
 #define MAX_CHECKPOINTS 100
 #define CHECKPOINT_GFX_ID 6
 
-typedef struct {
+struct PulseSnapshot {
     int sourceObj;
     float timeRun;
-} PulseSnapshot;
+};
 
-typedef struct {
+struct RotateObjectSnapshot {
     int obj;
     float rotation, visualRotation;
-} RotateObjectSnapshot;
+};
 
-typedef struct CheckpointData {
+struct CheckpointData {
     Player p1;
     Player p2;
 
@@ -147,7 +147,7 @@ typedef struct CheckpointData {
     float songOffset;
 
     void *allocBase;
-} CheckpointData;
+};
 
 CheckpointData checkpoints[MAX_CHECKPOINTS];
 
@@ -165,7 +165,7 @@ static unsigned int ckVarintGet(const uint8_t **pp);
 static float ckAxisGet(const uint8_t *blob, int fmt, int u, int k);
 
 static void addUsedChannel(int *out, bool *seen, int *count, int channel) {
-    if (channel <= 0 || channel >= COL_CHANNEL_NUM) return;
+    if (channel <= 0 || channel >= static_cast<int>(ColorChannelIDs::ColChannelNum)) return;
 
     int idx = getColChannelIndex(channel);
     if (seen[idx]) return;
@@ -178,28 +178,28 @@ static void addUsedChannel(int *out, bool *seen, int *count, int channel) {
 // and returns how many unique indices were written to 'out'
 static int collectUsedChannels(int *out) {
     int n = 0;
-    bool seen[COL_CHANNEL_NUM] = { false };
+    bool seen[static_cast<int>(ColorChannelIDs::ColChannelNum)] = { false };
 
     // normal player channels
-    addUsedChannel(out, seen, &n, NONE);
-    addUsedChannel(out, seen, &n, COL_1);
-    addUsedChannel(out, seen, &n, COL_2);
-    addUsedChannel(out, seen, &n, COL_3);
-    addUsedChannel(out, seen, &n, COL_4);
+    addUsedChannel(out, seen, &n, static_cast<int>(ColorChannelIDs::None));
+    addUsedChannel(out, seen, &n, static_cast<int>(ColorChannelIDs::Col1));
+    addUsedChannel(out, seen, &n, static_cast<int>(ColorChannelIDs::Col2));
+    addUsedChannel(out, seen, &n, static_cast<int>(ColorChannelIDs::Col3));
+    addUsedChannel(out, seen, &n, static_cast<int>(ColorChannelIDs::Col4));
 
     // built-in special channels
-    for (int id = CHANNEL_BG; id < COL_CHANNEL_LAST; id++) {
+    for (int id = static_cast<int>(ColorChannelIDs::ChannelBg); id < static_cast<int>(ColorChannelIDs::ColChannelLast); id++) {
         addUsedChannel(out, seen, &n, id);
     }
 
     // channels declared in the level
-    for (int i = 0; i < channelCount && n < COL_CHANNEL_NUM; i++) {
+    for (int i = 0; i < channelCount && n < static_cast<int>(ColorChannelIDs::ColChannelNum); i++) {
         addUsedChannel(out, seen, &n, colorChannels[i].channelID);
         addUsedChannel(out, seen, &n, colorChannels[i].inheritedChannelID);
     }
 
     // check for objects
-    for (int i = 0; i < objects.count && n < COL_CHANNEL_NUM; i++) {
+    for (int i = 0; i < objects.count && n < static_cast<int>(ColorChannelIDs::ColChannelNum); i++) {
         addUsedChannel(out, seen, &n, objects.colChannel[i]);
         addUsedChannel(out, seen, &n, objects.detailColChannel[i]);
         addUsedChannel(out, seen, &n, objects.v1p9ColChannel[i]);
@@ -334,7 +334,7 @@ static bool isCheckpointPickup(int obj) {
 
 static bool isCollectedPickup(int obj) {
     return isCheckpointPickup(obj) &&
-           (objects.flags[obj] & FLAG_TOGGLED) && (objects.activated[obj] & 3);
+           (objects.flags[obj] & static_cast<int>(ObjectFlags::FlagToggled)) && (objects.activated[obj] & 3);
 }
 
 void newCheckpoint() {
@@ -406,7 +406,7 @@ void newCheckpoint() {
     for (int i = 0; i < objects.count; i++) {
         if ((objects.id[i] == MOVE_TRIGGER || objects.id[i] == ROTATE_TRIGGER) && GET_ACTIVATED(i))
             firedCap++;
-        else if (objects.id[i] == KEY_OBJ && (objects.flags[i] & FLAG_TOGGLED)
+        else if (objects.id[i] == KEY_OBJ && (objects.flags[i] & static_cast<int>(ObjectFlags::FlagToggled))
                  && (objects.activated[i] & 3))
             keyCap++;
     }
@@ -707,7 +707,7 @@ void newCheckpoint() {
         int n = 0;
         for (int i = 0; i < objects.count; i++) {
             if (n >= keyCap) break;
-            if (objects.id[i] == KEY_OBJ && (objects.flags[i] & FLAG_TOGGLED)
+            if (objects.id[i] == KEY_OBJ && (objects.flags[i] & static_cast<int>(ObjectFlags::FlagToggled))
                 && (objects.activated[i] & 3))
                 check->keyIndex[n++] = i;
         }
@@ -766,8 +766,8 @@ void restoreCheckpoint() {
     state.player.platformVelocity = state.player.lastPlatformVelocity = 0.f;
     state.player2.platformVelocity = state.player2.lastPlatformVelocity = 0.f;
 
-    state.player.bufferingState = (state.input.holdJump ? BUFFER_READY : BUFFER_NONE);
-    state.player2.bufferingState = (state.input.holdJump ? BUFFER_READY : BUFFER_NONE);
+    state.player.bufferingState = (state.input.holdJump ? static_cast<int>(BufferingState::BufferReady) : static_cast<int>(BufferingState::BufferNone));
+    state.player2.bufferingState = (state.input.holdJump ? static_cast<int>(BufferingState::BufferReady) : static_cast<int>(BufferingState::BufferNone));
 
     state.player.bufferUfo = true;
     state.player2.bufferUfo = true;
@@ -890,14 +890,14 @@ void restoreCheckpoint() {
     for (int i = 0; i < objects.count; i++) {
         PickupItem *pickup = getPickupItem(i);
         if (pickup) {
-            objects.flags[i] &= ~FLAG_TOGGLED;
+            objects.flags[i] &= ~static_cast<int>(ObjectFlags::FlagToggled);
             objects.activated[i] = 0;
         }
     }
     for (int i = 0; i < check->collectedPickupsCount; i++) {
         int obj = check->collectedPickups[i];
         if (obj >= 0 && obj < objects.count && isCheckpointPickup(obj)) {
-            objects.flags[obj] |= FLAG_TOGGLED;
+            objects.flags[obj] |= static_cast<int>(ObjectFlags::FlagToggled);
             objects.activated[obj] = 3;
         }
     }
@@ -997,7 +997,7 @@ void restoreCheckpoint() {
         p->toggled = true;
         for (int i = 0; i < p->count; i++) {
             int object = p->objects[i];
-            objects.flags[object] |= FLAG_TOGGLED;
+            objects.flags[object] |= static_cast<int>(ObjectFlags::FlagToggled);
         }
     }
 
@@ -1007,7 +1007,7 @@ void restoreCheckpoint() {
 
     for (int i = 0; i < check->keyCount; i++) {
         SET_ACTIVATED(check->keyIndex[i], true);
-        objects.flags[check->keyIndex[i]] |= FLAG_TOGGLED;
+        objects.flags[check->keyIndex[i]] |= static_cast<int>(ObjectFlags::FlagToggled);
     }
 
     pulseTriggerCount = 0;
@@ -1017,7 +1017,7 @@ void restoreCheckpoint() {
         objects.mainBeingPulsed[i] = false;
         objects.detailBeingPulsed[i] = false;
     }
-    for (int i = 0; i < COL_CHANNEL_NUM; i++) {
+    for (int i = 0; i < static_cast<int>(ColorChannelIDs::ColChannelNum); i++) {
         channels[i].numPulses = 0;
     }
 
@@ -1104,18 +1104,18 @@ void handleAutoCheckpoints(float delta) {
     
     if (checkpointTimer <= 0) {
         switch (state.player.gamemode) {
-            case GAMEMODE_PLAYER:
-            case GAMEMODE_BALL:
-            case GAMEMODE_ROBOT:
-            case GAMEMODE_SPIDER:
+            case static_cast<int>(IconGamemode::GamemodePlayer):
+            case static_cast<int>(IconGamemode::GamemodeBall):
+            case static_cast<int>(IconGamemode::GamemodeRobot):
+            case static_cast<int>(IconGamemode::GamemodeSpider):
                 if (state.player.landedFromJump) {
                     state.pendingAutoCheckpoint = true;
                 }
                 break;
 
-            case GAMEMODE_SHIP:
-            case GAMEMODE_UFO:
-            case GAMEMODE_WAVE:
+            case static_cast<int>(IconGamemode::GamemodeShip):
+            case static_cast<int>(IconGamemode::GamemodeUfo):
+            case static_cast<int>(IconGamemode::GamemodeWave):
                 state.pendingAutoCheckpoint = true;
                 isPendingPseudoCheckpoint = true;
                 break;

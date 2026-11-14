@@ -8,13 +8,13 @@
 namespace gd3ds
 {
 
-typedef struct {
+struct FileOrFolder {
     char name[MAX_PATH_LEN];
     bool isDir;
-} FileOrFolder;
+};
 
 
-typedef struct GenericTask GenericTask;
+struct GenericTask;
 
 FileOrFolder *loadFolder(GenericTask *task, char *dir, int *count);
 void goBackDirectory(char *path);

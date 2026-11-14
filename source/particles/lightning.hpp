@@ -6,10 +6,10 @@
 namespace gd3ds
 {
 
-enum class LightningType{
-    SIZE_MINI,
-    SIZE_NORMAL,
-    TELEPORT
+enum class LightningType {
+    SizeMini,
+    SizeNormal,
+    Teleport
 };
 
 struct LightningPoint {

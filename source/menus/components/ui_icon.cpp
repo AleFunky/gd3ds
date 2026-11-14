@@ -25,7 +25,7 @@ static void uiIconDraw(UIElement* e, UITransform *transform) {
     UIIcon *icon = (UIIcon *) e;
     UIButton *button = (UIButton *) e;
 
-    if (icon->gamemode == GAMEMODE_SHIP) transform->y -= 4;
+    if (icon->gamemode == static_cast<int>(IconGamemode::GamemodeShip)) transform->y -= 4;
 
     if (icon->gamemode == TRAIL) {
         C2D_Sprite spr = { 0 };
@@ -49,7 +49,7 @@ static void uiIconDraw(UIElement* e, UITransform *transform) {
             icon->p2Color,
             icon->glowColor,
             (IconParameters) { 
-                .animID = (icon->gamemode == (int)GAMEMODE_ROBOT ? (int)ROBOT_ANIM_IDLE : (int)SPIDER_ANIM_IDLE),
+                .animID = (icon->gamemode == (int)static_cast<int>(IconGamemode::GamemodeRobot) ? (int)static_cast<int>(RobotAnimId::RobotAnimIdle) : (int)static_cast<int>(SpiderAnimId::SpiderAnimIdle)),
                 .animFrame = 0
             }
         );
@@ -108,7 +108,7 @@ UIIcon *uiCreateIcon(UIScreen *screen) {
 
     UIButton *button = (UIButton *) e;
 
-    button->base.type = UI_ICON;
+    button->base.type = UIElementType::UiIcon;
     button->base.enabled = true;
 
     button->base.update = uiIconUpdate;

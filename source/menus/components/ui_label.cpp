@@ -18,7 +18,7 @@ static void uiLabelDraw(UIElement* e, UITransform *transform) {
     int fontID = label->font;
 
     // Set to pusab if invalid
-    if (fontID >= NUM_FONTS) fontID = 0;
+    if (fontID >= static_cast<int>(Fonts::NumFonts)) fontID = 0;
 
     const LabelFont *font = &fonts[fontID];
 
@@ -55,7 +55,7 @@ UILabel *uiCreateLabel(UIScreen *screen) {
 
     if (!e) return NULL;
 
-    e->base.type = UI_LABEL;
+    e->base.type = UIElementType::UiLabel;
     e->base.enabled = true;
     
     uiElementApplyDefaultProperties(&e->base, screen);

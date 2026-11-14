@@ -16,9 +16,9 @@ namespace gd3ds
 {
 
 const UIIntEnumEntry buttonAnimEnum[] = {
-    { "normal", BUTTON_ANIM_NORMAL },
-    { "pull", BUTTON_ANIM_PULL },
-    { "darken", BUTTON_ANIM_DARKEN }
+    { "normal", static_cast<int>(ButtonAnimType::ButtonAnimNormal) },
+    { "pull", static_cast<int>(ButtonAnimType::ButtonAnimPull) },
+    { "darken", static_cast<int>(ButtonAnimType::ButtonAnimDarken) }
 };
 
 //prevents two or more buttons from being pressed at the exact same time
@@ -30,7 +30,7 @@ void uiButtonUpdate(UIElement* e, UIInput* touch, UITransform *transform) {
     //Keybinds logic
     u32 validKeybinds = button->keyBinds;
 
-    if(settingsState.enableDebugBindings && gameState == STATE_GAME && !gamePaused && !inLevelComplete){
+    if(settingsState.enableDebugBindings && gameState == static_cast<int>(GameState::StateGame) && !gamePaused && !inLevelComplete){
         validKeybinds &= ~(KEY_B | KEY_X | KEY_L | KEY_R);
     }
 
@@ -55,15 +55,15 @@ void uiButtonUpdate(UIElement* e, UIInput* touch, UITransform *transform) {
 
     // Animation
     switch(button->animType){
-        case BUTTON_ANIM_NORMAL:
+        case ButtonAnimType::ButtonAnimNormal:
             EaseTypes bounceType;
             if (button->hovered) {
                 button->hoverTimer += DT * (button->keyPressTimer > 0 ? 2 : 1);
-                bounceType = (button->keyPressTimer > 0 ? EASE_OUT : BOUNCE_OUT);
+                bounceType = (button->keyPressTimer > 0 ? EaseTypes::EaseOut : EaseTypes::BounceOut);
             } else {
                 button->hoverTimer -= DT;
                 // As the animation plays in reverse, we just use bounce in
-                bounceType = BOUNCE_IN;
+                bounceType = EaseTypes::BounceIn;
             }
 
             button->hoverTimer = clampf(button->hoverTimer, 0.f, BUTTON_HOVER_ANIM_TIME);
@@ -72,7 +72,7 @@ void uiButtonUpdate(UIElement* e, UIInput* touch, UITransform *transform) {
             // Apply hover factor
             button->hoverProgress = 1 + (button->hoverProgress - 1) * button->hoverFactor;
             break;
-        case BUTTON_ANIM_PULL:
+        case ButtonAnimType::ButtonAnimPull:
             if (button->hovered) {
                 button->hoverTimer += DT;
             } else {
@@ -80,7 +80,7 @@ void uiButtonUpdate(UIElement* e, UIInput* touch, UITransform *transform) {
             }
 
             button->hoverTimer = clampf(button->hoverTimer, 0.f, 0.2f);
-            button->hoverProgress = easeValue(EASE_IN_OUT, 0.f, 6.f, button->hoverTimer, 0.2f, 2.0f);
+            button->hoverProgress = easeValue(EaseTypes::EaseInOut, 0.f, 6.f, button->hoverTimer, 0.2f, 2.0f);
             break;
         default:
             break;
@@ -107,7 +107,7 @@ void uiButtonUpdate(UIElement* e, UIInput* touch, UITransform *transform) {
         button->pressed = false;
         button->hovered = false;
         //only the normal animation (zoom in) snaps when you release it
-        if(button->animType == BUTTON_ANIM_NORMAL){
+        if(button->animType == ButtonAnimType::ButtonAnimNormal){
             button->hoverTimer = 0.f;
             button->hoverProgress = 1.f;
         }
@@ -137,7 +137,7 @@ void uiButtonDrawText(UIElement *e, UITransform *transform) {
     int fontID = button->font;
 
     // Set to pusab if invalid
-    if (fontID >= NUM_FONTS) fontID = 0;
+    if (fontID >= static_cast<int>(Fonts::NumFonts)) fontID = 0;
 
     const LabelFont *font = &fonts[fontID];
 
@@ -165,11 +165,11 @@ void uiButtonModifyTransform(UIElement *e, UITransform *t) {
     UIButton *button = (UIButton *) e;
 
     switch(button->animType){
-        case BUTTON_ANIM_NORMAL:
+        case ButtonAnimType::ButtonAnimNormal:
             t->scaleX *= button->hoverProgress;
             t->scaleY *= button->hoverProgress;
             break;
-        case BUTTON_ANIM_PULL:
+        case ButtonAnimType::ButtonAnimPull:
             t->y += button->hoverProgress;
             break;
         default:
@@ -225,7 +225,7 @@ UIButton *uiCreateButton(UIScreen *screen) {
 
     if (!e) return NULL;
 
-    e->base.type = UI_BUTTON;
+    e->base.type = UIElementType::UiButton;
     e->base.enabled = true;
     e->base.update = uiButtonUpdate;
     e->base.draw = uiButtonDraw;
@@ -274,7 +274,7 @@ UIElement *uiCreateButtonFromProps(UIScreen *screen, const UIPropertyList *props
     
     button->keyBinds = uiPropBitfield(props, "keyBinds", keybindTable, ARRAY_LEN(keybindTable));
 
-    button->animType = (ButtonAnimType)uiPropIntEnum(props, "anim", buttonAnimEnum, ARRAY_LEN(buttonAnimEnum), BUTTON_ANIM_NORMAL);
+    button->animType = (ButtonAnimType)uiPropIntEnum(props, "anim", buttonAnimEnum, ARRAY_LEN(buttonAnimEnum), static_cast<int>(ButtonAnimType::ButtonAnimNormal));
     
     return &button->base;
 }

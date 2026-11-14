@@ -10,7 +10,7 @@
 namespace gd3ds
 {
 
-typedef struct GroupCombination {
+struct GroupCombination {
     short groups[MAX_GROUPS_PER_OBJECT];
     unsigned char groupCount;
     int *objects;
@@ -36,7 +36,7 @@ typedef struct GroupCombination {
     
     bool touched;
     bool deferredTouched;
-} GroupCombination;
+};
 
 static GroupNode groups[MAX_GROUPS];
 
@@ -353,7 +353,7 @@ void applyGroupCombinationMove(void) {
                 int oldSx = objects.sectionX[object];
                 int oldSy = objects.sectionY[object];
 
-                if (deltaX != 0.f && (objects.flags[object] & FLAG_CAN_BE_X_MOVED)) objects.x[object] += deltaX;
+                if (deltaX != 0.f && (objects.flags[object] & static_cast<int>(ObjectFlags::FlagCanBeXMoved))) objects.x[object] += deltaX;
                 if (deltaY != 0.f) objects.y[object] += deltaY;
 
                 if ((int)(objects.x[object] / SECTION_SIZE) != oldSx || (int)(objects.y[object] / SECTION_SIZE) != oldSy)
@@ -419,7 +419,7 @@ void getGroupObjectPosition(int object, float *x, float *y) {
     float currentX = *x;
     float currentY = *y;
 
-    bool canMoveX = (objects.flags[object] & FLAG_CAN_BE_X_MOVED) != 0;
+    bool canMoveX = (objects.flags[object] & static_cast<int>(ObjectFlags::FlagCanBeXMoved)) != 0;
 
     Matrix2x2 matrix = canMoveX ? combination->deferredMatrix : combination->deferredNoXMatrix;
     Vec2D offset = canMoveX ? combination->deferredOffset : combination->deferredNoXOffset;
@@ -441,7 +441,7 @@ void flushGroupCombinationVisualMoves(void) {
             float x = objects.x[object];
             float y = objects.y[object];
 
-            bool canMoveX = (objects.flags[object] & FLAG_CAN_BE_X_MOVED) != 0;
+            bool canMoveX = (objects.flags[object] & static_cast<int>(ObjectFlags::FlagCanBeXMoved)) != 0;
 
             Matrix2x2 matrix = canMoveX ? combination->deferredMatrix : combination->deferredNoXMatrix;
             Vec2D offset = canMoveX ? combination->deferredOffset : combination->deferredNoXOffset;

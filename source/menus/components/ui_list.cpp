@@ -184,7 +184,7 @@ UIList *uiCreateList(UIScreen *screen) {
 
     if (!e) return NULL;
 
-    e->base.type = UI_LIST;
+    e->base.type = UIElementType::UiList;
     e->base.enabled = true;
 
     e->base.update = uiListUpdate;

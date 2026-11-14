@@ -229,7 +229,7 @@ void motionTrailUpdate(MotionTrail* trail, float delta) {
     if (trail->alwaysOn) {
         Player *player = (trail->player ? &state.player2 : &state.player);
 
-        if (state.mirroring || (player->gamemode == GAMEMODE_WAVE && settingsState.noWaveTrailBehind) || !state.showPlayer) {
+        if (state.mirroring || (player->gamemode == static_cast<int>(IconGamemode::GamemodeWave) && settingsState.noWaveTrailBehind) || !state.showPlayer) {
             motionTrailStopStroke(trail);
         } else {
             motionTrailResumeStroke(trail);

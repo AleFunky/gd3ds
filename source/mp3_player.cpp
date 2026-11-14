@@ -207,7 +207,7 @@ u32 decodeMP3(void* buffer) {
 
 float calculateAmplitude(float power) {
     if (state.practiceMode && !settingsState.practiceMusicSync) return 0.f;
-    if (gameState == STATE_MENU) return 0.5f;
+    if (gameState == static_cast<int>(GameState::StateMenu)) return 0.5f;
 
     static float prev = 0.0f;
     static float pulse = 0.0f;
