@@ -1,4 +1,5 @@
 #include "portal_shine.hpp"
+#include "main.hpp"
 #include "level_loading.hpp"
 
 namespace gd3ds {
@@ -29,11 +30,11 @@ PortalShine::PortalShine(ShineType type, int obj){
 }
 
 void PortalShine::updateShine(){
-
+    this->time += delta;
 }
 
 void PortalShine::drawShine(){
-    
+
 }
 
 }

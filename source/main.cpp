@@ -1570,6 +1570,8 @@ void gameLoop() {
 
                 drawEndWall(delta);
 
+                drawDivorces();
+
                 drawAttemptText();
 
                 drawGround(state.groundX, state.cameraY, 0, false, world_width);
