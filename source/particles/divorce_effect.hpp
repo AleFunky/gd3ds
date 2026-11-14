@@ -10,7 +10,9 @@ private:
     float x, y;
     float rotation;
     float scale;
+    bool flipX;
     bool flipY;
+    bool mirrored;
 
     float time;
     UseEffectPool circle;

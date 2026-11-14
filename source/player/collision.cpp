@@ -1497,14 +1497,17 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         case DIVORCE_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
                 if (state.dual){
+                    int dualPlayer = !state.currentPlayer;
+                    Player * otherPlayer = dualPlayer ? &state.player2 : &state.player;
+
                     addDivorce(
-                        state.currentPlayer, 
-                        player->gamemode, 
-                        player->x, 
-                        player->y, 
-                        player->rotation, 
-                        player->mini ? 0.6f : 1.0f, 
-                        player->upsideDown
+                        dualPlayer, 
+                        otherPlayer->gamemode, 
+                        otherPlayer->x, 
+                        otherPlayer->y, 
+                        otherPlayer->rotation, 
+                        otherPlayer->mini ? 0.6f : 1.0f, 
+                        otherPlayer->upsideDown
                     );
                     
                     state.dual = false;

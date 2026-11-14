@@ -9,10 +9,13 @@ namespace gd3ds {
 DivorceEffect::DivorceEffect(int player, int gamemode, float x, float y, float rotation, float scale, bool flipY){
     this->player = player;
     this->gamemode = gamemode;
-    this->x = x;
+    //initial X position should be in world space, but not the subsequent animation (robert code)
+    this->x = getMirrorX(x - state.cameraX, state.mirrorFactor);
     this->y = y;
     this->rotation = rotation;
     this->scale = scale;
+    this->mirrored = (state.mirrorMult < 0);
+    this->flipX = this->mirrored;
     this->flipY = flipY;
 
     const UseEffectDefinition divorceEffect = {
@@ -26,15 +29,26 @@ DivorceEffect::DivorceEffect(int player, int gamemode, float x, float y, float r
         .endRad = 30,
         .hollow = true,
         .trifading = false,
+        .startOpacityEase = EASE_IN,
+        .endOpacityEase = EASE_OUT,
+        .startRadEase = QUAD_OUT,
+        .endRadEase = QUAD_OUT,
         .lineThickness = 1.f
     };
 
     initUseEffectPool(&this->circle, 1);
-    addUseEffect(x, y, 0, &divorceEffect, &this->circle);
+    addUseEffect(0, 0, USE_EFFECT_OBJ_NOTHING, &divorceEffect, &this->circle);
+    this->circle.stationary = true;
 }
 
 void DivorceEffect::updateDivorce(){
     this->time += delta;
+
+    //it only moves relative to 1x speed for some reason
+    this->x -= this->mirrored ? -playerSpeeds[1] * delta : playerSpeeds[1] * delta;
+
+    this->circle.pool[0].x = this->x;
+    this->circle.pool[0].y = SCREEN_HEIGHT - (this->y - state.cameraY);
 
     updateUseEffects(delta, &this->circle);
 }
@@ -66,20 +80,27 @@ void DivorceEffect::drawDivorce(){
             break;
     }
 
-    float t = (time / 0.4f);
+    float t = (time / 0.5f);
     float ti = 1.0f - t;
+
+    Color p1 = p1Color;
+    Color p2 = p2Color;
+    if(this->player == 1){
+        p1 = p2Color;
+        p2 = p1Color;
+    }
 
     spawnIconAt(
         this->gamemode, 
         selectedIcon, false, 
-        getMirrorX((this->x - state.cameraX), state.mirrorFactor), 
-        (this->y - state.cameraY), 
+        this->x, 
+        SCREEN_HEIGHT - (this->y - state.cameraY), 
         (this->rotation) + (180.0f * t), 
-        (state.mirrorMult < 0),
+        this->flipX,
         this->flipY,
         this->scale * ti,
-        (p1Color.toColor32() & 0x00FFFFFF) | ((u32)(ti * 255.0f) << 24), 
-        (p2Color.toColor32() & 0x00FFFFFF) | ((u32)(ti * 255.0f) << 24), 
+        (p1.toColor32() & 0x00FFFFFF) | ((u32)(ti * 255.0f) << 24), 
+        (p2.toColor32() & 0x00FFFFFF) | ((u32)(ti * 255.0f) << 24), 
         0, 
         (IconParameters) { 
             .animID = ROBOT_ANIM_IDLE,
@@ -89,7 +110,7 @@ void DivorceEffect::drawDivorce(){
 }
 
 bool DivorceEffect::done(){
-    return this->time > 0.4f;
+    return this->time > 0.5f;
 }
 
 DivorceEffect::~DivorceEffect() {
