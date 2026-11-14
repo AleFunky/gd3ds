@@ -62,7 +62,7 @@ UITextbox *uiCreateTextbox(UIScreen *screen) {
 
     if (!e) return NULL;
 
-    e->base.type = UI_TEXTBOX;
+    e->base.type = UIElementType::UiTextbox;
     e->base.enabled = true;
     e->base.update = uiTextboxUpdate;
     e->base.draw = uiTextboxDraw;

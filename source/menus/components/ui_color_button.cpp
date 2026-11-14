@@ -64,7 +64,7 @@ UIColor *uiCreateColorButton(UIScreen *screen) {
     
     UIButton *button = (UIButton *) e;
 
-    button->base.type = UI_COLOR_BUTTON;
+    button->base.type = UIElementType::UiColorButton;
     button->base.enabled = true;
 
     button->base.update = uiColorButtonUpdate;

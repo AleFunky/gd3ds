@@ -9,7 +9,7 @@
 namespace gd3ds
 {
 
-typedef struct {
+struct CoinCollectEffect {
     float x;
     float velX;
     float y;
@@ -24,7 +24,7 @@ typedef struct {
     bool alreadyCollected;
 
     bool active;
-} CoinCollectEffect;
+};
 
 static CoinCollectEffect collectedEffect[NUM_COINS] = { 0 };
 
@@ -63,7 +63,7 @@ void updateCollectEffect(float delta) {
                 if (data->fadeStart < 0) {
                     data->fadeStart = data->elapsed;
                 }
-                data->opacity = easeValue(EASE_IN, 1, 0, data->elapsed - data->fadeStart, COIN_COLLECT_DURATION - data->fadeStart, 1.f);
+                data->opacity = easeValue(EaseTypes::EaseIn, 1, 0, data->elapsed - data->fadeStart, COIN_COLLECT_DURATION - data->fadeStart, 1.f);
             }
 
             data->elapsed += delta;

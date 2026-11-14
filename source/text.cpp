@@ -18,10 +18,10 @@ namespace gd3ds
 static const u32 white_c = ABGR8(255, 255, 255, 255);
 static char wrapBuffer[4096];
 
-typedef struct {
+struct TagColor {
     const char *name;
     const u32 color;
-} TagColor;
+};
 
 // HOW TO USE TAGS
 // like this "<red>red text wohoo</>"

@@ -16,11 +16,11 @@
 namespace gd3ds
 {
 
-typedef struct {
+struct Tex2F {
     float u, v;
-} Tex2F;
+};
 
-typedef struct {
+struct MotionTrail {
     bool appendNewPoints;
     bool startingPositionInitialized;
     bool waveTrail;
@@ -62,16 +62,16 @@ typedef struct {
     bool blending;
     bool alwaysOn;
     bool stationary;
-} MotionTrail;
+};
 
-typedef struct {
+struct MotionTrailConfig {
     float fade;
     float width;
     bool alwaysOn;
     bool colored;
     bool stationary;
     bool blending;
-} MotionTrailConfig;
+};
 
 extern const MotionTrailConfig trailProperties[TRAIL_COUNT];
 

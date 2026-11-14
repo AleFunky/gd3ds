@@ -31,18 +31,18 @@ namespace gd3ds
 
 extern int currentPulserodBallImage;
 
-typedef enum {
-    FADE_STATUS_NONE,
-    FADE_STATUS_OUT,
-    FADE_STATUS_IN
-} FadeStatus;
+enum class FadeStatus {
+    FadeStatusNone,
+    FadeStatusOut,
+    FadeStatusIn
+};
 
-typedef struct {
+struct QuadParams {
     C2Di_Quad quadr;
     float tcTopLeft[2], tcTopRight[2], tcBotLeft[2], tcBotRight[2];
-} QuadParams;
+};
 
-typedef struct {
+struct SpriteObject {
     C2D_Sprite spr;
     u32 tint;
     QuadParams params;
@@ -55,41 +55,41 @@ typedef struct {
     unsigned char layer;
     bool blending;
     bool hidden;
-} SpriteObject;
-
-typedef struct {
-    SpriteObject *obj;
-    uint32_t key;
-} SortItem;
-
-enum FadingEffects {
-    FADE_NONE,
-    FADE_SIMPLE,
-    FADE_UP,
-    FADE_DOWN,
-    FADE_RIGHT,
-    FADE_LEFT,
-    FADE_SCALE_IN,
-    FADE_SCALE_OUT,
-    FADE_INWARDS,
-    FADE_OUTWARDS,
-    FADE_CIRCLE_LEFT,
-    FADE_CIRCLE_RIGHT,
-    FADE_UP_SLOW_LEFT,
-    FADE_DOWN_SLOW_LEFT,
-    FADE_UP_SLOW_RIGHT,
-    FADE_DOWN_SLOW_RIGHT,
-    FADE_UP_STATIONARY,
-    FADE_DOWN_STATIONARY,
-    FADE_COUNT
 };
 
-typedef struct {
+struct SortItem {
+    SpriteObject *obj;
+    uint32_t key;
+};
+
+enum class FadingEffects {
+    FadeNone,
+    FadeSimple,
+    FadeUp,
+    FadeDown,
+    FadeRight,
+    FadeLeft,
+    FadeScaleIn,
+    FadeScaleOut,
+    FadeInwards,
+    FadeOutwards,
+    FadeCircleLeft,
+    FadeCircleRight,
+    FadeUpSlowLeft,
+    FadeDownSlowLeft,
+    FadeUpSlowRight,
+    FadeDownSlowRight,
+    FadeUpStationary,
+    FadeDownStationary,
+    FadeCount
+};
+
+struct SpriteTemplate {
     C2D_Sprite parentTemplate;
     C2D_Sprite glowTemplate;
     int childCount;
     C2D_Sprite *childTemplates;
-} SpriteTemplate;
+};
 
 void cacheAllSprites();
 void freeCachedSprites();
@@ -146,7 +146,7 @@ void drawGround(float camX, float camY, float y, bool isCeiling, int screenWidth
 void updatePlayerColors();
 void setPlayerColors(Color p1, Color p2, Color glow);
 
-typedef struct {
+struct IconParameters {
     int animID;
     int animFrame;
     float animTimer;
@@ -155,7 +155,7 @@ typedef struct {
     float blendFromTimer;
     float blendFraction;
     float robotFireScale;
-} IconParameters;
+};
 
 void spawnIconAt(
     int gamemode,

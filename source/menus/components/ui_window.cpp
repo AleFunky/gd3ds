@@ -45,7 +45,7 @@ UIWindow *uiCreateWindow(UIScreen *screen) {
 
     if (!e) return NULL;
 
-    e->base.type = UI_WINDOW;
+    e->base.type = UIElementType::UiWindow;
     e->base.enabled = true;
 
     e->base.draw = uiWindowDraw;

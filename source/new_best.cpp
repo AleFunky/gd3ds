@@ -165,7 +165,7 @@ const char *newBestText[] = {
     "You successed failfully"
 };
 
-const char *diedToText[DEATH_REASON_COUNT] = {
+const char *diedToText[static_cast<int>(DeathReason::DeathReasonCount)] = {
     "Bro died magically",
     "Bro died to a <i646s3>spike",
     "Bro died to a <#000000><i639s3></>saw",
@@ -175,13 +175,13 @@ const char *diedToText[DEATH_REASON_COUNT] = {
     "Bro died to the ground",
 };
 
-typedef enum {
-    SCALE_IN,
-    WAITING,
-    SCALE_OUT,
-} NewBestState;
+enum class NewBestState {
+    ScaleIn,
+    Waiting,
+    ScaleOut,
+};
 
-typedef struct {
+struct NewBestPopup {
     bool active;
 
     int progress;
@@ -196,14 +196,14 @@ typedef struct {
     float timer;
     float duration;
     EaseTypes ease;
-} NewBestPopup;
+};
 
 static NewBestPopup newBestPopup;
 
 void initNewBestPopup(int progress) {
     newBestPopup.active = true;
-    newBestPopup.state = SCALE_IN;
-    newBestPopup.ease = ELASTIC_OUT;
+    newBestPopup.state = NewBestState::ScaleIn;
+    newBestPopup.ease = EaseTypes::ElasticOut;
 
     newBestPopup.textID = randomInt(0, ARRAY_LEN(newBestText) - 1);
     newBestPopup.progress = progress;
@@ -239,10 +239,10 @@ void clearNewBestPopup() {
 void handleNewBestPopup(float delta) {
     if (newBestPopup.active) {
         switch (newBestPopup.state) {
-            case SCALE_IN:
+            case NewBestState::ScaleIn:
                 if (newBestPopup.timer > NEW_BEST_STATE_0_DURATION) {
-                    newBestPopup.state = WAITING;
-                    newBestPopup.ease = EASE_LINEAR;
+                    newBestPopup.state = NewBestState::Waiting;
+                    newBestPopup.ease = EaseTypes::EaseLinear;
 
                     newBestPopup.timer = 0;
                     newBestPopup.duration = NEW_BEST_STATE_1_DURATION;
@@ -250,10 +250,10 @@ void handleNewBestPopup(float delta) {
                     newBestPopup.targetScale = newBestPopup.scale;
                 }
                 break;
-            case WAITING:
+            case NewBestState::Waiting:
                 if (newBestPopup.timer > NEW_BEST_STATE_1_DURATION) {
-                    newBestPopup.state = SCALE_OUT;
-                    newBestPopup.ease = QUAD_IN;
+                    newBestPopup.state = NewBestState::ScaleOut;
+                    newBestPopup.ease = EaseTypes::QuadIn;
                     
                     newBestPopup.timer = 0;
                     newBestPopup.duration = NEW_BEST_STATE_2_DURATION;
@@ -261,7 +261,7 @@ void handleNewBestPopup(float delta) {
                     newBestPopup.targetScale = NEW_BEST_STATE_2_TARGET_SCALE;
                 }
                 break;
-            case SCALE_OUT:
+            case NewBestState::ScaleOut:
                 if (newBestPopup.timer > NEW_BEST_STATE_2_DURATION) {
                     newBestPopup.active = false;
                 }
@@ -282,7 +282,7 @@ void drawNewBestPopup() {
             const char *text = newBestText[newBestPopup.textID];
 
             if (newBestPopup.textID == DIED_TO_ID) {
-                text = diedToText[state.deathReason];
+                text = diedToText[static_cast<int>(state.deathReason)];
             } 
 
             if (newBestPopup.textID == HARDER_THAN_ID) {

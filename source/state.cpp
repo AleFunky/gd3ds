@@ -72,7 +72,7 @@ void runCamera() {
     float playableHeight = state.ceilingY - state.groundY;
     float calcHeight = 0;
 
-    if ((player->gamemode != GAMEMODE_PLAYER && player->gamemode != GAMEMODE_ROBOT) || state.dual) {
+    if ((player->gamemode != static_cast<int>(IconGamemode::GamemodePlayer) && player->gamemode != static_cast<int>(IconGamemode::GamemodeRobot)) || state.dual) {
         calcHeight = (SCREEN_HEIGHT_AREA - playableHeight) / 2;
     }
     state.groundYGfx = easeOut(state.groundYGfx, calcHeight, 0.02f);
@@ -91,8 +91,8 @@ void runCamera() {
             state.backgroundWallInitialX = state.backgroundX;
             state.groundWallInitialX = state.groundX;
         }
-        state.backgroundX = easeValue(EASE_IN_OUT, state.backgroundWallInitialX, state.backgroundWallInitialX + CAMERA_X_WALL_OFFSET * state.mirrorSpeedFactor, state.cameraWallTimer, 1.f, 2.0f);            
-        state.groundX = easeValue(EASE_IN_OUT, state.groundWallInitialX, state.groundWallInitialX + CAMERA_X_WALL_OFFSET * state.mirrorSpeedFactor, state.cameraWallTimer, 1.f, 2.0f);            
+        state.backgroundX = easeValue(EaseTypes::EaseInOut, state.backgroundWallInitialX, state.backgroundWallInitialX + CAMERA_X_WALL_OFFSET * state.mirrorSpeedFactor, state.cameraWallTimer, 1.f, 2.0f);
+        state.groundX = easeValue(EaseTypes::EaseInOut, state.groundWallInitialX, state.groundWallInitialX + CAMERA_X_WALL_OFFSET * state.mirrorSpeedFactor, state.cameraWallTimer, 1.f, 2.0f);
     }
 
     if (levelInfo.wallY > 0 && (camera_x_right >= levelInfo.wallX - CAMERA_X_WALL_OFFSET)) {
@@ -103,15 +103,15 @@ void runCamera() {
         float finalCameraXWall = levelInfo.wallX - (SCREEN_WIDTH_AREA);
         float finalCameraYWall = levelInfo.wallY - ((SCREEN_HEIGHT_AREA / 2) - LEVEL_Y_OFFSET);   
 
-        setCameraX(easeValue(EASE_IN_OUT, finalCameraXWall - CAMERA_X_WALL_OFFSET, finalCameraXWall, state.cameraWallTimer, CAMERA_WALL_ANIM_DURATION, 2.0f));
-        setCameraY(easeValue(EASE_IN_OUT, state.cameraWallInitialY, finalCameraYWall, state.cameraWallTimer, CAMERA_WALL_ANIM_DURATION, 2.0f));
+        setCameraX(easeValue(EaseTypes::EaseInOut, finalCameraXWall - CAMERA_X_WALL_OFFSET, finalCameraXWall, state.cameraWallTimer, CAMERA_WALL_ANIM_DURATION, 2.0f));
+        setCameraY(easeValue(EaseTypes::EaseInOut, state.cameraWallInitialY, finalCameraYWall, state.cameraWallTimer, CAMERA_WALL_ANIM_DURATION, 2.0f));
         state.cameraWallTimer += STEPS_DT;
     } else { 
         float camY = state.cameraY;
 
         float targetY = camY;
 
-        if ((player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_ROBOT) && !state.dual) {
+        if ((player->gamemode == static_cast<int>(IconGamemode::GamemodePlayer) || player->gamemode == static_cast<int>(IconGamemode::GamemodeRobot)) && !state.dual) {
             float playerY = player->y;
 
             float upsideDownOffset = (player->upsideDown ? -30.f : 0);
@@ -161,13 +161,13 @@ void runCamera() {
 
 void setHitboxSize(Player *player, int gamemode) {
     float scale = (player->mini) ? 0.6f : 1.f;
-    if (gamemode == GAMEMODE_SPIDER) {
+    if (gamemode == static_cast<int>(IconGamemode::GamemodeSpider)) {
         player->height = 27 * scale;
         player->width = 27 * scale;
 
         player->internalHitbox.width = 9;
         player->internalHitbox.height = 9;
-    } else if (gamemode != GAMEMODE_WAVE) {
+    } else if (gamemode != static_cast<int>(IconGamemode::GamemodeWave)) {
         player->height = 30 * scale;
         player->width = 30 * scale;
         
@@ -313,7 +313,7 @@ void initState() {
     inLevelComplete = false;
 
     cheated = false;
-    for (int i = 0; i < CHEAT_COUNT; i++) {
+    for (int i = 0; i < static_cast<int>(Cheats::CheatCount); i++) {
         cheatsUsed[i] = false;
     }
 }
@@ -324,8 +324,8 @@ void initLevelBounds() {
             state.ceilingY = state.groundY + gamemodeHeights[levelInfo.initialGamemode];
             setIntendedCeiling();
             break;
-        case GAMEMODE_PLAYER:
-        case GAMEMODE_ROBOT:
+        case static_cast<int>(IconGamemode::GamemodePlayer):
+        case static_cast<int>(IconGamemode::GamemodeRobot):
             state.cameraIntendedY = 0;
     }
     
@@ -344,7 +344,7 @@ void initLevelBounds() {
     float playableHeight = state.ceilingY - state.groundY;
     float calcHeight = 0;
 
-    if ((state.player.gamemode != GAMEMODE_PLAYER && state.player.gamemode != GAMEMODE_ROBOT) || state.dual) {
+    if ((state.player.gamemode != static_cast<int>(IconGamemode::GamemodePlayer) && state.player.gamemode != static_cast<int>(IconGamemode::GamemodeRobot)) || state.dual) {
         calcHeight = (SCREEN_HEIGHT_AREA - playableHeight) / 2;
     }
     
@@ -365,7 +365,7 @@ void firstLoadInitVariables() {
     
     state.cameraX = 0;
     state.cameraY = 0;
-    currentFadingEffect = FADE_SIMPLE;
+    currentFadingEffect = static_cast<int>(FadingEffects::FadeSimple);
 
     slowSpeedParticlesTimer = 0;
     normalSpeedParticlesTimer = 0;
@@ -424,7 +424,7 @@ void initVariables() {
 
     clearUseEffects(getUseEffectArrayPtr(GFX_TOP));
 
-    currentFadingEffect = FADE_SIMPLE;
+    currentFadingEffect = static_cast<int>(FadingEffects::FadeSimple);
     levelInfo.completing = false;
 
     initPlayer(&state.player);
@@ -439,7 +439,7 @@ void initVariables() {
     p1Trail = false;
 
     clearBgFlash();
-    if (gameState == STATE_GAME && state.currentData.attempts != 1) startRespawnEffect();
+    if (gameState == static_cast<int>(GameState::StateGame) && state.currentData.attempts != 1) startRespawnEffect();
 }
 
 void handleDeath(Player *player, bool pauseSong) {
@@ -487,7 +487,7 @@ void startBgFlash() {
     BGFlashData *data = &state.flashData;
     data->flashing = true;
     data->timer = FLASH_TIME_1;
-    data->state = FLASH_FIRST_LIGHT;
+    data->state = FlashState::FlashFirstLight;
     data->useLbg = true;
 }
 
@@ -497,30 +497,30 @@ void handleBgFlash() {
 
     // Run flashing state
     switch (data->state) {
-        case FLASH_NONE:
+        case FlashState::FlashNone:
             break;
         
-        case FLASH_FIRST_LIGHT:
+        case FlashState::FlashFirstLight:
             data->timer -= STEPS_DT;
             if (data->timer <= 0) {
-                data->state = FLASH_UNLIGHTED;
+                data->state = FlashState::FlashUnlighted;
                 data->timer = FLASH_TIME_2;
                 data->useLbg = false;
             }
             break;
-        case FLASH_UNLIGHTED:
+        case FlashState::FlashUnlighted:
             data->timer -= STEPS_DT;
             if (data->timer <= 0) {
-                data->state = FLASH_SECOND_LIGHT;
+                data->state = FlashState::FlashSecondLight;
                 data->timer = FLASH_TIME_2;
                 data->useLbg = true;
             }
             break;
-        case FLASH_SECOND_LIGHT:
+        case FlashState::FlashSecondLight:
             data->timer -= STEPS_DT;
             if (data->timer <= 0) {
                 // End flash
-                data->state = FLASH_NONE;
+                data->state = FlashState::FlashNone;
                 data->timer = 0;
                 data->useLbg = false;
                 data->flashing = false;
@@ -579,7 +579,7 @@ void startRespawnEffect() {
     RespawnEffectData *data = &state.respawnEffectData;
     data->active = true;
     data->timer = RESPAWN_EFFECT_DURATION;
-    data->state = RESPAWN_EFFECT_HIDE_PLAYER;
+    data->state = RespawnEffectState::RespawnEffectHidePlayer;
     data->remaining = RESPAWN_EFFECT_REPEAT;
     data->hidePlayer = true;
 }
@@ -590,10 +590,10 @@ void handleRespawnEffect() {
 
     // Run respawn state
     switch (data->state) {
-        case RESPAWN_EFFECT_NONE:
+        case RespawnEffectState::RespawnEffectNone:
             break;
         
-        case RESPAWN_EFFECT_HIDE_PLAYER:
+        case RespawnEffectState::RespawnEffectHidePlayer:
             // First frame
             if (data->timer == RESPAWN_EFFECT_DURATION) {
                 UseEffect *effectP1 = addUseEffect(state.player.x, state.player.y, USE_EFFECT_OBJ_P1, &respawnEffect, getUseEffectArrayPtr(GFX_TOP));
@@ -619,24 +619,24 @@ void handleRespawnEffect() {
 
             data->timer -= STEPS_DT;
             if (data->timer <= 0) {
-                data->state = RESPAWN_EFFECT_SHOW_PLAYER;
+                data->state = RespawnEffectState::RespawnEffectShowPlayer;
                 data->timer = RESPAWN_EFFECT_DURATION;
                 data->hidePlayer = false;
             }
             break;
-        case RESPAWN_EFFECT_SHOW_PLAYER:
+        case RespawnEffectState::RespawnEffectShowPlayer:
             data->timer -= STEPS_DT;
             if (data->timer <= 0) {
                 data->hidePlayer = true;
                 if (--data->remaining == 0) {
                     data->timer = 0;
-                    data->state = RESPAWN_EFFECT_NONE;
+                    data->state = RespawnEffectState::RespawnEffectNone;
                     data->active = false;
                     break;
                 }
                 
                 data->timer = RESPAWN_EFFECT_DURATION;
-                data->state = RESPAWN_EFFECT_HIDE_PLAYER;
+                data->state = RespawnEffectState::RespawnEffectHidePlayer;
             }
             break;
     }

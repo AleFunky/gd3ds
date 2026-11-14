@@ -174,7 +174,7 @@ C3D_RenderTarget* c2dCreateScreenTargetExt(gfxScreen_t screen, gfx3dSide_t side,
     return target;
 }
 
-int fadeStatus = FADE_STATUS_NONE;
+FadeStatus fadeStatus = FadeStatus::FadeStatusNone;
 float opacity = 0;
 
 // How far apart both eyes get at most, in pixels
@@ -260,7 +260,7 @@ void applyScreenModes() {
 #define MAX_EYE_LAYERS 8
 
 static float stereoStrength = 0.f;
-static int currentEye = EYE_LEFT;
+static int currentEye = static_cast<int>(StereoEye::EyeLeft);
 static bool drawingTopEye = false;
 
 static C3D_Mtx layerViews[MAX_EYE_LAYERS];
@@ -274,7 +274,7 @@ bool isStereoActive() {
 
 // How much this eye moves something floating at the given depth
 float getDepthShift(float depth) {
-    return (currentEye == EYE_LEFT ? 1.f : -1.f) * depth * MAX_EYE_SHIFT * stereoStrength;
+    return (currentEye == static_cast<int>(StereoEye::EyeLeft) ? 1.f : -1.f) * depth * MAX_EYE_SHIFT * stereoStrength;
 }
 
 // Sets the top screen up for one eye, returns false once every eye has been drawn
@@ -284,13 +284,13 @@ bool beginTopEye(int eye) {
 
 bool beginTopEyeTarget(int eye, C3D_RenderTarget *primary) {
     // The slider only gets read once per frame so both eyes agree on the depth
-    if (eye == EYE_LEFT) {
+    if (eye == static_cast<int>(StereoEye::EyeLeft)) {
         stereoStrength = (primary == top && topRight) ? getStereoSlider() : 0.f;
     }
 
     // One eye is enough with the slider down
-    if (eye > (stereoStrength > 0.f ? EYE_RIGHT : EYE_LEFT)) {
-        currentEye = EYE_LEFT;
+    if (eye > (stereoStrength > 0.f ? static_cast<int>(StereoEye::EyeRight) : static_cast<int>(StereoEye::EyeLeft))) {
+        currentEye = static_cast<int>(StereoEye::EyeLeft);
         drawingTopEye = false;
         return false;
     }
@@ -298,7 +298,7 @@ bool beginTopEyeTarget(int eye, C3D_RenderTarget *primary) {
     currentEye = eye;
     drawingTopEye = true;
 
-    C3D_RenderTarget *target = (eye == EYE_RIGHT ? topRight : primary);
+    C3D_RenderTarget *target = (eye == static_cast<int>(StereoEye::EyeRight) ? topRight : primary);
     
     C2D_SceneBegin(target);
     C2D_TargetClear(target, C2D_Color32(0, 0, 0, 255));
@@ -308,7 +308,7 @@ bool beginTopEyeTarget(int eye, C3D_RenderTarget *primary) {
 
 // True while redrawing the screen for another eye, so nothing gets updated twice
 bool isExtraEye() {
-    return currentEye != EYE_LEFT;
+    return currentEye != static_cast<int>(StereoEye::EyeLeft);
 }
 
 // Shifts everything drawn after this to the given depth, pair it with end_eye_layer().

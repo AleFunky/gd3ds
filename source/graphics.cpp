@@ -122,7 +122,7 @@ static int currentObjectCount;
 
 bool p1Trail = false;
 float p1TrailTimer = 0;
-int currentFadingEffect = FADE_SIMPLE;
+int currentFadingEffect = static_cast<int>(FadingEffects::FadeSimple);
 int currentPulserodBallImage = 0;
 
 SpriteTemplate spriteTemplates[GAME_OBJECT_COUNT]; // global cache
@@ -181,10 +181,10 @@ size_t getChildGroup(const GameObject* obj, size_t childIndex) {
 
 const Animation* getAnimationForObject(int id) {
     switch (id) {
-        case 918: return &animations[ANIM_GJBEAST01_BITE];
-        case 919: return &animations[ANIM_BLACKSLUDGE_LOOP];
-        case 1327: return &animations[ANIM_GJBEAST02_IDLE01];
-        case 1328: return &animations[ANIM_GJBEAST03_IDLE01];
+        case 918: return &animations[static_cast<int>(AnimationID::AnimGjbeast01Bite)];
+        case 919: return &animations[static_cast<int>(AnimationID::AnimBlacksludgeLoop)];
+        case 1327: return &animations[static_cast<int>(AnimationID::AnimGjbeast02Idle01)];
+        case 1328: return &animations[static_cast<int>(AnimationID::AnimGjbeast03Idle01)];
         default:  return NULL;
     }
 }
@@ -357,23 +357,23 @@ int getGlowChannel(int obj);
 inline int getColorChannel(int colType, int obj, const GameObject *gameObj) {
     int objID = objects.id[obj];
     int colChannel = gameObj->baseColor;
-    if (colType == COLOR_TYPE_GLOW) {
+    if (colType == static_cast<int>(ColorType::ColorTypeGlow)) {
         colChannel = getGlowChannel(obj);
-        if (colChannel != CHANNEL_OBJ_BLENDING) return colChannel;
+        if (colChannel != static_cast<int>(ColorChannelIDs::ChannelObjBlending)) return colChannel;
     } 
     
     // Check for the presence of 1.9 color channel
     if (objects.v1p9ColChannel[obj]) {
         // If pulserods, use base instead of detail
         if (objID >= 15 && objID <= 17) {
-            if (colType != COLOR_TYPE_DETAIL) colChannel = objects.v1p9ColChannel[obj];
+            if (colType != static_cast<int>(ColorType::ColorTypeDetail)) colChannel = objects.v1p9ColChannel[obj];
         } else {
-            if (colType == COLOR_TYPE_DETAIL) colChannel = objects.v1p9ColChannel[obj];
+            if (colType == static_cast<int>(ColorType::ColorTypeDetail)) colChannel = objects.v1p9ColChannel[obj];
         }
     } else {
         // 2.0 color channels
         if (objects.colChannel[obj]) {
-            if (colType != COLOR_TYPE_DETAIL) {
+            if (colType != static_cast<int>(ColorType::ColorTypeDetail)) {
                 colChannel = objects.colChannel[obj];
             } else if (!objHasMain(gameObj)) {
                 colChannel = objects.colChannel[obj];
@@ -381,7 +381,7 @@ inline int getColorChannel(int colType, int obj, const GameObject *gameObj) {
         }
 
         if (objects.detailColChannel[obj]) {
-            if (colType == COLOR_TYPE_DETAIL) {
+            if (colType == static_cast<int>(ColorType::ColorTypeDetail)) {
                 if (objHasMain(gameObj)) {
                     colChannel = objects.detailColChannel[obj];
                 }
@@ -391,8 +391,8 @@ inline int getColorChannel(int colType, int obj, const GameObject *gameObj) {
         
         // Pulserods can have obj channel but be p1
         if (objID >= 15 && objID <= 17) {
-            if (colType == COLOR_TYPE_BASE && colChannel == CHANNEL_OBJ) {
-                colChannel = CHANNEL_P1;
+            if (colType == static_cast<int>(ColorType::ColorTypeBase) && colChannel == static_cast<int>(ColorChannelIDs::ChannelObj)) {
+                colChannel = static_cast<int>(ColorChannelIDs::ChannelP1);
             }
         }
     }
@@ -485,7 +485,7 @@ float getFadingObjFade(int obj, float rightEdge, float *glowOut) {
 // Get the glow color channel
 int getGlowChannel(int obj) {
     if (objectFades(obj)) {
-        return CHANNEL_INVISIBLE_GLOW;
+        return static_cast<int>(ColorChannelIDs::ChannelInvisibleGlow);
     }
 
     int id = objects.id[obj];
@@ -503,7 +503,7 @@ int getGlowChannel(int obj) {
         case 918:
         case 1327:
         case 1328:
-            return CHANNEL_LBG_NOLERP;
+            return static_cast<int>(ColorChannelIDs::ChannelLbgNolerp);
         case 144:
         case 145:
         case 146:
@@ -517,31 +517,31 @@ int getGlowChannel(int obj) {
         case 740:
         case 741:
         case 742:
-            return CHANNEL_LBG;
+            return static_cast<int>(ColorChannelIDs::ChannelLbg);
         case YELLOW_PAD:
         case YELLOW_ORB:
-            return CHANNEL_YELLOW_GLOW_INTERNAL;
+            return static_cast<int>(ColorChannelIDs::ChannelYellowGlowInternal);
         case BLUE_PAD:
         case BLUE_ORB:
-            return CHANNEL_BLUE_GLOW;
+            return static_cast<int>(ColorChannelIDs::ChannelBlueGlow);
         case PINK_PAD:
         case PINK_ORB:
-            return CHANNEL_PINK_GLOW;
+            return static_cast<int>(ColorChannelIDs::ChannelPinkGlow);
         case 200:
         case 201:
         case 202:
         case 203:
-            return CHANNEL_WHITE_GLOW;
+            return static_cast<int>(ColorChannelIDs::ChannelWhiteGlow);
         case 397:
         case 398:
         case 399:
         case 675:
         case 676:
         case 677:
-            return CHANNEL_LBG;
+            return static_cast<int>(ColorChannelIDs::ChannelLbg);
 
     }
-    return CHANNEL_OBJ_BLENDING;
+    return static_cast<int>(ColorChannelIDs::ChannelObjBlending);
 }
 
 int getCoinTexture(int tex, int ticks) {
@@ -724,11 +724,11 @@ float getObjectPulse(float amplitude, int id, int layer) {
 int getColorType(const GameObject *gameObj, int obj, int colType) {
     // Check for the presence of 1.9 color channel
     if (objects.v1p9ColChannel[obj]) {
-        colType = COLOR_TYPE_BASE;
+        colType = static_cast<int>(ColorType::ColorTypeBase);
     } else {
-        if (colType == COLOR_TYPE_DETAIL) {
+        if (colType == static_cast<int>(ColorType::ColorTypeDetail)) {
             if (!objHasMain(gameObj)) {
-                colType = gameObj->swapBaseDetail ? COLOR_TYPE_BASE : COLOR_TYPE_ONLY_DETAIL;
+                colType = gameObj->swapBaseDetail ? static_cast<int>(ColorType::ColorTypeBase) : static_cast<int>(ColorType::ColorTypeOnlyDetail);
             }
         }
     }
@@ -767,7 +767,7 @@ void spawnObjectAt(
 
     // get anim for this object
     const AnimFrame* anim_keyframe = NULL;
-    if (obj->animationType == ANIMATION_MOVEMENT && obj->groupCount > 0) {
+    if (obj->animationType == static_cast<int>(AnimationType::AnimationMovement) && obj->groupCount > 0) {
         const Animation* anim = getAnimationForObject(id);
         if (anim && anim->frameCount > 0) {
             float time = frameTimer * anim->fps;
@@ -857,7 +857,7 @@ void spawnObjectAt(
         float pX = x + rotX * scale * objScaleX;
         float pY = y + rotY * scale * objScaleY;
         
-        if (obj->animationType == ANIMATION_FRAME_SWAP && obj->frameCount > 0) {
+        if (obj->animationType == static_cast<int>(AnimationType::AnimationFrameSwap) && obj->frameCount > 0) {
             const SlotFrames* slotFrames = findSlotFrames(obj, 0);
             if (slotFrames) {
                 float time = frameTimer * slotFrames->fps;
@@ -923,10 +923,10 @@ void spawnObjectAt(
 
         vo->obj = objGame;
         vo->layer = 1;
-        vo->colType = COLOR_TYPE_GLOW;
+        vo->colType = static_cast<int>(ColorType::ColorTypeGlow);
         vo->opacity = obj->opacity;
         vo->blending = true;
-        vo->colChannel = getColorChannel(COLOR_TYPE_GLOW, objGame, obj);
+        vo->colChannel = getColorChannel(static_cast<int>(ColorType::ColorTypeGlow), objGame, obj);
         calcQuadParams(vo);
         viewableObjectsPtr[spriteCount] = vo;
         spriteCount++;
@@ -995,7 +995,7 @@ void spawnObjectAt(
                 }
             }
             // handle frame swap anims
-            if (obj->animationType == ANIMATION_FRAME_SWAP && obj->frameCount > 0) {
+            if (obj->animationType == static_cast<int>(AnimationType::AnimationFrameSwap) && obj->frameCount > 0) {
                 const SlotFrames* slotFrames = findSlotFrames(obj, i + 1);
                 if (slotFrames) {
                     float time = frameTimer * slotFrames->fps;
@@ -1202,7 +1202,7 @@ float getOutScaleFade(float x, int rightEdge) {
 
 // Some objects dont change opacity on fade transitions
 int getObjOpacity(int obj, float x) {
-    if ((objects.flags[obj] & FLAG_DONT_FADE) && objects.transitionApplied[obj] == FADE_SIMPLE) return 255;
+    if ((objects.flags[obj] & static_cast<int>(ObjectFlags::FlagDontFade)) && objects.transitionApplied[obj] == static_cast<int>(FadingEffects::FadeSimple)) return 255;
 
     float opacity = objEdgeFade(x, GAMEPLAY_SCREEN_WIDTH_AREA);
     bool blending;
@@ -1219,12 +1219,12 @@ int getObjOpacity(int obj, float x) {
         case 311:
         case 687:
         case 688:
-            if (objects.transitionApplied[obj] == FADE_SIMPLE) opacity = 255;
+            if (objects.transitionApplied[obj] == static_cast<int>(FadingEffects::FadeSimple)) opacity = 255;
             break;
             
         case 211:
             blending = channels[getColChannelIndex(objects.colChannel[obj])].blending;
-            if (!blending && objects.transitionApplied[obj] == FADE_SIMPLE) opacity = 255;
+            if (!blending && objects.transitionApplied[obj] == static_cast<int>(FadingEffects::FadeSimple)) opacity = 255;
             break;
         case 207:
         case 208:
@@ -1237,7 +1237,7 @@ int getObjOpacity(int obj, float x) {
         case 331:
         case 333:
             blending = channels[getColChannelIndex(objects.detailColChannel[obj])].blending;
-            if (!blending && objects.transitionApplied[obj] == FADE_SIMPLE) opacity = 255;
+            if (!blending && objects.transitionApplied[obj] == static_cast<int>(FadingEffects::FadeSimple)) opacity = 255;
             break;
     }
 
@@ -1247,47 +1247,47 @@ int getObjOpacity(int obj, float x) {
 // Handle complex fading transitions
 void handleSpecialFading(int obj, float calcX, float calcY) {
     switch (currentFadingEffect) {
-        case FADE_INWARDS:
+        case static_cast<int>(FadingEffects::FadeInwards):
             if (calcY > (SCREEN_HEIGHT / SCALE / 2)) {
-                objects.transitionApplied[obj] = FADE_UP;
+                objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeUp);
             } else {
-                objects.transitionApplied[obj] = FADE_DOWN;
+                objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeDown);
             }
             break;
-        case FADE_OUTWARDS:
+        case static_cast<int>(FadingEffects::FadeOutwards):
             if (calcY > (SCREEN_HEIGHT / SCALE / 2)) {
-                objects.transitionApplied[obj] = FADE_DOWN;
+                objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeDown);
             } else {
-                objects.transitionApplied[obj] = FADE_UP;
+                objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeUp);
             }
             break;
-        case FADE_CIRCLE_LEFT:
+        case static_cast<int>(FadingEffects::FadeCircleLeft):
             if (calcX > (GAMEPLAY_SCREEN_WIDTH_AREA / 2)) {
                 if (calcY > (SCREEN_HEIGHT / SCALE / 2)) {
-                    objects.transitionApplied[obj] = FADE_UP_STATIONARY;
+                    objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeUpStationary);
                 } else {
-                    objects.transitionApplied[obj] = FADE_DOWN_STATIONARY;
+                    objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeDownStationary);
                 }
             } else {
                 if (calcY > (SCREEN_HEIGHT / SCALE / 2)) {
-                    objects.transitionApplied[obj] = FADE_UP_SLOW_LEFT;
+                    objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeUpSlowLeft);
                 } else {
-                    objects.transitionApplied[obj] = FADE_DOWN_SLOW_LEFT;
+                    objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeDownSlowLeft);
                 }
             }
             break;
-        case FADE_CIRCLE_RIGHT:
+        case static_cast<int>(FadingEffects::FadeCircleRight):
             if (calcX > (GAMEPLAY_SCREEN_WIDTH_AREA / 2)) {
                 if (calcY > (SCREEN_HEIGHT / SCALE / 2)) {
-                    objects.transitionApplied[obj] = FADE_UP_SLOW_RIGHT;
+                    objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeUpSlowRight);
                 } else {
-                    objects.transitionApplied[obj] = FADE_DOWN_SLOW_RIGHT;
+                    objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeDownSlowRight);
                 }
             } else {
                 if (calcY > (SCREEN_HEIGHT / SCALE / 2)) {
-                    objects.transitionApplied[obj] = FADE_UP_STATIONARY;
+                    objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeUpStationary);
                 } else {
-                    objects.transitionApplied[obj] = FADE_DOWN_STATIONARY;
+                    objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeDownStationary);
                 }
             }
             break;
@@ -1297,58 +1297,58 @@ void handleSpecialFading(int obj, float calcX, float calcY) {
 }
 
 void getFadeVars(int obj, float x, float *fadeX, float *fadeY, float *fadeScale) {
-    if (objects.flags[obj] & FLAG_DONT_ENTER) return;
+    if (objects.flags[obj] & static_cast<int>(ObjectFlags::FlagDontEnter)) return;
 
     switch (objects.transitionApplied[obj]) {
-        case FADE_SIMPLE:
+        case static_cast<int>(FadingEffects::FadeSimple):
             break;
-        case FADE_UP:
+        case static_cast<int>(FadingEffects::FadeUp):
             *fadeY = getXyFadeOffset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
             break;
-        case FADE_DOWN:
+        case static_cast<int>(FadingEffects::FadeDown):
             *fadeY = -getXyFadeOffset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
             break;
-        case FADE_RIGHT:
+        case static_cast<int>(FadingEffects::FadeRight):
             *fadeX = getXyFadeOffset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
             break;
-        case FADE_LEFT:
+        case static_cast<int>(FadingEffects::FadeLeft):
             *fadeX = -getXyFadeOffset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
             break;
-        case FADE_SCALE_IN:
+        case static_cast<int>(FadingEffects::FadeScaleIn):
             *fadeScale = getInScaleFade(x, GAMEPLAY_SCREEN_WIDTH_AREA);
             break;
-        case FADE_SCALE_OUT:
+        case static_cast<int>(FadingEffects::FadeScaleOut):
             *fadeScale = getOutScaleFade(x, GAMEPLAY_SCREEN_WIDTH_AREA);
             break;
-        case FADE_UP_SLOW_LEFT:
+        case static_cast<int>(FadingEffects::FadeUpSlowLeft):
             *fadeX = -getXyFadeOffset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
             *fadeY = getXyFadeOffset(x, GAMEPLAY_SCREEN_WIDTH_AREA) / 3;
             break;
-        case FADE_UP_SLOW_RIGHT:
+        case static_cast<int>(FadingEffects::FadeUpSlowRight):
             *fadeX = getXyFadeOffset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
             *fadeY = getXyFadeOffset(x, GAMEPLAY_SCREEN_WIDTH_AREA) / 3;
             break;
-        case FADE_UP_STATIONARY:
+        case static_cast<int>(FadingEffects::FadeUpStationary):
             *fadeY = getXyFadeOffset(x, GAMEPLAY_SCREEN_WIDTH_AREA) / 3;
             break;
-        case FADE_DOWN_SLOW_LEFT:
+        case static_cast<int>(FadingEffects::FadeDownSlowLeft):
             *fadeX = -getXyFadeOffset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
             *fadeY = -getXyFadeOffset(x, GAMEPLAY_SCREEN_WIDTH_AREA) / 3;
             break;
-        case FADE_DOWN_SLOW_RIGHT:
+        case static_cast<int>(FadingEffects::FadeDownSlowRight):
             *fadeX = getXyFadeOffset(x, GAMEPLAY_SCREEN_WIDTH_AREA);
             *fadeY = -getXyFadeOffset(x, GAMEPLAY_SCREEN_WIDTH_AREA) / 3;
             break;
-        case FADE_DOWN_STATIONARY:
+        case static_cast<int>(FadingEffects::FadeDownStationary):
             *fadeY = -getXyFadeOffset(x, GAMEPLAY_SCREEN_WIDTH_AREA) / 3;
             break;
     }
 }
 
 float getSpecialFadingVars(int obj, float fadeVal) {
-    if (objects.flags[obj] & FLAG_DONT_ENTER) return 0;
+    if (objects.flags[obj] & static_cast<int>(ObjectFlags::FlagDontEnter)) return 0;
 
-    if (objects.transitionApplied[obj] == FADE_DOWN_STATIONARY || objects.transitionApplied[obj] == FADE_UP_STATIONARY) {
+    if (objects.transitionApplied[obj] == static_cast<int>(FadingEffects::FadeDownStationary) || objects.transitionApplied[obj] == static_cast<int>(FadingEffects::FadeUpStationary)) {
         if (fadeVal < 255) {
             float calcX = objects.x[obj] - state.cameraX;
             if (calcX > (GAMEPLAY_SCREEN_WIDTH_AREA) / 2) {
@@ -1396,10 +1396,10 @@ void changeBlending(bool blending) {
 void drawBackground(float x, float y) {
     C2D_ImageTint tint = { 0 };
 
-    Color col = channels[getColChannelIndex(CHANNEL_BG)].color;
+    Color col = channels[getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelBg))].color;
 
     // If flash is happening, use lbg
-    if (state.flashData.useLbg) col = channels[getColChannelIndex(CHANNEL_LBG_NOLERP)].color;
+    if (state.flashData.useLbg) col = channels[getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelLbgNolerp))].color;
 
     C2D_PlainImageTint(&tint, C2D_Color32(col.r, col.g, col.b, 255), 1.f);
 
@@ -1435,7 +1435,7 @@ void drawGround(float camX, float camY, float y, bool isCeiling, int screenWidth
     int mult = (isCeiling ? -1 : 1);
     
     C2D_ImageTint tint = { 0 };
-    Color col = channels[getColChannelIndex(CHANNEL_GROUND)].color;
+    Color col = channels[getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelGround))].color;
     C2D_PlainImageTint(&tint, C2D_Color32(col.r, col.g, col.b, 255), 1.f);
 
     int groundID = groundIndexes[levelInfo.groundID];
@@ -1469,7 +1469,7 @@ void drawGround(float camX, float camY, float y, bool isCeiling, int screenWidth
     }
 
     if (hasL2) {
-        col = channels[getColChannelIndex(CHANNEL_GROUND_2)].color;
+        col = channels[getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelGround2))].color;
         C2D_PlainImageTint(&tint, C2D_Color32(col.r, col.g, col.b, 255), 1.f);
 
         C2D_Sprite ground2 = { 0 };
@@ -1504,7 +1504,7 @@ void drawGround(float camX, float camY, float y, bool isCeiling, int screenWidth
     C2D_SpriteSetScale(&groundShadow, -1.f, 1.f);
     C2D_DrawSpriteTinted(&groundShadow, &tint);
 
-    int lineChan = getColChannelIndex(CHANNEL_LINE);
+    int lineChan = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelLine));
     // Then draw the line
     if (channels[lineChan].blending) {
         changeBlending(true);
@@ -1616,7 +1616,7 @@ static void loadCurrentObject(void) {
                 if (calcX < -xMargin || calcX >= SCREEN_WIDTH / SCALE + xMargin || calcY < -yMargin || calcY >= SCREEN_HEIGHT / SCALE + yMargin) 
                     continue;
 
-                if (!isValidObject(objects.id[obj]) || objects.flags[obj] & FLAG_TOGGLED) 
+                if (!isValidObject(objects.id[obj]) || objects.flags[obj] & static_cast<int>(ObjectFlags::FlagToggled))
                     continue;
 
                 // 0 scale objects are invisible
@@ -1645,8 +1645,8 @@ static void updateCurrentObjects(void) {
 
         float fadeVal = objEdgeFade(calcX, GAMEPLAY_SCREEN_WIDTH_AREA);
         if (fadeVal == 255) {
-            objects.transitionApplied[obj] = FADE_NONE;
-        } else if (objects.transitionApplied[obj] == FADE_NONE) {
+            objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeNone);
+        } else if (objects.transitionApplied[obj] == static_cast<int>(FadingEffects::FadeNone)) {
             float calcY = SCREEN_HEIGHT - (objects.y[obj] - state.cameraY);
             handleSpecialFading(obj, calcX, calcY);
         }
@@ -1660,11 +1660,11 @@ static void updateCurrentObjects(void) {
         spawnObjectParticles(obj);
         
         if (fadeVal == 255) {
-            objects.transitionApplied[obj] = FADE_NONE;
+            objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeNone);
         }
 
         // Fade when it reaches an edge
-        if (fadeVal != 255 && objects.transitionApplied[obj] == FADE_NONE) {
+        if (fadeVal != 255 && objects.transitionApplied[obj] == static_cast<int>(FadingEffects::FadeNone)) {
             handleSpecialFading(obj, calcX, calcY);
         }
         
@@ -1700,8 +1700,8 @@ void updateTints() {
 
             ColorChannel col;
 
-            if (colChannel == CHANNEL_INVISIBLE_GLOW) { // Handle invisible blocks color lerping
-                int chan = getColChannelIndex(CHANNEL_LBG_NOLERP);
+            if (colChannel == static_cast<int>(ColorChannelIDs::ChannelInvisibleGlow)) { // Handle invisible blocks color lerping
+                int chan = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelLbgNolerp));
                 col.alpha = channels[chan].alpha;
 
                 Color lbg = channels[chan].color;
@@ -1723,10 +1723,10 @@ void updateTints() {
                     col.color.b = CLAMP(b, 0, 255);
                     col.blending = true;
                 }
-            } else if (colChannel == CHANNEL_LIGHTER) {
+            } else if (colChannel == static_cast<int>(ColorChannelIDs::ChannelLighter)) {
                 // LIGHTER: derive the detail color from the object's main channel + lighter_hsv
                 int mainCh = objects.colChannel[obj->obj];
-                if (mainCh == 0 || mainCh == CHANNEL_LIGHTER)
+                if (mainCh == 0 || mainCh == static_cast<int>(ColorChannelIDs::ChannelLighter))
                     mainCh = gameObjects[objects.id[obj->obj]].baseColor;
                 mainCh = getColChannelIndex(mainCh);
                 col = channels[mainCh];
@@ -1744,7 +1744,7 @@ void updateTints() {
             int gameObject = obj->obj;
 
             // Apply hsv
-            if (obj->colType != COLOR_TYPE_DETAIL) {
+            if (obj->colType != static_cast<int>(ColorType::ColorTypeDetail)) {
                 if (objects.mainColHSVEnabled[gameObject]) {
                     col.color = applyHSVToColor(col.color, gameObject, true, colChannel);
                 }
@@ -1755,10 +1755,10 @@ void updateTints() {
             }
 
             switch (obj->colType) {
-                case COLOR_TYPE_GLOW:
+                case static_cast<int>(ColorType::ColorTypeGlow):
                     col.blending = true;
                     break;
-                case COLOR_TYPE_WHITE:
+                case static_cast<int>(ColorType::ColorTypeWhite):
                     if (levelHasUnverifiedCoins() && objects.id[gameObject] == SECRET_COIN) {
                         col.color = (Color) {USER_COIN_UNRATED_R, USER_COIN_UNRATED_G, USER_COIN_UNRATED_B};
                     } else {
@@ -1767,7 +1767,7 @@ void updateTints() {
                     break;
             }
 
-            bool detail = obj->colType == COLOR_TYPE_DETAIL || obj->colType == COLOR_TYPE_ONLY_DETAIL;
+            bool detail = obj->colType == static_cast<int>(ColorType::ColorTypeDetail) || obj->colType == static_cast<int>(ColorType::ColorTypeOnlyDetail);
 
             if (!detail) {
                 objects.mainNonPulseColor[gameObject] = col.color;
@@ -1785,7 +1785,7 @@ void updateTints() {
                 col.color = objects.mainColor[gameObject];
             } else if (detail && objects.detailBeingPulsed[gameObject] && colChannel >= 0) {
                 col.color = objects.detailColor[gameObject];
-                if (colChannel == CHANNEL_LIGHTER && objects.mainBeingPulsed[gameObject]) {
+                if (colChannel == static_cast<int>(ColorChannelIDs::ChannelLighter) && objects.mainBeingPulsed[gameObject]) {
                     col.color = hsvCombine(col.color, lighterHSV);
                     if (objects.mainColHSVEnabled[gameObject]) {
                         col.color = applyHSVToColor(col.color, gameObject, true, colChannel);
@@ -1794,7 +1794,7 @@ void updateTints() {
                 }
             }
             
-            if (obj->colType == COLOR_TYPE_BLACK) {
+            if (obj->colType == static_cast<int>(ColorType::ColorTypeBlack)) {
                 col.color = (Color) {0,0,0};
                 
                 // Rod base ignore blending
@@ -1876,7 +1876,7 @@ void createObjects() {
 
 #define MAX_DASH_FX 8
 
-typedef struct {
+struct DashEffect {
     bool active;
     bool exit;
     float x, y;
@@ -1885,7 +1885,7 @@ typedef struct {
     float scaleX, scaleY;
     Color color;
     int startFrame;
-} DashEffect;
+};
 
 static DashEffect dashEffects[MAX_DASH_FX];
 
@@ -1916,14 +1916,14 @@ static void dashFireState(const Player *player, float *localX, float *localY, fl
     *localY = 0.f;
 
     switch (player->gamemode) {
-        case GAMEMODE_SHIP:
+        case static_cast<int>(IconGamemode::GamemodeShip):
             *localY = 2.f;
             baseX = 1.0f;
             break;
-        case GAMEMODE_UFO:
+        case static_cast<int>(IconGamemode::GamemodeUfo):
             baseX = 0.95f;
             break;
-        case GAMEMODE_ROBOT:
+        case static_cast<int>(IconGamemode::GamemodeRobot):
             *localX = 1.f;
             break;
     }
@@ -2166,7 +2166,7 @@ void drawDashBooms(void) {
 #define SPIDER_DASH_LIFETIME (SPIDER_DASH_FRAME_TIME * SPIDER_DASH_FRAME_COUNT)
 #define SPIDER_DASH_WIDTH 221.f
 
-typedef struct {
+struct SpiderDashEffect {
     bool active;
     float x, y;
     float rotation;
@@ -2174,7 +2174,7 @@ typedef struct {
     float elapsed;
     Color color;
     int startFrame;
-} SpiderDashEffect;
+};
 
 static SpiderDashEffect spiderDashEffects[MAX_SPIDER_DASH_FX];
 
@@ -2400,7 +2400,7 @@ void updateTouchEffect(float delta) {
 
     touchDragParticles.emitting = false;
 
-    bool tapEffectEnabled = (gameState == STATE_GAME && !gamePaused) ? settingsState.gameplayTapEffect : settingsState.touchEffectEverywhere;
+    bool tapEffectEnabled = (gameState == static_cast<int>(GameState::StateGame) && !gamePaused) ? settingsState.gameplayTapEffect : settingsState.touchEffectEverywhere;
 
     if (tapEffectEnabled && (kHeld & KEY_TOUCH)) {
         // Flipped for particles
@@ -2454,11 +2454,11 @@ void drawBottomParticles() {
 void updateBottomParticles(float delta) {
     glitterParticlesBottom.emitting = false;
 
-    bool flyingGamemode = (state.player.gamemode == GAMEMODE_SHIP || state.player.gamemode == GAMEMODE_UFO || state.player.gamemode == GAMEMODE_WAVE);
-    if (state.dual) flyingGamemode = flyingGamemode || (state.player2.gamemode == GAMEMODE_SHIP || state.player2.gamemode == GAMEMODE_UFO || state.player2.gamemode == GAMEMODE_WAVE);
+    bool flyingGamemode = (state.player.gamemode == static_cast<int>(IconGamemode::GamemodeShip) || state.player.gamemode == static_cast<int>(IconGamemode::GamemodeUfo) || state.player.gamemode == static_cast<int>(IconGamemode::GamemodeWave));
+    if (state.dual) flyingGamemode = flyingGamemode || (state.player2.gamemode == static_cast<int>(IconGamemode::GamemodeShip) || state.player2.gamemode == static_cast<int>(IconGamemode::GamemodeUfo) || state.player2.gamemode == static_cast<int>(IconGamemode::GamemodeWave));
 
     // If in game and not paused and not fading, update the particles spawning
-    if (((gameState == STATE_GAME && !gamePaused))) {
+    if (((gameState == static_cast<int>(GameState::StateGame) && !gamePaused))) {
         if (flyingGamemode) {
             glitterParticlesBottom.emitterX = state.cameraXMiddle;
             glitterParticlesBottom.emitterY = 240/2;
@@ -2505,14 +2505,14 @@ static int iconPartTexture(const IconPart *parts, int partIndex) {
 
 
 const PlayerAnimation *getGamemodeAnimation(int gamemode) {
-    if (gamemode == GAMEMODE_ROBOT) return robotAnimations;
-    if (gamemode == GAMEMODE_SPIDER) return spiderAnimations;
+    if (gamemode == static_cast<int>(IconGamemode::GamemodeRobot)) return robotAnimations;
+    if (gamemode == static_cast<int>(IconGamemode::GamemodeSpider)) return spiderAnimations;
     return NULL;
 }
 
 int getAnimationCount(int gamemode) {
-    if (gamemode == GAMEMODE_ROBOT) return ROBOT_ANIM_COUNT;
-    if (gamemode == GAMEMODE_SPIDER) return SPIDER_ANIM_COUNT;
+    if (gamemode == static_cast<int>(IconGamemode::GamemodeRobot)) return static_cast<int>(RobotAnimId::RobotAnimCount);
+    if (gamemode == static_cast<int>(IconGamemode::GamemodeSpider)) return static_cast<int>(SpiderAnimId::SpiderAnimCount);
     return 0;
 }
 
@@ -2555,20 +2555,20 @@ static void spawnIconAtInternal(
     C2D_ImageTint tints[4];
 
     if (drawWhite) {
-        C2D_PlainImageTint(&tints[ICON_COLOR_WHITE], C2D_Color32(255, 255, 255, 255), 1.0f);
+        C2D_PlainImageTint(&tints[static_cast<int>(IconColorType::IconColorWhite)], C2D_Color32(255, 255, 255, 255), 1.0f);
     } else {
-        C2D_PlainImageTint(&tints[ICON_COLOR_WHITE], 0, 1.0f);
+        C2D_PlainImageTint(&tints[static_cast<int>(IconColorType::IconColorWhite)], 0, 1.0f);
     }
-    C2D_PlainImageTint(&tints[ICON_COLOR_P1], p1Color, 1.0f);
-    C2D_PlainImageTint(&tints[ICON_COLOR_P2], p2Color, 1.0f);
+    C2D_PlainImageTint(&tints[static_cast<int>(IconColorType::IconColorP1)], p1Color, 1.0f);
+    C2D_PlainImageTint(&tints[static_cast<int>(IconColorType::IconColorP2)], p2Color, 1.0f);
 
     if (glow) {
-        C2D_PlainImageTint(&tints[ICON_COLOR_GLOW], glowColor, 1.0f);
+        C2D_PlainImageTint(&tints[static_cast<int>(IconColorType::IconColorGlow)], glowColor, 1.0f);
     } else {
-        C2D_PlainImageTint(&tints[ICON_COLOR_GLOW], 0, 1.0f);
+        C2D_PlainImageTint(&tints[static_cast<int>(IconColorType::IconColorGlow)], 0, 1.0f);
     }
 
-    if (gamemode == GAMEMODE_ROBOT || gamemode == GAMEMODE_SPIDER) {
+    if (gamemode == static_cast<int>(IconGamemode::GamemodeRobot) || gamemode == static_cast<int>(IconGamemode::GamemodeSpider)) {
         const PlayerAnimation *animations = getGamemodeAnimation(gamemode);
         if (!animations) return;
 
@@ -2581,8 +2581,8 @@ static void spawnIconAtInternal(
         if (anim->frameCount > 1) {
             int nextIdx = params.animFrame + 1;
             if (nextIdx >= anim->frameCount) nextIdx = 0;
-            bool holdLast = nextIdx == 0 && (params.animID == ROBOT_ANIM_JUMP_START
-                                            || params.animID == ROBOT_ANIM_FALL_START);
+            bool holdLast = nextIdx == 0 && (params.animID == static_cast<int>(RobotAnimId::RobotAnimJumpStart)
+                                            || params.animID == static_cast<int>(RobotAnimId::RobotAnimFallStart));
             if (!holdLast) {
                 nextFrame = &anim->frames[nextIdx];
                 animFraction = params.animTimer / frame->delay;
@@ -2603,8 +2603,8 @@ static void spawnIconAtInternal(
                 if (blend_from_anim->frameCount > 1) {
                     int nextIdx = params.blendFromFrame + 1;
                     if (nextIdx >= blend_from_anim->frameCount) nextIdx = 0;
-                    bool holdLast = nextIdx == 0 && (params.blendFromAnimID == ROBOT_ANIM_JUMP_START
-                                                    || params.blendFromAnimID == ROBOT_ANIM_FALL_START);
+                    bool holdLast = nextIdx == 0 && (params.blendFromAnimID == static_cast<int>(RobotAnimId::RobotAnimJumpStart)
+                                                    || params.blendFromAnimID == static_cast<int>(RobotAnimId::RobotAnimFallStart));
                     if (!holdLast) {
                         blend_from_next_frame = &blend_from_anim->frames[nextIdx];
                         blendFromFraction = params.blendFromTimer / blendFromFrame->delay;
@@ -2707,7 +2707,7 @@ static void spawnIconAtInternal(
                         C2D_SpriteSetPos(&spr, pX, pY);
                         C2D_SpriteSetScale(&spr, sx * params.robotFireScale, scale * params.robotFireScale);
                         C2D_SpriteSetRotation(&spr, partRad + C3D_AngleFromDegrees(180.0f * flipY));
-                        C2D_DrawSpriteTinted(&spr, &tints[ICON_COLOR_WHITE]);
+                        C2D_DrawSpriteTinted(&spr, &tints[static_cast<int>(IconColorType::IconColorWhite)]);
                     }
 
                     C2D_SpriteFromSheet(&spr, sheet, localTexture);
@@ -2718,7 +2718,7 @@ static void spawnIconAtInternal(
                     C2D_SpriteSetScale(&spr, partSx, partSy);
                     C2D_SpriteSetRotation(&spr, partRad);
 
-                    C2D_DrawSpriteTinted(&spr, &tints[part->colorType]);
+                    C2D_DrawSpriteTinted(&spr, &tints[static_cast<int>(part->colorType)]);
                 }
             }
         }
@@ -2729,7 +2729,7 @@ static void spawnIconAtInternal(
             if (i==0) realIndex = 1;
             else if (i==1) realIndex = 0;
 
-            if (gamemode == GAMEMODE_UFO) {
+            if (gamemode == static_cast<int>(IconGamemode::GamemodeUfo)) {
                 if (i==2) realIndex = 0;
                 else if (i < 2) realIndex++;
             }
@@ -2756,7 +2756,7 @@ static void spawnIconAtInternal(
                 C2D_SpriteSetScale(&spr, sx, sy);
                 C2D_SpriteSetRotation(&spr, rad);
 
-                C2D_DrawSpriteTinted(&spr, &tints[part->colorType]);
+                C2D_DrawSpriteTinted(&spr, &tints[static_cast<int>(part->colorType)]);
             }
         }
     }
@@ -2899,7 +2899,7 @@ float approachf(float current, float target, float speed, float smoothing) {
 void handleMirrorTransition() {
     if (state.mirroring) {
         // Do the easing
-        state.mirrorFactor = easeValue(EASE_IN_OUT, state.originalMirrorFactor, state.intendedMirrorFactor, state.mirrorTimer, MIRROR_DURATION, 1.2);
+        state.mirrorFactor = easeValue(EaseTypes::EaseInOut, state.originalMirrorFactor, state.intendedMirrorFactor, state.mirrorTimer, MIRROR_DURATION, 1.2);
 
         state.mirrorSpeedFactor = 1 - 2*state.mirrorFactor;
         if (state.mirrorFactor >= 0.5f) {

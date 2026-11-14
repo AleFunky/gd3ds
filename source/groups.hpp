@@ -9,7 +9,7 @@ namespace gd3ds
 
 struct Matrix2x2;
 
-typedef struct GroupNode {
+struct GroupNode {
     float alpha;
     bool toggled;
     int *objects;
@@ -21,7 +21,7 @@ typedef struct GroupNode {
     int combinationCapacity;
 
     int collisionObjectCount;
-} GroupNode;
+};
 
 bool buildGroupCombinations(void);
 void beginGroupCombinationMoveStep(void);

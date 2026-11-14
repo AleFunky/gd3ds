@@ -30,7 +30,7 @@ static void uiPaletteIconsDraw(UIElement* e, UITransform *transform) {
             C2D_Color32(p2Color.r, p2Color.g, p2Color.b, 255),
             C2D_Color32(glowColor.r, glowColor.g, glowColor.b, 255),
             (IconParameters) { 
-                .animID = (g == (int)GAMEMODE_ROBOT ? (int)ROBOT_ANIM_IDLE : (int)SPIDER_ANIM_IDLE),
+                .animID = (g == (int)static_cast<int>(IconGamemode::GamemodeRobot) ? (int)static_cast<int>(RobotAnimId::RobotAnimIdle) : (int)static_cast<int>(SpiderAnimId::SpiderAnimIdle)),
                 .animFrame = 0
             }
         );
@@ -49,7 +49,7 @@ UIPaletteIcons *uiCreatePaletteIcons(UIScreen *screen) {
 
     if (!e) return NULL;
 
-    e->base.type = UI_PALETTE_ICONS;
+    e->base.type = UIElementType::UiPaletteIcons;
     e->base.enabled = true;
 
     e->base.draw = uiPaletteIconsDraw;

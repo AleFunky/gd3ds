@@ -17,10 +17,10 @@ namespace gd3ds
 
 static UIList *list;
 
-typedef struct StatisticEntries {
+struct StatisticEntries {
     const char *name;
     const int *value;
-} StatisticEntries;
+};
 
 static const StatisticEntries stats[] = {
     { "Total Jumps", &totalJumps },

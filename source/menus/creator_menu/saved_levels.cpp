@@ -67,7 +67,7 @@ static void actionOpenOnlineLevelMenu(UIElement* e, const UIPropertyList *args) 
     onlineMenuLevelID = entry->levelId;
     redownload = false; 
     keepPage = true;
-    uiStackPush(&onlineLevelMenuDef, ANIM_NONE, ANIM_NONE, PUSH_ROOT);
+    uiStackPush(&onlineLevelMenuDef, UIAnimation::AnimNone, UIAnimation::AnimNone, UIStackPushType::PushRoot);
 }
 
 static void actionVersionWarning(UIElement* e, const UIPropertyList *args){
@@ -89,7 +89,7 @@ static void actionVersionWarning(UIElement* e, const UIPropertyList *args){
     data->customTitle = true;
     data->copied = true;
 
-    uiStackPush(&infoCardDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+    uiStackPush(&infoCardDef, UIAnimation::AnimZoom, UIAnimation::AnimZoom, UIStackPushType::PushNext);
     uiStackPushData(data);
 }
 

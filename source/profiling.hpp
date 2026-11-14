@@ -4,14 +4,14 @@
 namespace gd3ds
 {
 
-typedef struct {
+struct ProfilerUpdateData {
     touchPosition touchPos;
     u32 kDown;
     int steps;
     float processingTime;
-} ProfilerUpdateData;
+};
 
-typedef struct {
+struct ProfilerSnapshot {
     // General
     float frameMs;
     float cpuMs;
@@ -65,7 +65,7 @@ typedef struct {
     u32 levelArenaUsed;
     u32 levelArenaFree;
     u32 levelArenaTotal;
-} ProfilerSnapshot;
+};
 
 extern ProfilerSnapshot snapshot;
 

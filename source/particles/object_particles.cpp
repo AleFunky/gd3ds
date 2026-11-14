@@ -32,7 +32,7 @@ static const ParticleDefinition collectableParticles = {
     .startColorRed = 1.0f,
     .startParticleSize = 1.5f,
     .startParticleSizeVariance = 1.1f,
-    .textureFileName = TEXTURE_SQUARE_PNG,
+    .textureFileName = TextureFileName::TextureSquarePng,
 };
 
 void initOpSystem() {
@@ -196,7 +196,7 @@ void updateObjectParticles(float dt) {
             }
             objectParticle[i].ps.emitterX = emitterX;
             objectParticle[i].ps.emitterY = emitterY;
-            bool toggled = (objects.flags[obj] & FLAG_TOGGLED) != 0;
+            bool toggled = (objects.flags[obj] & static_cast<int>(ObjectFlags::FlagToggled)) != 0;
             if (isCollectableObject(objects.id[obj])) {
                 objectParticle[i].ps.emitting = !toggled;
                 if (toggled) objectParticle[i].ps.data.count = 0;

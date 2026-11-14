@@ -150,8 +150,8 @@ static UIScreenPair *uiStackOpen(const UIScreenDefPair *defs){
 
     pair->name = defs->name;
 
-    UIScreen *top = &pair->screens[SCREEN_TOP];
-    UIScreen *btm = &pair->screens[SCREEN_BTM];
+    UIScreen *top = &pair->screens[static_cast<int>(Screens::ScreenTop)];
+    UIScreen *btm = &pair->screens[static_cast<int>(Screens::ScreenBtm)];
 
     *top = (UIScreen){ 0 };
     *btm = (UIScreen){ 0 };
@@ -174,11 +174,11 @@ void uiStackPush(
     UIStackPushType type
 ){
     //neither of these types actually push a screen
-    if(type == PUSH_NONE || type == PUSH_GAME_STATE){
+    if(type == UIStackPushType::PushNone || type == UIStackPushType::PushGameState){
         return;
     }
 
-    if(stack->push.type != PUSH_NONE){
+    if(stack->push.type != UIStackPushType::PushNone){
         outputLog("Cannot queue multiple pushes!\n");
         return;
     }
@@ -188,9 +188,9 @@ void uiStackPush(
     stack->push.btmAnim = btmAnim;
     stack->push.type = type;
 
-    if(type == PUSH_ROOT){
-        stack->rootTransition = UI_TRANSITION_OPENING;
-        stack->fade = FADE_STATUS_IN;
+    if(type == UIStackPushType::PushRoot){
+        stack->rootTransition = UITransitionState::UiTransitionOpening;
+        stack->fade = FadeStatus::FadeStatusIn;
         stack->fadeTime = 0.f;
     }
 }
@@ -212,7 +212,7 @@ void uiStackPushName(
 
 void uiStackPushData(void *data){
     //can't push data when there is no actual push
-    if(stack->push.type == PUSH_NONE) return;
+    if(stack->push.type == UIStackPushType::PushNone) return;
 
 
     stack->push.data = data;
@@ -229,8 +229,8 @@ void uiStackPushRootInstant(const UIScreenDefPair *defs){
 
     openRoot();
 
-    UIScreen *top = &pair->screens[SCREEN_TOP];
-    UIScreen *btm = &pair->screens[SCREEN_BTM];
+    UIScreen *top = &pair->screens[static_cast<int>(Screens::ScreenTop)];
+    UIScreen *btm = &pair->screens[static_cast<int>(Screens::ScreenBtm)];
 
     uiLoadScreen(top);
     uiLoadScreen(btm);
@@ -241,14 +241,14 @@ void uiStackPushRootInstant(const UIScreenDefPair *defs){
 
 void uiStackPushGameState(int gameState){
     stack->nextGameState = gameState;
-    stack->push.type = PUSH_GAME_STATE;
-    stack->rootTransition = UI_TRANSITION_OPENING;
-    stack->fade = FADE_STATUS_IN;
+    stack->push.type = UIStackPushType::PushGameState;
+    stack->rootTransition = UITransitionState::UiTransitionOpening;
+    stack->fade = FadeStatus::FadeStatusIn;
     stack->fadeTime = 0.f;
 }
 
 void uiStackPop(){
-    if(stack->rootTransition != UI_TRANSITION_NONE) {
+    if(stack->rootTransition != UITransitionState::UiTransitionNone) {
         outputLog("Cannot pop stack during transition!\n");
         return;
     }
@@ -257,8 +257,8 @@ void uiStackPop(){
 
     UIScreenPair *pair = stack->screenStack[uiStackMaxIndex()];
     if(pair->root){
-       stack->rootTransition = UI_TRANSITION_CLOSING;
-       stack->fade = FADE_STATUS_IN;
+       stack->rootTransition = UITransitionState::UiTransitionClosing;
+       stack->fade = FadeStatus::FadeStatusIn;
        stack->fadeTime = 0.f;
     } else{
         for(int i = 0; i < 2; i++){
@@ -269,7 +269,7 @@ void uiStackPop(){
 
 //pops all active screens
 void uiStackPopContext(){
-    if(stack->rootTransition != UI_TRANSITION_NONE) {
+    if(stack->rootTransition != UITransitionState::UiTransitionNone) {
         outputLog("Cannot pop stack during transition!\n");
         return;
     }
@@ -281,30 +281,30 @@ void uiStackPopContext(){
         }
     }
 
-    stack->rootTransition = UI_TRANSITION_CLOSING;
-    stack->fade = FADE_STATUS_IN;
+    stack->rootTransition = UITransitionState::UiTransitionClosing;
+    stack->fade = FadeStatus::FadeStatusIn;
     stack->fadeTime = 0.f;
 }
 
 static void updateOpening(){
     UIStackPush *push = &stack->push;
 
-    if(push->type == PUSH_NEXT){
+    if(push->type == UIStackPushType::PushNext){
         push->pushNow = true;
     }
 
     //do push
-    if(push->pushNow && push->type != PUSH_NONE){
+    if(push->pushNow && push->type != UIStackPushType::PushNone){
         push->pushNow = false;
 
         UIScreenPair *pair = uiStackOpen(push->defs);
 
         if(!pair){
-            push->type = PUSH_NONE;
+            push->type = UIStackPushType::PushNone;
             return;
         }
 
-        pair->root = (push->type == PUSH_ROOT);
+        pair->root = (push->type == UIStackPushType::PushRoot);
         if(push->defs->freeData){
             pair->freeData = push->defs->freeData;
         }
@@ -313,10 +313,10 @@ static void updateOpening(){
         }
         push->data = NULL;
 
-        push->type = PUSH_NONE;
+        push->type = UIStackPushType::PushNone;
 
-        UIScreen *top = &pair->screens[SCREEN_TOP];
-        UIScreen *btm = &pair->screens[SCREEN_BTM];
+        UIScreen *top = &pair->screens[static_cast<int>(Screens::ScreenTop)];
+        UIScreen *btm = &pair->screens[static_cast<int>(Screens::ScreenBtm)];
 
         if(pair->root){
             openRoot();
@@ -343,18 +343,18 @@ static void updateClosing(){
     if(!pair) return;
 
     if(!pair->root){
-        UIScreen *top = &pair->screens[SCREEN_TOP];
-        UIScreen *btm = &pair->screens[SCREEN_BTM];
+        UIScreen *top = &pair->screens[static_cast<int>(Screens::ScreenTop)];
+        UIScreen *btm = &pair->screens[static_cast<int>(Screens::ScreenBtm)];
 
         bool topClosing = top->loaded ? top->closing : true;
         bool btmClosing = btm->loaded ? btm->closing : true;
 
-        if(stack->rootTransition == UI_TRANSITION_NONE && topClosing && btmClosing){
+        if(stack->rootTransition == UITransitionState::UiTransitionNone && topClosing && btmClosing){
             unloadScreenpair(uiStackMaxIndex());
 
             stack->activeCount--;
 
-            if(stack->push.type == PUSH_AFTER_CLOSE){
+            if(stack->push.type == UIStackPushType::PushAfterClose){
                 stack->push.pushNow = true;
             }
         }
@@ -369,42 +369,42 @@ static void handleStackFading(){
     bool transitionSwitch = false;
     if(stack->fadeTime >= 255.f || stack->activeCount == 0){
         switch(stack->fade){
-            case FADE_STATUS_IN:
+            case FadeStatus::FadeStatusIn:
                 stack->fadeTime = 0.f;
-                stack->fade = FADE_STATUS_OUT;
+                stack->fade = FadeStatus::FadeStatusOut;
                 transitionSwitch = true;
                 break;
-            case FADE_STATUS_OUT:
+            case FadeStatus::FadeStatusOut:
                 stack->fadeTime = 0.f;
-                stack->fade = FADE_STATUS_NONE;
-                stack->rootTransition = UI_TRANSITION_NONE;
+                stack->fade = FadeStatus::FadeStatusNone;
+                stack->rootTransition = UITransitionState::UiTransitionNone;
                 break;
-            case FADE_STATUS_NONE:
+            case FadeStatus::FadeStatusNone:
                 break;
         }
     }
 
     //when the fade is fully black, either go back to the previous root or open a new one depending on transition
     if(transitionSwitch) {
-        if(stack->push.type == PUSH_GAME_STATE){
+        if(stack->push.type == UIStackPushType::PushGameState){
             gameState = stack->nextGameState;
             escapeState = true;
             stack->fadeTime = 0.f;
-            stack->fade = FADE_STATUS_OUT;
-            stack->push.type = PUSH_NONE;
+            stack->fade = FadeStatus::FadeStatusOut;
+            stack->push.type = UIStackPushType::PushNone;
         } else{
             switch(stack->rootTransition){
-                case UI_TRANSITION_OPENING:
-                    if(stack->push.type == PUSH_ROOT) stack->push.pushNow = true;
+                case UITransitionState::UiTransitionOpening:
+                    if(stack->push.type == UIStackPushType::PushRoot) stack->push.pushNow = true;
                     stack->fadeTime = 0.f;
-                    stack->fade = FADE_STATUS_OUT;
+                    stack->fade = FadeStatus::FadeStatusOut;
                     break;
-                case UI_TRANSITION_CLOSING:
+                case UITransitionState::UiTransitionClosing:
                     closeRoot();
                     stack->fadeTime = 0.f;
-                    stack->fade = FADE_STATUS_OUT;
+                    stack->fade = FadeStatus::FadeStatusOut;
                     break;
-                case UI_TRANSITION_NONE:
+                case UITransitionState::UiTransitionNone:
                     break;
             }
         }
@@ -426,14 +426,14 @@ void uiStackUpdate(UIInput *input){
 
             if(!pair) continue;
 
-            bool updatingTopmost = i == uiStackMaxIndex() && stack->rootTransition == UI_TRANSITION_NONE;
+            bool updatingTopmost = i == uiStackMaxIndex() && stack->rootTransition == UITransitionState::UiTransitionNone;
         
             for(int j = 0; j < 2; j++) {
                 UIScreen *screen = &pair->screens[j];
 
                 UIInput dummyInput = { 0 };
                 //only update top screen with input
-                UIInput *inputToUse = updatingTopmost && screen->transition.done && j == SCREEN_BTM ? input : &dummyInput;
+                UIInput *inputToUse = updatingTopmost && screen->transition.done && j == static_cast<int>(Screens::ScreenBtm) ? input : &dummyInput;
 
                 uiScreenUpdate(screen, inputToUse);
             }
@@ -529,9 +529,9 @@ void drawStackFade(){
     if (settingsState.fastMenu) return;
 
     float fade = 0;
-    if(stack->fade == FADE_STATUS_IN){
+    if(stack->fade == FadeStatus::FadeStatusIn){
         fade = CLAMP(stack->fadeTime, 0, 255);
-    } else if(stack->fade == FADE_STATUS_OUT){
+    } else if(stack->fade == FadeStatus::FadeStatusOut){
         fade = CLAMP(255 - stack->fadeTime, 0, 255);
     }
 
@@ -546,7 +546,7 @@ void uiStackDraw(Screens target){
 
         if(!pair) continue;
 
-        UIScreen *screen = &pair->screens[target];
+        UIScreen *screen = &pair->screens[static_cast<int>(target)];
         if(screen->loaded){
             uiScreenDraw(screen);
         }
@@ -577,7 +577,7 @@ UIScreen *uiStackGetScreen(const char *name, Screens screen) {
 
     if(!pair) return NULL;
     
-    return &pair->screens[screen];
+    return &pair->screens[static_cast<int>(screen)];
 }
 
 FadeStatus uiStackGetFadeStatus(){

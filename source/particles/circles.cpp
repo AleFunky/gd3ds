@@ -20,10 +20,10 @@ extern const UseEffectDefinition padUseEffect = {
     .endRad = 40,
     .hollow = false,
     .trifading = false,
-    .startOpacityEase = EASE_IN,
-    .endOpacityEase = EASE_LINEAR,
-    .startRadEase = QUAD_OUT,
-    .endRadEase = QUAD_OUT,
+    .startOpacityEase = EaseTypes::EaseIn,
+    .endOpacityEase = EaseTypes::EaseLinear,
+    .startRadEase = EaseTypes::QuadOut,
+    .endRadEase = EaseTypes::QuadOut,
 };
 extern const UseEffectDefinition orbUseEffect = {
     .colorR = 1, 
@@ -36,10 +36,10 @@ extern const UseEffectDefinition orbUseEffect = {
     .endRad = 3,
     .hollow = false,
     .trifading = true,
-    .startOpacityEase = CUBIC_OUT,
-    .endOpacityEase = EASE_LINEAR,
-    .startRadEase = EASE_LINEAR,
-    .endRadEase = EASE_LINEAR,
+    .startOpacityEase = EaseTypes::CubicOut,
+    .endOpacityEase = EaseTypes::EaseLinear,
+    .startRadEase = EaseTypes::EaseLinear,
+    .endRadEase = EaseTypes::EaseLinear,
 };
 extern const UseEffectDefinition portalUseEffect = {
     .colorR = 1, 
@@ -52,10 +52,10 @@ extern const UseEffectDefinition portalUseEffect = {
     .endRad = 0,
     .hollow = false,
     .trifading = true,
-    .startOpacityEase = CUBIC_OUT,
-    .endOpacityEase = EASE_LINEAR,
-    .startRadEase = EASE_LINEAR,
-    .endRadEase = EASE_LINEAR,
+    .startOpacityEase = EaseTypes::CubicOut,
+    .endOpacityEase = EaseTypes::EaseLinear,
+    .startRadEase = EaseTypes::EaseLinear,
+    .endRadEase = EaseTypes::EaseLinear,
 };
 extern const UseEffectDefinition orbCollideEffect = {
     .colorR = 1, 
@@ -68,10 +68,10 @@ extern const UseEffectDefinition orbCollideEffect = {
     .endRad = 65,
     .hollow = true,
     .trifading = false,
-    .startOpacityEase = EASE_IN,
-    .endOpacityEase = EASE_OUT,
-    .startRadEase = QUAD_OUT,
-    .endRadEase = QUAD_OUT,
+    .startOpacityEase = EaseTypes::EaseIn,
+    .endOpacityEase = EaseTypes::EaseOut,
+    .startRadEase = EaseTypes::QuadOut,
+    .endRadEase = EaseTypes::QuadOut,
     .lineThickness = 1.f
 };
 extern const UseEffectDefinition speedCollideEffect = {
@@ -85,10 +85,10 @@ extern const UseEffectDefinition speedCollideEffect = {
     .endRad = 75,
     .hollow = true,
     .trifading = false,
-    .startOpacityEase = EASE_IN,
-    .endOpacityEase = EASE_OUT,
-    .startRadEase = EASE_OUT,
-    .endRadEase = EASE_OUT,
+    .startOpacityEase = EaseTypes::EaseIn,
+    .endOpacityEase = EaseTypes::EaseOut,
+    .startRadEase = EaseTypes::EaseOut,
+    .endRadEase = EaseTypes::EaseOut,
     .lineThickness = 2.0f
 };
 extern const UseEffectDefinition deathEffect = {
@@ -102,10 +102,10 @@ extern const UseEffectDefinition deathEffect = {
     .endRad = 80,
     .hollow = false,
     .trifading = false,
-    .startOpacityEase = EASE_IN,
-    .endOpacityEase = EASE_LINEAR,
-    .startRadEase = QUAD_OUT,
-    .endRadEase = QUAD_OUT,
+    .startOpacityEase = EaseTypes::EaseIn,
+    .endOpacityEase = EaseTypes::EaseLinear,
+    .startRadEase = EaseTypes::QuadOut,
+    .endRadEase = EaseTypes::QuadOut,
 };
 extern const UseEffectDefinition tapEffect = {
     .colorR = 1, 
@@ -118,10 +118,10 @@ extern const UseEffectDefinition tapEffect = {
     .endRad = 40,
     .hollow = false,
     .trifading = false,
-    .startOpacityEase = EASE_IN,
-    .endOpacityEase = EASE_LINEAR,
-    .startRadEase = QUAD_OUT,
-    .endRadEase = QUAD_OUT,
+    .startOpacityEase = EaseTypes::EaseIn,
+    .endOpacityEase = EaseTypes::EaseLinear,
+    .startRadEase = EaseTypes::QuadOut,
+    .endRadEase = EaseTypes::QuadOut,
 };
 extern const UseEffectDefinition coinUseEffect = {
     .colorR = 1, 
@@ -134,10 +134,10 @@ extern const UseEffectDefinition coinUseEffect = {
     .endRad = 4,
     .hollow = false,
     .trifading = true,
-    .startOpacityEase = CUBIC_OUT,
-    .endOpacityEase = EASE_LINEAR,
-    .startRadEase = EASE_LINEAR,
-    .endRadEase = EASE_LINEAR,
+    .startOpacityEase = EaseTypes::CubicOut,
+    .endOpacityEase = EaseTypes::EaseLinear,
+    .startRadEase = EaseTypes::EaseLinear,
+    .endRadEase = EaseTypes::EaseLinear,
 };
 extern const UseEffectDefinition coinRadiusEffect = {
     .colorR = 1, 
@@ -150,10 +150,10 @@ extern const UseEffectDefinition coinRadiusEffect = {
     .endRad = 65,
     .hollow = true,
     .trifading = false,
-    .startOpacityEase = EASE_IN,
-    .endOpacityEase = EASE_OUT,
-    .startRadEase = QUAD_OUT,
-    .endRadEase = QUAD_OUT,
+    .startOpacityEase = EaseTypes::EaseIn,
+    .endOpacityEase = EaseTypes::EaseOut,
+    .startRadEase = EaseTypes::QuadOut,
+    .endRadEase = EaseTypes::QuadOut,
     .lineThickness = 2.5f
 };
 extern const UseEffectDefinition waveRadiusEffect = {
@@ -167,10 +167,10 @@ extern const UseEffectDefinition waveRadiusEffect = {
     .endRad = 80,
     .hollow = true,
     .trifading = false,
-    .startOpacityEase = EASE_IN,
-    .endOpacityEase = EASE_OUT,
-    .startRadEase = QUAD_OUT,
-    .endRadEase = QUAD_OUT,
+    .startOpacityEase = EaseTypes::EaseIn,
+    .endOpacityEase = EaseTypes::EaseOut,
+    .startRadEase = EaseTypes::QuadOut,
+    .endRadEase = EaseTypes::QuadOut,
     .lineThickness = 2.0f
 };
 extern const UseEffectDefinition sizeChangeBigEffect = {
@@ -184,10 +184,10 @@ extern const UseEffectDefinition sizeChangeBigEffect = {
     .endRad = 40,
     .hollow = false,
     .trifading = false,
-    .startOpacityEase = EASE_IN,
-    .endOpacityEase = EASE_LINEAR,
-    .startRadEase = EASE_OUT,
-    .endRadEase = EASE_OUT,
+    .startOpacityEase = EaseTypes::EaseIn,
+    .endOpacityEase = EaseTypes::EaseLinear,
+    .startRadEase = EaseTypes::EaseOut,
+    .endRadEase = EaseTypes::EaseOut,
 }; 
 
 extern const UseEffectDefinition endWallFilledFirst = {
@@ -201,10 +201,10 @@ extern const UseEffectDefinition endWallFilledFirst = {
     .endRad = 250,
     .hollow = false,
     .trifading = false,
-    .startOpacityEase = EASE_IN,
-    .endOpacityEase = EASE_OUT,
-    .startRadEase = QUAD_OUT,
-    .endRadEase = QUAD_OUT,
+    .startOpacityEase = EaseTypes::EaseIn,
+    .endOpacityEase = EaseTypes::EaseOut,
+    .startRadEase = EaseTypes::QuadOut,
+    .endRadEase = EaseTypes::QuadOut,
 }; 
 
 extern const UseEffectDefinition endWallFilledSecond = {
@@ -218,10 +218,10 @@ extern const UseEffectDefinition endWallFilledSecond = {
     .endRad = SCREEN_WIDTH_AREA,
     .hollow = false,
     .trifading = false,
-    .startOpacityEase = EASE_IN,
-    .endOpacityEase = EASE_LINEAR,
-    .startRadEase = QUAD_OUT,
-    .endRadEase = QUAD_OUT,
+    .startOpacityEase = EaseTypes::EaseIn,
+    .endOpacityEase = EaseTypes::EaseLinear,
+    .startRadEase = EaseTypes::QuadOut,
+    .endRadEase = EaseTypes::QuadOut,
 }; 
 
 extern const UseEffectDefinition endWallFilledTitle = {
@@ -235,10 +235,10 @@ extern const UseEffectDefinition endWallFilledTitle = {
     .endRad = 250.f,
     .hollow = false,
     .trifading = false,
-    .startOpacityEase = EASE_IN,
-    .endOpacityEase = EASE_LINEAR,
-    .startRadEase = QUAD_OUT,
-    .endRadEase = QUAD_OUT,
+    .startOpacityEase = EaseTypes::EaseIn,
+    .endOpacityEase = EaseTypes::EaseLinear,
+    .startRadEase = EaseTypes::QuadOut,
+    .endRadEase = EaseTypes::QuadOut,
 }; 
 
 extern const UseEffectDefinition endWallFireworkCircle = {
@@ -252,10 +252,10 @@ extern const UseEffectDefinition endWallFireworkCircle = {
     .endRad = 42.5f,
     .hollow = false,
     .trifading = true,
-    .startOpacityEase = CUBIC_OUT,
-    .endOpacityEase = EASE_LINEAR,
-    .startRadEase = EASE_LINEAR,
-    .endRadEase = EASE_LINEAR,
+    .startOpacityEase = EaseTypes::CubicOut,
+    .endOpacityEase = EaseTypes::EaseLinear,
+    .startRadEase = EaseTypes::EaseLinear,
+    .endRadEase = EaseTypes::EaseLinear,
 }; 
 
 extern const UseEffectDefinition endWallCircunference = {
@@ -269,10 +269,10 @@ extern const UseEffectDefinition endWallCircunference = {
     .endRad = SCREEN_WIDTH_AREA,
     .hollow = true,
     .trifading = true,
-    .startOpacityEase = EASE_LINEAR,
-    .endOpacityEase = EASE_LINEAR,
-    .startRadEase = EASE_LINEAR,
-    .endRadEase = EASE_LINEAR,
+    .startOpacityEase = EaseTypes::EaseLinear,
+    .endOpacityEase = EaseTypes::EaseLinear,
+    .startRadEase = EaseTypes::EaseLinear,
+    .endRadEase = EaseTypes::EaseLinear,
     .lineThickness = 1.8f,
 }; 
 
@@ -287,10 +287,10 @@ extern const UseEffectDefinition respawnEffect = {
     .endRad = 3.f,
     .hollow = true,
     .trifading = true,
-    .startOpacityEase = CUBIC_OUT,
-    .endOpacityEase = EASE_LINEAR,
-    .startRadEase = EASE_LINEAR,
-    .endRadEase = EASE_LINEAR,
+    .startOpacityEase = EaseTypes::CubicOut,
+    .endOpacityEase = EaseTypes::EaseLinear,
+    .startRadEase = EaseTypes::EaseLinear,
+    .endRadEase = EaseTypes::EaseLinear,
     .lineThickness = 1.f
 }; 
 
@@ -305,10 +305,10 @@ const UseEffectDefinition spiderInEffect = {
     .endRad = 3.f,
     .hollow = false,
     .trifading = false,
-    .startOpacityEase = EASE_IN,
-    .endOpacityEase = EASE_LINEAR,
-    .startRadEase = EASE_IN,
-    .endRadEase = EASE_LINEAR,
+    .startOpacityEase = EaseTypes::EaseIn,
+    .endOpacityEase = EaseTypes::EaseLinear,
+    .startRadEase = EaseTypes::EaseIn,
+    .endRadEase = EaseTypes::EaseLinear,
 }; 
 
 const UseEffectDefinition spiderOutEffect = {
@@ -322,10 +322,10 @@ const UseEffectDefinition spiderOutEffect = {
     .endRad = 3.f,
     .hollow = false,
     .trifading = false,
-    .startOpacityEase = EASE_IN,
-    .endOpacityEase = EASE_LINEAR,
-    .startRadEase = EASE_IN,
-    .endRadEase = EASE_LINEAR,
+    .startOpacityEase = EaseTypes::EaseIn,
+    .endOpacityEase = EaseTypes::EaseLinear,
+    .startRadEase = EaseTypes::EaseIn,
+    .endRadEase = EaseTypes::EaseLinear,
 }; 
 
 UseEffectPool useEffectsTop = {

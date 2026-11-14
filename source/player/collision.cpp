@@ -34,7 +34,7 @@ namespace gd3ds
 Player *player1 = &state.player;
 Player *player2 = &state.player2;
 
-const float jumpHeightsTable[SPEED_COUNT][JUMP_TYPES_COUNT][GAMEMODE_COUNT][2] = {
+const float jumpHeightsTable[static_cast<int>(PlayerSpeeds::SpeedCount)][static_cast<int>(JumpType::JumpTypesCount)][static_cast<int>(IconGamemode::GamemodeCount)][2] = {
     { // SLOW                        CUBE                              SHIP                                BALL                               UFO            WAVE              ROBOT  },
     /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {573.48,   458.784},  {0, 0},   {864,      691.2}, {518.4, 414.72} },
     /* YELLOW ORB */ {{573.48,   458.784},  {573.48,   458.784},  {401.435993,  321.148795},  {573.48,   458.784},  {0, 0},   {516.132,  430.9056}, {401.436, 321.149} },
@@ -87,7 +87,7 @@ const float jumpHeightsTable[SPEED_COUNT][JUMP_TYPES_COUNT][GAMEMODE_COUNT][2] =
     }
 };
 
-const float gamemodeHeights[GAMEMODE_COUNT] = {
+const float gamemodeHeights[static_cast<int>(IconGamemode::GamemodeCount)] = {
     999999,  // Cube
     300, // Ship
     240,  // Ball
@@ -97,7 +97,7 @@ const float gamemodeHeights[GAMEMODE_COUNT] = {
     270 // Spider
 };
 
-const int dualGamemodeHeights[GAMEMODE_COUNT] = {
+const int dualGamemodeHeights[static_cast<int>(IconGamemode::GamemodeCount)] = {
     9,  // Cube
     10, // Ship
     9,  // Ball
@@ -186,26 +186,26 @@ float snapPlayer(Vec2D diff, Player *player) {
     Vec2D stairs[3];
     float threshold;
     switch (state.speed) {
-        case SPEED_SLOW:
+        case static_cast<int>(PlayerSpeeds::SpeedSlow):
             memcpy(&stairs, &slowSpeedSnaps, sizeof(Vec2D) * 3);
             threshold = 1;
             break;
-        case SPEED_NORMAL:
+        case static_cast<int>(PlayerSpeeds::SpeedNormal):
             memcpy(&stairs, &normalSpeedSnaps, sizeof(Vec2D) * 3);
             threshold = 1;
             stairs[1].x = (player->mini ? 90 : 120);
             break;
-        case SPEED_FAST:
+        case static_cast<int>(PlayerSpeeds::SpeedFast):
             memcpy(&stairs, &fastSpeedSnaps, sizeof(Vec2D) * 3);
             threshold = 2;
             stairs[1].x = (player->mini ? 90 : 150);
             break;
-        case SPEED_FASTER:
+        case static_cast<int>(PlayerSpeeds::SpeedFaster):
             memcpy(&stairs, &fasterSpeedSnaps, sizeof(Vec2D) * 3);
             threshold = 2;
             stairs[1].x = (player->mini ? 90 : 180);
             break;
-        case SPEED_FASTEST:
+        case static_cast<int>(PlayerSpeeds::SpeedFastest):
             memcpy(&stairs, &fasterSpeedSnaps, sizeof(Vec2D) * 3);
             threshold = 2;
             stairs[1].x = (player->mini ? 90 : 180);
@@ -252,7 +252,7 @@ void trySnap(int block, Player *player) {
 #define N false
 
 // Table that says if gravity changes should affect the other gamemode
-static const bool gamemodeLinkedGravity[GAMEMODE_COUNT][GAMEMODE_COUNT] = {
+static const bool gamemodeLinkedGravity[static_cast<int>(IconGamemode::GamemodeCount)][static_cast<int>(IconGamemode::GamemodeCount)] = {
     /* CUBE  */ { Y, N, N, N, Y, N, N},
     /* SHIP  */ { N, Y, N, N, N, N, N},
     /* BALL  */ { N, N, Y, N, N, N, N},
@@ -282,7 +282,7 @@ void flipOtherPlayer(int currentPlayer) {
 void doBallReflection() {
     Player *player1 = &state.player;
     Player *player2 = &state.player2;
-    if (state.dual && player1->gamemode == GAMEMODE_BALL && player2->gamemode == GAMEMODE_BALL) {
+    if (state.dual && player1->gamemode == static_cast<int>(IconGamemode::GamemodeBall) && player2->gamemode == static_cast<int>(IconGamemode::GamemodeBall)) {
         if (player1->upsideDown == player2->upsideDown) {
             bool ballsIntersecting = intersect(
                 player1->x, player1->y, player1->width, player1->height, 0,
@@ -302,7 +302,7 @@ void doBallReflection() {
                         effect->def.colorB = p1White.b / 255.f;
                     }
 
-                    player2->velY = jumpHeightsTable[state.speed][JUMP_BLUE_PAD][player2->gamemode][player2->mini];
+                    player2->velY = jumpHeightsTable[state.speed][static_cast<int>(JumpType::JumpBluePad)][player2->gamemode][player2->mini];
                     player2->upsideDown ^= 1;
                 } else if (player2->onGround || player2->onCeiling) {
                     state.currentPlayer = 1;
@@ -316,7 +316,7 @@ void doBallReflection() {
                     }
 
 
-                    player1->velY = jumpHeightsTable[state.speed][JUMP_BLUE_PAD][player1->gamemode][player1->mini];
+                    player1->velY = jumpHeightsTable[state.speed][static_cast<int>(JumpType::JumpBluePad)][player1->gamemode][player1->mini];
                     player1->upsideDown ^= 1;
                 }
                 state.currentPlayer = currentPlayer;
@@ -388,7 +388,7 @@ static float dashOrbAngle(int obj) {
 
 static void collectPickupItem(int obj) {
     PickupItem *pickup = getPickupItem(obj);
-    if (!pickup || !pickup->isPickup || (objects.flags[obj] & FLAG_TOGGLED)) return;
+    if (!pickup || !pickup->isPickup || (objects.flags[obj] & static_cast<int>(ObjectFlags::FlagToggled))) return;
     addItemCount(pickup->itemID, (pickup->subCount ? -1 : 1));
 }
 
@@ -429,26 +429,26 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                 collectPickupItem(obj);
                 SET_ACTIVATED(obj, true);
                 spawnCollectableFx(obj);
-                objects.flags[obj] |= FLAG_TOGGLED;
+                objects.flags[obj] |= static_cast<int>(ObjectFlags::FlagToggled);
             }
             break;
         case SMALL_COIN:
             if (!GET_ACTIVATED(obj)) {
                 collectPickupItem(obj);
                 SET_ACTIVATED(obj, true);
-                objects.flags[obj] |= FLAG_TOGGLED;
+                objects.flags[obj] |= static_cast<int>(ObjectFlags::FlagToggled);
             }
             break;
         case YELLOW_PAD: {
-            if (!GET_ACTIVATED(obj) || ((objects.flags[obj] & FLAG_MULTI_ACTIVATE) && !GET_COLLIDED(obj))) {
+            if (!GET_ACTIVATED(obj) || ((objects.flags[obj] & static_cast<int>(ObjectFlags::FlagMultiActivate)) && !GET_COLLIDED(obj))) {
                 if (state.showPlayer) motionTrailResumeStroke(trail);
-                player->velY = jumpHeightsTable[state.speed][JUMP_YELLOW_PAD][player->gamemode][player->mini];
+                player->velY = jumpHeightsTable[state.speed][static_cast<int>(JumpType::JumpYellowPad)][player->gamemode][player->mini];
                 player->onGround = false;
                 player->inverseRotation = false;
                 player->leftGround = true;
                 player->jumped = true;
-                if (player->gamemode == GAMEMODE_ROBOT) setAnimation(player, ROBOT_ANIM_JUMP_START);
-                if (player->gamemode == GAMEMODE_SPIDER) setAnimation(player, SPIDER_ANIM_FALL);
+                if (player->gamemode == static_cast<int>(IconGamemode::GamemodeRobot)) setAnimation(player, static_cast<int>(RobotAnimId::RobotAnimJumpStart));
+                if (player->gamemode == static_cast<int>(IconGamemode::GamemodeSpider)) setAnimation(player, static_cast<int>(SpiderAnimId::SpiderAnimFall));
                 SET_ACTIVATED(obj, true);
                 updateRotationDirection(player);
                 UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &padUseEffect, getUseEffectArrayPtr(GFX_TOP));
@@ -461,15 +461,15 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
             }
         }
         case PINK_PAD: {
-            if (!GET_ACTIVATED(obj) || ((objects.flags[obj] & FLAG_MULTI_ACTIVATE) && !GET_COLLIDED(obj))) {
+            if (!GET_ACTIVATED(obj) || ((objects.flags[obj] & static_cast<int>(ObjectFlags::FlagMultiActivate)) && !GET_COLLIDED(obj))) {
                 if (state.showPlayer) motionTrailResumeStroke(trail);
-                player->velY = jumpHeightsTable[state.speed][JUMP_PINK_PAD][player->gamemode][player->mini];
+                player->velY = jumpHeightsTable[state.speed][static_cast<int>(JumpType::JumpPinkPad)][player->gamemode][player->mini];
                 player->onGround = false;
                 player->inverseRotation = false;
                 player->leftGround = true;
                 player->jumped = true;
-                if (player->gamemode == GAMEMODE_ROBOT) setAnimation(player, ROBOT_ANIM_JUMP_START);
-                if (player->gamemode == GAMEMODE_SPIDER) setAnimation(player, SPIDER_ANIM_FALL);
+                if (player->gamemode == static_cast<int>(IconGamemode::GamemodeRobot)) setAnimation(player, static_cast<int>(RobotAnimId::RobotAnimJumpStart));
+                if (player->gamemode == static_cast<int>(IconGamemode::GamemodeSpider)) setAnimation(player, static_cast<int>(SpiderAnimId::SpiderAnimFall));
                 SET_ACTIVATED(obj, true);
                 updateRotationDirection(player);
                 UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &padUseEffect, getUseEffectArrayPtr(GFX_TOP));
@@ -483,16 +483,16 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
             break;
         }
         case RED_PAD: {
-            if (!GET_ACTIVATED(obj) || ((objects.flags[obj] & FLAG_MULTI_ACTIVATE) && !GET_COLLIDED(obj))) {
+            if (!GET_ACTIVATED(obj) || ((objects.flags[obj] & static_cast<int>(ObjectFlags::FlagMultiActivate)) && !GET_COLLIDED(obj))) {
                 if (state.showPlayer) motionTrailResumeStroke(trail);
-                player->velY = jumpHeightsTable[state.speed][JUMP_RED_PAD][player->gamemode][player->mini];
+                player->velY = jumpHeightsTable[state.speed][static_cast<int>(JumpType::JumpRedPad)][player->gamemode][player->mini];
                 player->onGround = false;
                 player->inverseRotation = false;
                 player->leftGround = true;
                 player->jumped = true;
                 player->velocityUncapped = true;
-                if (player->gamemode == GAMEMODE_ROBOT) setAnimation(player, ROBOT_ANIM_JUMP_START);
-                if (player->gamemode == GAMEMODE_SPIDER) setAnimation(player, SPIDER_ANIM_FALL);
+                if (player->gamemode == static_cast<int>(IconGamemode::GamemodeRobot)) setAnimation(player, static_cast<int>(RobotAnimId::RobotAnimJumpStart));
+                if (player->gamemode == static_cast<int>(IconGamemode::GamemodeSpider)) setAnimation(player, static_cast<int>(SpiderAnimId::SpiderAnimFall));
                 SET_ACTIVATED(obj, true);
                 updateRotationDirection(player);
                 UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &padUseEffect, getUseEffectArrayPtr(GFX_TOP));
@@ -506,7 +506,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case BLUE_PAD: {
             if (GET_ACTIVATED(obj)) player->gravObjID = obj;
-            if (!GET_ACTIVATED(obj) || ((objects.flags[obj] & FLAG_MULTI_ACTIVATE) && !GET_COLLIDED(obj))) {
+            if (!GET_ACTIVATED(obj) || ((objects.flags[obj] & static_cast<int>(ObjectFlags::FlagMultiActivate)) && !GET_COLLIDED(obj))) {
                 float rotation = adjustAngle(objects.rotation[obj], objects.flippedV[obj], objects.flippedH[obj]);
                 if ((rotation < 90 || rotation > 270) && player->upsideDown)
                     break;
@@ -519,13 +519,13 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                     break;
 
                 if (state.showPlayer) motionTrailResumeStroke(trail);
-                if (player->gamemode == GAMEMODE_WAVE) motionTrailAddWavePoint(waveTrail);
+                if (player->gamemode == static_cast<int>(IconGamemode::GamemodeWave)) motionTrailAddWavePoint(waveTrail);
                 player->leftGround = true;
 
                 player->gravObjID = obj;
                 updateRotationDirection(player);
 
-                player->velY = jumpHeightsTable[state.speed][JUMP_BLUE_PAD][player->gamemode][player->mini];
+                player->velY = jumpHeightsTable[state.speed][static_cast<int>(JumpType::JumpBluePad)][player->gamemode][player->mini];
                 player->upsideDown ^= 1;
 
                 startGravitySweep(!player->upsideDown);
@@ -551,9 +551,9 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case YELLOW_ORB: {
             if (!GET_COLLIDED(obj)) addUseEffect(objects.x[obj], objects.y[obj], obj, &orbCollideEffect, getUseEffectArrayPtr(GFX_TOP));
-            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (currInput.holdJump) && player->bufferingState == BUFFER_READY) {
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & static_cast<int>(ObjectFlags::FlagMultiActivate))) && (currInput.holdJump) && player->bufferingState == static_cast<int>(BufferingState::BufferReady)) {
                 if (state.showPlayer) motionTrailResumeStroke(trail);
-                player->velY = jumpHeightsTable[state.speed][JUMP_YELLOW_ORB][player->gamemode][player->mini];
+                player->velY = jumpHeightsTable[state.speed][static_cast<int>(JumpType::JumpYellowOrb)][player->gamemode][player->mini];
                 
                 player->ballRotationSpeed = -BALL_SLOW_ROTATION;
                 
@@ -561,11 +561,11 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                 player->onCeiling = false;
                 player->inverseRotation = false;
                 player->leftGround = true;
-                player->bufferingState = BUFFER_END;
+                player->bufferingState = static_cast<int>(BufferingState::BufferEnd);
                 player->jumped = true;
                 updateRotationDirection(player);
-                if (player->gamemode == GAMEMODE_ROBOT) setAnimation(player, ROBOT_ANIM_JUMP_START);
-                if (player->gamemode == GAMEMODE_SPIDER) setAnimation(player, SPIDER_ANIM_JUMP);
+                if (player->gamemode == static_cast<int>(IconGamemode::GamemodeRobot)) setAnimation(player, static_cast<int>(RobotAnimId::RobotAnimJumpStart));
+                if (player->gamemode == static_cast<int>(IconGamemode::GamemodeSpider)) setAnimation(player, static_cast<int>(SpiderAnimId::SpiderAnimJump));
                 
                 state.currentData.jumps++;
                 
@@ -584,9 +584,9 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case PINK_ORB: {
             if (!GET_COLLIDED(obj)) addUseEffect(objects.x[obj], objects.y[obj], obj, &orbCollideEffect, getUseEffectArrayPtr(GFX_TOP));
-            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (currInput.holdJump) && player->bufferingState == BUFFER_READY) {
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & static_cast<int>(ObjectFlags::FlagMultiActivate))) && (currInput.holdJump) && player->bufferingState == static_cast<int>(BufferingState::BufferReady)) {
                 if (state.showPlayer) motionTrailResumeStroke(trail);
-                player->velY = jumpHeightsTable[state.speed][JUMP_PINK_ORB][player->gamemode][player->mini];
+                player->velY = jumpHeightsTable[state.speed][static_cast<int>(JumpType::JumpPinkOrb)][player->gamemode][player->mini];
                 
                 player->ballRotationSpeed = -BALL_SLOW_ROTATION;
                 
@@ -594,11 +594,11 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                 player->onCeiling = false;
                 player->inverseRotation = false;
                 player->leftGround = true;
-                player->bufferingState = BUFFER_END;
+                player->bufferingState = static_cast<int>(BufferingState::BufferEnd);
                 player->jumped = true;
                 updateRotationDirection(player);
-                if (player->gamemode == GAMEMODE_ROBOT) setAnimation(player, ROBOT_ANIM_JUMP_START);
-                if (player->gamemode == GAMEMODE_SPIDER) setAnimation(player, SPIDER_ANIM_JUMP);
+                if (player->gamemode == static_cast<int>(IconGamemode::GamemodeRobot)) setAnimation(player, static_cast<int>(RobotAnimId::RobotAnimJumpStart));
+                if (player->gamemode == static_cast<int>(IconGamemode::GamemodeSpider)) setAnimation(player, static_cast<int>(SpiderAnimId::SpiderAnimJump));
 
                 state.currentData.jumps++;
 
@@ -617,9 +617,9 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case RED_ORB: {
             if (!GET_COLLIDED(obj)) addUseEffect(objects.x[obj], objects.y[obj], obj, &orbCollideEffect, getUseEffectArrayPtr(GFX_TOP));
-            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (currInput.holdJump) && player->bufferingState == BUFFER_READY) {
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & static_cast<int>(ObjectFlags::FlagMultiActivate))) && (currInput.holdJump) && player->bufferingState == static_cast<int>(BufferingState::BufferReady)) {
                 if (state.showPlayer) motionTrailResumeStroke(trail);
-                player->velY = jumpHeightsTable[state.speed][JUMP_RED_ORB][player->gamemode][player->mini];
+                player->velY = jumpHeightsTable[state.speed][static_cast<int>(JumpType::JumpRedOrb)][player->gamemode][player->mini];
                 
                 player->ballRotationSpeed = -BALL_SLOW_ROTATION;
                 
@@ -627,12 +627,12 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                 player->onCeiling = false;
                 player->inverseRotation = false;
                 player->leftGround = true;
-                player->bufferingState = BUFFER_END;
+                player->bufferingState = static_cast<int>(BufferingState::BufferEnd);
                 player->jumped = true;
                 player->velocityUncapped = true;
                 updateRotationDirection(player);
-                if (player->gamemode == GAMEMODE_ROBOT) setAnimation(player, ROBOT_ANIM_JUMP_START);
-                if (player->gamemode == GAMEMODE_SPIDER) setAnimation(player, SPIDER_ANIM_JUMP);
+                if (player->gamemode == static_cast<int>(IconGamemode::GamemodeRobot)) setAnimation(player, static_cast<int>(RobotAnimId::RobotAnimJumpStart));
+                if (player->gamemode == static_cast<int>(IconGamemode::GamemodeSpider)) setAnimation(player, static_cast<int>(SpiderAnimId::SpiderAnimJump));
                 
                 state.currentData.jumps++;
                 
@@ -651,9 +651,9 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case BLACK_ORB: {
             if (!GET_COLLIDED(obj)) addUseEffect(objects.x[obj], objects.y[obj], obj, &orbCollideEffect, getUseEffectArrayPtr(GFX_TOP));
-            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (currInput.holdJump) && player->bufferingState == BUFFER_READY) {
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & static_cast<int>(ObjectFlags::FlagMultiActivate))) && (currInput.holdJump) && player->bufferingState == static_cast<int>(BufferingState::BufferReady)) {
                 if (state.showPlayer) motionTrailResumeStroke(trail);
-                float blackVel = (player->gamemode == GAMEMODE_UFO) ? -604.8f : (playerGamemodeIsFlying(player) ? -756.f : -810.f);
+                float blackVel = (player->gamemode == static_cast<int>(IconGamemode::GamemodeUfo)) ? -604.8f : (playerGamemodeIsFlying(player) ? -756.f : -810.f);
                 player->velY = blackVel;
                 
                 player->ballRotationSpeed = -BALL_SLOW_ROTATION;
@@ -662,17 +662,17 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                 player->onCeiling = false;
                 player->inverseRotation = false;
                 player->leftGround = true;
-                player->bufferingState = BUFFER_END;
+                player->bufferingState = static_cast<int>(BufferingState::BufferEnd);
                 player->jumped = true;
                 player->velocityUncapped = true;
                 updateRotationDirection(player);
-                if (player->gamemode == GAMEMODE_ROBOT) setAnimation(player, ROBOT_ANIM_JUMP_START);
+                if (player->gamemode == static_cast<int>(IconGamemode::GamemodeRobot)) setAnimation(player, static_cast<int>(RobotAnimId::RobotAnimJumpStart));
                 
                 state.currentData.jumps++;
                 
                 UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &orbUseEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
-                    Color color = channels[CHANNEL_LBG].color;
+                    Color color = channels[static_cast<int>(ColorChannelIDs::ChannelLbg)].color;
                     effect->def.colorR = color.r / 255.f;
                     effect->def.colorG = color.g / 255.f;
                     effect->def.colorB = color.b / 255.f;
@@ -686,15 +686,15 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case DASH_ORB: {
             if (!GET_COLLIDED(obj)) addUseEffect(objects.x[obj], objects.y[obj], obj, &orbCollideEffect, getUseEffectArrayPtr(GFX_TOP));
-            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (currInput.holdJump) && player->bufferingState == BUFFER_READY && !player->dashing) {
-                if (player->gamemode != GAMEMODE_WAVE) motionTrailStopStroke(trail);
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & static_cast<int>(ObjectFlags::FlagMultiActivate))) && (currInput.holdJump) && player->bufferingState == static_cast<int>(BufferingState::BufferReady) && !player->dashing) {
+                if (player->gamemode != static_cast<int>(IconGamemode::GamemodeWave)) motionTrailStopStroke(trail);
 
                 player->onGround = false;
                 player->onCeiling = false;
                 player->inverseRotation = false;
                 player->leftGround = true;
                 player->robotAirTime = 999.f;
-                player->bufferingState = BUFFER_END;
+                player->bufferingState = static_cast<int>(BufferingState::BufferEnd);
                 
                 player->dashing = true;
                 player->dashAngle = dashOrbAngle(obj);
@@ -720,10 +720,10 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case GRAVITY_DASH_ORB: {
             if (!GET_COLLIDED(obj)) addUseEffect(objects.x[obj], objects.y[obj], obj, &orbCollideEffect, getUseEffectArrayPtr(GFX_TOP));
-            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (currInput.holdJump) && player->bufferingState == BUFFER_READY && !player->dashing) {
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & static_cast<int>(ObjectFlags::FlagMultiActivate))) && (currInput.holdJump) && player->bufferingState == static_cast<int>(BufferingState::BufferReady) && !player->dashing) {
                 player->ceilingInvTime = CEILING_INVUL_TIME;
-                if (player->gamemode != GAMEMODE_BALL && state.showPlayer) motionTrailResumeStroke(trail);
-                if (player->gamemode == GAMEMODE_WAVE) motionTrailAddWavePoint(waveTrail);
+                if (player->gamemode != static_cast<int>(IconGamemode::GamemodeBall) && state.showPlayer) motionTrailResumeStroke(trail);
+                if (player->gamemode == static_cast<int>(IconGamemode::GamemodeWave)) motionTrailAddWavePoint(waveTrail);
                 player->velY /= -2;
                 player->upsideDown = !player->upsideDown;
                 updateRotationDirection(player);
@@ -733,9 +733,9 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                 player->onCeiling = false;
                 player->inverseRotation = false;
                 player->leftGround = true;
-                player->bufferingState = BUFFER_END;
+                player->bufferingState = static_cast<int>(BufferingState::BufferEnd);
 
-                if (player->gamemode == GAMEMODE_UFO)
+                if (player->gamemode == static_cast<int>(IconGamemode::GamemodeUfo))
                     player->rotation = 0;
                 else
                     player->snapRotation = true;
@@ -768,13 +768,13 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         case BLUE_ORB: {
             if (GET_ACTIVATED(obj)) player->gravObjID = obj;
             if (!GET_COLLIDED(obj)) addUseEffect(objects.x[obj], objects.y[obj], obj, &orbCollideEffect, getUseEffectArrayPtr(GFX_TOP));
-            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (currInput.holdJump) && player->bufferingState == BUFFER_READY) {    
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & static_cast<int>(ObjectFlags::FlagMultiActivate))) && (currInput.holdJump) && player->bufferingState == static_cast<int>(BufferingState::BufferReady)) {
                 if (state.showPlayer) motionTrailResumeStroke(trail);
-                if (player->gamemode == GAMEMODE_WAVE) motionTrailAddWavePoint(waveTrail);
+                if (player->gamemode == static_cast<int>(IconGamemode::GamemodeWave)) motionTrailAddWavePoint(waveTrail);
                 player->gravObjID = obj;
                 updateRotationDirection(player); 
                 
-                player->velY = jumpHeightsTable[state.speed][JUMP_BLUE_ORB][player->gamemode][player->mini];
+                player->velY = jumpHeightsTable[state.speed][static_cast<int>(JumpType::JumpBlueOrb)][player->gamemode][player->mini];
                 player->upsideDown ^= 1;
 
                 startGravitySweep(!player->upsideDown);
@@ -789,10 +789,10 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                 player->onCeiling = false;
                 player->inverseRotation = false;
                 player->leftGround = true;
-                player->bufferingState = BUFFER_END;
+                player->bufferingState = static_cast<int>(BufferingState::BufferEnd);
                 player->ceilingInvTime = CEILING_INVUL_TIME;
                 player->jumped = true;
-                if (player->gamemode == GAMEMODE_SPIDER) setAnimation(player, SPIDER_ANIM_JUMP);
+                if (player->gamemode == static_cast<int>(IconGamemode::GamemodeSpider)) setAnimation(player, static_cast<int>(SpiderAnimId::SpiderAnimJump));
                 
                 UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &orbUseEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
@@ -810,7 +810,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         case GREEN_ORB: {
             if (GET_ACTIVATED(obj)) player->gravObjID = obj;
             if (!GET_COLLIDED(obj)) addUseEffect(objects.x[obj], objects.y[obj], obj, &orbCollideEffect, getUseEffectArrayPtr(GFX_TOP));
-            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & FLAG_MULTI_ACTIVATE)) && (currInput.holdJump) && player->bufferingState == BUFFER_READY) {
+            if ((!GET_ACTIVATED(obj) || (objects.flags[obj] & static_cast<int>(ObjectFlags::FlagMultiActivate))) && (currInput.holdJump) && player->bufferingState == static_cast<int>(BufferingState::BufferReady)) {
                 if (state.showPlayer) motionTrailResumeStroke(trail);
                 player->gravObjID = obj;
 
@@ -818,11 +818,11 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
 
                 startGravitySweep(!player->upsideDown);
 
-                player->velY = jumpHeightsTable[state.speed][JUMP_YELLOW_ORB][player->gamemode][player->mini];
+                player->velY = jumpHeightsTable[state.speed][static_cast<int>(JumpType::JumpYellowOrb)][player->gamemode][player->mini];
                 
                 updateRotationDirection(player);
 
-                if (player->gamemode == GAMEMODE_SHIP) player->velY *= 0.7f;
+                if (player->gamemode == static_cast<int>(IconGamemode::GamemodeShip)) player->velY *= 0.7f;
 
                 flipOtherPlayer(state.currentPlayer);
 
@@ -830,14 +830,14 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
 
                 player->ballRotationSpeed = -BALL_SLOW_ROTATION;
                 
-                if (player->gamemode == GAMEMODE_ROBOT) setAnimation(player, ROBOT_ANIM_JUMP_START);
-                if (player->gamemode == GAMEMODE_SPIDER) setAnimation(player, SPIDER_ANIM_JUMP);
+                if (player->gamemode == static_cast<int>(IconGamemode::GamemodeRobot)) setAnimation(player, static_cast<int>(RobotAnimId::RobotAnimJumpStart));
+                if (player->gamemode == static_cast<int>(IconGamemode::GamemodeSpider)) setAnimation(player, static_cast<int>(SpiderAnimId::SpiderAnimJump));
 
                 player->onGround = false;
                 player->onCeiling = false;
                 player->inverseRotation = false;
                 player->leftGround = true;
-                player->bufferingState = BUFFER_END;
+                player->bufferingState = static_cast<int>(BufferingState::BufferEnd);
                 player->ceilingInvTime = 0.5f;
                 player->jumped = true;
 
@@ -856,7 +856,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case TOGGLE_ORB: {
             if (!GET_COLLIDED(obj)) addUseEffect(objects.x[obj], objects.y[obj], obj, &orbCollideEffect, getUseEffectArrayPtr(GFX_TOP));
-            if (!GET_ACTIVATED(obj) && (currInput.holdJump) && (player->bufferingState == BUFFER_READY || currInput.pressedJump)) {
+            if (!GET_ACTIVATED(obj) && (currInput.holdJump) && (player->bufferingState == static_cast<int>(BufferingState::BufferReady) || currInput.pressedJump)) {
                 ToggleTrigger *trigger = getToggleTrigger(obj);
 
                 if (trigger->spawnOnly) spawnGroup(trigger->targetGroup);
@@ -879,14 +879,14 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                 startGravitySweep(true);
                 player->ceilingInvTime = CEILING_INVUL_TIME;
                 if (player->upsideDown) {
-                    if (player->gamemode != GAMEMODE_BALL && state.showPlayer) motionTrailResumeStroke(trail);
-                    if (player->gamemode == GAMEMODE_WAVE) motionTrailAddWavePoint(waveTrail);
+                    if (player->gamemode != static_cast<int>(IconGamemode::GamemodeBall) && state.showPlayer) motionTrailResumeStroke(trail);
+                    if (player->gamemode == static_cast<int>(IconGamemode::GamemodeWave)) motionTrailAddWavePoint(waveTrail);
                     player->velY /= -2;
                     player->upsideDown = false;
                     player->inverseRotation = false;
                     player->robotAirTime = 999.f;
 
-                    if (player->gamemode == GAMEMODE_UFO) 
+                    if (player->gamemode == static_cast<int>(IconGamemode::GamemodeUfo))
                         player->rotation = 0;
                     else
                         player->snapRotation = true;
@@ -911,14 +911,14 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                 startGravitySweep(false);
                 player->ceilingInvTime = CEILING_INVUL_TIME;
                 if (!player->upsideDown) {
-                    if (player->gamemode != GAMEMODE_BALL && state.showPlayer) motionTrailResumeStroke(trail);
-                    if (player->gamemode == GAMEMODE_WAVE) motionTrailAddWavePoint(waveTrail);
+                    if (player->gamemode != static_cast<int>(IconGamemode::GamemodeBall) && state.showPlayer) motionTrailResumeStroke(trail);
+                    if (player->gamemode == static_cast<int>(IconGamemode::GamemodeWave)) motionTrailAddWavePoint(waveTrail);
                     player->velY /= -2;
                     player->upsideDown = true;
                     player->inverseRotation = false;
                     player->robotAirTime = 999.f;
 
-                    if (player->gamemode == GAMEMODE_UFO) 
+                    if (player->gamemode == static_cast<int>(IconGamemode::GamemodeUfo))
                         player->rotation = 0;
                     else
                         player->snapRotation = true;
@@ -986,7 +986,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                         Lightning(
                             objects.x[obj] + randomInt(-25.0f, 25.0f) + 25.0f, state.cameraY + 50.0f + SCREEN_HEIGHT, 
                             objects.x[obj], objects.y[obj], 
-                            LightningType::SIZE_NORMAL
+                            LightningType::SizeNormal
                         )
                     );
 
@@ -1023,7 +1023,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                         Lightning(
                             objects.x[obj] + randomInt(-25.0f, 25.0f) + 25.0f, state.cameraY + 50.0f + SCREEN_HEIGHT, 
                             objects.x[obj], objects.y[obj], 
-                            LightningType::SIZE_MINI
+                            LightningType::SizeMini
                         )
                     );
 
@@ -1063,8 +1063,8 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                     effect->def.colorG = 255 / 255.f;
                     effect->def.colorB = 0 / 255.f;
                 }
-                if (state.speed != SPEED_SLOW) {
-                    state.speed = SPEED_SLOW;
+                if (state.speed != static_cast<int>(PlayerSpeeds::SpeedSlow)) {
+                    state.speed = static_cast<int>(PlayerSpeeds::SpeedSlow);
                     slowSpeedParticlesTimer = 0.7f;
                 };
             }
@@ -1079,8 +1079,8 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                     effect->def.colorG = 190 / 255.f;
                     effect->def.colorB = 255 / 255.f;
                 }
-                if (state.speed != SPEED_NORMAL) {
-                    state.speed = SPEED_NORMAL;
+                if (state.speed != static_cast<int>(PlayerSpeeds::SpeedNormal)) {
+                    state.speed = static_cast<int>(PlayerSpeeds::SpeedNormal);
                     normalSpeedParticlesTimer = 0.7f;
                 }
             }
@@ -1095,8 +1095,8 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                     effect->def.colorG = 255 / 255.f;
                     effect->def.colorB = 0 / 255.f;
                 }
-                if (state.speed != SPEED_FAST){
-                    state.speed = SPEED_FAST;
+                if (state.speed != static_cast<int>(PlayerSpeeds::SpeedFast)){
+                    state.speed = static_cast<int>(PlayerSpeeds::SpeedFast);
                     fastSpeedParticlesTimer = 0.7f;
                 }
             }
@@ -1113,8 +1113,8 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                     effect->def.colorB = 255 / 255.f;
                 }
                 
-                if (state.speed != SPEED_FASTER) {
-                    state.speed = SPEED_FASTER;
+                if (state.speed != static_cast<int>(PlayerSpeeds::SpeedFaster)) {
+                    state.speed = static_cast<int>(PlayerSpeeds::SpeedFaster);
                     fasterSpeedParticlesTimer = 0.7f;
                 }
             }
@@ -1131,8 +1131,8 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                     effect->def.colorB = 65  / 255.f;
                 }
 
-                if (state.speed != SPEED_FASTEST) {
-                    state.speed = SPEED_FASTEST;
+                if (state.speed != static_cast<int>(PlayerSpeeds::SpeedFastest)) {
+                    state.speed = static_cast<int>(PlayerSpeeds::SpeedFastest);
                     fastestSpeedParticlesTimer = 0.7f;
                 }
             }
@@ -1142,16 +1142,16 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
             if (!GET_ACTIVATED(obj)) {
                 state.groundY = 0;
                 state.ceilingY = 999999;
-                if (player->gamemode != GAMEMODE_PLAYER) {
-                    if (player->gamemode != GAMEMODE_BALL && player->gamemode != GAMEMODE_ROBOT) {
+                if (player->gamemode != static_cast<int>(IconGamemode::GamemodePlayer)) {
+                    if (player->gamemode != static_cast<int>(IconGamemode::GamemodeBall) && player->gamemode != static_cast<int>(IconGamemode::GamemodeRobot)) {
                         player->velY /= 2;
                     }
 
-                    if (player->gamemode == GAMEMODE_WAVE) player->velY *= 0.9f;
+                    if (player->gamemode == static_cast<int>(IconGamemode::GamemodeWave)) player->velY *= 0.9f;
                     
                     player->ceilingInvTime = GAMEMODE_INVUL_TIME;
                     player->snapRotation = true;
-                    setGamemode(player, GAMEMODE_PLAYER);
+                    setGamemode(player, static_cast<int>(IconGamemode::GamemodePlayer));
                     setCheckpointTimer(0);
                     pseudoCheckpointExists = false;
                     flipOtherPlayer(state.currentPlayer ^ 1);
@@ -1170,22 +1170,22 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                 if (!GET_ACTIVATED(obj)) {
                     state.groundY = 0;
                     state.ceilingY = 999999;
-                    if (player->gamemode != GAMEMODE_ROBOT) {
-                        if (player->gamemode != GAMEMODE_BALL && player->gamemode != GAMEMODE_PLAYER) {
+                    if (player->gamemode != static_cast<int>(IconGamemode::GamemodeRobot)) {
+                        if (player->gamemode != static_cast<int>(IconGamemode::GamemodeBall) && player->gamemode != static_cast<int>(IconGamemode::GamemodePlayer)) {
                             player->velY /= 2;
                         }
-                        if (player->gamemode == GAMEMODE_WAVE) player->velY *= 0.9f;
+                        if (player->gamemode == static_cast<int>(IconGamemode::GamemodeWave)) player->velY *= 0.9f;
 
                         player->ceilingInvTime = GAMEMODE_INVUL_TIME;
                         player->snapRotation = true;
                         player->inverseRotation = false;
-                        setGamemode(player, GAMEMODE_ROBOT);
+                        setGamemode(player, static_cast<int>(IconGamemode::GamemodeRobot));
                         setCheckpointTimer(0);
                         pseudoCheckpointExists = false;
                         flipOtherPlayer(state.currentPlayer ^ 1);
                         updateRotationDirection(player);
 
-                        setAnimation(player, player->dashing ? ROBOT_ANIM_FALL_START : ROBOT_ANIM_JUMP_START);
+                        setAnimation(player, player->dashing ? static_cast<int>(RobotAnimId::RobotAnimFallStart) : static_cast<int>(RobotAnimId::RobotAnimJumpStart));
                         player->robotAirTime = 999.f;
 
                         UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
@@ -1206,26 +1206,26 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
             }   
         case SPIDER_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
-                state.groundY = fmaxf(0, ip1Ceilf((objects.originalY[obj] - ((gamemodeHeights[GAMEMODE_SPIDER] + 60.f) / 2.f)) / 30.f)) * 30;
-                state.ceilingY = state.groundY + gamemodeHeights[GAMEMODE_SPIDER];
+                state.groundY = fmaxf(0, ip1Ceilf((objects.originalY[obj] - ((gamemodeHeights[static_cast<int>(IconGamemode::GamemodeSpider)] + 60.f) / 2.f)) / 30.f)) * 30;
+                state.ceilingY = state.groundY + gamemodeHeights[static_cast<int>(IconGamemode::GamemodeSpider)];
                 setIntendedCeiling();
 
-                if (player->gamemode != GAMEMODE_SPIDER) {
-                    if (player->gamemode != GAMEMODE_BALL && player->gamemode != GAMEMODE_PLAYER) {
+                if (player->gamemode != static_cast<int>(IconGamemode::GamemodeSpider)) {
+                    if (player->gamemode != static_cast<int>(IconGamemode::GamemodeBall) && player->gamemode != static_cast<int>(IconGamemode::GamemodePlayer)) {
                         player->velY /= 2;
                     }
-                    if (player->gamemode == GAMEMODE_WAVE) player->velY *= 0.9f;
+                    if (player->gamemode == static_cast<int>(IconGamemode::GamemodeWave)) player->velY *= 0.9f;
 
                     player->ceilingInvTime = GAMEMODE_INVUL_TIME;
                     player->snapRotation = true;
                     player->inverseRotation = false;
-                    setGamemode(player, GAMEMODE_SPIDER);
+                    setGamemode(player, static_cast<int>(IconGamemode::GamemodeSpider));
                     setCheckpointTimer(0);
                     pseudoCheckpointExists = false;
                     flipOtherPlayer(state.currentPlayer ^ 1);
                     updateRotationDirection(player);
 
-                    setAnimation(player, player->dashing ? SPIDER_ANIM_FALL : SPIDER_ANIM_RUN);
+                    setAnimation(player, player->dashing ? static_cast<int>(SpiderAnimId::SpiderAnimFall) : static_cast<int>(SpiderAnimId::SpiderAnimRun));
 
                     UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
                     if (effect) {
@@ -1251,7 +1251,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                     Lightning(
                         objects.x[obj], objects.y[obj],
                         objects.x[oi], objects.y[oi], 
-                        LightningType::TELEPORT
+                        LightningType::Teleport
                     )
                 );
 
@@ -1288,7 +1288,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
             player->justTeleported = true;
             motionTrailClear(trail);
             motionTrailClear(waveTrail);
-            if (player->gamemode == GAMEMODE_WAVE) {
+            if (player->gamemode == static_cast<int>(IconGamemode::GamemodeWave)) {
                 waveTrail->positionR = (Vec2D){player->x, player->y};  
                 waveTrail->startingPositionInitialized = true;
                 motionTrailResumeStroke(waveTrail);
@@ -1298,20 +1298,20 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case SHIP_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
-                state.groundY = fmaxf(0, ip1Ceilf((objects.originalY[obj] - ((gamemodeHeights[GAMEMODE_SHIP] + 60.f) / 2.f)) / 30.f)) * 30;
-                state.ceilingY = state.groundY + gamemodeHeights[GAMEMODE_SHIP];
+                state.groundY = fmaxf(0, ip1Ceilf((objects.originalY[obj] - ((gamemodeHeights[static_cast<int>(IconGamemode::GamemodeShip)] + 60.f) / 2.f)) / 30.f)) * 30;
+                state.ceilingY = state.groundY + gamemodeHeights[static_cast<int>(IconGamemode::GamemodeShip)];
                 setIntendedCeiling();
 
-                if (player->gamemode != GAMEMODE_SHIP) {
-                    if (player->gamemode == GAMEMODE_WAVE) player->velY *= 0.9f;
-                    player->velY /= (player->gamemode == GAMEMODE_UFO || player->gamemode == GAMEMODE_WAVE) ? 4 : 2;
+                if (player->gamemode != static_cast<int>(IconGamemode::GamemodeShip)) {
+                    if (player->gamemode == static_cast<int>(IconGamemode::GamemodeWave)) player->velY *= 0.9f;
+                    player->velY /= (player->gamemode == static_cast<int>(IconGamemode::GamemodeUfo) || player->gamemode == static_cast<int>(IconGamemode::GamemodeWave)) ? 4 : 2;
                     
                     // No pseudo checkpoint if coming from non flying gamemode
                     if (!playerGamemodeIsFlying(player)) {
                         pseudoCheckpointExists = false;
                     }
 
-                    setGamemode(player, GAMEMODE_SHIP);
+                    setGamemode(player, static_cast<int>(IconGamemode::GamemodeShip));
                     setCheckpointTimer(AUTO_CHECKPOINT_TIME);
                     player->inverseRotation = false;
                     player->rotation = 0;
@@ -1343,28 +1343,28 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case BALL_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
-                state.groundY = fmaxf(0, ip1Ceilf((objects.originalY[obj] - ((gamemodeHeights[GAMEMODE_BALL] + 60.f) / 2.f)) / 30.f)) * 30;
-                state.ceilingY = state.groundY + gamemodeHeights[GAMEMODE_BALL];
+                state.groundY = fmaxf(0, ip1Ceilf((objects.originalY[obj] - ((gamemodeHeights[static_cast<int>(IconGamemode::GamemodeBall)] + 60.f) / 2.f)) / 30.f)) * 30;
+                state.ceilingY = state.groundY + gamemodeHeights[static_cast<int>(IconGamemode::GamemodeBall)];
                 setIntendedCeiling();
 
-                if (player->gamemode != GAMEMODE_BALL) {
+                if (player->gamemode != static_cast<int>(IconGamemode::GamemodeBall)) {
                     player->ballRotationSpeed = -BALL_SLOW_ROTATION;
 
                     switch (player->gamemode) {
-                        case GAMEMODE_WAVE:
+                        case static_cast<int>(IconGamemode::GamemodeWave):
                             player->velY *= 0.9f;
                             player->velY /= 2;
-                        case GAMEMODE_SHIP:
-                        case GAMEMODE_UFO:
+                        case static_cast<int>(IconGamemode::GamemodeShip):
+                        case static_cast<int>(IconGamemode::GamemodeUfo):
                             player->velY /= 2;
                             break;
                     }
-                    setGamemode(player, GAMEMODE_BALL);
+                    setGamemode(player, static_cast<int>(IconGamemode::GamemodeBall));
                     setCheckpointTimer(0);
                     pseudoCheckpointExists = false;
 
-                    if (currInput.holdJump && state.oldPlayer.gamemode == GAMEMODE_SHIP) {
-                        player->bufferingState = BUFFER_READY;
+                    if (currInput.holdJump && state.oldPlayer.gamemode == static_cast<int>(IconGamemode::GamemodeShip)) {
+                        player->bufferingState = static_cast<int>(BufferingState::BufferReady);
                     }
 
                     player->inverseRotation = false;
@@ -1388,27 +1388,27 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case UFO_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
-                state.groundY = fmaxf(0, ip1Ceilf((objects.originalY[obj] - ((gamemodeHeights[GAMEMODE_UFO] + 60.f) / 2.f)) / 30.f)) * 30;
-                state.ceilingY = state.groundY + gamemodeHeights[GAMEMODE_UFO];
+                state.groundY = fmaxf(0, ip1Ceilf((objects.originalY[obj] - ((gamemodeHeights[static_cast<int>(IconGamemode::GamemodeUfo)] + 60.f) / 2.f)) / 30.f)) * 30;
+                state.ceilingY = state.groundY + gamemodeHeights[static_cast<int>(IconGamemode::GamemodeUfo)];
                 setIntendedCeiling();
                 
-                if (player->gamemode != GAMEMODE_UFO) {
-                    if (player->gamemode == GAMEMODE_WAVE) player->velY *= 0.9f;
-                    player->velY /= (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_WAVE) ? 4 : 2;
+                if (player->gamemode != static_cast<int>(IconGamemode::GamemodeUfo)) {
+                    if (player->gamemode == static_cast<int>(IconGamemode::GamemodeWave)) player->velY *= 0.9f;
+                    player->velY /= (player->gamemode == static_cast<int>(IconGamemode::GamemodeShip) || player->gamemode == static_cast<int>(IconGamemode::GamemodeWave)) ? 4 : 2;
                     
                     // No pseudo checkpoint if coming from non flying gamemode
                     if (!playerGamemodeIsFlying(player)) {
                         pseudoCheckpointExists = false;
                     }
 
-                    setGamemode(player, GAMEMODE_UFO);
+                    setGamemode(player, static_cast<int>(IconGamemode::GamemodeUfo));
                     setCheckpointTimer(AUTO_CHECKPOINT_TIME);
                     player->inverseRotation = false;
                     player->rotation = 0;
                     flipOtherPlayer(state.currentPlayer ^ 1);
 
-                    if (state.oldPlayer.gamemode == GAMEMODE_SHIP || state.oldPlayer.gamemode == GAMEMODE_WAVE) {
-                        player->bufferingState = BUFFER_READY;
+                    if (state.oldPlayer.gamemode == static_cast<int>(IconGamemode::GamemodeShip) || state.oldPlayer.gamemode == static_cast<int>(IconGamemode::GamemodeWave)) {
+                        player->bufferingState = static_cast<int>(BufferingState::BufferReady);
                     }
 
                     UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
@@ -1428,17 +1428,17 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case WAVE_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
-                state.groundY = fmaxf(0, ip1Ceilf((objects.originalY[obj] - ((gamemodeHeights[GAMEMODE_WAVE] + 60.f) / 2.f)) / 30.f)) * 30;
-                state.ceilingY = state.groundY + gamemodeHeights[GAMEMODE_WAVE];
+                state.groundY = fmaxf(0, ip1Ceilf((objects.originalY[obj] - ((gamemodeHeights[static_cast<int>(IconGamemode::GamemodeWave)] + 60.f) / 2.f)) / 30.f)) * 30;
+                state.ceilingY = state.groundY + gamemodeHeights[static_cast<int>(IconGamemode::GamemodeWave)];
                 setIntendedCeiling();
 
-                if (player->gamemode != GAMEMODE_WAVE) {
+                if (player->gamemode != static_cast<int>(IconGamemode::GamemodeWave)) {
                     // No pseudo checkpoint if coming from non flying gamemode
                     if (!playerGamemodeIsFlying(player)) {
                         pseudoCheckpointExists = false;
                     }
                     
-                    setGamemode(player, GAMEMODE_WAVE);
+                    setGamemode(player, static_cast<int>(IconGamemode::GamemodeWave));
                     setCheckpointTimer(AUTO_CHECKPOINT_TIME);
                     player->inverseRotation = false;
                     player->snapRotation = true;
@@ -1483,7 +1483,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                 setDualBounds();
 
                 motionTrailClear(&trailP2);
-                if (state.player2.gamemode == GAMEMODE_WAVE) {
+                if (state.player2.gamemode == static_cast<int>(IconGamemode::GamemodeWave)) {
                     waveTrailP2.positionR = (Vec2D){state.player2.x, state.player2.y};  
                     waveTrailP2.startingPositionInitialized = true;
                     motionTrailClear(&waveTrailP2);
@@ -1506,15 +1506,15 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                         motionTrailCopyTrail(&waveTrailP1, &waveTrailP2);   
                     }
                     switch (state.player.gamemode) {
-                        case GAMEMODE_PLAYER:
-                        case GAMEMODE_ROBOT:
+                        case static_cast<int>(IconGamemode::GamemodePlayer):
+                        case static_cast<int>(IconGamemode::GamemodeRobot):
                             state.groundY = 0;
                             state.ceilingY = 999999;
                             break;
-                        case GAMEMODE_SHIP:
-                        case GAMEMODE_UFO:
-                        case GAMEMODE_BALL:
-                        case GAMEMODE_SPIDER:
+                        case static_cast<int>(IconGamemode::GamemodeShip):
+                        case static_cast<int>(IconGamemode::GamemodeUfo):
+                        case static_cast<int>(IconGamemode::GamemodeBall):
+                        case static_cast<int>(IconGamemode::GamemodeSpider):
                             state.groundY = fmaxf(0, ip1Ceilf((state.dualPortalY - ((gamemodeHeights[state.player.gamemode] + 60.f) / 2.f)) / 30.f)) * 30;
                             state.ceilingY = state.groundY + gamemodeHeights[state.player.gamemode];
                             setIntendedCeiling();
@@ -1576,7 +1576,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                         break;
                 }
 
-                objects.flags[obj] |= FLAG_TOGGLED;
+                objects.flags[obj] |= static_cast<int>(ObjectFlags::FlagToggled);
             }
             break;
         }
@@ -1793,7 +1793,7 @@ static float movingSurfaceVelocity(Player *player, int obj) {
 }
 
 static bool movingSupportCrossed(Player *player, int obj, float velocity) {
-    if (velocity <= MINIMUM_OBJECT_SPEED || player->gamemode == GAMEMODE_WAVE ||
+    if (velocity <= MINIMUM_OBJECT_SPEED || player->gamemode == static_cast<int>(IconGamemode::GamemodeWave) ||
         player->upsideDown != state.oldPlayer.upsideDown || player->justTeleported) return false;
     float oldTop = grav(player, objects.lastY[obj]) + objects.height[obj] * .5f;
     float newTop = objGravTop(player, obj);
@@ -1803,7 +1803,7 @@ static bool movingSupportCrossed(Player *player, int obj, float velocity) {
 
 static void finishMovingContact(Player *player) {
     bool reset = state.dead || player->upsideDown != state.oldPlayer.upsideDown || player->justTeleported ||
-        player->gamemode != state.oldPlayer.gamemode || player->gamemode == GAMEMODE_WAVE ||
+        player->gamemode != state.oldPlayer.gamemode || player->gamemode == static_cast<int>(IconGamemode::GamemodeWave) ||
         player->slopeData.slopeID >= 0;
     float launch;
     if (!reset && platformLaunch(grav(player, player->lastPlatformVelocity), grav(player, player->platformVelocity),
@@ -1812,7 +1812,7 @@ static void finishMovingContact(Player *player) {
         player->velocityOverride = true;
         player->onGround = player->onCeiling = false;
         player->leftGround = true;
-        player->inverseRotation = player->gamemode == GAMEMODE_PLAYER;
+        player->inverseRotation = player->gamemode == static_cast<int>(IconGamemode::GamemodePlayer);
         if (state.showPlayer) motionTrailResumeStroke(trail);
     }
     player->lastPlatformVelocity = reset ? 0.f : player->platformVelocity;
@@ -1821,10 +1821,10 @@ static void finishMovingContact(Player *player) {
 void handleCollision(Player *player, int obj, const ObjectHitbox *hitbox) {
     InternalHitbox internal = player->internalHitbox;
 
-    float clip = (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_UFO) ? 7 : 10;
+    float clip = (player->gamemode == static_cast<int>(IconGamemode::GamemodeShip) || player->gamemode == static_cast<int>(IconGamemode::GamemodeUfo)) ? 7 : 10;
     switch (hitbox->collisionType) {
         //case HITBOX_BREAKABLE_BLOCK:
-        case HITBOX_SOLID: {
+        case static_cast<int>(HitboxType::HitboxSolid): {
             bool gravSnap = false;
 
             float x = objects.x[obj];
@@ -1835,7 +1835,7 @@ void handleCollision(Player *player, int obj, const ObjectHitbox *hitbox) {
             // This is equal to using the old player y position (a frame of snap leeway)
             clip += fabsf(player->velY) * STEPS_DT;
 
-            bool modeSnap = state.oldPlayer.gamemode != player->gamemode && state.oldPlayer.gamemode == GAMEMODE_WAVE && player->allowDartSlide;
+            bool modeSnap = state.oldPlayer.gamemode != player->gamemode && state.oldPlayer.gamemode == static_cast<int>(IconGamemode::GamemodeWave) && player->allowDartSlide;
 
             if (modeSnap) clip += (player->height - state.oldPlayer.height) / 2;
             
@@ -1853,7 +1853,7 @@ void handleCollision(Player *player, int obj, const ObjectHitbox *hitbox) {
 
             bool safeZone = player->mini && ((objGravTop(player, obj) - gravBottom(player) <= clip) || (gravTop(player) - objGravBottom(player, obj) <= clip));
             
-            bool dartSlide = player->gamemode == GAMEMODE_WAVE && player->allowDartSlide &&
+            bool dartSlide = player->gamemode == static_cast<int>(IconGamemode::GamemodeWave) && player->allowDartSlide &&
                 objects.id[obj] != BREAKABLE_BLOCK &&
                 ((((objGravTop(player, obj) - gravBottom(player) <= clip) || movingSupport) && player->velY <= fmaxf(objectRawVel, 0)) ||
                 ((gravTop(player) - objGravBottom(player, obj) <= clip) && player->velY >= objectRawVel));
@@ -1864,7 +1864,7 @@ void handleCollision(Player *player, int obj, const ObjectHitbox *hitbox) {
             bool snapGrace = modeSnap && (landFace || ceilFace) && snapGap > 0.f && snapGap <= player->height / 2;
 
             // Check collision with internal hitbox
-            if (!dartSlide && !snapGrace && (player->gamemode == GAMEMODE_WAVE || (!gravSnap && !safeZone && !movingSupport)) && intersect(
+            if (!dartSlide && !snapGrace && (player->gamemode == static_cast<int>(IconGamemode::GamemodeWave) || (!gravSnap && !safeZone && !movingSupport)) && intersect(
                 player->x, player->y, internal.width, internal.height, 0, 
                 x, y, objects.width[obj], objects.height[obj], 0
             )) {
@@ -1873,10 +1873,10 @@ void handleCollision(Player *player, int obj, const ObjectHitbox *hitbox) {
                     brickDestroyParticles.emitterX = x;
                     brickDestroyParticles.emitterY = y;
                     spawnMultipleParticles(&brickDestroyParticles, 25);
-                    objects.flags[obj] |= FLAG_TOGGLED;
+                    objects.flags[obj] |= static_cast<int>(ObjectFlags::FlagToggled);
                 } else {
                     // Not a brick, die
-                    killPlayer(DEATH_BLOCK);
+                    killPlayer(DeathReason::DeathBlock);
                 }
 
                 return;
@@ -1889,7 +1889,7 @@ void handleCollision(Player *player, int obj, const ObjectHitbox *hitbox) {
                 int orient = gravSlopeOrient(player->slopeData.slopeID, player);
 
                 // Down slope must never exit
-                bool downSlope = (orient == ORIENT_NORMAL_DOWN || orient == ORIENT_UD_DOWN);
+                bool downSlope = (orient == static_cast<int>(SlopeOrientations::OrientNormalDown) || orient == static_cast<int>(SlopeOrientations::OrientUdDown));
                 if (!downSlope) {
                     return;
                 }
@@ -1917,7 +1917,7 @@ void handleCollision(Player *player, int obj, const ObjectHitbox *hitbox) {
             }
 
             // Check snap for player bottom
-            if ((objGravTop(player, obj) - bottom <= clip || movingSupport) && player->velY <= fmaxf(objectRawVel, 0) && (player->gamemode != GAMEMODE_WAVE || player->allowDartSlide)) {
+            if ((objGravTop(player, obj) - bottom <= clip || movingSupport) && player->velY <= fmaxf(objectRawVel, 0) && (player->gamemode != static_cast<int>(IconGamemode::GamemodeWave) || player->allowDartSlide)) {
                 player->y = grav(player, objGravTop(player, obj)) + grav(player, player->height / 2);
                 if (player->velY <= 0) player->velY = 0;
                 player->onGround = true;
@@ -1930,7 +1930,7 @@ void handleCollision(Player *player, int obj, const ObjectHitbox *hitbox) {
                 if (objectRawVel > MINIMUM_OBJECT_SPEED)
                     player->velY = fmaxf(player->velY, objectRawVel * .9f);
 
-                if (player->gamemode == GAMEMODE_PLAYER) {
+                if (player->gamemode == static_cast<int>(IconGamemode::GamemodePlayer)) {
                     // Check for x snap
                     if (!state.oldPlayer.onGround) {
                         if (player->snapData.playerFrame > 0 && player->snapData.playerFrame + 1 < player->frame) {
@@ -1943,13 +1943,13 @@ void handleCollision(Player *player, int obj, const ObjectHitbox *hitbox) {
                     player->snapData.playerSnapDiff = player->x - x;
                 }
             // Check snap for player top
-            } else if (player->gamemode != GAMEMODE_WAVE || player->allowDartSlide) {
+            } else if (player->gamemode != static_cast<int>(IconGamemode::GamemodeWave) || player->allowDartSlide) {
                 // Ufo can break breakable blocks from above, so dont use as a ceiling
-                if (player->gamemode == GAMEMODE_UFO && objects.id[obj] == BREAKABLE_BLOCK) {
+                if (player->gamemode == static_cast<int>(IconGamemode::GamemodeUfo) && objects.id[obj] == BREAKABLE_BLOCK) {
                     break;
                 }
                 // Behave normally
-                if ((player->gamemode != GAMEMODE_PLAYER && player->gamemode != GAMEMODE_ROBOT && player->gamemode != GAMEMODE_SPIDER) || gravSnap || player->allowHeadHit) {
+                if ((player->gamemode != static_cast<int>(IconGamemode::GamemodePlayer) && player->gamemode != static_cast<int>(IconGamemode::GamemodeRobot) && player->gamemode != static_cast<int>(IconGamemode::GamemodeSpider)) || gravSnap || player->allowHeadHit) {
                     if (((gravTop(player) - objGravBottom(player, obj) <= clip && player->velY >= objectRawVel) || gravSnap)) {
                         if (!gravSnap) player->onCeiling = true;
                         else player->velY = 0;
@@ -1962,11 +1962,11 @@ void handleCollision(Player *player, int obj, const ObjectHitbox *hitbox) {
             }
             break;
         }
-        case HITBOX_HAZARD: {
-            killPlayer(hitbox->type == COLLISION_CIRCLE ? DEATH_SAW : DEATH_SPIKE);
+        case static_cast<int>(HitboxType::HitboxHazard): {
+            killPlayer(hitbox->type == static_cast<int>(CollisionShape::CollisionCircle) ? DeathReason::DeathSaw : DeathReason::DeathSpike);
             break;
         }
-        case HITBOX_SPECIAL: {
+        case static_cast<int>(HitboxType::HitboxSpecial): {
             handleSpecialHitbox(player, obj, hitbox);
             break;
         }
@@ -1974,7 +1974,7 @@ void handleCollision(Player *player, int obj, const ObjectHitbox *hitbox) {
 }
 
 void handleMovingBlock(Player *player, int obj) {
-    if (obj < 0 || obj >= objects.count || objects.flags[obj] & FLAG_TOGGLED ||
+    if (obj < 0 || obj >= objects.count || objects.flags[obj] & static_cast<int>(ObjectFlags::FlagToggled) ||
         !state.oldPlayer.onGround || player->velY > 0.f || player->justTeleported ||
         player->upsideDown != state.oldPlayer.upsideDown) return;
     if (fabsf(player->x - objects.x[obj]) > (player->width + objects.width[obj]) * .5f) return;
@@ -1987,7 +1987,7 @@ void collideWithObj(Player *player, int obj) {
     int objID = objects.id[obj];
     const ObjectHitbox *hitbox = gameObjects[objID].hitbox;
 
-    if (!hitbox || objects.flags[obj] & FLAG_TOGGLED) return;
+    if (!hitbox || objects.flags[obj] & static_cast<int>(ObjectFlags::FlagToggled)) return;
 
     snapshot.collisionChecks++;
 
@@ -2007,7 +2007,7 @@ void collideWithObj(Player *player, int obj) {
     float width = objects.width[obj];
     float height = objects.height[obj];
 
-    if (UNLIKELY(hitbox->type == COLLISION_CIRCLE)) {
+    if (UNLIKELY(hitbox->type == static_cast<int>(CollisionShape::CollisionCircle))) {
         if (intersectRectCircle(
             player->x, player->y, player->width, player->height, 0, 
             x, y, objects.width[obj]
@@ -2022,7 +2022,7 @@ void collideWithObj(Player *player, int obj) {
         float objRot = normalizeAngle(objects.rotation[obj]);
 
         // No rotation for solid hitboxes
-        if (hitbox->collisionType == HITBOX_SOLID) {
+        if (hitbox->collisionType == static_cast<int>(HitboxType::HitboxSolid)) {
             objRot = 0;
         }
 
@@ -2054,7 +2054,7 @@ void collideWithObj(Player *player, int obj) {
 void collideWithSlope(Player *player, int obj, bool hasSlope) {
     const ObjectHitbox *hitbox = gameObjects[objects.id[obj]].hitbox;
     
-    if (!hitbox || objects.flags[obj] & FLAG_TOGGLED) return;
+    if (!hitbox || objects.flags[obj] & static_cast<int>(ObjectFlags::FlagToggled)) return;
     
     float width = objects.width[obj];
     float height = objects.height[obj];
@@ -2105,8 +2105,8 @@ void collideWithObjects(Player *player) {
                 if (!hitbox) continue;
                 
                 // Save some types to buffer, so they can be checked in a type order
-                if (hitbox->collisionType == HITBOX_SOLID) {
-                    if (hitbox->type == COLLISION_SLOPE) {
+                if (hitbox->collisionType == static_cast<int>(HitboxType::HitboxSolid)) {
+                    if (hitbox->type == static_cast<int>(CollisionShape::CollisionSlope)) {
                         if (slopeCount < MAX_COLLIDED_OBJECTS) {
                             slopeBuffer[slopeCount++] = obj;
                         }
@@ -2115,7 +2115,7 @@ void collideWithObjects(Player *player) {
                             blockBuffer[blockCount++] = obj;
                         }
                     }
-                } else if (hitbox->collisionType == HITBOX_HAZARD) {
+                } else if (hitbox->collisionType == static_cast<int>(HitboxType::HitboxHazard)) {
                     if (hazardCount < MAX_COLLIDED_OBJECTS) {
                         hazardBuffer[hazardCount++] = obj;
                     }

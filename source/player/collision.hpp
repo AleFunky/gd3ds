@@ -5,16 +5,16 @@
 namespace gd3ds
 {
 
-enum JumpType {
-    JUMP_YELLOW_PAD,
-    JUMP_YELLOW_ORB,
-    JUMP_BLUE_PAD,
-    JUMP_BLUE_ORB,
-    JUMP_PINK_PAD,
-    JUMP_PINK_ORB,
-    JUMP_RED_ORB,
-    JUMP_RED_PAD,
-    JUMP_TYPES_COUNT
+enum class JumpType {
+    JumpYellowPad,
+    JumpYellowOrb,
+    JumpBluePad,
+    JumpBlueOrb,
+    JumpPinkPad,
+    JumpPinkOrb,
+    JumpRedOrb,
+    JumpRedPad,
+    JumpTypesCount
 };
 
 #define MINIMUM_OBJECT_SPEED 315
@@ -114,7 +114,7 @@ static inline bool isCollectableObject(int id) {
 extern int potentialSlopesBuffer[2][MAX_COLLIDED_OBJECTS];
 extern int potentialSlopes[2];
 
-extern const float gamemodeHeights[GAMEMODE_COUNT];
+extern const float gamemodeHeights[static_cast<int>(IconGamemode::GamemodeCount)];
 
 void setupDual();
 void setDualBounds();

@@ -69,7 +69,7 @@ Setting settings[] = {
         .id = "wideEnabled",
         .label = "800 px res",
         .additionalInfo = "Doubles the top screen's horizontal\nresolution.",
-        .page = PAGE_GRAPHICS, 
+        .page = SettingPage::PageGraphics,
 
         .defaultValue = false,
         .var = &settingsState.wideEnabled,
@@ -84,7 +84,7 @@ Setting settings[] = {
         .id = "stereoEnabled",
         .label = "Stereoscopic 3D",
         .additionalInfo = "Adds depth to the top screen.\nUse the 3D slider, costs some FPS.",
-        .page = PAGE_GRAPHICS, 
+        .page = SettingPage::PageGraphics,
 
         .defaultValue = false,
         .var = &settingsState.stereoEnabled,
@@ -99,7 +99,7 @@ Setting settings[] = {
         .id = "particlesDisabled",
         .label = "Disable particles",
         .additionalInfo = NULL,
-        .page = PAGE_GRAPHICS, 
+        .page = SettingPage::PageGraphics,
 
         .defaultValue = false,
         .var = &settingsState.particlesDisabled,
@@ -109,7 +109,7 @@ Setting settings[] = {
         .id = "glowEnabled",
         .label = "Enable object glow",
         .additionalInfo = NULL,
-        .page = PAGE_GRAPHICS, 
+        .page = SettingPage::PageGraphics,
 
         .defaultValue = true,
         .var = &settingsState.glowEnabled,
@@ -118,7 +118,7 @@ Setting settings[] = {
     {
         .id = "disableGravityEffect",
         .label = "Disable gravity effect",
-        .page = PAGE_GRAPHICS, 
+        .page = SettingPage::PageGraphics,
 
         .defaultValue = false,
         .var = &settingsState.disableGravityEffect,
@@ -128,7 +128,7 @@ Setting settings[] = {
         .id = "showFpsCounter",
         .label = "FPS counter",
         .additionalInfo = "Displays current FPS in gameplay.",
-        .page = PAGE_GRAPHICS, 
+        .page = SettingPage::PageGraphics,
 
         .defaultValue = false,
         .var = &settingsState.showFpsCounter,
@@ -138,7 +138,7 @@ Setting settings[] = {
         .id = "vsyncEnabled",
         .label = "V-Sync",
         .additionalInfo = "Prevents screen tearing at the cost\nof some performance.\nCaps FPS at 60.",
-        .page = PAGE_GRAPHICS, 
+        .page = SettingPage::PageGraphics,
 
         .defaultValue = true,
         .var = &settingsState.vsync,
@@ -148,7 +148,7 @@ Setting settings[] = {
         .id = "yButton",
         .label = "Y to jump",
         .additionalInfo = "Swaps your jump input to Y.",
-        .page = PAGE_INPUT, 
+        .page = SettingPage::PageInput,
 
         .defaultValue = false,
         .var = &settingsState.yJump,
@@ -158,7 +158,7 @@ Setting settings[] = {
         .id = "touchEffectEverywhere",
         .label = "Global tap effect",
         .additionalInfo = "Plays the tap effect across all menus.",
-        .page = PAGE_INPUT, 
+        .page = SettingPage::PageInput,
 
         .defaultValue = false,
         .var = &settingsState.touchEffectEverywhere,
@@ -168,7 +168,7 @@ Setting settings[] = {
         .id = "gameplayTapEffect",
         .label = "Gameplay tap effect",
         .additionalInfo = "Plays the tap effect in gameplay.",
-        .page = PAGE_INPUT, 
+        .page = SettingPage::PageInput,
 
         .defaultValue = true,
         .var = &settingsState.gameplayTapEffect,
@@ -178,7 +178,7 @@ Setting settings[] = {
         .id = "enableDebugBindings",
         .label = "Enable debug keys",
         .additionalInfo = "Enables debug key shortcuts.\n(B + L, B + R, X)",
-        .page = PAGE_INPUT,
+        .page = SettingPage::PageInput,
 
         .defaultValue = false,
         .var = &settingsState.enableDebugBindings,
@@ -188,7 +188,7 @@ Setting settings[] = {
         .id = "preciseInput",
         .label = "240Hz input (CBF)",
         .additionalInfo = "Registers jumps on the exact 240Hz\nphysics tick they were pressed on.\nPrecision is reduced below 30fps.",
-        .page = PAGE_INPUT,
+        .page = SettingPage::PageInput,
 
         .defaultValue = false,
         .var = &piEnabled,
@@ -198,7 +198,7 @@ Setting settings[] = {
         .id = "hitboxesEnabled",
         .label = "Show hitboxes",
         .additionalInfo = "Shows object hitboxes while in a level.\nWARNING: AFFECTS PERFOMANCE!",
-        .page = PAGE_MISC, 
+        .page = SettingPage::PageMisc,
 
         .defaultValue = false,
         .var = &settingsState.hitboxesEnabled,
@@ -208,7 +208,7 @@ Setting settings[] = {
         .id = "hitboxTrail",
         .label = "Enable hitbox trail",
         .additionalInfo = NULL,
-        .page = PAGE_MISC, 
+        .page = SettingPage::PageMisc,
 
         .defaultValue = false,
         .var = &settingsState.hitboxTrail,
@@ -218,7 +218,7 @@ Setting settings[] = {
         .id = "hitboxesOnDeath",
         .label = "Show hitboxes\non death",
         .additionalInfo = NULL,
-        .page = PAGE_MISC, 
+        .page = SettingPage::PageMisc,
 
         .defaultValue = false,
         .var = &settingsState.hitboxesOnDeath,
@@ -228,7 +228,7 @@ Setting settings[] = {
         .id = "doNot",
         .label = "Do not",
         .additionalInfo = "Doesn't do anything...\nWell, nothing useful.",
-        .page = PAGE_MISC, 
+        .page = SettingPage::PageMisc,
 
         .defaultValue = false,
         .var = &settingsState.doNot,
@@ -238,7 +238,7 @@ Setting settings[] = {
         .id = "practiceMusicSync",
         .label = "Practice music sync",
         .additionalInfo = "Plays the level's music in practice mode.",
-        .page = PAGE_MISC, 
+        .page = SettingPage::PageMisc,
 
         .defaultValue = false,
         .var = &settingsState.practiceMusicSync,
@@ -250,7 +250,7 @@ Setting settings[] = {
         .id = "menuMusic",
         .label = "Menu Music",
         .additionalInfo = "Toggles the Main Menu Music.",
-        .page = PAGE_MISC, 
+        .page = SettingPage::PageMisc,
 
         .defaultValue = true,
         .var = &settingsState.menuMusic,
@@ -262,7 +262,7 @@ Setting settings[] = {
         .id = "fastMenu",
         .label = "Fast Menu",
         .additionalInfo = "Makes transitions between\nmenu pages faster.",
-        .page = PAGE_MISC, 
+        .page = SettingPage::PageMisc,
 
         .defaultValue = false,
         .var = &settingsState.fastMenu,
@@ -272,7 +272,7 @@ Setting settings[] = {
         .id = "skipHighObjWarning",
         .label = "Disable object alert",
         .additionalInfo = "Disables the high object alert for\ncustom levels.",
-        .page = PAGE_MISC, 
+        .page = SettingPage::PageMisc,
 
         .defaultValue = false,
         .var = &settingsState.skipHighObjWarning,
@@ -282,7 +282,7 @@ Setting settings[] = {
         .id = "skipVersionWarning",
         .label = "Disable version alert",
         .additionalInfo = "Disables the incompatible\nGeometry Dash version alert for\ncustom levels.",
-        .page = PAGE_MISC, 
+        .page = SettingPage::PageMisc,
 
         .defaultValue = false,
         .var = &settingsState.skipVersionWarning,
@@ -292,7 +292,7 @@ Setting settings[] = {
         .id = "skipSongWarning",
         .label = "Disable song alert",
         .additionalInfo = "Disables the missing song alert for\ncustom levels.",
-        .page = PAGE_MISC, 
+        .page = SettingPage::PageMisc,
 
         .defaultValue = false,
         .var = &settingsState.skipSongWarning,
@@ -302,7 +302,7 @@ Setting settings[] = {
         .id = "showProgressBar",
         .label = "Show progress bar",
         .additionalInfo = NULL,
-        .page = PAGE_GAMEPLAY, 
+        .page = SettingPage::PageGameplay,
 
         .defaultValue = false,
         .var = &settingsState.showProgressBar,
@@ -312,7 +312,7 @@ Setting settings[] = {
         .id = "showProgressPercent",
         .label = "Show level percentage",
         .additionalInfo = NULL,
-        .page = PAGE_GAMEPLAY, 
+        .page = SettingPage::PageGameplay,
 
         .defaultValue = false,
         .var = &settingsState.showProgressPercent,
@@ -322,7 +322,7 @@ Setting settings[] = {
         .id = "decimalPercent",
         .label = "Accurate percentage",
         .additionalInfo = "Shows level progress with 2 decimals.",
-        .page = PAGE_GAMEPLAY, 
+        .page = SettingPage::PageGameplay,
 
         .defaultValue = false,
         .var = &settingsState.decimalPercent,
@@ -332,7 +332,7 @@ Setting settings[] = {
         .id = "ultraDecimalPercent",
         .label = "Ultra percentage",
         .additionalInfo = "But mom, I want more decimals!!!!\n(Why would you want to use this?)",
-        .page = PAGE_GAMEPLAY, 
+        .page = SettingPage::PageGameplay,
 
         .defaultValue = false,
         .var = &settingsState.ultraDecimalPercent,
@@ -342,7 +342,7 @@ Setting settings[] = {
         .id = "goldenBest",
         .label = "Golden best",
         .additionalInfo = "Changes the percentage counter to\nbe gold when you pass\nyour previous best.",
-        .page = PAGE_GAMEPLAY, 
+        .page = SettingPage::PageGameplay,
 
         .defaultValue = false,
         .var = &settingsState.goldenBest,
@@ -352,7 +352,7 @@ Setting settings[] = {
         .id = "quickRetry",
         .label = "Quick retry",
         .additionalInfo = "Restarts in 0.5 seconds instead of 1.",
-        .page = PAGE_GAMEPLAY, 
+        .page = SettingPage::PageGameplay,
 
         .defaultValue = false,
         .var = &settingsState.quickRetry,
@@ -362,7 +362,7 @@ Setting settings[] = {
         .id = "autoCheckpoints",
         .label = "Auto checkpoints",
         .additionalInfo = NULL,
-        .page = PAGE_GAMEPLAY, 
+        .page = SettingPage::PageGameplay,
 
         .defaultValue = false,
         .var = &settingsState.autoCheckpoints,
@@ -372,7 +372,7 @@ Setting settings[] = {
         .id = "quickCheckpoints",
         .label = "Quick checkpoints",
         .additionalInfo = "Makes auto checkpoints appear quicker.",
-        .page = PAGE_GAMEPLAY, 
+        .page = SettingPage::PageGameplay,
 
         .defaultValue = false,
         .var = &settingsState.quickCheckpoints,
@@ -382,7 +382,7 @@ Setting settings[] = {
         .id = "hidePracticeButtons",
         .label = "Hide Practice Buttons",
         .additionalInfo = "Hides the checkpoint buttons\nshown in practice mode.",
-        .page = PAGE_GAMEPLAY, 
+        .page = SettingPage::PageGameplay,
 
         .defaultValue = false,
         .var = &settingsState.hidePracticeButtons,
@@ -392,7 +392,7 @@ Setting settings[] = {
         .id = "swapGameplayScreens",
         .label = "Switch gameplay\nto bottom screen",
         .additionalInfo = NULL,
-        .page = PAGE_GAMEPLAY, 
+        .page = SettingPage::PageGameplay,
 
         .defaultValue = false,
         .var = &settingsState.swapGameplayScreens,
@@ -402,7 +402,7 @@ Setting settings[] = {
         .id = "defaultMiniIcon",
         .label = "Default mini icon",
         .additionalInfo = "Uses default player icon in\nmini mode.",
-        .page = PAGE_COSMETIC, 
+        .page = SettingPage::PageCosmetic,
 
         .defaultValue = false,
         .var = &settingsState.defaultMiniIcon,
@@ -412,7 +412,7 @@ Setting settings[] = {
         .id = "switchTrailColor",
         .label = "Switch trail color",
         .additionalInfo = "Makes the player trail use P1\ninstead of P2.",
-        .page = PAGE_COSMETIC, 
+        .page = SettingPage::PageCosmetic,
 
         .defaultValue = false,
         .var = &settingsState.switchTrailColor,
@@ -422,7 +422,7 @@ Setting settings[] = {
         .id = "switchWaveTrailColor",
         .label = "Switch wave\ntrail color",
         .additionalInfo = "Makes the wave trail use P1\ninstead of P2.",
-        .page = PAGE_COSMETIC, 
+        .page = SettingPage::PageCosmetic,
 
         .defaultValue = false,
         .var = &settingsState.switchWaveTrailColor,
@@ -432,7 +432,7 @@ Setting settings[] = {
         .id = "solidWaveTrail",
         .label = "Solid wave trail",
         .additionalInfo = "Disables blending for the wave trail.",
-        .page = PAGE_COSMETIC, 
+        .page = SettingPage::PageCosmetic,
 
         .defaultValue = false,
         .var = &settingsState.solidWaveTrail,
@@ -442,7 +442,7 @@ Setting settings[] = {
         .id = "noPlayerTrail",
         .label = "Disable player trail",
         .additionalInfo = NULL,
-        .page = PAGE_COSMETIC, 
+        .page = SettingPage::PageCosmetic,
 
         .defaultValue = false,
         .var = &settingsState.noPlayerTrail,
@@ -452,7 +452,7 @@ Setting settings[] = {
         .id = "noWaveTrailBehind",
         .label = "No wave trail behind",
         .additionalInfo = "Disables player trail for the wave.",
-        .page = PAGE_COSMETIC, 
+        .page = SettingPage::PageCosmetic,
 
         .defaultValue = false,
         .var = &settingsState.noWaveTrailBehind,
@@ -462,7 +462,7 @@ Setting settings[] = {
         .id = "dimSecondaryScreen",
         .label = "Dim secondary screen",
         .additionalInfo = NULL,
-        .page = PAGE_COSMETIC, 
+        .page = SettingPage::PageCosmetic,
 
         .defaultValue = false,
         .var = NULL,
@@ -474,20 +474,20 @@ Setting settings[] = {
     },
 };
 
-typedef struct CheckboxData {
+struct CheckboxData {
     Setting *setting;
-} CheckboxData;
+};
 
-typedef struct InfoButtonData {
+struct InfoButtonData {
     const char *text;
-} InfoButtonData;
+};
 
 UICheckBox *getSettingCheckboxByID(const char *id) {
     if (list) {
         // Iterate through list children
         for (UIElement *rectangle = list->base.firstChild; rectangle; rectangle = rectangle->nextSibling) {
             // Find checkbox in the rectangle
-            UIElement *checkbox = uiGetChildByType(rectangle, UI_CHECKBOX);
+            UIElement *checkbox = uiGetChildByType(rectangle, UIElementType::UiCheckbox);
             if (checkbox) {
                 if (checkbox->userdata) {
                     CheckboxData *data = (CheckboxData *)checkbox->userdata;
@@ -527,7 +527,7 @@ void stereoSetting(bool checked) {
         threeDWarningData->title = strdup("Disclaimer");
         threeDWarningData->proceedText = strdup("Enable");
         threeDWarningData->cancelText = strdup("Disable");
-        uiStackPush(&threeDWarningPopUpDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+        uiStackPush(&threeDWarningPopUpDef, UIAnimation::AnimZoom, UIAnimation::AnimZoom, UIStackPushType::PushNext);
         uiStackPushData(threeDWarningData);
         threeDWarningPassed = true;
     }
@@ -555,7 +555,7 @@ void practiceMusicSyncSetting(bool checked) {
 }
 
 void menuMusicSetting(bool checked) {
-    if (gameState != STATE_MENU) return;
+    if (gameState != static_cast<int>(GameState::StateMenu)) return;
 
     if (!checked) {
         if (playingMenuLoop) {
@@ -689,7 +689,7 @@ void createSetting(Setting *setting, int id, UIScreen *s) {
 
 void loadCategory(SettingPage page, UIScreen *s) {
     uiListReset(list);
-    uiLabelSetText(categoryName, categoryNames[page]);
+    uiLabelSetText(categoryName, categoryNames[static_cast<int>(page)]);
     uiRunFuncOnTag(s, "category", setButtonStyle);
 
     int count = 0;

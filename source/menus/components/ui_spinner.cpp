@@ -36,7 +36,7 @@ UISpinner *uiCreateSpinner(UIScreen *s) {
 
     UIImage *image = (UIImage *) e;
 
-    image->base.type = UI_IMAGE;
+    image->base.type = UIElementType::UiImage;
     image->base.enabled = true;
 
     uiElementApplyDefaultProperties(&image->base, s);

@@ -228,7 +228,7 @@ static const PlayerFrame spiderIdleFrames[] = {
     { spiderIdleF001, 6, 0.040000f },
 };
 
-const PlayerAnimation spiderAnimations[SPIDER_ANIM_COUNT] = {
+const PlayerAnimation spiderAnimations[static_cast<int>(SpiderAnimId::SpiderAnimCount)] = {
     { spiderRunFrames, 7 },
     { spiderJumpFrames, 1 },
     { spiderFallFrames, 5 },

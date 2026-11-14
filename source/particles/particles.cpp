@@ -526,7 +526,7 @@ void freeParticleData(ParticleData* d) {
 void drawParticleSystem(ParticleSystem* ps, float xOffset, float yOffset, float opacity) {
     if (settingsState.particlesDisabled) return;
     
-    C2D_Image img = C2D_SpriteSheetGetImage(particleSheet, ps->cfg.textureFileName);
+    C2D_Image img = C2D_SpriteSheetGetImage(particleSheet, static_cast<size_t>(ps->cfg.textureFileName));
     C3D_TexSetFilter(img.tex, GPU_LINEAR, GPU_LINEAR);
     
     ParticleData* d = &ps->data;

@@ -46,11 +46,11 @@ static void actionUpdate(UIElement *e, const UIPropertyList *p) {
         data->customTitle = true;
         data->copied = true;
 
-        uiStackPush(&infoCardDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+        uiStackPush(&infoCardDef, UIAnimation::AnimZoom, UIAnimation::AnimZoom, UIStackPushType::PushNext);
         uiStackPushData(data);
         return;
     }
-    if (updateData->isAvailable && checkedForUpdate) uiStackPush(&updaterPopUpDef, ANIM_NONE, ANIM_ZOOM, PUSH_NEXT); 
+    if (updateData->isAvailable && checkedForUpdate) uiStackPush(&updaterPopUpDef, UIAnimation::AnimNone, UIAnimation::AnimZoom, UIStackPushType::PushNext);
 }
 
 static void actionRefreshUpdates(UIElement *e, const UIPropertyList *p) {
