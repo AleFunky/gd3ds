@@ -9,20 +9,20 @@ namespace gd3ds
 {
 
 GravitySweep::GravitySweep(bool down){
-    this->down = down;
-    this->time = 9999.0f;
+    m_down = down;
+    m_time = 9999.0f;
 };
 
 void GravitySweep::updateSweepTimer(){
-    if(this->done()) return;
-    this->time += delta;
+    if(done()) return;
+    m_time += delta;
 }
 
 void GravitySweep::startSweep(){
-    this->time = 0.0f;
+    m_time = 0.0f;
     float spacing = (SCREEN_WIDTH - 30.0f) / 22.0f;
     for(int i = 0; i < 22; i++){
-        GravityLine* l = &this->lines[i];
+        GravityLine* l = &this->m_lines[i];
         l->x = (i * spacing) + (CCRANDOM_0_1() * spacing) + 15.0f;
         l->y = (CCRANDOM_0_1() + CCRANDOM_0_1() - 1.0f) * 10.0f;
         l->scaleX = (CCRANDOM_0_1() * 4.0f) + 2.0f;
@@ -33,21 +33,21 @@ void GravitySweep::startSweep(){
 
 
 void GravitySweep::renderSweep(){
-    if(this->done()) return;
+    if(done()) return;
 
-    float t = clampf(this->time / 0.4f, 0.0f, 1.0f);
+    float t = clampf(m_time / 0.4f, 0.0f, 1.0f);
     float ti = (1.0f - t);
 
     float yOffset;
-    if(this->down){
+    if(m_down){
         yOffset = t * ((SCREEN_HEIGHT / 2.0f) + 95.0f) + ti * ((-SCREEN_HEIGHT / 2.0f) - 95.0f);
     } else{
         yOffset = ti * ((SCREEN_HEIGHT / 2.0f) + 95.0f) + t * ((-SCREEN_HEIGHT / 2.0f) - 95.0f);
     }
 
-    for(const auto& l : this->lines){
+    for(const auto& l : m_lines){
         u32 color;
-        if(this->down){
+        if(m_down){
             color = C2D_Color32f(0.0f, 200.0f / 255.0f, 1.0f, l.opacity);
         } else{
             color = C2D_Color32f(1.0f, 200.0f / 255.0f, 0.0f, l.opacity);
@@ -63,7 +63,7 @@ void GravitySweep::renderSweep(){
 };
 
 bool GravitySweep::done(){
-    return this->time > 0.4f;
+    return m_time > 0.4f;
 }
 
 GravitySweep upSweeps[2] = {

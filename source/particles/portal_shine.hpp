@@ -3,26 +3,26 @@
 
 namespace gd3ds {
 
-enum ShineType {
-    PORTAL_GAMEMODE,
-    PORTAL_GRAVITY,
-    PORTAL_MIRROR,
-    PORTAL_SIZE,
-    PORTAL_DUAL,
-    PORTAL_TELEPORT,
-    PORTAL_SPEED_SLOW,
-    PORTAL_SPEED_NORMAL,
-    PORTAL_SPEED_FAST,
-    PORTAL_SPEED_FASTER,
-    PORTAL_SPEED_FASTEST,
-    PORTAL_SHINE_COUNT
+enum class ShineType {
+    PortalGamemode,
+    PortalGravity,
+    PortalMirror,
+    PortalSize,
+    PortalDual,
+    PortalTeleport,
+    PortalSpeedSlow,
+    PortalSpeedNormal,
+    PortalSpeedFast,
+    PortalSpeedFaster,
+    PortalSpeedFastest,
+    Count
 };
 
 class PortalShine {
 private:
-    ShineType type;
-    int obj;
-    float time;
+    ShineType m_type;
+    int m_obj;
+    float m_time;
 public:
     PortalShine(ShineType type, int obj);
     void updateShine();

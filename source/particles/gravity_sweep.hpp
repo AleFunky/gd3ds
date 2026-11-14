@@ -14,9 +14,9 @@ struct GravityLine {
 };
 
 class GravitySweep {
-    GravityLine lines[22];
-    float time;
-    bool down;
+    GravityLine m_lines[22];
+    float m_time;
+    bool m_down;
 public:
     GravitySweep(bool down);
 

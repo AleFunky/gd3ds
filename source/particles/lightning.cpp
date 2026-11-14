@@ -15,19 +15,6 @@ constexpr u32 lightningSizeNormalCol = C2D_Color32f(0.0f, 1.0f, 50.f / 255.f, 1.
 constexpr u32 lightningTeleInCol = C2D_Color32f(56 / 255.f, 200 / 255.f, 1.0f, 1.0f);
 constexpr u32 lightningTeleOutCol = C2D_Color32f(1.0f, 1.0f, 0.0f, 1.0f);
 
-LightningPoint::LightningPoint(float x, float y){
-    this->x = x;
-    this->y = y;
-}
-
-LightningSegment::LightningSegment(float startX, float startY, float endX, float endY, u32 color){
-    this->startX = startX;
-    this->startY = startY;
-    this->endX = endX;
-    this->endY = endY;
-    this->color = color;
-}
-
 static unsigned int lightningRand(unsigned long long& seed){
     seed = seed * 1103515245 + 12345;
     return (unsigned)(seed / 65536) % 32768;
@@ -53,7 +40,10 @@ std::vector<LightningSegment> Lightning::generateLightingRecursive(
         midX += xRand;
         midY += yRand;
 
-        LightningPoint point = LightningPoint(midX, midY);
+        LightningPoint point = (LightningPoint){
+            .x = midX,
+            .y = midY
+        };
 
         nextPoints.push_back(point);
     }
@@ -84,13 +74,13 @@ std::vector<LightningSegment> Lightning::generateLightingRecursive(
                     break;
             }
 
-            segments.push_back(LightningSegment(
+            segments.push_back((LightningSegment){
                 nextPoints[i].x, 
                 nextPoints[i].y, 
                 nextPoints[i + 1].x,
                 nextPoints[i + 1].y,
                 color
-            ));
+            });
         }
 
         return segments;
@@ -98,15 +88,15 @@ std::vector<LightningSegment> Lightning::generateLightingRecursive(
 }
 
 void Lightning::updateLightningTimer(){
-    this->pulseTime += delta;
+    m_time += delta;
 }
 
 void Lightning::renderLightning(){
-    for(unsigned int i = 0; i < this->segments.size(); i++){
-        LightningSegment s = segments[i];
+    for(unsigned int i = 0; i < m_segments.size(); i++){
+        LightningSegment s = m_segments[i];
 
         //set alpha
-        float alpha = 1.0f - (this->pulseTime * 2.0f);
+        float alpha = 1.0f - (m_time * 2.0f);
 
         alpha = clampf(alpha, 0.0f, 1.0f);
 
@@ -122,16 +112,20 @@ void Lightning::renderLightning(){
 }
 
 bool Lightning::done(){
-    return pulseTime >= 0.5f;
+    return m_time >= 0.5f;
 }
 
 Lightning::Lightning(float startX, float startY, float endX, float endY, LightningType type){
     std::vector<LightningPoint> segmentPoints = {
-        LightningPoint(startX, startY),
-        LightningPoint(endX, endY)
+        (LightningPoint){
+            startX, startY
+        },
+        (LightningPoint){
+            endX, endY
+        },
     };
 
-    this->segments = generateLightingRecursive(segmentPoints, 160, type, rand());
+    m_segments = generateLightingRecursive(segmentPoints, 160, type, rand());
 }
 
 std::deque<Lightning> lightningBolts;

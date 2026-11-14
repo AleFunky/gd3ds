@@ -5,16 +5,16 @@ namespace gd3ds {
 
 class DivorceEffect {
 private:
-    int player;
-    int gamemode;
-    float x, y;
-    float rotation;
-    float scale;
-    bool flipY;
-    bool mirrored;
+    int m_player;
+    int m_gamemode;
+    float m_x, m_y;
+    float m_rotation;
+    float m_scale;
+    bool m_flipY;
+    bool m_mirrored;
 
-    float time;
-    UseEffectPool circle;
+    float m_time;
+    UseEffectPool m_circle;
 public:
     DivorceEffect(int player, int gamemode, float x, float y, float rotation, float scale, bool flipY);
 

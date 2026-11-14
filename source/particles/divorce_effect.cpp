@@ -4,18 +4,19 @@
 #include "utils/gfx.hpp"
 #include "state.hpp"
 #include "player/robot_anim_data.hpp"
+#include "player/spider_anim_data.hpp"
 namespace gd3ds {
 
 DivorceEffect::DivorceEffect(int player, int gamemode, float x, float y, float rotation, float scale, bool flipY){
-    this->player = player;
-    this->gamemode = gamemode;
+    m_player = player;
+    m_gamemode = gamemode;
     //initial X position should be in world space, but not the subsequent animation (robert code)
-    this->x = getMirrorX(x - state.cameraX, state.mirrorFactor);
-    this->y = SCREEN_HEIGHT - (y - state.cameraY);
-    this->rotation = rotation;
-    this->scale = scale;
-    this->mirrored = (state.mirrorMult < 0);
-    this->flipY = flipY;
+    m_x = getMirrorX(x - state.cameraX, state.mirrorFactor);
+    m_y = SCREEN_HEIGHT - (y - state.cameraY);
+    m_rotation = rotation;
+    m_scale = scale;
+    m_mirrored = (state.mirrorMult < 0);
+    m_flipY = flipY;
 
     const UseEffectDefinition divorceEffect = {
         .colorR = p1Color.r / 255.0f, 
@@ -28,93 +29,98 @@ DivorceEffect::DivorceEffect(int player, int gamemode, float x, float y, float r
         .endRad = 30,
         .hollow = true,
         .trifading = false,
-        .startOpacityEase = EASE_IN,
-        .endOpacityEase = EASE_OUT,
-        .startRadEase = QUAD_OUT,
-        .endRadEase = QUAD_OUT,
+        .startOpacityEase = EaseTypes::EaseIn,
+        .endOpacityEase = EaseTypes::EaseOut,
+        .startRadEase = EaseTypes::QuadOut,
+        .endRadEase = EaseTypes::QuadOut,
         .lineThickness = 1.f
     };
 
-    initUseEffectPool(&this->circle, 1);
-    addUseEffect(0, 0, USE_EFFECT_OBJ_NOTHING, &divorceEffect, &this->circle);
-    this->circle.stationary = true;
+    initUseEffectPool(&m_circle, 1);
+    addUseEffect(0, 0, USE_EFFECT_OBJ_NOTHING, &divorceEffect, &m_circle);
+    m_circle.stationary = true;
 }
 
 void DivorceEffect::updateDivorce(){
-    this->time += delta;
+    m_time += delta;
 
     //it only moves relative to 1x speed for some reason
-    this->x -= this->mirrored ? -playerSpeeds[1] * delta : playerSpeeds[1] * delta;
+    m_x -= m_mirrored ? -playerSpeeds[1] * delta : playerSpeeds[1] * delta;
 
-    this->circle.pool[0].x = this->x;
-    this->circle.pool[0].y = this->y;
+    m_circle.pool[0].x = m_x;
+    m_circle.pool[0].y = m_y;
 
-    updateUseEffects(delta, &this->circle);
+    updateUseEffects(delta, &m_circle);
 }
 
 void DivorceEffect::drawDivorce(){
     changeBlending(true);
-    drawUseEffects(&this->circle);
+    drawUseEffects(&m_circle);
     changeBlending(false);
     
     int selectedIcon = 0;
-    switch(this->gamemode){
-        case GAMEMODE_PLAYER:
+    switch(static_cast<IconGamemode>(m_gamemode)){
+        case IconGamemode::GamemodePlayer:
             selectedIcon = selectedCube;
             break;
-        case GAMEMODE_SHIP:
+        case IconGamemode::GamemodeShip:
             selectedIcon = selectedShip;
             break;
-        case GAMEMODE_BALL:
+        case IconGamemode::GamemodeBall:
             selectedIcon = selectedBall;
             break;
-        case GAMEMODE_UFO:
+        case IconGamemode::GamemodeUfo:
             selectedIcon = selectedUfo;
             break;
-        case GAMEMODE_WAVE:
+        case IconGamemode::GamemodeWave:
             selectedIcon = selectedWave;
             break;
-        case GAMEMODE_ROBOT:
+        case IconGamemode::GamemodeRobot:
             selectedIcon = selectedRobot;
+            break;
+        case IconGamemode::GamemodeSpider:
+            selectedIcon = selectedSpider;
+            break;
+        default:
             break;
     }
 
-    float t = (time / 0.4f);
+    float t = (m_time / 0.4f);
     float ti = 1.0f - t;
 
     Color p1 = p1Color;
     Color p2 = p2Color;
-    if(this->player == 1){
+    if(m_player == 1){
         p1 = p2Color;
         p2 = p1Color;
     }
 
     spawnIconAt(
-        this->gamemode, 
+        m_gamemode, 
         selectedIcon, false, 
-        this->x, 
-        this->y, 
-        (this->rotation) + (180.0f * t), 
-        this->mirrored,
-        this->flipY,
-        this->scale * ti,
+        m_x, 
+        m_y, 
+        (m_rotation) + (180.0f * t), 
+        m_mirrored,
+        m_flipY,
+        m_scale * ti,
         (p1.toColor32() & 0x00FFFFFF) | ((u32)(ti * 255.0f) << 24), 
         (p2.toColor32() & 0x00FFFFFF) | ((u32)(ti * 255.0f) << 24), 
         0, 
         (IconParameters) { 
-            .animID = ROBOT_ANIM_IDLE,
+            .animID = (m_gamemode == (int)static_cast<int>(IconGamemode::GamemodeRobot) ? (int)static_cast<int>(RobotAnimId::RobotAnimIdle) : (int)static_cast<int>(SpiderAnimId::SpiderAnimIdle)),
             .animFrame = 0
         }
     );
 }
 
 bool DivorceEffect::done(){
-    return this->time > 0.4f;
+    return m_time > 0.4f;
 }
 
 DivorceEffect::~DivorceEffect() {
-    if(this->circle.pool){
-        free(this->circle.pool);
+    if(m_circle.pool){
+        free(m_circle.pool);
     }
 }
 

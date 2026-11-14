@@ -15,8 +15,6 @@ enum class LightningType {
 struct LightningPoint {
     float x;
     float y;
-
-    LightningPoint(float x, float y);
 };
 
 struct LightningSegment {
@@ -25,14 +23,12 @@ struct LightningSegment {
     float endX;
     float endY;
     u32 color;
-
-    LightningSegment(float startX, float startY, float endX, float endY, u32 color);
 };
 
 class Lightning {
 private:
-    std::vector<LightningSegment> segments;
-    float pulseTime;
+    std::vector<LightningSegment> m_segments;
+    float m_time;
 
     std::vector<LightningSegment> generateLightingRecursive(
         const std::vector<LightningPoint>& points, 

@@ -4,7 +4,7 @@
 
 namespace gd3ds {
 
-const std::array<int, PORTAL_SHINE_COUNT * 2> shineSheetIndices = {
+const std::array<int, static_cast<int>(ShineType::Count) * 2> shineSheetIndices = {
 //back, front
     8, 9, //gamemode
     6, 7, //gravity
@@ -21,16 +21,18 @@ const std::array<int, PORTAL_SHINE_COUNT * 2> shineSheetIndices = {
 
 static int getShineSheetIndex(ShineType type, bool front){
     //array alternates between back and front
-    return shineSheetIndices[(type * 2) + (front ? 1 : 0)];
+    return shineSheetIndices[
+        (static_cast<int>(type) * 2) + (front ? 1 : 0)
+    ];
 }
 
 PortalShine::PortalShine(ShineType type, int obj){
-    this->type = type;
-    this->obj = obj;
+    m_type = type;
+    m_obj = obj;
 }
 
 void PortalShine::updateShine(){
-    this->time += delta;
+    m_time += delta;
 }
 
 void PortalShine::drawShine(){
