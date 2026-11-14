@@ -11,11 +11,10 @@ DivorceEffect::DivorceEffect(int player, int gamemode, float x, float y, float r
     this->gamemode = gamemode;
     //initial X position should be in world space, but not the subsequent animation (robert code)
     this->x = getMirrorX(x - state.cameraX, state.mirrorFactor);
-    this->y = y;
+    this->y = SCREEN_HEIGHT - (this->y - state.cameraY);
     this->rotation = rotation;
     this->scale = scale;
     this->mirrored = (state.mirrorMult < 0);
-    this->flipX = this->mirrored;
     this->flipY = flipY;
 
     const UseEffectDefinition divorceEffect = {
@@ -48,7 +47,7 @@ void DivorceEffect::updateDivorce(){
     this->x -= this->mirrored ? -playerSpeeds[1] * delta : playerSpeeds[1] * delta;
 
     this->circle.pool[0].x = this->x;
-    this->circle.pool[0].y = SCREEN_HEIGHT - (this->y - state.cameraY);
+    this->circle.pool[0].y = this->y;
 
     updateUseEffects(delta, &this->circle);
 }
@@ -80,7 +79,7 @@ void DivorceEffect::drawDivorce(){
             break;
     }
 
-    float t = (time / 0.5f);
+    float t = (time / 0.4f);
     float ti = 1.0f - t;
 
     Color p1 = p1Color;
@@ -94,9 +93,9 @@ void DivorceEffect::drawDivorce(){
         this->gamemode, 
         selectedIcon, false, 
         this->x, 
-        SCREEN_HEIGHT - (this->y - state.cameraY), 
+        this->y, 
         (this->rotation) + (180.0f * t), 
-        this->flipX,
+        this->mirrored,
         this->flipY,
         this->scale * ti,
         (p1.toColor32() & 0x00FFFFFF) | ((u32)(ti * 255.0f) << 24), 
@@ -110,7 +109,7 @@ void DivorceEffect::drawDivorce(){
 }
 
 bool DivorceEffect::done(){
-    return this->time > 0.5f;
+    return this->time > 0.4f;
 }
 
 DivorceEffect::~DivorceEffect() {

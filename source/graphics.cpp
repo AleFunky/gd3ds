@@ -112,6 +112,7 @@ int loadedBgSheet = 0;
 C2D_SpriteSheet groundSheet;
 C2D_SpriteSheet trailSheet;
 C2D_SpriteSheet particleSheet;
+C2D_SpriteSheet miscFXSheet;
 
 static SortItem bufA[MAX_SPRITES];
 static SortItem bufB[MAX_SPRITES];
@@ -1043,18 +1044,40 @@ void spawnObjectAt(
     }
 }
 
+constexpr int placeholderPlayer = -1;
+constexpr int placeholderShineBack = -2;
+constexpr int placeholderShineFront = -3;
+
+const GameObject portalShineBack = {
+    .zLayer = -1,
+    .zOrder = 99999
+};
+
+const GameObject portalShineFront = {
+    .zLayer = 1,
+    .zOrder = 99999
+};
+
 static inline uint32_t makeSortKey(SpriteObject *s)
 {
     const int obj = s->obj;
 
     // Player sprite is -1 so handle it there
-    if (obj == -1) {
+    if (obj == placeholderPlayer) {
         return ((4 + 8) << 18) | (2 << 16) | (255 << 8) | 128;
     }
 
-    const int id = objects.id[obj];
-    const GameObject *gameObj = (const GameObject*)&gameObjects[id];
+    const int id = obj >= 0 ? objects.id[obj] : 0;
+    const GameObject *gameObj = nullptr;
 
+    if(obj == placeholderShineFront){
+        gameObj = &portalShineBack;
+    } else if(obj == placeholderShineBack){
+        gameObj = &portalShineFront;
+    } else {
+        gameObj = (const GameObject*)&gameObjects[id];
+    }
+    
     int zlayer = objects.zlayer[obj];
     int zorder = objects.zorder[obj];
 
@@ -1836,10 +1859,6 @@ void updateTints() {
     snapshot.tintMs = ticks / CPU_TICKS_PER_MSEC;
 }
 
-constexpr int placeholderPlayer = -1;
-constexpr int placeholderShineBack = -2;
-constexpr int placeholderShineFront = -3;
-
 void insertPlayer(){
     SpriteObject *vo = &viewableObjects[spriteCount];
 
@@ -1860,7 +1879,7 @@ void insertShines(){
     C2D_Sprite backspr = { 0 };
     back->spr = backspr;
     back->obj = placeholderShineBack;
-    back->layer = 0;
+    back->layer = -1;
     back->colType = 0;
     back->opacity = 1.f;
     back->colChannel = 0;
@@ -1872,7 +1891,7 @@ void insertShines(){
     C2D_Sprite frontspr = { 0 };
     front->spr = frontspr;
     front->obj = placeholderShineFront;
-    front->layer = 0;
+    front->layer = 1;
     front->colType = 0;
     front->opacity = 1.f;
     front->colChannel = 0;

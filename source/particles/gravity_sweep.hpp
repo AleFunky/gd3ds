@@ -5,8 +5,6 @@
 namespace gd3ds
 {
 
-extern C2D_SpriteSheet gravLineSheet;
-
 struct GravityLine {
     float x;
     float y;

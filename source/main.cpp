@@ -1803,8 +1803,8 @@ void gameAssetsInit() {
     particleSheet = C2D_SpriteSheetLoad("romfs:/gfx/particles.t3x");
     if (!particleSheet) svcBreak(USERBREAK_PANIC);
     
-    gravLineSheet = C2D_SpriteSheetLoad("romfs:/gfx/effects.t3x");
-    if (!gravLineSheet) svcBreak(USERBREAK_PANIC);
+    miscFXSheet = C2D_SpriteSheetLoad("romfs:/gfx/effects.t3x");
+    if (!miscFXSheet) svcBreak(USERBREAK_PANIC);
 
     initParticleSystem(&touchDragParticles, &touchDragEffect);
     touchDragParticles.relativeStationary = true;

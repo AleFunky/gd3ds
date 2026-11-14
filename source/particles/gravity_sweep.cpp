@@ -8,8 +8,6 @@
 namespace gd3ds
 {
 
-C2D_SpriteSheet gravLineSheet;
-
 GravitySweep::GravitySweep(bool down){
     this->down = down;
     this->time = 9999.0f;
@@ -42,9 +40,9 @@ void GravitySweep::renderSweep(){
 
     float yOffset;
     if(this->down){
-        yOffset = t * ((SCREEN_HEIGHT / 2.0f) + 60.0f) + ti * ((-SCREEN_HEIGHT / 2.0f) - 60.0f);
+        yOffset = t * ((SCREEN_HEIGHT / 2.0f) + 95.0f) + ti * ((-SCREEN_HEIGHT / 2.0f) - 95.0f);
     } else{
-        yOffset = ti * ((SCREEN_HEIGHT / 2.0f) + 60.0f) + t * ((-SCREEN_HEIGHT / 2.0f) - 60.0f);
+        yOffset = ti * ((SCREEN_HEIGHT / 2.0f) + 95.0f) + t * ((-SCREEN_HEIGHT / 2.0f) - 95.0f);
     }
 
     for(const auto& l : this->lines){
@@ -59,7 +57,7 @@ void GravitySweep::renderSweep(){
         C2D_PlainImageTint(&tint, color, 1.0f);
 
         C2D_DrawImageAt(
-            C2D_SpriteSheetGetImage(gravLineSheet, 0), 
+            C2D_SpriteSheetGetImage(miscFXSheet, 0), 
             l.x, l.y + yOffset, 0.0f, &tint, l.scaleX, l.scaleY);
     }
 };

@@ -113,6 +113,7 @@ extern int loadedBgSheet;
 extern C2D_SpriteSheet groundSheet;
 extern C2D_SpriteSheet trailSheet;
 extern C2D_SpriteSheet particleSheet;
+extern C2D_SpriteSheet miscFXSheet;
 
 #define PLAYER_EFFECTS_FIRE_START 0
 #define PLAYER_EFFECTS_BOOM_START 12
