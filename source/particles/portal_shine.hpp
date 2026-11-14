@@ -19,15 +19,20 @@ enum class ShineType {
 };
 
 class PortalShine {
-private:
-    ShineType m_type;
-    int m_obj;
-    float m_time;
 public:
     PortalShine(ShineType type, int obj);
     void updateShine();
     void drawShine();
     bool done();
+private:
+    ShineType m_type;
+    int m_obj;
+    float m_time;
 };
+
+void updateShines();
+void drawShines();
+void addShine(int obj);
+void resetDivorces();
 
 }

@@ -14,9 +14,6 @@ struct GravityLine {
 };
 
 class GravitySweep {
-    GravityLine m_lines[22];
-    float m_time;
-    bool m_down;
 public:
     GravitySweep(bool down);
 
@@ -24,6 +21,10 @@ public:
     void startSweep();
     void renderSweep();
     bool done();
+private:
+    GravityLine m_lines[22];
+    float m_time;
+    bool m_down;
 };
 
 void startGravitySweep(bool down);

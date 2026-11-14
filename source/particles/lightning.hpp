@@ -26,6 +26,11 @@ struct LightningSegment {
 };
 
 class Lightning {
+public:
+    Lightning(float startX, float startY, float endX, float endY, LightningType type);
+    void updateLightningTimer();
+    void renderLightning();
+    bool done();
 private:
     std::vector<LightningSegment> m_segments;
     float m_time;
@@ -36,11 +41,6 @@ private:
         LightningType type,
         unsigned long long seed
     );
-public:
-    Lightning(float startX, float startY, float endX, float endY, LightningType type);
-    void updateLightningTimer();
-    void renderLightning();
-    bool done();
 };
 
 extern std::deque<Lightning> lightningBolts;
