@@ -22,6 +22,7 @@
 #define SCREEN_WIDTH_AREA ((SCREEN_HEIGHT_AREA / SCREEN_HEIGHT) * SCREEN_WIDTH)
 #define SCREEN_WIDTH_AREA_BOT ((SCREEN_HEIGHT_AREA / SCREEN_HEIGHT) * SCREEN_BOT_WIDTH)
 #define SCREEN_WIDTH_AREA_GAMEPLAY(swapScreens) ((swapScreens) ? SCREEN_WIDTH_AREA_BOT : SCREEN_WIDTH_AREA)
+#define GAMEPLAY_SCREEN_WIDTH_AREA SCREEN_WIDTH_AREA_GAMEPLAY(settingsState.swapGameplayScreens && !inLevelComplete)
 
 #define SCALE (SCREEN_HEIGHT / SCREEN_HEIGHT_AREA)
 
@@ -113,6 +114,7 @@ extern int loadedBgSheet;
 extern C2D_SpriteSheet groundSheet;
 extern C2D_SpriteSheet trailSheet;
 extern C2D_SpriteSheet particleSheet;
+extern C2D_SpriteSheet miscFXSheet;
 
 #define PLAYER_EFFECTS_FIRE_START 0
 #define PLAYER_EFFECTS_BOOM_START 12

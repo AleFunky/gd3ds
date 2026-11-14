@@ -41,6 +41,8 @@
 #include "particles/circles.hpp"
 #include "particles/lightning.hpp"
 #include "particles/gravity_sweep.hpp"
+#include "particles/divorce_effect.hpp"
+#include "particles/portal_shine.hpp"
 
 #include "level/main_levels.hpp"
 #include "menus/main_menu.hpp"
@@ -1323,6 +1325,10 @@ void gameLoop() {
                 if (state.deathTimer <= 0.f) {
                     initVariables();
                     reloadLevel(); 
+                    resetLightnings();
+                    resetDivorces();
+                    resetShines();
+                    resetGravitySweeps();
                     //resets UI coins on gameplay screen
                     resetCoins();
 
@@ -1393,6 +1399,12 @@ void gameLoop() {
 
             u64 startPart = svcGetSystemTick();
             updatePlayerEffects(delta);
+
+            updateAllLightning();
+            updateGravitySweeps();
+            updateDivorces();
+            updateShines();
+
             updateRays(delta);
 
             // End wall particles
@@ -1560,6 +1572,8 @@ void gameLoop() {
                 drawObjects();
 
                 drawEndWall(delta);
+
+                drawDivorces();
 
                 drawAttemptText();
 
@@ -1794,8 +1808,8 @@ void gameAssetsInit() {
     particleSheet = C2D_SpriteSheetLoad("romfs:/gfx/particles.t3x");
     if (!particleSheet) svcBreak(USERBREAK_PANIC);
     
-    gravLineSheet = C2D_SpriteSheetLoad("romfs:/gfx/effects.t3x");
-    if (!gravLineSheet) svcBreak(USERBREAK_PANIC);
+    miscFXSheet = C2D_SpriteSheetLoad("romfs:/gfx/effects.t3x");
+    if (!miscFXSheet) svcBreak(USERBREAK_PANIC);
 
     initParticleSystem(&touchDragParticles, &touchDragEffect);
     touchDragParticles.relativeStationary = true;
@@ -1992,8 +2006,10 @@ int main(int argc, char* argv[]) {
     freeCachedSprites();
     iconCacheShutdown();
 
-    lightningBolts.clear();
-    lightningBolts.shrink_to_fit();
+    resetLightnings();
+    resetDivorces();
+    resetGravitySweeps();
+    resetShines();
 
     // Delete graphics
     C2D_SpriteSheetFree(spriteSheet);

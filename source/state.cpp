@@ -18,6 +18,7 @@
 #include "level_loading.hpp"
 #include "menus/level_select.hpp"
 #include "save/saving.hpp"
+#include "particles/divorce_effect.hpp"
 
 #include "new_best.hpp"
 #include "endwall.hpp"
@@ -473,6 +474,19 @@ void handleDeath(Player *player, bool pauseSong) {
         explosionParticles[state.currentPlayer].scale = (player->mini ? 0.6 : 1.0f);
         spawnMultipleParticles(&explosionParticles[state.currentPlayer], 90);
     }
+
+    int dualPlayer = !state.currentPlayer;
+    Player * otherPlayer = dualPlayer ? &state.player2 : &state.player;
+
+    addDivorce(
+        dualPlayer, 
+        otherPlayer->gamemode, 
+        otherPlayer->x, 
+        otherPlayer->y, 
+        otherPlayer->rotation, 
+        otherPlayer->mini ? 0.6f : 1.0f, 
+        otherPlayer->upsideDown
+    );    
 
     if (!state.practiceMode) startShake(0.15f, 1.f);
     

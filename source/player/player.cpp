@@ -1660,15 +1660,15 @@ void drawPlayer(Player *player) {
 
     if (player->flashActive) {
         float flashT = player->flashTimer - player->flashDelay;
-        float flash_k = (flashT <= 0.f) ? 0.f : CLAMP(flashT / player->flashDuration, 0.f, 1.f);
+        float flashK = (flashT <= 0.f) ? 0.f : CLAMP(flashT / player->flashDuration, 0.f, 1.f);
 
-        p1Color.r = (unsigned char)(255.f + ((float)p1Color.r - 255.f) * flash_k);
-        p1Color.g = (unsigned char)(255.f + ((float)p1Color.g - 255.f) * flash_k);
-        p1Color.b = (unsigned char)(255.f + ((float)p1Color.b - 255.f) * flash_k);
+        p1Color.r = (unsigned char)(255.f + ((float)p1Color.r - 255.f) * flashK);
+        p1Color.g = (unsigned char)(255.f + ((float)p1Color.g - 255.f) * flashK);
+        p1Color.b = (unsigned char)(255.f + ((float)p1Color.b - 255.f) * flashK);
 
-        p2Color.r = (unsigned char)(255.f + ((float)p2Color.r - 255.f) * flash_k);
-        p2Color.g = (unsigned char)(255.f + ((float)p2Color.g - 255.f) * flash_k);
-        p2Color.b = (unsigned char)(255.f + ((float)p2Color.b - 255.f) * flash_k);
+        p2Color.r = (unsigned char)(255.f + ((float)p2Color.r - 255.f) * flashK);
+        p2Color.g = (unsigned char)(255.f + ((float)p2Color.g - 255.f) * flashK);
+        p2Color.b = (unsigned char)(255.f + ((float)p2Color.b - 255.f) * flashK);
     }
 
     u32 primaryColor = C2D_Color32(p1Color.r, p1Color.g, p1Color.b, 255);

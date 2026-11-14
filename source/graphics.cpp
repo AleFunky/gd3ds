@@ -29,6 +29,8 @@
 #include "particles/collectable_effect.hpp"
 
 #include "particles/gravity_sweep.hpp"
+#include "particles/divorce_effect.hpp"
+#include "particles/portal_shine.hpp"
 
 #include "menus/settings_hub/settings.hpp"
 
@@ -47,7 +49,6 @@ extern const Color white = { 255, 255, 255 };
 
 #define COLLECTABLE_FLOAT_AMP 1.5f
 #define COLLECTABLE_FLOAT_PERIOD 0.8f
-#define GAMEPLAY_SCREEN_WIDTH_AREA SCREEN_WIDTH_AREA_GAMEPLAY(settingsState.swapGameplayScreens && !inLevelComplete)
 #define COLLECTABLE_FLOAT_BASE 0.0f
 
 static inline float collectableFloatOffset(void) {
@@ -111,6 +112,7 @@ int loadedBgSheet = 0;
 C2D_SpriteSheet groundSheet;
 C2D_SpriteSheet trailSheet;
 C2D_SpriteSheet particleSheet;
+C2D_SpriteSheet miscFXSheet;
 
 static SortItem bufA[MAX_SPRITES];
 static SortItem bufB[MAX_SPRITES];
@@ -1042,17 +1044,25 @@ void spawnObjectAt(
     }
 }
 
+constexpr int kPlaceholderPlayer = -1;
+constexpr int kPlaceholderShineBack = -2;
+constexpr int kPlaceholderShineFront = -3;
+
 static inline uint32_t makeSortKey(SpriteObject *s)
 {
     const int obj = s->obj;
 
-    // Player sprite is -1 so handle it there
-    if (obj == -1) {
+    // Handle placeholders
+    if (obj == kPlaceholderPlayer) {
         return ((4 + 8) << 18) | (2 << 16) | (255 << 8) | 128;
+    } else if (obj == kPlaceholderShineBack) {
+        return ((4 + 8) << 18) | (2 << 16) | (255 << 8) | 128;
+    } else if (obj == kPlaceholderShineFront) {
+        return ((5 + 8) << 18) | (2 << 16) | (255 << 8) | 128;
     }
 
     const int id = objects.id[obj];
-    const GameObject *gameObj = (const GameObject*)&gameObjects[id];
+    const GameObject *gameObj = &gameObjects[id];
 
     int zlayer = objects.zlayer[obj];
     int zorder = objects.zorder[obj];
@@ -1695,7 +1705,7 @@ void updateTints() {
     u64 start = svcGetSystemTick();
     for (size_t s = 0; s < spriteCount; s++) {
         SpriteObject *obj = viewableObjectsPtr[s];
-        if (obj->obj != -1) {
+        if (obj->obj >= 0) {
             int colChannel = obj->colChannel;
 
             ColorChannel col;
@@ -1835,25 +1845,55 @@ void updateTints() {
     snapshot.tintMs = ticks / CPU_TICKS_PER_MSEC;
 }
 
-
-void createObjects() {
-    u64 start = svcGetSystemTick();
-
-    spriteCount = 0;
-
-    // Player sprite
-    // Only needs one as its only for sorting purposes
+void insertPlayer(){
     SpriteObject *vo = &viewableObjects[spriteCount];
 
     C2D_Sprite spr = { 0 };
     vo->spr = spr;
-    vo->obj = -1;
+    vo->obj = kPlaceholderPlayer;
     vo->layer = 0;
     vo->colType = 0;
     vo->opacity = 1.f;
     vo->colChannel = 0;
     viewableObjectsPtr[spriteCount] = vo;
     spriteCount++;
+}
+
+void insertShines(){
+    SpriteObject *back = &viewableObjects[spriteCount];
+
+    C2D_Sprite backspr = { 0 };
+    back->spr = backspr;
+    back->obj = kPlaceholderShineBack;
+    back->layer = 0;
+    back->colType = 0;
+    back->opacity = 1.f;
+    back->colChannel = 0;
+    viewableObjectsPtr[spriteCount] = back;
+    spriteCount++;
+
+    SpriteObject *front = &viewableObjects[spriteCount];
+
+    C2D_Sprite frontspr = { 0 };
+    front->spr = frontspr;
+    front->obj = kPlaceholderShineFront;
+    front->layer = 1;
+    front->colType = 0;
+    front->opacity = 1.f;
+    front->colChannel = 0;
+    viewableObjectsPtr[spriteCount] = front;
+    spriteCount++;
+}
+
+
+void createObjects() {
+    u64 start = svcGetSystemTick();
+
+    spriteCount = 0;
+
+    //adds placeholder values which, upon being reached by the renderer, will render the player or shine fx instead
+    insertPlayer();
+    insertShines();
 
     loadCurrentObject();
 
@@ -2336,10 +2376,9 @@ void drawObjects() {
     // Draw
     for (size_t s = 0; s < spriteCount; s++) {
         SpriteObject *obj = viewableObjectsPtr[s];
+        if (obj->hidden) continue;
 
-        if (obj->obj != -1) {
-            if (obj->hidden) continue;
-
+        if (obj->obj >= 0) {
             changeBlending(obj->blending);
 
             if (isCollectableObject(objects.id[obj->obj])) {
@@ -2353,8 +2392,18 @@ void drawObjects() {
             } else {
                 c2dDrawImageFast(&obj->spr.image, &obj->params, &obj->spr.params, obj->tint);
             }
-        } else {   
-            drawPlayerGraphics();
+        } else {
+            switch(obj->obj){
+                case kPlaceholderPlayer:
+                    drawPlayerGraphics();
+                    break;
+                case kPlaceholderShineBack:
+                    drawShines(false);
+                    break;
+                case kPlaceholderShineFront:
+                    drawShines(true);
+                    break;
+            }
         }
     }
 

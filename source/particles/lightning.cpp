@@ -9,24 +9,8 @@
 namespace gd3ds
 {
 
-constexpr u32 lightningSizeMiniCol = C2D_Color32f(1.0f, 31 / 255.f, 1.0f, 1.0f);
-constexpr u32 lightningSizeNormalCol = C2D_Color32f(0.0f, 1.0f, 50.f / 255.f, 1.0f);
-
-constexpr u32 lightningTeleInCol = C2D_Color32f(56 / 255.f, 200 / 255.f, 1.0f, 1.0f);
-constexpr u32 lightningTeleOutCol = C2D_Color32f(1.0f, 1.0f, 0.0f, 1.0f);
-
-LightningPoint::LightningPoint(float x, float y){
-    this->x = x;
-    this->y = y;
-}
-
-LightningSegment::LightningSegment(float startX, float startY, float endX, float endY, u32 color){
-    this->startX = startX;
-    this->startY = startY;
-    this->endX = endX;
-    this->endY = endY;
-    this->color = color;
-}
+constexpr u32 kLightningSizeMiniCol = C2D_Color32f(1.0f, 31 / 255.f, 1.0f, 1.0f);
+constexpr u32 kLightningSizeNormalCol = C2D_Color32f(0.0f, 1.0f, 50.f / 255.f, 1.0f);
 
 static unsigned int lightningRand(unsigned long long& seed){
     seed = seed * 1103515245 + 12345;
@@ -41,23 +25,30 @@ std::vector<LightningSegment> Lightning::generateLightingRecursive(
 ){
     std::vector<LightningPoint> nextPoints;
 
+    float xRand = ((lightningRand(seed) % 101) / 100.0f - 0.5f) * segmentLength;
+    float yRand = ((lightningRand(seed) % 101) / 100.0f - 0.5f) * segmentLength;
+
     unsigned int i = 0;
     for(; i < points.size() - 1; i++){
         nextPoints.push_back(points[i]);
 
         float midX = (points[i].x + points[i + 1].x) / 2.0f;
         float midY = (points[i].y + points[i + 1].y) / 2.0f;
-        midX += ((lightningRand(seed) % 101) / 100.0f - 0.5f) * segmentLength;
-        midY += ((lightningRand(seed) % 101) / 100.0f - 0.5f) * segmentLength;
+        midX += xRand;
+        midY += yRand;
 
-        LightningPoint point = LightningPoint(midX, midY);
+        LightningPoint point = (LightningPoint){
+            .x = midX,
+            .y = midY
+        };
 
         nextPoints.push_back(point);
     }
     nextPoints.push_back(points.back());
 
+    segmentLength /= 2;
     if(segmentLength > 8){
-        return generateLightingRecursive(nextPoints, segmentLength / 2, type, seed);
+        return generateLightingRecursive(nextPoints, segmentLength, type, seed);
     } else{
         //generate lightning
         std::vector<LightningSegment> segments;
@@ -65,79 +56,98 @@ std::vector<LightningSegment> Lightning::generateLightingRecursive(
         segments.reserve(segmentCount);
 
         for(unsigned int i = 0; i < segmentCount; i++){
-            u32 color = 0;
-            switch(type){
-                case LightningType::SizeMini:
-                    color = lightningSizeMiniCol;
-                    break;
-                case LightningType::SizeNormal:
-                    color = lightningSizeNormalCol;
-                    break;
-                case LightningType::Teleport:
-                    color = p1Color.toColor32();
-                    break;
-                default:
-                    break;
-            }
-
-            segments.push_back(LightningSegment(
+            segments.push_back((LightningSegment){
                 nextPoints[i].x, 
                 nextPoints[i].y, 
                 nextPoints[i + 1].x,
-                nextPoints[i + 1].y,
-                color
-            ));
+                nextPoints[i + 1].y
+            });
         }
 
         return segments;
     }
 }
 
+void Lightning::updateLightningTimer(){
+    m_time += delta;
+}
+
 void Lightning::renderLightning(){
-    for(unsigned int i = 0; i < this->segments.size(); i++){
-        LightningSegment s = segments[i];
+    for(unsigned int i = 0; i < m_segments.size(); i++){
+        LightningSegment s = m_segments[i];
 
         //set alpha
-        float alpha = 1.0f - (this->pulseTime * 2.0f);
+        float alpha = 1.0f - (m_time * 2.0f);
 
         alpha = clampf(alpha, 0.0f, 1.0f);
 
-        u32 color = (s.color & 0x00FFFFFF) |((u32)(alpha * 255.0f) << 24);
+        u32 color = (m_color & 0x00FFFFFF) | ((u32)(alpha * (u32)255) << 24);
 
         float topX = s.startX - state.cameraX;
         float btmX = s.endX - state.cameraX;
         float topY = SCREEN_HEIGHT - (s.startY - state.cameraY);
         float btmY = SCREEN_HEIGHT - (s.endY  - state.cameraY);
 
-        C2D_DrawLine(topX, topY, color, btmX, btmY, color, 2, 0.0f);
+        C2D_DrawLine(getMirrorX(topX, state.mirrorFactor), topY, color, getMirrorX(btmX, state.mirrorFactor), btmY, color, 2, 0.0f);
     }
-
-    if(!gamePaused) this->pulseTime += delta;
 }
 
 bool Lightning::done(){
-    return pulseTime >= 0.5f;
+    return m_time >= 0.5f;
 }
 
 Lightning::Lightning(float startX, float startY, float endX, float endY, LightningType type){
+    switch(type){
+        case LightningType::SizeMini:
+            m_color = kLightningSizeMiniCol;
+            break;
+        case LightningType::SizeNormal:
+            m_color = kLightningSizeNormalCol;
+            break;
+        case LightningType::Teleport:
+            m_color = p1Color.toColor32();
+            break;
+        default:
+            break;
+    }
+
     std::vector<LightningPoint> segmentPoints = {
-        LightningPoint(startX, startY),
-        LightningPoint(endX, endY)
+        (LightningPoint){
+            startX, startY
+        },
+        (LightningPoint){
+            endX, endY
+        },
     };
 
-    this->segments = generateLightingRecursive(segmentPoints, 160, type, rand());
+    m_segments = generateLightingRecursive(segmentPoints, 160, type, rand());
 }
 
 std::deque<Lightning> lightningBolts;
 
-void drawAllLightning(){
+void updateAllLightning(){
     while (!lightningBolts.empty() && lightningBolts.front().done()) {
         lightningBolts.pop_front();
     }
 
     for(auto& bolt : lightningBolts){
+        bolt.updateLightningTimer();
+    }
+}
+
+void drawAllLightning(){
+    for(auto& bolt : lightningBolts){
         bolt.renderLightning();
     }
+}
+
+void addLightning(float start_x, float start_y, float end_x, float end_y, LightningType type){
+    lightningBolts.push_back(Lightning(start_x, start_y, end_x, end_y, type));
+}
+
+void resetLightnings(){
+    lightningBolts.clear();
+    lightningBolts.shrink_to_fit();
 }
 
 }

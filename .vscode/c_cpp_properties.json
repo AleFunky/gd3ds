@@ -19,7 +19,7 @@
             ],
             "compilerPath": "C:/devkitpro/devkitARM/bin/arm-none-eabi-gcc",
             "cStandard": "gnu11",
-            "cppStandard": "gnu++11",
+            "cppStandard": "gnu++17",
             "intelliSenseMode": "linux-gcc-arm",
             "compilerArgs": [
                 "-Werror=incompatible-pointer-types",

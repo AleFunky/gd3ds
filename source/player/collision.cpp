@@ -27,6 +27,8 @@
 #include "menus/level_select.hpp"
 #include "particles/lightning.hpp"
 #include "particles/gravity_sweep.hpp"
+#include "particles/divorce_effect.hpp"
+#include "particles/portal_shine.hpp"
 
 namespace gd3ds
 {
@@ -876,7 +878,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         case BLUE_GRAVITY_PORTAL: {
             player->gravObjID = obj;
             if (!GET_ACTIVATED(obj)) {
-                startGravitySweep(true);
+                addShine(ShineType::Gravity, obj);
                 player->ceilingInvTime = CEILING_INVUL_TIME;
                 if (player->upsideDown) {
                     if (player->gamemode != static_cast<int>(IconGamemode::GamemodeBall) && state.showPlayer) motionTrailResumeStroke(trail);
@@ -908,7 +910,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         case YELLOW_GRAVITY_PORTAL: {
             player->gravObjID = obj;
             if (!GET_ACTIVATED(obj)) {
-                startGravitySweep(false);
+                addShine(ShineType::Gravity, obj);
                 player->ceilingInvTime = CEILING_INVUL_TIME;
                 if (!player->upsideDown) {
                     if (player->gamemode != static_cast<int>(IconGamemode::GamemodeBall) && state.showPlayer) motionTrailResumeStroke(trail);
@@ -938,6 +940,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case ORANGE_MIRROR_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
+                addShine(ShineType::Mirror, obj);
                 if (state.intendedMirrorFactor != 1.f) {
                     motionTrailStopStroke(trail);
                     state.mirroring = true;
@@ -957,6 +960,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case BLUE_MIRROR_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
+                addShine(ShineType::Mirror, obj);
                 if (state.intendedMirrorFactor != 0.f) {
                     motionTrailStopStroke(trail);
                     state.mirroring = true;
@@ -979,6 +983,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case BIG_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
+                addShine(ShineType::Size, obj);
                 if (player->mini) {
                     startBgFlash();
 
@@ -1016,6 +1021,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case MINI_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
+                addShine(ShineType::Size, obj);
                 if (!player->mini){
                     startBgFlash();
 
@@ -1057,6 +1063,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         case SLOW_SPEED_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
                 SET_ACTIVATED(obj, true);
+                addShine(ShineType::SpeedSlow, obj);
                 UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &speedCollideEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 255 / 255.f;
@@ -1073,6 +1080,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         case NORMAL_SPEED_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
                 SET_ACTIVATED(obj, true);
+                addShine(ShineType::SpeedNormal, obj);
                 UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &speedCollideEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 0 / 255.f;
@@ -1089,6 +1097,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         case FAST_SPEED_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
                 SET_ACTIVATED(obj, true);
+                addShine(ShineType::SpeedFast, obj);
                 UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &speedCollideEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 0 / 255.f;
@@ -1105,7 +1114,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         case FASTER_SPEED_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
                 SET_ACTIVATED(obj, true);
-
+                addShine(ShineType::SpeedFaster, obj);
                 UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &speedCollideEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 230 / 255.f;
@@ -1123,7 +1132,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         case FASTEST_SPEED_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
                 SET_ACTIVATED(obj, true);
-
+                addShine(ShineType::SpeedFastest, obj);
                 UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &speedCollideEffect, getUseEffectArrayPtr(GFX_TOP));
                 if (effect) {
                     effect->def.colorR = 255 / 255.f;
@@ -1140,6 +1149,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case CUBE_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
+                addShine(ShineType::Gamemode, obj);
                 state.groundY = 0;
                 state.ceilingY = 999999;
                 if (player->gamemode != static_cast<int>(IconGamemode::GamemodePlayer)) {
@@ -1167,45 +1177,47 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
             break;
         }
         case ROBOT_PORTAL: {
-                if (!GET_ACTIVATED(obj)) {
-                    state.groundY = 0;
-                    state.ceilingY = 999999;
-                    if (player->gamemode != static_cast<int>(IconGamemode::GamemodeRobot)) {
-                        if (player->gamemode != static_cast<int>(IconGamemode::GamemodeBall) && player->gamemode != static_cast<int>(IconGamemode::GamemodePlayer)) {
-                            player->velY /= 2;
-                        }
-                        if (player->gamemode == static_cast<int>(IconGamemode::GamemodeWave)) player->velY *= 0.9f;
-
-                        player->ceilingInvTime = GAMEMODE_INVUL_TIME;
-                        player->snapRotation = true;
-                        player->inverseRotation = false;
-                        setGamemode(player, static_cast<int>(IconGamemode::GamemodeRobot));
-                        setCheckpointTimer(0);
-                        pseudoCheckpointExists = false;
-                        flipOtherPlayer(state.currentPlayer ^ 1);
-                        updateRotationDirection(player);
-
-                        setAnimation(player, player->dashing ? static_cast<int>(RobotAnimId::RobotAnimFallStart) : static_cast<int>(RobotAnimId::RobotAnimJumpStart));
-                        player->robotAirTime = 999.f;
-
-                        UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
-                        if (effect) {
-                            effect->def.colorR = 255 / 255.f;
-                            effect->def.colorG = 100 / 255.f;
-                            effect->def.colorB = 0 / 255.f;
-                        }
+            if (!GET_ACTIVATED(obj)) {
+                addShine(ShineType::Gamemode, obj);
+                state.groundY = 0;
+                state.ceilingY = 999999;
+                if (player->gamemode != static_cast<int>(IconGamemode::GamemodeRobot)) {
+                    if (player->gamemode != static_cast<int>(IconGamemode::GamemodeBall) && player->gamemode != static_cast<int>(IconGamemode::GamemodePlayer)) {
+                        player->velY /= 2;
                     }
+                    if (player->gamemode == static_cast<int>(IconGamemode::GamemodeWave)) player->velY *= 0.9f;
 
-                    if (state.dual) {
-                        setDualBounds();
-                    } 
+                    player->ceilingInvTime = GAMEMODE_INVUL_TIME;
+                    player->snapRotation = true;
+                    player->inverseRotation = false;
+                    setGamemode(player, static_cast<int>(IconGamemode::GamemodeRobot));
+                    setCheckpointTimer(0);
+                    pseudoCheckpointExists = false;
+                    flipOtherPlayer(state.currentPlayer ^ 1);
+                    updateRotationDirection(player);
 
-                    SET_ACTIVATED(obj, true);
+                    setAnimation(player, player->dashing ? static_cast<int>(RobotAnimId::RobotAnimFallStart) : static_cast<int>(RobotAnimId::RobotAnimJumpStart));
+                    player->robotAirTime = 999.f;
+
+                    UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
+                    if (effect) {
+                        effect->def.colorR = 255 / 255.f;
+                        effect->def.colorG = 100 / 255.f;
+                        effect->def.colorB = 0 / 255.f;
+                    }
                 }
-                break;
-            }   
+
+                if (state.dual) {
+                    setDualBounds();
+                } 
+
+                SET_ACTIVATED(obj, true);
+            }
+            break;
+        }   
         case SPIDER_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
+                addShine(ShineType::Gamemode, obj);
                 state.groundY = fmaxf(0, ip1Ceilf((objects.originalY[obj] - ((gamemodeHeights[static_cast<int>(IconGamemode::GamemodeSpider)] + 60.f) / 2.f)) / 30.f)) * 30;
                 state.ceilingY = state.groundY + gamemodeHeights[static_cast<int>(IconGamemode::GamemodeSpider)];
                 setIntendedCeiling();
@@ -1255,6 +1267,9 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                     )
                 );
 
+                addShine(ShineType::Teleport, obj);
+                addShine(ShineType::Teleport, oi);
+
                 player->y = objects.y[oi];
                 state.oldPlayer.y = player->y;
 
@@ -1298,6 +1313,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case SHIP_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
+                addShine(ShineType::Gamemode, obj);
                 state.groundY = fmaxf(0, ip1Ceilf((objects.originalY[obj] - ((gamemodeHeights[static_cast<int>(IconGamemode::GamemodeShip)] + 60.f) / 2.f)) / 30.f)) * 30;
                 state.ceilingY = state.groundY + gamemodeHeights[static_cast<int>(IconGamemode::GamemodeShip)];
                 setIntendedCeiling();
@@ -1343,6 +1359,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case BALL_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
+                addShine(ShineType::Gamemode, obj);
                 state.groundY = fmaxf(0, ip1Ceilf((objects.originalY[obj] - ((gamemodeHeights[static_cast<int>(IconGamemode::GamemodeBall)] + 60.f) / 2.f)) / 30.f)) * 30;
                 state.ceilingY = state.groundY + gamemodeHeights[static_cast<int>(IconGamemode::GamemodeBall)];
                 setIntendedCeiling();
@@ -1388,6 +1405,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case UFO_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
+                addShine(ShineType::Gamemode, obj);
                 state.groundY = fmaxf(0, ip1Ceilf((objects.originalY[obj] - ((gamemodeHeights[static_cast<int>(IconGamemode::GamemodeUfo)] + 60.f) / 2.f)) / 30.f)) * 30;
                 state.ceilingY = state.groundY + gamemodeHeights[static_cast<int>(IconGamemode::GamemodeUfo)];
                 setIntendedCeiling();
@@ -1428,6 +1446,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case WAVE_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
+                addShine(ShineType::Gamemode, obj);
                 state.groundY = fmaxf(0, ip1Ceilf((objects.originalY[obj] - ((gamemodeHeights[static_cast<int>(IconGamemode::GamemodeWave)] + 60.f) / 2.f)) / 30.f)) * 30;
                 state.ceilingY = state.groundY + gamemodeHeights[static_cast<int>(IconGamemode::GamemodeWave)];
                 setIntendedCeiling();
@@ -1473,6 +1492,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         case DUAL_PORTAL: {
             player->gravObjID = obj;
             if (!GET_ACTIVATED(obj)) {
+                addShine(ShineType::Dual, obj);
                 if (!state.dual){
                     player->ceilingInvTime = CEILING_INVUL_TIME;
                     state.dual = true;
@@ -1497,7 +1517,21 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case DIVORCE_PORTAL: {
             if (!GET_ACTIVATED(obj)) {
+                addShine(ShineType::Dual, obj);
                 if (state.dual){
+                    int dualPlayer = !state.currentPlayer;
+                    Player * otherPlayer = dualPlayer ? &state.player2 : &state.player;
+
+                    addDivorce(
+                        dualPlayer, 
+                        otherPlayer->gamemode, 
+                        otherPlayer->x, 
+                        otherPlayer->y, 
+                        otherPlayer->rotation, 
+                        otherPlayer->mini ? 0.6f : 1.0f, 
+                        otherPlayer->upsideDown
+                    );
+                    
                     state.dual = false;
                     if (state.currentPlayer == 1) {
                         memcpy(&state.player, player, sizeof(Player));

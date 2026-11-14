@@ -1,0 +1,152 @@
+#include "portal_shine.hpp"
+#include "menus/settings_hub/settings.hpp"
+#include "graphics.hpp"
+#include "main.hpp"
+#include "state.hpp"
+#include "utils/gfx.hpp"
+#include "math_helpers.hpp"
+#include "level_loading.hpp"
+#include <deque>
+
+namespace gd3ds {
+
+constexpr std::array<int, static_cast<int>(ShineType::Count) * 2> kShineSheetIndices = {
+//back, front
+    8, 9, //gamemode
+    6, 7, //gravity
+    10, 11, //mirror
+    12, 13, //size
+    14, 15, //dual
+    16, 17, //teleport
+    //speed portals
+    3, 0,
+    4, 0,
+    5, 0,
+    6, 0,
+    7, 0
+};
+
+static int getShineSheetIndex(ShineType type, bool front){
+    //array alternates between back and front
+    return kShineSheetIndices[
+        (static_cast<int>(type) * 2) + (front ? 1 : 0)
+    ];
+}
+
+static bool hasFront(ShineType type){
+    //speed portals have no front
+    return static_cast<int>(type) < static_cast<int>(ShineType::SpeedSlow);
+}
+
+PortalShine::PortalShine(ShineType type, int obj){
+    m_type = type;
+    m_obj = obj;
+}
+
+void PortalShine::updateShine(){
+    m_time += delta;
+}
+
+//This is offset locally in the X direction for some reason please help
+void PortalShine::drawShine(bool front){
+    if(front && !hasFront(m_type)) return;
+
+    float fade = 0.0f;
+    if(m_time <= 0.05f){
+        fade = m_time / 0.05f;
+    } else{
+        fade = 1.0f - (m_time / 0.4f);
+    }
+
+    fade = C2D_Clamp(fade, 0.0f, 1.0f);
+    u32 color = C2D_Color32f(1.0f, 1.0f, 1.0f, fade);
+
+    C2D_ImageTint tint;
+    C2D_PlainImageTint(&tint, color, 1.0f);
+
+    float calcX = objects.x[m_obj] - state.cameraX;
+    float calcY = SCREEN_HEIGHT - (objects.y[m_obj] - state.cameraY);
+    float fadeVal = objEdgeFade(calcX, GAMEPLAY_SCREEN_WIDTH_AREA);
+    
+    float fadeX = 0;
+    float fadeY = 0;
+    float fadeScale = 1.f;
+    getFadeVars(m_obj, calcX, &fadeX, &fadeY, &fadeScale);
+
+    // Handle special fade types
+    fadeX += getSpecialFadingVars(m_obj, fadeVal);
+
+    float x = getMirrorX(calcX + fadeX, state.mirrorFactor);
+    float y = calcY + fadeY;
+    float deg = objects.visualRotation[m_obj];
+    bool flipX = objects.flippedH[m_obj] ^ (state.mirrorMult < 0);
+    bool flipY = objects.flippedV[m_obj];
+    float scale = fadeScale;
+
+    const GameObject* obj = (const GameObject*)&gameObjects[objects.id[m_obj]];
+
+    float rad = C3D_AngleFromDegrees(adjustAngle(deg, 0, state.mirrorMult < 0));
+    float cosR = lutCos(rad);
+    float sinR = lutSin(rad);
+
+    int flipXMult = (flipX ? -1 : 1);
+    int flipYMult = (flipY ? -1 : 1);
+
+    float m00 = cosR;
+    float m01 = sinR;
+    float m10 = sinR;
+    float m11 = -cosR;
+
+    float objScaleX = objects.scaleX[m_obj];
+    float objScaleY = objects.scaleY[m_obj];
+
+    float sx = scale * flipXMult * objScaleX;
+    float sy = scale * flipYMult * objScaleY;
+
+    float localX = obj->x * flipXMult;
+    float localY = obj->y * flipYMult;
+
+    float rotX = localX * m00 + localY * m01;
+    float rotY = localX * m10 + localY * m11;
+
+    float pX = x + rotX * scale * objScaleX;
+    float pY = y + rotY * scale * objScaleY;
+    
+    C2D_DrawImageAtRotated(
+        C2D_SpriteSheetGetImage(miscFXSheet, getShineSheetIndex(m_type, front)), 
+        pX, pY, 0.0f, rad,&tint, sx, sy
+    );
+}
+
+bool PortalShine::done(){
+    //fade in and out combined
+    return m_time >= 0.05f + 0.4f;
+};
+
+std::deque<PortalShine> shines;
+
+void updateShines(){
+    while (!shines.empty() && shines.front().done()) {
+        shines.pop_front();
+    }
+
+    for(auto& shine : shines){
+        shine.updateShine();
+    }
+}
+void drawShines(bool front){
+    for(auto& shine : shines){
+        shine.drawShine(front);
+    }
+}
+
+void addShine(ShineType type, int obj){
+    shines.push_back(PortalShine(type, obj));
+}
+
+void resetShines(){
+    shines.clear();
+    shines.shrink_to_fit();
+}
+
+}
