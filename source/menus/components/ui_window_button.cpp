@@ -61,7 +61,7 @@ UIWindowButton *uiCreateWindowButton(UIScreen *screen) {
     if (!e) return NULL;
     UIButton *button = (UIButton *) e;
 
-    button->base.type = UI_WINDOW_BUTTON;
+    button->base.type = UIElementType::UiWindowButton;
     button->base.enabled = true;
     button->base.update = uiWindowButtonUpdate;
     button->base.draw = uiWindowButtonDraw;

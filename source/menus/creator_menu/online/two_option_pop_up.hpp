@@ -4,12 +4,12 @@
 namespace gd3ds
 {
 
-typedef struct {
+struct TwoOptionPopupData {
     const char *text;
     const char *title;
     const char *cancelText;
     const char *proceedText;
-} TwoOptionPopupData;
+};
 
 extern const UIScreenDefPair twoOptionPopUpDef;
 extern const UIScreenDefPair warningPopUpDef;

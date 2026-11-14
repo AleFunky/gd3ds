@@ -50,7 +50,7 @@ UIImage *uiCreateImage(UIScreen *screen) {
 
     if (!e) return NULL;
 
-    e->base.type = UI_IMAGE;
+    e->base.type = UIElementType::UiImage;
     e->base.enabled = true;
 
     uiElementApplyDefaultProperties(&e->base, screen);

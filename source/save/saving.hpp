@@ -26,7 +26,7 @@
 namespace gd3ds
 {
 
-typedef struct LevelData {
+struct LevelData {
     int levelID;
     int attempts;
     int jumps;
@@ -37,76 +37,76 @@ typedef struct LevelData {
     bool coin2;
     bool coin3;
     bool lowDetail;
-} LevelData;
+};
 
 bool levelHasRate(const LevelData *data);
 
-typedef struct SavedLevelDataEntry {
+struct SavedLevelDataEntry {
     char *key;
     int version;
     SearchEntry searchEntry;
     CreatorEntry creatorEntry;
     SongEntry songEntry;
     LevelEntry levelEntry;
-} SavedLevelDataEntry;
+};
 
-typedef struct SavedLevelDataList {
+struct SavedLevelDataList {
     SavedLevelDataEntry *list;
     size_t capacity;
     size_t count;
-} SavedLevelDataList;
+};
 
-typedef struct LevelDataEntry {
+struct LevelDataEntry {
     char *key;
     LevelData data;
-} LevelDataEntry;
+};
 
-typedef struct LevelDataList {
+struct LevelDataList {
     LevelDataEntry *list;
     size_t capacity;
     size_t count;
-} LevelDataList;
+};
 
-typedef struct ServerFile {
+struct ServerFile {
     LevelDataList onlineLevels;
     LevelDataList mainLevels;
     SavedLevelDataList savedLevels;
-} ServerFile;
+};
 
-typedef struct ExternalLevelFile {
+struct ExternalLevelFile {
     LevelDataList externalLevels;  
-} ExternalLevelFile;
+};
 
-typedef enum {
-    LEVEL_LIST_MAIN_LEVELS,
-    LEVEL_LIST_EXTERNAL,
-    LEVEL_LIST_ONLINE,
-} LevelListType;
+enum class LevelListType {
+    LevelListMainLevels,
+    LevelListExternal,
+    LevelListOnline,
+};
 
-typedef enum {
-    SAVE_ROBTOP,
-    SAVE_1P9_GDPS,
-    SAVE_EXTERNAL,
-    SAVE_CONFIG,
-    SAVE_TYPE_COUNT,
-} SaveType;
+enum class SaveType {
+    SaveRobtop,
+    Save1p9Gdps,
+    SaveExternal,
+    SaveConfig,
+    SaveTypeCount,
+};
 
-typedef enum {
-    SAVE_ERROR_NONE,
-    SAVE_ERROR_JSON_FAIL,
-    SAVE_ERROR_MAKE_DATA_LIST,
-    SAVE_ERROR_DECOMPRESS,
-    SAVE_ERROR_COMPRESS,
-    SAVE_ERROR_OPEN_FILE,
-    SAVE_ERROR_WRITING_FILE,
-    SAVE_ERROR_REMOVE_FILE,
-    SAVE_ERROR_RENAME_FILE,
-    SAVE_ERROR_DATA,
-    SAVE_ERROR_MAKE_SAVE_DATA_LIST,
-    SAVE_ERROR_OUTOFMEM,
-} SavingError;
+enum class SavingError {
+    SaveErrorNone,
+    SaveErrorJsonFail,
+    SaveErrorMakeDataList,
+    SaveErrorDecompress,
+    SaveErrorCompress,
+    SaveErrorOpenFile,
+    SaveErrorWritingFile,
+    SaveErrorRemoveFile,
+    SaveErrorRenameFile,
+    SaveErrorData,
+    SaveErrorMakeSaveDataList,
+    SaveErrorOutofmem,
+};
 
-typedef struct SavingTask {
+struct SavingTask {
     struct json_object *root;
     unsigned char *data;
     size_t dataLen;
@@ -115,7 +115,7 @@ typedef struct SavingTask {
     char tmpFile[256];
     volatile bool ready;
     volatile bool running;
-} SavingTask;
+};
 
 void beginSaving(SaveType type);
 void processSaving();

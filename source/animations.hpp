@@ -6,38 +6,38 @@
 namespace gd3ds
 {
 
-typedef struct {
+struct AnimSprite {
     size_t childSlot;
     float x, y;
     float scaleX, scaleY;
     int flipX, flipY;
     float rot;
     int z;
-} AnimSprite;
+};
 
-typedef struct {
+struct AnimFrame {
     const AnimSprite* sprites;
     size_t spriteCount;
-} AnimFrame;
+};
 
-typedef struct {
+struct Animation {
     const AnimFrame* frames;
     int frameCount;
     float fps;
-} Animation;
+};
 
-typedef enum {
-    ANIM_BLACKSLUDGE_LOOP = 0,
-    ANIM_GJBEAST01_ATTACK01 = 1,
-    ANIM_GJBEAST01_ATTACK01_END = 2,
-    ANIM_GJBEAST01_ATTACK01_LOOP = 3,
-    ANIM_GJBEAST01_BITE = 4,
-    ANIM_GJBEAST01_IDLE01 = 5,
-    ANIM_GJBEAST02_IDLE01 = 6,
-    ANIM_GJBEAST02_IDLE02 = 7,
-    ANIM_GJBEAST03_IDLE01 = 8,
-    ANIM_GJBEAST03_IDLE02 = 9
-} AnimationID;
+enum class AnimationID {
+    AnimBlacksludgeLoop = 0,
+    AnimGjbeast01Attack01 = 1,
+    AnimGjbeast01Attack01End = 2,
+    AnimGjbeast01Attack01Loop = 3,
+    AnimGjbeast01Bite = 4,
+    AnimGjbeast01Idle01 = 5,
+    AnimGjbeast02Idle01 = 6,
+    AnimGjbeast02Idle02 = 7,
+    AnimGjbeast03Idle01 = 8,
+    AnimGjbeast03Idle02 = 9
+};
 
 #define ANIMATION_COUNT 10
 

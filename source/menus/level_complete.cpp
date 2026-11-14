@@ -229,7 +229,7 @@ static void restartLevel(UIElement* e, const UIPropertyList *args) {
 static void scaleBottomButtonsAnim(UIElement* e){
     UIButton *button = (UIButton *) e;
 
-    float fadeValueScale = easeValue(ELASTIC_OUT, 0, 1, animTime, ANIM_DURATION, 1.f);
+    float fadeValueScale = easeValue(EaseTypes::ElasticOut, 0, 1, animTime, ANIM_DURATION, 1.f);
     
     uiElementSetScale((UIElement *) button, fadeValueScale);
 }
@@ -241,7 +241,7 @@ static UIActionDef actions[] = {
 
 // This runs the initial animation of the menu coming off screen
 static void runStartAnimation(float delta) {
-    float fadeValue = easeValue(BOUNCE_OUT, 0, 240, animTime, ANIM_DURATION, 1.f);\
+    float fadeValue = easeValue(EaseTypes::BounceOut, 0, 240, animTime, ANIM_DURATION, 1.f);\
     windowYPos = -120 + fadeValue;
     upYStart = fadeValue;
 
@@ -298,8 +298,8 @@ static void runRewardsAnimation(float delta){
     LevelData *levelDataSel = &currentLevelEntry->data;
     UIImage *rewardCenter = NULL;
 
-    float scaleValue = easeValue(BOUNCE_OUT, 3.f, 1.f, rewardAnimTime, 0.35f, 1.f);
-    float opacityValue = easeValue(EASE_LINEAR, 0.f, 1.f, rewardAnimTime, 0.1f, 1.f);
+    float scaleValue = easeValue(EaseTypes::BounceOut, 3.f, 1.f, rewardAnimTime, 0.35f, 1.f);
+    float opacityValue = easeValue(EaseTypes::EaseLinear, 0.f, 1.f, rewardAnimTime, 0.1f, 1.f);
     //coins
     if(rewardAnimPhase < 3){
         //Skip uncollected/already collected coins
@@ -364,7 +364,7 @@ static void runRewardsAnimation(float delta){
 
 // This runs the animation that happens when you press "restart"
 static void runEndAnimation(float delta) {
-    float fadeValue = easeValue(QUAD_IN, upYStart, 0, animTime, RESTART_ANIM_DURATION, 1.f);
+    float fadeValue = easeValue(EaseTypes::QuadIn, upYStart, 0, animTime, RESTART_ANIM_DURATION, 1.f);
     windowYPos = -120 + fadeValue;
 
     uiSetPosOnTag(&screen, (float)SCREEN_BOT_WIDTH / 2.f, windowYPos, "window");
@@ -572,7 +572,7 @@ void levelCompleteInit() {
             char enabledCheats[256] = "";
             size_t len = 0;
             
-            for (int i = 0; i < CHEAT_COUNT; i++) {
+            for (int i = 0; i < static_cast<int>(Cheats::CheatCount); i++) {
                 if (cheatsUsed[i]) {
                     if (len > 0) {
                         len += snprintf(enabledCheats + len,

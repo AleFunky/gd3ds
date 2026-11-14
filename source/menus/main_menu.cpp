@@ -64,17 +64,17 @@ static void actionOpenQuitGamePopUp(UIElement *e, const UIPropertyList *args){
     quitData->proceedText = strdup("Quit");
     quitData->cancelText = strdup("Cancel");
 
-    uiStackPush(&quitPopUpDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+    uiStackPush(&quitPopUpDef, UIAnimation::AnimZoom, UIAnimation::AnimZoom, UIStackPushType::PushNext);
     uiStackPushData(quitData);
 }
 
 void handleTitleScreenPlayer(Player *player) {
     if (state.input.holdJump) {
-        if (player->bufferingState == BUFFER_NONE) {
-            player->bufferingState = BUFFER_READY;
+        if (player->bufferingState == static_cast<int>(BufferingState::BufferNone)) {
+            player->bufferingState = static_cast<int>(BufferingState::BufferReady);
         }
     } else {
-        player->bufferingState = BUFFER_NONE;
+        player->bufferingState = static_cast<int>(BufferingState::BufferNone);
     }
 
     player->onGround = false;
@@ -105,9 +105,9 @@ void resetPlayers() {
     initPlayer(&titleScreenPlayer);
     titleScreenPlayer.x = -120;
     titleScreenPlayer.upsideDown = false;
-    state.speed = randomInt(0, SPEED_COUNT - 1);
+    state.speed = randomInt(0, static_cast<int>(PlayerSpeeds::SpeedCount) - 1);
     titleScreenPlayer.rotation = 0;
-    setGamemode(&titleScreenPlayer, randomInt(0, GAMEMODE_COUNT - 1));
+    setGamemode(&titleScreenPlayer, randomInt(0, static_cast<int>(IconGamemode::GamemodeCount) - 1));
     setMini(&titleScreenPlayer, randomInt(0,1));
 
     titleScreenPlayer.playerIcons.cube = randomInt(1, ICON_COUNT_PLAYER - 1);
@@ -142,15 +142,15 @@ static void handleInput() {
     oldPressing = pressing;
     pressing = false;
     switch (titleScreenPlayer.gamemode) {
-        case GAMEMODE_PLAYER:
+        case static_cast<int>(IconGamemode::GamemodePlayer):
             // Press A 1/16 of time
             if (!(rand() & 0b1111)) pressing = true;
             break;
-        case GAMEMODE_UFO:
+        case static_cast<int>(IconGamemode::GamemodeUfo):
             // Press A 1/16 of time
             if (!(rand() & 0b1111)) pressing = true;
             break;
-        case GAMEMODE_WAVE:
+        case static_cast<int>(IconGamemode::GamemodeWave):
             // Switch holding A 1/16 of time
             if (!(rand() & 0b1111)) titleScreenPlayerHold ^= 1;
 
@@ -158,7 +158,7 @@ static void handleInput() {
                 pressing = true;
             }
             break;
-        case GAMEMODE_SHIP:
+        case static_cast<int>(IconGamemode::GamemodeShip):
             // Switch holding A 1/16 of time
             if (!(rand() & 0b1111)) titleScreenPlayerHold ^= 1;
 
@@ -166,7 +166,7 @@ static void handleInput() {
                 pressing = true;
             }
             break;
-        case GAMEMODE_ROBOT:
+        case static_cast<int>(IconGamemode::GamemodeRobot):
             if (titleScreenPlayerHold) {
                 // If holding, 1/8 change to stop holding
                 if (!(rand() & 0b111)) titleScreenPlayerHold = 0;
@@ -176,7 +176,7 @@ static void handleInput() {
                 if (!(rand() & 0b1111)) titleScreenPlayerHold = 0;
             }
             break;
-        case GAMEMODE_SPIDER:
+        case static_cast<int>(IconGamemode::GamemodeSpider):
             pressing = false;
             break;
     }
@@ -189,7 +189,7 @@ static void handlePlayers() {
     state.oldPlayer = titleScreenPlayer;
     handleTitleScreenPlayer(&titleScreenPlayer);
 
-    bool wtrailOpacityIsZero = (titleScreenPlayer.gamemode == GAMEMODE_WAVE ? waveTrailP1.opacity <= 0.f : true);
+    bool wtrailOpacityIsZero = (titleScreenPlayer.gamemode == static_cast<int>(IconGamemode::GamemodeWave) ? waveTrailP1.opacity <= 0.f : true);
     
     // Wave trail needs to be invisible in order to despawn this player
     if (wtrailOpacityIsZero && titleScreenPlayer.x >= SCREEN_WIDTH_AREA + OFFSCREEN_BUFFER) {
@@ -220,20 +220,20 @@ static void mainMenuInit(UIScreen *s){
     col.g = GET_G(color);
     col.b = GET_B(color);
 
-    int chanBg = getColChannelIndex(CHANNEL_BG);
-    int chanGround = getColChannelIndex(CHANNEL_GROUND);
-    int chanGround2 = getColChannelIndex(CHANNEL_GROUND_2);
-    int chanLine = getColChannelIndex(CHANNEL_LINE);
+    int chanBg = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelBg));
+    int chanGround = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelGround));
+    int chanGround2 = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelGround2));
+    int chanLine = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelLine));
 
     channels[chanBg].color = col;
     channels[chanGround].color = col;
     channels[chanGround2].color = col;
     channels[chanLine].color = white;
 
-    getBuffer(CHANNEL_BG)->active = false;
-    getBuffer(CHANNEL_GROUND)->active = false;
-    getBuffer(CHANNEL_GROUND_2)->active = false;
-    getBuffer(CHANNEL_LINE)->active = false;
+    getBuffer(static_cast<int>(ColorChannelIDs::ChannelBg))->active = false;
+    getBuffer(static_cast<int>(ColorChannelIDs::ChannelGround))->active = false;
+    getBuffer(static_cast<int>(ColorChannelIDs::ChannelGround2))->active = false;
+    getBuffer(static_cast<int>(ColorChannelIDs::ChannelLine))->active = false;
 
     allocateParticles();
     initVariables();
@@ -254,7 +254,7 @@ static void mainMenuInit(UIScreen *s){
       warningData->text = strdup("The .3dsx release lacks RAM\non non-New 3DS hardware.\nPlease install the .cia.");
       warningData->title = strdup("Warning");
       warningData->copied = true;
-      uiStackPush(&infoCardDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+      uiStackPush(&infoCardDef, UIAnimation::AnimZoom, UIAnimation::AnimZoom, UIStackPushType::PushNext);
       uiStackPushData(warningData);
     }
 
@@ -320,7 +320,7 @@ static void mainMenuUpdate(UIScreen *s, UIInput *input){
     glitterParticlesBottom.emitting = false;
 
     // Fade wave trail
-    if (titleScreenPlayer.gamemode == GAMEMODE_WAVE && (state.dead || titleScreenPlayer.x >= SCREEN_WIDTH_AREA)) {
+    if (titleScreenPlayer.gamemode == static_cast<int>(IconGamemode::GamemodeWave) && (state.dead || titleScreenPlayer.x >= SCREEN_WIDTH_AREA)) {
         if (waveTrail->opacity > 0) waveTrail->opacity -= 0.08f;
         
         if (waveTrail->opacity <= 0) {
@@ -343,7 +343,7 @@ static void mainMenuUpdate(UIScreen *s, UIInput *input){
     );
 
     if (kill && !state.dead) {
-        killPlayer(DEATH_TITLE_SCREEN_KILL);
+        killPlayer(DeathReason::DeathTitleScreenKill);
         playersDestroyed++;
         handleDeath(&titleScreenPlayer, false);
         deathWaitTimer = DEATH_WAITING_TIME;
@@ -359,15 +359,15 @@ static void mainMenuUpdate(UIScreen *s, UIInput *input){
         }
     }
 
-    handleColChannel(CHANNEL_BG);
-    handleColChannel(CHANNEL_GROUND);
-    handleColChannel(CHANNEL_GROUND_2);
+    handleColChannel(static_cast<int>(ColorChannelIDs::ChannelBg));
+    handleColChannel(static_cast<int>(ColorChannelIDs::ChannelGround));
+    handleColChannel(static_cast<int>(ColorChannelIDs::ChannelGround2));
 
-    ColTriggerBuffer *trig = getBuffer(CHANNEL_BG);
+    ColTriggerBuffer *trig = getBuffer(static_cast<int>(ColorChannelIDs::ChannelBg));
     if (!trig->active) {
-        uploadColorToBuffer(CHANNEL_BG, defaultLvlColors[mainMenuColorIndex % numMenuColors], 4.f);
-        uploadColorToBuffer(CHANNEL_GROUND, defaultLvlColors[mainMenuColorIndex % numMenuColors], 4.f);
-        uploadColorToBuffer(CHANNEL_GROUND_2, defaultLvlColors[mainMenuColorIndex % numMenuColors], 4.f);
+        uploadColorToBuffer(static_cast<int>(ColorChannelIDs::ChannelBg), defaultLvlColors[mainMenuColorIndex % numMenuColors], 4.f);
+        uploadColorToBuffer(static_cast<int>(ColorChannelIDs::ChannelGround), defaultLvlColors[mainMenuColorIndex % numMenuColors], 4.f);
+        uploadColorToBuffer(static_cast<int>(ColorChannelIDs::ChannelGround2), defaultLvlColors[mainMenuColorIndex % numMenuColors], 4.f);
         mainMenuColorIndex++;
     }
     
@@ -376,7 +376,7 @@ static void mainMenuUpdate(UIScreen *s, UIInput *input){
 
 //bottom screen
 static void mainMenuDraw(UIScreen *s, UIDrawPhase phase){
-    if(phase == UI_DRAW_AFTER) return;
+    if(phase == UIDrawPhase::UiDrawAfter) return;
 
     drawBackground(bgScroll / 8, SCREEN_HEIGHT);
 
@@ -400,7 +400,7 @@ static void mainMenuDraw(UIScreen *s, UIDrawPhase phase){
 }
 
 static void mainMenuDrawTop(UIScreen *s, UIDrawPhase phase){
-    if(phase == UI_DRAW_AFTER) return;
+    if(phase == UIDrawPhase::UiDrawAfter) return;
 
     beginEyeLayer(DEPTH_BACKGROUND);
     drawBackground(-40 + (bgScroll / 8), 0);

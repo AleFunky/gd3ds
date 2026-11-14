@@ -18,7 +18,7 @@
 namespace gd3ds
 {
 
-typedef struct SearchFilters {
+struct SearchFilters {
     bool uncompleted:1;
     bool completed:1;
     bool original:1;
@@ -40,11 +40,11 @@ typedef struct SearchFilters {
     size_t mainSong;
     char customSongQuery[15];
     char searchQuery[20];
-} SearchFilters;
+};
 
-typedef struct GenericTask GenericTask;
+struct GenericTask;
 
-typedef struct {
+struct DownloadTask {
     volatile float progress;
     volatile int speed;
 
@@ -61,7 +61,7 @@ typedef struct {
     const char *url;
     char fileName[16];
     char extension[8];
-} DownloadTask;
+};
 
 Thread createFileDownloadThread(DownloadTask *task);
 

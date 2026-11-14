@@ -5,36 +5,36 @@
 namespace gd3ds
 {
 
-enum MainLevelDifficulties {
-    MAIN_DIFF_EASY,
-    MAIN_DIFF_NORMAL,
-    MAIN_DIFF_HARD,
-    MAIN_DIFF_HARDER,
-    MAIN_DIFF_INSANE,
-    MAIN_DIFF_DEMON
+enum class Difficulty {
+    Easy,
+    Normal,
+    Hard,
+    Harder,
+    Insane,
+    Demon
 };
 
-typedef struct SongEntries {
+struct SongEntries {
     const char *title;
     const char *artist;
-} SongEntries;
+};
 
-typedef struct {
+struct MainLevelDefinition {
     int levelID;
     
     const char *levelName;
     const char *gmdPath;
     const char *songPath;
 
-    int difficulty;
+    Difficulty difficulty;
     int stars;
     SongEntries songData;
-} MainLevelDefinition;
+};
 
-typedef struct {
+struct MainLevelPack {
     MainLevelDefinition *levels;
     size_t count;
-} MainLevelPack;
+};
 
 extern const MainLevelPack *currentMainLevelPack;
 

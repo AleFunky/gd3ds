@@ -173,7 +173,7 @@ UISlider *uiCreateSlider(UIScreen *screen) {
 
     if (!e) return NULL;
 
-    e->base.type = UI_SLIDER;
+    e->base.type = UIElementType::UiSlider;
     e->base.enabled = true;
     
     uiElementApplyDefaultProperties(&e->base, screen);

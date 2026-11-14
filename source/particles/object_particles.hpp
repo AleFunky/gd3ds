@@ -7,7 +7,7 @@
 namespace gd3ds
 {
 
-typedef struct {
+struct ObjectParticles {
     ParticleSystem ps;
     int id;
     bool occupied;
@@ -16,7 +16,7 @@ typedef struct {
     float rotationBase;
     float angleBase;
     float lastRotation;
-} ObjectParticles;
+};
 
 extern ObjectParticles objectParticle[MAX_OBJECT_PS];
 extern ParticleSystem brickDestroyParticles;

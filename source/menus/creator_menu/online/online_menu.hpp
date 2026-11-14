@@ -25,15 +25,15 @@ extern const int epics[4];
 
 extern const UIScreenDefPair onlineDef;
 
-typedef struct {
+struct VersionWarningData {
     bool wasUpdated;
     float version;
-} VersionWarningData;
+};
 
-typedef struct {
+struct OnlineCardData {
     int entryId;
     int levelId;
     int redownload;
-} OnlineCardData;
+};
 
 }

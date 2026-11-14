@@ -74,7 +74,7 @@ UICheckBox *uiCreateCheckbox(UIScreen *screen) {
 
     UIButton *button = (UIButton* ) e;
     
-    button->base.type = UI_CHECKBOX;
+    button->base.type = UIElementType::UiCheckbox;
     button->base.enabled = true;
     button->base.update = uiCheckboxUpdate;
     button->base.draw = uiCheckboxDraw;

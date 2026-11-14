@@ -15,17 +15,17 @@
 namespace gd3ds
 {
 
-typedef struct {
+struct IconCacheEntry {
     int key;
     C2D_SpriteSheet sheet;
     bool pinned;
     bool used;
-} IconCacheEntry;
+};
 
-typedef struct {
+struct IconArchiveEntry {
     u32 offset;
     u32 length;
-} IconArchiveEntry;
+};
 
 static IconCacheEntry cache[ICON_CACHE_CAPACITY];
 static int iconPrefix[ICON_GAMEMODE_COUNT];

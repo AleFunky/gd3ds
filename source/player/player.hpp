@@ -35,25 +35,25 @@
 namespace gd3ds
 {
 
-typedef struct {
+struct SlopeData {
     int slopeID;
     float elapsed;
     bool snapDown;
-} SlopeData;
+};
 
-typedef struct {
+struct SnapData {
     int objectID;
     int playerFrame;
     float playerSnapDiff;
     int snappedObj;
-} SnapData;
+};
 
-typedef struct {
+struct InternalHitbox {
     float width;
     float height;
-} InternalHitbox;
+};
 
-typedef struct {
+struct P1Trail {
     int gamemode;
     float x;
     float y;
@@ -68,9 +68,9 @@ typedef struct {
 
     bool upsideDown;
     bool active;
-} P1Trail;
+};
 
-typedef struct {
+struct IconsDrawing {
     int cube;
     int ship;
     int ball;
@@ -84,9 +84,9 @@ typedef struct {
     Color glowColor;
 
     bool glow;
-} IconsDrawing;
+};
 
-typedef struct {
+struct Player {
     float x;
     float y;
     
@@ -212,25 +212,25 @@ typedef struct {
 
     float minVel;
     float maxVel;
-} Player;
-
-typedef struct {
-    void (*func)(Player *);
-} PlayerAction;
-
-enum BufferingState {
-    BUFFER_NONE,
-    BUFFER_READY,
-    BUFFER_END
 };
 
-enum PlayerSpeeds {
-    SPEED_SLOW,
-    SPEED_NORMAL,
-    SPEED_FAST,
-    SPEED_FASTER,
-    SPEED_FASTEST,
-    SPEED_COUNT
+struct PlayerAction {
+    void (*func)(Player *);
+};
+
+enum class BufferingState {
+    BufferNone,
+    BufferReady,
+    BufferEnd
+};
+
+enum class PlayerSpeeds {
+    SpeedSlow,
+    SpeedNormal,
+    SpeedFast,
+    SpeedFaster,
+    SpeedFastest,
+    SpeedCount
 };
 
 extern PlayerAction playerActions[2][MAX_ACTIONS];
@@ -261,19 +261,19 @@ extern ParticleSystem fasterSpeedParticles;
 extern ParticleSystem fastestSpeedParticles;
 extern ParticleSystem coinPickupParticles;
 
-typedef struct KeyInput KeyInput;
+struct KeyInput;
 
 extern KeyInput currInput;
 extern KeyInput currOldInput;
 
-extern const float playerSpeeds[SPEED_COUNT];
-extern const float playerSpeedMults[SPEED_COUNT];
+extern const float playerSpeeds[static_cast<int>(PlayerSpeeds::SpeedCount)];
+extern const float playerSpeedMults[static_cast<int>(PlayerSpeeds::SpeedCount)];
 
 inline float getTop(Player *player)  { return player->y + player->height / 2; }
 inline float getBottom(Player *player)  { return player->y - player->height / 2; }
 
-inline float getGroundTop(Player *player)  { return player->y + (player->height / 2) + ((player->gamemode == GAMEMODE_WAVE) ? (player->mini ? 3 : 5) : 0); }
-inline float getGroundBottom(Player *player)  { return player->y - (player->height / 2) - ((player->gamemode == GAMEMODE_WAVE) ? (player->mini ? 3 : 5) : 0); }
+inline float getGroundTop(Player *player)  { return player->y + (player->height / 2) + ((player->gamemode == static_cast<int>(IconGamemode::GamemodeWave)) ? (player->mini ? 3 : 5) : 0); }
+inline float getGroundBottom(Player *player)  { return player->y - (player->height / 2) - ((player->gamemode == static_cast<int>(IconGamemode::GamemodeWave)) ? (player->mini ? 3 : 5) : 0); }
 
 inline float getRight(Player *player)  { return player->x + player->width / 2; }
 inline float getLeft(Player *player)  { return player->x - player->width / 2; }

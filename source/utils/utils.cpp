@@ -75,7 +75,7 @@ unsigned char *compressData(const unsigned char *data, size_t dataLen, size_t *o
     if (ret != Z_STREAM_END) {
         free(out);
         deflateEnd(&strm);
-        *outCode = LOAD_INVALID_COMPRESSED_DATA;
+        *outCode = static_cast<int>(LevelLoadError::LoadInvalidCompressedData);
         return NULL;
     }
 
@@ -83,7 +83,7 @@ unsigned char *compressData(const unsigned char *data, size_t dataLen, size_t *o
 
     deflateEnd(&strm);
 
-    *outCode = LOAD_NO_ERROR;
+    *outCode = static_cast<int>(LevelLoadError::LoadNoError);
 
     return out;
 }
@@ -98,7 +98,7 @@ char *decompressData(unsigned char *data, size_t dataLen, size_t *outLen, int *o
 
     if (inflateInit2(&strm, 15 | 32) != Z_OK) {   // auto-detect gzip/zlib
         printf("Failed to initialize zlib stream for GZIP\n");
-        *outCode = LOAD_INVALID_COMPRESSED_DATA;
+        *outCode = static_cast<int>(LevelLoadError::LoadInvalidCompressedData);
         return NULL;
     }
 
@@ -107,7 +107,7 @@ char *decompressData(unsigned char *data, size_t dataLen, size_t *outLen, int *o
     if (!out) {
         printf("malloc failed for %lu bytes\n", (unsigned long)finalSize);
         inflateEnd(&strm);
-        *outCode = LOAD_OUT_OF_MEMORY;
+        *outCode = static_cast<int>(LevelLoadError::LoadOutOfMemory);
         return NULL;
     }
 
@@ -119,7 +119,7 @@ char *decompressData(unsigned char *data, size_t dataLen, size_t *outLen, int *o
         printf("inflate failed with code %d\n", ret);
         free(out);
         inflateEnd(&strm);
-        *outCode = LOAD_INVALID_COMPRESSED_DATA;
+        *outCode = static_cast<int>(LevelLoadError::LoadInvalidCompressedData);
         return NULL;
     }
 
@@ -130,7 +130,7 @@ char *decompressData(unsigned char *data, size_t dataLen, size_t *outLen, int *o
 
     printf("Decompressed %lu bytes successfully\n", (unsigned long)*outLen);
 
-    *outCode = LOAD_NO_ERROR;
+    *outCode = static_cast<int>(LevelLoadError::LoadNoError);
     return out;
 }
 
@@ -143,7 +143,7 @@ char *decompressDataLevel(unsigned char *data, size_t dataLen, size_t *outLen, i
 
     if (inflateInit2(&strm, 15 | 32) != Z_OK) {   // auto-detect gzip/zlib
         printf("Failed to initialize zlib stream for GZIP\n");
-        *outCode = LOAD_INVALID_COMPRESSED_DATA;
+        *outCode = static_cast<int>(LevelLoadError::LoadInvalidCompressedData);
         return NULL;
     }
 
@@ -152,7 +152,7 @@ char *decompressDataLevel(unsigned char *data, size_t dataLen, size_t *outLen, i
     if (!out) {
         printf("malloc failed for %lu bytes\n", (unsigned long)finalSize);
         inflateEnd(&strm);
-        *outCode = LOAD_OUT_OF_MEMORY;
+        *outCode = static_cast<int>(LevelLoadError::LoadOutOfMemory);
         return NULL;
     }
 
@@ -164,7 +164,7 @@ char *decompressDataLevel(unsigned char *data, size_t dataLen, size_t *outLen, i
         printf("inflate failed with code %d\n", ret);
         free(out);
         inflateEnd(&strm);
-        *outCode = LOAD_INVALID_COMPRESSED_DATA;
+        *outCode = static_cast<int>(LevelLoadError::LoadInvalidCompressedData);
         return NULL;
     }
 
@@ -175,7 +175,7 @@ char *decompressDataLevel(unsigned char *data, size_t dataLen, size_t *outLen, i
 
     printf("Decompressed %lu bytes successfully\n", (unsigned long)*outLen);
 
-    *outCode = LOAD_NO_ERROR;
+    *outCode = static_cast<int>(LevelLoadError::LoadNoError);
     return out;
 }
 

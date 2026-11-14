@@ -31,10 +31,10 @@
 namespace gd3ds
 {
 
-typedef struct {
+struct Config {
     struct json_object* root;
     char path[256];
-} Config;
+};
 
 int configLoad(Config* cfg, const char* path);
 void configSave(Config* cfg);

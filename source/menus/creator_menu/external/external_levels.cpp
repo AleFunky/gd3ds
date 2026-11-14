@@ -47,10 +47,10 @@ static char reloadPath[320];
 char currentPath[320] = { 0 };
 char lastPath[320] = { 1 };
 
-typedef struct {
+struct LevelCardData {
     char path[256];
     bool isDir;
-} LevelCardData;
+};
 
 static UILabel *path_label = NULL;
 static UIList *list = NULL;
@@ -77,7 +77,7 @@ static void openFolder(UIElement *e, const UIPropertyList* args);
 static void openExternalPopup(UIElement *e, const UIPropertyList* args) {
     LevelCardData *entry = (LevelCardData *)e->userdata;
     strcpy(state.customLevelPath, entry->path);
-    uiStackPush(&externalPopupDef, ANIM_ZOOM_SUBTLE, ANIM_ZOOM_SUBTLE, PUSH_NEXT);
+    uiStackPush(&externalPopupDef, UIAnimation::AnimZoomSubtle, UIAnimation::AnimZoomSubtle, UIStackPushType::PushNext);
 }
 
 void startLoad(char *folder, UIScreen *s) {

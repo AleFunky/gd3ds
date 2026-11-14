@@ -72,7 +72,7 @@ static void openLevel(UIElement *e, const UIPropertyList *args) {
 
     stopMP3();
     playingMenuLoop = false;
-    uiStackPushGameState(STATE_GAME);
+    uiStackPushGameState(static_cast<int>(GameState::StateGame));
 }
 
 static UIActionDef externalPopupActions[] = {
@@ -118,7 +118,7 @@ static void setNameCreator(char *gmd) {
     snprintf(file, sizeof(file), "ext_%s_%s", levelInfo.levelName, levelInfo.creatorName);
     
     currentLevelEntry = getOrAddLevelToExternalFile(&externalFile, file);
-    currentLevelList = LEVEL_LIST_EXTERNAL;
+    currentLevelList = LevelListType::LevelListExternal;
     
     setProgress();
 }
@@ -332,7 +332,7 @@ void showLevelLoadErrorMessage() {
     extErrorData->title = strdup("Error");
     extErrorData->customTitle = true;
 
-    uiStackPush(&infoCardDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+    uiStackPush(&infoCardDef, UIAnimation::AnimZoom, UIAnimation::AnimZoom, UIStackPushType::PushNext);
     uiStackPushData(extErrorData);
 
     levelResult = 0;

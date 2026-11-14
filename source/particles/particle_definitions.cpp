@@ -87,7 +87,7 @@ extern const ParticleDefinition dragEffect = {
     .startParticleSizeVariance = 3,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition ringEffect = {
@@ -141,7 +141,7 @@ extern const ParticleDefinition ringEffect = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition portalEffect01 = {
@@ -195,7 +195,7 @@ extern const ParticleDefinition portalEffect01 = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition bumpEffect = {
@@ -249,7 +249,7 @@ extern const ParticleDefinition bumpEffect = {
     .startParticleSizeVariance = 1.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition portalEffect08 = {
@@ -303,7 +303,7 @@ extern const ParticleDefinition portalEffect08 = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 100.0f,
     .tangentialAcceleration = -100.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition landEffect = {
@@ -357,7 +357,7 @@ extern const ParticleDefinition landEffect = {
     .startParticleSizeVariance = 3,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition glassDestroy01 = {
@@ -411,7 +411,7 @@ extern const ParticleDefinition glassDestroy01 = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition glitterEffect = {
@@ -465,7 +465,7 @@ extern const ParticleDefinition glitterEffect = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition levelComplete01 = {
@@ -519,7 +519,7 @@ extern const ParticleDefinition levelComplete01 = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition shipDragEffect = {
@@ -573,7 +573,7 @@ extern const ParticleDefinition shipDragEffect = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition speedEffectFast = {
@@ -627,7 +627,7 @@ extern const ParticleDefinition speedEffectFast = {
     .startParticleSizeVariance = 1.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition speedEffectNormal = {
@@ -681,7 +681,7 @@ extern const ParticleDefinition speedEffectNormal = {
     .startParticleSizeVariance = 1.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition speedEffectSlow = {
@@ -735,7 +735,7 @@ extern const ParticleDefinition speedEffectSlow = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition speedEffectVfast = {
@@ -789,7 +789,7 @@ extern const ParticleDefinition speedEffectVfast = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 const ParticleDefinition speedEffectFastest = {
@@ -843,7 +843,7 @@ const ParticleDefinition speedEffectFastest = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 const ParticleDefinition firework = {
@@ -897,7 +897,7 @@ const ParticleDefinition firework = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition explodeEffect = {
@@ -951,7 +951,7 @@ extern const ParticleDefinition explodeEffect = {
     .startParticleSizeVariance = 5.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition coinEffect = {
@@ -1005,7 +1005,7 @@ extern const ParticleDefinition coinEffect = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition coinPickupEffect = {
@@ -1059,7 +1059,7 @@ extern const ParticleDefinition coinPickupEffect = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition burstEffect = {
@@ -1113,7 +1113,7 @@ extern const ParticleDefinition burstEffect = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 957.03125f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition boost01Effect = {
@@ -1167,7 +1167,7 @@ extern const ParticleDefinition boost01Effect = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition boost02Effect = {
@@ -1221,7 +1221,7 @@ extern const ParticleDefinition boost02Effect = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition boost03Effect = {
@@ -1275,7 +1275,7 @@ extern const ParticleDefinition boost03Effect = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition boost04Effect = {
@@ -1329,7 +1329,7 @@ extern const ParticleDefinition boost04Effect = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition endEffectPortal = {
@@ -1383,7 +1383,7 @@ extern const ParticleDefinition endEffectPortal = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition shipEffect = {
@@ -1437,7 +1437,7 @@ extern const ParticleDefinition shipEffect = {
     .startParticleSizeVariance = 3,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition shipFireEffect = {
@@ -1491,7 +1491,7 @@ extern const ParticleDefinition shipFireEffect = {
     .startParticleSizeVariance = 2,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition touchDragEffect = {
@@ -1545,7 +1545,7 @@ extern const ParticleDefinition touchDragEffect = {
     .startParticleSizeVariance = 1,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition touchExplosionEffect = {
@@ -1599,7 +1599,7 @@ extern const ParticleDefinition touchExplosionEffect = {
     .startParticleSizeVariance = 4.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 extern const ParticleDefinition starEffect = {
@@ -1653,7 +1653,7 @@ extern const ParticleDefinition starEffect = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 0.0f,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 
@@ -1708,7 +1708,7 @@ extern const ParticleDefinition burstEffect2 = {
     .startParticleSizeVariance = 2.0f,
     .tangentialAccelVariance = 600,
     .tangentialAcceleration = 0.0f,
-    .textureFileName = TEXTURE_SQUARE_PNG
+    .textureFileName = TextureFileName::TextureSquarePng
 };
 
 }

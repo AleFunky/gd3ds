@@ -27,13 +27,13 @@ static float completionTimer = 0.0f;
 
 #include "save/saving.hpp"
 
-typedef enum {
-    SCALE_IN,
-    WAITING,
-    SCALE_OUT,
-} LevelCompleteState;
+enum class LevelCompleteState {
+    ScaleIn,
+    Waiting,
+    ScaleOut,
+};
 
-typedef struct {
+struct LevelCompletePopup {
     bool active;
     
     LevelCompleteState state;
@@ -45,7 +45,7 @@ typedef struct {
     float timer;
     float duration;
     EaseTypes ease;
-} LevelCompletePopup;
+};
 
 static void initLevelCompletePopup();
 
@@ -194,7 +194,7 @@ int handleWallCutscene(float delta, UIInput *touch) {
                             stars = currentMainLevelPack->levels[currLevelID].stars;
 
                             // Add if demon
-                            if (currentMainLevelPack->levels[currLevelID].difficulty == MAIN_DIFF_DEMON) {
+                            if (currentMainLevelPack->levels[currLevelID].difficulty == Difficulty::Demon) {
                                 totalDemons++;
                             }
                         }
@@ -270,8 +270,8 @@ int handleWallCutscene(float delta, UIInput *touch) {
 
 static void initLevelCompletePopup() {
     levelCompletePopup.active = true;
-    levelCompletePopup.state = SCALE_IN;
-    levelCompletePopup.ease = ELASTIC_OUT;
+    levelCompletePopup.state = LevelCompleteState::ScaleIn;
+    levelCompletePopup.ease = EaseTypes::ElasticOut;
 
     levelCompletePopup.timer = 0;
     levelCompletePopup.duration = LVL_COMPLETE_STATE_0_DURATION;
@@ -286,10 +286,10 @@ void clearLevelCompletePopup() {
 void handleLevelCompletePopup(float delta) {
     if (levelCompletePopup.active) {
         switch (levelCompletePopup.state) {
-            case SCALE_IN:
+            case LevelCompleteState::ScaleIn:
                 if (levelCompletePopup.timer > LVL_COMPLETE_STATE_0_DURATION) {
-                    levelCompletePopup.state = WAITING;
-                    levelCompletePopup.ease = EASE_LINEAR;
+                    levelCompletePopup.state = LevelCompleteState::Waiting;
+                    levelCompletePopup.ease = EaseTypes::EaseLinear;
 
                     levelCompletePopup.timer = 0;
                     levelCompletePopup.duration = LVL_COMPLETE_STATE_1_DURATION;
@@ -297,10 +297,10 @@ void handleLevelCompletePopup(float delta) {
                     levelCompletePopup.targetScale = levelCompletePopup.scale;
                 }
                 break;
-            case WAITING:
+            case LevelCompleteState::Waiting:
                 if (levelCompletePopup.timer > LVL_COMPLETE_STATE_1_DURATION) {
-                    levelCompletePopup.state = SCALE_OUT;
-                    levelCompletePopup.ease = QUAD_IN;
+                    levelCompletePopup.state = LevelCompleteState::ScaleOut;
+                    levelCompletePopup.ease = EaseTypes::QuadIn;
                     
                     levelCompletePopup.timer = 0;
                     levelCompletePopup.duration = LVL_COMPLETE_STATE_2_DURATION;
@@ -308,7 +308,7 @@ void handleLevelCompletePopup(float delta) {
                     levelCompletePopup.targetScale = LVL_COMPLETE_STATE_2_TARGET_SCALE;
                 }
                 break;
-            case SCALE_OUT:
+            case LevelCompleteState::ScaleOut:
                 if (levelCompletePopup.timer > LVL_COMPLETE_STATE_2_DURATION) {
                     levelCompletePopup.active = false;
                 }

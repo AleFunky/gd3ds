@@ -6,14 +6,14 @@
 namespace gd3ds
 {
 
-typedef struct Allocation {
+struct Allocation {
     void *ptr;
     size_t size;
     void *caller;
     int generation;
 
     struct Allocation *next;
-} Allocation;
+};
 
 int current_generation = 0;
 

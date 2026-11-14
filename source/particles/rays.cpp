@@ -8,7 +8,7 @@
 namespace gd3ds
 {
 
-typedef struct {
+struct RayData {
     Vec2D position;
     
     float startDelay;
@@ -20,7 +20,7 @@ typedef struct {
     float angle;
 
     float fadeTimer;
-} RayData;
+};
 
 static float anglesArray[BEAM_COUNT];
 static RayData rayData[BEAM_COUNT];
@@ -186,14 +186,14 @@ void drawRays() {
             float alpha = data->startAlpha * 255;
 
             if (fading) {
-                alpha = easeValue(EASE_LINEAR, alpha, 0, data->fadeTimer, RAY_FADE_DURATION, 1);
+                alpha = easeValue(EaseTypes::EaseLinear, alpha, 0, data->fadeTimer, RAY_FADE_DURATION, 1);
             }
 
             Color col = getP2IfBlack(p1Color);
 
             u32 color = C2D_Color32(col.r, col.g, col.b, alpha);
 
-            float t = easeValue(QUAD_OUT, 0, 1, elapsed, duration, 1);
+            float t = easeValue(EaseTypes::QuadOut, 0, 1, elapsed, duration, 1);
 
             drawRay(x, y, length, startWidth, endWidth, data->angle, t, color);
         }

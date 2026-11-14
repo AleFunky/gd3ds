@@ -32,9 +32,9 @@ Color glowColor;
 
 float triggerDt = 0.f;
 
-ColorChannel channels[COL_CHANNEL_NUM];
+ColorChannel channels[static_cast<int>(ColorChannelIDs::ColChannelNum)];
 
-ColTriggerBuffer colTriggerBuffer[COL_CHANNEL_NUM];
+ColTriggerBuffer colTriggerBuffer[static_cast<int>(ColorChannelIDs::ColChannelNum)];
 AlphaTriggerBuffer *alphaTriggerBuffer = NULL;
 int alphaTriggerCount = 0;
 int alphaTriggerCapacity = 0;
@@ -254,11 +254,11 @@ PulseTriggerBuffer *getNewPulseTrigger() {
     return buffer;
 }
 
-typedef struct {
+struct RotateInitialRotation {
     bool saved;
     float rotation;
     float visualRotation;
-} RotateInitialRotation;
+};
 
 static RotateInitialRotation *rotate_initial_rotations = NULL;
 static int rotateInitialRotationsCapacity = 0;
@@ -413,7 +413,7 @@ bool getGroupToggles(int object) {
 
 // Convert channel id to buffer index
 int getColChannelIndex(int channel) {
-    if (channel < 0 || channel >= COL_CHANNEL_NUM) {
+    if (channel < 0 || channel >= static_cast<int>(ColorChannelIDs::ColChannelNum)) {
         return 0;
     }
     return channel;
@@ -421,7 +421,7 @@ int getColChannelIndex(int channel) {
 
 // Convert from buffer index to channel id
 int getColChannelFromIndex(int index) {
-    if (index < 0 || index >= COL_CHANNEL_NUM) {
+    if (index < 0 || index >= static_cast<int>(ColorChannelIDs::ColChannelNum)) {
         return 0;
     }
     return index;
@@ -429,14 +429,14 @@ int getColChannelFromIndex(int index) {
 
 int convertOnePointNineChannel(int channel) {
     switch (channel) {
-        case 1: return CHANNEL_P1;
-        case 2: return CHANNEL_P2;
-        case 3: return COL_1;
-        case 4: return COL_2;
-        case 5: return CHANNEL_LBG;
-        case 6: return COL_3;
-        case 7: return COL_4;
-        case 8: return CHANNEL_3DL;
+        case 1: return static_cast<int>(ColorChannelIDs::ChannelP1);
+        case 2: return static_cast<int>(ColorChannelIDs::ChannelP2);
+        case 3: return static_cast<int>(ColorChannelIDs::Col1);
+        case 4: return static_cast<int>(ColorChannelIDs::Col2);
+        case 5: return static_cast<int>(ColorChannelIDs::ChannelLbg);
+        case 6: return static_cast<int>(ColorChannelIDs::Col3);
+        case 7: return static_cast<int>(ColorChannelIDs::Col4);
+        case 8: return static_cast<int>(ColorChannelIDs::Channel3dl);
     }
 
     return channel;
@@ -538,7 +538,7 @@ void initColChannels() {
     channels[0].copyColorID = 0;
     memset(&channels[0].hsv, 0, sizeof(HSV));
 
-    for (size_t chan = 1; chan < COL_CHANNEL_NUM; chan++) {
+    for (size_t chan = 1; chan < static_cast<int>(ColorChannelIDs::ColChannelNum); chan++) {
         channels[chan].color.r = 255;
         channels[chan].color.g = 255;
         channels[chan].color.b = 255;
@@ -551,103 +551,103 @@ void initColChannels() {
         colTriggerBuffer[chan].active = false;
     }
 
-    int bg = getColChannelIndex(CHANNEL_BG);
+    int bg = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelBg));
     channels[bg].color.r = 0;
     channels[bg].color.g = 5;
     channels[bg].color.b = 100;
     
-    int ground = getColChannelIndex(CHANNEL_GROUND);
+    int ground = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelGround));
     channels[ground].color.r = 40;
     channels[ground].color.g = 125;
     channels[ground].color.b = 255;
        
-    int line = getColChannelIndex(CHANNEL_LINE);
+    int line = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelLine));
     channels[line].color.r = 255;
     channels[line].color.g = 255;
     channels[line].color.b = 255;
     channels[line].blending = true;
     
-    int obj = getColChannelIndex(CHANNEL_OBJ);
+    int obj = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelObj));
     channels[obj].color.r = 255;
     channels[obj].color.g = 255;
     channels[obj].color.b = 255;
     
-    int objBlend = getColChannelIndex(CHANNEL_OBJ_BLENDING);
+    int objBlend = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelObjBlending));
     channels[objBlend].color.r = 255;
     channels[objBlend].color.g = 255;
     channels[objBlend].color.b = 255;
     channels[objBlend].blending = true;
     
-    int threedl = getColChannelIndex(CHANNEL_3DL);
+    int threedl = getColChannelIndex(static_cast<int>(ColorChannelIDs::Channel3dl));
     channels[threedl].color.r = 255;
     channels[threedl].color.g = 255;
     channels[threedl].color.b = 255;
     
-    int chnP1 = getColChannelIndex(CHANNEL_P1);
+    int chnP1 = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelP1));
     channels[chnP1].color = getP2IfBlack(p1Color);
     channels[chnP1].blending = true;
         
-    int chnP2 = getColChannelIndex(CHANNEL_P2);
+    int chnP2 = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelP2));
     channels[chnP2].color = getP1IfBlack(p2Color);
     channels[chnP2].blending = true;
     
-    int lbg = getColChannelIndex(CHANNEL_LBG);
+    int lbg = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelLbg));
     channels[lbg].color.r = 255;
     channels[lbg].color.g = 255;
     channels[lbg].color.b = 255;
     channels[lbg].blending = true;
 
     
-    int blackChn = getColChannelIndex(CHANNEL_BLACK);
+    int blackChn = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelBlack));
     channels[blackChn].color.r = 0;
     channels[blackChn].color.g = 0;
     channels[blackChn].color.b = 0;
     channels[blackChn].blending = false;
 
-    int whiteChn = getColChannelIndex(CHANNEL_WHITE);
+    int whiteChn = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelWhite));
     channels[whiteChn].color.r = 255;
     channels[whiteChn].color.g = 255;
     channels[whiteChn].color.b = 255;
     channels[whiteChn].blending = false;
 
-    int yellowGlow = getColChannelIndex(CHANNEL_YELLOW_GLOW_INTERNAL);
+    int yellowGlow = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelYellowGlowInternal));
     channels[yellowGlow].color.r = 255;
     channels[yellowGlow].color.g = 255;
     channels[yellowGlow].color.b = 0;
     channels[yellowGlow].blending = true;
 
-    int blueGlow = getColChannelIndex(CHANNEL_BLUE_GLOW);
+    int blueGlow = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelBlueGlow));
     channels[blueGlow].color.r = 0;
     channels[blueGlow].color.g = 255;
     channels[blueGlow].color.b = 255;
     channels[blueGlow].blending = true;
 
-    int pinkGlow = getColChannelIndex(CHANNEL_PINK_GLOW);
+    int pinkGlow = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelPinkGlow));
     channels[pinkGlow].color.r = 255;
     channels[pinkGlow].color.g = 0;
     channels[pinkGlow].color.b = 255;
     channels[pinkGlow].blending = true;
     
-    int invisGlow = getColChannelIndex(CHANNEL_INVISIBLE_GLOW);
+    int invisGlow = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelInvisibleGlow));
     channels[invisGlow].color.r = 255;
     channels[invisGlow].color.g = 255;
     channels[invisGlow].color.b = 255;
     channels[invisGlow].blending = true;
     
-    int whiteGlow = getColChannelIndex(CHANNEL_WHITE_GLOW);
+    int whiteGlow = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelWhiteGlow));
     channels[whiteGlow].color.r = 255;
     channels[whiteGlow].color.g = 255;
     channels[whiteGlow].color.b = 255;
     channels[whiteGlow].blending = true;
 
-    for (int i = 0; i < COL_CHANNEL_NUM; i++)
+    for (int i = 0; i < static_cast<int>(ColorChannelIDs::ColChannelNum); i++)
         channels[i].nonPulseColor = channels[i].color;
 }
 
 void handleColChannel(int chan) {
     int channel = getColChannelIndex(chan);
 
-    if (channel == getColChannelIndex(CHANNEL_BLACK)) return;
+    if (channel == getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelBlack))) return;
 
     ColTriggerBuffer *buffer = &colTriggerBuffer[channel];
 
@@ -691,14 +691,14 @@ ColTriggerBuffer *getBuffer(int chan) {
 }
 
 void handleColTriggers(void) {
-    for (int chan = 1; chan < COL_CHANNEL_NUM; chan++) {
+    for (int chan = 1; chan < static_cast<int>(ColorChannelIDs::ColChannelNum); chan++) {
         handleColChannel(getColChannelFromIndex(chan));
     }
 }
 
 void handleCopyChannels() {
-    for (int chan = 0; chan < COL_CHANNEL_NUM; chan++) {
-        if (chan == getColChannelIndex(CHANNEL_BLACK)) continue;
+    for (int chan = 0; chan < static_cast<int>(ColorChannelIDs::ColChannelNum); chan++) {
+        if (chan == getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelBlack))) continue;
         int copyID = channels[chan].copyColorID;
         if (copyID > 0) {
             int src = getColChannelIndex(copyID);
@@ -803,27 +803,27 @@ void handleAlphaTriggers(void) {
 
 static int convertEase(int easing) {
     switch (easing) {
-        case 0: return EASE_LINEAR;
-        case 1: return EASE_IN_OUT;
-        case 2: return EASE_IN;
-        case 3: return EASE_OUT;
-        case 4: return ELASTIC_IN_OUT;
-        case 5: return ELASTIC_IN;
-        case 6: return ELASTIC_OUT;
-        case 7: return BOUNCE_IN_OUT;
-        case 8: return BOUNCE_IN;
-        case 9: return BOUNCE_OUT;
-        case 10: return EXPO_IN_OUT;
-        case 11: return EXPO_IN;
-        case 12: return EXPO_OUT;
-        case 13: return SINE_IN_OUT;
-        case 14: return SINE_IN;
-        case 15: return SINE_OUT;
-        case 16: return BACK_IN_OUT;
-        case 17: return BACK_IN;
-        case 18: return BACK_OUT;
+        case 0: return static_cast<int>(EaseTypes::EaseLinear);
+        case 1: return static_cast<int>(EaseTypes::EaseInOut);
+        case 2: return static_cast<int>(EaseTypes::EaseIn);
+        case 3: return static_cast<int>(EaseTypes::EaseOut);
+        case 4: return static_cast<int>(EaseTypes::ElasticInOut);
+        case 5: return static_cast<int>(EaseTypes::ElasticIn);
+        case 6: return static_cast<int>(EaseTypes::ElasticOut);
+        case 7: return static_cast<int>(EaseTypes::BounceInOut);
+        case 8: return static_cast<int>(EaseTypes::BounceIn);
+        case 9: return static_cast<int>(EaseTypes::BounceOut);
+        case 10: return static_cast<int>(EaseTypes::ExpoInOut);
+        case 11: return static_cast<int>(EaseTypes::ExpoIn);
+        case 12: return static_cast<int>(EaseTypes::ExpoOut);
+        case 13: return static_cast<int>(EaseTypes::SineInOut);
+        case 14: return static_cast<int>(EaseTypes::SineIn);
+        case 15: return static_cast<int>(EaseTypes::SineOut);
+        case 16: return static_cast<int>(EaseTypes::BackInOut);
+        case 17: return static_cast<int>(EaseTypes::BackIn);
+        case 18: return static_cast<int>(EaseTypes::BackOut);
     }
-    return EASE_LINEAR;
+    return static_cast<int>(EaseTypes::EaseLinear);
 }
 
 void uploadToMoveBuffer(int obj) {
@@ -1268,7 +1268,7 @@ static bool rotateTargetIsSolid(int obj) {
     int id = objects.id[obj];
     if (id <= 0 || id >= GAME_OBJECT_COUNT) return false;
     const ObjectHitbox *hitbox = gameObjects[id].hitbox;
-    return hitbox && hitbox->collisionType == HITBOX_SOLID;
+    return hitbox && hitbox->collisionType == static_cast<int>(HitboxType::HitboxSolid);
 }
 
 void handleRotateTriggers(void) {
@@ -1481,7 +1481,7 @@ void handlePulseTriggers(void) {
         if (!buffer->active) continue;
         if (buffer->pulseMode == PULSE_MODE_HSV) {
             int sourceID = buffer->copiedColorID;
-            if (sourceID <= 0 || sourceID >= COL_CHANNEL_NUM)
+            if (sourceID <= 0 || sourceID >= static_cast<int>(ColorChannelIDs::ColChannelNum))
                 sourceID = buffer->targetColorID;
             int sourceIdx = getColChannelIndex(sourceID);
             Color copyColor = channels[sourceIdx].nonPulseColor;
@@ -1689,7 +1689,7 @@ void uploadToBuffer(int obj, int channel) {
         channels[bufferChannel].copyColorID = 0;
     }
 
-    if (channel < CHANNEL_BG) {
+    if (channel < static_cast<int>(ColorChannelIDs::ChannelBg)) {
         channels[bufferChannel].blending = trigger->blending;
     }
     
@@ -1738,8 +1738,8 @@ void toggleGroup(int group, bool activate, bool spawn) {
         p->toggled = !activate;
         for (int i = 0; i < p->count; i++) {
             int object = p->objects[i];
-            objects.flags[object] &= ~FLAG_TOGGLED;
-            objects.flags[object] |= getGroupToggles(object) ? FLAG_TOGGLED : 0;
+            objects.flags[object] &= ~static_cast<int>(ObjectFlags::FlagToggled);
+            objects.flags[object] |= getGroupToggles(object) ? static_cast<int>(ObjectFlags::FlagToggled) : 0;
         }
 
         if (activate && spawn) {
@@ -1768,7 +1768,7 @@ void spawnGroup(int group) {
         if (triggerIsSpawnTriggered(objects.id[objIdx], objIdx)
             && isTriggerObject(objects.id[objIdx])
             && (triggerIsMultiTriggered(objects.id[objIdx], objIdx) || !GET_ACTIVATED(objIdx))
-            && !(objects.flags[objIdx] & FLAG_TOGGLED)) {
+            && !(objects.flags[objIdx] & static_cast<int>(ObjectFlags::FlagToggled))) {
             runTrigger(objIdx, true);
         }
     }
@@ -1856,7 +1856,7 @@ static void stopActions(int group) {
         buffer->active = false;
     }
 
-    for (int i = 0; i < COL_CHANNEL_NUM; i++) {
+    for (int i = 0; i < static_cast<int>(ColorChannelIDs::ColChannelNum); i++) {
         ColTriggerBuffer *buffer = &colTriggerBuffer[i];
         if (!buffer->active || !objectInGroup(buffer->sourceObj, group)) continue;
         buffer->active = false;
@@ -1879,69 +1879,69 @@ static void stopActions(int group) {
 }
 
 void runTrigger(int obj, bool fromSpawn) {
-    if (objects.flags[obj] & FLAG_TOGGLED) return;
+    if (objects.flags[obj] & static_cast<int>(ObjectFlags::FlagToggled)) return;
 
     switch (objects.id[obj]) {
         case TRIGGER_FADE_SIMPLE:
-            currentFadingEffect = FADE_SIMPLE;
+            currentFadingEffect = static_cast<int>(FadingEffects::FadeSimple);
             break;
             
         case TRIGGER_FADE_UP:
-            currentFadingEffect = FADE_UP;
+            currentFadingEffect = static_cast<int>(FadingEffects::FadeUp);
             break;
             
         case TRIGGER_FADE_DOWN:
-            currentFadingEffect = FADE_DOWN;
+            currentFadingEffect = static_cast<int>(FadingEffects::FadeDown);
             break;
             
         case TRIGGER_FADE_RIGHT:
-            currentFadingEffect = FADE_RIGHT;
+            currentFadingEffect = static_cast<int>(FadingEffects::FadeRight);
             break;
             
         case TRIGGER_FADE_LEFT:
-            currentFadingEffect = FADE_LEFT;
+            currentFadingEffect = static_cast<int>(FadingEffects::FadeLeft);
             break;
             
         case TRIGGER_FADE_SCALE_IN:
-            currentFadingEffect = FADE_SCALE_IN;
+            currentFadingEffect = static_cast<int>(FadingEffects::FadeScaleIn);
             break;
             
         case TRIGGER_FADE_SCALE_OUT:
-            currentFadingEffect = FADE_SCALE_OUT;
+            currentFadingEffect = static_cast<int>(FadingEffects::FadeScaleOut);
             break;
         
         case TRIGGER_FADE_INWARDS:
-            currentFadingEffect = FADE_INWARDS;
+            currentFadingEffect = static_cast<int>(FadingEffects::FadeInwards);
             break;
 
         case TRIGGER_FADE_OUTWARDS:
-            currentFadingEffect = FADE_OUTWARDS;
+            currentFadingEffect = static_cast<int>(FadingEffects::FadeOutwards);
             break;
         
         case TRIGGER_FADE_LEFT_SEMICIRCLE:
-            currentFadingEffect = FADE_CIRCLE_LEFT;
+            currentFadingEffect = static_cast<int>(FadingEffects::FadeCircleLeft);
             break;
 
         case TRIGGER_FADE_RIGHT_SEMICIRCLE:
-            currentFadingEffect = FADE_CIRCLE_RIGHT;
+            currentFadingEffect = static_cast<int>(FadingEffects::FadeCircleRight);
             break;
 
         case BG_TRIGGER:
-            uploadToBuffer(obj, CHANNEL_BG);
+            uploadToBuffer(obj, static_cast<int>(ColorChannelIDs::ChannelBg));
             if (!getColorTrigger(obj)->tintGround) break;
         
         case GROUND_TRIGGER:
-            uploadToBuffer(obj, CHANNEL_GROUND);
+            uploadToBuffer(obj, static_cast<int>(ColorChannelIDs::ChannelGround));
             break;
                     
         case LINE_TRIGGER:
         case V2_0_LINE_TRIGGER: // gd converts 1.4 line trigger to 2.0 one for some reason
-            uploadToBuffer(obj, CHANNEL_LINE);
+            uploadToBuffer(obj, static_cast<int>(ColorChannelIDs::ChannelLine));
             break;
         
         case OBJ_TRIGGER:
-            uploadToBuffer(obj, CHANNEL_OBJ);
-            uploadToBuffer(obj, CHANNEL_OBJ_BLENDING);
+            uploadToBuffer(obj, static_cast<int>(ColorChannelIDs::ChannelObj));
+            uploadToBuffer(obj, static_cast<int>(ColorChannelIDs::ChannelObjBlending));
             break;
         
         case OBJ_2_TRIGGER:
@@ -1961,11 +1961,11 @@ void runTrigger(int obj, bool fromSpawn) {
             break;
             
         case THREEDL_TRIGGER: // 3DL
-            uploadToBuffer(obj, CHANNEL_3DL);
+            uploadToBuffer(obj, static_cast<int>(ColorChannelIDs::Channel3dl));
             break;
 
         case GROUND_2_TRIGGER:
-            uploadToBuffer(obj, CHANNEL_GROUND_2);
+            uploadToBuffer(obj, static_cast<int>(ColorChannelIDs::ChannelGround2));
             break;
 
         case ENABLE_TRAIL:
@@ -1977,7 +1977,7 @@ void runTrigger(int obj, bool fromSpawn) {
             break;
 
         case COL_TRIGGER: // 2.0 color trigger
-            if (getColChannelIndex(getColorTrigger(obj)->targetColorID) == getColChannelIndex(CHANNEL_BLACK)) break;
+            if (getColChannelIndex(getColorTrigger(obj)->targetColorID) == getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelBlack))) break;
             uploadToBuffer(obj, getColorTrigger(obj)->targetColorID);
             break;
         case ALPHA_TRIGGER:
@@ -2016,7 +2016,7 @@ void runTrigger(int obj, bool fromSpawn) {
             break;
         case PULSE_TRIGGER:
             if (getPulseTrigger(obj)->pulseTargetType == PULSE_TARGET_CHANNEL &&
-                getColChannelIndex(getPulseTrigger(obj)->targetGroup) == getColChannelIndex(CHANNEL_BLACK)) break;
+                getColChannelIndex(getPulseTrigger(obj)->targetGroup) == getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelBlack))) break;
             uploadToPulseBuffer(obj);
             break;
         case TOGGLE_TRIGGER:
@@ -2161,7 +2161,7 @@ void handleStepTriggers(void) {
 
 // https://github.com/gd-programming/gd.docs/issues/87
 void calculateLbg() {
-    ColorChannel channel = channels[getColChannelIndex(CHANNEL_BG)];
+    ColorChannel channel = channels[getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelBg))];
     float h,s,v;
     
     convertRGBtoHSV(channel.color.r, channel.color.g, channel.color.b, &h, &s, &v);
@@ -2175,7 +2175,7 @@ void calculateLbg() {
 
     convertHSVtoRGB(h, s, v, &r, &g, &b);
 
-    int chanLbgNolerp = getColChannelIndex(CHANNEL_LBG_NOLERP);
+    int chanLbgNolerp = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelLbgNolerp));
     channels[chanLbgNolerp].color.r = r;
     channels[chanLbgNolerp].color.g = g;
     channels[chanLbgNolerp].color.b = b;
@@ -2191,7 +2191,7 @@ void calculateLbg() {
     }
 
     // Set here lerped LBG
-    int chanLbg = getColChannelIndex(CHANNEL_LBG);
+    int chanLbg = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelLbg));
     channels[chanLbg].color.r = r;
     channels[chanLbg].color.g = g;
     channels[chanLbg].color.b = b;

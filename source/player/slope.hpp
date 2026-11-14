@@ -6,11 +6,11 @@
 namespace gd3ds
 {
 
-enum SlopeOrientations {
-    ORIENT_NORMAL_UP,
-    ORIENT_NORMAL_DOWN,
-    ORIENT_UD_DOWN,
-    ORIENT_UD_UP
+enum class SlopeOrientations {
+    OrientNormalUp,
+    OrientNormalDown,
+    OrientUdDown,
+    OrientUdUp
 };
 
 #define SLOPE_HEAD_TOLERANCE 2.f

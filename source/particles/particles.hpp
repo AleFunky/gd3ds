@@ -7,7 +7,7 @@ namespace gd3ds
 {
 
 // Struct of arrays my beloved
-typedef struct {
+struct ParticleData {
     int count;
     int capacity;
 
@@ -52,9 +52,9 @@ typedef struct {
     float* degreesPerSecond;
     float* radius;
     float* deltaRadius;
-} ParticleData;
+};
 
-typedef struct {
+struct ParticleSystem {
     ParticleData data;
     ParticleDefinition cfg;
 
@@ -88,7 +88,7 @@ typedef struct {
     
     bool active;
     bool emitting;
-} ParticleSystem;
+};
 
 void updateParticleSystem(ParticleSystem* ps, float dt);
 void initParticleData(ParticleData* d, int capacity);

@@ -5,10 +5,10 @@
 namespace gd3ds
 {
 
-typedef struct {
+struct SFXKVP {
     const char *name;
     SFX *sound;
-} SFXKVP;
+};
 
 extern SFX playSound;
 extern SFX quitSound;

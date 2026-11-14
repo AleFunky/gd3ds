@@ -6,7 +6,7 @@
 namespace gd3ds
 {
 
-typedef struct UIScreenPair {
+struct UIScreenPair {
     const char* name;
     //top and bottom screen
     UIScreen screens[2];  
@@ -15,26 +15,26 @@ typedef struct UIScreenPair {
 
     void *data;
     void (*freeData)(void *data);
-} UIScreenPair;
+};
 
-typedef enum {
-    PUSH_NONE,
-    PUSH_NEXT,
-    PUSH_AFTER_CLOSE,
-    PUSH_ROOT,
-    PUSH_GAME_STATE
-} UIStackPushType;
+enum class UIStackPushType {
+    PushNone,
+    PushNext,
+    PushAfterClose,
+    PushRoot,
+    PushGameState
+};
 
-typedef struct {
+struct UIStackPush {
     const UIScreenDefPair *defs;
     UIAnimation topAnim;
     UIAnimation btmAnim;
     UIStackPushType type;
     bool pushNow;
     void *data;
-} UIStackPush;
+};
 
-typedef struct {
+struct UIStack {
     //array of pointers to UIScreenPairs
     UIScreenPair **screenStack;
     size_t stackCapacity;
@@ -53,7 +53,7 @@ typedef struct {
     UIStackPush push;
 
     int nextGameState;
-} UIStack;
+};
 
 bool uiStackCheckLoadedRoot(const UIScreenDefPair *screen);
 bool uiStackCheckLoadedScreenInRoot(const UIScreenDefPair *screen);

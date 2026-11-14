@@ -5,7 +5,7 @@
 namespace gd3ds
 {
 
-typedef struct {
+struct Glyph {
     unsigned short id;
     unsigned short x;
     unsigned short y;
@@ -15,20 +15,20 @@ typedef struct {
     short yOffset;
     short xAdvance;
     short spriteIndex;
-} Glyph;
+};
 
 #define TEXT_OBJECT_SCALE (1.0f)
 
-typedef struct {
+struct Charset {
     const Glyph* glyphs;
     unsigned int count;
     float scale;
-} Charset;
+};
 
-typedef struct {
+struct TextGlyphPlacement {
     float x, y;
     short sprite;
-} TextGlyphPlacement;
+};
 
 bool parseHexColor(const char *str, u32 *out);
 

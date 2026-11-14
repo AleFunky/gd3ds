@@ -67,13 +67,13 @@ std::vector<LightningSegment> Lightning::generateLightingRecursive(
         for(unsigned int i = 0; i < segmentCount; i++){
             u32 color = 0;
             switch(type){
-                case LightningType::SIZE_MINI:
+                case LightningType::SizeMini:
                     color = lightningSizeMiniCol;
                     break;
-                case LightningType::SIZE_NORMAL:
+                case LightningType::SizeNormal:
                     color = lightningSizeNormalCol;
                     break;
-                case LightningType::TELEPORT:
+                case LightningType::Teleport:
                     color = p1Color.toColor32();
                     break;
                 default:

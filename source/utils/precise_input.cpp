@@ -24,7 +24,7 @@ static u32 frameStart;
 static u32 frameEnd;
 static u32 frameSubsteps;
 
-typedef struct PreciseSource {
+struct PreciseSource {
     u32 tickWord;
     u32 idxWord;
 
@@ -46,19 +46,19 @@ typedef struct PreciseSource {
     bool suppressHoldUntilRelease;
     bool fakePress;
     bool pressedEdge;
-} PreciseSource;
+};
 
-typedef struct {
+struct RingSnapshot {
     u32 now;
     u32 latestTick;
     u32 prevTick;
     u32 currentIdx;
-} RingSnapshot;
+};
 
 static bool padSampleJump(const PreciseSource *src, u32 slot);
 static bool touchSampleJump(const PreciseSource *src, u32 slot);
 
-enum { SOURCE_PAD, SOURCE_TOUCH, SOURCE_COUNT };
+enum class InputSource { SourcePad, SourceTouch, SourceCount };
 
 // https://www.3dbrew.org/wiki/HID_Shared_Memory#Offset_0x0
 #define PAD_SOURCE { \
@@ -76,9 +76,9 @@ enum { SOURCE_PAD, SOURCE_TOUCH, SOURCE_COUNT };
     .sampleJump = touchSampleJump, \
 }
 
-static PreciseSource sources[PI_PLAYER_COUNT][SOURCE_COUNT] = {
-    { [SOURCE_PAD] = PAD_SOURCE, [SOURCE_TOUCH] = TOUCH_SOURCE },
-    { [SOURCE_PAD] = PAD_SOURCE, [SOURCE_TOUCH] = TOUCH_SOURCE },
+static PreciseSource sources[static_cast<int>(PreciseInputPlayer::PiPlayerCount)][static_cast<int>(InputSource::SourceCount)] = {
+    { [static_cast<int>(InputSource::SourcePad)] = PAD_SOURCE, [static_cast<int>(InputSource::SourceTouch)] = TOUCH_SOURCE },
+    { [static_cast<int>(InputSource::SourcePad)] = PAD_SOURCE, [static_cast<int>(InputSource::SourceTouch)] = TOUCH_SOURCE },
 };
 
 static vu32 *getRingBuffer(const PreciseSource* src);
@@ -94,23 +94,23 @@ static void resyncFromRing(PreciseSource *src);
 static u32 substepCutoff(u32 substep);
 
 void piSetTouchFilter(PreciseInputPlayer player, bool (*filter)(u16 px, u16 py)){
-    if (player >= PI_PLAYER_COUNT) {
+    if (static_cast<int>(player) >= static_cast<int>(PreciseInputPlayer::PiPlayerCount)) {
         return;
     }
-    sources[player][SOURCE_TOUCH].touchFilter = filter;
+    sources[static_cast<int>(player)][static_cast<int>(InputSource::SourceTouch)].touchFilter = filter;
 }
 
 void piSetJumpKeys(PreciseInputPlayer player, u32 mask) {
-    if (player >= PI_PLAYER_COUNT) {
+    if (static_cast<int>(player) >= static_cast<int>(PreciseInputPlayer::PiPlayerCount)) {
         return;
     }
-    sources[player][SOURCE_PAD].jumpKeys = mask;
+    sources[static_cast<int>(player)][static_cast<int>(InputSource::SourcePad)].jumpKeys = mask;
 }
 
 void piReset(void) {
-    for (u32 player = 0; player < PI_PLAYER_COUNT; player++) {
-        for (u32 kind = 0; kind < SOURCE_COUNT; kind++) {
-            PreciseSource *src = &sources[player][kind];
+    for (u32 player = 0; player < static_cast<int>(PreciseInputPlayer::PiPlayerCount); player++) {
+        for (u32 kind = 0; kind < static_cast<int>(InputSource::SourceCount); kind++) {
+            PreciseSource *src = &sources[static_cast<int>(player)][kind];
             resyncFromRing(src);
             src->suppressHoldUntilRelease = false;
             src->fakePress = false;
@@ -120,9 +120,9 @@ void piReset(void) {
 }
 
 void piSuppressUntilRelease(void) {
-    for (u32 player = 0; player < PI_PLAYER_COUNT; player++) {
-        for (u32 kind = 0; kind < SOURCE_COUNT; kind++) {
-            sources[player][kind].suppressHoldUntilRelease = true;
+    for (u32 player = 0; player < static_cast<int>(PreciseInputPlayer::PiPlayerCount); player++) {
+        for (u32 kind = 0; kind < static_cast<int>(InputSource::SourceCount); kind++) {
+            sources[static_cast<int>(player)][kind].suppressHoldUntilRelease = true;
         }
     }
 }
@@ -130,10 +130,10 @@ void piSuppressUntilRelease(void) {
 // poll to find the times that the clicks occured and schdule them for later application
 void piPoll(void) {
     u32 now = (u32)(svcGetSystemTick());
-    for (u32 kind = 0; kind < SOURCE_COUNT; kind++) {
-        RingSnapshot snapshot = snapshotRing(&sources[PI_PLAYER_1][kind], now);
-        for (u32 player = 0; player < PI_PLAYER_COUNT; player++) {
-            pollSource(&sources[player][kind], &snapshot);
+    for (u32 kind = 0; kind < static_cast<int>(InputSource::SourceCount); kind++) {
+        RingSnapshot snapshot = snapshotRing(&sources[static_cast<int>(PreciseInputPlayer::PiPlayer1)][kind], now);
+        for (u32 player = 0; player < static_cast<int>(PreciseInputPlayer::PiPlayerCount); player++) {
+            pollSource(&sources[static_cast<int>(player)][kind], &snapshot);
         }
     }
 }
@@ -145,58 +145,58 @@ void piBeginFrame(u32 frameStartTick, u32 frameEndTick, u32 substeps) {
 }
 
 void piApplySubstep(u32 substep) {
-    for (u32 player = 0; player < PI_PLAYER_COUNT; player++) {
-        for (u32 kind = 0; kind < SOURCE_COUNT; kind++) {
-            applySource(&sources[player][kind], substep);
+    for (u32 player = 0; player < static_cast<int>(PreciseInputPlayer::PiPlayerCount); player++) {
+        for (u32 kind = 0; kind < static_cast<int>(InputSource::SourceCount); kind++) {
+            applySource(&sources[static_cast<int>(player)][kind], substep);
         }
     }
 }
 
 bool piHold(PreciseInputPlayer player) {
-    if (player >= PI_PLAYER_COUNT) {
+    if (static_cast<int>(player) >= static_cast<int>(PreciseInputPlayer::PiPlayerCount)) {
         return false;
     }
-    PreciseSource *pad = &sources[player][SOURCE_PAD];
-    PreciseSource *touch = &sources[player][SOURCE_TOUCH];
+    PreciseSource *pad = &sources[static_cast<int>(player)][static_cast<int>(InputSource::SourcePad)];
+    PreciseSource *touch = &sources[static_cast<int>(player)][static_cast<int>(InputSource::SourceTouch)];
     bool padHold = pad->holdState && !pad->suppressHoldUntilRelease;
     bool touchHold = touch->holdState && !touch->suppressHoldUntilRelease;
     return padHold || touchHold;
 }
 
 bool piPressed(PreciseInputPlayer player) {
-    if (player >= PI_PLAYER_COUNT) {
+    if (static_cast<int>(player) >= static_cast<int>(PreciseInputPlayer::PiPlayerCount)) {
         return false;
     }
-    return sources[player][SOURCE_PAD].pressedEdge || sources[player][SOURCE_TOUCH].pressedEdge;
+    return sources[static_cast<int>(player)][static_cast<int>(InputSource::SourcePad)].pressedEdge || sources[static_cast<int>(player)][static_cast<int>(InputSource::SourceTouch)].pressedEdge;
 }
 
 u32 piPadEventCount(PreciseInputPlayer player) {
-    if (player >= PI_PLAYER_COUNT) {
+    if (static_cast<int>(player) >= static_cast<int>(PreciseInputPlayer::PiPlayerCount)) {
         return 0;
     }
-    return sources[player][SOURCE_PAD].queueCount;
+    return sources[static_cast<int>(player)][static_cast<int>(InputSource::SourcePad)].queueCount;
 }
 
 u32 piTouchEventCount(PreciseInputPlayer player) {
-    if (player >= PI_PLAYER_COUNT) {
+    if (static_cast<int>(player) >= static_cast<int>(PreciseInputPlayer::PiPlayerCount)) {
         return 0;
     }
-    return sources[player][SOURCE_TOUCH].queueCount;
+    return sources[static_cast<int>(player)][static_cast<int>(InputSource::SourceTouch)].queueCount;
 }
 
 PreciseInputEvent piPadEventGet(PreciseInputPlayer player, u32 index) {
-    if (player >= PI_PLAYER_COUNT) {
+    if (static_cast<int>(player) >= static_cast<int>(PreciseInputPlayer::PiPlayerCount)) {
         return (PreciseInputEvent){ 0 };
     }
-    PreciseSource *pad = &sources[player][SOURCE_PAD];
+    PreciseSource *pad = &sources[static_cast<int>(player)][static_cast<int>(InputSource::SourcePad)];
     return pad->queue[(pad->queueHead + index) % INPUT_QUEUE_SIZE];
 }
 
 PreciseInputEvent piTouchEventGet(PreciseInputPlayer player, u32 index) {
-    if (player >= PI_PLAYER_COUNT) {
+    if (static_cast<int>(player) >= static_cast<int>(PreciseInputPlayer::PiPlayerCount)) {
         return (PreciseInputEvent){ 0 };
     }
-    PreciseSource *touch = &sources[player][SOURCE_TOUCH];
+    PreciseSource *touch = &sources[static_cast<int>(player)][static_cast<int>(InputSource::SourceTouch)];
     return touch->queue[(touch->queueHead + index) % INPUT_QUEUE_SIZE];
 }
 

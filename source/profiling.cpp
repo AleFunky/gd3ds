@@ -14,17 +14,17 @@ namespace gd3ds
 ProfilerSnapshot snapshot;
 static ProfilerSnapshot internalSnapshot;
 
-typedef enum {
-    PROFILER_PAGE_OVERVIEW,
-    PROFILER_PAGE_RENDER,
-    PROFILER_PAGE_GAMEPLAY,
-    PROFILER_PAGE_PLAYER_CAMERA,
-    PROFILER_PAGE_MISC,
-    PROFILER_PAGE_MEMORY,
-    PROFILER_PAGE_COUNT
-} ProfilerPage;
+enum class ProfilerPage {
+    ProfilerPageOverview,
+    ProfilerPageRender,
+    ProfilerPageGameplay,
+    ProfilerPagePlayerCamera,
+    ProfilerPageMisc,
+    ProfilerPageMemory,
+    ProfilerPageCount
+};
 
-static int currentPage = (int)PROFILER_PAGE_OVERVIEW;
+static int currentPage = (int)static_cast<int>(ProfilerPage::ProfilerPageOverview);
 
 #define PROFILER_SCALE 0.8f
 #define PROFILER_ROW_HEIGHT 12.f
@@ -33,145 +33,145 @@ static int currentPage = (int)PROFILER_PAGE_OVERVIEW;
 #define PROFILER_SEC_VALUE_X 260.f
 #define PROFILER_START_Y 25.f
 
-typedef enum {
-    PROFILER_VALUE_NONE,
-    PROFILER_VALUE_FLOAT,
-    PROFILER_VALUE_FPS,
-    PROFILER_VALUE_MS_PERCENTAGE,
-    PROFILER_VALUE_INTEGER,
-    PROFILER_VALUE_HEX
-} ProfilerValueType;
+enum class ProfilerValueType {
+    ProfilerValueNone,
+    ProfilerValueFloat,
+    ProfilerValueFps,
+    ProfilerValueMsPercentage,
+    ProfilerValueInteger,
+    ProfilerValueHex
+};
 
-typedef enum {
-    PROFILER_STAT_NONE,
+enum class ProfilerStat {
+    ProfilerStatNone,
 
-    PROFILER_STAT_FRAME,
-    PROFILER_STAT_FPS,
-    PROFILER_STAT_CPU,
-    PROFILER_STAT_GPU,
+    ProfilerStatFrame,
+    ProfilerStatFps,
+    ProfilerStatCpu,
+    ProfilerStatGpu,
 
-    PROFILER_STAT_PHYSICS,
-    PROFILER_STAT_TRIGGERS,
-    PROFILER_STAT_COLLISION,
-    PROFILER_STAT_PARTICLES,
-    PROFILER_STAT_RENDERING,
+    ProfilerStatPhysics,
+    ProfilerStatTriggers,
+    ProfilerStatCollision,
+    ProfilerStatParticles,
+    ProfilerStatRendering,
     
-    PROFILER_STAT_PLAYER,
-    PROFILER_STAT_PLAYER_COLLISION,
-    PROFILER_STAT_PLAYER_HANDLER,
-    PROFILER_STAT_PLAYER_STEP_TRIGGER,
-    PROFILER_STAT_PLAYER_STEPS,
-    PROFILER_STAT_PLAYER_COLLISIONS,
-    PROFILER_STAT_PLAYER_COLLISION_CHECKS,
+    ProfilerStatPlayer,
+    ProfilerStatPlayerCollision,
+    ProfilerStatPlayerHandler,
+    ProfilerStatPlayerStepTrigger,
+    ProfilerStatPlayerSteps,
+    ProfilerStatPlayerCollisions,
+    ProfilerStatPlayerCollisionChecks,
 
-    PROFILER_STAT_RENDER_CREATING,
-    PROFILER_STAT_RENDER_SORTING,
-    PROFILER_STAT_RENDER_TINT,
-    PROFILER_STAT_RENDER_DRAWING,
+    ProfilerStatRenderCreating,
+    ProfilerStatRenderSorting,
+    ProfilerStatRenderTint,
+    ProfilerStatRenderDrawing,
 
-    PROFILER_STAT_OPTIM_COUNT,
-    PROFILER_STAT_OPTIM_IN_CACHE,
+    ProfilerStatOptimCount,
+    ProfilerStatOptimInCache,
 
-    PROFILER_STAT_INPUT_X,
-    PROFILER_STAT_INPUT_Y,
+    ProfilerStatInputX,
+    ProfilerStatInputY,
 
-    PROFILER_STAT_PLAYER_TICK,
-    PROFILER_STAT_PLAYER_X,
-    PROFILER_STAT_PLAYER_Y,
-    PROFILER_STAT_PLAYER_VX,
-    PROFILER_STAT_PLAYER_VY,
+    ProfilerStatPlayerTick,
+    ProfilerStatPlayerX,
+    ProfilerStatPlayerY,
+    ProfilerStatPlayerVx,
+    ProfilerStatPlayerVy,
 
-    PROFILER_STAT_CAMERA_X,
-    PROFILER_STAT_CAMERA_Y,
-    PROFILER_STAT_CAMERA_INTENDED_Y,
+    ProfilerStatCameraX,
+    ProfilerStatCameraY,
+    ProfilerStatCameraIntendedY,
 
-    PROFILER_STAT_LINEAR_FREE,
-    PROFILER_STAT_HEAP_USED,
-    PROFILER_STAT_HEAP_FREE,
-    PROFILER_STAT_HEAP_TOTAL,
-    PROFILER_STAT_LEVEL_ARENA_USED,
-    PROFILER_STAT_LEVEL_ARENA_FREE,
-    PROFILER_STAT_LEVEL_ARENA_TOTAL,
-} ProfilerStat;
+    ProfilerStatLinearFree,
+    ProfilerStatHeapUsed,
+    ProfilerStatHeapFree,
+    ProfilerStatHeapTotal,
+    ProfilerStatLevelArenaUsed,
+    ProfilerStatLevelArenaFree,
+    ProfilerStatLevelArenaTotal,
+};
 
-typedef struct {
+struct ProfilerRow {
     const char *label;
     ProfilerStat stat;
     ProfilerValueType valueType;
-} ProfilerRow;
+};
 
 static const ProfilerRow overviewRows[] = {
-    { "FPS",       PROFILER_STAT_FPS,       PROFILER_VALUE_FPS },
-    { "CPU",       PROFILER_STAT_CPU,       PROFILER_VALUE_MS_PERCENTAGE },
-    { "GPU",       PROFILER_STAT_GPU,       PROFILER_VALUE_MS_PERCENTAGE },
+    { "FPS",       ProfilerStat::ProfilerStatFps,       ProfilerValueType::ProfilerValueFps },
+    { "CPU",       ProfilerStat::ProfilerStatCpu,       ProfilerValueType::ProfilerValueMsPercentage },
+    { "GPU",       ProfilerStat::ProfilerStatGpu,       ProfilerValueType::ProfilerValueMsPercentage },
     {},
-    { "Rendering", PROFILER_STAT_RENDERING, PROFILER_VALUE_MS_PERCENTAGE },
-    { "Physics",   PROFILER_STAT_PHYSICS,   PROFILER_VALUE_MS_PERCENTAGE },
-    { "Triggers",  PROFILER_STAT_TRIGGERS,  PROFILER_VALUE_MS_PERCENTAGE },
+    { "Rendering", ProfilerStat::ProfilerStatRendering, ProfilerValueType::ProfilerValueMsPercentage },
+    { "Physics",   ProfilerStat::ProfilerStatPhysics,   ProfilerValueType::ProfilerValueMsPercentage },
+    { "Triggers",  ProfilerStat::ProfilerStatTriggers,  ProfilerValueType::ProfilerValueMsPercentage },
 };
 
 static const ProfilerRow renderRows[] = {
-    { "CPU",        PROFILER_STAT_CPU,             PROFILER_VALUE_MS_PERCENTAGE },
-    { "GPU",        PROFILER_STAT_GPU,             PROFILER_VALUE_MS_PERCENTAGE },
+    { "CPU",        ProfilerStat::ProfilerStatCpu,             ProfilerValueType::ProfilerValueMsPercentage },
+    { "GPU",        ProfilerStat::ProfilerStatGpu,             ProfilerValueType::ProfilerValueMsPercentage },
     {},
-    { "Rendering",  PROFILER_STAT_RENDERING,       PROFILER_VALUE_MS_PERCENTAGE },
-    { "- Creating", PROFILER_STAT_RENDER_CREATING, PROFILER_VALUE_MS_PERCENTAGE },
-    { "- Sorting",  PROFILER_STAT_RENDER_SORTING,  PROFILER_VALUE_MS_PERCENTAGE },
-    { "- Tinting",  PROFILER_STAT_RENDER_TINT,     PROFILER_VALUE_MS_PERCENTAGE },
-    { "- Drawing",  PROFILER_STAT_RENDER_DRAWING,  PROFILER_VALUE_MS_PERCENTAGE },
+    { "Rendering",  ProfilerStat::ProfilerStatRendering,       ProfilerValueType::ProfilerValueMsPercentage },
+    { "- Creating", ProfilerStat::ProfilerStatRenderCreating, ProfilerValueType::ProfilerValueMsPercentage },
+    { "- Sorting",  ProfilerStat::ProfilerStatRenderSorting,  ProfilerValueType::ProfilerValueMsPercentage },
+    { "- Tinting",  ProfilerStat::ProfilerStatRenderTint,     ProfilerValueType::ProfilerValueMsPercentage },
+    { "- Drawing",  ProfilerStat::ProfilerStatRenderDrawing,  ProfilerValueType::ProfilerValueMsPercentage },
     {},
-    { "Particles",  PROFILER_STAT_PARTICLES,       PROFILER_VALUE_MS_PERCENTAGE },
+    { "Particles",  ProfilerStat::ProfilerStatParticles,       ProfilerValueType::ProfilerValueMsPercentage },
     {},
     { "Optim" },
-    { "- Total",    PROFILER_STAT_OPTIM_COUNT,    PROFILER_VALUE_INTEGER},
+    { "- Total",    ProfilerStat::ProfilerStatOptimCount,    ProfilerValueType::ProfilerValueInteger},
 };
 
 static const ProfilerRow gameplayRows[] = {
-    { "Collisions", PROFILER_STAT_PLAYER_COLLISIONS,       PROFILER_VALUE_INTEGER },
-    { "Checks",     PROFILER_STAT_PLAYER_COLLISION_CHECKS, PROFILER_VALUE_INTEGER },
-    { "Steps",      PROFILER_STAT_PLAYER_STEPS,            PROFILER_VALUE_INTEGER },
+    { "Collisions", ProfilerStat::ProfilerStatPlayerCollisions,       ProfilerValueType::ProfilerValueInteger },
+    { "Checks",     ProfilerStat::ProfilerStatPlayerCollisionChecks, ProfilerValueType::ProfilerValueInteger },
+    { "Steps",      ProfilerStat::ProfilerStatPlayerSteps,            ProfilerValueType::ProfilerValueInteger },
     {},
-    { "Physics",        PROFILER_STAT_PHYSICS,            PROFILER_VALUE_MS_PERCENTAGE },
-    { "- Player",       PROFILER_STAT_PLAYER,             PROFILER_VALUE_MS_PERCENTAGE },
-    { "- Collision",    PROFILER_STAT_PLAYER_COLLISION,   PROFILER_VALUE_MS_PERCENTAGE },
-    { "- Handler",      PROFILER_STAT_PLAYER_HANDLER,     PROFILER_VALUE_MS_PERCENTAGE },
-    { "- Step triggers",PROFILER_STAT_PLAYER_STEP_TRIGGER,PROFILER_VALUE_MS_PERCENTAGE },
+    { "Physics",        ProfilerStat::ProfilerStatPhysics,            ProfilerValueType::ProfilerValueMsPercentage },
+    { "- Player",       ProfilerStat::ProfilerStatPlayer,             ProfilerValueType::ProfilerValueMsPercentage },
+    { "- Collision",    ProfilerStat::ProfilerStatPlayerCollision,   ProfilerValueType::ProfilerValueMsPercentage },
+    { "- Handler",      ProfilerStat::ProfilerStatPlayerHandler,     ProfilerValueType::ProfilerValueMsPercentage },
+    { "- Step triggers",ProfilerStat::ProfilerStatPlayerStepTrigger,ProfilerValueType::ProfilerValueMsPercentage },
     {},
-    { "Triggers",  PROFILER_STAT_TRIGGERS,  PROFILER_VALUE_MS_PERCENTAGE },
+    { "Triggers",  ProfilerStat::ProfilerStatTriggers,  ProfilerValueType::ProfilerValueMsPercentage },
 };
 
 static const ProfilerRow playerCameraRows[] = {
     { "Player" },
-    { "- X",    PROFILER_STAT_PLAYER_X,  PROFILER_VALUE_FLOAT },
-    { "- Y",    PROFILER_STAT_PLAYER_Y,  PROFILER_VALUE_FLOAT },
-    { "- VX",   PROFILER_STAT_PLAYER_VX, PROFILER_VALUE_FLOAT },
-    { "- VY",   PROFILER_STAT_PLAYER_VY, PROFILER_VALUE_FLOAT },
+    { "- X",    ProfilerStat::ProfilerStatPlayerX,  ProfilerValueType::ProfilerValueFloat },
+    { "- Y",    ProfilerStat::ProfilerStatPlayerY,  ProfilerValueType::ProfilerValueFloat },
+    { "- VX",   ProfilerStat::ProfilerStatPlayerVx, ProfilerValueType::ProfilerValueFloat },
+    { "- VY",   ProfilerStat::ProfilerStatPlayerVy, ProfilerValueType::ProfilerValueFloat },
     {},
     { "Camera" },
-    { "- X",          PROFILER_STAT_CAMERA_X,          PROFILER_VALUE_FLOAT },
-    { "- Y",          PROFILER_STAT_CAMERA_Y,          PROFILER_VALUE_FLOAT },
-    { "- Intended Y", PROFILER_STAT_CAMERA_INTENDED_Y, PROFILER_VALUE_FLOAT }
+    { "- X",          ProfilerStat::ProfilerStatCameraX,          ProfilerValueType::ProfilerValueFloat },
+    { "- Y",          ProfilerStat::ProfilerStatCameraY,          ProfilerValueType::ProfilerValueFloat },
+    { "- Intended Y", ProfilerStat::ProfilerStatCameraIntendedY, ProfilerValueType::ProfilerValueFloat }
 };
 
 static const ProfilerRow miscRows[] = {
     { "Input" },
-    { "- X",   PROFILER_STAT_INPUT_X, PROFILER_VALUE_INTEGER },
-    { "- Y",   PROFILER_STAT_INPUT_Y, PROFILER_VALUE_INTEGER }
+    { "- X",   ProfilerStat::ProfilerStatInputX, ProfilerValueType::ProfilerValueInteger },
+    { "- Y",   ProfilerStat::ProfilerStatInputY, ProfilerValueType::ProfilerValueInteger }
 };
 
 static const ProfilerRow memoryRows[] = {
-    { "Linear free", PROFILER_STAT_LINEAR_FREE, PROFILER_VALUE_HEX },
+    { "Linear free", ProfilerStat::ProfilerStatLinearFree, ProfilerValueType::ProfilerValueHex },
     {},
-    { "Heap used",   PROFILER_STAT_HEAP_USED,   PROFILER_VALUE_HEX },
-    { "Heap free",   PROFILER_STAT_HEAP_FREE,   PROFILER_VALUE_HEX },
-    { "Heap total",  PROFILER_STAT_HEAP_TOTAL,  PROFILER_VALUE_HEX },
+    { "Heap used",   ProfilerStat::ProfilerStatHeapUsed,   ProfilerValueType::ProfilerValueHex },
+    { "Heap free",   ProfilerStat::ProfilerStatHeapFree,   ProfilerValueType::ProfilerValueHex },
+    { "Heap total",  ProfilerStat::ProfilerStatHeapTotal,  ProfilerValueType::ProfilerValueHex },
     {},
-    { "Level arena used",   PROFILER_STAT_LEVEL_ARENA_USED,   PROFILER_VALUE_HEX },
-    { "Level arena free",   PROFILER_STAT_LEVEL_ARENA_FREE,   PROFILER_VALUE_HEX },
-    { "Level arena total",  PROFILER_STAT_LEVEL_ARENA_TOTAL,  PROFILER_VALUE_HEX }
+    { "Level arena used",   ProfilerStat::ProfilerStatLevelArenaUsed,   ProfilerValueType::ProfilerValueHex },
+    { "Level arena free",   ProfilerStat::ProfilerStatLevelArenaFree,   ProfilerValueType::ProfilerValueHex },
+    { "Level arena total",  ProfilerStat::ProfilerStatLevelArenaTotal,  ProfilerValueType::ProfilerValueHex }
 };
 
-static const char *pageNames[PROFILER_PAGE_COUNT] = {
+static const char *pageNames[static_cast<int>(ProfilerPage::ProfilerPageCount)] = {
     "Overview",
     "Render",
     "Gameplay",
@@ -182,12 +182,12 @@ static const char *pageNames[PROFILER_PAGE_COUNT] = {
 
 static void profilerHandleInput(u32 kDown) {
     if (kDown & KEY_LEFT) {
-        if (currentPage == PROFILER_PAGE_OVERVIEW) currentPage = PROFILER_PAGE_COUNT - 1;
+        if (currentPage == static_cast<int>(ProfilerPage::ProfilerPageOverview)) currentPage = static_cast<int>(ProfilerPage::ProfilerPageCount) - 1;
         else currentPage--;
     }
 
     if (kDown & KEY_RIGHT) {
-        currentPage = (currentPage + 1) % PROFILER_PAGE_COUNT;
+        currentPage = (currentPage + 1) % static_cast<int>(ProfilerPage::ProfilerPageCount);
     }
 }
 
@@ -201,42 +201,42 @@ static void drawPageHeader(void) {
         true,
         "[%d/%d] %s",
         currentPage + 1,
-        PROFILER_PAGE_COUNT,
+        static_cast<int>(ProfilerPage::ProfilerPageCount),
         pageNames[currentPage]
     );
 }
 
 static float profilerStatValue(ProfilerStat stat) {
     switch (stat) {
-        case PROFILER_STAT_FRAME: return internalSnapshot.frameMs;
-        case PROFILER_STAT_FPS: return internalSnapshot.frameMs > 0 ? 1000.f / internalSnapshot.frameMs : 0.f;
-        case PROFILER_STAT_CPU: return internalSnapshot.cpuMs;
-        case PROFILER_STAT_GPU: return internalSnapshot.gpuMs;
+        case ProfilerStat::ProfilerStatFrame: return internalSnapshot.frameMs;
+        case ProfilerStat::ProfilerStatFps: return internalSnapshot.frameMs > 0 ? 1000.f / internalSnapshot.frameMs : 0.f;
+        case ProfilerStat::ProfilerStatCpu: return internalSnapshot.cpuMs;
+        case ProfilerStat::ProfilerStatGpu: return internalSnapshot.gpuMs;
 
-        case PROFILER_STAT_PHYSICS: return internalSnapshot.physicsMs;
-        case PROFILER_STAT_TRIGGERS: return internalSnapshot.triggersMs;
-        case PROFILER_STAT_COLLISION: return internalSnapshot.collisionMs;
-        case PROFILER_STAT_PARTICLES: return internalSnapshot.particlesMs;
-        case PROFILER_STAT_RENDERING: return internalSnapshot.renderingMs;
+        case ProfilerStat::ProfilerStatPhysics: return internalSnapshot.physicsMs;
+        case ProfilerStat::ProfilerStatTriggers: return internalSnapshot.triggersMs;
+        case ProfilerStat::ProfilerStatCollision: return internalSnapshot.collisionMs;
+        case ProfilerStat::ProfilerStatParticles: return internalSnapshot.particlesMs;
+        case ProfilerStat::ProfilerStatRendering: return internalSnapshot.renderingMs;
 
-        case PROFILER_STAT_PLAYER: return internalSnapshot.playMs;
-        case PROFILER_STAT_PLAYER_COLLISION: return internalSnapshot.collisionMs;
-        case PROFILER_STAT_PLAYER_HANDLER: return internalSnapshot.handlerMs;
-        case PROFILER_STAT_PLAYER_STEP_TRIGGER: return internalSnapshot.stepTriggerMs;
+        case ProfilerStat::ProfilerStatPlayer: return internalSnapshot.playMs;
+        case ProfilerStat::ProfilerStatPlayerCollision: return internalSnapshot.collisionMs;
+        case ProfilerStat::ProfilerStatPlayerHandler: return internalSnapshot.handlerMs;
+        case ProfilerStat::ProfilerStatPlayerStepTrigger: return internalSnapshot.stepTriggerMs;
 
-        case PROFILER_STAT_RENDER_CREATING: return internalSnapshot.creatingMs;
-        case PROFILER_STAT_RENDER_SORTING: return internalSnapshot.sortingMs;
-        case PROFILER_STAT_RENDER_TINT: return internalSnapshot.tintMs;
-        case PROFILER_STAT_RENDER_DRAWING: return internalSnapshot.drawingMs;
+        case ProfilerStat::ProfilerStatRenderCreating: return internalSnapshot.creatingMs;
+        case ProfilerStat::ProfilerStatRenderSorting: return internalSnapshot.sortingMs;
+        case ProfilerStat::ProfilerStatRenderTint: return internalSnapshot.tintMs;
+        case ProfilerStat::ProfilerStatRenderDrawing: return internalSnapshot.drawingMs;
 
-        case PROFILER_STAT_PLAYER_X: return internalSnapshot.plyPosX;
-        case PROFILER_STAT_PLAYER_Y: return internalSnapshot.plyPosY;
-        case PROFILER_STAT_PLAYER_VX: return internalSnapshot.plyVelX;
-        case PROFILER_STAT_PLAYER_VY: return internalSnapshot.plyVelY;
+        case ProfilerStat::ProfilerStatPlayerX: return internalSnapshot.plyPosX;
+        case ProfilerStat::ProfilerStatPlayerY: return internalSnapshot.plyPosY;
+        case ProfilerStat::ProfilerStatPlayerVx: return internalSnapshot.plyVelX;
+        case ProfilerStat::ProfilerStatPlayerVy: return internalSnapshot.plyVelY;
         
-        case PROFILER_STAT_CAMERA_X: return internalSnapshot.camPosX;
-        case PROFILER_STAT_CAMERA_Y: return internalSnapshot.camPosY;
-        case PROFILER_STAT_CAMERA_INTENDED_Y: return internalSnapshot.camItdY;
+        case ProfilerStat::ProfilerStatCameraX: return internalSnapshot.camPosX;
+        case ProfilerStat::ProfilerStatCameraY: return internalSnapshot.camPosY;
+        case ProfilerStat::ProfilerStatCameraIntendedY: return internalSnapshot.camItdY;
 
         default: return 0.f;
     }
@@ -244,52 +244,52 @@ static float profilerStatValue(ProfilerStat stat) {
 
 static unsigned int profilerStatInteger(ProfilerStat stat) {
     switch (stat) {
-        case PROFILER_STAT_PLAYER_STEPS: return internalSnapshot.steps;
-        case PROFILER_STAT_PLAYER_COLLISIONS: return internalSnapshot.collisions;
-        case PROFILER_STAT_PLAYER_COLLISION_CHECKS: return internalSnapshot.collisionChecks;
+        case ProfilerStat::ProfilerStatPlayerSteps: return internalSnapshot.steps;
+        case ProfilerStat::ProfilerStatPlayerCollisions: return internalSnapshot.collisions;
+        case ProfilerStat::ProfilerStatPlayerCollisionChecks: return internalSnapshot.collisionChecks;
 
-        case PROFILER_STAT_OPTIM_COUNT: return internalSnapshot.drawCount;
+        case ProfilerStat::ProfilerStatOptimCount: return internalSnapshot.drawCount;
 
-        case PROFILER_STAT_INPUT_X: return internalSnapshot.inputX;
-        case PROFILER_STAT_INPUT_Y: return internalSnapshot.inputY;
+        case ProfilerStat::ProfilerStatInputX: return internalSnapshot.inputX;
+        case ProfilerStat::ProfilerStatInputY: return internalSnapshot.inputY;
 
-        case PROFILER_STAT_PLAYER_TICK: return internalSnapshot.tick;
+        case ProfilerStat::ProfilerStatPlayerTick: return internalSnapshot.tick;
 
-        case PROFILER_STAT_LINEAR_FREE: return internalSnapshot.linearFree;
-        case PROFILER_STAT_HEAP_USED: return internalSnapshot.heapUsed;
-        case PROFILER_STAT_HEAP_FREE: return internalSnapshot.heapFree;
-        case PROFILER_STAT_HEAP_TOTAL: return internalSnapshot.heapTotal;
+        case ProfilerStat::ProfilerStatLinearFree: return internalSnapshot.linearFree;
+        case ProfilerStat::ProfilerStatHeapUsed: return internalSnapshot.heapUsed;
+        case ProfilerStat::ProfilerStatHeapFree: return internalSnapshot.heapFree;
+        case ProfilerStat::ProfilerStatHeapTotal: return internalSnapshot.heapTotal;
 
-        case PROFILER_STAT_LEVEL_ARENA_USED: return internalSnapshot.levelArenaUsed;
-        case PROFILER_STAT_LEVEL_ARENA_FREE: return internalSnapshot.levelArenaFree;
-        case PROFILER_STAT_LEVEL_ARENA_TOTAL: return internalSnapshot.levelArenaTotal;
+        case ProfilerStat::ProfilerStatLevelArenaUsed: return internalSnapshot.levelArenaUsed;
+        case ProfilerStat::ProfilerStatLevelArenaFree: return internalSnapshot.levelArenaFree;
+        case ProfilerStat::ProfilerStatLevelArenaTotal: return internalSnapshot.levelArenaTotal;
         default: return 0;
     }
 }
 
 static void drawStatValue(const ProfilerRow *row, float y) {
     switch (row->valueType) {
-        case PROFILER_VALUE_FLOAT:
+        case ProfilerValueType::ProfilerValueFloat:
             drawText(&chatFontFontCharset, &chatFontSheet, PROFILER_VALUE_X, y,
                 PROFILER_SCALE, PROFILER_SCALE, 1, true, "%.2f",
                 profilerStatValue(row->stat));
             break;
-        case PROFILER_VALUE_FPS:
+        case ProfilerValueType::ProfilerValueFps:
             drawText(&chatFontFontCharset, &chatFontSheet, PROFILER_VALUE_X, y,
                 PROFILER_SCALE, PROFILER_SCALE, 1, true, "%.1f FPS",
                 profilerStatValue(row->stat));
             break;
-        case PROFILER_VALUE_MS_PERCENTAGE:
+        case ProfilerValueType::ProfilerValueMsPercentage:
             drawText(&chatFontFontCharset, &chatFontSheet, PROFILER_VALUE_X, y,
                 PROFILER_SCALE, PROFILER_SCALE, 1, true, "%.2f%%",
                 profilerStatValue(row->stat) * 6.f);
             break;
-        case PROFILER_VALUE_INTEGER:
+        case ProfilerValueType::ProfilerValueInteger:
             drawText(&chatFontFontCharset, &chatFontSheet, PROFILER_VALUE_X, y,
                 PROFILER_SCALE, PROFILER_SCALE, 1, true, "%u",
                 profilerStatInteger(row->stat));
             break;
-        case PROFILER_VALUE_HEX:
+        case ProfilerValueType::ProfilerValueHex:
             drawText(&chatFontFontCharset, &chatFontSheet, PROFILER_VALUE_X, y,
                 PROFILER_SCALE, PROFILER_SCALE, 1, true, "0x%X",
                 profilerStatInteger(row->stat));
@@ -301,7 +301,7 @@ static void drawStatValue(const ProfilerRow *row, float y) {
 
 static void drawSecondaryStatValue(const ProfilerRow *row, float y) {
     switch (row->valueType) {
-        case PROFILER_VALUE_MS_PERCENTAGE:
+        case ProfilerValueType::ProfilerValueMsPercentage:
             drawText(&chatFontFontCharset, &chatFontSheet, PROFILER_SEC_VALUE_X, y,
                 PROFILER_SCALE, PROFILER_SCALE, 1, true, "(%.2f ms)",
                 profilerStatValue(row->stat));
@@ -398,22 +398,22 @@ void profilerDraw(void) {
     drawPageHeader();
 
     switch (currentPage) {
-        case PROFILER_PAGE_OVERVIEW:
+        case static_cast<int>(ProfilerPage::ProfilerPageOverview):
             drawOverviewPage();
             break;
-        case PROFILER_PAGE_RENDER:
+        case static_cast<int>(ProfilerPage::ProfilerPageRender):
             drawRenderPage();
             break;
-        case PROFILER_PAGE_GAMEPLAY:
+        case static_cast<int>(ProfilerPage::ProfilerPageGameplay):
             drawGameplayPage();
             break;
-        case PROFILER_PAGE_PLAYER_CAMERA:
+        case static_cast<int>(ProfilerPage::ProfilerPagePlayerCamera):
             drawPlayerCameraPage();
             break;
-        case PROFILER_PAGE_MISC:
+        case static_cast<int>(ProfilerPage::ProfilerPageMisc):
             drawMiscPage();
             break;
-        case PROFILER_PAGE_MEMORY:
+        case static_cast<int>(ProfilerPage::ProfilerPageMemory):
             drawMemoryPage();
             break;
         default:

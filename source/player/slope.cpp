@@ -18,7 +18,7 @@
 namespace gd3ds
 {
 
-const float falls[SPEED_COUNT] = {
+const float falls[static_cast<int>(PlayerSpeeds::SpeedCount)] = {
     226.044054,
     280.422108,
     348.678108,
@@ -50,7 +50,7 @@ int getPlayerTouchingSlopes(Player *player) {
 
                 if (!hitbox) continue;
 
-                if (hitbox->collisionType == HITBOX_SOLID && hitbox->type == COLLISION_SLOPE) {
+                if (hitbox->collisionType == static_cast<int>(HitboxType::HitboxSolid) && hitbox->type == static_cast<int>(CollisionShape::CollisionSlope)) {
                     // If touching do stuff
                     bool colliding = intersect(
                         player->x, player->y, player->width + 1, player->height + 1, 0, 
@@ -65,7 +65,7 @@ int getPlayerTouchingSlopes(Player *player) {
 
                             bool wouldBeNext;
 
-                            if (orient == ORIENT_NORMAL_UP || orient == ORIENT_UD_DOWN) {
+                            if (orient == static_cast<int>(SlopeOrientations::OrientNormalUp) || orient == static_cast<int>(SlopeOrientations::OrientUdDown)) {
                                 wouldBeNext = diff > 0;
                             } else {
                                 wouldBeNext = diff < 0;
@@ -108,14 +108,14 @@ int gravSlopeOrient(int obj, Player *player) {
 
     if (player->upsideDown) {
         // Flip vertically slope orientation
-        if (orient == ORIENT_UD_UP)
-			orient = ORIENT_NORMAL_UP;
-		else if (orient == ORIENT_UD_DOWN)
-			orient = ORIENT_NORMAL_DOWN;
-		else if (orient == ORIENT_NORMAL_UP)
-			orient = ORIENT_UD_UP;
-		else if (orient == ORIENT_NORMAL_DOWN)
-			orient = ORIENT_UD_DOWN;
+        if (orient == static_cast<int>(SlopeOrientations::OrientUdUp))
+			orient = static_cast<int>(SlopeOrientations::OrientNormalUp);
+		else if (orient == static_cast<int>(SlopeOrientations::OrientUdDown))
+			orient = static_cast<int>(SlopeOrientations::OrientNormalDown);
+		else if (orient == static_cast<int>(SlopeOrientations::OrientNormalUp))
+			orient = static_cast<int>(SlopeOrientations::OrientUdUp);
+		else if (orient == static_cast<int>(SlopeOrientations::OrientNormalDown))
+			orient = static_cast<int>(SlopeOrientations::OrientUdDown);
     }
     return orient;
 }
@@ -138,7 +138,7 @@ bool isSpikeSlope(int obj) {
 float slopeAngle(int obj, Player *player) {
     float angle = atanf((float) objects.height[obj] / objects.width[obj]);
     int orient = gravSlopeOrient(obj, player);
-    if (orient == ORIENT_NORMAL_DOWN || orient == ORIENT_UD_DOWN) {
+    if (orient == static_cast<int>(SlopeOrientations::OrientNormalDown) || orient == static_cast<int>(SlopeOrientations::OrientUdDown)) {
         angle = -angle;
     }
 
@@ -154,14 +154,14 @@ float slopeSnapAngle(int obj, Player *player) {
     float angle = slopeAngle(obj, player);
     int orient = objects.orientation[obj];
 
-    if (orient == ORIENT_NORMAL_UP) angle = -fabsf(angle);
-    if (orient == ORIENT_NORMAL_DOWN) angle = fabsf(angle);
+    if (orient == static_cast<int>(SlopeOrientations::OrientNormalUp)) angle = -fabsf(angle);
+    if (orient == static_cast<int>(SlopeOrientations::OrientNormalDown)) angle = fabsf(angle);
 
     return angle;
 }
 
 float expectedSlopeY(int obj, Player *player) {
-    int flipping = gravSlopeOrient(obj, player) >= ORIENT_UD_DOWN;
+    int flipping = gravSlopeOrient(obj, player) >= static_cast<int>(SlopeOrientations::OrientUdDown);
     int mult = (player->upsideDown ^ flipping) ? -1 : 1;
     
     float angle = slopeAngle(obj, player);
@@ -178,7 +178,7 @@ float expectedSlopeY(int obj, Player *player) {
 
     // Spike slope has bigger hitbox
     if (isSpikeSlope(obj)) {
-        y += (objects.orientation[obj] >= ORIENT_UD_DOWN ? -4 : 4);
+        y += (objects.orientation[obj] >= static_cast<int>(SlopeOrientations::OrientUdDown) ? -4 : 4);
     }
 
     return y;
@@ -189,7 +189,7 @@ void slopeSnapY(int obj, Player *player) {
     int orientation = gravSlopeOrient(obj, player);
 
     switch (orientation) {
-        case ORIENT_NORMAL_UP: // Normal - up
+        case static_cast<int>(SlopeOrientations::OrientNormalUp): // Normal - up
             if (player->upsideDown) {
                 player->y = MAX(objGetBottom(obj) - player->height / 2, expectedSlopeY(obj, player));
             } else {
@@ -203,7 +203,7 @@ void slopeSnapY(int obj, Player *player) {
                 player->velY = 0;
             }
             break;
-        case ORIENT_NORMAL_DOWN: // Normal - down
+        case static_cast<int>(SlopeOrientations::OrientNormalDown): // Normal - down
             if (player->upsideDown) {
                 player->y = MIN(expectedSlopeY(obj, player), objGetTop(obj) + player->height / 2);
             } else {
@@ -217,7 +217,7 @@ void slopeSnapY(int obj, Player *player) {
                 player->velY = 0;
             }
             break;
-        case ORIENT_UD_DOWN: // Upside down - down
+        case static_cast<int>(SlopeOrientations::OrientUdDown): // Upside down - down
             if (player->upsideDown) {
                 player->y = MAX(expectedSlopeY(obj, player), objGetBottom(obj) - player->height / 2);
             } else {
@@ -231,7 +231,7 @@ void slopeSnapY(int obj, Player *player) {
                 player->velY = 0;
             }
             break;
-        case ORIENT_UD_UP: // Upside down - up
+        case static_cast<int>(SlopeOrientations::OrientUdUp): // Upside down - up
             if (player->upsideDown) {
                 player->y = MIN(objGetTop(obj) + player->height / 2, expectedSlopeY(obj, player));
             } else {
@@ -254,24 +254,24 @@ static float slopeLaunchVelocity(int obj, Player *player) {
     float vel = 0.9f * MIN(1.12f / slopeAngle(obj, player), 1.54f) * (objects.height[obj] * playerSpeeds[state.speed] / objects.width[obj]);
     float time = clampf(10 * (player->timeElapsed - player->slopeData.elapsed), 0.4f, 1.0f);
 
-    if (player->gamemode == GAMEMODE_BALL) vel *= 0.75f;
-    if (player->gamemode == GAMEMODE_SHIP) vel *= 0.75f;
-    if (player->gamemode == GAMEMODE_UFO) vel *= 0.7499f;
+    if (player->gamemode == static_cast<int>(IconGamemode::GamemodeBall)) vel *= 0.75f;
+    if (player->gamemode == static_cast<int>(IconGamemode::GamemodeShip)) vel *= 0.75f;
+    if (player->gamemode == static_cast<int>(IconGamemode::GamemodeUfo)) vel *= 0.7499f;
 
     return vel * time;
 }
 
 void slopeCalc(int obj, Player *player) {
     int orientation = gravSlopeOrient(obj, player);
-    if (orientation == ORIENT_NORMAL_UP) { // Normal - up
+    if (orientation == static_cast<int>(SlopeOrientations::OrientNormalUp)) { // Normal - up
         // Make the player start with higher velocity 
-        if ((player->gamemode == GAMEMODE_UFO || player->gamemode == GAMEMODE_SHIP) && player->velY < SHIP_UFO_EXITING_VEL && currInput.holdJump) {
+        if ((player->gamemode == static_cast<int>(IconGamemode::GamemodeUfo) || player->gamemode == static_cast<int>(IconGamemode::GamemodeShip)) && player->velY < SHIP_UFO_EXITING_VEL && currInput.holdJump) {
             player->velY = SHIP_UFO_EXITING_VEL; // 2 in gd
         }
         
         // Handle leaving slope
         if (!slopeTouching(obj, player)) {
-            if (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_UFO) {
+            if (player->gamemode == static_cast<int>(IconGamemode::GamemodeShip) || player->gamemode == static_cast<int>(IconGamemode::GamemodeUfo)) {
                 float launch = slopeLaunchVelocity(obj, player);
                 if (player->velY < launch) player->newVelY = launch;
             }
@@ -299,7 +299,7 @@ void slopeCalc(int obj, Player *player) {
             
             pushPlayerAction(clearSlopeData);
         }
-    } else if (orientation == ORIENT_NORMAL_DOWN) { // Normal - down
+    } else if (orientation == static_cast<int>(SlopeOrientations::OrientNormalDown)) { // Normal - down
         // Handle leaving slope
         if (player->velY > 0) {
             pushPlayerAction(clearSlopeData);
@@ -317,9 +317,9 @@ void slopeCalc(int obj, Player *player) {
             player->slopeSlideCoyoteTime = 2;
             pushPlayerAction(clearSlopeData);
         }        
-    } else if (orientation == ORIENT_UD_UP) { // Upside down - up
+    } else if (orientation == static_cast<int>(SlopeOrientations::OrientUdUp)) { // Upside down - up
         // Make the player start with higher velocity 
-        if ((player->gamemode == GAMEMODE_UFO || player->gamemode == GAMEMODE_SHIP) && player->velY > -SHIP_UFO_EXITING_VEL && !currInput.holdJump) {
+        if ((player->gamemode == static_cast<int>(IconGamemode::GamemodeUfo) || player->gamemode == static_cast<int>(IconGamemode::GamemodeShip)) && player->velY > -SHIP_UFO_EXITING_VEL && !currInput.holdJump) {
             player->velY = -SHIP_UFO_EXITING_VEL; // 2 in gd
         }
 
@@ -331,9 +331,9 @@ void slopeCalc(int obj, Player *player) {
         
         bool gravSnap = (player->ceilingInvTime > 0) || (player->gravObjID >= 0 && GET_HITBOX_COUNTER(player->gravObjID) == 1);
         
-        if (player->gamemode == GAMEMODE_PLAYER && !gravSnap && !player->allowHeadHit) {
+        if (player->gamemode == static_cast<int>(IconGamemode::GamemodePlayer) && !gravSnap && !player->allowHeadHit) {
             if (grav(player, player->y - SLOPE_HEAD_TOLERANCE) > grav(player, expectedSlopeY(obj, player))) {
-                killPlayer(DEATH_SLOPE);
+                killPlayer(DeathReason::DeathSlope);
             }
             return;
         }
@@ -351,15 +351,15 @@ void slopeCalc(int obj, Player *player) {
             float time = clampf(10 * (player->timeElapsed - player->slopeData.elapsed), 0.4f, 1.0f);
             
             //float orig = vel;
-            if (player->gamemode == GAMEMODE_BALL) {
+            if (player->gamemode == static_cast<int>(IconGamemode::GamemodeBall)) {
                 vel *= 0.75f;
             }
             
-            if (player->gamemode == GAMEMODE_SHIP) {
+            if (player->gamemode == static_cast<int>(IconGamemode::GamemodeShip)) {
                 vel *= 0.75f;
             }
 
-            if (player->gamemode == GAMEMODE_UFO) {
+            if (player->gamemode == static_cast<int>(IconGamemode::GamemodeUfo)) {
                 vel *= 0.7499f;
             }
 
@@ -374,7 +374,7 @@ void slopeCalc(int obj, Player *player) {
 
             //output_log("Tick %d - Time %.2f PElapsed %.2f SElapsed %.2f Exit vel %.2f\n", player->frame, time, player->timeElapsed, player->slope_data.elapsed, player->new_vel_y);
         }
-    } else if (orientation == ORIENT_UD_DOWN) { // Upside down - down
+    } else if (orientation == static_cast<int>(SlopeOrientations::OrientUdDown)) { // Upside down - down
         // Handle leaving slope
         if (player->velY < 0) {
             pushPlayerAction(clearSlopeData);
@@ -383,9 +383,9 @@ void slopeCalc(int obj, Player *player) {
         
         bool gravSnap = (player->ceilingInvTime > 0) || (player->gravObjID >= 0 && GET_HITBOX_COUNTER(player->gravObjID) == 1);
         
-        if (player->gamemode == GAMEMODE_PLAYER && !gravSnap && !player->allowHeadHit) {
+        if (player->gamemode == static_cast<int>(IconGamemode::GamemodePlayer) && !gravSnap && !player->allowHeadHit) {
             if (grav(player, player->y - SLOPE_HEAD_TOLERANCE) > grav(player, expectedSlopeY(obj, player))) {
-                killPlayer(DEATH_SLOPE);
+                killPlayer(DeathReason::DeathSlope);
             }
             return;
         }
@@ -417,16 +417,16 @@ bool playerCircleTouchesSlope(int obj, Player *player) {
 
     // Collide with hipotenuse
     switch (orientation) {
-        case ORIENT_NORMAL_UP:
-        case ORIENT_UD_DOWN: {
+        case static_cast<int>(SlopeOrientations::OrientNormalUp):
+        case static_cast<int>(SlopeOrientations::OrientUdDown): {
             x1 = objects.x[obj] - hw;
             y1 = objects.y[obj] - hh;
             x2 = objects.x[obj] + hw;
             y2 = objects.y[obj] + hh;
             break;
         }
-        case ORIENT_NORMAL_DOWN:
-        case ORIENT_UD_UP: {
+        case static_cast<int>(SlopeOrientations::OrientNormalDown):
+        case static_cast<int>(SlopeOrientations::OrientUdUp): {
             x1 = objects.x[obj] + hw;
             y1 = objects.y[obj] - hh;
             x2 = objects.x[obj] - hw;
@@ -442,15 +442,15 @@ bool playerCircleTouchesSlope(int obj, Player *player) {
 
     // Collide with vertical
     switch (orientation) {
-        case ORIENT_NORMAL_UP:
-        case ORIENT_UD_UP:
+        case static_cast<int>(SlopeOrientations::OrientNormalUp):
+        case static_cast<int>(SlopeOrientations::OrientUdUp):
             x1 = objects.x[obj] + hw;
             y1 = objects.y[obj] - hh;
             x2 = objects.x[obj] + hw;
             y2 = objects.y[obj]  + hh;
             break;
-        case ORIENT_NORMAL_DOWN:
-        case ORIENT_UD_DOWN:
+        case static_cast<int>(SlopeOrientations::OrientNormalDown):
+        case static_cast<int>(SlopeOrientations::OrientUdDown):
             x1 = objects.x[obj] - hw;
             y1 = objects.y[obj]  - hh;
             x2 = objects.x[obj] - hw;
@@ -465,15 +465,15 @@ bool playerCircleTouchesSlope(int obj, Player *player) {
 
     // Collide with horizontal
     switch (orientation) {
-        case ORIENT_NORMAL_UP:
-        case ORIENT_NORMAL_DOWN:
+        case static_cast<int>(SlopeOrientations::OrientNormalUp):
+        case static_cast<int>(SlopeOrientations::OrientNormalDown):
             x1 = objects.x[obj] + hw;
             y1 = objects.y[obj]  - hh;
             x2 = objects.x[obj] - hw;
             y2 = objects.y[obj]  - hh;
             break;
-        case ORIENT_UD_DOWN:
-        case ORIENT_UD_UP:
+        case static_cast<int>(SlopeOrientations::OrientUdDown):
+        case static_cast<int>(SlopeOrientations::OrientUdUp):
             x1 = objects.x[obj] + hw;
             y1 = objects.y[obj]  + hh;
             x2 = objects.x[obj] - hw;
@@ -501,33 +501,33 @@ void slopeCollide(int obj, Player *player) {
 	else if (objects.orientation[obj] >= 2 && expectedSlopeY(obj, player) - (hasSlope ? 3 : 0) >= player->y)
 		return;
     
-    int clip = (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_UFO) ? 7 : 10;
+    int clip = (player->gamemode == static_cast<int>(IconGamemode::GamemodeShip) || player->gamemode == static_cast<int>(IconGamemode::GamemodeUfo)) ? 7 : 10;
     int orient = gravSlopeOrient(obj, player);  
-    int mult = orient >= ORIENT_UD_DOWN ? -1 : 1;
+    int mult = orient >= static_cast<int>(SlopeOrientations::OrientUdDown) ? -1 : 1;
 
     InternalHitbox internal = player->internalHitbox;
 
     bool gravSnap = (player->ceilingInvTime > 0) || (player->gravObjID >= 0 && GET_HITBOX_COUNTER(player->gravObjID) == 1);
 
     // Check if player inside slope
-    if (orient == ORIENT_NORMAL_UP || orient == ORIENT_UD_UP) {
+    if (orient == static_cast<int>(SlopeOrientations::OrientNormalUp) || orient == static_cast<int>(SlopeOrientations::OrientUdUp)) {
         bool internalCollidingSlope = intersect(
             player->x, player->y, internal.width, internal.height, 0, 
             objGetRight(obj), objects.y[obj] , 1, objects.height[obj], 0
         );
 
         // Die if so
-        if (internalCollidingSlope) killPlayer(DEATH_SLOPE);
+        if (internalCollidingSlope) killPlayer(DeathReason::DeathSlope);
     }
 
     // Normal slope - resting on bottom
     if (
-        !(player->gamemode == GAMEMODE_WAVE && player->allowDartSlide) &&
+        !(player->gamemode == static_cast<int>(IconGamemode::GamemodeWave) && player->allowDartSlide) &&
         state.oldPlayer.slopeData.slopeID < 0 &&
-        orient < ORIENT_UD_DOWN && 
+        orient < static_cast<int>(SlopeOrientations::OrientUdDown) &&
         gravTop(player) - objGravBottom(player, obj) <= clip + 5 * !player->mini // Remove extra if mini
     ) {
-        if ((player->gamemode != GAMEMODE_WAVE || player->allowDartSlide) && ((player->gamemode != GAMEMODE_PLAYER && (player->velY >= 0)) || gravSnap)) {
+        if ((player->gamemode != static_cast<int>(IconGamemode::GamemodeWave) || player->allowDartSlide) && ((player->gamemode != static_cast<int>(IconGamemode::GamemodePlayer) && (player->velY >= 0)) || gravSnap)) {
             player->velY = 0;
             player->collidedBlock = obj;
             if (!gravSnap) player->onCeiling = true;
@@ -539,7 +539,7 @@ void slopeCollide(int obj, Player *player) {
                 objects.x[obj], objects.y[obj], objects.width[obj], objects.height[obj], 0
             );
 
-            if (internalCollidingSlope) killPlayer(DEATH_SLOPE);
+            if (internalCollidingSlope) killPlayer(DeathReason::DeathSlope);
         }
 
         return;
@@ -547,12 +547,12 @@ void slopeCollide(int obj, Player *player) {
 
     // Upside down slope - resting on top
     if (
-        !(player->gamemode == GAMEMODE_WAVE && player->allowDartSlide) &&
+        !(player->gamemode == static_cast<int>(IconGamemode::GamemodeWave) && player->allowDartSlide) &&
         state.oldPlayer.slopeData.slopeID < 0 &&
-        orient >= ORIENT_UD_DOWN && 
+        orient >= static_cast<int>(SlopeOrientations::OrientUdDown) &&
         objGravTop(player, obj) - gravBottom(player) <= clip + 5 * !player->mini // Remove extra if mini
     ) {
-        if ((player->gamemode != GAMEMODE_WAVE || player->allowDartSlide) && player->velY <= 0) {
+        if ((player->gamemode != static_cast<int>(IconGamemode::GamemodeWave) || player->allowDartSlide) && player->velY <= 0) {
             player->velY = 0;
             if (!gravSnap) player->onGround = true;
             player->timeSinceGround = 0;
@@ -563,7 +563,7 @@ void slopeCollide(int obj, Player *player) {
                 objects.x[obj], objects.y[obj], objects.width[obj], objects.height[obj], 0
             );
 
-            if (internalCollidingSlope) killPlayer(DEATH_SLOPE);
+            if (internalCollidingSlope) killPlayer(DeathReason::DeathSlope);
         }
         
         return;
@@ -572,7 +572,7 @@ void slopeCollide(int obj, Player *player) {
     // Left side collision
     if (
         state.oldPlayer.slopeData.slopeID < 0 && 
-        (orient == ORIENT_NORMAL_DOWN || orient == ORIENT_UD_DOWN) && 
+        (orient == static_cast<int>(SlopeOrientations::OrientNormalDown) || orient == static_cast<int>(SlopeOrientations::OrientUdDown)) &&
         player->x - objGetLeft(obj) < 0
     ) {
         // Going from the left
@@ -582,13 +582,13 @@ void slopeCollide(int obj, Player *player) {
                 objects.x[obj], objects.y[obj], objects.width[obj], objects.height[obj], 0
             );
 
-            if (internalCollidingSlope) killPlayer(DEATH_SLOPE);
+            if (internalCollidingSlope) killPlayer(DeathReason::DeathSlope);
             return;
         }
         
         // Touching slope before center is in slope
-        if ((player->gamemode != GAMEMODE_WAVE || player->allowDartSlide) && player->velY * mult <= 0) {
-            if (orient == ORIENT_NORMAL_DOWN) {
+        if ((player->gamemode != static_cast<int>(IconGamemode::GamemodeWave) || player->allowDartSlide) && player->velY * mult <= 0) {
+            if (orient == static_cast<int>(SlopeOrientations::OrientNormalDown)) {
                 player->y = grav(player, objGravTop(player, obj)) + grav(player, player->height / 2);
             } else {
                 player->y = grav(player, objGravBottom(player, obj)) - grav(player, player->height / 2);
@@ -599,7 +599,7 @@ void slopeCollide(int obj, Player *player) {
         }
     }
 
-    if (!gravSnap && player->gamemode == GAMEMODE_PLAYER && gravSlopeOrient(obj, player) >= 2 && !playerCircleTouchesSlope(obj, player)) return;
+    if (!gravSnap && player->gamemode == static_cast<int>(IconGamemode::GamemodePlayer) && gravSlopeOrient(obj, player) >= 2 && !playerCircleTouchesSlope(obj, player)) return;
 
     bool colliding = intersectExclusive(
         player->x, player->y, player->width, player->height, 0, 
@@ -618,7 +618,7 @@ void slopeCollide(int obj, Player *player) {
         int orient = objects.orientation[slope];
 
 
-        if (orient == ORIENT_NORMAL_UP || orient == ORIENT_UD_DOWN) {
+        if (orient == static_cast<int>(SlopeOrientations::OrientNormalUp) || orient == static_cast<int>(SlopeOrientations::OrientUdDown)) {
             wouldBeNext = diff > 0;
         } else {
             wouldBeNext = diff < 0;
@@ -628,8 +628,8 @@ void slopeCollide(int obj, Player *player) {
     // Check if going from going down to up
     bool upToDown = slope >= 0 && gravSlopeOrient(slope, player) != gravSlopeOrient(obj, player) && 
     (
-        (gravSlopeOrient(slope, player) == ORIENT_NORMAL_DOWN && gravSlopeOrient(obj, player) == ORIENT_NORMAL_UP) ||
-        (gravSlopeOrient(slope, player) == ORIENT_UD_DOWN && gravSlopeOrient(obj, player) == ORIENT_UD_UP)
+        (gravSlopeOrient(slope, player) == static_cast<int>(SlopeOrientations::OrientNormalDown) && gravSlopeOrient(obj, player) == static_cast<int>(SlopeOrientations::OrientNormalUp)) ||
+        (gravSlopeOrient(slope, player) == static_cast<int>(SlopeOrientations::OrientUdDown) && gravSlopeOrient(obj, player) == static_cast<int>(SlopeOrientations::OrientUdUp))
     );
 
     if ((slope < 0 || gravSlopeOrient(slope, player) == gravSlopeOrient(obj, player) || upToDown) && slopeTouching(obj, player) && colliding && objGravTop(player, obj) - gravBottom(player) > 2 && (upToDown || wouldBeNext)
@@ -637,10 +637,10 @@ void slopeCollide(int obj, Player *player) {
         if (slope >= 0 && slopeAngle(obj, player) < slopeAngle(slope, player)) return;
         
         int oldOrient = gravSlopeOrient(obj, &state.oldPlayer);
-        float oldVel = (oldOrient == ORIENT_NORMAL_DOWN || oldOrient == ORIENT_UD_DOWN) ? grav(player, state.oldPlayer.deltaY) : (state.oldPlayer.velY * STEPS_DT);
+        float oldVel = (oldOrient == static_cast<int>(SlopeOrientations::OrientNormalDown) || oldOrient == static_cast<int>(SlopeOrientations::OrientUdDown)) ? grav(player, state.oldPlayer.deltaY) : (state.oldPlayer.velY * STEPS_DT);
 
         float angle = atanf(oldVel / (playerSpeeds[state.speed] * STEPS_DT));
-        if (oldOrient >= ORIENT_UD_DOWN) angle = -angle;
+        if (oldOrient >= static_cast<int>(SlopeOrientations::OrientUdDown)) angle = -angle;
 
         bool hasSlope = state.oldPlayer.slopeData.slopeID >= 0;
 
@@ -649,20 +649,20 @@ void slopeCollide(int obj, Player *player) {
             hasSlope = objects.orientation[state.oldPlayer.slopeData.slopeID] == objects.orientation[slope];
         }
 
-        bool projectedHit = (orient == ORIENT_NORMAL_DOWN || orient == ORIENT_UD_DOWN) ? (angle * 5.f <= slopeAngle(obj, player)) : (angle <= slopeAngle(obj, player));
+        bool projectedHit = (orient == static_cast<int>(SlopeOrientations::OrientNormalDown) || orient == static_cast<int>(SlopeOrientations::OrientUdDown)) ? (angle * 5.f <= slopeAngle(obj, player)) : (angle <= slopeAngle(obj, player));
         bool clip = true;//slope_touching(obj, player);
-        bool snapDown = (orient == ORIENT_NORMAL_DOWN || orient == ORIENT_UD_DOWN) && player->velY * mult > 0 && player->x - objGetLeft(obj) > 0;
+        bool snapDown = (orient == static_cast<int>(SlopeOrientations::OrientNormalDown) || orient == static_cast<int>(SlopeOrientations::OrientUdDown)) && player->velY * mult > 0 && player->x - objGetLeft(obj) > 0;
 
         //output_log("Tick %d - dir %d oldDir %d proyectedHit %d clip %d snapDown %d angle %f slope_angle %f\n", player->frame, orient, (slope >= 0 ? grav_slope_orient(slope, player) : -1), projectedHit, clip, snapDown, angle, slope_angle(obj, player));
 
         if ((projectedHit && clip) || snapDown) {
             // If wave, just die, nothing else, wave hates slopes
-            if (player->gamemode == GAMEMODE_WAVE && !player->allowDartSlide) {
-                killPlayer(DEATH_SLOPE);
+            if (player->gamemode == static_cast<int>(IconGamemode::GamemodeWave) && !player->allowDartSlide) {
+                killPlayer(DeathReason::DeathSlope);
                 return;
             }
 
-            if (orient >= ORIENT_UD_DOWN) player->onCeiling = true;
+            if (orient >= static_cast<int>(SlopeOrientations::OrientUdDown)) player->onCeiling = true;
             else {
                 player->collidedBlock = obj;
                 player->onGround = true;
@@ -674,16 +674,16 @@ void slopeCollide(int obj, Player *player) {
             //slope_snap_y(obj, player);
 
             if (isSpikeSlope(obj)) {
-                killPlayer(DEATH_SLOPE);
+                killPlayer(DeathReason::DeathSlope);
             }
 
             // If player is on an slope that goes down, and is in the top corner, snap down
             if (snapDown && !hasSlope) {
-                if (orient == ORIENT_NORMAL_DOWN && player->velY <= 0) {
+                if (orient == static_cast<int>(SlopeOrientations::OrientNormalDown) && player->velY <= 0) {
                     player->y = grav(player, objGravTop(player, obj)) + grav(player, player->height / 2);
                     player->slopeData.snapDown = true;
                     player->velY = 0;
-                } else if (orient == ORIENT_UD_DOWN && player->velY >= 0) {
+                } else if (orient == static_cast<int>(SlopeOrientations::OrientUdDown) && player->velY >= 0) {
                     player->y = grav(player, objGravBottom(player, obj)) - grav(player, player->height / 2);
                     player->slopeData.snapDown = true;
                     player->velY = 0;
@@ -717,7 +717,7 @@ bool slopeTouching(int obj, Player *player) {
 
     // If player is on slope, add a bit of hitbox
     if (hasSlope) {
-        int mult = gravSlopeOrient(state.oldPlayer.slopeData.slopeID, player) >= ORIENT_UD_DOWN ? -1 : 1;
+        int mult = gravSlopeOrient(state.oldPlayer.slopeData.slopeID, player) >= static_cast<int>(SlopeOrientations::OrientUdDown) ? -1 : 1;
         hasSlope = hasSlope && player->velY * mult <= 0;
     }
     
@@ -728,13 +728,13 @@ bool slopeTouching(int obj, Player *player) {
     if (objGetRight(obj) < getLeft(player)) return false;
 
     switch (gravSlopeOrient(obj, player)) {
-        case ORIENT_NORMAL_UP:
-        case ORIENT_NORMAL_DOWN: {
+        case static_cast<int>(SlopeOrientations::OrientNormalUp):
+        case static_cast<int>(SlopeOrientations::OrientNormalDown): {
             float diff = grav(player, expectedSlopeY(obj, player)) - grav(player, player->y);
             return diff >= min && diff <= snapHeight;
         }
-        case ORIENT_UD_UP:
-        case ORIENT_UD_DOWN: {
+        case static_cast<int>(SlopeOrientations::OrientUdUp):
+        case static_cast<int>(SlopeOrientations::OrientUdDown): {
             float diffUd = grav(player, player->y) - grav(player, expectedSlopeY(obj, player));  
             return diffUd >= min && diffUd <= snapHeight;
         }

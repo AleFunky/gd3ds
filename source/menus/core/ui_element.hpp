@@ -14,51 +14,51 @@
 namespace gd3ds
 {
 
-typedef enum {
-    UI_ELEMENT,
-    UI_BUTTON,
-    UI_IMAGE,
-    UI_LABEL,
-    UI_CHECKBOX,
-    UI_WINDOW,
-    UI_TEXTBOX,
-    UI_LIST,
-    UI_DARKEN,
-    UI_ICON,
-    UI_COLOR_BUTTON,
-    UI_WINDOW_BUTTON,
-    UI_PROGRESS_BAR,
-    UI_EXTERNAL_LEVEL_CARD,
-    UI_STATISTIC_CARD,
-    UI_PARTICLE,
-    UI_USE_EFFECT,
-    UI_PALETTE_ICONS,
-    UI_SLIDER,
-    UI_ONLINE_LEVEL_CARD,
-    UI_RECTANGLE,
-} UIElementType;
+enum class UIElementType {
+    UiElement,
+    UiButton,
+    UiImage,
+    UiLabel,
+    UiCheckbox,
+    UiWindow,
+    UiTextbox,
+    UiList,
+    UiDarken,
+    UiIcon,
+    UiColorButton,
+    UiWindowButton,
+    UiProgressBar,
+    UiExternalLevelCard,
+    UiStatisticCard,
+    UiParticle,
+    UiUseEffect,
+    UiPaletteIcons,
+    UiSlider,
+    UiOnlineLevelCard,
+    UiRectangle,
+};
 
-typedef struct UIInput UIInput;
-typedef struct UITransform UITransform;
-typedef struct UIElement UIElement;
-typedef struct UIScreen UIScreen;
+struct UIInput;
+struct UITransform;
+struct UIElement;
+struct UIScreen;
 
 typedef void (*UIActionFn)(UIElement *e, const UIPropertyList *args);
 
-typedef struct UIAction {
+struct UIAction {
     UIActionFn action;
     UIPropertyList args;
-} UIAction;
+};
 
-typedef struct UIActionDef {
+struct UIActionDef {
     const char* name;
     UIActionFn fn;
-} UIActionDef;
+};
 
-typedef struct {
+struct UIActionList {
     const UIActionDef *actions;
     const size_t actionCount;
-} UIActionList;
+};
 
 void uiElementSetUserdata(UIElement *element, void *userdata);
 
@@ -86,14 +86,14 @@ void uiElementApplyProperties(UIElement *e, UIScreen *screen, const UIPropertyLi
 
 void performActions(UIElement *e);
 
-typedef struct UITransform {
+struct UITransform {
     float x;
     float y;
     float scaleX;
     float scaleY;
-} UITransform;
+};
 
-typedef struct UIInput {
+struct UIInput {
     u32 down;
     u32 held;
     u32 up;
@@ -102,10 +102,10 @@ typedef struct UIInput {
     bool interacted;
     //used for lists
     bool dragging;
-} UIInput;
+};
 
 struct UIElement {
-    UIElementType type = UI_ELEMENT;
+    UIElementType type = UIElementType::UiElement;
 
     float x = 0.0f, y = 0.0f;
     int w = 0, h = 0;
@@ -153,27 +153,27 @@ struct UIElement {
     void (*onDisable)(UIElement*) = nullptr;
 };
 
-typedef struct {
+struct ImageData {
     C2D_Sprite sprite;
     C2D_ImageTint tint;
-} ImageData;
+};
 
-typedef struct {
+struct UIImage {
     UIElement base;
 
     ImageData image;
 
     bool useTint;
-} UIImage;
+};
 
-typedef enum ButtonAnimType {
-    BUTTON_ANIM_NORMAL,
-    BUTTON_ANIM_PULL,
+enum class ButtonAnimType {
+    ButtonAnimNormal,
+    ButtonAnimPull,
     //uninmplemented lel
-    BUTTON_ANIM_DARKEN
-} ButtonAnimType;
+    ButtonAnimDarken
+};
 
-typedef struct {
+struct UIButton {
     UIElement base;
 
     ImageData image;
@@ -197,24 +197,24 @@ typedef struct {
     int keyPressTimer;
 
     bool invisible;
-} UIButton;
+};
 
-typedef struct {
+struct UICheckBox {
     UIButton  base;
 
     bool checked;
-} UICheckBox;
+};
 
-typedef struct {
+struct UIWindow {
     UIElement base;
     
     C2D_Image atlas;
 
     u32 color;
     int border;
-} UIWindow;
+};
 
-typedef struct {
+struct UITextbox {
     UIElement base;
 
     C2D_Image atlas;
@@ -223,9 +223,9 @@ typedef struct {
     char text[128];
     int characterLimit;
     int border;
-} UITextbox;
+};
 
-typedef struct {
+struct UILabel {
     UIElement base;
     
     char text[1024];
@@ -233,9 +233,9 @@ typedef struct {
 
     int font;
     bool parseTags;
-} UILabel;
+};
 
-typedef struct {
+struct UIIcon {
     UIButton base;
 
     int gamemode;
@@ -246,9 +246,9 @@ typedef struct {
 
     bool isSelected;
     bool glow;
-} UIIcon;
+};
 
-typedef struct {
+struct UIColor {
     UIButton base;
 
     int index;
@@ -257,26 +257,26 @@ typedef struct {
     ImageData image;
 
     bool isSelected;
-} UIColor;
+};
 
-typedef struct {
+struct UIWindowButton {
     UIButton base;
 
     C2D_Image atlas;
     u32 color;
     int border;
-} UIWindowButton;
+};
 
-typedef struct {
+struct UIDarken {
     UIElement base;
     
     ImageData image;
 
     float opacity;
     bool fullScreen;
-} UIDarken;
+};
 
-typedef struct {
+struct UIProgressBar {
     UIElement base;
 
     ImageData frame;
@@ -290,9 +290,9 @@ typedef struct {
 
     bool flipOrder;
     bool useTint;
-} UIProgressBar;
+};
 
-typedef struct {
+struct UIList {
     UIElement base;
 
     int scrollY;
@@ -304,24 +304,24 @@ typedef struct {
     int dpadHeldTime;
 
     u32 backgroundColor;
-} UIList;
+};
 
-typedef struct {
+struct UIParticle {
     UIElement base;
     
     ParticleSystem particle;
-} UIParticle;
+};
 
-typedef struct {
+struct UIUseEffect {
     UIElement base;
 
     UseEffectPool useEffects;
     //Use effect original positions relative to (0, 0)
     float xPos[MAX_USE_EFFECTS];
     float yPos[MAX_USE_EFFECTS];
-} UIUseEffect;
+};
 
-typedef struct {
+struct UISlider {
     UIElement base;
 
     float maxValue;
@@ -332,28 +332,28 @@ typedef struct {
     C2D_Sprite trackFrame;
     C2D_Sprite track;
     C2D_Sprite button;
-} UISlider;
+};
 
-typedef struct {
+struct UIPaletteIcons {
     UIElement base;
 
     float spacing;
-} UIPaletteIcons;
+};
 
-typedef struct {
+struct UIRectangle {
     UIElement base;
 
     u32 color;
-} UIRectangle;
+};
 
-typedef struct {
+struct UISpinner {
     UIImage base;
 
     float rotationSpeed;
     bool blending;
-} UISpinner;
+};
 /*
-typedef struct {
+struct UIExternalLevelCardData {
     
     UIImageData icon;
     UILabelData label;
@@ -362,15 +362,15 @@ typedef struct {
     float button_h;
     char path[256];
     bool swap_color;
-} UIExternalLevelCardData;
+};
 
-typedef struct {
+struct UIStatisticCardData {
     UILabelData stat_name;
     int value;
     bool swap_color;
-} UIStatisticCardData;
+};
 
-typedef struct {
+struct UIOnlineLevelCardData {
     UILabelData name;
     UILabelData creator;
     UILabelData song;
@@ -387,7 +387,7 @@ typedef struct {
     UIImageData downloads_icon;
     UIImageData likes_icon;
     UIImageData length_icon;
-} UIOnlineLevelCardData;
+};
 */
 
 }

@@ -29,19 +29,19 @@ void levelUnratedOnlineRefresh(void);
 
 u32 userCoinIconTint(bool collected, bool hasRate);
 
-typedef struct {
+struct PlayerHitboxTrail {
     float x;
     float y;
     float width;
     float height;
     float rotation;
     InternalHitbox internalHitbox;
-} PlayerHitboxTrail;
+};
 
-typedef struct KeyInput {
+struct KeyInput {
     u8 pressedJump:1;
     u8 holdJump:1;
-} KeyInput;
+};
 
 // First flash
 #define FLASH_TIME_1 (20.f / STEPS_HZ)
@@ -51,46 +51,46 @@ typedef struct KeyInput {
 #define RESPAWN_EFFECT_REPEAT 4
 #define RESPAWN_EFFECT_DURATION (12.f / STEPS_HZ)
 
-typedef enum {
-    DEATH_TITLE_SCREEN_KILL,
-    DEATH_SPIKE,
-    DEATH_SAW,
-    DEATH_BLOCK,
-    DEATH_SLOPE,
-    DEATH_FELL_OFF_LEVEL,
-    DEATH_CEILING,
-    DEATH_REASON_COUNT
-} DeathReason;
+enum class DeathReason {
+    DeathTitleScreenKill,
+    DeathSpike,
+    DeathSaw,
+    DeathBlock,
+    DeathSlope,
+    DeathFellOffLevel,
+    DeathCeiling,
+    DeathReasonCount
+};
 
-typedef enum {
-    FLASH_NONE,
-    FLASH_FIRST_LIGHT,
-    FLASH_UNLIGHTED,
-    FLASH_SECOND_LIGHT
-} FlashState;
+enum class FlashState {
+    FlashNone,
+    FlashFirstLight,
+    FlashUnlighted,
+    FlashSecondLight
+};
 
-typedef struct {
+struct BGFlashData {
     bool flashing;
     FlashState state;
     float timer;
     bool useLbg;
-} BGFlashData;
+};
 
-typedef enum {
-    RESPAWN_EFFECT_NONE,
-    RESPAWN_EFFECT_SHOW_PLAYER,
-    RESPAWN_EFFECT_HIDE_PLAYER
-} RespawnEffectState;
+enum class RespawnEffectState {
+    RespawnEffectNone,
+    RespawnEffectShowPlayer,
+    RespawnEffectHidePlayer
+};
 
-typedef struct {
+struct RespawnEffectData {
     bool active;
     bool hidePlayer;
     RespawnEffectState state;
     float timer;
     int remaining;
-} RespawnEffectData;
+};
 
-typedef struct {
+struct StateLevelData {
     int attempts;
     int jumps;
     float timeStart;
@@ -100,15 +100,15 @@ typedef struct {
     bool coin1;
     bool coin2;
     bool coin3;
-} StateLevelData;
+};
 
-typedef struct {
+struct ShakeData {
     bool active;
     float timer;
     float strength;
-} ShakeData;
+};
 
-typedef struct {
+struct GamePlayState {
     float unmodCamX;
     float unmodCamY;
 
@@ -204,7 +204,7 @@ typedef struct {
     KeyInput oldInputP2;
 
     DeathReason deathReason;
-} GamePlayState;
+};
 
 #define CEILING_INVUL_TIME 0.1f
 #define GAMEMODE_INVUL_TIME 0.1f

@@ -3,59 +3,59 @@
 namespace gd3ds
 {
 
-typedef enum {
-    EASE_LINEAR,
+enum class EaseTypes {
+    EaseLinear,
 
-    EASE_IN,
-    EASE_OUT,
-    EASE_IN_OUT,
+    EaseIn,
+    EaseOut,
+    EaseInOut,
 
-    SINE_IN,
-    SINE_OUT,
-    SINE_IN_OUT,
+    SineIn,
+    SineOut,
+    SineInOut,
 
-    QUAD_IN,
-    QUAD_OUT,
-    QUAD_INT_OUT,
+    QuadIn,
+    QuadOut,
+    QuadIntOut,
 
-    CUBIC_IN,
-    CUBIC_OUT,
-    CUBIC_IN_OUT,
+    CubicIn,
+    CubicOut,
+    CubicInOut,
 
-    QUART_IN,
-    QUART_OUT,
-    QUART_IN_OUT,
+    QuartIn,
+    QuartOut,
+    QuartInOut,
     
-    QUINT_IN,
-    QUINT_OUT,
-    QUINT_IN_OUT,
+    QuintIn,
+    QuintOut,
+    QuintInOut,
 
-    EXPO_IN,
-    EXPO_OUT,
-    EXPO_IN_OUT,
+    ExpoIn,
+    ExpoOut,
+    ExpoInOut,
     
-    CIRC_IN,
-    CIRC_OUT,
-    CIRC_IN_OUT,
+    CircIn,
+    CircOut,
+    CircInOut,
     
-    ELASTIC_IN,
-    ELASTIC_OUT,
-    ELASTIC_IN_OUT,
+    ElasticIn,
+    ElasticOut,
+    ElasticInOut,
     
-    BACK_IN,
-    BACK_OUT,
-    BACK_IN_OUT,
+    BackIn,
+    BackOut,
+    BackInOut,
     
-    BOUNCE_IN,
-    BOUNCE_OUT,
-    BOUNCE_IN_OUT,
+    BounceIn,
+    BounceOut,
+    BounceInOut,
     
-    QUADRATIC_IN,
-    QUADRATIC_OUT,
-    QUADRATIC_IN_OUT,
+    QuadraticIn,
+    QuadraticOut,
+    QuadraticInOut,
 
-    EASING_COUNT,
-} EaseTypes;
+    EasingCount,
+};
 
 float easeValue(EaseTypes ease, float start, float end, float elapsed, float duration, float period);
 float easeTime(EaseTypes ease, float elapsed, float duration, float period);

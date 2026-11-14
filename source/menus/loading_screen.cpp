@@ -231,7 +231,7 @@ void loadingScreenInit() {
     col.g = 102;
     col.b = 255;
 
-    int chan = getColChannelIndex(CHANNEL_BG);
+    int chan = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelBg));
 
     channels[chan].color = col;
     getBuffer(chan)->active = false;

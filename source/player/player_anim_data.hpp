@@ -3,23 +3,23 @@
 namespace gd3ds
 {
 
-typedef struct {
+struct PlayerSpritePart {
     int   textureIdx;
     float px, py;
     float rotation;
     float scaleX, scaleY;
     int   zOrder;
-} PlayerSpritePart;
+};
 
-typedef struct {
+struct PlayerFrame {
     const PlayerSpritePart *parts;
     int   partCount;
     float delay;
-} PlayerFrame;
+};
 
-typedef struct {
+struct PlayerAnimation {
     const PlayerFrame *frames;
     int   frameCount;
-} PlayerAnimation;
+};
 
 }

@@ -110,7 +110,7 @@ extern const UIScreenDefPair deletePopUpDef = {
 //EXIT POPUP
 
 static void actionQuitGame(UIElement *e, const UIPropertyList *args){
-    uiStackPushGameState(STATE_EXIT);
+    uiStackPushGameState(static_cast<int>(GameState::StateExit));
     stopMP3();
     return;
 }
@@ -136,7 +136,7 @@ extern const UIScreenDefPair quitPopUpDef = {
 // AUTOUPDATE POPUP
 
 static void actionOpenUpdater(UIElement *e, const UIPropertyList *args){
-    uiStackPush(&updaterDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_AFTER_CLOSE);
+    uiStackPush(&updaterDef, UIAnimation::AnimZoom, UIAnimation::AnimZoom, UIStackPushType::PushAfterClose);
     return;
 }
 

@@ -27,9 +27,9 @@
 namespace gd3ds
 {
 
-typedef struct Matrix2x2 {
+struct Matrix2x2 {
     float m[2][2];
-} Matrix2x2;
+};
 
 Matrix2x2 matrix2x2Identity(void);
 Matrix2x2 matrix2x2Rotation(float radians);

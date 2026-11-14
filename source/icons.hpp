@@ -5,14 +5,14 @@
 namespace gd3ds
 {
 
-typedef enum {
- ICON_COLOR_WHITE = 0,
- ICON_COLOR_P1,
- ICON_COLOR_P2,
- ICON_COLOR_GLOW
-} IconColorType;
+enum class IconColorType {
+ IconColorWhite = 0,
+ IconColorP1,
+ IconColorP2,
+ IconColorGlow
+};
 
-typedef struct {
+struct IconPart {
  int atlas;
  int texture;
  float x,y;
@@ -23,25 +23,24 @@ typedef struct {
  IconColorType colorType;
  float opacity;
  int animationPart;
-} IconPart;
+};
 
-typedef struct {
+struct Icon {
  size_t partCount;
  const IconPart* parts;
-} Icon;
+};
 
-typedef enum {
- GAMEMODE_PLAYER,
- GAMEMODE_SHIP,
- GAMEMODE_BALL,
- GAMEMODE_UFO,
- GAMEMODE_WAVE,
- GAMEMODE_ROBOT,
- GAMEMODE_SPIDER,
- GAMEMODE_COUNT
-} IconGamemode;
+enum class IconGamemode {
+ GamemodePlayer,
+ GamemodeShip,
+ GamemodeBall,
+ GamemodeUfo,
+ GamemodeWave,
+ GamemodeRobot,
+ GamemodeSpider,
+ GamemodeCount
+};
 
-#define GAMEMODE_COUNT 7
 #define ICON_GAMEMODE_COUNT 7
 
 #define TRAIL 7

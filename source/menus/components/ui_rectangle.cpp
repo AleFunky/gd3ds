@@ -40,7 +40,7 @@ UIRectangle *uiCreateRectangle(UIScreen *screen) {
 
     if (!e) return NULL;
 
-    e->base.type = UI_RECTANGLE;
+    e->base.type = UIElementType::UiRectangle;
     e->base.enabled = true;
     
     uiElementApplyDefaultProperties(&e->base, screen);

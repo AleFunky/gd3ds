@@ -11,7 +11,7 @@
 namespace gd3ds
 {
 
-typedef struct {
+struct CollectableEffect {
     float x, y;
     float velX, velY;
     float gravity;
@@ -26,7 +26,7 @@ typedef struct {
     int detailChannel;
 
     bool active;
-} CollectableEffect;
+};
 
 static CollectableEffect collectableEffects[COLLECTABLE_EFFECT_POOL_SIZE] = { 0 };
 
@@ -75,7 +75,7 @@ void updateCollectableEffect(float delta) {
         e->y += e->velY * delta;
 
         e->elapsed += delta;
-        e->opacity = easeValue(EASE_OUT, 1.0f, 0.0f, e->elapsed, COLLECTABLE_EFFECT_LIFE, 2.0f);
+        e->opacity = easeValue(EaseTypes::EaseOut, 1.0f, 0.0f, e->elapsed, COLLECTABLE_EFFECT_LIFE, 2.0f);
 
         if (e->elapsed >= COLLECTABLE_EFFECT_LIFE) e->active = false;
     }

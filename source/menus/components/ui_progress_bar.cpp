@@ -137,7 +137,7 @@ UIProgressBar *uiCreateProgressBar(UIScreen *screen) {
 
     if (!e) return NULL;
 
-    e->base.type = UI_PROGRESS_BAR;
+    e->base.type = UIElementType::UiProgressBar;
     e->base.enabled = true;
     e->useTint = false;
 

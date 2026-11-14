@@ -5,16 +5,16 @@
 namespace gd3ds
 {
 
-typedef enum {
-    PI_PLAYER_1,
-    PI_PLAYER_2,
-    PI_PLAYER_COUNT
-} PreciseInputPlayer;
+enum class PreciseInputPlayer {
+    PiPlayer1,
+    PiPlayer2,
+    PiPlayerCount
+};
 
-typedef struct {
+struct PreciseInputEvent {
     u32 tick;
     bool down;
-} PreciseInputEvent;
+};
 
 extern bool piEnabled;
 

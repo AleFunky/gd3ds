@@ -57,10 +57,10 @@ UIScreen defaultScreen = {
 };
 UIScreen defaultScreenTop;
 
-typedef struct {
+struct UIElementConstructor {
     const char *name;
     UICreateFn create;
-} UIElementConstructor;
+};
 
 static const UIElementConstructor elementConstructors[] = {
     {"button",       uiCreateButtonFromProps },
@@ -113,7 +113,7 @@ extern const UIBitfieldEntry keybindTable[] = {
     { "CPRIGHT", KEY_CPAD_RIGHT },
 };
 
-extern const LabelFont fonts[NUM_FONTS] = {
+extern const LabelFont fonts[static_cast<int>(Fonts::NumFonts)] = {
     {
         .charset = &bigFontFontCharset,
         .sheet = &bigFontSheet
@@ -191,7 +191,7 @@ void uiScreenOpen(UIScreen *screen, UIAnimation animation) {
     if (!screen)
         return;
 
-    if(animation == ANIM_NONE){
+    if(animation == UIAnimation::AnimNone){
         finishAnimation(screen);
     }
 
@@ -205,19 +205,19 @@ void uiScreenOpen(UIScreen *screen, UIAnimation animation) {
     t->outDuration = 0.f;
     t->darkenFrac = 1.f;
 
-    if(animation != ANIM_NONE) t->inDuration = 0.5f;
+    if(animation != UIAnimation::AnimNone) t->inDuration = 0.5f;
 
     switch (animation) {
-    case ANIM_SLIDE_DOWN:
+    case UIAnimation::AnimSlideDown:
         t->outDuration = 0.5f;
         break;
 
-    case ANIM_BOUNCE_DOWN:
+    case UIAnimation::AnimBounceDown:
         t->outDuration = 0.3f;
         t->darkenFrac = 0.6f;
         break;
 
-    case ANIM_BOUNCE_DOWN_SLOW:
+    case UIAnimation::AnimBounceDownSlow:
         t->inDuration = 1;
         t->outDuration = 0.6f;
         t->darkenFrac = 0.6f;
@@ -228,7 +228,7 @@ void uiScreenOpen(UIScreen *screen, UIAnimation animation) {
         break;
     };
 
-    t->state = UI_TRANSITION_OPENING;
+    t->state = UITransitionState::UiTransitionOpening;
 
     if(t->inDuration <= 0.f){
         t->time = t->duration;
@@ -248,14 +248,14 @@ void uiScreenClose(UIScreen *screen) {
     UITransition *t = &screen->transition;
 
     if (settingsState.fastMenu) {
-        t->state = UI_TRANSITION_CLOSING;
+        t->state = UITransitionState::UiTransitionClosing;
         t->time = t->duration;
         t->done = true;
         screen->closing = true;
         return;
     }
 
-    t->state = UI_TRANSITION_CLOSING;
+    t->state = UITransitionState::UiTransitionClosing;
 
     if(t->outDuration <= 0.f){
         t->time = t->duration;
@@ -274,7 +274,7 @@ void uiScreenUpdateTransition(UIScreen *screen, float dt) {
 
     UITransition *t = &screen->transition;
 
-    if (t->done || t->state == UI_TRANSITION_NONE)
+    if (t->done || t->state == UITransitionState::UiTransitionNone)
         return;
 
     t->time += dt;
@@ -283,7 +283,7 @@ void uiScreenUpdateTransition(UIScreen *screen, float dt) {
         t->time = t->duration;
         t->done = true;
 
-        if (t->state == UI_TRANSITION_CLOSING) {
+        if (t->state == UITransitionState::UiTransitionClosing) {
             screen->closing = true;
         }
     }
@@ -324,10 +324,10 @@ static void uiScreenHandleAnim(UIScreen* s, UITransform *root) {
 
     // Animation stuff
     switch (s->transition.animation) {
-        case ANIM_ZOOM:
-            scaleValue = easeValue(ELASTIC_OUT, 0.f, 1.f, s->transition.time, s->transition.duration, 0.6f);
+        case UIAnimation::AnimZoom:
+            scaleValue = easeValue(EaseTypes::ElasticOut, 0.f, 1.f, s->transition.time, s->transition.duration, 0.6f);
             
-            if (s->transition.state == UI_TRANSITION_CLOSING) scaleValue = 1.f - scaleValue;
+            if (s->transition.state == UITransitionState::UiTransitionClosing) scaleValue = 1.f - scaleValue;
 
             root->scaleX = scaleValue;
             root->scaleY = scaleValue;
@@ -335,10 +335,10 @@ static void uiScreenHandleAnim(UIScreen* s, UITransform *root) {
             root->x = cx * (1.f - scaleValue);
             root->y = cy * (1.f - scaleValue);
             break;
-        case ANIM_ZOOM_SUBTLE:
-            scaleValue = easeValue(ELASTIC_OUT, 0.f, 1.f, s->transition.time, s->transition.duration / 1.5f, 1.6f);
+        case UIAnimation::AnimZoomSubtle:
+            scaleValue = easeValue(EaseTypes::ElasticOut, 0.f, 1.f, s->transition.time, s->transition.duration / 1.5f, 1.6f);
             
-            if (s->transition.state == UI_TRANSITION_CLOSING) scaleValue = 1.f - scaleValue;
+            if (s->transition.state == UITransitionState::UiTransitionClosing) scaleValue = 1.f - scaleValue;
 
             root->scaleX = scaleValue;
             root->scaleY = scaleValue;
@@ -346,27 +346,27 @@ static void uiScreenHandleAnim(UIScreen* s, UITransform *root) {
             root->x = cx * (1.f - scaleValue);
             root->y = cy * (1.f - scaleValue);
             break;
-        case ANIM_BOUNCE_DOWN:
-        case ANIM_BOUNCE_DOWN_SLOW:
-            if (s->transition.state == UI_TRANSITION_CLOSING) 
-            slideValue = 1.f - easeValue(EASE_IN, 0.f, 1.f, s->transition.time, s->transition.duration, 2.f); 
+        case UIAnimation::AnimBounceDown:
+        case UIAnimation::AnimBounceDownSlow:
+            if (s->transition.state == UITransitionState::UiTransitionClosing)
+            slideValue = 1.f - easeValue(EaseTypes::EaseIn, 0.f, 1.f, s->transition.time, s->transition.duration, 2.f);
             else 
-            slideValue = easeValue(BOUNCE_OUT, 0.f, 1.f, s->transition.time, s->transition.duration, 1.f);
+            slideValue = easeValue(EaseTypes::BounceOut, 0.f, 1.f, s->transition.time, s->transition.duration, 1.f);
             
 
             root->y = -(1.f - slideValue) * height;
             break;
-        case ANIM_SLIDE_RIGHT:
-            slideValue = easeValue(ELASTIC_OUT, 0.f, 1.f, s->transition.time, s->transition.duration, 0.6f);
+        case UIAnimation::AnimSlideRight:
+            slideValue = easeValue(EaseTypes::ElasticOut, 0.f, 1.f, s->transition.time, s->transition.duration, 0.6f);
 
-            if (s->transition.state == UI_TRANSITION_CLOSING) slideValue = 1.f - slideValue;
+            if (s->transition.state == UITransitionState::UiTransitionClosing) slideValue = 1.f - slideValue;
 
             root->x = -(1.f - slideValue) * (width / 2.f);
             break;
-        case ANIM_SLIDE_DOWN:
-            slideValue = easeValue(EASE_IN_OUT, 0.f, 1.f, s->transition.time, s->transition.duration, 2.f);
+        case UIAnimation::AnimSlideDown:
+            slideValue = easeValue(EaseTypes::EaseInOut, 0.f, 1.f, s->transition.time, s->transition.duration, 2.f);
 
-            if (s->transition.state == UI_TRANSITION_CLOSING) slideValue = 1.f - slideValue;
+            if (s->transition.state == UITransitionState::UiTransitionClosing) slideValue = 1.f - slideValue;
 
             root->y = -(1.f - slideValue) * height;
             break;
@@ -381,7 +381,7 @@ void uiScreenDraw(UIScreen* s) {
 
     bool customDraw = s->def && s->def->draw;
 
-    if(customDraw) s->def->draw(s, UI_DRAW_BEFORE);
+    if(customDraw) s->def->draw(s, UIDrawPhase::UiDrawBefore);
 
     UITransform root = {
         .x = 0.f,
@@ -398,7 +398,7 @@ void uiScreenDraw(UIScreen* s) {
         uiDrawTree(e, &root);
     }
 
-    if(customDraw) s->def->draw(s, UI_DRAW_AFTER);
+    if(customDraw) s->def->draw(s, UIDrawPhase::UiDrawAfter);
 }
 
 void finishAnimation(UIScreen *screen) {
@@ -521,10 +521,10 @@ UIElement *uiGetElementByTag(UIScreen *screen, const char *tag) {
     return NULL;
 }
 
-typedef struct {
+struct UITagVisitorData {
     const char *tag;
     void (*func)(UIElement *);
-} UITagVisitorData;
+};
 
 static void visitTag(UIElement *element, void *userdata) {
     UITagVisitorData *data = (UITagVisitorData *)userdata;

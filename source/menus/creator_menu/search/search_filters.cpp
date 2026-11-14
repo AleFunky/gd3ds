@@ -58,7 +58,7 @@ void resetSearchFilters() {
     filters.isNA = false;
     filters.customSongQuery[0] = '\0';
     updateDifficultyTints(
-        uiStackGetScreen("search_menu", SCREEN_BTM)
+        uiStackGetScreen("search_menu", Screens::ScreenBtm)
     );
 }
 

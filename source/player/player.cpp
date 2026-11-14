@@ -70,7 +70,7 @@ ParticleSystem coinPickupParticles;
 PlayerAction playerActions[2][MAX_ACTIONS];
 int numActions[2] = {0};
 
-const float velocityThresholds[SPEED_COUNT] = {
+const float velocityThresholds[static_cast<int>(PlayerSpeeds::SpeedCount)] = {
 	101.541492,
 	103.485494592,
 	103.377492,
@@ -78,7 +78,7 @@ const float velocityThresholds[SPEED_COUNT] = {
 	103.809492
 };
 
-extern const float playerSpeeds[SPEED_COUNT] = {
+extern const float playerSpeeds[static_cast<int>(PlayerSpeeds::SpeedCount)] = {
 	251.16007972276924,
 	311.580093712804,
 	387.42014039710523,
@@ -86,7 +86,7 @@ extern const float playerSpeeds[SPEED_COUNT] = {
 	576.000192
 };
 
-const float cubeJumpHeights[SPEED_COUNT] = {
+const float cubeJumpHeights[static_cast<int>(PlayerSpeeds::SpeedCount)] = {
     573.481728,
     603.7217172,
     616.681728,
@@ -94,7 +94,7 @@ const float cubeJumpHeights[SPEED_COUNT] = {
     606.421728,
 };
 
-const float cubeAccelerations[SPEED_COUNT] = {
+const float cubeAccelerations[static_cast<int>(PlayerSpeeds::SpeedCount)] = {
     -2747.52,
     -2794.1082,
     -2786.4,
@@ -102,7 +102,7 @@ const float cubeAccelerations[SPEED_COUNT] = {
     -2799.36,
 };
 
-const float robotAccelerations[SPEED_COUNT] = {
+const float robotAccelerations[static_cast<int>(PlayerSpeeds::SpeedCount)] = {
     -2467.4583,
     -2514.6975,
     -2512.0731,
@@ -110,7 +110,7 @@ const float robotAccelerations[SPEED_COUNT] = {
     -2522.5707,
 };
 
-const float playerSpeedMults[SPEED_COUNT] = {
+const float playerSpeedMults[static_cast<int>(PlayerSpeeds::SpeedCount)] = {
 	0.7f,
 	0.9f,
 	1.1f,
@@ -124,7 +124,7 @@ const float cubeRotationSpeed[2] = {
 };
 
 bool playerGamemodeIsFlying(Player *player) {
-    return player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_UFO || player->gamemode == GAMEMODE_WAVE;
+    return player->gamemode == static_cast<int>(IconGamemode::GamemodeShip) || player->gamemode == static_cast<int>(IconGamemode::GamemodeUfo) || player->gamemode == static_cast<int>(IconGamemode::GamemodeWave);
 }
 
 void setAnimation(Player *player, int animID) {
@@ -141,9 +141,9 @@ void setAnimation(Player *player, int animID) {
 }
 
 float getBlendDuration(Player *player) {
-    if (player->gamemode == GAMEMODE_ROBOT) {
+    if (player->gamemode == static_cast<int>(IconGamemode::GamemodeRobot)) {
         return ROBOT_BLEND_DURATION;
-    } else if (player->gamemode == GAMEMODE_SPIDER) {
+    } else if (player->gamemode == static_cast<int>(IconGamemode::GamemodeSpider)) {
         return SPIDER_BLEND_DURATION;
     }
     return 0.1f;
@@ -178,7 +178,7 @@ void stopDashing(Player *player) {
     addDashExit(player);
     player->dashing = false;
     player->dashFireTimer = 0.f;
-    if (player->gamemode == GAMEMODE_BALL) {
+    if (player->gamemode == static_cast<int>(IconGamemode::GamemodeBall)) {
         player->ballRotationSpeed = 1.f;
         player->ballSlopeRotationMult = 1.f;
     }
@@ -224,7 +224,7 @@ void cubeGamemode(Player *player) {
     if (player->velY > player->maxVel) player->velY = player->maxVel;
 
     // If player fell above the level, die
-    if (player->y > 2794.f) killPlayer(DEATH_FELL_OFF_LEVEL);
+    if (player->y > 2794.f) killPlayer(DeathReason::DeathFellOffLevel);
 
     if (player->snapRotation) {
         player->cubeTargetRotation = player->rotation;
@@ -257,7 +257,7 @@ void cubeGamemode(Player *player) {
     }
 
     // J block
-    if (player->holdingJumpCancelled && player->bufferingState == BUFFER_END) {
+    if (player->holdingJumpCancelled && player->bufferingState == static_cast<int>(BufferingState::BufferEnd)) {
         jump = false;
     }
 
@@ -275,12 +275,12 @@ void cubeGamemode(Player *player) {
         slopeData = player->coyoteSlope;
     }
 
-    if (((slopeData.slopeID >= 0 && gravSlopeOrient(slopeData.slopeID, player) < ORIENT_UD_DOWN) || player->onGround || shouldCoyote) && jump) {
+    if (((slopeData.slopeID >= 0 && gravSlopeOrient(slopeData.slopeID, player) < static_cast<int>(SlopeOrientations::OrientUdDown)) || player->onGround || shouldCoyote) && jump) {
         // If on slope, the player jumps depending on time on slope
         if (slopeData.slopeID >= 0) {
             // Slope jump
             int orient = gravSlopeOrient(slopeData.slopeID, player);
-            if (orient == ORIENT_NORMAL_UP) {
+            if (orient == static_cast<int>(SlopeOrientations::OrientNormalUp)) {
                 float time = clampf(10 * (player->timeElapsed - slopeData.elapsed), 0.4f, 1.0f);
                 float vel = 0.9f * MIN(1.12f / slopeAngle(slopeData.slopeID, player), 1.54f) * (objects.height[slopeData.slopeID] * playerSpeeds[state.speed] / objects.width[slopeData.slopeID]);
                 setPVelocity(player, 0.25f * time * vel + cubeJumpHeights[state.speed], false);
@@ -293,7 +293,7 @@ void cubeGamemode(Player *player) {
             setPVelocity(player, cubeJumpHeights[state.speed], currOldInput.holdJump);
         }
         player->inverseRotation = false;
-        player->bufferingState = BUFFER_END;
+        player->bufferingState = static_cast<int>(BufferingState::BufferEnd);
     
         player->onGround = false;
         player->consecutiveJumps++;
@@ -331,7 +331,7 @@ void rotateFly(Player *player, float mult) {
         player->rotation = RadToDeg(angleRad);
     } else if (STEPS_DT * 72 <= diffX * diffX + diffY * diffY) {
         // This is how gd does rotation
-        if (player->gamemode == GAMEMODE_UFO) {
+        if (player->gamemode == static_cast<int>(IconGamemode::GamemodeUfo)) {
             if (player->slopeData.slopeID >= 0) {
                 angleRad = slopeSnapAngle(player->slopeData.slopeID, player);
             } else if (player->onGround) {
@@ -440,11 +440,11 @@ void shipGamemode(Player *player) {
         if (!currInput.holdJump && !legacyFalling) shipMod = 1.2f;
         float boost = (currInput.holdJump && legacyFalling) ? 0.5f : 0.4f;
         player->gravity = -shipMod * boost * (player->mini ? 3287.186216f : 2794.108284f);
-        if (currInput.holdJump) player->bufferingState = BUFFER_END;
+        if (currInput.holdJump) player->bufferingState = static_cast<int>(BufferingState::BufferEnd);
     } else if (state.dual) {
         // Make both dual players symmetric by using inverted ship gravity
         if (currInput.holdJump) {
-            player->bufferingState = BUFFER_END;
+            player->bufferingState = static_cast<int>(BufferingState::BufferEnd);
             if (player->velY <= -velocityThresholds[state.speed])
                 player->gravity = player->mini ? 1643.5872f : 1397.0491f;
             else
@@ -457,7 +457,7 @@ void shipGamemode(Player *player) {
         }
     } else {
         if (currInput.holdJump) {
-            player->bufferingState = BUFFER_END;
+            player->bufferingState = static_cast<int>(BufferingState::BufferEnd);
             if (player->velY <= grav(player, velocityThresholds[state.speed]))
                 player->gravity = player->mini ? 1643.5872f : 1397.0491f;
             else
@@ -480,7 +480,7 @@ void shipGamemode(Player *player) {
 }
 
 
-static float ballJumpHeights[SPEED_COUNT] = {
+static float ballJumpHeights[static_cast<int>(PlayerSpeeds::SpeedCount)] = {
     -172.044007,
     -181.11601,
     -185.00401,
@@ -521,15 +521,15 @@ void ballGamemode(Player *player) {
 
     bool shouldCoyote = (state.dual || player->upsideDown) && player->coyoteFrames < 16;
     // If on ground (block or slope) and its buffering, do a jump
-    if ((player->slopeData.slopeID >= 0 || player->onGround || player->onCeiling || shouldCoyote) && player->bufferingState == BUFFER_READY && !player->dashing) {        
+    if ((player->slopeData.slopeID >= 0 || player->onGround || player->onCeiling || shouldCoyote) && player->bufferingState == static_cast<int>(BufferingState::BufferReady) && !player->dashing) {
         player->upsideDown ^= 1;
 
-        setPVelocity(player, ballJumpHeights[state.speed], state.oldPlayer.bufferingState == BUFFER_READY);
+        setPVelocity(player, ballJumpHeights[state.speed], state.oldPlayer.bufferingState == static_cast<int>(BufferingState::BufferReady));
 
-        if (player->slopeData.slopeID >= 0 && gravSlopeOrient(player->slopeData.slopeID, player) == ORIENT_NORMAL_UP)
+        if (player->slopeData.slopeID >= 0 && gravSlopeOrient(player->slopeData.slopeID, player) == static_cast<int>(SlopeOrientations::OrientNormalUp))
             player->velY -= player->gravity * STEPS_DT;
 
-        player->bufferingState = BUFFER_END;
+        player->bufferingState = static_cast<int>(BufferingState::BufferEnd);
         
         state.currentData.jumps++;
         
@@ -594,11 +594,11 @@ void ufoGamemode(Player *player) {
     dragParticles2[state.currentPlayer].gravityFlipped = !player->upsideDown;
     dragParticles2[state.currentPlayer].scale = (player->mini ? 0.6f : 1.0f);
 
-    bool bufferingCheck = ((state.oldPlayer.gamemode == GAMEMODE_PLAYER || state.oldPlayer.gamemode == GAMEMODE_SHIP || state.oldPlayer.gamemode == GAMEMODE_WAVE || player->bufferUfo) && (currInput.holdJump));
+    bool bufferingCheck = ((state.oldPlayer.gamemode == static_cast<int>(IconGamemode::GamemodePlayer) || state.oldPlayer.gamemode == static_cast<int>(IconGamemode::GamemodeShip) || state.oldPlayer.gamemode == static_cast<int>(IconGamemode::GamemodeWave) || player->bufferUfo) && (currInput.holdJump));
     // If buffering, jump
-    if (player->bufferingState == BUFFER_READY && (currInput.pressedJump || bufferingCheck) && !player->dashing) {
+    if (player->bufferingState == static_cast<int>(BufferingState::BufferReady) && (currInput.pressedJump || bufferingCheck) && !player->dashing) {
         player->velY = fmaxf(player->velY, player->mini ? 358.992 : 371.034);
-        player->bufferingState = BUFFER_END;
+        player->bufferingState = static_cast<int>(BufferingState::BufferEnd);
         player->velocityOverride = true;
         player->burstParticleTimer = BURST_PARTICLES_DURATION;
         player->velocityUncapped = false;
@@ -665,9 +665,9 @@ void waveGamemode(Player *player) {
     trail->positionR = (Vec2D){x, y};  
     trail->startingPositionInitialized = true;
  
-    if (gameState == STATE_GAME && player->cutsceneTimer == 0 && !state.mirroring) waveTrail->opacity = 1.f;
+    if (gameState == static_cast<int>(GameState::StateGame) && player->cutsceneTimer == 0 && !state.mirroring) waveTrail->opacity = 1.f;
 
-    if (player->bufferingState == BUFFER_READY) player->bufferingState = BUFFER_END;
+    if (player->bufferingState == static_cast<int>(BufferingState::BufferReady)) player->bufferingState = static_cast<int>(BufferingState::BufferEnd);
 
     bool input = (currInput.holdJump);
     player->gravity = 0;
@@ -685,7 +685,7 @@ static float robotFireInScale(float timer) {
 }
 
 static void updateRobotFire(Player *player) {
-    bool show = player->gamemode == GAMEMODE_ROBOT
+    bool show = player->gamemode == static_cast<int>(IconGamemode::GamemodeRobot)
              && !player->onGround
              && player->gravity == 0.f
              && player->robotAirTime > 0.f
@@ -725,10 +725,10 @@ void robotGamemode(Player *player) {
     if (player->velY < player->minVel) player->velY = player->minVel;
     if (player->velY > player->maxVel) player->velY = player->maxVel;
 
-    if (player->y > 2794.f) killPlayer(DEATH_FELL_OFF_LEVEL);
+    if (player->y > 2794.f) killPlayer(DeathReason::DeathFellOffLevel);
 
     if (player->onGround) {
-        if (!player->dashing) setAnimation(player, ROBOT_ANIM_RUN);
+        if (!player->dashing) setAnimation(player, static_cast<int>(RobotAnimId::RobotAnimRun));
         motionTrailStopStroke(trail);
         if (player->slopeData.slopeID < 0 && !player->dashing) player->rotation = roundf(player->rotation / 90.0f) * 90.0f;
     }
@@ -754,12 +754,12 @@ void robotGamemode(Player *player) {
         player->rotation = 0;
     }
 
-    if ((slopeData.slopeID >= 0 || player->onGround || shouldCoyote) && (currInput.holdJump && player->bufferingState == BUFFER_READY) && !player->dashing) {
+    if ((slopeData.slopeID >= 0 || player->onGround || shouldCoyote) && (currInput.holdJump && player->bufferingState == static_cast<int>(BufferingState::BufferReady)) && !player->dashing) {
         setPVelocity(player, cubeJumpHeights[state.speed] / 2, false);
         player->inverseRotation = false;
         player->onGround = false;
-        setAnimation(player, ROBOT_ANIM_JUMP_START);
-        player->bufferingState = BUFFER_END;
+        setAnimation(player, static_cast<int>(RobotAnimId::RobotAnimJumpStart));
+        player->bufferingState = static_cast<int>(BufferingState::BufferEnd);
         player->robotAirTime = 0.f;
         player->gravity = 0;
         player->jumped = true;
@@ -767,8 +767,8 @@ void robotGamemode(Player *player) {
 
     if (player->robotAirTime >= 1.5f || (!currInput.holdJump)) {
         player->gravity = robotAccelerations[state.speed];
-        if (player->animID == ROBOT_ANIM_JUMP) {
-            setAnimation(player, ROBOT_ANIM_FALL_START);
+        if (player->animID == static_cast<int>(RobotAnimId::RobotAnimJump)) {
+            setAnimation(player, static_cast<int>(RobotAnimId::RobotAnimFallStart));
         }
     } else {
         player->robotAirTime += 5.4f * STEPS_DT;
@@ -782,16 +782,16 @@ void robotGamemode(Player *player) {
     robotFireParticles[state.currentPlayer].scale = scale;
 
     if (!player->onGround && player->velY < 0
-        && player->animID != ROBOT_ANIM_FALL_START
-        && player->animID != ROBOT_ANIM_FALL) {
-        setAnimation(player, ROBOT_ANIM_FALL_START);
+        && player->animID != static_cast<int>(RobotAnimId::RobotAnimFallStart)
+        && player->animID != static_cast<int>(RobotAnimId::RobotAnimFall)) {
+        setAnimation(player, static_cast<int>(RobotAnimId::RobotAnimFallStart));
     }
 
     const PlayerAnimation *anim = &robotAnimations[player->animID];
-    float animSpeed = (state.speed == SPEED_SLOW) ? 0.9f
-                     : (state.speed == SPEED_FAST) ? 1.15f
-                     : (state.speed == SPEED_FASTER) ? 1.3f
-                     : (state.speed == SPEED_FASTEST) ? 1.5f : 1.0f;
+    float animSpeed = (state.speed == static_cast<int>(PlayerSpeeds::SpeedSlow)) ? 0.9f
+                     : (state.speed == static_cast<int>(PlayerSpeeds::SpeedFast)) ? 1.15f
+                     : (state.speed == static_cast<int>(PlayerSpeeds::SpeedFaster)) ? 1.3f
+                     : (state.speed == static_cast<int>(PlayerSpeeds::SpeedFastest)) ? 1.5f : 1.0f;
     if (player->mini) animSpeed /= 0.85f;
     
     animSpeed *= 35.0f / 24.0f;
@@ -801,10 +801,10 @@ void robotGamemode(Player *player) {
         player->animTimer -= anim->frames[player->animFrame].delay;
         int next = player->animFrame + 1;
         if (next >= anim->frameCount) {
-            if (player->animID == ROBOT_ANIM_JUMP_START) {
-                setAnimation(player, ROBOT_ANIM_JUMP);
-            } else if (player->animID == ROBOT_ANIM_FALL_START) {
-                setAnimation(player, ROBOT_ANIM_FALL);
+            if (player->animID == static_cast<int>(RobotAnimId::RobotAnimJumpStart)) {
+                setAnimation(player, static_cast<int>(RobotAnimId::RobotAnimJump));
+            } else if (player->animID == static_cast<int>(RobotAnimId::RobotAnimFallStart)) {
+                setAnimation(player, static_cast<int>(RobotAnimId::RobotAnimFall));
             }
             next = 0;
         }
@@ -853,10 +853,10 @@ static int spiderCollect(float minX, float minY, float maxX, float maxY, int *ou
                 const ObjectHitbox *hitbox = gameObjects[id].hitbox;
 
                 if (!hitbox) continue;
-                if (objects.flags[obj] & FLAG_TOGGLED) continue;
+                if (objects.flags[obj] & static_cast<int>(ObjectFlags::FlagToggled)) continue;
                 if (isHazard) {
-                    if (hitbox->collisionType != HITBOX_HAZARD) continue;
-                } else if (hitbox->collisionType != HITBOX_SOLID) continue;
+                    if (hitbox->collisionType != static_cast<int>(HitboxType::HitboxHazard)) continue;
+                } else if (hitbox->collisionType != static_cast<int>(HitboxType::HitboxSolid)) continue;
 
                 if (!spiderRectHits(obj, minX, minY, maxX, maxY)) continue;
 
@@ -886,7 +886,7 @@ static void spiderSort(int *list, int count, bool upsideDown) {
 }
 
 static float spiderSlopeY(Player *player, int obj) {
-    float ydist = (player->upsideDown ^ (gravSlopeOrient(obj, player) >= ORIENT_UD_DOWN) ? -1.f : 1.f)
+    float ydist = (player->upsideDown ^ (gravSlopeOrient(obj, player) >= static_cast<int>(SlopeOrientations::OrientUdDown)) ? -1.f : 1.f)
                 * (player->height / 2) / cosf(slopeAngle(obj, player));
     return expectedSlopeY(obj, player) - ydist - grav(player, player->height / 2);
 }
@@ -954,7 +954,7 @@ void spiderTestJump(Player *player, bool isRetry) {
                 landY = objGetTop(obj) + playerHeight * 0.5f;
             }
 
-            if (gameObjects[objects.id[obj]].hitbox->type == COLLISION_SLOPE) {
+            if (gameObjects[objects.id[obj]].hitbox->type == static_cast<int>(CollisionShape::CollisionSlope)) {
                 checkingSlope = true;
                 landY = spiderSlopeY(player, obj);
             }
@@ -1022,7 +1022,7 @@ void spiderTestJump(Player *player, bool isRetry) {
     player->leftGround = true;
     player->inverseRotation = false;
     player->snapRotation = true;
-    player->bufferingState = BUFFER_END;
+    player->bufferingState = static_cast<int>(BufferingState::BufferEnd);
 
     Color dashColor = getWhiteIfBlack(state.currentPlayer == 1 ? p1Color : p2Color);
     addSpiderDashEffect(player->x, oldY, landY, player->upsideDown, dashColor);
@@ -1032,7 +1032,7 @@ void spiderTestJump(Player *player, bool isRetry) {
     player->spiderScaleActive = true;
     player->spiderScaleTimer = 0.f;
 
-    UseEffect *effect = addUseEffect(player->x, landY, USE_EFFECT_OBJ_NOTHING, &spiderInEffect, getUseEffectArrayPtr(SCREEN_TOP));
+    UseEffect *effect = addUseEffect(player->x, landY, USE_EFFECT_OBJ_NOTHING, &spiderInEffect, getUseEffectArrayPtr(static_cast<int>(Screens::ScreenTop)));
     if (effect) {
         Color p2NotWhite = getWhiteIfBlack(p2Color);
 
@@ -1041,7 +1041,7 @@ void spiderTestJump(Player *player, bool isRetry) {
         effect->def.colorB = p2NotWhite.b / 255.f;
         effect->def.startRad = spiderInEffect.startRad * (player->mini ? 0.6f : 1);
     }
-    effect = addUseEffect(player->x, oldY, USE_EFFECT_OBJ_NOTHING, &spiderOutEffect, getUseEffectArrayPtr(SCREEN_TOP));
+    effect = addUseEffect(player->x, oldY, USE_EFFECT_OBJ_NOTHING, &spiderOutEffect, getUseEffectArrayPtr(static_cast<int>(Screens::ScreenTop)));
     if (effect) {
         Color p2NotWhite = getWhiteIfBlack(p2Color);
 
@@ -1069,10 +1069,10 @@ void spiderGamemode(Player *player) {
 
     player->gravity = -2794.1082f * 0.6f;
 
-    if (player->y > 2794.f) killPlayer(DEATH_FELL_OFF_LEVEL);
+    if (player->y > 2794.f) killPlayer(DeathReason::DeathFellOffLevel);
 
     if (player->onGround) {
-        if (!player->dashing) setAnimation(player, (state.speed <= SPEED_NORMAL) ? SPIDER_ANIM_WALK : SPIDER_ANIM_RUN);
+        if (!player->dashing) setAnimation(player, (state.speed <= static_cast<int>(PlayerSpeeds::SpeedNormal)) ? static_cast<int>(SpiderAnimId::SpiderAnimWalk) : static_cast<int>(SpiderAnimId::SpiderAnimRun));
         motionTrailStopStroke(trail);
 
         if (player->slopeData.slopeID < 0 && !player->dashing) player->rotation = roundf(player->rotation / 90.0f) * 90.0f;
@@ -1093,26 +1093,26 @@ void spiderGamemode(Player *player) {
 
     bool cameFromBlackOrb = (player->lastOrbPressed >= 0 && objects.id[player->lastOrbPressed] == BLACK_ORB);
 
-    if ((player->slopeData.slopeID >= 0 || player->onGround) && (currInput.holdJump && (player->bufferingState == BUFFER_READY || cameFromBlackOrb)) && !player->dashing) {
+    if ((player->slopeData.slopeID >= 0 || player->onGround) && (currInput.holdJump && (player->bufferingState == static_cast<int>(BufferingState::BufferReady) || cameFromBlackOrb)) && !player->dashing) {
         spiderTestJump(player, false);
-        player->bufferingState = BUFFER_END;
+        player->bufferingState = static_cast<int>(BufferingState::BufferEnd);
         player->jumped = true;
         player->lastOrbPressed = -1;
     }
 
-    if (!player->onGround && player->velY < 0 && player->animID != SPIDER_ANIM_FALL) {
-        setAnimation(player, SPIDER_ANIM_FALL);
+    if (!player->onGround && player->velY < 0 && player->animID != static_cast<int>(SpiderAnimId::SpiderAnimFall)) {
+        setAnimation(player, static_cast<int>(SpiderAnimId::SpiderAnimFall));
     }
 
     const PlayerAnimation *anim = &spiderAnimations[player->animID];
 
-    float animSpeed = (state.speed == SPEED_SLOW) ? 0.9f
-                     : (state.speed == SPEED_FAST) ? 1.15f
-                     : (state.speed == SPEED_FASTER) ? 1.3f
-                     : (state.speed == SPEED_FASTEST) ? 1.5f : 1.0f;
+    float animSpeed = (state.speed == static_cast<int>(PlayerSpeeds::SpeedSlow)) ? 0.9f
+                     : (state.speed == static_cast<int>(PlayerSpeeds::SpeedFast)) ? 1.15f
+                     : (state.speed == static_cast<int>(PlayerSpeeds::SpeedFaster)) ? 1.3f
+                     : (state.speed == static_cast<int>(PlayerSpeeds::SpeedFastest)) ? 1.5f : 1.0f;
 
     if (player->mini) animSpeed /= 0.85f;
-    if (state.speed >= SPEED_FAST) animSpeed /= 1.1f;
+    if (state.speed >= static_cast<int>(PlayerSpeeds::SpeedFast)) animSpeed /= 1.1f;
 
     player->animTimer += STEPS_DT * animSpeed;
 
@@ -1128,35 +1128,35 @@ void spiderGamemode(Player *player) {
 }
 
 void clampPlayerGround(Player *player) {
-    bool slopeCheck = player->slopeData.slopeID >= 0 && (gravSlopeOrient(player->slopeData.slopeID, player) == ORIENT_NORMAL_DOWN || gravSlopeOrient(player->slopeData.slopeID, player) == ORIENT_UD_DOWN);
+    bool slopeCheck = player->slopeData.slopeID >= 0 && (gravSlopeOrient(player->slopeData.slopeID, player) == static_cast<int>(SlopeOrientations::OrientNormalDown) || gravSlopeOrient(player->slopeData.slopeID, player) == static_cast<int>(SlopeOrientations::OrientUdDown));
 
     // Check for ground collision
     if (getGroundBottom(player) < state.groundY && !player->justTeleported) {
-        if (player->ceilingInvTime <= 0 && (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_ROBOT) && player->upsideDown) {
-            killPlayer(DEATH_CEILING);
+        if (player->ceilingInvTime <= 0 && (player->gamemode == static_cast<int>(IconGamemode::GamemodePlayer) || player->gamemode == static_cast<int>(IconGamemode::GamemodeRobot)) && player->upsideDown) {
+            killPlayer(DeathReason::DeathCeiling);
         }
 
         if (slopeCheck) {
             clearSlopeData(player);
         }
         
-        if (player->gamemode != GAMEMODE_WAVE && grav(player, player->velY) <= 0) setPVelocity(player, 0, player->gamemode == GAMEMODE_BALL);
-        player->y = state.groundY + (player->height / 2) + ((player->gamemode == GAMEMODE_WAVE) ? (player->mini ? 3 : 5) : 0);;
+        if (player->gamemode != static_cast<int>(IconGamemode::GamemodeWave) && grav(player, player->velY) <= 0) setPVelocity(player, 0, player->gamemode == static_cast<int>(IconGamemode::GamemodeBall));
+        player->y = state.groundY + (player->height / 2) + ((player->gamemode == static_cast<int>(IconGamemode::GamemodeWave)) ? (player->mini ? 3 : 5) : 0);;
         player->snapData.playerFrame = 0;    
     }
 
     // Check for ceiling collision
     if (getGroundTop(player) > state.ceilingY && !player->justTeleported) {
-        if (player->ceilingInvTime <= 0 && (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_ROBOT) && !player->upsideDown) {
-            killPlayer(DEATH_CEILING);
+        if (player->ceilingInvTime <= 0 && (player->gamemode == static_cast<int>(IconGamemode::GamemodePlayer) || player->gamemode == static_cast<int>(IconGamemode::GamemodeRobot)) && !player->upsideDown) {
+            killPlayer(DeathReason::DeathCeiling);
         }
 
         if (slopeCheck) {
             clearSlopeData(player);
         }
         
-        if (player->gamemode != GAMEMODE_WAVE && grav(player, player->velY) >= 0) setPVelocity(player, 0, player->gamemode == GAMEMODE_BALL);
-        player->y = state.ceilingY - (player->height / 2) - ((player->gamemode == GAMEMODE_WAVE) ? (player->mini ? 3 : 5) : 0);    
+        if (player->gamemode != static_cast<int>(IconGamemode::GamemodeWave) && grav(player, player->velY) >= 0) setPVelocity(player, 0, player->gamemode == static_cast<int>(IconGamemode::GamemodeBall));
+        player->y = state.ceilingY - (player->height / 2) - ((player->gamemode == static_cast<int>(IconGamemode::GamemodeWave)) ? (player->mini ? 3 : 5) : 0);
         
     } 
 }
@@ -1196,7 +1196,7 @@ void runPlayer(Player *player) {
     if (state.currentPlayer == 0) handleAutoCheckpoints(STEPS_DT);
     
     // Handle land particles
-    if (player->gamemode != GAMEMODE_WAVE && !state.oldPlayer.onGround && player->onGround) {
+    if (player->gamemode != static_cast<int>(IconGamemode::GamemodeWave) && !state.oldPlayer.onGround && player->onGround) {
         landParticles[state.currentPlayer].emitterX = player->x;
         landParticles[state.currentPlayer].emitterY = fabsf(gravBottom(player)) + (player->upsideDown ? -4 : 4);
         landParticles[state.currentPlayer].gravityFlipped = player->upsideDown;
@@ -1217,27 +1217,27 @@ void runPlayer(Player *player) {
     if (player->onGround) player->velocityUncapped = false;
 
     switch (player->gamemode) {
-        case GAMEMODE_PLAYER:
+        case static_cast<int>(IconGamemode::GamemodePlayer):
             cubeGamemode(player);
             break;
-        case GAMEMODE_SHIP:
+        case static_cast<int>(IconGamemode::GamemodeShip):
             glitterParticles.emitterX = state.cameraXMiddle;
             glitterParticles.emitterY = state.cameraYMiddle;
             glitterParticles.emitting = true;
             if (!state.mirroring && state.showPlayer) motionTrailResumeStroke(trail);
             shipGamemode(player);
             break;
-        case GAMEMODE_BALL:
+        case static_cast<int>(IconGamemode::GamemodeBall):
             ballGamemode(player);
             break;
-        case GAMEMODE_UFO:
+        case static_cast<int>(IconGamemode::GamemodeUfo):
             glitterParticles.emitterX = state.cameraXMiddle;
             glitterParticles.emitterY = state.cameraYMiddle;
             glitterParticles.emitting = true;
             if (!state.mirroring && state.showPlayer) motionTrailResumeStroke(trail);
             ufoGamemode(player);
             break;
-        case GAMEMODE_WAVE:
+        case static_cast<int>(IconGamemode::GamemodeWave):
             glitterParticles.emitterX = state.cameraXMiddle;
             glitterParticles.emitterY = state.cameraYMiddle;
             glitterParticles.emitting = true;
@@ -1250,10 +1250,10 @@ void runPlayer(Player *player) {
             }
             waveGamemode(player);
             break;
-        case GAMEMODE_ROBOT:
+        case static_cast<int>(IconGamemode::GamemodeRobot):
             robotGamemode(player);
             break;
-        case GAMEMODE_SPIDER:
+        case static_cast<int>(IconGamemode::GamemodeSpider):
             spiderGamemode(player);
             break;
     } 
@@ -1278,7 +1278,7 @@ void runPlayer(Player *player) {
     player->timeSinceGround += STEPS_DT;
 
     // Fade wave trail if not in wave anymore or end animation started or mirror portal animation is happening
-    if (player->gamemode != GAMEMODE_WAVE || state.mirroring || player->cutsceneTimer > 0) {
+    if (player->gamemode != static_cast<int>(IconGamemode::GamemodeWave) || state.mirroring || player->cutsceneTimer > 0) {
         if (waveTrail->opacity > 0) waveTrail->opacity -= 0.02f;
         
         if (waveTrail->opacity <= 0) {
@@ -1292,7 +1292,7 @@ void runPlayer(Player *player) {
 		float newVel = player->velY + player->gravity * STEPS_DT;
 
 		// Player will fall off blocks a frame faster than expected
-		if (!(player->onGround || player->onCeiling) && (state.oldPlayer.onGround || state.oldPlayer.onCeiling) && ((!currInput.holdJump && (currOldInput.pressedJump || currInput.pressedJump)) || player->bufferingState == BUFFER_READY) && gravBottom(&state.oldPlayer) > gravFloor(&state.oldPlayer) && player->mini == state.oldPlayer.mini) {
+		if (!(player->onGround || player->onCeiling) && (state.oldPlayer.onGround || state.oldPlayer.onCeiling) && ((!currInput.holdJump && (currOldInput.pressedJump || currInput.pressedJump)) || player->bufferingState == static_cast<int>(BufferingState::BufferReady)) && gravBottom(&state.oldPlayer) > gravFloor(&state.oldPlayer) && player->mini == state.oldPlayer.mini) {
 			player->y += grav(&state.oldPlayer, state.oldPlayer.gravity) * STEPS_DT * STEPS_DT;
 
 			if (player->velY == 0)
@@ -1334,7 +1334,7 @@ void runPlayer(Player *player) {
     }
 
     // Handle wave trail point adding
-    if (player->gamemode == GAMEMODE_WAVE && !state.mirroring) {    
+    if (player->gamemode == static_cast<int>(IconGamemode::GamemodeWave) && !state.mirroring) {
         waveTrail->positionR = (Vec2D){player->x, player->y};  
         waveTrail->startingPositionInitialized = true;
         if (player->velY != state.oldPlayer.velY || player->onGround != state.oldPlayer.onGround || player->onCeiling != state.oldPlayer.onCeiling) {
@@ -1346,7 +1346,7 @@ void runPlayer(Player *player) {
 
     // Handle rotation for ship and wave
     if (!player->dashing) switch (player->gamemode) {
-        case GAMEMODE_PLAYER:
+        case static_cast<int>(IconGamemode::GamemodePlayer):
             if (player->onGround || player->slopeData.slopeID >= 0) {
                 if (player->slopeData.slopeID < 0 && !player->slopeSlideCoyoteTime) lerpSpeed *= 3.0f;
                 player->rotation = RadToDeg(slerpFancy(DegToRad(player->rotation), DegToRad(player->cubeTargetRotation), MIN(STEPS_DT, STEPS_DT * lerpSpeed) * 60));
@@ -1354,17 +1354,17 @@ void runPlayer(Player *player) {
                 player->cubeTargetRotation = player->rotation;
             }
             break;
-        case GAMEMODE_SHIP:
+        case static_cast<int>(IconGamemode::GamemodeShip):
             rotateFly(player, 0.15f);
             break;
-        case GAMEMODE_UFO:
+        case static_cast<int>(IconGamemode::GamemodeUfo):
             rotateFly(player, 0.07f);
             break;
-        case GAMEMODE_WAVE:
+        case static_cast<int>(IconGamemode::GamemodeWave):
             rotateFly(player, player->mini ? 0.4f : 0.25f);
             break;
-        case GAMEMODE_ROBOT:
-        case GAMEMODE_SPIDER:
+        case static_cast<int>(IconGamemode::GamemodeRobot):
+        case static_cast<int>(IconGamemode::GamemodeSpider):
             float angleRad = 0;
             if (player->slopeData.slopeID >= 0) {
                 angleRad = slopeSnapAngle(player->slopeData.slopeID, player);
@@ -1384,12 +1384,12 @@ void handlePlayer(Player *player) {
     u64 startPlayer = svcGetSystemTick();
 
     if (currInput.holdJump) {    
-        if (player->bufferingState == BUFFER_NONE) {
-            player->bufferingState = BUFFER_READY;
+        if (player->bufferingState == static_cast<int>(BufferingState::BufferNone)) {
+            player->bufferingState = static_cast<int>(BufferingState::BufferReady);
         }
     } else {
         player->holdingJumpCancelled = false;
-        player->bufferingState = BUFFER_NONE;
+        player->bufferingState = static_cast<int>(BufferingState::BufferNone);
         stopDashing(player);
     }
     
@@ -1413,7 +1413,7 @@ void handlePlayer(Player *player) {
         player->velY = 0;
         player->y += (player->velX * STEPS_DT) * player->dashSlope;
         player->dashFireTimer += STEPS_DT;
-        if (player->gamemode == GAMEMODE_PLAYER || player->gamemode == GAMEMODE_BALL) {
+        if (player->gamemode == static_cast<int>(IconGamemode::GamemodePlayer) || player->gamemode == static_cast<int>(IconGamemode::GamemodeBall)) {
             player->rotation += (player->upsideDown ? -1.f : 1.f) * (288.f / 0.3f) * STEPS_DT;
         } else {
             player->rotation = -player->dashAngle;
@@ -1462,13 +1462,13 @@ void handlePlayer(Player *player) {
         p1Trail = true;
         if (player->cutsceneTimer == 0) {
             // Add a trail point for wave
-            if (player->gamemode == GAMEMODE_WAVE) motionTrailAddWavePoint(waveTrail);
+            if (player->gamemode == static_cast<int>(IconGamemode::GamemodeWave)) motionTrailAddWavePoint(waveTrail);
 
             player->cutsceneInitialPlayerX = player->x;
             player->cutsceneInitialPlayerY = player->y;
         }
         animPlayerToWall(player);
-        player->rotation += easeValue(EASE_IN, 0, 415.3848f, player->cutsceneTimer, 0.5f, 2.f) * STEPS_DT;
+        player->rotation += easeValue(EaseTypes::EaseIn, 0, 415.3848f, player->cutsceneTimer, 0.5f, 2.f) * STEPS_DT;
         player->cutsceneTimer += STEPS_DT;
         
         // End level
@@ -1542,21 +1542,21 @@ void spawnP1Trail(Player *player, int playerID) {
     float scale = (player->mini) ? 0.6f : 1.f;
 
     switch (player->gamemode) {
-        case GAMEMODE_PLAYER:
-        case GAMEMODE_BALL:
-        case GAMEMODE_WAVE:
+        case static_cast<int>(IconGamemode::GamemodePlayer):
+        case static_cast<int>(IconGamemode::GamemodeBall):
+        case static_cast<int>(IconGamemode::GamemodeWave):
             trailData->gamemode = player->gamemode;
             trailData->scale = scale;
             trailData->upsideDown = false;
             break;
-        case GAMEMODE_SHIP:
-        case GAMEMODE_UFO:
-            trailData->gamemode = GAMEMODE_PLAYER;
+        case static_cast<int>(IconGamemode::GamemodeShip):
+        case static_cast<int>(IconGamemode::GamemodeUfo):
+            trailData->gamemode = static_cast<int>(IconGamemode::GamemodePlayer);
             trailData->scale = scale * 0.5f;
             trailData->upsideDown = player->upsideDown;
             break;
-        case GAMEMODE_ROBOT:
-        case GAMEMODE_SPIDER:
+        case static_cast<int>(IconGamemode::GamemodeRobot):
+        case static_cast<int>(IconGamemode::GamemodeSpider):
             trailData->gamemode = player->gamemode;
             trailData->scale = scale;
             trailData->upsideDown = player->upsideDown;
@@ -1682,7 +1682,7 @@ void drawPlayer(Player *player) {
 
     float scale = (player->mini) ? 0.6f : 1.f;
 
-    if (player->gamemode == GAMEMODE_SPIDER && player->spiderScaleActive) {
+    if (player->gamemode == static_cast<int>(IconGamemode::GamemodeSpider) && player->spiderScaleActive) {
         float scale_t = CLAMP(player->spiderScaleTimer / SPIDER_DASH_SCALE_DURATION, 0.f, 1.f);
         scale *= SPIDER_DASH_SCALE_START + (1.f - SPIDER_DASH_SCALE_START) * elasticEaseOut(scale_t, SPIDER_DASH_ELASTIC_PERIOD);
     }
@@ -1701,7 +1701,7 @@ void drawPlayer(Player *player) {
     float m11 = -cosR;
 
     const float localX = 0;
-    const float localY = ((player->gamemode == GAMEMODE_SHIP) ? 6 : 4) * flipYMult;
+    const float localY = ((player->gamemode == static_cast<int>(IconGamemode::GamemodeShip)) ? 6 : 4) * flipYMult;
 
     float rotX = localX * m00 + localY * m01;
     float rotY = localX * m10 + localY * m11;
@@ -1723,72 +1723,72 @@ void drawPlayer(Player *player) {
     bool glowEnabled = (player->playerIcons.glow || ((player->playerIcons.p1Color.r | player->playerIcons.p1Color.g | player->playerIcons.p1Color.b) == 0));
 
     switch (player->gamemode) {
-        case GAMEMODE_PLAYER:
-            spawnIconAt(GAMEMODE_PLAYER, (settingsState.defaultMiniIcon && player->mini) ? 0 : selectedCube, glowEnabled, calcXMirror, calcY, pRot, flipX, false, scale, 
+        case static_cast<int>(IconGamemode::GamemodePlayer):
+            spawnIconAt(static_cast<int>(IconGamemode::GamemodePlayer), (settingsState.defaultMiniIcon && player->mini) ? 0 : selectedCube, glowEnabled, calcXMirror, calcY, pRot, flipX, false, scale,
                 primaryColor,
                 secondaryColor,
                 C2D_Color32(glowColor.r, glowColor.g, glowColor.b, 255),
                 (IconParameters) { 0 }
             );
             break;
-        case GAMEMODE_SHIP:
+        case static_cast<int>(IconGamemode::GamemodeShip):
             if (glowEnabled) {
-                spawnGlowLayerAt(GAMEMODE_SHIP, selectedShip, calcXMirror, calcY, pRot, flipX, player->upsideDown, scale, 
+                spawnGlowLayerAt(static_cast<int>(IconGamemode::GamemodeShip), selectedShip, calcXMirror, calcY, pRot, flipX, player->upsideDown, scale,
                     C2D_Color32(glowColor.r, glowColor.g, glowColor.b, 255), 
                     (IconParameters) { 0 }
                 );
             }
-            spawnIconAt(GAMEMODE_PLAYER, (settingsState.defaultMiniIcon && player->mini) ? 0 : selectedCube, glowEnabled, pX, pY, pRot, flipX, player->upsideDown, scale * 0.5f, 
+            spawnIconAt(static_cast<int>(IconGamemode::GamemodePlayer), (settingsState.defaultMiniIcon && player->mini) ? 0 : selectedCube, glowEnabled, pX, pY, pRot, flipX, player->upsideDown, scale * 0.5f,
                 primaryColor,
                 secondaryColor,
                 C2D_Color32(glowColor.r, glowColor.g, glowColor.b, 255),
                 (IconParameters) { 0 }
             );
-            spawnIconAt(GAMEMODE_SHIP, selectedShip, glowEnabled, calcXMirror, calcY, pRot, flipX, player->upsideDown, scale, 
+            spawnIconAt(static_cast<int>(IconGamemode::GamemodeShip), selectedShip, glowEnabled, calcXMirror, calcY, pRot, flipX, player->upsideDown, scale,
                 primaryColor,
                 secondaryColor,
                 0,
                 (IconParameters) { 0 }
             );
             break;
-        case GAMEMODE_BALL:
-            spawnIconAt(GAMEMODE_BALL, (settingsState.defaultMiniIcon && player->mini) ? 0 : selectedBall, glowEnabled, calcXMirror, calcY, pRot, flipX, false, scale, 
+        case static_cast<int>(IconGamemode::GamemodeBall):
+            spawnIconAt(static_cast<int>(IconGamemode::GamemodeBall), (settingsState.defaultMiniIcon && player->mini) ? 0 : selectedBall, glowEnabled, calcXMirror, calcY, pRot, flipX, false, scale,
                 primaryColor,
                 secondaryColor,
                 C2D_Color32(glowColor.r, glowColor.g, glowColor.b, 255),
                 (IconParameters) { 0 }
             );
             break;
-        case GAMEMODE_UFO:
+        case static_cast<int>(IconGamemode::GamemodeUfo):
             if (glowEnabled) {
-                spawnGlowLayerAt(GAMEMODE_UFO, selectedUfo, calcXMirror, calcY, pRot, flipX, player->upsideDown, scale,
+                spawnGlowLayerAt(static_cast<int>(IconGamemode::GamemodeUfo), selectedUfo, calcXMirror, calcY, pRot, flipX, player->upsideDown, scale,
                     C2D_Color32(glowColor.r, glowColor.g, glowColor.b, 255),
                     (IconParameters) { 0 }
             );
             }
-            spawnIconAt(GAMEMODE_PLAYER, (settingsState.defaultMiniIcon && player->mini) ? 0 : selectedCube, glowEnabled, pX, pY, pRot, flipX, player->upsideDown, scale * 0.5f, 
+            spawnIconAt(static_cast<int>(IconGamemode::GamemodePlayer), (settingsState.defaultMiniIcon && player->mini) ? 0 : selectedCube, glowEnabled, pX, pY, pRot, flipX, player->upsideDown, scale * 0.5f,
                 primaryColor,
                 secondaryColor,
                 C2D_Color32(glowColor.r, glowColor.g, glowColor.b, 255),
                 (IconParameters) { 0 }
             );
-            spawnIconAt(GAMEMODE_UFO, selectedUfo, glowEnabled, calcXMirror, calcY, pRot, flipX, player->upsideDown, scale, 
+            spawnIconAt(static_cast<int>(IconGamemode::GamemodeUfo), selectedUfo, glowEnabled, calcXMirror, calcY, pRot, flipX, player->upsideDown, scale,
                 primaryColor,
                 secondaryColor,
                 0,
                 (IconParameters) { 0 }
             );
             break;    
-        case GAMEMODE_WAVE:
-            spawnIconAt(GAMEMODE_WAVE, selectedWave, glowEnabled, calcXMirror, calcY, pRot, flipX, player->upsideDown, scale, 
+        case static_cast<int>(IconGamemode::GamemodeWave):
+            spawnIconAt(static_cast<int>(IconGamemode::GamemodeWave), selectedWave, glowEnabled, calcXMirror, calcY, pRot, flipX, player->upsideDown, scale,
                 primaryColor,
                 secondaryColor,
                 C2D_Color32(glowColor.r, glowColor.g, glowColor.b, 255),
                 (IconParameters) { 0 }
             );
             break;
-        case GAMEMODE_ROBOT: {
-            spawnIconAt(GAMEMODE_ROBOT, selectedRobot, glowEnabled, calcXMirror, calcY, pRot, flipX, player->upsideDown, scale,
+        case static_cast<int>(IconGamemode::GamemodeRobot): {
+            spawnIconAt(static_cast<int>(IconGamemode::GamemodeRobot), selectedRobot, glowEnabled, calcXMirror, calcY, pRot, flipX, player->upsideDown, scale,
                 primaryColor,
                 secondaryColor,
                 C2D_Color32(glowColor.r, glowColor.g, glowColor.b, 255),
@@ -1805,8 +1805,8 @@ void drawPlayer(Player *player) {
             );
             break;
         }
-        case GAMEMODE_SPIDER: {
-            spawnIconAt(GAMEMODE_SPIDER, selectedSpider, glowEnabled, calcXMirror, calcY, pRot, flipX, player->upsideDown, scale,
+        case static_cast<int>(IconGamemode::GamemodeSpider): {
+            spawnIconAt(static_cast<int>(IconGamemode::GamemodeSpider), selectedSpider, glowEnabled, calcXMirror, calcY, pRot, flipX, player->upsideDown, scale,
                 primaryColor,
                 secondaryColor,
                 C2D_Color32(glowColor.r, glowColor.g, glowColor.b, 255),
@@ -1912,21 +1912,21 @@ void drawHitbox(int obj) {
 
     float rot = objects.rotation[obj];
 
-    if (hitbox->collisionType == HITBOX_SOLID) {
+    if (hitbox->collisionType == static_cast<int>(HitboxType::HitboxSolid)) {
         rot = 0;
     }
     unsigned int color = C2D_Color32(0x00, 0xff, 0xff, 0xff);
 
     int hitboxType = hitbox->collisionType;
-    if (hitboxType == HITBOX_HAZARD) {
+    if (hitboxType == static_cast<int>(HitboxType::HitboxHazard)) {
         color = C2D_Color32(0xff, 0x00, 0x00, 0xff);
         depth = 0.5f;
     }
-    if (hitboxType == HITBOX_SOLID) {
+    if (hitboxType == static_cast<int>(HitboxType::HitboxSolid)) {
         color = C2D_Color32(0x00, 0x00, 0xff, 0xff);
         depth = 0.f;
     }
-    if (hitboxType == HITBOX_SPECIAL) {
+    if (hitboxType == static_cast<int>(HitboxType::HitboxSpecial)) {
         color = C2D_Color32(0x00, 0xff, 0x00, 0xff);
         depth = 1.f;
     }
@@ -1938,7 +1938,7 @@ void drawHitbox(int obj) {
     if (obj == state.player.slopeData.slopeID || obj == state.player2.slopeData.slopeID) color = C2D_Color32(0x00, 0xff, 0x00, 0xff);
     if (obj == state.player.snapData.snappedObj || obj == state.player2.snapData.snappedObj) color = C2D_Color32(0xff, 0xff, 0x00, 0xff);
 
-    if (hitbox->type == COLLISION_SLOPE) {
+    if (hitbox->type == static_cast<int>(CollisionShape::CollisionSlope)) {
         w = objects.width[obj];
         h = objects.height[obj];
         getCorners(x, y, w, h, 0, rect);
@@ -1951,7 +1951,7 @@ void drawHitbox(int obj) {
         } else {
             drawTriangleFromRect(rect, 3 - objects.orientation[obj], color, color, depth);
         }
-    } else if (hitbox->type == COLLISION_CIRCLE) {
+    } else if (hitbox->type == static_cast<int>(CollisionShape::CollisionCircle)) {
         float calcRadius = objects.width[obj];
 
         customCircunference(mirrorXOnScreen(x), calcYOnScreen(y), calcRadius, color, 2.f);

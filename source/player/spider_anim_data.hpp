@@ -7,15 +7,15 @@
 namespace gd3ds
 {
 
-typedef enum {
-    SPIDER_ANIM_RUN = 0,
-    SPIDER_ANIM_JUMP = 1,
-    SPIDER_ANIM_FALL = 2,
-    SPIDER_ANIM_WALK = 3,
-    SPIDER_ANIM_IDLE = 4,
-    SPIDER_ANIM_COUNT = 5,
-} SpiderAnimId;
+enum class SpiderAnimId {
+    SpiderAnimRun = 0,
+    SpiderAnimJump = 1,
+    SpiderAnimFall = 2,
+    SpiderAnimWalk = 3,
+    SpiderAnimIdle = 4,
+    SpiderAnimCount = 5,
+};
 
-extern const PlayerAnimation spiderAnimations[SPIDER_ANIM_COUNT];
+extern const PlayerAnimation spiderAnimations[static_cast<int>(SpiderAnimId::SpiderAnimCount)];
 
 }

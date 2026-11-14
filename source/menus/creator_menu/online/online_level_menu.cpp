@@ -158,12 +158,12 @@ static UIButton *songDownloadButton;
 bool inWarning = false;
 bool inWarningScreen = false;
 
-typedef enum WarningPopupStep {
-    WARNING_HIGH_OBJECT,
-    WARNING_VERSION,
-    WARNING_MISSING_SONG,
-    WARNING_DONE
-} WarningPopupStep;
+enum class WarningPopupStep {
+    WarningHighObject,
+    WarningVersion,
+    WarningMissingSong,
+    WarningDone
+};
 
 const char* warningTitles[] = {
     "High objects",
@@ -227,7 +227,7 @@ static void openWarning(){
     warningData->proceedText = strdup("Play");
     warningData->cancelText = strdup("Cancel");
 
-    uiStackPush(&warningPopUpDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+    uiStackPush(&warningPopUpDef, UIAnimation::AnimZoom, UIAnimation::AnimZoom, UIStackPushType::PushNext);
     uiStackPushData(warningData);
 }
 
@@ -249,7 +249,7 @@ static void playLevel() {
         currLevelString = levelEntry->levelString;
     }
 
-    uiStackPushGameState(STATE_GAME);
+    uiStackPushGameState(static_cast<int>(GameState::StateGame));
 }
 
 void checkWarningsAndPlay(){
@@ -258,18 +258,18 @@ void checkWarningsAndPlay(){
     if(!alreadyPlayedOnlineLevel){
         bool shouldWarn;
 
-        while(warningStep <= (int)WARNING_DONE){
+        while(warningStep <= (int)WarningPopupStep::WarningDone){
             switch(warningStep){
-                case WARNING_HIGH_OBJECT: {
+                case static_cast<int>(WarningPopupStep::WarningHighObject): {
                     int objCount = (isN3Ds ? 44000 : 14000);
                     shouldWarn = currentSearchEntry->objCount >= objCount;
                     break;
                 }
-                case WARNING_VERSION: {
+                case static_cast<int>(WarningPopupStep::WarningVersion): {
                     shouldWarn = deriveGJVersion(currentSearchEntry->gameVersion) > GD_VERSION;
                     break;
                 }
-                case WARNING_MISSING_SONG: {
+                case static_cast<int>(WarningPopupStep::WarningMissingSong): {
                     int songID = currentSearchEntry->songId;
                     shouldWarn = !(songID == 0 || checkSong(songID));
                 }
@@ -297,7 +297,7 @@ static void actionPlay(UIElement *e, const UIPropertyList *args) {
 
 static void actionOpenInfo(UIElement *e, const UIPropertyList *args) {
     if (result == 0 || alreadyPlayedOnlineLevel){
-        uiStackPush(&onlineInfoboxDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+        uiStackPush(&onlineInfoboxDef, UIAnimation::AnimZoom, UIAnimation::AnimZoom, UIStackPushType::PushNext);
     }
 }
 
@@ -315,7 +315,7 @@ static void actionOpenDeleteLevel(UIElement *e, const UIPropertyList *args){
         deleteLevelData->proceedText = strdup("Yes");
         deleteLevelData->cancelText = strdup("No");
 
-        uiStackPush(&deletePopUpDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+        uiStackPush(&deletePopUpDef, UIAnimation::AnimZoom, UIAnimation::AnimZoom, UIStackPushType::PushNext);
         uiStackPushData(deleteLevelData);
     }
 }
@@ -487,8 +487,8 @@ static void populateLevelInfo(int levelID) {
     char key[16];
     snprintf(key, sizeof(key), "%d", entrySrch->levelId);
     
-    currentLevelEntry = getOrAddLevelToServerFile(currentServerFile, key, LEVEL_LIST_ONLINE);
-    currentLevelList = LEVEL_LIST_ONLINE;
+    currentLevelEntry = getOrAddLevelToServerFile(currentServerFile, key, LevelListType::LevelListOnline);
+    currentLevelList = LevelListType::LevelListOnline;
 
     currentLevelEntry->data.levelID = entrySrch->levelId;
     currentLevelEntry->data.stars = entrySrch->stars;
@@ -551,7 +551,7 @@ static void handleErrors(int code) {
     data->customTitle = true;
     data->copied = true;
 
-    uiStackPush(&infoCardDef, ANIM_ZOOM, ANIM_ZOOM, PUSH_NEXT);
+    uiStackPush(&infoCardDef, UIAnimation::AnimZoom, UIAnimation::AnimZoom, UIStackPushType::PushNext);
     uiStackPushData(data);
 }
 
@@ -856,7 +856,7 @@ static void onlineLevelMenuExit(UIScreen *s) {
     }
 
     alreadyPlayedOnlineLevel = false;
-    saveCurrentSaveFile(LEVEL_LIST_ONLINE);
+    saveCurrentSaveFile(LevelListType::LevelListOnline);
 }
 
 extern const UIScreenDefPair onlineLevelMenuDef = {

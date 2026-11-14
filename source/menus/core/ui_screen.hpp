@@ -8,45 +8,45 @@
 namespace gd3ds
 {
 
-typedef struct UIScreenPair UIScreenPair;
+struct UIScreenPair;
 
-typedef struct {
+struct LabelFont {
     const Charset *charset;
     C2D_SpriteSheet *sheet;    
-} LabelFont;
-
-enum Fonts {
-    FONT_PUSAB,
-    FONT_CHAT,
-    FONT_GOLD_PUSAB,
-
-    NUM_FONTS
 };
 
-typedef enum {
-    ANIM_NONE,
-    ANIM_ZOOM,
-    ANIM_ZOOM_SUBTLE,
-    ANIM_BOUNCE_DOWN,
-    ANIM_BOUNCE_DOWN_SLOW,
-    ANIM_SLIDE_RIGHT,
-    ANIM_SLIDE_DOWN,
+enum class Fonts {
+    FontPusab,
+    FontChat,
+    FontGoldPusab,
 
-    NUM_OPEN_ANIMS
-} UIAnimation;
+    NumFonts
+};
 
-typedef enum {
-    UI_TRANSITION_NONE,
-    UI_TRANSITION_OPENING,
-    UI_TRANSITION_CLOSING
-} UITransitionState;
+enum class UIAnimation {
+    AnimNone,
+    AnimZoom,
+    AnimZoomSubtle,
+    AnimBounceDown,
+    AnimBounceDownSlow,
+    AnimSlideRight,
+    AnimSlideDown,
 
-typedef enum {
-    UI_DRAW_BEFORE,
-    UI_DRAW_AFTER
-} UIDrawPhase;
+    NumOpenAnims
+};
 
-typedef struct {
+enum class UITransitionState {
+    UiTransitionNone,
+    UiTransitionOpening,
+    UiTransitionClosing
+};
+
+enum class UIDrawPhase {
+    UiDrawBefore,
+    UiDrawAfter
+};
+
+struct UITransition {
     UIAnimation animation;
     UITransitionState state;
 
@@ -59,9 +59,9 @@ typedef struct {
     float darkenFrac;
 
     bool done;
-} UITransition;
+};
 
-typedef struct {
+struct UIScreenDefinition {
     const char* path;
 
     void (*init)(UIScreen *);
@@ -70,16 +70,16 @@ typedef struct {
     void (*exit)(UIScreen *);
 
     UIActionList actionList;
-} UIScreenDefinition;
+};
 
-typedef struct {
+struct UIScreenDefPair {
     const char *name;
     UIScreenDefinition top;
     UIScreenDefinition btm;
     void (*freeData)(void *data);
-} UIScreenDefPair;
+};
 
-typedef struct UIScreen {
+struct UIScreen {
     UIScreenPair *pair;
     const UIScreenDefinition *def;
 
@@ -93,7 +93,7 @@ typedef struct UIScreen {
 
     bool loaded:1;
     bool closing:1;
-} UIScreen;
+};
 
 typedef void (*UIElementVisitor)(UIElement *element, void *userdata);
 typedef bool (*UIElementPredicate)(UIElement *, void *);
@@ -111,7 +111,7 @@ extern C2D_SpriteSheet barSheet;
 extern UIScreen defaultScreen;
 extern UIScreen defaultScreenTop;
 
-extern const LabelFont fonts[NUM_FONTS];
+extern const LabelFont fonts[static_cast<int>(Fonts::NumFonts)];
 
 extern const UIBitfieldEntry keybindTable[22];
 

@@ -29,11 +29,11 @@ void switchPage2(size_t page, UIScreen *s) {
     for (size_t i = 0; i < ARRAY_LEN(howToPlayPages); i++) {
         if (i == page) {
             uiRunFuncOnTag(s, howToPlayPages[page], uiEnableElement);
-            uiRunFuncOnTag(&s->pair->screens[SCREEN_TOP], howToPlayPages[page], uiEnableElement);
+            uiRunFuncOnTag(&s->pair->screens[static_cast<int>(Screens::ScreenTop)], howToPlayPages[page], uiEnableElement);
 
         } else {
             uiRunFuncOnTag(s, howToPlayPages[i], uiDisableElement);
-            uiRunFuncOnTag(&s->pair->screens[SCREEN_TOP], howToPlayPages[i], uiDisableElement);
+            uiRunFuncOnTag(&s->pair->screens[static_cast<int>(Screens::ScreenTop)], howToPlayPages[i], uiDisableElement);
         }
     }
 }

@@ -41,9 +41,9 @@
 namespace gd3ds
 {
 
-typedef struct {
+struct Vec2D {
     float x, y;
-} Vec2D;
+};
 
 extern float delta;
 extern float frameTimer;
@@ -99,25 +99,25 @@ extern Arena levelArena;
 #define SCREEN_HEIGHT 240
 #define SWAP_SIDE_OFFSET_X ((SCREEN_WIDTH - SCREEN_BOT_WIDTH) / 2.f)
 
-enum GameState {
-    STATE_MENU,
-    STATE_GAME,
-    STATE_EXIT
+enum class GameState {
+    StateMenu,
+    StateGame,
+    StateExit
 };
 
-typedef enum Cheats {
-    CHEAT_NOCLIP,
-    CHEAT_HITBOX_DISPLAY,
-    CHEAT_COUNT
-} Cheats;
+enum class Cheats {
+    CheatNoclip,
+    CheatHitboxDisplay,
+    CheatCount
+};
 
-typedef enum Screens {
-    SCREEN_TOP,
-    SCREEN_BTM
-} Screens;
+enum class Screens {
+    ScreenTop,
+    ScreenBtm
+};
 
-extern bool cheatsUsed[CHEAT_COUNT];
-extern const char *cheatNames[CHEAT_COUNT];
+extern bool cheatsUsed[static_cast<int>(Cheats::CheatCount)];
+extern const char *cheatNames[static_cast<int>(Cheats::CheatCount)];
 
 extern C3D_RenderTarget* top;
 extern C3D_RenderTarget* topRight;

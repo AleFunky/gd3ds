@@ -450,7 +450,7 @@ static const PlayerFrame robotIdleFrames[] = {
     { robotIdleF001, 7, 0.041667f },
 };
 
-const PlayerAnimation robotAnimations[ROBOT_ANIM_COUNT] = {
+const PlayerAnimation robotAnimations[static_cast<int>(RobotAnimId::RobotAnimCount)] = {
     { robotRunFrames, 16 },  // ROBOT_ANIM_RUN
     { robotJumpStartFrames, 5 },  // ROBOT_ANIM_JUMP_START
     { robotJumpFrames, 5 },  // ROBOT_ANIM_JUMP

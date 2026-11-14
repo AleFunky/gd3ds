@@ -198,7 +198,7 @@ static void handleHideAnimation(float delta) {
 
         if (pauseHideOffset == targetOffset) return;
 
-        pauseHideOffset = easeValue(QUAD_IN, pauseHideOffset, targetOffset, animTime, 4.f, 1.f);
+        pauseHideOffset = easeValue(EaseTypes::QuadIn, pauseHideOffset, targetOffset, animTime, 4.f, 1.f);
         applyPauseMenuOffset(pauseHideOffset);
 
         animTime += delta;
@@ -213,7 +213,7 @@ static void handleHideAnimation(float delta) {
 
     if (pauseWindow->base.y == targetPos) return;
     
-    currentPos = easeValue(QUAD_IN, pauseWindow->base.y, targetPos, animTime, 4.f, 1.f);
+    currentPos = easeValue(EaseTypes::QuadIn, pauseWindow->base.y, targetPos, animTime, 4.f, 1.f);
     uiElementSetPosition((UIElement *) pauseWindow, (float)SCREEN_WIDTH / 2.f, currentPos);
     
     animTime += delta;
@@ -258,7 +258,7 @@ void unpauseGame() {
 static void exitLevel() {
     if (gamePaused){
         exitingLevel = true;
-        uiStackPushGameState(STATE_MENU);
+        uiStackPushGameState(static_cast<int>(GameState::StateMenu));
     }
 }
 
@@ -483,8 +483,8 @@ void gameplayUpdate(UIScreen *s, UIInput *touch) {
 
     for(int i = 0; i < 3; i++){
         if(coinsGot[i] && !gamePaused){
-            float scale = easeValue(BOUNCE_OUT, 2.f, state.customLevel ? COIN_BIG_USER_SCALE : 0.65f, coinAnims[i], 0.35f, 1.f);
-            float opacity = easeValue(EASE_LINEAR, 0.f, 1.f, coinAnims[i], 0.1f, 1.f);
+            float scale = easeValue(EaseTypes::BounceOut, 2.f, state.customLevel ? COIN_BIG_USER_SCALE : 0.65f, coinAnims[i], 0.35f, 1.f);
+            float opacity = easeValue(EaseTypes::EaseLinear, 0.f, 1.f, coinAnims[i], 0.1f, 1.f);
 
             coinsFull[i]->base.enabled = true;
             uiElementSetScale((UIElement *) coinsFull[i], scale);
@@ -519,8 +519,8 @@ void gameplayUpdate(UIScreen *s, UIInput *touch) {
 
     //level end buttons retraction animation
     float cutsceneTimer = state.player.cutsceneTimer;
-    float completeYOffset = easeValue(EASE_IN, 20.f, -20.f, cutsceneTimer, 0.3f, 1.3f);
-    float completeYOffsetPractice = easeValue(EASE_IN, 200.f, 270.f, cutsceneTimer, 0.3f, 1.8f);
+    float completeYOffset = easeValue(EaseTypes::EaseIn, 20.f, -20.f, cutsceneTimer, 0.3f, 1.3f);
+    float completeYOffsetPractice = easeValue(EaseTypes::EaseIn, 200.f, 270.f, cutsceneTimer, 0.3f, 1.8f);
 
     bool swapCoins = settingsState.swapGameplayScreens && !inLevelComplete;
     float coinX = swapCoins ? 20.f - SWAP_SIDE_OFFSET_X : 20.f;

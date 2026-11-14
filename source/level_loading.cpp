@@ -101,18 +101,18 @@ CounterLabel *getCounterLabel(int obj) {
 }
 
 PickupItem *getPickupItem(int obj) {
-    if (!(objects.flags[obj] & FLAG_PICKUP)) return NULL;
+    if (!(objects.flags[obj] & static_cast<int>(ObjectFlags::FlagPickup))) return NULL;
     int index = objects.triggerIndex[obj];
     if (index < 0 || !pickupPool.data || (size_t)index >= pickupPool.count) return NULL;
     return TRIGGER_AT(pickupPool, PickupItem, index);
 }
 
 static PickupItem *ensurePickupItem(int obj) {
-    if (objects.flags[obj] & FLAG_PICKUP) return getPickupItem(obj);
+    if (objects.flags[obj] & static_cast<int>(ObjectFlags::FlagPickup)) return getPickupItem(obj);
     int index = triggerPoolAdd(&pickupPool, sizeof(PickupItem));
     if (index < 0) return NULL;
     objects.triggerIndex[obj] = index;
-    objects.flags[obj] |= FLAG_PICKUP;
+    objects.flags[obj] |= static_cast<int>(ObjectFlags::FlagPickup);
     return TRIGGER_AT(pickupPool, PickupItem, index);
 }
 
@@ -525,14 +525,14 @@ char *decompressOnlineLevel(char *data, int *outCode) {
     unsigned char *decoded = (unsigned char *)arenaAlloc(&levelArena, strlen(data));
 
     if (!decoded) {
-        *outCode = LOAD_OUT_OF_MEMORY;
+        *outCode = static_cast<int>(LevelLoadError::LoadOutOfMemory);
         return NULL;
     }
     
     int decodedLen = base64Decode(data, decoded);
     if (decodedLen <= 0) {
         outputLog("Failed to decode base64\n");
-        *outCode = LOAD_INVALID_BASE64;
+        *outCode = static_cast<int>(LevelLoadError::LoadInvalidBase64);
         return NULL;
     }
 
@@ -554,7 +554,7 @@ char *decompressLevel(char *data, int *outCode) {
         // Empty level
         char *temp = strdup(data);
         if (!temp) {
-            *outCode = LOAD_OUT_OF_MEMORY;
+            *outCode = static_cast<int>(LevelLoadError::LoadOutOfMemory);
         }
         return temp;
     }
@@ -566,14 +566,14 @@ char *decompressLevel(char *data, int *outCode) {
 
     unsigned char *decoded = (unsigned char *)arenaAlloc(&levelArena, strlen(b64));
     if (!decoded) {
-        *outCode = LOAD_OUT_OF_MEMORY;
+        *outCode = static_cast<int>(LevelLoadError::LoadOutOfMemory);
         return NULL;
     }
     int decodedLen = base64Decode(b64, decoded);
     if (decodedLen <= 0) {
         outputLog("Failed to decode base64\n");
         free(b64);
-        *outCode = LOAD_OUT_OF_MEMORY;
+        *outCode = static_cast<int>(LevelLoadError::LoadOutOfMemory);
         return NULL;
     }
 
@@ -781,7 +781,7 @@ int parseOldChannels(char *levelString, GDColorChannel **outArray, int *outCode)
     GDColorChannel *channels = (GDColorChannel *)malloc(sizeof(GDColorChannel) * 2);
     if (!channels) {
         outputLog("Couldn't alloc initial pre 2.0 color channels\n");
-        *outCode = LOAD_OUT_OF_MEMORY;
+        *outCode = static_cast<int>(LevelLoadError::LoadOutOfMemory);
         return 0;
     }
 
@@ -791,14 +791,14 @@ int parseOldChannels(char *levelString, GDColorChannel **outArray, int *outCode)
 
     if (v19Bg) { // 1.9 only
         parseColorChannel(channels, i, v19Bg);
-        channels[i].channelID = CHANNEL_BG;
+        channels[i].channelID = static_cast<int>(ColorChannelIDs::ChannelBg);
         i++;
         free(v19Bg);
 
         char *ground = getMetadataValue(levelString, "kS30");
         if (ground) {
             parseColorChannel(channels, i, ground);
-            channels[i].channelID = CHANNEL_GROUND;
+            channels[i].channelID = static_cast<int>(ColorChannelIDs::ChannelGround);
             i++;
             free(ground);
         }
@@ -807,11 +807,11 @@ int parseOldChannels(char *levelString, GDColorChannel **outArray, int *outCode)
         if (line) {
             channels = (GDColorChannel *)realloc(channels, sizeof(GDColorChannel) * (i + 1));
             if (!channels) {
-                *outCode = LOAD_OUT_OF_MEMORY;
+                *outCode = static_cast<int>(LevelLoadError::LoadOutOfMemory);
                 return 0;
             }
             parseColorChannel(channels, i, line);
-            channels[i].channelID = CHANNEL_LINE;
+            channels[i].channelID = static_cast<int>(ColorChannelIDs::ChannelLine);
             i++;
             free(line);
         }
@@ -820,11 +820,11 @@ int parseOldChannels(char *levelString, GDColorChannel **outArray, int *outCode)
         if (obj) {
             channels = (GDColorChannel *)realloc(channels, sizeof(GDColorChannel) * (i + 1));
             if (!channels) {
-                *outCode = LOAD_OUT_OF_MEMORY;
+                *outCode = static_cast<int>(LevelLoadError::LoadOutOfMemory);
                 return 0;
             }
             parseColorChannel(channels, i, obj);
-            channels[i].channelID = CHANNEL_OBJ;
+            channels[i].channelID = static_cast<int>(ColorChannelIDs::ChannelObj);
             i++;
             free(obj);
         }
@@ -833,7 +833,7 @@ int parseOldChannels(char *levelString, GDColorChannel **outArray, int *outCode)
         if (col1) {
             channels = (GDColorChannel *)realloc(channels, sizeof(GDColorChannel) * (i + 1));
             if (!channels) {
-                *outCode = LOAD_OUT_OF_MEMORY;
+                *outCode = static_cast<int>(LevelLoadError::LoadOutOfMemory);
                 return 0;
             }
             parseColorChannel(channels, i, col1);
@@ -846,7 +846,7 @@ int parseOldChannels(char *levelString, GDColorChannel **outArray, int *outCode)
         if (col2) {
             channels = (GDColorChannel *)realloc(channels, sizeof(GDColorChannel) * (i + 1));
             if (!channels) {
-                *outCode = LOAD_OUT_OF_MEMORY;
+                *outCode = static_cast<int>(LevelLoadError::LoadOutOfMemory);
                 return 0;
             }
             parseColorChannel(channels, i, col2);
@@ -859,7 +859,7 @@ int parseOldChannels(char *levelString, GDColorChannel **outArray, int *outCode)
         if (col3) {
             channels = (GDColorChannel *)realloc(channels, sizeof(GDColorChannel) * (i + 1));
             if (!channels) {
-                *outCode = LOAD_OUT_OF_MEMORY;
+                *outCode = static_cast<int>(LevelLoadError::LoadOutOfMemory);
                 return 0;
             }
             parseColorChannel(channels, i, col3);
@@ -872,7 +872,7 @@ int parseOldChannels(char *levelString, GDColorChannel **outArray, int *outCode)
         if (col4) {
             channels = (GDColorChannel *)realloc(channels, sizeof(GDColorChannel) * (i + 1));
             if (!channels) {
-                *outCode = LOAD_OUT_OF_MEMORY;
+                *outCode = static_cast<int>(LevelLoadError::LoadOutOfMemory);
                 return 0;
             }
             parseColorChannel(channels, i, col4);
@@ -885,11 +885,11 @@ int parseOldChannels(char *levelString, GDColorChannel **outArray, int *outCode)
         if (dl3) {
             channels = (GDColorChannel *)realloc(channels, sizeof(GDColorChannel) * (i + 1));
             if (!channels) {
-                *outCode = LOAD_OUT_OF_MEMORY;
+                *outCode = static_cast<int>(LevelLoadError::LoadOutOfMemory);
                 return 0;
             }
             parseColorChannel(channels, i, dl3);
-            channels[i].channelID = CHANNEL_3DL;
+            channels[i].channelID = static_cast<int>(ColorChannelIDs::Channel3dl);
             i++;
             free(dl3);
         }
@@ -907,7 +907,7 @@ int parseOldChannels(char *levelString, GDColorChannel **outArray, int *outCode)
     if (bgR && bgG && bgB) {
         GDColorChannel bgChannel = {0};
         bgChannel.fromOpacity = 1.0f;
-        bgChannel.channelID = CHANNEL_BG;
+        bgChannel.channelID = static_cast<int>(ColorChannelIDs::ChannelBg);
         bgChannel.fromRed = atoi(bgR);
         bgChannel.fromGreen = atoi(bgG);
         bgChannel.fromBlue = atoi(bgB);
@@ -933,7 +933,7 @@ int parseOldChannels(char *levelString, GDColorChannel **outArray, int *outCode)
     if (gR && gG && gB) {
         GDColorChannel gChannel = {0};
         gChannel.fromOpacity = 1.0f;
-        gChannel.channelID = CHANNEL_GROUND;
+        gChannel.channelID = static_cast<int>(ColorChannelIDs::ChannelGround);
         gChannel.fromRed = atoi(gR);
         gChannel.fromGreen = atoi(gG);
         gChannel.fromBlue = atoi(gB);
@@ -958,7 +958,7 @@ int parseOldChannels(char *levelString, GDColorChannel **outArray, int *outCode)
     if (lineR && lineG && lineB) {
         GDColorChannel lineChannel = {0};
         lineChannel.fromOpacity = 1.0f;
-        lineChannel.channelID = CHANNEL_LINE;
+        lineChannel.channelID = static_cast<int>(ColorChannelIDs::ChannelLine);
         lineChannel.fromRed = atoi(lineR);
         lineChannel.fromGreen = atoi(lineG);
         lineChannel.fromBlue = atoi(lineB);
@@ -971,7 +971,7 @@ int parseOldChannels(char *levelString, GDColorChannel **outArray, int *outCode)
 
         channels = (GDColorChannel *)realloc(channels, sizeof(GDColorChannel) * (i + 1));
         if (!channels) {
-            *outCode = LOAD_OUT_OF_MEMORY;
+            *outCode = static_cast<int>(LevelLoadError::LoadOutOfMemory);
             return 0;
         }
         channels[i] = lineChannel;
@@ -989,7 +989,7 @@ int parseOldChannels(char *levelString, GDColorChannel **outArray, int *outCode)
     if (objR && objG && objB) {
         GDColorChannel objChannel = {0};
         objChannel.fromOpacity = 1.0f;
-        objChannel.channelID = CHANNEL_OBJ;
+        objChannel.channelID = static_cast<int>(ColorChannelIDs::ChannelObj);
         objChannel.fromRed = atoi(objR);
         objChannel.fromGreen = atoi(objG);
         objChannel.fromBlue = atoi(objB);
@@ -1002,7 +1002,7 @@ int parseOldChannels(char *levelString, GDColorChannel **outArray, int *outCode)
         
         channels = (GDColorChannel *)realloc(channels, sizeof(GDColorChannel) * (i + 1));
         if (!channels) {
-            *outCode = LOAD_OUT_OF_MEMORY;
+            *outCode = static_cast<int>(LevelLoadError::LoadOutOfMemory);
             return 0;
         }
         channels[i] = objChannel;
@@ -1039,7 +1039,7 @@ int parseOldChannels(char *levelString, GDColorChannel **outArray, int *outCode)
 
         channels = (GDColorChannel *)realloc(channels, sizeof(GDColorChannel) * (i + 1));
         if (!channels) {
-            *outCode = LOAD_OUT_OF_MEMORY;
+            *outCode = static_cast<int>(LevelLoadError::LoadOutOfMemory);
             return 0;
         }
         channels[i] = obj2Channel;
@@ -1062,7 +1062,7 @@ int parseColorChannels(const char *colorString, GDColorChannel **outArray, int *
     // Split string into each channel
     char **entries = splitString(colorString, '|', &count, false);
     if (!entries) {
-        *outCode = LOAD_OUT_OF_MEMORY;
+        *outCode = static_cast<int>(LevelLoadError::LoadOutOfMemory);
         return 0;
     }
 
@@ -1070,7 +1070,7 @@ int parseColorChannels(const char *colorString, GDColorChannel **outArray, int *
     if (!channels) {
         outputLog("Couldn't alloc color channels\n");
         freeStringArray(entries, count);
-        *outCode = LOAD_OUT_OF_MEMORY;
+        *outCode = static_cast<int>(LevelLoadError::LoadOutOfMemory);
         return 0;
     }
 
@@ -1085,85 +1085,85 @@ int parseColorChannels(const char *colorString, GDColorChannel **outArray, int *
 
 GDValueType getValueTypeForKey(int key) {
     switch (key) {
-        case 1:  return GD_VAL_INT;    // Object ID
-        case 2:  return GD_VAL_FLOAT;  // X Position
-        case 3:  return GD_VAL_FLOAT;  // Y Position
-        case 4:  return GD_VAL_BOOL;   // Flipped Horizontally
-        case 5:  return GD_VAL_BOOL;   // Flipped Vertically
-        case 6:  return GD_VAL_FLOAT;  // Rotation
-        case 7:  return GD_VAL_INT;    // (Color/Pulse trigger) Red
-        case 8:  return GD_VAL_INT;    // (Color/Pulse trigger) Green
-        case 9:  return GD_VAL_INT;    // (Color/Pulse trigger) Blue
-        case 10: return GD_VAL_FLOAT;  // (Color trigger) Duration
-        case 11: return GD_VAL_BOOL;   // (Triggers) Touch Triggered
-        case 14: return GD_VAL_BOOL;   // (Color trigger) Tint ground
-        case 15: return GD_VAL_BOOL;   // (Color trigger) Player 1 color
-        case 16: return GD_VAL_BOOL;   // (Color trigger) Player 2 color
-        case 17: return GD_VAL_BOOL;   // (Color trigger) Blending
-        case 19: return GD_VAL_INT;    // 1.9 color channel
-        case 21: return GD_VAL_INT;    // Main col channel
-        case 22: return GD_VAL_INT;    // Detail col channel
-        case 23: return GD_VAL_INT;    // (Color trigger) Target color ID
-        case 24: return GD_VAL_INT;    // Zlayer
-        case 25: return GD_VAL_INT;    // Zorder
-        case 28: return GD_VAL_FLOAT;  // move offset X
-        case 29: return GD_VAL_FLOAT;  // move offset Y
-        case 30: return GD_VAL_INT;    // move easing
-        case 31: return GD_VAL_STRING; // (Text object) Text
-        case 32: return GD_VAL_FLOAT;  // scale (uniform)
-        case 35: return GD_VAL_FLOAT;  // opacity (alpha trigger)
-        case 41: return GD_VAL_BOOL;   // main_col_HSV_enabled
-        case 42: return GD_VAL_BOOL;   // detail_col_HSV_enabled
-        case 43: return GD_VAL_HSV;    // main_col_HSV
-        case 44: return GD_VAL_HSV;    // detail_col_HSV
-        case 45: return GD_VAL_FLOAT;  // pulse fade_in
-        case 46: return GD_VAL_FLOAT;  // pulse hold
-        case 47: return GD_VAL_FLOAT;  // pulse fade_out
-        case 48: return GD_VAL_INT;    // pulse_mode
-        case 49: return GD_VAL_HSV;    // copied_hsv
-        case 50: return GD_VAL_INT;    // copied_color_id
-        case 51: return GD_VAL_INT;    // target group (triggers)
-        case 52: return GD_VAL_INT;    // pulse_target_type
-        case 54: return GD_VAL_FLOAT;  // teleport portal Y offset
-        case 56: return GD_VAL_BOOL;   // activate group (toggle trigger)
-        case 58: return GD_VAL_BOOL;   // lock to player X (move trigger)
-        case 59: return GD_VAL_BOOL;   // lock to player Y (move trigger)
-        case 62: return GD_VAL_BOOL;   // spawn_triggered
-        case 63: return GD_VAL_FLOAT;  // spawn_delay
-        case 64: return GD_VAL_BOOL;   // dont fade
-        case 65: return GD_VAL_BOOL;   // pulse main_only
-        case 66: return GD_VAL_BOOL;   // pulse detail_only
-        case 67: return GD_VAL_BOOL;   // dont enter
-        case 68: return GD_VAL_FLOAT;  // rotate degrees
-        case 69: return GD_VAL_INT;    // rotate times360
-        case 70: return GD_VAL_BOOL;   // rotate lock object rotation
-        case 71: return GD_VAL_INT;    // rotate center group
-        case 72: return GD_VAL_FLOAT;  // follow x mod
-        case 73: return GD_VAL_FLOAT;  // follow y mod
-        case 77: return GD_VAL_INT;    // target count (count/instant count)
-        case 78: return GD_VAL_BOOL;   // sub count (collectible, 2.1)
-        case 79: return GD_VAL_BOOL;   // pickup item (2.1)
-        case 80: return GD_VAL_INT;    // item ID (pickup/count/counter label)
-        case 81: return GD_VAL_INT;    // hold mode (touch trigger)
-        case 82: return GD_VAL_INT;    // on/off (touch trigger)
-        case 85: return GD_VAL_FLOAT;  // easing rate
-        case 89: return GD_VAL_INT;    // dual mode (touch trigger)
-        case 87: return GD_VAL_BOOL;   // multi_triggered
-        case 88: return GD_VAL_INT;    // instant count mode (equals/larger/smaller)
-        case 104: return GD_VAL_BOOL;  // multi activate (count trigger)
-        case 381: return GD_VAL_BOOL;  // pickup item (2.2, robtop changed the pickup_item id to 381 for some reason but 2.1 levels like fingerdash use 79)
-        case 90: return GD_VAL_FLOAT;  // follow speed (follow player Y trigger)
-        case 91: return GD_VAL_FLOAT;  // follow delay (follow player Y trigger)
-        case 92: return GD_VAL_FLOAT;  // follow offset (follow player Y trigger)
-        case 105: return GD_VAL_FLOAT; // follow max speed (follow plaeyr Y trigger)
-        case 128: return GD_VAL_FLOAT; // scale X
-        case 129: return GD_VAL_FLOAT; // scale Y
-        case 57: return GD_VAL_INT_ARRAY; // groups
-        case 504: return GD_VAL_BOOL;   // spawn only (toggle orb)
-        case 99: return GD_VAL_BOOL;   // multi activate (orbs / pads)
-        case 100: return GD_VAL_BOOL;  // target mode (move trigger) are you happy now, cloud?
+        case 1:  return GDValueType::GdValInt;    // Object ID
+        case 2:  return GDValueType::GdValFloat;  // X Position
+        case 3:  return GDValueType::GdValFloat;  // Y Position
+        case 4:  return GDValueType::GdValBool;   // Flipped Horizontally
+        case 5:  return GDValueType::GdValBool;   // Flipped Vertically
+        case 6:  return GDValueType::GdValFloat;  // Rotation
+        case 7:  return GDValueType::GdValInt;    // (Color/Pulse trigger) Red
+        case 8:  return GDValueType::GdValInt;    // (Color/Pulse trigger) Green
+        case 9:  return GDValueType::GdValInt;    // (Color/Pulse trigger) Blue
+        case 10: return GDValueType::GdValFloat;  // (Color trigger) Duration
+        case 11: return GDValueType::GdValBool;   // (Triggers) Touch Triggered
+        case 14: return GDValueType::GdValBool;   // (Color trigger) Tint ground
+        case 15: return GDValueType::GdValBool;   // (Color trigger) Player 1 color
+        case 16: return GDValueType::GdValBool;   // (Color trigger) Player 2 color
+        case 17: return GDValueType::GdValBool;   // (Color trigger) Blending
+        case 19: return GDValueType::GdValInt;    // 1.9 color channel
+        case 21: return GDValueType::GdValInt;    // Main col channel
+        case 22: return GDValueType::GdValInt;    // Detail col channel
+        case 23: return GDValueType::GdValInt;    // (Color trigger) Target color ID
+        case 24: return GDValueType::GdValInt;    // Zlayer
+        case 25: return GDValueType::GdValInt;    // Zorder
+        case 28: return GDValueType::GdValFloat;  // move offset X
+        case 29: return GDValueType::GdValFloat;  // move offset Y
+        case 30: return GDValueType::GdValInt;    // move easing
+        case 31: return GDValueType::GdValString; // (Text object) Text
+        case 32: return GDValueType::GdValFloat;  // scale (uniform)
+        case 35: return GDValueType::GdValFloat;  // opacity (alpha trigger)
+        case 41: return GDValueType::GdValBool;   // main_col_HSV_enabled
+        case 42: return GDValueType::GdValBool;   // detail_col_HSV_enabled
+        case 43: return GDValueType::GdValHsv;    // main_col_HSV
+        case 44: return GDValueType::GdValHsv;    // detail_col_HSV
+        case 45: return GDValueType::GdValFloat;  // pulse fade_in
+        case 46: return GDValueType::GdValFloat;  // pulse hold
+        case 47: return GDValueType::GdValFloat;  // pulse fade_out
+        case 48: return GDValueType::GdValInt;    // pulse_mode
+        case 49: return GDValueType::GdValHsv;    // copied_hsv
+        case 50: return GDValueType::GdValInt;    // copied_color_id
+        case 51: return GDValueType::GdValInt;    // target group (triggers)
+        case 52: return GDValueType::GdValInt;    // pulse_target_type
+        case 54: return GDValueType::GdValFloat;  // teleport portal Y offset
+        case 56: return GDValueType::GdValBool;   // activate group (toggle trigger)
+        case 58: return GDValueType::GdValBool;   // lock to player X (move trigger)
+        case 59: return GDValueType::GdValBool;   // lock to player Y (move trigger)
+        case 62: return GDValueType::GdValBool;   // spawn_triggered
+        case 63: return GDValueType::GdValFloat;  // spawn_delay
+        case 64: return GDValueType::GdValBool;   // dont fade
+        case 65: return GDValueType::GdValBool;   // pulse main_only
+        case 66: return GDValueType::GdValBool;   // pulse detail_only
+        case 67: return GDValueType::GdValBool;   // dont enter
+        case 68: return GDValueType::GdValFloat;  // rotate degrees
+        case 69: return GDValueType::GdValInt;    // rotate times360
+        case 70: return GDValueType::GdValBool;   // rotate lock object rotation
+        case 71: return GDValueType::GdValInt;    // rotate center group
+        case 72: return GDValueType::GdValFloat;  // follow x mod
+        case 73: return GDValueType::GdValFloat;  // follow y mod
+        case 77: return GDValueType::GdValInt;    // target count (count/instant count)
+        case 78: return GDValueType::GdValBool;   // sub count (collectible, 2.1)
+        case 79: return GDValueType::GdValBool;   // pickup item (2.1)
+        case 80: return GDValueType::GdValInt;    // item ID (pickup/count/counter label)
+        case 81: return GDValueType::GdValInt;    // hold mode (touch trigger)
+        case 82: return GDValueType::GdValInt;    // on/off (touch trigger)
+        case 85: return GDValueType::GdValFloat;  // easing rate
+        case 89: return GDValueType::GdValInt;    // dual mode (touch trigger)
+        case 87: return GDValueType::GdValBool;   // multi_triggered
+        case 88: return GDValueType::GdValInt;    // instant count mode (equals/larger/smaller)
+        case 104: return GDValueType::GdValBool;  // multi activate (count trigger)
+        case 381: return GDValueType::GdValBool;  // pickup item (2.2, robtop changed the pickup_item id to 381 for some reason but 2.1 levels like fingerdash use 79)
+        case 90: return GDValueType::GdValFloat;  // follow speed (follow player Y trigger)
+        case 91: return GDValueType::GdValFloat;  // follow delay (follow player Y trigger)
+        case 92: return GDValueType::GdValFloat;  // follow offset (follow player Y trigger)
+        case 105: return GDValueType::GdValFloat; // follow max speed (follow plaeyr Y trigger)
+        case 128: return GDValueType::GdValFloat; // scale X
+        case 129: return GDValueType::GdValFloat; // scale Y
+        case 57: return GDValueType::GdValIntArray; // groups
+        case 504: return GDValueType::GdValBool;   // spawn only (toggle orb)
+        case 99: return GDValueType::GdValBool;   // multi activate (orbs / pads)
+        case 100: return GDValueType::GdValBool;  // target mode (move trigger) are you happy now, cloud?
         default:
-            return GD_VAL_INT; // Default fallback
+            return GDValueType::GdValInt; // Default fallback
     }
 }
 
@@ -1312,7 +1312,7 @@ bool fillObjectData(int object, int key, GDValueType type, GDValue val) {
     int triggerIndex = objects.triggerIndex[object];
     switch (key) {
         case 1:  // ID
-            if (type == GD_VAL_INT) {
+            if (type == GDValueType::GdValInt) {
                 objects.id[object] = convertObject(val.i);
 
                 initDefaultVariables(object);
@@ -1336,32 +1336,32 @@ bool fillObjectData(int object, int key, GDValueType type, GDValue val) {
             }
             break;
         case 2:  // X
-            if (type == GD_VAL_FLOAT) {
+            if (type == GDValueType::GdValFloat) {
                 objects.x[object] = val.f;
                 objects.originalX[object] = val.f;
             }
             break;
         case 3:  // Y
-            if (type == GD_VAL_FLOAT) {
+            if (type == GDValueType::GdValFloat) {
                 objects.y[object] = val.f;
                 objects.lastY[object] = val.f;
                 objects.originalY[object] = val.f;
             }
             break;
         case 4:  // FlippedH
-            if (type == GD_VAL_BOOL) objects.flippedH[object] = val.b;
+            if (type == GDValueType::GdValBool) objects.flippedH[object] = val.b;
             break;
         case 5:  // FlippedV
-            if (type == GD_VAL_BOOL) objects.flippedV[object] = val.b;
+            if (type == GDValueType::GdValBool) objects.flippedV[object] = val.b;
             break;
         case 6:  // Rotation
-            if (type == GD_VAL_FLOAT) {
+            if (type == GDValueType::GdValFloat) {
                 objects.rotation[object] = val.f;
                 objects.visualRotation[object] = val.f;
             }
             break;
         case 7:  // Color R
-            if (type == GD_VAL_INT) {
+            if (type == GDValueType::GdValInt) {
                 if (isColorTrigger(objects.id[object])) {
                     getColorTrigger(object)->trigColorR = val.i;
                 } else if (objects.id[object] == PULSE_TRIGGER) {
@@ -1370,7 +1370,7 @@ bool fillObjectData(int object, int key, GDValueType type, GDValue val) {
             }
             break;
         case 8:  // Color G
-            if (type == GD_VAL_INT) {
+            if (type == GDValueType::GdValInt) {
                 if (isColorTrigger(objects.id[object])) {
                     getColorTrigger(object)->trigColorG = val.i;
                 } else if (objects.id[object] == PULSE_TRIGGER) {
@@ -1379,7 +1379,7 @@ bool fillObjectData(int object, int key, GDValueType type, GDValue val) {
             }
             break;
         case 9:  // Color B
-            if (type == GD_VAL_INT) {
+            if (type == GDValueType::GdValInt) {
                 if (isColorTrigger(objects.id[object])) {
                     getColorTrigger(object)->trigColorB = val.i;
                 } else if (objects.id[object] == PULSE_TRIGGER) {
@@ -1388,7 +1388,7 @@ bool fillObjectData(int object, int key, GDValueType type, GDValue val) {
             }
             break;
         case 10: // Duration
-            if (type == GD_VAL_FLOAT) {
+            if (type == GDValueType::GdValFloat) {
                 if (isColorTrigger(objects.id[object])) {
                     getColorTrigger(object)->trigDuration = val.f;
                 } else {
@@ -1416,39 +1416,39 @@ bool fillObjectData(int object, int key, GDValueType type, GDValue val) {
             }
             break;
         case 11: // Touch triggered
-            if (type == GD_VAL_BOOL) objects.touchTriggered[object] = val.b;
+            if (type == GDValueType::GdValBool) objects.touchTriggered[object] = val.b;
             break;
         case 14: // Tint Ground
-            if (type == GD_VAL_BOOL && isColorTrigger(objects.id[object])) {
+            if (type == GDValueType::GdValBool && isColorTrigger(objects.id[object])) {
                 getColorTrigger(object)->tintGround = val.b;
             }
             break;
         case 15: // Player 1 color
-            if (type == GD_VAL_BOOL && isColorTrigger(objects.id[object])) {
+            if (type == GDValueType::GdValBool && isColorTrigger(objects.id[object])) {
                 getColorTrigger(object)->p1Color = val.b;
             }
             break;
         case 16: // Player 2 color
-            if (type == GD_VAL_BOOL && isColorTrigger(objects.id[object])) {
+            if (type == GDValueType::GdValBool && isColorTrigger(objects.id[object])) {
                 getColorTrigger(object)->p2Color = val.b;
             }
             break;
         case 17: // Blending
-            if (type == GD_VAL_BOOL && isColorTrigger(objects.id[object])) {
+            if (type == GDValueType::GdValBool && isColorTrigger(objects.id[object])) {
                 getColorTrigger(object)->blending = val.b;
             }
             break;
         case 19: // 1.9 channel id
-            if (type == GD_VAL_INT) objects.v1p9ColChannel[object] = convertOnePointNineChannel(val.i);
+            if (type == GDValueType::GdValInt) objects.v1p9ColChannel[object] = convertOnePointNineChannel(val.i);
             break;
         case 21: // Main col channel
-            if (type == GD_VAL_INT) objects.colChannel[object] = val.i;
+            if (type == GDValueType::GdValInt) objects.colChannel[object] = val.i;
             break;
         case 22: // Detail col channel
-            if (type == GD_VAL_INT) objects.detailColChannel[object] = val.i;
+            if (type == GDValueType::GdValInt) objects.detailColChannel[object] = val.i;
             break;
         case 23: // Target color ID
-            if (type == GD_VAL_INT) {
+            if (type == GDValueType::GdValInt) {
                 if (isColorTrigger(objects.id[object])) {
                     getColorTrigger(object)->targetColorID = val.i;
                 } else if (objects.id[object] == PULSE_TRIGGER) {
@@ -1457,23 +1457,23 @@ bool fillObjectData(int object, int key, GDValueType type, GDValue val) {
             }
             break;
         case 24: // Z layer
-            if (type == GD_VAL_INT) objects.zlayer[object] = val.i;
+            if (type == GDValueType::GdValInt) objects.zlayer[object] = val.i;
             break;
         case 25: // Z order
-            if (type == GD_VAL_INT) objects.zorder[object] = val.i;
+            if (type == GDValueType::GdValInt) objects.zorder[object] = val.i;
             break;
         case 28: // Move offset X
-            if (type == GD_VAL_FLOAT && objects.id[object] == MOVE_TRIGGER) {
+            if (type == GDValueType::GdValFloat && objects.id[object] == MOVE_TRIGGER) {
                 getMoveTrigger(object)->moveOffsetX = val.f;
             }
             break;
         case 29: // Move offset Y
-            if (type == GD_VAL_FLOAT && objects.id[object] == MOVE_TRIGGER) {
+            if (type == GDValueType::GdValFloat && objects.id[object] == MOVE_TRIGGER) {
                 getMoveTrigger(object)->moveOffsetY = val.f;
             }
             break;
         case 30: // Move easing
-            if (type == GD_VAL_INT) {
+            if (type == GDValueType::GdValInt) {
                 if (objects.id[object] == MOVE_TRIGGER) {
                     getMoveTrigger(object)->moveEasing = val.i;
                 } else if (objects.id[object] == ROTATE_TRIGGER) {
@@ -1482,7 +1482,7 @@ bool fillObjectData(int object, int key, GDValueType type, GDValue val) {
             }
             break;
         case 31: // Text
-            if (type == GD_VAL_STRING && objects.id[object] == TEXT_OBJECT && val.str) {
+            if (type == GDValueType::GdValString && objects.id[object] == TEXT_OBJECT && val.str) {
                 fixBase64URL(val.str);
 
                 char *decoded = (char *)malloc(strlen(val.str) + 1);
@@ -1502,13 +1502,13 @@ bool fillObjectData(int object, int key, GDValueType type, GDValue val) {
             }
             break;
         case 32: // Scale (uniform)
-            if (type == GD_VAL_FLOAT) {
+            if (type == GDValueType::GdValFloat) {
                 objects.scaleX[object] = objects.scaleY[object] = val.f;
                 objects.originalScaleX[object] = objects.originalScaleY[object] = val.f;
             }
             break;
         case 35: // Opacity (alpha trigger)
-            if (type == GD_VAL_FLOAT) {
+            if (type == GDValueType::GdValFloat) {
                 if (isColorTrigger(objects.id[object])) {
                     getColorTrigger(object)->opacity = val.f;
                 } else if (objects.id[object] == ALPHA_TRIGGER) {
@@ -1519,39 +1519,39 @@ bool fillObjectData(int object, int key, GDValueType type, GDValue val) {
             }
             break;
         case 41: // main_col_HSV_enabled
-            if (type == GD_VAL_BOOL) objects.mainColHSVEnabled[object] = val.b;
+            if (type == GDValueType::GdValBool) objects.mainColHSVEnabled[object] = val.b;
             break;
         case 42: // detail_col_HSV_enabled
-            if (type == GD_VAL_BOOL) objects.detailColHSVEnabled[object] = val.b;
+            if (type == GDValueType::GdValBool) objects.detailColHSVEnabled[object] = val.b;
             break;
         case 43: // main_col_HSV
-            if (type == GD_VAL_HSV) objects.mainColHSV[object] = val.hsv;
+            if (type == GDValueType::GdValHsv) objects.mainColHSV[object] = val.hsv;
             break;
         case 44: // detail_col_HSV
-            if (type == GD_VAL_HSV) objects.detailColHSV[object] = val.hsv;
+            if (type == GDValueType::GdValHsv) objects.detailColHSV[object] = val.hsv;
             break;
         case 45: // pulse fade_in
-            if (type == GD_VAL_FLOAT && objects.id[object] == PULSE_TRIGGER) {
+            if (type == GDValueType::GdValFloat && objects.id[object] == PULSE_TRIGGER) {
                 getPulseTrigger(object)->pulseFadeIn = val.f;
             }
             break;
         case 46: // pulse hold
-            if (type == GD_VAL_FLOAT && objects.id[object] == PULSE_TRIGGER) {
+            if (type == GDValueType::GdValFloat && objects.id[object] == PULSE_TRIGGER) {
                 getPulseTrigger(object)->pulseHold = val.f;
             }
             break;
         case 47: // pulse fade_out
-            if (type == GD_VAL_FLOAT && objects.id[object] == PULSE_TRIGGER) {
+            if (type == GDValueType::GdValFloat && objects.id[object] == PULSE_TRIGGER) {
                 getPulseTrigger(object)->pulseFadeOut = val.f;
             }
             break;
         case 48: // pulse_mode
-            if (type == GD_VAL_INT && objects.id[object] == PULSE_TRIGGER) {
+            if (type == GDValueType::GdValInt && objects.id[object] == PULSE_TRIGGER) {
                 getPulseTrigger(object)->pulseMode = val.i;
             }
             break;
         case 49: // copied_hsv
-            if (type == GD_VAL_HSV) {
+            if (type == GDValueType::GdValHsv) {
                 if (isColorTrigger(objects.id[object])) {
                     getColorTrigger(object)->copiedHSV = val.hsv;
                 } else if (objects.id[object] == PULSE_TRIGGER) {
@@ -1560,7 +1560,7 @@ bool fillObjectData(int object, int key, GDValueType type, GDValue val) {
             }
             break;
         case 50: // copied_color_id
-            if (type == GD_VAL_INT) {
+            if (type == GDValueType::GdValInt) {
                 if (isColorTrigger(objects.id[object])) {
                     getColorTrigger(object)->copiedColorID = val.i;
                 } else if (objects.id[object] == PULSE_TRIGGER) {
@@ -1569,7 +1569,7 @@ bool fillObjectData(int object, int key, GDValueType type, GDValue val) {
             }
             break;
         case 51: // Target group
-            if (type == GD_VAL_INT) {
+            if (type == GDValueType::GdValInt) {
                 if (isColorTrigger(objects.id[object])) {
                     getColorTrigger(object)->targetGroup = val.i;
                 } else {
@@ -1621,15 +1621,15 @@ bool fillObjectData(int object, int key, GDValueType type, GDValue val) {
             }
             break;
         case 52: // pulse_target_type
-            if (type == GD_VAL_INT && objects.id[object] == PULSE_TRIGGER) {
+            if (type == GDValueType::GdValInt && objects.id[object] == PULSE_TRIGGER) {
                 getPulseTrigger(object)->pulseTargetType = val.i;
             }
             break;
         case 54: // teleport portal Y offset
-            if (type == GD_VAL_FLOAT) objects.tpYOffset[object] = val.f;
+            if (type == GDValueType::GdValFloat) objects.tpYOffset[object] = val.f;
             break;
         case 56: // Activate group
-            if (type == GD_VAL_BOOL) {
+            if (type == GDValueType::GdValBool) {
                 if (objects.id[object] == TOGGLE_TRIGGER || objects.id[object] == TOGGLE_ORB) {
                     getToggleTrigger(object)->activateGroup = val.b;
                 } else if (objects.id[object] == COUNT_TRIGGER) {
@@ -1642,17 +1642,17 @@ bool fillObjectData(int object, int key, GDValueType type, GDValue val) {
             }
             break;
         case 58: // Lock to player X
-            if (type == GD_VAL_BOOL && objects.id[object] == MOVE_TRIGGER) {
+            if (type == GDValueType::GdValBool && objects.id[object] == MOVE_TRIGGER) {
                 getMoveTrigger(object)->lockToPlayerX = val.b;
             }
             break;
         case 59: // Lock to player Y
-            if (type == GD_VAL_BOOL && objects.id[object] == MOVE_TRIGGER) {
+            if (type == GDValueType::GdValBool && objects.id[object] == MOVE_TRIGGER) {
                 getMoveTrigger(object)->lockToPlayerY = val.b;
             }
             break;
         case 62: // spawn_triggered
-            if (type == GD_VAL_BOOL) {
+            if (type == GDValueType::GdValBool) {
                 if (isColorTrigger(objects.id[object])) {
                     getColorTrigger(object)->spawnTriggered = val.b;
                 } else if (isSimpleTriggerObject(objects.id[object])) {
@@ -1703,83 +1703,83 @@ bool fillObjectData(int object, int key, GDValueType type, GDValue val) {
             }
             break;
         case 63: // spawn_delay
-            if (type == GD_VAL_FLOAT && objects.id[object] == SPAWN_TRIGGER) {
+            if (type == GDValueType::GdValFloat && objects.id[object] == SPAWN_TRIGGER) {
                 getSpawnTrigger(object)->spawnDelay = val.f;
             }
             break;
         case 64: // dont fade
-            if (type == GD_VAL_BOOL) {
-                objects.flags[object] |= val.b ? FLAG_DONT_FADE : 0;
+            if (type == GDValueType::GdValBool) {
+                objects.flags[object] |= val.b ? static_cast<int>(ObjectFlags::FlagDontFade) : 0;
             }
             break;
         case 65: // pulse main_only
-            if (type == GD_VAL_BOOL && objects.id[object] == PULSE_TRIGGER) {
+            if (type == GDValueType::GdValBool && objects.id[object] == PULSE_TRIGGER) {
                 getPulseTrigger(object)->pulseMainOnly = val.b;
             }
             break;
         case 66: // pulse detail_only
-            if (type == GD_VAL_BOOL && objects.id[object] == PULSE_TRIGGER) {
+            if (type == GDValueType::GdValBool && objects.id[object] == PULSE_TRIGGER) {
                 getPulseTrigger(object)->pulseDetailOnly = val.b;
             }
             break;
         case 67: // dont enter
-            if (type == GD_VAL_BOOL) {
-                objects.flags[object] |= val.b ? FLAG_DONT_ENTER : 0;
+            if (type == GDValueType::GdValBool) {
+                objects.flags[object] |= val.b ? static_cast<int>(ObjectFlags::FlagDontEnter) : 0;
             }
             break;
         case 68:
-            if (type == GD_VAL_FLOAT && objects.id[object] == ROTATE_TRIGGER) {
+            if (type == GDValueType::GdValFloat && objects.id[object] == ROTATE_TRIGGER) {
                 getRotateTrigger(object)->degrees = val.f;
             }
             break;
         case 69:
-            if (type == GD_VAL_INT && objects.id[object] == ROTATE_TRIGGER) {
+            if (type == GDValueType::GdValInt && objects.id[object] == ROTATE_TRIGGER) {
                 getRotateTrigger(object)->times360 = val.i;
             }
             break;
         case 70:
-            if (type == GD_VAL_BOOL && objects.id[object] == ROTATE_TRIGGER) {
+            if (type == GDValueType::GdValBool && objects.id[object] == ROTATE_TRIGGER) {
                 getRotateTrigger(object)->lockObjectRotation = val.b;
             }
             break;
         case 71:
-            if (type == GD_VAL_INT && objects.id[object] == ROTATE_TRIGGER) {
+            if (type == GDValueType::GdValInt && objects.id[object] == ROTATE_TRIGGER) {
                 getRotateTrigger(object)->centerGroup = val.i;
-            } else if (type == GD_VAL_INT && objects.id[object] == FOLLOW_TRIGGER) {
+            } else if (type == GDValueType::GdValInt && objects.id[object] == FOLLOW_TRIGGER) {
                 getFollowTrigger(object)->followGroup = val.i;
-            } else if (type == GD_VAL_INT && objects.id[object] == MOVE_TRIGGER) {
+            } else if (type == GDValueType::GdValInt && objects.id[object] == MOVE_TRIGGER) {
                 getMoveTrigger(object)->targetGroup2 = val.i;
             }
             break;
         case 72:
-            if (type == GD_VAL_FLOAT && objects.id[object] == FOLLOW_TRIGGER) {
+            if (type == GDValueType::GdValFloat && objects.id[object] == FOLLOW_TRIGGER) {
                 getFollowTrigger(object)->xMod = val.f;
             }
             break;
         case 73:
-            if (type == GD_VAL_FLOAT && objects.id[object] == FOLLOW_TRIGGER) {
+            if (type == GDValueType::GdValFloat && objects.id[object] == FOLLOW_TRIGGER) {
                 getFollowTrigger(object)->yMod = val.f;
             }
             break;
         case 85:
-            if (type == GD_VAL_FLOAT && objects.id[object] == ROTATE_TRIGGER) {
+            if (type == GDValueType::GdValFloat && objects.id[object] == ROTATE_TRIGGER) {
                 getRotateTrigger(object)->easingRate = val.f;
             }
             break;
         case 81:
-            if (type == GD_VAL_INT && objects.id[object] == TOUCH_TRIGGER) {
+            if (type == GDValueType::GdValInt && objects.id[object] == TOUCH_TRIGGER) {
                 getTouchTrigger(object)->holdMode = val.i != 0;
             }
             break;
         case 82:
-            if (type == GD_VAL_INT && objects.id[object] == TOUCH_TRIGGER) {
+            if (type == GDValueType::GdValInt && objects.id[object] == TOUCH_TRIGGER) {
                 getTouchTrigger(object)->toggleMode = (unsigned char)val.i;
             }
             break;
         case 89:
             break;
         case 87: // multi_triggered
-            if (type == GD_VAL_BOOL) {
+            if (type == GDValueType::GdValBool) {
                 if (isColorTrigger(objects.id[object])) {
                     getColorTrigger(object)->multiTriggered = val.b;
                 } else if (isSimpleTriggerObject(objects.id[object])) {
@@ -1830,12 +1830,12 @@ bool fillObjectData(int object, int key, GDValueType type, GDValue val) {
             }
             break;
         case 88:
-            if (type == GD_VAL_INT && objects.id[object] == INSTANT_COUNT_TRIGGER) {
+            if (type == GDValueType::GdValInt && objects.id[object] == INSTANT_COUNT_TRIGGER) {
                 getInstantCountTrigger(object)->instantCountMode = val.i;
             }
             break;
         case 77:
-            if (type == GD_VAL_INT) {
+            if (type == GDValueType::GdValInt) {
                 if (objects.id[object] == COUNT_TRIGGER) {
                     getCountTrigger(object)->targetCount = val.i;
                 } else if (objects.id[object] == INSTANT_COUNT_TRIGGER) {
@@ -1844,13 +1844,13 @@ bool fillObjectData(int object, int key, GDValueType type, GDValue val) {
             }
             break;
         case 78:
-            if (type == GD_VAL_BOOL && val.b) {
+            if (type == GDValueType::GdValBool && val.b) {
                 PickupItem *pickup = ensurePickupItem(object);
                 if (pickup) pickup->subCount = true;
             }
             break;
         case 80:
-            if (type == GD_VAL_INT) {
+            if (type == GDValueType::GdValInt) {
                 switch (objects.id[object]) {
                     case COUNT_TRIGGER:
                         getCountTrigger(object)->itemID = val.i;
@@ -1874,51 +1874,51 @@ bool fillObjectData(int object, int key, GDValueType type, GDValue val) {
             }
             break;
         case 104:
-            if (type == GD_VAL_BOOL && objects.id[object] == COUNT_TRIGGER) {
+            if (type == GDValueType::GdValBool && objects.id[object] == COUNT_TRIGGER) {
                 getCountTrigger(object)->multiActivate = val.b;
             }
             break;
         case 79:
         case 381:
-            if (type == GD_VAL_BOOL && val.b) {
+            if (type == GDValueType::GdValBool && val.b) {
                 PickupItem *pickup = ensurePickupItem(object);
                 if (pickup) pickup->isPickup = true;
             }
             break;
         case 90:
-            if (type == GD_VAL_FLOAT && objects.id[object] == FOLLOW_PLAYER_Y_TRIGGER) {
+            if (type == GDValueType::GdValFloat && objects.id[object] == FOLLOW_PLAYER_Y_TRIGGER) {
                 getFollowPlayerYTrigger(object)->followSpeed = val.f;
             }
             break;
         case 91:
-            if (type == GD_VAL_FLOAT && objects.id[object] == FOLLOW_PLAYER_Y_TRIGGER) {
+            if (type == GDValueType::GdValFloat && objects.id[object] == FOLLOW_PLAYER_Y_TRIGGER) {
                 getFollowPlayerYTrigger(object)->followDelay = val.f;
             }
             break;
         case 92:
-            if (type == GD_VAL_FLOAT && objects.id[object] == FOLLOW_PLAYER_Y_TRIGGER) {
+            if (type == GDValueType::GdValFloat && objects.id[object] == FOLLOW_PLAYER_Y_TRIGGER) {
                 getFollowPlayerYTrigger(object)->followOffset = val.f;
             }
             break;
         case 105:
-            if (type == GD_VAL_FLOAT && objects.id[object] == FOLLOW_PLAYER_Y_TRIGGER) {
+            if (type == GDValueType::GdValFloat && objects.id[object] == FOLLOW_PLAYER_Y_TRIGGER) {
                 getFollowPlayerYTrigger(object)->followMaxSpeed = val.f;
             }
             break;
         case 128: // Scale X
-            if (type == GD_VAL_FLOAT) {
+            if (type == GDValueType::GdValFloat) {
                 objects.scaleX[object] = val.f;
                 objects.originalScaleX[object] = val.f;
             }
             break;
         case 129: // Scale Y
-            if (type == GD_VAL_FLOAT) {
+            if (type == GDValueType::GdValFloat) {
                 objects.scaleY[object] = val.f;
                 objects.originalScaleY[object] = val.f;
             }
             break;
         case 57: // Groups
-            if (type == GD_VAL_INT_ARRAY) {
+            if (type == GDValueType::GdValIntArray) {
                 int gcount = 0;
                 for (int i = 0; i < MAX_GROUPS_PER_OBJECT; i++) {
                     objects.groups[object][i] = val.intArray[i];
@@ -1928,22 +1928,22 @@ bool fillObjectData(int object, int key, GDValueType type, GDValue val) {
             }
             break;
         case 504:
-            if (type == GD_VAL_BOOL && objects.id[object] == TOGGLE_ORB) {
+            if (type == GDValueType::GdValBool && objects.id[object] == TOGGLE_ORB) {
                 getToggleTrigger(object)->spawnOnly = val.b;
             }
             break;
         case 99:
-            if (type == GD_VAL_BOOL) {
-                objects.flags[object] |= val.b ? FLAG_MULTI_ACTIVATE : 0;
+            if (type == GDValueType::GdValBool) {
+                objects.flags[object] |= val.b ? static_cast<int>(ObjectFlags::FlagMultiActivate) : 0;
             }
             break;
         case 100:
-            if (type == GD_VAL_BOOL && objects.id[object] == MOVE_TRIGGER) {
+            if (type == GDValueType::GdValBool && objects.id[object] == MOVE_TRIGGER) {
                 getMoveTrigger(object)->targetMode = val.b;
             }
             break;
         case 395:
-            if (type == GD_VAL_INT && objects.id[object] == MOVE_TRIGGER) {
+            if (type == GDValueType::GdValInt && objects.id[object] == MOVE_TRIGGER) {
                 getMoveTrigger(object)->centerGroup = val.i;
             }
             break;
@@ -1952,19 +1952,19 @@ bool fillObjectData(int object, int key, GDValueType type, GDValue val) {
 }
 
 bool objHasMain(const GameObject *obj) {
-    if (obj->colorType != COLOR_TYPE_DETAIL) return true;
+    if (obj->colorType != static_cast<int>(ColorType::ColorTypeDetail)) return true;
     
     for (size_t i = 0; i < obj->childCount; i++) {
-        if (obj->children[i].colorType != COLOR_TYPE_DETAIL) return true;
+        if (obj->children[i].colorType != static_cast<int>(ColorType::ColorTypeDetail)) return true;
     }
     return false;
 }
 
 bool objHasDetail(const GameObject *obj) {
-    if (obj->colorType == COLOR_TYPE_DETAIL) return true;
+    if (obj->colorType == static_cast<int>(ColorType::ColorTypeDetail)) return true;
     
     for (size_t i = 0; i < obj->childCount; i++) {
-        if (obj->children[i].colorType == COLOR_TYPE_DETAIL) return true;
+        if (obj->children[i].colorType == static_cast<int>(ColorType::ColorTypeDetail)) return true;
     }
     return false;
 }
@@ -2132,37 +2132,37 @@ int parseGdObject(char *objStr, char *objEnd, int obj, int capacity) {
         GDValue val;
 
         switch (type) {
-            case GD_VAL_INT:
+            case GDValueType::GdValInt:
                 val.i = atoi(valStr);
-                if (!fillObjectData(obj, key, GD_VAL_INT, val)) {
+                if (!fillObjectData(obj, key, GDValueType::GdValInt, val)) {
                     return 0;
                 }
                 break;
-            case GD_VAL_FLOAT:
+            case GDValueType::GdValFloat:
                 val.f = atof(valStr);
-                if (!fillObjectData(obj, key, GD_VAL_FLOAT, val)) {
+                if (!fillObjectData(obj, key, GDValueType::GdValFloat, val)) {
                     return 0;
                 }
                 break;
-            case GD_VAL_BOOL:
+            case GDValueType::GdValBool:
                 val.b = parseBool(valStr);
-                if (!fillObjectData(obj, key, GD_VAL_BOOL, val)) {
+                if (!fillObjectData(obj, key, GDValueType::GdValBool, val)) {
                     return 0;
                 }
                 break;
-            case GD_VAL_HSV:
+            case GDValueType::GdValHsv:
                 val.hsv = parseHSVString(valStr);
-                if (!fillObjectData(obj, key, GD_VAL_HSV, val)) {
+                if (!fillObjectData(obj, key, GDValueType::GdValHsv, val)) {
                     return 0;
                 }
                 break;
-            case GD_VAL_INT_ARRAY:
+            case GDValueType::GdValIntArray:
                 parseInts(val.intArray, valStr);
-                fillObjectData(obj, key, GD_VAL_INT_ARRAY, val);
+                fillObjectData(obj, key, GDValueType::GdValIntArray, val);
                 break;
-            case GD_VAL_STRING:
+            case GDValueType::GdValString:
                 val.str = (char *) valStr;
-                fillObjectData(obj, key, GD_VAL_STRING, val);
+                fillObjectData(obj, key, GDValueType::GdValString, val);
                 break;
             default:
                 break;
@@ -2202,7 +2202,7 @@ int parseGdObject(char *objStr, char *objEnd, int obj, int capacity) {
             objects.height[obj] = hitbox->height;
             
             // If object is and slope, calculate orientation
-            if (hitbox->type == COLLISION_SLOPE) {
+            if (hitbox->type == static_cast<int>(CollisionShape::CollisionSlope)) {
                 int orientation = objects.rotation[obj] / 90;
                 if (objects.flippedH[obj] && objects.flippedV[obj]) orientation += 2;
                 else if (objects.flippedH[obj]) orientation += 1;
@@ -2214,7 +2214,7 @@ int parseGdObject(char *objStr, char *objEnd, int obj, int capacity) {
                 objects.orientation[obj] = orientation;
             }
 
-            if (hitbox->collisionType == HITBOX_SOLID) {
+            if (hitbox->collisionType == static_cast<int>(HitboxType::HitboxSolid)) {
                 // Modify height and width depending on rotation
                 if ((int) fabsf(objects.rotation[obj]) % 180 != 0) {
                     objects.width[obj] = hitbox->height;
@@ -2226,10 +2226,10 @@ int parseGdObject(char *objStr, char *objEnd, int obj, int capacity) {
             }
 
             // precompute scaled hitbox dimensions (scale_x/scale_y)
-            if (hitbox->type == COLLISION_CIRCLE) {
+            if (hitbox->type == static_cast<int>(CollisionShape::CollisionCircle)) {
                 float s = fmaxf(fabsf(objects.scaleX[obj]), fabsf(objects.scaleY[obj]));
                 objects.width[obj] *= s;
-            } else if (hitbox->type == COLLISION_SLOPE || hitbox->collisionType == HITBOX_SOLID) {
+            } else if (hitbox->type == static_cast<int>(CollisionShape::CollisionSlope) || hitbox->collisionType == static_cast<int>(HitboxType::HitboxSolid)) {
                 if ((int) fabsf(objects.rotation[obj]) % 180 != 0) {
                     objects.width[obj] *= fabsf(objects.scaleY[obj]);
                     objects.height[obj] *= fabsf(objects.scaleX[obj]);
@@ -2258,7 +2258,7 @@ int parseGdObject(char *objStr, char *objEnd, int obj, int capacity) {
     }
 
     if (objectCanBeXMoved(obj)) {
-        objects.flags[obj] |= FLAG_CAN_BE_X_MOVED;
+        objects.flags[obj] |= static_cast<int>(ObjectFlags::FlagCanBeXMoved);
     }
 
     free(tokens);
@@ -2560,7 +2560,7 @@ int parseString(char *levelString, int extraSlots, int *outObjectCount) {
 
     if (sectionCount < 1) {
         outputLog("Level string missing sections!\n");
-        return LOAD_LEVEL_STRING_MISSING_SECTIONS;
+        return static_cast<int>(LevelLoadError::LoadLevelStringMissingSections);
     }
     
     int objectCount = sectionCount - 1;
@@ -2570,7 +2570,7 @@ int parseString(char *levelString, int extraSlots, int *outObjectCount) {
     if (!initArrays(allocCount)) {
         freeArrays();
         outputLog("Failed to allocate object array\n");
-        return LOAD_OUT_OF_MEMORY;
+        return static_cast<int>(LevelLoadError::LoadOutOfMemory);
     }
 
     objects.count = allocCount;
@@ -2596,7 +2596,7 @@ int parseString(char *levelString, int extraSlots, int *outObjectCount) {
                     if (parsed == -2) {
                         outputLog("Object capacity exceeded\n");
                         freeArrays();
-                        return LOAD_OUT_OF_MEMORY;
+                        return static_cast<int>(LevelLoadError::LoadOutOfMemory);
                     }
                     if (parsed > 0) {
                         assignObjectToSection(objectIndex);
@@ -2604,7 +2604,7 @@ int parseString(char *levelString, int extraSlots, int *outObjectCount) {
                     } else if (!parsed) {
                         outputLog("Failed to parse object %d\n", objectIndex);
                         freeArrays();
-                        return LOAD_COULDNT_PARSE_OBJECTS;
+                        return static_cast<int>(LevelLoadError::LoadCouldntParseObjects);
                     }
                 }
                 sectionIndex++;
@@ -2642,7 +2642,7 @@ int parseString(char *levelString, int extraSlots, int *outObjectCount) {
         sortGroup(i);
     }
 
-    return LOAD_NO_ERROR;
+    return static_cast<int>(LevelLoadError::LoadNoError);
 }
 
 static int streamLevelInput(const LevelStreamInput *input, LevelStreamCallback callback, void *context) {
@@ -2655,12 +2655,12 @@ static int streamLevelInput(const LevelStreamInput *input, LevelStreamCallback c
     stream.next_in = Z_NULL;
     stream.avail_in = 0;
     if (inflateInit2(&stream, 15 | 32) != Z_OK) {
-        return LOAD_INVALID_COMPRESSED_DATA;
+        return static_cast<int>(LevelLoadError::LoadInvalidCompressedData);
     }
 
     unsigned char buffer[4096];
     size_t inputOffset = 0;
-    int result = LOAD_INVALID_COMPRESSED_DATA;
+    int result = static_cast<int>(LevelLoadError::LoadInvalidCompressedData);
     bool complete = false;
 
     while (!complete) {
@@ -2683,22 +2683,22 @@ static int streamLevelInput(const LevelStreamInput *input, LevelStreamCallback c
         size_t produced = sizeof(buffer) - stream.avail_out;
         if (produced) {
             result = callback(buffer, produced, context);
-            if (result != LOAD_NO_ERROR) break;
+            if (result != static_cast<int>(LevelLoadError::LoadNoError)) break;
         }
 
         if (ret == Z_STREAM_END) {
             // Success! yay
             complete = true;
-            result = LOAD_NO_ERROR;
+            result = static_cast<int>(LevelLoadError::LoadNoError);
         } else if (ret != Z_OK && ret != Z_BUF_ERROR) {
             // Fail :(
-            result = LOAD_INVALID_COMPRESSED_DATA;
+            result = static_cast<int>(LevelLoadError::LoadInvalidCompressedData);
             break;
         } else if (beforeIn == stream.avail_in && produced == 0 && 
                 (stream.avail_in > 0 ||
                 (stream.avail_in == 0 && inputOffset == input->compressedLen))) {
             // Avoid decompression loop
-            result = LOAD_INVALID_COMPRESSED_DATA;
+            result = static_cast<int>(LevelLoadError::LoadInvalidCompressedData);
             break;
         }
     }
@@ -2730,7 +2730,7 @@ static int finishLevelScanSection(LevelStreamScan *scan, bool terminated) {
             size_t metadataLen = scan->sectionLen + (terminated ? 1 : 0);
 
             scan->metadata = (char *)malloc(metadataLen + 1);
-            if (!scan->metadata) return LOAD_OUT_OF_MEMORY;
+            if (!scan->metadata) return static_cast<int>(LevelLoadError::LoadOutOfMemory);
 
             memcpy(scan->metadata, scan->section, scan->sectionLen);
 
@@ -2743,7 +2743,7 @@ static int finishLevelScanSection(LevelStreamScan *scan, bool terminated) {
         scan->sectionCount++;
     }
     scan->sectionLen = 0;
-    return LOAD_NO_ERROR;
+    return static_cast<int>(LevelLoadError::LoadNoError);
 }
 
 static int scanLevelChunk(const unsigned char *data, size_t len, void *context) {
@@ -2756,10 +2756,10 @@ static int scanLevelChunk(const unsigned char *data, size_t len, void *context) 
         if (ch == ';') {
             // Section end
             int result = finishLevelScanSection(scan, true);
-            if (result != LOAD_NO_ERROR) return result;
+            if (result != static_cast<int>(LevelLoadError::LoadNoError)) return result;
         } else {
             if (!reserveCharBuffer(&scan->section, &scan->sectionCapacity, scan->sectionLen + 1)) 
-                return LOAD_OUT_OF_MEMORY;
+                return static_cast<int>(LevelLoadError::LoadOutOfMemory);
 
             scan->section[scan->sectionLen++] = ch;
         }
@@ -2776,7 +2776,7 @@ static int scanLevelChunk(const unsigned char *data, size_t len, void *context) 
         }
     }
 
-    return LOAD_NO_ERROR;
+    return static_cast<int>(LevelLoadError::LoadNoError);
 }
 
 static void freeLevelStreamScan(LevelStreamScan *scan) {
@@ -2786,7 +2786,7 @@ static void freeLevelStreamScan(LevelStreamScan *scan) {
 
 static int parseStreamSection(LevelStreamParser *parser) {
     // Check for nothing
-    if (!parser->sectionLen) return LOAD_NO_ERROR;
+    if (!parser->sectionLen) return static_cast<int>(LevelLoadError::LoadNoError);
 
     parser->section[parser->sectionLen] = '\0';
 
@@ -2794,12 +2794,12 @@ static int parseStreamSection(LevelStreamParser *parser) {
         int parsed = parseGdObject(parser->section, parser->section + parser->sectionLen, parser->objectIndex, parser->parseCapacity);
         if (parsed == -2) {
             outputLog("Object capacity exceeded\n");
-            return LOAD_OUT_OF_MEMORY;
+            return static_cast<int>(LevelLoadError::LoadOutOfMemory);
         }
         
         if (parsed == 0) {
             outputLog("Failed to parse object %d\n", parser->objectIndex);
-            return LOAD_COULDNT_PARSE_OBJECTS;
+            return static_cast<int>(LevelLoadError::LoadCouldntParseObjects);
         }
 
         if (parsed > 0) {
@@ -2810,7 +2810,7 @@ static int parseStreamSection(LevelStreamParser *parser) {
 
     parser->sectionCount++;
     parser->sectionLen = 0;
-    return LOAD_NO_ERROR;
+    return static_cast<int>(LevelLoadError::LoadNoError);
 }
 
 static int parseLevelChunk(const unsigned char *data, size_t len, void *context) {
@@ -2820,11 +2820,11 @@ static int parseLevelChunk(const unsigned char *data, size_t len, void *context)
         if (data[i] == ';') {
             // Section end
             int result = parseStreamSection(parser);
-            if (result != LOAD_NO_ERROR) return result;
+            if (result != static_cast<int>(LevelLoadError::LoadNoError)) return result;
         } else {
             // Reserve enough capacity
             if (!reserveCharBuffer(&parser->section, &parser->sectionCapacity, parser->sectionLen + 2)) {
-                return LOAD_OUT_OF_MEMORY;
+                return static_cast<int>(LevelLoadError::LoadOutOfMemory);
             }
 
             // Append
@@ -2832,13 +2832,13 @@ static int parseLevelChunk(const unsigned char *data, size_t len, void *context)
         }
     }
 
-    return LOAD_NO_ERROR;
+    return static_cast<int>(LevelLoadError::LoadNoError);
 }
 
 static int parseLevelStream(const LevelStreamInput *input, const LevelStreamScan *scan, int *outObjectCount) {
     if (scan->sectionCount < 1) {
         outputLog("Level string missing sections!\n");
-        return LOAD_LEVEL_STRING_MISSING_SECTIONS;
+        return static_cast<int>(LevelLoadError::LoadLevelStringMissingSections);
     }
 
     int objectCount = scan->sectionCount - 1;
@@ -2848,7 +2848,7 @@ static int parseLevelStream(const LevelStreamInput *input, const LevelStreamScan
     if (allocCount < 0 || !initArrays((size_t)allocCount)) {
         freeArrays();
         outputLog("Failed to allocate object array\n");
-        return LOAD_OUT_OF_MEMORY;
+        return static_cast<int>(LevelLoadError::LoadOutOfMemory);
     }
 
     objects.count = allocCount;
@@ -2861,11 +2861,11 @@ static int parseLevelStream(const LevelStreamInput *input, const LevelStreamScan
     int result = streamLevelInput(input, parseLevelChunk, &parser);
 
     // Parse last section, because we check for ; to mark the end of a section
-    if (result == LOAD_NO_ERROR) result = parseStreamSection(&parser);
+    if (result == static_cast<int>(LevelLoadError::LoadNoError)) result = parseStreamSection(&parser);
 
     free(parser.section);
 
-    if (result != LOAD_NO_ERROR) {
+    if (result != static_cast<int>(LevelLoadError::LoadNoError)) {
         freeArrays();
         return result;
     }
@@ -2895,7 +2895,7 @@ static int parseLevelStream(const LevelStreamInput *input, const LevelStreamScan
     for (int i = 1; i < MAX_GROUPS; i++) {
         sortGroup(i);
     }
-    return LOAD_NO_ERROR;
+    return static_cast<int>(LevelLoadError::LoadNoError);
 }
 
 static void generateOrangePortals(int orangeStart);
@@ -2909,7 +2909,7 @@ static int loadLevelStream(const LevelStreamInput *input, char *gmdData, bool on
 
     // Scan the level, we need to know how many objects to parse
     int result = streamLevelInput(input, scanLevelChunk, &scan);
-    if (result == LOAD_NO_ERROR) {
+    if (result == static_cast<int>(LevelLoadError::LoadNoError)) {
         result = finishLevelScanSection(&scan, false);
     } else {
         freeLevelStreamScan(&scan);
@@ -2923,12 +2923,12 @@ static int loadLevelStream(const LevelStreamInput *input, char *gmdData, bool on
     if (scan.sectionCount < 1) {
         freeLevelStreamScan(&scan);
         outputLog("Level string missing sections!\n");
-        return LOAD_LEVEL_STRING_MISSING_SECTIONS;
+        return static_cast<int>(LevelLoadError::LoadLevelStringMissingSections);
     }
 
     char *metaStr = getMetadataValue(scan.metadata, "kS38");
 
-    int outCode = LOAD_NO_ERROR;
+    int outCode = static_cast<int>(LevelLoadError::LoadNoError);
     if (metaStr) {
         channelCount = parseColorChannels(metaStr, &colorChannels, &outCode);
     } else {
@@ -2953,13 +2953,13 @@ static int loadLevelStream(const LevelStreamInput *input, char *gmdData, bool on
     free(metaStr);
     freeLevelStreamScan(&scan);
 
-    if (result != LOAD_NO_ERROR) return result;
+    if (result != static_cast<int>(LevelLoadError::LoadNoError)) return result;
 
     generateOrangePortals(orangeStart);
 
     if (!buildGroupCombinations()) {
         outputLog("Failed to build group combinations\n");
-        return LOAD_OUT_OF_MEMORY;
+        return static_cast<int>(LevelLoadError::LoadOutOfMemory);
     }
 
     initColChannels();
@@ -2974,7 +2974,7 @@ static int loadLevelStream(const LevelStreamInput *input, char *gmdData, bool on
     C2D_SpriteFromSheet(&spriteTemplates[17].childTemplates[0], spriteSheet, currentPulserodBallImage);
     C2D_SpriteSetCenter(&spriteTemplates[17].childTemplates[0], 0.5f, 0.5f);
 
-    return LOAD_NO_ERROR;
+    return static_cast<int>(LevelLoadError::LoadNoError);
 }
 
 void setColorChannels() {
@@ -2982,15 +2982,15 @@ void setColorChannels() {
         GDColorChannel colorChannel = colorChannels[i];
         int id = colorChannel.channelID;
 
-        if (id == CHANNEL_BLACK) continue;
+        if (id == static_cast<int>(ColorChannelIDs::ChannelBlack)) continue;
 
         switch (id) {
-            case CHANNEL_P1:
-            case CHANNEL_P2:
+            case static_cast<int>(ColorChannelIDs::ChannelP1):
+            case static_cast<int>(ColorChannelIDs::ChannelP2):
                 break;
 
             default:
-                if (id >= 0 && id < COL_CHANNEL_NUM) {
+                if (id >= 0 && id < static_cast<int>(ColorChannelIDs::ColChannelNum)) {
                     int chan = getColChannelIndex(id);
 
                     Color color;
@@ -3019,15 +3019,15 @@ void setColorChannels() {
                         channels[chan].nonPulseColor = channels[chan].color;
                     }
 
-                    if (id == CHANNEL_OBJ) {
-                        channels[getColChannelIndex(CHANNEL_OBJ_BLENDING)].color = color;
-                        channels[getColChannelIndex(CHANNEL_OBJ_BLENDING)].nonPulseColor = color;
+                    if (id == static_cast<int>(ColorChannelIDs::ChannelObj)) {
+                        channels[getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelObjBlending))].color = color;
+                        channels[getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelObjBlending))].nonPulseColor = color;
                     }
                 }
         }
     }
 
-    for (int i = 0; i < COL_CHANNEL_NUM; i++)
+    for (int i = 0; i < static_cast<int>(ColorChannelIDs::ColChannelNum); i++)
         channels[i].nonPulseColor = channels[i].color;
 
     loadUsedChannels();
@@ -3098,10 +3098,10 @@ void loadLevelStringInfo(char *levelString) {
     
     char *gamemodeData = getMetadataValue(levelString, "kA2");
     if (gamemodeData) {
-        levelInfo.initialGamemode = CLAMP(atoi(gamemodeData), 0, GAMEMODE_COUNT - 1);
+        levelInfo.initialGamemode = CLAMP(atoi(gamemodeData), 0, static_cast<int>(IconGamemode::GamemodeCount) - 1);
         free(gamemodeData);
     } else {
-        levelInfo.initialGamemode = GAMEMODE_PLAYER;
+        levelInfo.initialGamemode = static_cast<int>(IconGamemode::GamemodePlayer);
     }
 
     char *miniData = getMetadataValue(levelString, "kA3");
@@ -3114,12 +3114,12 @@ void loadLevelStringInfo(char *levelString) {
 
     char *speedData = getMetadataValue(levelString, "kA4");
     if (speedData) {
-        levelInfo.initialSpeed = CLAMP(atoi(speedData), 0, SPEED_COUNT - 1);
-        if (levelInfo.initialSpeed == 0) levelInfo.initialSpeed = SPEED_NORMAL;
-        else if (levelInfo.initialSpeed == 1) levelInfo.initialSpeed = SPEED_SLOW;
+        levelInfo.initialSpeed = CLAMP(atoi(speedData), 0, static_cast<int>(PlayerSpeeds::SpeedCount) - 1);
+        if (levelInfo.initialSpeed == 0) levelInfo.initialSpeed = static_cast<int>(PlayerSpeeds::SpeedNormal);
+        else if (levelInfo.initialSpeed == 1) levelInfo.initialSpeed = static_cast<int>(PlayerSpeeds::SpeedSlow);
         free(speedData);
     } else {
-        levelInfo.initialSpeed = SPEED_NORMAL;
+        levelInfo.initialSpeed = static_cast<int>(PlayerSpeeds::SpeedNormal);
     }
 
     char *dualData = getMetadataValue(levelString, "kA8");
@@ -3200,7 +3200,7 @@ static void generateOrangePortals(int orangeStart) {
         objects.flippedH[oi]     = false;
         objects.flippedV[oi]     = false;
         objects.opacity[oi]      = 1.0f;
-        objects.flags[oi]        &= ~FLAG_TOGGLED;
+        objects.flags[oi]        &= ~static_cast<int>(ObjectFlags::FlagToggled);
         objects.activated[oi]    = 0;
         objects.collided[oi]     = 0;
         objects.childObject[oi] = -1;
@@ -3262,13 +3262,13 @@ int loadOnlineLevel(char *levelString) {
             levelArena.prevOffset = 0;
         } else {
             decoded = (unsigned char *)arenaAlloc(&levelArena, strlen(levelString));
-            if (!decoded) return LOAD_OUT_OF_MEMORY;
+            if (!decoded) return static_cast<int>(LevelLoadError::LoadOutOfMemory);
             decodedLen = base64Decode(levelString, decoded);
         }
 
         if (decodedLen <= 0) {
             outputLog("Failed to decode base64\n");
-            return LOAD_INVALID_BASE64;
+            return static_cast<int>(LevelLoadError::LoadInvalidBase64);
         }
         input.compressedData = decoded;
         input.compressedLen = (size_t)decodedLen;
@@ -3331,7 +3331,7 @@ static char *buildGMDInfo(char *level, char *valueStart, char *valueEnd, size_t 
 }
 
 int loadLevel(const char *path) {
-    int outCode = LOAD_NO_ERROR;
+    int outCode = static_cast<int>(LevelLoadError::LoadNoError);
 
     arenaReset(&levelArena);
 
@@ -3344,7 +3344,7 @@ int loadLevel(const char *path) {
     if (!inArena) {
         level = convertIfGdlvl(level, path);
         if (!level) {
-            return LOAD_OUT_OF_MEMORY;
+            return static_cast<int>(LevelLoadError::LoadOutOfMemory);
         }
     }
 
@@ -3360,14 +3360,14 @@ int loadLevel(const char *path) {
             // Not even compressed
             if (inArena) {
                 info = buildGMDInfo(level, b64, k4End, out);
-                if (!info) return LOAD_OUT_OF_MEMORY;
+                if (!info) return static_cast<int>(LevelLoadError::LoadOutOfMemory);
                 input.rawData = b64;
             } else {
                 uncompressed = strdup(b64);
                 if (k4End) *k4End = '<';
                 if (!uncompressed) {
                     free(level);
-                    return LOAD_OUT_OF_MEMORY;
+                    return static_cast<int>(LevelLoadError::LoadOutOfMemory);
                 }
                 input.rawData = uncompressed;
             }
@@ -3376,13 +3376,13 @@ int loadLevel(const char *path) {
 
             if (inArena) {
                 info = buildGMDInfo(level, b64, k4End, out);
-                if (!info) return LOAD_OUT_OF_MEMORY;
+                if (!info) return static_cast<int>(LevelLoadError::LoadOutOfMemory);
                 decoded = (unsigned char *) b64;
             } else {
                 decoded = (unsigned char *)arenaAlloc(&levelArena, strlen(b64));
                 if (!decoded) {
                     free(level);
-                    return LOAD_OUT_OF_MEMORY;
+                    return static_cast<int>(LevelLoadError::LoadOutOfMemory);
                 }
             }
 
@@ -3391,7 +3391,7 @@ int loadLevel(const char *path) {
                 outputLog("Failed to decode base64\n");
                 if (inArena) free(info);
                 else free(level);
-                return LOAD_INVALID_BASE64;
+                return static_cast<int>(LevelLoadError::LoadInvalidBase64);
             }
 
             if (inArena) {
@@ -3464,7 +3464,7 @@ int loadLevel(const char *path) {
     
     if (!buildGroupCombinations()) {
         outputLog("Failed to build group combinations\n");
-        return LOAD_OUT_OF_MEMORY;
+        return static_cast<int>(LevelLoadError::LoadOutOfMemory);
     }
 
     initColChannels();
@@ -3482,7 +3482,7 @@ int loadLevel(const char *path) {
     C2D_SpriteFromSheet(&spriteTemplates[17].childTemplates[0], spriteSheet, currentPulserodBallImage);
     C2D_SpriteSetCenter(&spriteTemplates[17].childTemplates[0], 0.5f, 0.5f);
 
-    return LOAD_NO_ERROR;
+    return static_cast<int>(LevelLoadError::LoadNoError);
 }
 
 void reloadLevel() {
@@ -3498,8 +3498,8 @@ void reloadLevel() {
         objects.activated[i] = false;
         objects.collided[i] = false;
         objects.hitboxCounter[i] = 0;
-        objects.transitionApplied[i] = FADE_NONE;
-        objects.flags[i] &= ~FLAG_TOGGLED;
+        objects.transitionApplied[i] = static_cast<int>(FadingEffects::FadeNone);
+        objects.flags[i] &= ~static_cast<int>(ObjectFlags::FlagToggled);
         objects.opacity[i] = 1.f;
         objects.x[i] = objects.originalX[i];
         objects.y[i] = objects.originalY[i];

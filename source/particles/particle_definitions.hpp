@@ -7,13 +7,13 @@
 namespace gd3ds
 {
 
-typedef enum {
-    TEXTURE_SQUARE_PNG,
-    TEXTURE_CIRCLE_PNG,
-} TextureFileName;
+enum class TextureFileName {
+    TextureSquarePng,
+    TextureCirclePng,
+};
 
 // Billion properties
-typedef struct {
+struct ParticleDefinition {
     float angle;
     float angleVariance;
     int blendFuncDestination;
@@ -65,12 +65,12 @@ typedef struct {
     float tangentialAccelVariance;
     float tangentialAcceleration;
     TextureFileName textureFileName;
-} ParticleDefinition;
+};
 
-typedef struct {
+struct ParticleDefenitionName {
     const char *name;
     const ParticleDefinition *def;
-} ParticleDefenitionName;
+};
 
 extern const ParticleDefenitionName particleDefNames[];
 

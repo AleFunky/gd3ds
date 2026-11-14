@@ -221,7 +221,7 @@ void cfgSave() {
     configSetInt(&cfg, CONFIG_FILTERS_PATH "normalId", filters.mainSong);
     configSetString(&cfg, CONFIG_FILTERS_PATH "songId", filters.customSongQuery);
 
-    beginSaving(SAVE_CONFIG);
+    beginSaving(SaveType::SaveConfig);
 }
 
 void cfgFini() {

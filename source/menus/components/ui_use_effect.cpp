@@ -90,7 +90,7 @@ UIUseEffect *uiCreateUseEffect(UIScreen *screen) {
     
     uiElementApplyDefaultProperties(&e->base, screen);
 
-    e->base.type = UI_USE_EFFECT;
+    e->base.type = UIElementType::UiUseEffect;
     e->base.enabled = true;
 
     e->base.update = uiUseEffectUpdate;

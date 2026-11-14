@@ -11,34 +11,34 @@
 namespace gd3ds
 {
 
-typedef enum {
-   COLLISION_NONE = 0,
-   COLLISION_BOX,
-   COLLISION_CIRCLE,
-   COLLISION_SLOPE
-} CollisionShape;
+enum class CollisionShape {
+   CollisionNone = 0,
+   CollisionBox,
+   CollisionCircle,
+   CollisionSlope
+};
 
-typedef enum {
-   COLOR_TYPE_BASE = 0,
-   COLOR_TYPE_DETAIL,
-   COLOR_TYPE_BLACK,
-   COLOR_TYPE_WHITE,
-   COLOR_TYPE_GLOW,
-   COLOR_TYPE_ONLY_DETAIL,} ColorType;
+enum class ColorType {
+   ColorTypeBase = 0,
+   ColorTypeDetail,
+   ColorTypeBlack,
+   ColorTypeWhite,
+   ColorTypeGlow,
+   ColorTypeOnlyDetail,};
 
-typedef enum {
-   HITBOX_SPECIAL = 0,
-   HITBOX_SOLID,
-   HITBOX_HAZARD
-} HitboxType;
+enum class HitboxType {
+   HitboxSpecial = 0,
+   HitboxSolid,
+   HitboxHazard
+};
 
-typedef enum {
-   ANIMATION_NONE = 0,
-   ANIMATION_MOVEMENT,
-   ANIMATION_FRAME_SWAP
-} AnimationType;
+enum class AnimationType {
+   AnimationNone = 0,
+   AnimationMovement,
+   AnimationFrameSwap
+};
 
-typedef struct {
+struct ChildSprite {
     int texture;
     float x, y;
     float scaleX, scaleY;
@@ -48,33 +48,33 @@ typedef struct {
     float rot;
     int colorType;
     float opacity;
-} ChildSprite;
+};
 
-typedef struct {
+struct ChildGroup {
     size_t start;
     size_t count;
-} ChildGroup;
+};
 
-typedef struct {
+struct SwapFrame {
     int texture;
     int flipX, flipY;
-} SwapFrame;
+};
 
-typedef struct {
+struct SlotFrames {
     int slot;
     float fps;
     size_t start;
     size_t count;
-} SlotFrames;
+};
 
-typedef struct {
+struct ObjectHitbox {
    int collisionType;
    float x, y;
    float width, height;
    int type;
-} ObjectHitbox;
+};
 
-typedef struct {
+struct GameObject {
     int texture;
     int glowFrame;
     float x, y;
@@ -95,7 +95,7 @@ typedef struct {
     size_t slotCount;
     const SlotFrames* slotFrames;
     const ObjectHitbox* hitbox;
-} GameObject;
+};
 
 #define TEXTURE_COUNT 2472
 #define GAME_OBJECT_COUNT 1912
