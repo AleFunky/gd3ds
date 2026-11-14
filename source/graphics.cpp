@@ -49,7 +49,6 @@ extern const Color white = { 255, 255, 255 };
 
 #define COLLECTABLE_FLOAT_AMP 1.5f
 #define COLLECTABLE_FLOAT_PERIOD 0.8f
-#define GAMEPLAY_SCREEN_WIDTH_AREA SCREEN_WIDTH_AREA_GAMEPLAY(settingsState.swapGameplayScreens && !inLevelComplete)
 #define COLLECTABLE_FLOAT_BASE 0.0f
 
 static inline float collectableFloatOffset(void) {
@@ -1046,6 +1045,8 @@ void spawnObjectAt(
 }
 
 constexpr int kPlaceholderPlayer = -1;
+constexpr int kPlaceholderShineBack = -2;
+constexpr int kPlaceholderShineFront = -3;
 
 static inline uint32_t makeSortKey(SpriteObject *s)
 {
@@ -1054,6 +1055,10 @@ static inline uint32_t makeSortKey(SpriteObject *s)
     // Handle placeholders
     if (obj == kPlaceholderPlayer) {
         return ((4 + 8) << 18) | (2 << 16) | (255 << 8) | 128;
+    } else if (obj == kPlaceholderShineBack) {
+        return ((4 + 8) << 18) | (2 << 16) | (255 << 8) | 128;
+    } else if (obj == kPlaceholderShineFront) {
+        return ((5 + 8) << 18) | (2 << 16) | (255 << 8) | 128;
     }
 
     const int id = objects.id[obj];
@@ -1700,7 +1705,7 @@ void updateTints() {
     u64 start = svcGetSystemTick();
     for (size_t s = 0; s < spriteCount; s++) {
         SpriteObject *obj = viewableObjectsPtr[s];
-        if (obj->obj != -1) {
+        if (obj->obj >= 0) {
             int colChannel = obj->colChannel;
 
             ColorChannel col;
@@ -1854,12 +1859,41 @@ void insertPlayer(){
     spriteCount++;
 }
 
+void insertShines(){
+    SpriteObject *back = &viewableObjects[spriteCount];
+
+    C2D_Sprite backspr = { 0 };
+    back->spr = backspr;
+    back->obj = kPlaceholderShineBack;
+    back->layer = 0;
+    back->colType = 0;
+    back->opacity = 1.f;
+    back->colChannel = 0;
+    viewableObjectsPtr[spriteCount] = back;
+    spriteCount++;
+
+    SpriteObject *front = &viewableObjects[spriteCount];
+
+    C2D_Sprite frontspr = { 0 };
+    front->spr = frontspr;
+    front->obj = kPlaceholderShineFront;
+    front->layer = 1;
+    front->colType = 0;
+    front->opacity = 1.f;
+    front->colChannel = 0;
+    viewableObjectsPtr[spriteCount] = front;
+    spriteCount++;
+}
+
+
 void createObjects() {
     u64 start = svcGetSystemTick();
 
     spriteCount = 0;
 
+    //adds placeholder values which, upon being reached by the renderer, will render the player or shine fx instead
     insertPlayer();
+    insertShines();
 
     loadCurrentObject();
 
@@ -2340,10 +2374,8 @@ void drawObjects() {
     u64 start = svcGetSystemTick();
 
     // Draw
-    int lastZLayer = 0;
     for (size_t s = 0; s < spriteCount; s++) {
         SpriteObject *obj = viewableObjectsPtr[s];
-
         if (obj->hidden) continue;
 
         if (obj->obj >= 0) {
@@ -2360,9 +2392,19 @@ void drawObjects() {
             } else {
                 c2dDrawImageFast(&obj->spr.image, &obj->params, &obj->spr.params, obj->tint);
             }
-
-            lastZLayer = obj->zlayer;
-        } else if(obj->obj == -1) drawPlayerGraphics();
+        } else {
+            switch(obj->obj){
+                case kPlaceholderPlayer:
+                    drawPlayerGraphics();
+                    break;
+                case kPlaceholderShineBack:
+                    drawShines(false);
+                    break;
+                case kPlaceholderShineFront:
+                    drawShines(true);
+                    break;
+            }
+        }
     }
 
     changeBlending(true);

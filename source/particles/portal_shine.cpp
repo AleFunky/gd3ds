@@ -1,8 +1,10 @@
 #include "portal_shine.hpp"
+#include "menus/settings_hub/settings.hpp"
 #include "graphics.hpp"
 #include "main.hpp"
 #include "state.hpp"
 #include "utils/gfx.hpp"
+#include "math_helpers.hpp"
 #include "level_loading.hpp"
 #include <deque>
 
@@ -45,6 +47,7 @@ void PortalShine::updateShine(){
     m_time += delta;
 }
 
+//This is offset locally in the X direction for some reason please help
 void PortalShine::drawShine(bool front){
     if(front && !hasFront(m_type)) return;
 
@@ -61,22 +64,57 @@ void PortalShine::drawShine(bool front){
     C2D_ImageTint tint;
     C2D_PlainImageTint(&tint, color, 1.0f);
 
-    float scaleX = objects.scaleX[m_obj];
-    if(objects.flippedH[m_obj]) scaleX *= -1.0f;
-    if(state.mirrorMult < 0) scaleX *= -1.0f;
+    float calcX = objects.x[m_obj] - state.cameraX;
+    float calcY = SCREEN_HEIGHT - (objects.y[m_obj] - state.cameraY);
+    float fadeVal = objEdgeFade(calcX, GAMEPLAY_SCREEN_WIDTH_AREA);
+    
+    float fadeX = 0;
+    float fadeY = 0;
+    float fadeScale = 1.f;
+    getFadeVars(m_obj, calcX, &fadeX, &fadeY, &fadeScale);
 
-    float scaleY = objects.scaleY[m_obj];
-    if(objects.flippedV[m_obj]) scaleY *= -1.0f;
+    // Handle special fade types
+    fadeX += getSpecialFadingVars(m_obj, fadeVal);
 
+    float x = getMirrorX(calcX + fadeX, state.mirrorFactor);
+    float y = calcY + fadeY;
+    float deg = objects.visualRotation[m_obj];
+    bool flipX = objects.flippedH[m_obj] ^ (state.mirrorMult < 0);
+    bool flipY = objects.flippedV[m_obj];
+    float scale = fadeScale;
+
+    const GameObject* obj = (const GameObject*)&gameObjects[objects.id[m_obj]];
+
+    float rad = C3D_AngleFromDegrees(adjustAngle(deg, 0, state.mirrorMult < 0));
+    float cosR = lutCos(rad);
+    float sinR = lutSin(rad);
+
+    int flipXMult = (flipX ? -1 : 1);
+    int flipYMult = (flipY ? -1 : 1);
+
+    float m00 = cosR;
+    float m01 = sinR;
+    float m10 = sinR;
+    float m11 = -cosR;
+
+    float objScaleX = objects.scaleX[m_obj];
+    float objScaleY = objects.scaleY[m_obj];
+
+    float sx = scale * flipXMult * objScaleX;
+    float sy = scale * flipYMult * objScaleY;
+
+    float localX = obj->x * flipXMult;
+    float localY = obj->y * flipYMult;
+
+    float rotX = localX * m00 + localY * m01;
+    float rotY = localX * m10 + localY * m11;
+
+    float pX = x + rotX * scale * objScaleX;
+    float pY = y + rotY * scale * objScaleY;
+    
     C2D_DrawImageAtRotated(
         C2D_SpriteSheetGetImage(miscFXSheet, getShineSheetIndex(m_type, front)), 
-        getMirrorX(objects.x[m_obj] - state.cameraX, state.mirrorFactor) * 0.0f + SCREEN_WIDTH / 2.0f, 
-        (SCREEN_HEIGHT - (objects.y[m_obj] - state.cameraY)) * 0.0f + SCREEN_HEIGHT / 2.0f, 
-        0.0f, 
-        objects.rotation[m_obj],
-        &tint, 
-        scaleX, 
-        scaleY
+        pX, pY, 0.0f, rad,&tint, sx, sy
     );
 }
 

@@ -58,7 +58,8 @@ void GravitySweep::renderSweep(){
 
         C2D_DrawImageAt(
             C2D_SpriteSheetGetImage(miscFXSheet, 0), 
-            l.x, l.y + yOffset, 0.0f, &tint, l.scaleX, l.scaleY);
+            l.x, l.y + yOffset, 0.0f, &tint, l.scaleX, l.scaleY
+        );
     }
 };
 
