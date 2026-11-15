@@ -38,26 +38,23 @@ static void uiPaletteIconsDraw(UIElement* e, UITransform *transform) {
 }
 
 static void uiPaletteIcons(UIElement *e) {
-    if (e) {
-        delete (UIPaletteIcons *)e;
-        e = NULL;
-    }
+    (void)e;
 }
 
 UIPaletteIcons *uiCreatePaletteIcons(UIScreen *screen) {
-    UIPaletteIcons *e = new UIPaletteIcons{};
+    auto e = std::make_unique<UIPaletteIcons>();
 
-    if (!e) return NULL;
+    UIPaletteIcons *result = e.get();
 
-    e->base.type = UIElementType::UiPaletteIcons;
-    e->base.enabled = true;
+    result->base.type = UIElementType::UiPaletteIcons;
+    result->base.enabled = true;
 
-    e->base.draw = uiPaletteIconsDraw;
-    e->base.destroy = uiPaletteIcons;
+    result->base.draw = uiPaletteIconsDraw;
+    result->base.destroy = uiPaletteIcons;
     
-    uiElementApplyDefaultProperties(&e->base, screen);
+    uiElementApplyDefaultProperties(&result->base, screen);
 
-    return e;
+    return e.release();
 }
 
 UIElement *uiCreatePaletteIconsFromProps(UIScreen *screen, const UIPropertyList *props) {

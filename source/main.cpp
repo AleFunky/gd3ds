@@ -86,7 +86,7 @@ u32 ctruLinearHeapSize __asm__("__ctru_linear_heap_size") = 34 << 20;
 
 bool inExclusiveState = false;
 
-int gameState = static_cast<int>(GameState::StateMenu);
+int gameState = static_cast<int>(GameState::Menu);
 bool escapeState;
 
 bool exitingLevel;
@@ -154,9 +154,9 @@ bool isNightly;
 
 bool queuedRestart;
 
-bool threeDWarningPassed;
+bool has3DWarningPassed;
 
-char *threeDsxPath;
+char *_3dsxPath;
 
 UIStack menuStack = {};
 UIStack gameplayStack = {};
@@ -816,7 +816,7 @@ void uiLoop(){
 
         // 3d first time use warning pop up stuff
 
-        if (stereoSupported() && settingsState.stereoEnabled && uiStackGetFadeStatus() == FadeStatus::FadeStatusNone && !threeDWarningPassed && getStereoSlider() > 0.f && strcmp("settings", uiStackGetCurrentScreenName()) != 0)
+        if (stereoSupported() && settingsState.stereoEnabled && uiStackGetFadeStatus() == FadeStatus::FadeStatusNone && !has3DWarningPassed && getStereoSlider() > 0.f && strcmp("settings", uiStackGetCurrentScreenName()) != 0)
         {
             TwoOptionPopupData *threeDWarningData = (TwoOptionPopupData *)malloc(sizeof(TwoOptionPopupData));
             if (!threeDWarningData)
@@ -828,7 +828,7 @@ void uiLoop(){
             threeDWarningData->cancelText = strdup("Cancel");
             uiStackPush(&threeDWarningPopUpDef, UIAnimation::AnimZoom, UIAnimation::AnimZoom, UIStackPushType::PushNext);
             uiStackPushData(threeDWarningData);
-            threeDWarningPassed = true;
+            has3DWarningPassed = true;
         }
 
         // Frees a render target, so keep it out of the frame below
@@ -964,7 +964,7 @@ void gameLoop() {
         if (returned) {
             outputLog("Failed %d\n", returned);
 
-            uiStackPushGameState(static_cast<int>(GameState::StateMenu));
+            uiStackPushGameState(static_cast<int>(GameState::Menu));
             uiStackUpdate(&touch);
             state.onlineLevel = false;
             exitingLevel = true;
@@ -984,7 +984,7 @@ void gameLoop() {
         if (returned) {
             outputLog("Failed %d\n", returned);
             
-            uiStackPushGameState(static_cast<int>(GameState::StateMenu));
+            uiStackPushGameState(static_cast<int>(GameState::Menu));
             uiStackUpdate(&touch);
             exitingLevel = true;
             unloadLevel();
@@ -1496,7 +1496,7 @@ void gameLoop() {
 
         uiStackUpdate(&touch);
 
-        if (stereoSupported() && settingsState.stereoEnabled && !threeDWarningPassed && getStereoSlider() > 0.f && strcmp("3d_warning_pop_up", uiStackGetCurrentScreenName()) != 0 && uiStackGetFadeStatus() == FadeStatus::FadeStatusNone) {
+        if (stereoSupported() && settingsState.stereoEnabled && !has3DWarningPassed && getStereoSlider() > 0.f && strcmp("3d_warning_pop_up", uiStackGetCurrentScreenName()) != 0 && uiStackGetFadeStatus() == FadeStatus::FadeStatusNone) {
             if (!gamePaused) pauseGame();
             if (!gamePaused) return; 
             TwoOptionPopupData *threeDWarningData = (TwoOptionPopupData *)malloc(sizeof(TwoOptionPopupData));
@@ -1508,7 +1508,7 @@ void gameLoop() {
             threeDWarningData->cancelText = strdup("Disable");
             uiStackPush(&threeDWarningPopUpDef, UIAnimation::AnimZoom, UIAnimation::AnimZoom, UIStackPushType::PushNext);
             uiStackPushData(threeDWarningData);
-            threeDWarningPassed = true;
+            has3DWarningPassed = true;
         }
 
         // If the wide or 3D settings have been changed, reinitialize screens
@@ -1530,7 +1530,7 @@ void gameLoop() {
             // Exiting
             if (status == 1) {
                 exitingLevel = true;
-                uiStackPushGameState(static_cast<int>(GameState::StateMenu));
+                uiStackPushGameState(static_cast<int>(GameState::Menu));
                 // Restarting level
             } else if (status == 2) {
                 levelInfo.completing = false;
@@ -1865,7 +1865,7 @@ int main(int argc, char* argv[]) {
     checkRomType();
     // output_log("argc: %d\n", argc);
     if (argc > 0) { 
-        threeDsxPath = argv[0];
+        _3dsxPath = argv[0];
         // output_log("3dsx path: %s\n", _3dsx_path);
     }
     
@@ -1981,13 +1981,13 @@ int main(int argc, char* argv[]) {
         fastestSpeedParticlesBottom.cfg.startColorBlue = 65 / 255.f;
 
         switch (gameState) {
-            case static_cast<int>(GameState::StateMenu):
+            case static_cast<int>(GameState::Menu):
                 uiLoop();
                 break;
-            case static_cast<int>(GameState::StateGame):
+            case static_cast<int>(GameState::Game):
                 gameLoop();
                 break;
-            case static_cast<int>(GameState::StateExit):
+            case static_cast<int>(GameState::Exit):
                 exit = true;
                 break;
         }

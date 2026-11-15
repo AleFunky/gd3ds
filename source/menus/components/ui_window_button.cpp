@@ -34,10 +34,7 @@ static void uiWindowButtonDraw(UIElement* e, UITransform *transform) {
 }
 
 static void uiWindowButtonDestroy(UIElement *e) {
-    if (e) {
-        delete (UIWindowButton *)e;
-        e = NULL;
-    }
+    (void)e;
 }
 
 static void uiWindowButtonOnDisable(UIElement *e) {
@@ -56,10 +53,10 @@ void uiWindowButtonSetStyle(UIWindowButton *e, int style) {
 }
 
 UIWindowButton *uiCreateWindowButton(UIScreen *screen) {
-    UIWindowButton *e = new UIWindowButton{};
+    auto e = std::make_unique<UIWindowButton>();
 
-    if (!e) return NULL;
-    UIButton *button = (UIButton *) e;
+    UIWindowButton *result = e.get();
+    UIButton *button = (UIButton *) result;
 
     button->base.type = UIElementType::UiWindowButton;
     button->base.enabled = true;
@@ -76,11 +73,11 @@ UIWindowButton *uiCreateWindowButton(UIScreen *screen) {
     button->hoverProgress = 1;
     button->hoverFactor = 1;
 
-    uiWindowButtonSetTint(e, C2D_Color32(255, 255, 255, 255));
+    uiWindowButtonSetTint(result, C2D_Color32(255, 255, 255, 255));
 
     pressedKey = false;
 
-    return e;
+    return e.release();
 }
 
 UIElement *uiCreateWindowButtonFromProps(UIScreen *screen, const UIPropertyList *props) {

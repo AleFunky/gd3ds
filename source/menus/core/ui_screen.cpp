@@ -307,7 +307,7 @@ void uiScreenUpdate(UIScreen* s, UIInput* touch) {
     };
 
     for (int i = (int)s->count - 1; i >= 0; i--) {
-        UIElement *e = s->elements[i];
+        UIElement *e = s->elements[i].get();
         uiUpdateTree(e, touch, &identity);
     }
 }
@@ -393,7 +393,7 @@ void uiScreenDraw(UIScreen* s) {
     uiScreenHandleAnim(s, &root);
 
     for (size_t i = 0; i < s->count; i++) {
-        UIElement *e = s->elements[i];
+        UIElement *e = s->elements[i].get();
 
         uiDrawTree(e, &root);
     }
@@ -513,7 +513,7 @@ static bool hasTag(UIElement *element, void *userdata) {
 // Get element by its tag, returns NULL if there is no elements with that tag
 UIElement *uiGetElementByTag(UIScreen *screen, const char *tag) {
     for (size_t i = 0; i < screen->count; i++) {
-        UIElement *found = uiFindElement(screen->elements[i], hasTag, (void *)tag);
+        UIElement *found = uiFindElement(screen->elements[i].get(), hasTag, (void *)tag);
 
         if (found) return found;
     }
@@ -542,7 +542,7 @@ void uiRunFuncOnTag(UIScreen *screen, const char *tag, void (*func)(UIElement *e
     UITagVisitorData data = { .tag = tag, .func = func };
 
     for (size_t i = 0; i < screen->count; i++) {
-        uiVisitTree(screen->elements[i], visitTag, &data);
+        uiVisitTree(screen->elements[i].get(), visitTag, &data);
     }
 }
 
@@ -553,7 +553,7 @@ void uiSetPosOnTag(UIScreen *screen, float x, float y, const char *tag) {
     float movementY = 0;
     for (size_t i = 0; i < screen->count; i++) {
         for (int j = 0; j < TAGS_PER_ELEMENT; j++) {
-            UIElement *e = screen->elements[i];
+            UIElement *e = screen->elements[i].get();
             // Check for element with this tag
             if (strcmp(e->tag[j], tag) == 0) {
                 if (!foundParent) {
@@ -603,17 +603,11 @@ UNUSED static void printProps(UIPropertyList *props) {
 }
 
 void uiScreenAddElement(UIScreen *screen, UIElement *element) {
-    // Expand if out of space
-    if (screen->count == screen->capacity) {
-        screen->capacity *= 2;
+    if (!screen || !element) return;
 
-        screen->elements = (UIElement **)realloc(
-            screen->elements,
-            screen->capacity * sizeof(*screen->elements)
-        );
-    }
-
-    screen->elements[screen->count++] = element;
+    screen->elements.emplace_back(element);
+    screen->count = screen->elements.size();
+    screen->capacity = screen->count;
     element->screen = screen;
 }
 
@@ -659,8 +653,8 @@ void uiLoadScreen(UIScreen* screen) {
     screen->transition.done = false;
 
     screen->count = 0;
-    screen->capacity = 16;
-    screen->elements = (UIElement **)calloc(screen->capacity, sizeof(*screen->elements));
+    screen->capacity = 0;
+    screen->elements.clear();
 
     char line[512];
 
@@ -740,19 +734,20 @@ void uiLoadScreen(UIScreen* screen) {
 }
 
 void uiUnloadScreen(UIScreen *screen) {
-    if (!screen->loaded || !screen->elements) return;
+    if (!screen || !screen->loaded) return;
 
     if(screen->def && screen->def->exit){
         screen->def->exit(screen);
     }
 
     for (size_t i = 0; i < screen->count; i++) {
-        UIElement *e = screen->elements[i];
+        UIElement *e = screen->elements[i].get();
         uiDestroyTree(e);
     }
 
-    free(screen->elements);
-    screen->elements = NULL;
+    screen->elements.clear();
+    screen->count = 0;
+    screen->capacity = 0;
     screen->closing = false;
     screen->loaded = false;
 }
@@ -781,8 +776,8 @@ void uiLoadScreenOld(UIScreen* screen, const UIActionDef* actions, size_t action
     screen->transition.done = false;
 
     screen->count = 0;
-    screen->capacity = 16;
-    screen->elements = (UIElement **)calloc(screen->capacity, sizeof(*screen->elements));
+    screen->capacity = 0;
+    screen->elements.clear();
 
     char line[512];
 

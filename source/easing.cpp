@@ -391,7 +391,7 @@ float backEaseInOut(float time)
 }
 
 // Bounce Ease
-float bounceTime(float time)
+float bounceTimeOld(float time) // TODO: remove when actually doing the tween port
 {
     if (time < 1 / 2.75f)
     {
@@ -413,12 +413,12 @@ float bounceTime(float time)
 }
 float bounceEaseIn(float time)
 {
-    return 1 - bounceTime(1 - time);
+    return 1 - bounceTimeOld(1 - time);
 }
 
 float bounceEaseOut(float time)
 {
-    return bounceTime(time);
+    return bounceTimeOld(time);
 }
 
 float bounceEaseInOut(float time)
@@ -427,11 +427,11 @@ float bounceEaseInOut(float time)
     if (time < 0.5f)
     {
         time = time * 2;
-        newT = (1 - bounceTime(1 - time)) * 0.5f;
+        newT = (1 - bounceTimeOld(1 - time)) * 0.5f;
     }
     else
     {
-        newT = bounceTime(time * 2 - 1) * 0.5f + 0.5f;
+        newT = bounceTimeOld(time * 2 - 1) * 0.5f + 0.5f;
     }
 
     return newT;

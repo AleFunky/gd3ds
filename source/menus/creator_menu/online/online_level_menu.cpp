@@ -249,7 +249,7 @@ static void playLevel() {
         currLevelString = levelEntry->levelString;
     }
 
-    uiStackPushGameState(static_cast<int>(GameState::StateGame));
+    uiStackPushGameState(static_cast<int>(GameState::Game));
 }
 
 void checkWarningsAndPlay(){

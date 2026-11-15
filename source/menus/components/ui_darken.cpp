@@ -82,33 +82,30 @@ static void uiDarkenDraw(UIElement* e, UITransform *transform) {
 }
 
 static void uiDarkenDestroy(UIElement *e) {
-    if (e) {
-        delete (UIDarken *)e;
-        e = NULL;
-    }
+    (void)e;
 }
 
 UIDarken *uiCreateDarken(UIScreen *screen) {
-    UIDarken *e = new UIDarken{};
+    auto e = std::make_unique<UIDarken>();
 
-    if (!e) return NULL;
+    UIDarken *result = e.get();
 
-    e->base.type = UIElementType::UiDarken;
-    e->base.enabled = true;
-    e->base.opacity = 0.0f;
+    result->base.type = UIElementType::UiDarken;
+    result->base.enabled = true;
+    result->base.opacity = 0.0f;
 
-    e->opacity = 0.4f;
+    result->opacity = 0.4f;
     
-    uiElementApplyDefaultProperties(&e->base, screen);
+    uiElementApplyDefaultProperties(&result->base, screen);
     
-    C2D_SpriteFromSheet(&e->image.sprite, uiSheet, 416);
-    C2D_SpriteSetCenter(&e->image.sprite, 0.5f, 0.5f);
+    C2D_SpriteFromSheet(&result->image.sprite, uiSheet, 416);
+    C2D_SpriteSetCenter(&result->image.sprite, 0.5f, 0.5f);
 
-    e->base.update = uiDarkenUpdate;
-    e->base.draw = uiDarkenDraw;
-    e->base.destroy = uiDarkenDestroy;
+    result->base.update = uiDarkenUpdate;
+    result->base.draw = uiDarkenDraw;
+    result->base.destroy = uiDarkenDestroy;
 
-    return e;
+    return e.release();
 }
 
 UIElement *uiCreateDarkenFromProps(UIScreen *screen, const UIPropertyList *props) {

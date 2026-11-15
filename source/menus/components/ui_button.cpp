@@ -30,7 +30,7 @@ void uiButtonUpdate(UIElement* e, UIInput* touch, UITransform *transform) {
     //Keybinds logic
     u32 validKeybinds = button->keyBinds;
 
-    if(settingsState.enableDebugBindings && gameState == static_cast<int>(GameState::StateGame) && !gamePaused && !inLevelComplete){
+    if(settingsState.enableDebugBindings && gameState == static_cast<int>(GameState::Game) && !gamePaused && !inLevelComplete){
         validKeybinds &= ~(KEY_B | KEY_X | KEY_L | KEY_R);
     }
 
@@ -191,10 +191,7 @@ static void uiButtonDraw(UIElement* e, UITransform *transform) {
 }
 
 static void uiButtonDestroy(UIElement *e) {
-    if (e) {
-        delete (UIButton *)e;
-        e = NULL;
-    }
+    (void)e;
 }
 
 static void uiButtonOnDisable(UIElement *e) {
@@ -221,32 +218,32 @@ void uiButtonSetImage(UIButton *e, int spriteIndex, int sheet) {
 }
 
 UIButton *uiCreateButton(UIScreen *screen) {
-    UIButton *e = new UIButton{};
+    auto e = std::make_unique<UIButton>();
 
-    if (!e) return NULL;
+    UIButton *result = e.get();
 
-    e->base.type = UIElementType::UiButton;
-    e->base.enabled = true;
-    e->base.update = uiButtonUpdate;
-    e->base.draw = uiButtonDraw;
-    e->base.destroy = uiButtonDestroy;
+    result->base.type = UIElementType::UiButton;
+    result->base.enabled = true;
+    result->base.update = uiButtonUpdate;
+    result->base.draw = uiButtonDraw;
+    result->base.destroy = uiButtonDestroy;
     
-    e->base.modifyTransform = uiButtonModifyTransform;
+    result->base.modifyTransform = uiButtonModifyTransform;
 
-    e->base.onDisable = uiButtonOnDisable;
+    result->base.onDisable = uiButtonOnDisable;
 
-    e->base.opacity = 1.f;
+    result->base.opacity = 1.f;
 
-    C2D_PlainImageTint(&e->image.tint, C2D_Color32f(1, 1, 1, 1), 1.f);
+    C2D_PlainImageTint(&result->image.tint, C2D_Color32f(1, 1, 1, 1), 1.f);
 
-    uiElementApplyDefaultProperties(&e->base, screen);
+    uiElementApplyDefaultProperties(&result->base, screen);
 
-    e->hoverProgress = 1.f;
-    e->hoverFactor = 1.f;
+    result->hoverProgress = 1.f;
+    result->hoverFactor = 1.f;
 
     pressedKey = false;
 
-    return e;
+    return e.release();
 }
 
 UIElement *uiCreateButtonFromProps(UIScreen *screen, const UIPropertyList *props) {

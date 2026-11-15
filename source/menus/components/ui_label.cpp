@@ -38,10 +38,7 @@ static void uiLabelDraw(UIElement* e, UITransform *transform) {
 }
 
 static void uiLabelDestroy(UIElement* e) {
-    if (e) {
-        delete (UILabel *)e;
-        e = NULL;
-    }
+    (void)e;
 }
 
 void uiLabelSetText(UILabel *e, const char *text) {
@@ -51,21 +48,21 @@ void uiLabelSetText(UILabel *e, const char *text) {
 }
 
 UILabel *uiCreateLabel(UIScreen *screen) {
-    UILabel *e = new UILabel{};
+    auto e = std::make_unique<UILabel>();
 
-    if (!e) return NULL;
+    UILabel *result = e.get();
 
-    e->base.type = UIElementType::UiLabel;
-    e->base.enabled = true;
+    result->base.type = UIElementType::UiLabel;
+    result->base.enabled = true;
     
-    uiElementApplyDefaultProperties(&e->base, screen);
+    uiElementApplyDefaultProperties(&result->base, screen);
 
-    e->parseTags = true;
+    result->parseTags = true;
 
-    e->base.draw = uiLabelDraw;
-    e->base.destroy = uiLabelDestroy;
+    result->base.draw = uiLabelDraw;
+    result->base.destroy = uiLabelDestroy;
 
-    return e;
+    return e.release();
 }
 
 UIElement *uiCreateLabelFromProps(UIScreen *screen, const UIPropertyList *props) {

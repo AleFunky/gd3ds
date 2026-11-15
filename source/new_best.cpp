@@ -24,11 +24,11 @@ namespace gd3ds
 {
 
 const char *newBestText[] = {
-    [NOT_100_ID] = "Not 100%",
-    [IMPOSSIBLE_TIMING_ID] = "Impossible timing",
-    [STORY_MADNESS_ID] = "Have you tried Story Madness yet?",
-    [DIED_TO_ID] = "<DIED TO X>",
-    [HARDER_THAN_ID] = "Harder than %d%% btw!",
+    "Not 100%",
+    "Impossible timing",
+    "Have you tried Story Madness yet?",
+    "<DIED TO X>",
+    "Harder than %d%% btw!",
     "<#5AFFFF>I'm green for an amazing reason</>",
     "6000 FPS would've fixed that",
     "!tseB weN",
