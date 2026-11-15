@@ -2,9 +2,10 @@
 
 #include <math.h>
 #include "math_helpers.hpp"
-#include "main.hpp"
+#include "constants.hpp"
 #include "state.hpp"
 #include "graphics.hpp"
+#include "triggers.hpp"
 #include "utils/gfx.hpp"
 #include "easing.hpp"
 
@@ -107,7 +108,7 @@ void drawCollectableEffect() {
         if (!e->active) continue;
 
         float calcX = e->x - state.cameraX;
-        float calcY = SCREEN_HEIGHT - (e->y - state.cameraY);
+        float calcY = constants::ScreenHeight - (e->y - state.cameraY);
 
         float px = getMirrorX(calcX, state.mirrorFactor) + COLLECTABLE_EFFECT_DRAW_OFFSET;
         float py = calcY + COLLECTABLE_EFFECT_DRAW_OFFSET;

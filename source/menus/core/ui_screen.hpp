@@ -1,9 +1,8 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include "menus/core/ui_element.hpp"
-#include "text.hpp"
-#include "common_setters.hpp"
+#include "../../menus/core/ui_element.hpp"
+#include "../../text.hpp"
 
 #define MAX_ELEMENT_PROPERTIES 64
 

@@ -1,11 +1,11 @@
 #include <3ds.h>
 #include <citro2d.h>
-#include "main.hpp"
+#include "macros.hpp"
+#include "triggers.hpp"
 
 #include "menus/core/ui_screen.hpp"
 #include "math_helpers.hpp"
 #include "menus/components/ui_list.hpp"
-#include "menus/components/ui_window.hpp"
 #include "menus/components/ui_color_button.hpp"
 #include "menus/components/ui_window_button.hpp"
 #include "graphics.hpp"

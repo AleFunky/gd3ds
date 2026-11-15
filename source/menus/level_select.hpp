@@ -1,6 +1,6 @@
 #pragma once
 #include "3ds/types.h"
-#include "menus/core/ui_stack.hpp"
+#include "../menus/core/ui_stack.hpp"
 
 #define LEVEL_CARD_Y_POS 80
 

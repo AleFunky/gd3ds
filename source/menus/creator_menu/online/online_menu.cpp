@@ -6,6 +6,7 @@
 
 #include "level/main_levels.hpp"
 #include "level_loading.hpp"
+#include "macros.hpp"
 #include "main.hpp"
 #include "save/saving.hpp"
 #include "state.hpp"
@@ -33,6 +34,8 @@
 #include "fonts/bigFont.hpp"
 #include "fonts/goldFont.hpp"
 #include "utils/utils.hpp"
+
+#include "game/game_manager.hpp"
 
 namespace gd3ds
 {
@@ -258,7 +261,7 @@ static void populateList() {
 
             // high object count icon
             UIImage *highObjectIcon = uiCreateImage(&defaultScreen);
-            if (highObjectIcon && (entry->objCount >= (isN3Ds ? 44000 : 14000))) {
+            if (highObjectIcon && (entry->objCount >= (GameManager::get()->platformState.isN3Ds ? 44000 : 14000))) {
                 uiImageSetImage(highObjectIcon, 362, 0);
                 uiElementSetPosition((UIElement *)highObjectIcon, -listWidth + 48 + getTextLength(&goldFontFontCharset, 0.45f, false, creatorName) + 27 + ((entry->originalId != 0) ? 11 : 0), -4.5f);
                 uiElementSetScale((UIElement *)highObjectIcon, 0.7f);
@@ -337,8 +340,8 @@ static void populateList() {
                 int yOffset = 0;
 
                 if(entry->epic > 0 && IN_BOUNDS((size_t)entry->epic, epics)){
-                    featuredID = (gdps ? SUPER_GLOW : epics[entry->epic]);
-                    yOffset = (gdps ? -1 : -2);
+                    featuredID = (GameManager::get()->platformState.isGDPS ? SUPER_GLOW : epics[entry->epic]);
+                    yOffset = (GameManager::get()->platformState.isGDPS ? -1 : -2);
                 } else if(entry->featureScore > 0) {
                     featuredID = FEATURED_GLOW;
                 }
@@ -346,7 +349,7 @@ static void populateList() {
                 if(!entry->stars) yOffset += 4;
 
                 uiImageSetImage(featuredGlow, featuredID, 0);
-                uiElementSetPosition((UIElement *)featuredGlow, -listWidth + 23 + (gdps ? 0.3 : 0), -8.5f + yOffset);
+                uiElementSetPosition((UIElement *)featuredGlow, -listWidth + 23 + (GameManager::get()->platformState.isGDPS ? 0.3 : 0), -8.5f + yOffset);
                 uiElementSetScale((UIElement *)featuredGlow, 0.82f);
 
                 uiElementAddChild(card, (UIElement *)featuredGlow);
@@ -358,7 +361,7 @@ static void populateList() {
 
                 if(entry->isAuto) {
                     difficulty_id = AUTO_FACE;
-                } else if (entry->isDemon && gdps) {
+                } else if (entry->isDemon && GameManager::get()->platformState.isGDPS) {
                     difficulty_id = 258;
                 } else if(entry->isDemon && IN_BOUNDS((size_t)entry->difficulty, demonFaces)) {
                     difficulty_id = demonFaces[entry->difficulty];
@@ -506,8 +509,8 @@ static void handleErrors(int code) {
     char temp[64];
     switch (code) {
         case -2:
-            //me when gdps returns -2 when no levels are found
-            if (gdps) break;
+            //me gdps returns -2 when no levels are found
+            if (GameManager::get()->platformState.isGDPS) break;
             uiLabelSetText(errorLabel, "An unknown error has\n occured.");
             break;
         case -1:

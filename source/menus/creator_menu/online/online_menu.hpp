@@ -1,6 +1,6 @@
 #pragma once
-#include "menus/core/ui_stack.hpp"
 
+#include "menus/core/ui_screen.hpp"
 #define EASY_DEMON_FACE 260
 #define MEDIUM_DEMON_FACE 262
 #define HARD_DEMON_FACE 258

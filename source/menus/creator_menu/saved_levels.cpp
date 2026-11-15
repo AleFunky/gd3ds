@@ -2,19 +2,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <citro2d.h>
-#include "3ds/thread.h"
 
 #include "level/main_levels.hpp"
 #include "level_loading.hpp"
+#include "macros.hpp"
 #include "main.hpp"
-#include "graphics.hpp"
-#include "menus/creator_menu/online/two_option_pop_up.hpp"
-#include "mp3_player.hpp"
 #include "save/saving.hpp"
 #include "state.hpp"
 
 #include "utils/folders.hpp"
-#include "utils/network.hpp"
 #include "utils/server_utils.hpp"
 #include "utils/string_helpers.hpp"
 
@@ -27,19 +23,16 @@
 #include "menus/components/ui_label.hpp"
 #include "menus/components/ui_button.hpp"
 #include "menus/components/ui_rectangle.hpp"
-#include "menus/components/ui_particle.hpp"
 #include "menus/creator_menu/online/online_level_menu.hpp"
 #include "menus/creator_menu/external/external_popup.hpp"
-#include "menus/creator_menu/search_menu.hpp"
 #include "menus/creator_menu/online/online_menu.hpp"
 #include "menus/creator_menu/saved_levels.hpp"
 #include "menus/settings_hub/info_card.hpp"
-#include "menus/settings_hub/songs.hpp"
-#include "menus/main_menu.hpp"
 
 #include "fonts/bigFont.hpp"
 #include "fonts/goldFont.hpp"
-#include "utils/utils.hpp"
+#include "game/game_manager.hpp"
+#include "game/platform.hpp"
 
 namespace gd3ds
 {
@@ -131,6 +124,9 @@ static void populateList() {
     uiListReset(list);
     int from = currentPage * MAX_LEVELS_PER_PAGE;
     int start = savedLevels->count - from - 1;
+
+    bool gdps = GameManager::get()->platformState.isGDPS;
+
     for (int i = start; (i > start - MAX_LEVELS_PER_PAGE) && (i >= 0); i--) {
         char tmpName[32];
         char tmpCreator[36];
@@ -213,7 +209,7 @@ static void populateList() {
 
             // high object count icon
             UIImage *highObjectIcon = uiCreateImage(screen);
-            if (highObjectIcon && (entry->objCount >= (isN3Ds ? 44000 : 14000))) {
+            if (highObjectIcon && (entry->objCount >= (GameManager::get()->platformState.isN3Ds ? 44000 : 14000))) {
                 uiImageSetImage(highObjectIcon, 362, 0);
                 uiElementSetPosition((UIElement *)highObjectIcon, -listWidth + 48 + getTextLength(&goldFontFontCharset, 0.45f, false, creatorName) + 27 + ((entry->originalId != 0) ? 11 : 0), -4.5f);
                 uiElementSetScale((UIElement *)highObjectIcon, 0.7f);
@@ -439,7 +435,7 @@ static void populateList() {
 
 static void savedLevelsInit(UIScreen *s) {
     screen = s;
-    savedLevels = &currentServerFile->savedLevels;
+    savedLevels = &platform::currentServerFile->savedLevels;
     listTitle = (UILabel *) uiGetElementByTag(screen, "listtitle");
     list = (UIList *) uiGetElementByTag(s, "list");
     errorLabel = (UILabel *)uiGetElementByTag(s, "errorLabel");

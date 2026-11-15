@@ -1,6 +1,6 @@
 
 #include <citro2d.h>
-#include "main.hpp"
+#include "game/game_manager.hpp"
 #include "menus/core/ui_screen.hpp"
 #include "graphics.hpp"
 #include "particles/circles.hpp"
@@ -49,7 +49,7 @@ static void uiUseEffectUpdate(UIElement* e, UIInput* touch, UITransform *transfo
     UIUseEffect *useEffect = (UIUseEffect *) e;
 
     UseEffectPool *pool = &(useEffect->useEffects);
-    updateUseEffects(delta, pool);
+    updateUseEffects(GameManager::get()->deltaTime, pool);
 }
 
 static void uiUseEffectDraw(UIElement* e, UITransform *transform) {

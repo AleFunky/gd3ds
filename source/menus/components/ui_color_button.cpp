@@ -4,12 +4,10 @@
 #include "ui_color_button.hpp"
 #include "menus/core/ui_screen.hpp"
 #include "menus/core/ui_props.hpp"
-#include "graphics.hpp"
 
 #include "menus/palette_kit.hpp"
 
-#include "main.hpp"
-#include "ui_slider.hpp"
+#include "menus/core/common_setters.hpp"
 
 namespace gd3ds
 {

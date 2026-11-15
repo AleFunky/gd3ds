@@ -28,6 +28,8 @@
 #include "menus/creator_menu/online/online_level_comments.hpp"
 #include "utils/utils.hpp"
 
+#include "game/platform.hpp"
+
 namespace gd3ds
 {
 
@@ -281,6 +283,7 @@ static void fillLevelEntry(char *levelString, bool fillSearchEntry, int searchId
     int levelKeyCount = 0;
 
     SavedLevelDataEntry *entry = getSavedLevelData(onlineMenuLevelID);
+    bool gdps = GameManager::get()->platformState.isGDPS;
 
     char **levelKeys = splitStringInPlace(levelString, ':', &levelKeyCount, true);
     if (!levelKeys) return;
@@ -680,14 +683,14 @@ int parseLatestCommit(char *jsonString) {
 
     // check if we didnt get served garbage data
     if (!jsonObject) {
-        outputLog("failure parsing commit data: response - %s", jsonString);
+        platform::outputLog("failure parsing commit data: response - %s", jsonString);
         return -1;
     }
 
 
     if (json_object_object_get_ex(jsonObject, "status", &status)) {
       // check what github wants to tell us
-      outputLog("status code: %d\n%s\n", json_object_get_int(status), jsonString);
+      platform::outputLog("status code: %d\n%s\n", json_object_get_int(status), jsonString);
       json_object_put(jsonObject);
       return -4;
     }
@@ -717,13 +720,13 @@ int parseCommitsData(char *jsonString) {
 
     // check if we didnt get served garbage data
     if (!jsonObject) {
-        outputLog("failure parsing commit data: response - %s", jsonString);
+        platform::outputLog("failure parsing commit data: response - %s", jsonString);
         return -1;
     }
 
     if (json_object_object_get_ex(jsonObject, "status", &status)) {
       // check what github wants to tell us
-      outputLog("status code: %d\n%s\n", json_object_get_int(status), jsonString);
+      platform::outputLog("status code: %d\n%s\n", json_object_get_int(status), jsonString);
       json_object_put(jsonObject);
       return -4;
     }
@@ -784,7 +787,7 @@ int parseReleasesData(char *jsonString) {
 
     if (json_object_object_get_ex(jsonObject, "status", &status)) {
       // check what github wants to tell us
-      outputLog("status code: %d\n%s\n", json_object_get_int(status), jsonString);
+      platform::outputLog("status code: %d\n%s\n", json_object_get_int(status), jsonString);
       json_object_put(jsonObject);
       return -4;
     }
@@ -831,7 +834,7 @@ int parseReleasesData(char *jsonString) {
 
                 if (json_object_object_get_ex(currAssetObject, "name", &assetNameObject)) {
                     const char *currAssetName = json_object_get_string(assetNameObject);
-                    if (strstr(currAssetName, is3Dsx ? ".3dsx" : ".cia")) {
+                    if (strstr(currAssetName, GameManager::get()->platformState.is3Dsx ? ".3dsx" : ".cia")) {
                         if (json_object_object_get_ex(currAssetObject, "browser_download_url", &url)) {
                             // we found the freaking download link lets go
                             const char *tempUrl = json_object_get_string(url);
@@ -867,7 +870,7 @@ int parseActionsData(char *jsonString) {
     
     if (json_object_object_get_ex(jsonObject, "status", &status)) {
       // check what github wants to tell us
-      outputLog("status code: %d\n%s\n", json_object_get_int(status), jsonString);
+      platform::outputLog("status code: %d\n%s\n", json_object_get_int(status), jsonString);
       json_object_put(jsonObject);
       return -4;
     }
@@ -1159,7 +1162,7 @@ int getLatestNightlyInternal(GenericTask *task, const char *repoAuthor, const ch
         return parserResult;
     }
     // get repo actions
-    result = getActions(task, &outdata, repoAuthor, repoName, is3Dsx ? "gd3ds-3dsx-zip" : "gd3ds-cia-zip");
+    result = getActions(task, &outdata, repoAuthor, repoName, GameManager::get()->platformState.is3Dsx ? "gd3ds-3dsx-zip" : "gd3ds-cia-zip");
     if (result != 0) return result;
 
     // parse actions and get download link
@@ -1217,27 +1220,29 @@ int extractUpdateInternal(const char *targetPath) {
 
 int installUpdateInternal(const char *updatePath) {
     // 3dsx and cia rom installs are handled very differently 
+
+    auto& ps = GameManager::get()->platformState;
     
-    if (is3Dsx) {
+    if (ps.is3Dsx) {
         // ensure 3dsx path is present
-        if (!threeDsxPath) return -1;
+        if (!ps._3dsxPath) return -1;
         
         Result res = 0;
 
         // unmount romfs so we can modify current .3dsx
         res = romfsExit();
         if(R_FAILED(res)) {
-            outputLog("failed to exit romfs - code: %d\n", res);
+            platform::outputLog("failed to exit romfs - code: %d\n", res);
             return -1;
         }
 
         // filesystem operations
-        if (remove(threeDsxPath) != 0) {
-            outputLog("failed to remove current .3dsx\n");
+        if (remove(ps._3dsxPath) != 0) {
+            platform::outputLog("failed to remove current .3dsx\n");
             return -1;
         }
-        if (rename(updatePath, threeDsxPath) != 0) {
-            outputLog("failed to move target .3dsx.\n");
+        if (rename(updatePath, ps._3dsxPath) != 0) {
+            platform::outputLog("failed to move target .3dsx.\n");
             return -1;
         }
         // success
@@ -1251,7 +1256,7 @@ int installUpdateInternal(const char *updatePath) {
     // initialise application manager 
     res = amInit();
     if (R_FAILED(res)) {
-        outputLog("failed to init application manager - code: %d\n", res);
+        platform::outputLog("failed to init application manager - code: %d\n", res);
         return 2;
     }
     
@@ -1259,7 +1264,7 @@ int installUpdateInternal(const char *updatePath) {
     cia = fopen(updatePath, "rb");
     if (!cia) {
         amExit();
-        outputLog("failed to open target .cia\n");
+        platform::outputLog("failed to open target .cia\n");
         return 1;
     }
     
@@ -1268,7 +1273,7 @@ int installUpdateInternal(const char *updatePath) {
     if (R_FAILED(res)) {
         fclose(cia);
         amExit();
-        outputLog("failed to start cia install: %d\n", res);
+        platform::outputLog("failed to start cia install: %d\n", res);
         return 3;
     }
     
@@ -1288,7 +1293,7 @@ int installUpdateInternal(const char *updatePath) {
             free(buffer);
             fclose(cia);
             amExit();
-            outputLog("failed during cia install - code: %d\n", res);
+            platform::outputLog("failed during cia install - code: %d\n", res);
             return 4;
         }
         
@@ -1307,22 +1312,22 @@ int installUpdateInternal(const char *updatePath) {
 //intermediate functions
 
 int searchLevels(GenericTask *task) {
-    int result = searchLevelsInternal(task, gdps);
+    int result = searchLevelsInternal(task, GameManager::get()->platformState.isGDPS);
     return result;
 }
 
 int getLevel(GenericTask *task) {
-    int result = getLevelDataInternal(task, onlineMenuLevelID, refresh, currSearchID, gdps);
+    int result = getLevelDataInternal(task, onlineMenuLevelID, refresh, currSearchID,  GameManager::get()->platformState.isGDPS);
     return result;
 }
 
 int getComments(GenericTask *task) {
-    int result = getCommentsInternal(task, onlineMenuLevelID, currentCommentsPage, commentsSortType, gdps);
+    int result = getCommentsInternal(task, onlineMenuLevelID, currentCommentsPage, commentsSortType,  GameManager::get()->platformState.isGDPS);
     return result;
 }
 
 int getSongData(GenericTask *task) {
-    int result = getSongDataInternal(task, currentSearchEntry->songId, currentSongEntry, gdps);
+    int result = getSongDataInternal(task, currentSearchEntry->songId, currentSongEntry,  GameManager::get()->platformState.isGDPS);
     return result;
 }
 
@@ -1333,7 +1338,7 @@ int checkForUpdates(GenericTask *task) {
 
 int installUpdate(GenericTask *){
     char updatePath[512];
-    snprintf(updatePath, sizeof(updatePath), "%sGeometryDash3DS.%s", CONFIG_ROOT, is3Dsx ? "3dsx" : "cia");
+    snprintf(updatePath, sizeof(updatePath), "%sGeometryDash3DS.%s", CONFIG_ROOT,  GameManager::get()->platformState.is3Dsx ? "3dsx" : "cia");
     int result = installUpdateInternal(updatePath);
     return result;
 }

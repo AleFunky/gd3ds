@@ -1,3 +1,4 @@
+#include "macros.hpp"
 #include "save/config.hpp"
 
 #include "menus/components/ui_checkbox.hpp"

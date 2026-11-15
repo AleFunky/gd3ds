@@ -6,13 +6,15 @@
 #include "menus/core/ui_props.hpp"
 #include "ui_bg_gradient.hpp"
 #include "math_helpers.hpp"
-#include "menus/creator_menu/search_menu.hpp"
+#include "game/game_manager.hpp"
 
 namespace gd3ds
 {
 
 static void uiBgGradientDraw(UIElement* e, UITransform *transform) {
     UIImage *image = (UIImage *) e;
+
+    bool gdps = GameManager::get()->platformState.isGDPS;
 
     C2D_SpriteFromSheet(&image->image.sprite, bgGradientSheet, gdps ? 1 : 0);
 

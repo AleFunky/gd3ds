@@ -1,6 +1,7 @@
 #include <3ds.h>
 #include <citro2d.h>
 
+#include "macros.hpp"
 #include "menus/core/ui_screen.hpp"
 #include "math_helpers.hpp"
 #include "menus/components/ui_image.hpp"
@@ -10,6 +11,10 @@
 #include "triggers.hpp"
 #include "graphics.hpp"
 #include "utils/gfx.hpp"
+
+#include "constants.hpp"
+
+#include "game/game_manager.hpp"
 
 namespace gd3ds
 {
@@ -240,7 +245,7 @@ void loadingScreenInit() {
 
     UIImage *title = (UIImage *) uiGetElementByTag(&defaultScreenTop, "title");
 
-    if (title && altTitleScreen) {
+    if (title && GameManager::get()->altTitleScreen) {
         uiImageSetImage(title, 3, 1);
     }
     
@@ -278,20 +283,20 @@ void loadingScreenUpdate(float progress, int fade) {
         uiScreenDraw(&defaultScreenTop);
         endEyeLayer();
     
-        C2D_DrawRectSolid(0.f, 0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT, C2D_Color32(0, 0, 0, fade));
+        C2D_DrawRectSolid(0.f, 0.f, 0.f, constants::ScreenWidth, constants::ScreenHeight, C2D_Color32(0, 0, 0, fade));
     }
 
     // Bottom Screen
     C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
     C2D_SceneBegin(bot);
 
-    drawBackground(20, SCREEN_HEIGHT-30);
+    drawBackground(20, constants::ScreenHeight-30);
     C2D_ViewScale(SCALE, SCALE);
 
     C2D_ViewScale(1/SCALE, 1/SCALE);
     uiScreenDraw(&defaultScreen);
 
-    C2D_DrawRectSolid(0.f, 0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT, C2D_Color32(0, 0, 0, fade));
+    C2D_DrawRectSolid(0.f, 0.f, 0.f, constants::ScreenWidth, constants::ScreenHeight, C2D_Color32(0, 0, 0, fade));
 
     C2D_ViewReset();
     C3D_FrameEnd(0);

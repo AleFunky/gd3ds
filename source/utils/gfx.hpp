@@ -1,13 +1,11 @@
 #pragma once
+
 #include <3ds.h>
 #include <citro2d.h>
-
 #include "c2d_internal.h"
-
-#include "graphics.hpp"
-
+#include "../graphics.hpp"
+#include "types.hpp"
 #include <math.h>
-#include "player/collision.hpp"
 
 #define FADE_DURATION 0.25f
 #define FADE_SPEED (255 / FADE_DURATION)
@@ -32,14 +30,14 @@ void c2dFastCalcQuad(C2Di_Quad* quad, const C2D_DrawParams* params);
 // Text is the hardest thing to fuse, so the UI stays close to the screen
 #define DEPTH_UI         (0.f)
 #define DEPTH_POPUP      (0.1f)
-void drawHitboxLineInward(Vec2D rect[4], 
+void drawHitboxLineInward(Point rect[4], 
                              const float x1, const float y1,
                              const float x2, const float y2,
                              const float thickness,
                              const float cx, const float cy,
                              const u32 color, const float depth);
 
-void drawPolygonInwardMitered(Vec2D *poly, int n, float thickness, u32 *color, float depth); 
+void drawPolygonInwardMitered(Point *poly, int n, float thickness, u32 *color, float depth); 
 
 float calcXOnScreen(float val);
 float mirrorXOnScreen(float val);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "utils/json_config.hpp"
+#include "../utils/json_config.hpp"
 
 #define DEFAULT_P1 39
 #define DEFAULT_P2 51

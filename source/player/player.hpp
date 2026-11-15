@@ -1,9 +1,9 @@
 #pragma once
 
 #include <stdbool.h>
-#include "level_loading.hpp"
-#include "icons.hpp"
-#include "particles/particles.hpp"
+#include "../level_loading.hpp"
+#include "../icons.hpp"
+#include "../particles/particles.hpp"
 
 #include "trail.hpp"
 

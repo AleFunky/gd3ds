@@ -3,6 +3,7 @@
 
 #include "level_complete.hpp"
 
+#include "macros.hpp"
 #include "menus/core/common_setters.hpp"
 
 #include "math_helpers.hpp"
@@ -13,6 +14,8 @@
 #include "state.hpp"
 #include "level_loading.hpp"
 #include "particles/circles.hpp"
+
+#include "constants.hpp"
 
 #include "menus/components/ui_darken.hpp"
 #include "menus/components/ui_list.hpp"
@@ -26,6 +29,8 @@
 
 #include "save/saving.hpp"
 #include "wav_player.hpp"
+
+#include "game/game_manager.hpp"
 
 #define ANIM_DURATION 1.f
 #define RESTART_ANIM_DURATION 0.5f
@@ -251,8 +256,8 @@ static void runStartAnimation(float delta) {
 
     uiRunFuncOnTag(&screen, "bottomWindow", scaleBottomButtonsAnim);
     
-    uiSetPosOnTag(&screen, (float)SCREEN_BOT_WIDTH / 2, windowYPos, "window");
-    uiSetPosOnTag(&screenTop, (float)SCREEN_WIDTH / 2, windowYPos, "window");
+    uiSetPosOnTag(&screen, (float)constants::ScreenBotWidth / 2, windowYPos, "window");
+    uiSetPosOnTag(&screenTop, (float)constants::ScreenWidth / 2, windowYPos, "window");
 
     if(animTime > 0.6f){
         animatingReward = true;
@@ -367,8 +372,8 @@ static void runEndAnimation(float delta) {
     float fadeValue = easeValue(EaseTypes::QuadIn, upYStart, 0, animTime, RESTART_ANIM_DURATION, 1.f);
     windowYPos = -120 + fadeValue;
 
-    uiSetPosOnTag(&screen, (float)SCREEN_BOT_WIDTH / 2.f, windowYPos, "window");
-    uiSetPosOnTag(&screenTop, (float)SCREEN_WIDTH / 2.f, windowYPos, "window");
+    uiSetPosOnTag(&screen, (float)constants::ScreenBotWidth / 2.f, windowYPos, "window");
+    uiSetPosOnTag(&screenTop, (float)constants::ScreenWidth / 2.f, windowYPos, "window");
     
     // Animation end
     if (animTime >= RESTART_ANIM_DURATION) {
@@ -410,7 +415,7 @@ static void enableSavedCoins(LevelData *levelDataSel) {
 
 void levelCompleteInit() {
     init = true;
-    inLevelComplete = true;
+    GameManager::get()->inLevelComplete = true;
 
     levelUnratedOnlineRefresh();
     
@@ -517,8 +522,8 @@ void levelCompleteInit() {
 
     showStars = stars > 0 && levelDataSel->normalProgress < 100;
 
-    if(state.customLevel == true || state.practiceMode || cheated) {
-        if (state.customLevel && !state.practiceMode && !cheated) {
+    if(state.customLevel == true || state.practiceMode || GameManager::get()->cheated) {
+        if (state.customLevel && !state.practiceMode && !GameManager::get()->cheated) {
             for (int k = 0; k < 3; k++) {
                 bool saved = (k == 0 && levelDataSel->coin1)
                           || (k == 1 && levelDataSel->coin2)
@@ -568,7 +573,7 @@ void levelCompleteInit() {
             text = practiceCompletionText;
         }
         
-        if (cheated) {
+        if (GameManager::get()->cheated) {
             char enabledCheats[256] = "";
             size_t len = 0;
             
@@ -602,7 +607,7 @@ void levelCompleteInit() {
     }
 
     for (int k = 0; k < 3; k++) {
-        float coinX = (SCREEN_WIDTH / 2.f) + (k - (coinDisplayCount - 1) / 2.f) * 50.f;
+        float coinX = (constants::ScreenWidth / 2.f) + (k - (coinDisplayCount - 1) / 2.f) * 50.f;
         if (coinsBase[k]) uiElementSetPosition((UIElement *) coinsBase[k], coinX, coinsBase[k]->base.y);
         if (coinsFull[k]) uiElementSetPosition((UIElement *) coinsFull[k], coinX, coinsFull[k]->base.y);
         if (particles[k]) {
@@ -611,7 +616,7 @@ void levelCompleteInit() {
         }
     }
 
-    if (getLevelCoinCount() > 0 && !state.practiceMode && !cheated) {
+    if (getLevelCoinCount() > 0 && !state.practiceMode && !GameManager::get()->cheated) {
         uiRunFuncOnTag(&screenTop, "funnytext", uiDisableElement);
     }
 
@@ -639,8 +644,10 @@ void levelCompleteInit() {
 int levelCompleteLoop(UIInput *touch) {
     if (!init) return 0;
 
+    float delta = GameManager::get()->deltaTime;
+
     if (animatingDown) runStartAnimation(delta);
-    if (animatingReward && !state.practiceMode && !cheated) runRewardsAnimation(delta);
+    if (animatingReward && !state.practiceMode && !GameManager::get()->cheated) runRewardsAnimation(delta);
     if (animatingUp) runEndAnimation(delta);
 
     if (yesExit) {

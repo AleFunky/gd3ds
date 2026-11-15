@@ -3,6 +3,7 @@
 #include <citro3d.h>
 #include <3ds/util/utf.h>
 
+#include "macros.hpp"
 #include "math_helpers.hpp"
 
 #include "text.hpp"

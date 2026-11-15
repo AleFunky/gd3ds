@@ -2,9 +2,7 @@
 #include "triggers.hpp"
 #include "arena.hpp"
 #include "color.h"
-#include "icons.hpp"
 #include "math_helpers.hpp"
-#include <float.h>
 #include <math.h>
 #include "level_loading.hpp"
 #include "main.hpp"

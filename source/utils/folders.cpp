@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 #include "utils.hpp"
-#include "main.hpp"
+#include "game/platform.hpp"
 
 namespace gd3ds
 {
@@ -46,11 +46,11 @@ FileOrFolder *loadFolder(GenericTask *task, char *dir, int *count) {
 
     DIR *levelDir = opendir(directory);
     if (!levelDir) {
-        outputLog("Failed to open dir: %s\n", directory);
+        platform::outputLog("Failed to open dir: %s\n", directory);
         return NULL;
     }
 
-    outputLog("Loaded folder: %s\n", directory);
+    platform::outputLog("Loaded folder: %s\n", directory);
 
     struct dirent *pent;
     struct stat statbuf;
@@ -78,7 +78,7 @@ FileOrFolder *loadFolder(GenericTask *task, char *dir, int *count) {
             sdLevelPaths[sdLevelCount].isDir = true;
             sdLevelCount++;
 
-            outputLog("Folder: %s\n", pent->d_name);
+            platform::outputLog("Folder: %s\n", pent->d_name);
         } else {
             // File
             const char *ext = strrchr(pent->d_name, '.');
@@ -88,7 +88,7 @@ FileOrFolder *loadFolder(GenericTask *task, char *dir, int *count) {
                 sdLevelPaths[sdLevelCount].isDir = false;
                 sdLevelCount++;
 
-                outputLog("Level: %s (%llu)\n", pent->d_name, statbuf.st_size);
+                platform::outputLog("Level: %s (%llu)\n", pent->d_name, statbuf.st_size);
             }
         }
     }

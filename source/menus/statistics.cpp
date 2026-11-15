@@ -2,10 +2,11 @@
 #include <citro2d.h>
 #include <stdio.h>
 
+#include "macros.hpp"
 #include "menus/core/ui_screen.hpp"
 #include "menus/components/ui_list.hpp"
 #include "statistics.hpp"
-#include "menus/components/ui_darken.hpp"
+#include "menus/core/common_setters.hpp"
 #include "menus/components/ui_rectangle.hpp"
 #include "menus/components/ui_label.hpp"
 

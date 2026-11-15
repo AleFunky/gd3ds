@@ -1,18 +1,24 @@
 #include "divorce_effect.hpp"
-#include "main.hpp"
-#include "menus/palette_kit.hpp"
+
+#include "constants.hpp"
+#include "triggers.hpp"
 #include "utils/gfx.hpp"
 #include "state.hpp"
 #include "player/robot_anim_data.hpp"
 #include "player/spider_anim_data.hpp"
-namespace gd3ds {
+#include "game/game_manager.hpp"
+#include "menus/icon_kit.hpp"
+#include <deque>
+
+namespace gd3ds
+{
 
 DivorceEffect::DivorceEffect(int player, int gamemode, float x, float y, float rotation, float scale, bool flipY){
     m_player = player;
     m_gamemode = gamemode;
     //initial X position should be in world space, but not the subsequent animation (robert code)
     m_x = getMirrorX(x - state.cameraX, state.mirrorFactor);
-    m_y = SCREEN_HEIGHT - (y - state.cameraY);
+    m_y = constants::ScreenHeight - (y - state.cameraY);
     m_rotation = rotation;
     m_scale = scale;
     m_mirrored = (state.mirrorMult < 0);
@@ -42,6 +48,7 @@ DivorceEffect::DivorceEffect(int player, int gamemode, float x, float y, float r
 }
 
 void DivorceEffect::updateDivorce(){
+    float delta = GameManager::get()->deltaTime;
     m_time += delta;
 
     //it only moves relative to 1x speed for some reason

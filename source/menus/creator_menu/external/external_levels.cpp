@@ -2,38 +2,24 @@
 #include <citro2d.h>
 #include <stdlib.h>
 
-#include "math_helpers.hpp"
+#include "macros.hpp"
 #include "main.hpp"
-#include "easing.hpp"
-#include "triggers.hpp"
 #include "menus/core/ui_element.hpp"
-#include "mp3_player.hpp"
-#include "graphics.hpp"
 #include "state.hpp"
-#include "save/config.hpp"
 #include "utils/folders.hpp"
-#include "level_loading.hpp"
 
 #include "menus/core/common_setters.hpp"
 #include "menus/core/ui_screen.hpp"
 #include "menus/components/ui_list.hpp"
-#include "menus/components/ui_window.hpp"
-#include "menus/components/ui_textbox.hpp"
 #include "menus/components/ui_image.hpp"
-#include "menus/components/ui_progress_bar.hpp"
 #include "menus/components/ui_label.hpp"
 #include "menus/components/ui_rectangle.hpp"
 #include "menus/components/ui_button.hpp"
 
-#include "menus/settings_hub/settings.hpp"
-#include "menus/settings_hub/info_card.hpp"
 #include "menus/creator_menu/external/external_levels.hpp"
 #include "menus/creator_menu/external/external_popup.hpp"
-#include "menus/main_menu.hpp"
-#include "menus/level_select.hpp"
-#include "menus/gameplay.hpp"
 
-#include "fonts/bigFont.hpp"
+#include "game/platform.hpp"
 
 #include "utils/network.hpp"
 #include "utils/utils.hpp"
@@ -235,7 +221,7 @@ static void externalLevelsInit(UIScreen *s) {
     spinner = (UISpinner *) uiGetElementByTag(s, "spinner");
     path_label = (UILabel *) uiGetElementByTag(s, "path");
 
-    if (!isCitra()) {
+    if (!platform::isCitra()) {
         UIElement *refreshButton = uiGetElementByTag(s, "refresh");
         if (refreshButton) uiDisableElement(refreshButton);
     }

@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
-#include <stdarg.h>
 #include <unistd.h>
 #include "string_helpers.hpp"
 
@@ -21,6 +20,9 @@
 #include <arpa/inet.h>
 
 #include "utils.hpp"
+
+#include "game/game_manager.hpp"
+
 #define SOC_ALIGN       0x1000
 #define SOC_BUFFERSIZE  0x100000
 
@@ -670,7 +672,7 @@ Thread createFileDownloadThread(DownloadTask *task) {
         task,
         32 * 1024,
         priority,
-        (isN3Ds ? 2 : 0),
+        (GameManager::get()->platformState.isN3Ds ? 2 : 0),
         true
     );
 }

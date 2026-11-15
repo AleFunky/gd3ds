@@ -1,12 +1,13 @@
 #include <3ds.h>
 #include <citro2d.h>
 
+#include "macros.hpp"
 #include "menus/core/ui_screen.hpp"
 #include "menus/components/ui_list.hpp"
 #include "menus/components/ui_rectangle.hpp"
 #include "menus/components/ui_label.hpp"
 #include "fonts/bigFont.hpp"
-#include "main.hpp"
+#include "menus/core/common_setters.hpp"
 #include "menus/settings_hub/credits.hpp"
 
 namespace gd3ds

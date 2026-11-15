@@ -1,11 +1,7 @@
-
 #include <citro2d.h>
-#include "ui_image.hpp"
 #include "text.hpp"
 #include "fonts/bigFont.hpp"
-#include "easing.hpp"
 #include "utils/gfx.hpp"
-#include "ui_checkbox.hpp"
 #include "menus/core/ui_screen.hpp"
 #include "menus/core/ui_props.hpp"
 #include "ui_textbox.hpp"

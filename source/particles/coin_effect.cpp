@@ -1,9 +1,10 @@
 #include "coin_effect.hpp"
 
 #include "math_helpers.hpp"
-#include "main.hpp"
+#include "constants.hpp"
 #include "state.hpp"
 #include "utils/gfx.hpp"
+#include "player/collision.hpp"
 #include "easing.hpp"
 
 namespace gd3ds
@@ -91,7 +92,7 @@ void drawCollectEffect() {
             int index = getCoinTexture(gameObjects[SECRET_COIN].texture + (state.customLevel ? (data->alreadyCollected ? 8 : 4) : (data->alreadyCollected ? 12 : 0)), 12) - SPRITESHEET2_START;
             
             float calcX = (data->x - state.cameraX);
-            float calcY = SCREEN_HEIGHT - ((data->y - state.cameraY));  
+            float calcY = constants::ScreenHeight - ((data->y - state.cameraY));  
             
             C2D_SpriteFromSheet(&spr, spriteSheet2, index);
             C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);

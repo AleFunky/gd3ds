@@ -1,4 +1,5 @@
 #include "main_levels.hpp"
+#include "macros.hpp"
 #include "main.hpp"
 
 // level_id property defines the save entry id

@@ -2,11 +2,15 @@
 #include "3ds/services/hid.h"
 #include "arena.hpp"
 #include "fonts/chatFont.hpp"
+#include "macros.hpp"
 #include "main.hpp"
 #include "math_helpers.hpp"
 #include "menus/core/ui_screen.hpp"
 #include "menus/settings_hub/settings.hpp"
 #include "state.hpp"
+#include "game/game_manager.hpp"
+
+#include "constants.hpp"
 
 namespace gd3ds
 {
@@ -352,6 +356,9 @@ static void drawMemoryPage() {
 }
 
 void profilerUpdate(ProfilerUpdateData data) {
+
+    float delta = GameManager::get()->deltaTime;
+
     snapshot.frameMs = settingsState.vsync ? delta * 1000.f : MAX(delta * 1000.f, C3D_GetDrawingTime());
     snapshot.cpuMs = data.processingTime + C3D_GetProcessingTime();
     snapshot.gpuMs = C3D_GetDrawingTime();
@@ -386,7 +393,7 @@ void profilerUpdate(ProfilerUpdateData data) {
     snapshot.levelArenaFree = arenaAvailable(&levelArena);
     snapshot.levelArenaTotal = arenaTotal(&levelArena);
 
-    if (!gamePaused) internalSnapshot = snapshot;
+    if (!GameManager::get()->gamePaused) internalSnapshot = snapshot;
 
     profilerHandleInput(data.kDown);
 }
@@ -394,7 +401,7 @@ void profilerUpdate(ProfilerUpdateData data) {
 #define BG_COL (ABGR8(0, 0, 0, 127))
 
 void profilerDraw(void) {
-    C2D_DrawRectangle(0, 0, 0, SCREEN_BOT_WIDTH, SCREEN_HEIGHT, BG_COL, BG_COL, BG_COL, BG_COL);
+    C2D_DrawRectangle(0, 0, 0, constants::ScreenBotWidth, constants::ScreenHeight, BG_COL, BG_COL, BG_COL, BG_COL);
     drawPageHeader();
 
     switch (currentPage) {

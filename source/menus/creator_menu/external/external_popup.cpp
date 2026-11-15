@@ -2,7 +2,9 @@
 #include <citro2d.h>
 #include <stdlib.h>
 
+#include "game/platform.hpp"
 #include "level/main_levels.hpp"
+#include "macros.hpp"
 #include "main.hpp"
 #include "menus/core/ui_element.hpp"
 #include "menus/settings_hub/info_card.hpp"
@@ -16,13 +18,12 @@
 #include "menus/components/ui_image.hpp"
 #include "menus/components/ui_label.hpp"
 #include "menus/components/ui_progress_bar.hpp"
-#include "menus/creator_menu/external/external_levels.hpp"
-#include "menus/settings_hub/songs.hpp"
-#include "menus/creator_menu/external/external_level_infobox.hpp"
+#include "game/game_manager.hpp"
 #include "menus/creator_menu/external/external_popup.hpp"
 #include "utils/utils.hpp"
 
 #include "fonts/chatFont.hpp"
+#include "menus/core/ui_stack.hpp"
 
 namespace gd3ds
 {
@@ -117,7 +118,7 @@ static void setNameCreator(char *gmd) {
     char file[516];
     snprintf(file, sizeof(file), "ext_%s_%s", levelInfo.levelName, levelInfo.creatorName);
     
-    currentLevelEntry = getOrAddLevelToExternalFile(&externalFile, file);
+    currentLevelEntry = getOrAddLevelToExternalFile(&platform::externalFile, file);
     currentLevelList = LevelListType::LevelListExternal;
     
     setProgress();
@@ -343,9 +344,9 @@ void externalPopupUpdate(UIScreen *s, UIInput *u) {
         showLevelLoadErrorMessage();
     }
 
-    if (exitingLevel) {
+    if (GameManager::get()->exitingLevel) {
         setProgress();
-        exitingLevel = false;
+        GameManager::get()->exitingLevel = false;
     }
 }
 

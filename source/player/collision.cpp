@@ -1,6 +1,9 @@
 #include "collision.hpp"
+
+#include "game/game_manager.hpp"
 #include "icons.hpp"
 #include "level_loading.hpp"
+#include "macros.hpp"
 #include "player.hpp"
 #include "player/trail.hpp"
 #include "robot_anim_data.hpp"
@@ -11,9 +14,6 @@
 #include "state.hpp"
 #include <citro3d.h>
 #include "graphics.hpp"
-#include "text.hpp"
-#include "fonts/bigFont.hpp"
-#include "menus/core/ui_screen.hpp"
 #include "math_helpers.hpp"
 #include "slope.hpp"
 #include "triggers.hpp"
@@ -23,12 +23,14 @@
 #include "particles/circles.hpp"
 #include "particles/coin_effect.hpp"
 #include "particles/collectable_effect.hpp"
-#include "save/saving.hpp"
-#include "menus/level_select.hpp"
 #include "particles/lightning.hpp"
 #include "particles/gravity_sweep.hpp"
 #include "particles/divorce_effect.hpp"
 #include "particles/portal_shine.hpp"
+
+#include "constants.hpp"
+
+#include "types.hpp"
 
 namespace gd3ds
 {
@@ -109,117 +111,72 @@ const int dualGamemodeHeights[static_cast<int>(IconGamemode::GamemodeCount)] = {
     9 // Spider
 };
 
-const Vec2D slowSpeedSnaps[3] = {
-    {
-        .x = 120,
-        .y = -30
-    },
-    {
-        .x = 90,
-        .y = 30
-    },
-    {
-        .x = 60,
-        .y = 60
-    },
+const Point slowSpeedSnaps[3] = {
+    {120, -30},
+    {90, 30},
+    {60, 60},
 };
 
-const Vec2D normalSpeedSnaps[3] = {
-    {
-        .x = 150,
-        .y = -30
-    },
-    {
-        .x = 120,
-        .y = 30
-    },
-    {
-        .x = 90,
-        .y = 60
-    },
+const Point normalSpeedSnaps[3] = {
+    {150, -30},
+    {120, 30},
+    {90, 60},
 };
 
-const Vec2D fastSpeedSnaps[3] = {
-    {
-        .x = 180,
-        .y = -30
-    },
-    {
-        .x = 150,
-        .y = 30
-    },
-    {
-        .x = 120,
-        .y = 60
-    },
+const Point fastSpeedSnaps[3] = {
+    {180, -30},
+    {150, 30},
+    {120, 60}
 };
 
-const Vec2D fasterSpeedSnaps[3] = {
-    {
-        .x = 225,
-        .y = -30
-    },
-    {
-        .x = 180,
-        .y = 30
-    },
-    {
-        .x = 135,
-        .y = 60
-    },
+const Point fasterSpeedSnaps[3] = {
+    {225, -30},
+    {180, 30 },
+    {135, 60}
 };
 
-const Vec2D defaultSpeedSnaps[3] = {
-    {
-        .x = 150,
-        .y = -30
-    },
-    {
-        .x = 120,
-        .y = 30
-    },
-    {
-        .x = 90,
-        .y = 60
-    },
+const Point defaultSpeedSnaps[3] = {
+    {150, -30},
+    {120, 30},
+    {90, 60}
 };
 
-float snapPlayer(Vec2D diff, Player *player) {
-    Vec2D stairs[3];
+float snapPlayer(Point diff, Player *player) {
+    Point stairs[3];
     float threshold;
     switch (state.speed) {
         case static_cast<int>(PlayerSpeeds::SpeedSlow):
-            memcpy(&stairs, &slowSpeedSnaps, sizeof(Vec2D) * 3);
+            memcpy(&stairs, &slowSpeedSnaps, sizeof(Point) * 3);
             threshold = 1;
             break;
         case static_cast<int>(PlayerSpeeds::SpeedNormal):
-            memcpy(&stairs, &normalSpeedSnaps, sizeof(Vec2D) * 3);
+            memcpy(&stairs, &normalSpeedSnaps, sizeof(Point) * 3);
             threshold = 1;
             stairs[1].x = (player->mini ? 90 : 120);
             break;
         case static_cast<int>(PlayerSpeeds::SpeedFast):
-            memcpy(&stairs, &fastSpeedSnaps, sizeof(Vec2D) * 3);
+            memcpy(&stairs, &fastSpeedSnaps, sizeof(Point) * 3);
             threshold = 2;
             stairs[1].x = (player->mini ? 90 : 150);
             break;
         case static_cast<int>(PlayerSpeeds::SpeedFaster):
-            memcpy(&stairs, &fasterSpeedSnaps, sizeof(Vec2D) * 3);
+            memcpy(&stairs, &fasterSpeedSnaps, sizeof(Point) * 3);
             threshold = 2;
             stairs[1].x = (player->mini ? 90 : 180);
             break;
         case static_cast<int>(PlayerSpeeds::SpeedFastest):
-            memcpy(&stairs, &fasterSpeedSnaps, sizeof(Vec2D) * 3);
+            memcpy(&stairs, &fasterSpeedSnaps, sizeof(Point) * 3);
             threshold = 2;
             stairs[1].x = (player->mini ? 90 : 180);
             break;
         default:
-            memcpy(&stairs, &defaultSpeedSnaps, sizeof(Vec2D) * 3);
+            memcpy(&stairs, &defaultSpeedSnaps, sizeof(Point) * 3);
             threshold = 1;
-    }   
+    }
 
     // Check snaps
     for (int i = 0; i < 3; i++) {
-        Vec2D stair = stairs[i];
+        Point stair = stairs[i];
         if (fabsf(diff.x - stair.x) <= threshold && fabsf(diff.y - stair.y) <= threshold) {
             return threshold;
         }
@@ -229,7 +186,7 @@ float snapPlayer(Vec2D diff, Player *player) {
 }
 
 void trySnap(int block, Player *player) {
-    Vec2D diff;
+    Point diff;
     int snapBlock = player->snapData.objectID;
 
     if (snapBlock >= 0) {
@@ -989,7 +946,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
 
                     lightningBolts.push_back(
                         Lightning(
-                            objects.x[obj] + randomInt(-25.0f, 25.0f) + 25.0f, state.cameraY + 50.0f + SCREEN_HEIGHT, 
+                            objects.x[obj] + randomInt(-25.0f, 25.0f) + 25.0f, state.cameraY + 50.0f + constants::ScreenHeight, 
                             objects.x[obj], objects.y[obj], 
                             LightningType::SizeNormal
                         )
@@ -1027,7 +984,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
 
                     lightningBolts.push_back(
                         Lightning(
-                            objects.x[obj] + randomInt(-25.0f, 25.0f) + 25.0f, state.cameraY + 50.0f + SCREEN_HEIGHT, 
+                            objects.x[obj] + randomInt(-25.0f, 25.0f) + 25.0f, state.cameraY + 50.0f + constants::ScreenHeight, 
                             objects.x[obj], objects.y[obj], 
                             LightningType::SizeMini
                         )
@@ -1304,7 +1261,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
             motionTrailClear(trail);
             motionTrailClear(waveTrail);
             if (player->gamemode == static_cast<int>(IconGamemode::GamemodeWave)) {
-                waveTrail->positionR = (Vec2D){player->x, player->y};  
+                waveTrail->positionR = (Point){player->x, player->y};  
                 waveTrail->startingPositionInitialized = true;
                 motionTrailResumeStroke(waveTrail);
                 motionTrailAddWavePoint(waveTrail);
@@ -1475,7 +1432,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                     }
                 }
 
-                waveTrail->positionR = (Vec2D){player->x, player->y};  
+                waveTrail->positionR = (Point){player->x, player->y};  
                 waveTrail->startingPositionInitialized = true;
                 
                 motionTrailResumeStroke(waveTrail);
@@ -1504,7 +1461,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
 
                 motionTrailClear(&trailP2);
                 if (state.player2.gamemode == static_cast<int>(IconGamemode::GamemodeWave)) {
-                    waveTrailP2.positionR = (Vec2D){state.player2.x, state.player2.y};  
+                    waveTrailP2.positionR = (Point){state.player2.x, state.player2.y};  
                     waveTrailP2.startingPositionInitialized = true;
                     motionTrailClear(&waveTrailP2);
                     
@@ -1641,7 +1598,7 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
     if (!GET_COLLIDED(obj)) SET_HITBOX_COUNTER(obj, GET_HITBOX_COUNTER(obj) + 1); 
 }
 
-void getCorners(float cx, float cy, float w, float h, float angle, Vec2D out[4]) {
+void getCorners(float cx, float cy, float w, float h, float angle, Point out[4]) {
     float hw = w * 0.5f, hh = h * 0.5f;
     angle = -angle;
     float rad = C3D_AngleFromDegrees(angle);
@@ -1664,10 +1621,10 @@ void getCorners(float cx, float cy, float w, float h, float angle, Vec2D out[4])
     out[3].y = cy - hwSin + hhCos;
 }
 
-static bool satOverlapExclusive(const Vec2D a[4], const Vec2D b[4]) {
+static bool satOverlapExclusive(const Point a[4], const Point b[4]) {
     // Test all axes (normals of edges)
     for (int shape = 0; shape < 2; ++shape) {
-        const Vec2D *verts = (shape == 0) ? a : b;
+        const Point *verts = (shape == 0) ? a : b;
         for (int i = 0; i < 4; ++i) {
             // Edge from verts[i] to verts[(i+1)%4]
             float dx = verts[(i+1)%4].x - verts[i].x;
@@ -1704,16 +1661,16 @@ bool intersectExclusive(float x1, float y1, float w1, float h1, float angle1,
         return false;
     }
     
-    Vec2D rect1[4], rect2[4];
+    Point rect1[4], rect2[4];
     getCorners(x1, y1, w1, h1, angle1, rect1);
     getCorners(x2, y2, w2, h2, angle2, rect2);
     return satOverlapExclusive(rect1, rect2);
 }
 
-static bool satOverlap(const Vec2D a[4], const Vec2D b[4]) {
+static bool satOverlap(const Point a[4], const Point b[4]) {
     // Test all axes (normals of edges)
     for (int shape = 0; shape < 2; ++shape) {
-        const Vec2D *verts = (shape == 0) ? a : b;
+        const Point *verts = (shape == 0) ? a : b;
         for (int i = 0; i < 4; ++i) {
             // Edge from verts[i] to verts[(i+1)%4]
             float dx = verts[(i+1)%4].x - verts[i].x;
@@ -1750,7 +1707,7 @@ bool intersect(float x1, float y1, float w1, float h1, float angle1,
         return false;
     }
     
-    Vec2D rect1[4], rect2[4];
+    Point rect1[4], rect2[4];
     getCorners(x1, y1, w1, h1, angle1, rect1);
     getCorners(x2, y2, w2, h2, angle2, rect2);
     return satOverlap(rect1, rect2);
@@ -1972,7 +1929,7 @@ void handleCollision(Player *player, int obj, const ObjectHitbox *hitbox) {
                         }
                     }
 
-                    player->snapData.playerFrame = levelFrame;
+                    player->snapData.playerFrame = GameManager::get()->levelFrame;
                     player->snapData.objectID = obj;
                     player->snapData.playerSnapDiff = player->x - x;
                 }

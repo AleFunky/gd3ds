@@ -1,6 +1,7 @@
 #include "new_best.hpp"
+#include "macros.hpp"
 #include "math_helpers.hpp"
-#include "main.hpp"
+#include "constants.hpp"
 #include "state.hpp"
 #include "easing.hpp"
 #include "graphics.hpp"

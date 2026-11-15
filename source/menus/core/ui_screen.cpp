@@ -1,7 +1,6 @@
 #include "menus/core/ui_screen.hpp"
-#include "main.hpp"
+#include "macros.hpp"
 #include "menus/components/ui_spinner.hpp"
-#include "menus/core/common_setters.hpp"
 #include "menus/settings_hub/settings.hpp"
 #include "ui_element.hpp"
 #include "ui_screen.hpp"
@@ -37,7 +36,8 @@
 #include "fonts/bigFont.hpp"
 #include "fonts/chatFont.hpp"
 #include "fonts/goldFont.hpp"
-#include "utils/gfx.hpp"
+#include "game/game_manager.hpp"
+#include "game/platform.hpp"
 #include "utils/string_helpers.hpp"
 
 namespace gd3ds
@@ -291,7 +291,7 @@ void uiScreenUpdateTransition(UIScreen *screen, float dt) {
 
 // Update all screen characters
 void uiScreenUpdate(UIScreen* s, UIInput* touch) {
-    uiScreenUpdateTransition(s, DT);
+    uiScreenUpdateTransition(s, GameManager::get()->deltaTime);
 
     if (!s || !s->loaded || s->closing) return;
 
@@ -595,11 +595,11 @@ void copyTagArray(UIElement *e, const char *tags) {
 }
 
 UNUSED static void printProps(UIPropertyList *props) {
-    outputLog("START\n");
+    platform::outputLog("START\n");
     for (size_t i = 0; i < props->count; i++) {
-        outputLog("KEY %s VALUE %s\n",props->properties[i].key, props->properties[i].value);
+        platform::outputLog("KEY %s VALUE %s\n",props->properties[i].key, props->properties[i].value);
     }
-    outputLog("END\n");
+    platform::outputLog("END\n");
 }
 
 void uiScreenAddElement(UIScreen *screen, UIElement *element) {

@@ -9,6 +9,11 @@
 #include "utils/gfx.hpp"
 #include <string.h>
 
+#include "game/game_manager.hpp"
+#include "game/platform.hpp"
+
+#include "constants.hpp"
+
 namespace gd3ds
 {
 
@@ -175,7 +180,7 @@ void uiStackPush(
     }
 
     if(stack->push.type != UIStackPushType::PushNone){
-        outputLog("Cannot queue multiple pushes!\n");
+        platform::outputLog("Cannot queue multiple pushes!\n");
         return;
     }
 
@@ -245,7 +250,7 @@ void uiStackPushGameState(int gameState){
 
 void uiStackPop(){
     if(stack->rootTransition != UITransitionState::UiTransitionNone) {
-        outputLog("Cannot pop stack during transition!\n");
+        platform::outputLog("Cannot pop stack during transition!\n");
         return;
     }
 
@@ -266,7 +271,7 @@ void uiStackPop(){
 //pops all active screens
 void uiStackPopContext(){
     if(stack->rootTransition != UITransitionState::UiTransitionNone) {
-        outputLog("Cannot pop stack during transition!\n");
+        platform::outputLog("Cannot pop stack during transition!\n");
         return;
     }
 
@@ -406,10 +411,10 @@ static void handleStackFading(){
                     break;
             }
         }
-        fixedDt = true;
+        GameManager::get()->fixedDt = true;
     } else{
         //make sure there's at least a frame of black
-        stack->fadeTime += FADE_SPEED * DT;
+        stack->fadeTime += FADE_SPEED * GameManager::get()->deltaTime;
     }
 }
 
@@ -520,7 +525,7 @@ void drawStackDebug(){
     char capacitySlop[] = "Capacity:....";
     snprintf(capacitySlop, sizeof(capacitySlop), "Capacity: %d", stack->stackCapacity);
 
-    drawText(&bigFontFontCharset, &bigFontSheet, SCREEN_BOT_WIDTH / 2.f, SCREEN_HEIGHT / 2.f, 0.5f, 0.5f, 0, true, debug);
+    drawText(&bigFontFontCharset, &bigFontSheet, constants::ScreenBotWidth / 2.f, constants::ScreenHeight / 2.f, 0.5f, 0.5f, 0, true, debug);
     drawText(&bigFontFontCharset, &bigFontSheet, 10, 10, 0.5f, 0.5f, 0, true, rootSlop);
     drawText(&bigFontFontCharset, &bigFontSheet, 10, 25, 0.5f, 0.5f, 0, true, activeSlop);
     drawText(&bigFontFontCharset, &bigFontSheet, 10, 40, 0.5f, 0.5f, 0, true, capacitySlop);
@@ -536,7 +541,7 @@ void drawStackFade(){
         fade = CLAMP(255 - stack->fadeTime, 0, 255);
     }
 
-    C2D_DrawRectSolid(0.f, 0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT, C2D_Color32(0, 0, 0, fade));
+    C2D_DrawRectSolid(0.f, 0.f, 0.f, constants::ScreenWidth, constants::ScreenHeight, C2D_Color32(0, 0, 0, fade));
 }
 
 void uiStackDraw(Screens target){

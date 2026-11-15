@@ -1,6 +1,6 @@
 #pragma once
 #include <math.h>
-#include "graphics.hpp"
+#include "../graphics.hpp"
 
 #define BEAM_COUNT 8
 #define BASE_W 1

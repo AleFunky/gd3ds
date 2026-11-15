@@ -7,7 +7,7 @@
 
 #include "icons.hpp"
 #include "menus/icon_kit.hpp"
-#include "main.hpp"
+#include "game/platform.hpp"
 
 #define ICON_CACHE_CAPACITY 64
 #define ICON_ARCHIVE_MAGIC 0x4E434947u
@@ -91,7 +91,7 @@ void iconCacheInit(void) {
 
     iconCacheArchive = fopen("romfs:/gfx/icons.bin", "rb");
     if (!iconCacheArchive) {
-        outputLog("Could not open romfs:/gfx/icons.bin\n");
+        platform::outputLog("Could not open romfs:/gfx/icons.bin\n");
         return;
     }
 
@@ -99,7 +99,7 @@ void iconCacheInit(void) {
     if (fread(header, sizeof(header), 1, iconCacheArchive) != 1 ||
         header[0] != ICON_ARCHIVE_MAGIC ||
         header[2] != (u32) total) {
-        outputLog("Invalid romfs:/gfx/icons.bin header\n");
+        platform::outputLog("Invalid romfs:/gfx/icons.bin header\n");
         iconCacheCloseArchive();
         return;
     }
@@ -107,13 +107,13 @@ void iconCacheInit(void) {
     entryCount = total;
     iconCacheEntries = (IconArchiveEntry *) malloc(sizeof(IconArchiveEntry) * entryCount);
     if (!iconCacheEntries) {
-        outputLog("Could not allocate icon archive table\n");
+        platform::outputLog("Could not allocate icon archive table\n");
         iconCacheCloseArchive();
         return;
     }
 
     if (fread(iconCacheEntries, sizeof(IconArchiveEntry), entryCount, iconCacheArchive) != (size_t) entryCount) {
-        outputLog("Could not read icon archive table\n");
+        platform::outputLog("Could not read icon archive table\n");
         iconCacheCloseArchive();
         return;
     }

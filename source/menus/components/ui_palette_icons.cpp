@@ -3,10 +3,11 @@
 #include <citro2d.h>
 #include "menus/core/ui_screen.hpp"
 #include "menus/core/ui_props.hpp"
-#include "menus/palette_kit.hpp"
+#include "triggers.hpp"
 #include "graphics.hpp"
 #include "player/robot_anim_data.hpp"
 #include "player/spider_anim_data.hpp"
+#include "menus/icon_kit.hpp"
 
 #define ICON_WIDTH 30
 

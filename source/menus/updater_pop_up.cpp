@@ -1,3 +1,4 @@
+#include "macros.hpp"
 #include "menus/core/ui_stack.hpp"
 #include "menus/components/ui_progress_bar.hpp"
 #include "menus/components/ui_label.hpp"
@@ -8,6 +9,7 @@
 #include "utils/utils.hpp"
 #include "utils/json_config.hpp"
 #include "utils/folders.hpp"
+#include "game/platform.hpp"
 #include "utils/string_helpers.hpp"
 
 namespace gd3ds
@@ -132,7 +134,7 @@ static void updaterPopUpInit(UIScreen *s) {
     downloadThread = createFileDownloadThread(&downloadTask);
 
     // temporarily disable sleep mode, enter exclusive mode so network won't get interrupted
-    enterExclusiveState();
+    platform::enterExclusiveState();
     aptSetSleepAllowed(false);
 }
 
@@ -153,13 +155,13 @@ static void updaterPopUpUpdate(UIScreen *s, UIInput *i) {
         uiDisableElement((UIElement *) speedLabel);
 
         // networking is no longer needed, exit exclusive mode
-        exitExclusiveState(false);
+        platform::exitExclusiveState(false);
 
         // Handle result
         if (downloadTask.result != 0) {
             statusLabel->base.y = 10;
             aptSetSleepAllowed(true);
-            outputLog(handleDownloadErrorCodes(downloadTask.result));
+            platform::outputLog(handleDownloadErrorCodes(downloadTask.result));
             uiLabelSetText(statusLabel, handleDownloadErrorCodes(downloadTask.result));
             return;
         }
@@ -186,7 +188,7 @@ static void updaterPopUpUpdate(UIScreen *s, UIInput *i) {
             statusLabel->base.y = 10;
             aptSetSleepAllowed(true);
             canExit = false;
-            outputLog("failed to extract rom\n");
+            platform::outputLog("failed to extract rom\n");
             uiLabelSetText(statusLabel, "Failed to extract update!");
             statusLabel->base.y = 10;
             uiEnableElement((UIElement *) exitButton);
@@ -210,7 +212,7 @@ static void updaterPopUpUpdate(UIScreen *s, UIInput *i) {
 
         // Handle result
         if (installTask.result != 0) {
-            outputLog(handleInstallErrorCodes(installTask.result));
+            platform::outputLog(handleInstallErrorCodes(installTask.result));
             statusLabel->base.y = 10;
             uiLabelSetText(statusLabel, handleInstallErrorCodes(installTask.result));
             canExit = true;
@@ -218,9 +220,9 @@ static void updaterPopUpUpdate(UIScreen *s, UIInput *i) {
 
             return;
         }
-        queuedRestart = !is3Dsx;
+        GameManager::get()->restartQueued = !GameManager::get()->platformState.is3Dsx;
         statusLabel->base.y = -5;
-        uiLabelSetText(statusLabel, is3Dsx ? "Update successful!\nPress OK to quit." : "Update successful!\nPress OK to restart.");
+        uiLabelSetText(statusLabel, GameManager::get()->platformState.is3Dsx ? "Update successful!\nPress OK to quit." : "Update successful!\nPress OK to restart.");
         uiEnableElement((UIElement *) finishUpdateButton);
     }
     
@@ -249,7 +251,7 @@ static void updaterPopUpUpdate(UIScreen *s, UIInput *i) {
 static void updaterPopUpExit(UIScreen *s) {
     if (downloadTask.running) {
         downloadTask.cancelled = true;
-        exitExclusiveState(false);
+        platform::exitExclusiveState(false);
         aptSetSleepAllowed(true);
         threadJoin(downloadThread, U64_MAX);
     }

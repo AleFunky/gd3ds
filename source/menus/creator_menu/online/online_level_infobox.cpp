@@ -7,7 +7,7 @@
 #include "menus/core/ui_screen.hpp"
 #include "menus/components/ui_label.hpp"
 #include "menus/creator_menu/online/online_menu.hpp"
-#include "menus/creator_menu/search_menu.hpp"
+#include "game/game_manager.hpp"
 #include "online_level_menu.hpp"
 
 namespace gd3ds
@@ -26,6 +26,9 @@ static UILabel *normalPercent;
 static UILabel *practicePercent;
 
 static void populateOnlineInfo() {
+
+    bool gdps = GameManager::get()->platformState.isGDPS;
+
     SearchEntry *currEntry;
     CreatorEntry *creatorEntry;
     LevelEntry *lvlEntry;

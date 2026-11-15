@@ -5,13 +5,9 @@
 #include "level/main_levels.hpp"
 #include "menus/core/ui_screen.hpp"
 #include "menus/components/ui_list.hpp"
-#include "menus/components/ui_darken.hpp"
 #include "menus/components/ui_rectangle.hpp"
 #include "menus/components/ui_label.hpp"
-
-#include "menus/statistics.hpp"
-
-#include "save/saving.hpp"
+#include "menus/core/common_setters.hpp"
 #include "menus/settings_hub/songs.hpp"
 
 namespace gd3ds

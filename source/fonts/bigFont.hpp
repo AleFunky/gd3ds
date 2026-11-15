@@ -1,6 +1,6 @@
 #pragma once
 
-#include "text.hpp"
+#include "../text.hpp"
 
 namespace gd3ds
 {

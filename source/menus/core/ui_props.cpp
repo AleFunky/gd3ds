@@ -1,6 +1,5 @@
 #include "ui_props.hpp"
 #include <stdlib.h>
-#include "main.hpp"
 #include "text.hpp"
 #include "utils/string_helpers.hpp"
 #include "ui_actions.hpp"

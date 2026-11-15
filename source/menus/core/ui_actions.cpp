@@ -1,3 +1,4 @@
+#include "macros.hpp"
 #include "sounds.hpp"
 #include "ui_element.hpp"
 #include "wav_player.hpp"

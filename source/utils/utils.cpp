@@ -10,6 +10,8 @@
 #include <sys/types.h>
 #include <minizip/unzip.h>
 
+#include "game/platform.hpp"
+
 namespace gd3ds
 {
 
@@ -204,7 +206,7 @@ Thread createGenericThread(GenericTask *task) {
         task,
         32 * 1024,
         priority,
-        (isN3Ds ? 2 : 0),
+        (GameManager::get()->platformState.isN3Ds ? 2 : 0),
         true
    );
 }
@@ -216,13 +218,13 @@ int extractZip(const char *inputPath, const char *destinationDir) {
     // open file at input path
     unzFile *zipFile = (unzFile *)unzOpen(inputPath);
     if (!zipFile) {
-        outputLog("failed to open zip file\n");
+        platform::outputLog("failed to open zip file\n");
         return 1;
     }
     // get zip file metadata
     unz_global_info globalInfo;
     if (unzGetGlobalInfo(zipFile, &globalInfo) != UNZ_OK){
-        outputLog("failed to get zip file metadata\n");
+        platform::outputLog("failed to get zip file metadata\n");
         return 1;
     }
 
@@ -236,7 +238,7 @@ int extractZip(const char *inputPath, const char *destinationDir) {
         char path[256 + sizeof(filename)];
 
         if (unzGetCurrentFileInfo(zipFile, &fileInfo, filename, sizeof(filename), NULL, 0, NULL, 0) != UNZ_OK) {
-          outputLog("could not read file metadata\n");
+          platform::outputLog("could not read file metadata\n");
           unzClose(zipFile);
           return 1;
         }
@@ -251,7 +253,7 @@ int extractZip(const char *inputPath, const char *destinationDir) {
         } else {
             // entry is a file, so extract it
             if (unzOpenCurrentFile(zipFile) != UNZ_OK) {
-                outputLog("could not open file\n");
+                platform::outputLog("could not open file\n");
                 unzClose(zipFile);
                 return 1;
             }
@@ -259,7 +261,7 @@ int extractZip(const char *inputPath, const char *destinationDir) {
             // open a file to write out the data
             FILE *out = fopen(path, "wb");
             if (!out) {
-                outputLog("could not open destination file\n");
+                platform::outputLog("could not open destination file\n");
                 unzCloseCurrentFile(zipFile);
                 unzClose(zipFile);
                 return 1;
@@ -269,7 +271,7 @@ int extractZip(const char *inputPath, const char *destinationDir) {
             do {
                 error = unzReadCurrentFile(zipFile, readBuffer, sizeof(readBuffer));
                 if (error < 0) {
-                    outputLog("error %d\n", error);
+                    platform::outputLog("error %d\n", error);
                     unzCloseCurrentFile(zipFile);
                     unzClose(zipFile);
                     return 1;
@@ -290,7 +292,7 @@ int extractZip(const char *inputPath, const char *destinationDir) {
         if ((i+1) < globalInfo.number_entry) {
             if (unzGoToNextFile(zipFile) != UNZ_OK)
             {
-                outputLog("could not read next file\n");
+                platform::outputLog("could not read next file\n");
                 unzClose(zipFile);
                 return 1;
             }

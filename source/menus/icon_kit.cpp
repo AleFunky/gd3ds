@@ -1,30 +1,20 @@
 #include <3ds.h>
 #include <citro2d.h>
 #include "icons.hpp"
+#include "macros.hpp"
 #include "menus/core/ui_screen.hpp"
-#include "math_helpers.hpp"
 #include "menus/components/ui_list.hpp"
-#include "menus/components/ui_window.hpp"
-#include "menus/components/ui_textbox.hpp"
-#include "menus/components/ui_image.hpp"
 #include "menus/components/ui_button.hpp"
 #include "menus/components/ui_icon.hpp"
 #include "menus/components/ui_label.hpp"
 #include "save/saving.hpp"
-#include "fonts/bigFont.hpp"
-#include "main.hpp"
-#include "easing.hpp"
 #include "triggers.hpp"
-#include "mp3_player.hpp"
 #include "graphics.hpp"
 #include "icon_kit.hpp"
-#include "level/main_levels.hpp"
-
-#include "palette_kit.hpp"
-
-#include "save/config.hpp"
 #include "state.hpp"
 #include "menus/creator_menu/search_menu.hpp"
+
+#include "menus/core/common_setters.hpp"
 
 namespace gd3ds
 {

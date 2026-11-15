@@ -1,10 +1,11 @@
 #include "lightning.hpp"
 #include <citro2d.h>
-#include <random>
 #include "math_helpers.hpp"
-#include "graphics.hpp"
 #include "state.hpp"
 #include "utils/gfx.hpp"
+#include "triggers.hpp"
+#include "constants.hpp"
+#include "game/game_manager.hpp"
 
 namespace gd3ds
 {
@@ -69,7 +70,7 @@ std::vector<LightningSegment> Lightning::generateLightingRecursive(
 }
 
 void Lightning::updateLightningTimer(){
-    m_time += delta;
+    m_time += GameManager::get()->deltaTime;
 }
 
 void Lightning::renderLightning(){
@@ -85,8 +86,8 @@ void Lightning::renderLightning(){
 
         float topX = s.startX - state.cameraX;
         float btmX = s.endX - state.cameraX;
-        float topY = SCREEN_HEIGHT - (s.startY - state.cameraY);
-        float btmY = SCREEN_HEIGHT - (s.endY  - state.cameraY);
+        float topY = constants::ScreenHeight - (s.startY - state.cameraY);
+        float btmY = constants::ScreenHeight - (s.endY  - state.cameraY);
 
         C2D_DrawLine(getMirrorX(topX, state.mirrorFactor), topY, color, getMirrorX(btmX, state.mirrorFactor), btmY, color, 2, 0.0f);
     }

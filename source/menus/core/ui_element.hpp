@@ -4,10 +4,10 @@
 #include <vector>
 #include <3ds.h>
 #include <citro2d.h>
-#include "particles/circles.hpp"
+#include "../../particles/circles.hpp"
 #include <malloc.h>
 
-#include "particles/particles.hpp"
+#include "../../particles/particles.hpp"
 #include "ui_props.hpp"
 
 #define TAGS_PER_ELEMENT 5

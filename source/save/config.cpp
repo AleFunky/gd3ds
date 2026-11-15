@@ -1,6 +1,7 @@
 #include "config.hpp"
 
 #include <3ds.h>
+#include "macros.hpp"
 #include "main.hpp"
 
 #include <sys/stat.h>
@@ -16,6 +17,9 @@
 #include "utils/json_config.hpp"
 
 #include "utils/server_utils.hpp"
+
+#include "game/game_manager.hpp"
+#include "game/audio_manager.hpp"
 
 namespace gd3ds
 {
@@ -78,7 +82,7 @@ void saveUserConfig(Config *cfg) {
 void initValues() {
     configInitBool(&cfg, CONFIG_FLAGS "sogged", false);
     configInitBool(&cfg, CONFIG_FLAGS "gdps", false);
-    configInitBool(&cfg, CONFIG_FLAGS "nightlyUpdates", isNightly);
+    configInitBool(&cfg, CONFIG_FLAGS "nightlyUpdates", GameManager::get()->platformState.isNightly);
     configInitBool(&cfg, CONFIG_FLAGS "autoUpdate", false);
     configInitBool(&cfg, CONFIG_FLAGS "3dWarningPassed", false);
     
@@ -130,17 +134,19 @@ void cfgInit() {
     doAutoUpdates = configGetBool(&cfg, CONFIG_FLAGS "autoUpdate", false);
     useNightlyBranch = configGetBool(&cfg, CONFIG_FLAGS "nightlyUpdates", false);
 
+    bool gdps = GameManager::get()->platformState.isGDPS;
+
     gotSogged = configGetBool(&cfg, CONFIG_FLAGS "sogged", false);
     gdps = configGetBool(&cfg, CONFIG_FLAGS "gdps", false);
     strcpy(menuLoopPath, gdps ? "romfs:/songs/menuLoopGDPS.mp3" : "romfs:/songs/menuLoop.mp3");
-    threeDWarningPassed = configGetBool(&cfg, CONFIG_FLAGS "3dWarningPassed", false);
+    GameManager::get()->platformState.has3DWarningPassed = configGetBool(&cfg, CONFIG_FLAGS "3dWarningPassed", false);
 
     playersDestroyed = configGetInt(&cfg, CONFIG_VALUES "playersDestroyed", 0);
-    musicVolume = configGetFloat(&cfg, CONFIG_VALUES "music_volume", 1);
-    soundVolume = configGetFloat(&cfg, CONFIG_VALUES "sound_volume", 1);
+    AudioManager::get()->musicVolume = configGetFloat(&cfg, CONFIG_VALUES "music_volume", 1);
+    AudioManager::get()->soundVolume = configGetFloat(&cfg, CONFIG_VALUES "sound_volume", 1);
 
     loadUserConfig(&cfg);
-    dimSecondaryScreen = configGetFloat(&cfg, CONFIG_COSMETIC_PATH "dimSecondaryScreen", 0);
+    GameManager::get()->dimSecondaryScreen = configGetFloat(&cfg, CONFIG_COSMETIC_PATH "dimSecondaryScreen", 0);
     
     selectedCube = configGetInt(&cfg, CONFIG_CUSTOMIZATION_PATH "cube", 1);
     selectedShip = configGetInt(&cfg, CONFIG_CUSTOMIZATION_PATH "ship", 1);
@@ -181,12 +187,12 @@ void cfgSave() {
     configSetBool(&cfg, CONFIG_FLAGS "autoUpdate", doAutoUpdates);
     configSetBool(&cfg, CONFIG_FLAGS "nightlyUpdates", useNightlyBranch);
     configSetBool(&cfg, CONFIG_FLAGS "sogged", gotSogged);
-    configSetBool(&cfg, CONFIG_FLAGS "gdps", gdps);
-    configSetBool(&cfg, CONFIG_FLAGS "3dWarningPassed", threeDWarningPassed);
+    configSetBool(&cfg, CONFIG_FLAGS "gdps", GameManager::get()->platformState.isGDPS);
+    configSetBool(&cfg, CONFIG_FLAGS "3dWarningPassed", GameManager::get()->platformState.has3DWarningPassed);
 
     configSetInt(&cfg, CONFIG_VALUES "playersDestroyed", playersDestroyed);
-    configSetFloat(&cfg, CONFIG_VALUES "music_volume", musicVolume);
-    configSetFloat(&cfg, CONFIG_VALUES "sound_volume", soundVolume);
+    configSetFloat(&cfg, CONFIG_VALUES "music_volume", AudioManager::get()->musicVolume);
+    configSetFloat(&cfg, CONFIG_VALUES "sound_volume", AudioManager::get()->soundVolume);
 
     configSetInt(&cfg, CONFIG_CUSTOMIZATION_PATH "cube", selectedCube);
     configSetInt(&cfg, CONFIG_CUSTOMIZATION_PATH "ship", selectedShip);
@@ -202,7 +208,7 @@ void cfgSave() {
     configSetBool(&cfg, CONFIG_CUSTOMIZATION_PATH "playerGlowEnabled", playerGlowEnabled);
 
     saveUserConfig(&cfg);
-    configSetFloat(&cfg, CONFIG_COSMETIC_PATH "dimSecondaryScreen", dimSecondaryScreen);
+    configSetFloat(&cfg, CONFIG_COSMETIC_PATH "dimSecondaryScreen", GameManager::get()->dimSecondaryScreen);
 
     configSetBool(&cfg, CONFIG_FILTERS_PATH "na", filters.isNA);
     configSetBool(&cfg, CONFIG_FILTERS_PATH "auto", filters.isAuto);

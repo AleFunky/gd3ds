@@ -1,5 +1,6 @@
 #include "screen_definitions.hpp"
 
+#include "macros.hpp"
 #include "menus/creator_menu/search/clear_search_filters.hpp"
 #include "menus/creator_menu/creator_menu.hpp"
 #include "menus/creator_menu/online/online_menu.hpp"
@@ -14,9 +15,7 @@
 #include "menus/settings_hub/info_card.hpp"
 #include "menus/settings_hub/dim_screen.hpp"
 #include "menus/creator_menu/search/length_filter.hpp"
-#include "menus/level_complete.hpp"
 #include "menus/level_select.hpp"
-#include "menus/loading_screen.hpp"
 #include "menus/main_menu.hpp"
 #include "menus/creator_menu/online/online_level_comments.hpp"
 #include "menus/creator_menu/online/online_level_infobox.hpp"
@@ -35,6 +34,7 @@
 #include "menus/updater.hpp"
 #include "menus/updater_settings.hpp"
 #include "menus/updater_pop_up.hpp"
+#include "menus/level_options.hpp"
 
 namespace gd3ds
 {

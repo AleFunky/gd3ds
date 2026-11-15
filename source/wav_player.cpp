@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "wav_player.hpp"
-#include "main.hpp"
+#include "game/audio_manager.hpp"
+
 namespace gd3ds
 {
 
@@ -90,7 +91,7 @@ void playSfx(SFX* sfx, int channel) {
 
     ndspChnWaveBufAdd(channel, &waveBufs[channel]);
     
-    applyVolumeSettings();
+    AudioManager::get()->applyVolumeSettings();
 }
 
 }

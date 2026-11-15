@@ -2,6 +2,8 @@
 #include <3ds.h>
 #include <citro2d.h>
 
+#include "game/platform.hpp"
+#include "macros.hpp"
 #include "main.hpp"
 #include "menus/core/ui_screen.hpp"
 #include "mp3_player.hpp"
@@ -9,8 +11,6 @@
 #include "utils/server_utils.hpp"
 
 #include "menus/core/ui_stack.hpp"
-#include "menus/components/ui_label.hpp"
-#include "menus/components/ui_checkbox.hpp"
 #include "menus/components/ui_window_button.hpp"
 #include "menus/components/ui_image.hpp"
 #include "menus/components/ui_window_button.hpp"
@@ -23,21 +23,21 @@ namespace gd3ds
 static void darkenText(UIElement* e){
     UILabel *l = (UILabel *)e;
 
-    if(uiPropInt(&e->parent->customProperties, "server", 0) != gdps) snprintf(l->text, sizeof(l->text), "<127, 127, 127>%s</>", uiPropString(&e->customProperties, "basetext", "Fuck you"));
+    if(uiPropInt(&e->parent->customProperties, "server", 0) != GameManager::get()->platformState.isGDPS) snprintf(l->text, sizeof(l->text), "<127, 127, 127>%s</>", uiPropString(&e->customProperties, "basetext", "Fuck you"));
     else snprintf(l->text, sizeof(l->text), "<255, 255, 255>%s</>", uiPropString(&e->customProperties, "basetext", "Fuck you"));
 }
 
 static void darkenImage(UIElement* e){
     UIImage *i = (UIImage *)e;
 
-    if(uiPropInt(&e->parent->customProperties, "server", 0) != gdps) uiImageSetTint(i, C2D_Color32(127, 127, 127, 255));
+    if(uiPropInt(&e->parent->customProperties, "server", 0) != GameManager::get()->platformState.isGDPS) uiImageSetTint(i, C2D_Color32(127, 127, 127, 255));
     else uiImageSetTint(i, C2D_Color32(255, 255, 255, 255));
 }
 
 static void darkenButton(UIElement* e){
     UIWindowButton *b = (UIWindowButton *)e;
 
-    if(uiPropInt(&e->customProperties, "server", 0) != gdps) uiWindowButtonSetTint(b, C2D_Color32(127, 127, 127, 255));
+    if(uiPropInt(&e->customProperties, "server", 0) != GameManager::get()->platformState.isGDPS) uiWindowButtonSetTint(b, C2D_Color32(127, 127, 127, 255));
     else uiWindowButtonSetTint(b, C2D_Color32(255, 255, 255, 255));
 }
 
@@ -49,39 +49,39 @@ static void updateServerButtons(UIScreen *s){
 
 static void actionSwitchServer(UIElement* e, const UIPropertyList *args) {
     int target = uiPropInt(&e->customProperties, "server", 0);
-    bool gdpsBefore = gdps;
-    gdps = (target == 1);
+    bool wasGDPS = GameManager::get()->platformState.isGDPS;
+    GameManager::get()->platformState.isGDPS = (target == 1);
 
-    if(gdps != gdpsBefore){
+    if(GameManager::get()->platformState.isGDPS != wasGDPS){
         stopMP3();
-        strcpy(menuLoopPath, gdps ? "romfs:/songs/menuLoopGDPS.mp3" : "romfs:/songs/menuLoop.mp3");
+        strcpy(menuLoopPath, GameManager::get()->platformState.isGDPS ? "romfs:/songs/menuLoopGDPS.mp3" : "romfs:/songs/menuLoop.mp3");
         playingMenuLoop = false;
         playMenuSong();
 
-        if (gdps) {
+        if (GameManager::get()->platformState.isGDPS) {
             filters.difficultyFilters = filters.isDemon ? 0 : filters.difficultyFilters;
         }
 
         if (uiStackCheckLoadedRoot(&searchMenuDef)) {
             UIScreenPair *screenPair = uiStackGetLoadedScreen(&searchMenuDef);
             UIScreen *screen = &screenPair->screens[static_cast<int>(Screens::ScreenBtm)];
-            if(gdps){
+            if(GameManager::get()->platformState.isGDPS){
                 disableDemons(screen);
-            } else if(!gdps && filters.isDemon){
+            } else if(!GameManager::get()->platformState.isGDPS && filters.isDemon){
                 enableDemons(screen);
             }
 
             updateDifficultyTints(screen);
         }
 
-        filters.super = filters.super && gdps;
+        filters.super = filters.super && GameManager::get()->platformState.isGDPS;
         filters.mainSong = 0;
         filters.songFilter = false;
     }
 
     updateServerButtons(e->screen);
 
-    loadGdpsInfo();
+    platform::loadGdpsInfo();
 }
 
 static UIActionDef serverSwitcherActions[] = {

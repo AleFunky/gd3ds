@@ -4,23 +4,27 @@
 #include "main.hpp"
 #include "state.hpp"
 #include "menus/settings_hub/settings.hpp"
+#include "types.hpp"
 #include "utils/utils.hpp"
+
+#include "constants.hpp"
+#include "game/platform.hpp"
 
 namespace gd3ds
 {
 
 void setScissor(GPU_SCISSORMODE mode, int x, int y, int width, int height) {
     int screenWidth = GSP_SCREEN_HEIGHT_BOTTOM;
-    int screen_height = GSP_SCREEN_WIDTH;
+    int screenHeight = GSP_SCREEN_WIDTH;
 
     int invX = screenWidth - (x + width);
-    int invY = screen_height - (y + height);
+    int invY = screenHeight - (y + height);
 
     C2D_Flush();
     C3D_SetScissor(mode,
-        CLAMP(invY         , 0, screen_height), // left (Y min)
+        CLAMP(invY         , 0, screenHeight), // left (Y min)
         CLAMP(invX         , 0, screenWidth),  // top (X min)
-        CLAMP(invY + height, 0, screen_height), // right (Y max)
+        CLAMP(invY + height, 0, screenHeight), // right (Y max)
         CLAMP(invX + width , 0, screenWidth)   // bottom (X max)
     );
     C2D_Prepare();
@@ -145,7 +149,7 @@ void draw9Slice(const C2D_Image atlas, const float x, const float y, const float
 
 C3D_RenderTarget* c2dCreateScreenTargetExt(gfxScreen_t screen, gfx3dSide_t side, bool aa) {
     u8 model = getModel();
-    bool wide = settingsState.wideEnabled && model != CFG_MODEL_2DS && !isCitra() && screen == GFX_TOP;
+    bool wide = settingsState.wideEnabled && model != CFG_MODEL_2DS && !platform::isCitra() && screen == GFX_TOP;
 
     int height;
     switch (screen)
@@ -227,7 +231,7 @@ void updateStereoTarget() {
 
 void setWide(bool wide) {
     u8 model = getModel();
-    if (model != CFG_MODEL_2DS && !isCitra()) {
+    if (model != CFG_MODEL_2DS && !platform::isCitra()) {
         settingsState.wideEnabled = wide;
         gfxSetWide(wide);
     }
@@ -337,7 +341,7 @@ void endEyeLayer() {
 }
 
 float getMirrorX(float x, float factor) {
-    float width = SCREEN_WIDTH_AREA_GAMEPLAY(settingsState.swapGameplayScreens && !inLevelComplete);
+    float width = SCREEN_WIDTH_AREA_GAMEPLAY(settingsState.swapGameplayScreens && !GameManager::get()->inLevelComplete);
 
     if (factor == 0) return x;
     else if (factor == 1) return width - x;
@@ -502,11 +506,11 @@ float mirrorXOnScreen(float val) {
 }
 
 float calcYOnScreen(float val) {
-    return SCREEN_HEIGHT - ((val - state.cameraY));
+    return constants::ScreenHeight - ((val - state.cameraY));
 }
 
 
-bool isCcw(Vec2D *poly, int n) {
+bool isCcw(Point *poly, int n) {
     float sum = 0.0f;
     for (int i = 0; i < n; i++) {
         int j = (i + 1) % n;
@@ -515,24 +519,24 @@ bool isCcw(Vec2D *poly, int n) {
     return sum < 0.0f; // CCW if sum < 0
 }
 
-void computeMiteredOffsets(Vec2D *poly, Vec2D *offsets, int n, float thickness, bool ccw) {
+void computeMiteredOffsets(Point *poly, Point *offsets, int n, float thickness, bool ccw) {
     for (int i = 0; i < n; i++) {
         int prev = (i + n - 1) % n;
         int next = (i + 1) % n;
 
         // Edge vectors
-        Vec2D ePrev = { poly[i].x - poly[prev].x, poly[i].y - poly[prev].y };
-        Vec2D eNext = { poly[next].x - poly[i].x, poly[next].y - poly[i].y };
+        Point ePrev = { poly[i].x - poly[prev].x, poly[i].y - poly[prev].y };
+        Point eNext = { poly[next].x - poly[i].x, poly[next].y - poly[i].y };
 
         // Normals
-        Vec2D nPrev = normalize(perpendicular(ePrev));
-        Vec2D nNext = normalize(perpendicular(eNext));
+        Point nPrev = normalize(perpendicular(ePrev));
+        Point nNext = normalize(perpendicular(eNext));
 
         // Flip to point inward if mirror
         if (state.mirrorFactor < 0.5f) { nPrev.x = -nPrev.x; nPrev.y = -nPrev.y; nNext.x = -nNext.x; nNext.y = -nNext.y; }
 
         // Miter = normalize(n_prev + n_next)
-        Vec2D miter = normalize((Vec2D){ nPrev.x + nNext.x, nPrev.y + nNext.y });
+        Point miter = normalize((Point){ nPrev.x + nNext.x, nPrev.y + nNext.y });
 
         // Compute miter length to preserve thickness
         float cosHalfAngle = dotVec(miter, nNext); // cos(theta/2)
@@ -543,10 +547,10 @@ void computeMiteredOffsets(Vec2D *poly, Vec2D *offsets, int n, float thickness, 
     }
 }
 
-void drawPolygonInwardMitered(Vec2D *poly, int n, float thickness, u32 *color, float depth) {
+void drawPolygonInwardMitered(Point *poly, int n, float thickness, u32 *color, float depth) {
     bool ccw = isCcw(poly, n);
 
-    Vec2D offsets[n];
+    Point offsets[n];
     computeMiteredOffsets(poly, offsets, n, thickness, ccw);
 
     for (int i = 0; i < n; i++) {
@@ -580,7 +584,7 @@ void drawPolygonInwardMitered(Vec2D *poly, int n, float thickness, u32 *color, f
     }
 }
 
-void drawHitboxLineInward(Vec2D rect[4], 
+void drawHitboxLineInward(Point rect[4], 
                              const float x1, const float y1,
                              const float x2, const float y2,
                              const float thickness,

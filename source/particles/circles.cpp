@@ -2,7 +2,7 @@
 #include "easing.hpp"
 #include "utils/gfx.hpp"
 #include "state.hpp"
-#include "main.hpp"
+#include "constants.hpp"
 #include "level_loading.hpp"
 #include <stdlib.h>
 
@@ -493,7 +493,7 @@ void drawUseEffects(UseEffectPool *pool) {
                     float fadeScale = 1.f;
                     getFadeVars(effect->obj, tmpX, &fadeX, &fadeY, &fadeScale);
 
-                    opacity = objEdgeFade(tmpX, SCREEN_WIDTH / SCALE) / 255.f;
+                    opacity = objEdgeFade(tmpX, constants::ScreenWidth / SCALE) / 255.f;
 
                     x = getMirrorX(tmpX + fadeX, state.mirrorFactor);
                     y = GSP_SCREEN_WIDTH - ((y - state.cameraY));  

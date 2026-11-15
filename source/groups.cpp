@@ -5,7 +5,7 @@
 #include "math_helpers.hpp"
 #include <stdlib.h>
 #include "main.hpp"
-#include "triggers.hpp"
+#include "types.hpp"
 
 namespace gd3ds
 {
@@ -26,13 +26,13 @@ struct GroupCombination {
     float offsetY;
 
     Matrix2x2 rotationMatrix;
-    Vec2D rotationOffset;
+    Point rotationOffset;
     bool rotationTouched;
     
     Matrix2x2 deferredMatrix;
-    Vec2D deferredOffset;
+    Point deferredOffset;
     Matrix2x2 deferredNoXMatrix;
-    Vec2D deferredNoXOffset;
+    Point deferredNoXOffset;
     
     bool touched;
     bool deferredTouched;
@@ -103,16 +103,16 @@ static bool isSameGroupCombination(int count, short *groupA, short *groupB) {
 static void prepareDeferredTransform(GroupCombination *combination) {
     if (!combination->deferredTouched) {
         combination->deferredMatrix = matrix2x2Identity();
-        combination->deferredOffset = (Vec2D){ 0.f, 0.f };
+        combination->deferredOffset = (Point){ 0.f, 0.f };
         combination->deferredNoXMatrix = matrix2x2Identity();
-        combination->deferredNoXOffset = (Vec2D){ 0.f, 0.f };
+        combination->deferredNoXOffset = (Point){ 0.f, 0.f };
         combination->deferredTouched = true;
         deferred_combinations[deferredCombinationCount++] = (int)(combination - group_combinations);
     }
 }
 
 static void deferGroupCombinationTransform(GroupCombination *combination,
-    Matrix2x2 matrix, Vec2D offset) {
+    Matrix2x2 matrix, Point offset) {
     prepareDeferredTransform(combination);
     composeAffineTransform(&combination->deferredMatrix, &combination->deferredOffset, matrix, offset);
     composeAffineTransform(&combination->deferredNoXMatrix, &combination->deferredNoXOffset, matrix, offset);
@@ -125,10 +125,10 @@ static void deferGroupCombinationMove(GroupCombination *combination, float delta
     combination->deferredNoXOffset.y += deltaY;
 }
 
-static Vec2D applyDeferredTransform(const Matrix2x2 *matrix, Vec2D offset, Vec2D point) {
+static Point applyDeferredTransform(const Matrix2x2 *matrix, Point offset, Point point) {
     if (matrix->m[0][0] == 1.f && matrix->m[0][1] == 0.f &&
         matrix->m[1][0] == 0.f && matrix->m[1][1] == 1.f) {
-        return (Vec2D){ point.x + offset.x, point.y + offset.y };
+        return (Point){ point.x + offset.x, point.y + offset.y };
     }
 
     return affineTransformPoint(*matrix, offset, point);
@@ -275,7 +275,7 @@ void beginGroupCombinationRotationStep(void) {
     for (int i = 0; i < rotationCombinationCount; i++) {
         GroupCombination *combination = &group_combinations[rotation_combinations[i]];
         combination->rotationMatrix = matrix2x2Identity();
-        combination->rotationOffset = (Vec2D){ 0.f, 0.f };
+        combination->rotationOffset = (Point){ 0.f, 0.f };
         combination->rotationTouched = false;
     }
     rotationCombinationCount = 0;
@@ -311,8 +311,8 @@ bool addRotationToGroupCombinations(int group, const Matrix2x2 *matrix, float pi
     GroupNode *node = getGroup(group);
     if (!node) return false;
 
-    Vec2D pivot = { pivotX, pivotY };
-    Vec2D offset = subVec(pivot, matrix2x2Transform(*matrix, pivot));
+    Point pivot = { pivotX, pivotY };
+    Point offset = subVec(pivot, matrix2x2Transform(*matrix, pivot));
     bool hasTransform = matrix->m[0][0] != 1.f || matrix->m[0][1] != 0.f || matrix->m[1][0] != 0.f || matrix->m[1][1] != 1.f || offset.x != 0.f || offset.y != 0.f;
 
     for (int i = 0; i < node->combinationCount; i++) {
@@ -321,7 +321,7 @@ bool addRotationToGroupCombinations(int group, const Matrix2x2 *matrix, float pi
         if (hasTransform && combination->collisionObjectCount > 0) {
             if (!combination->rotationTouched) {
                 combination->rotationMatrix = matrix2x2Identity();
-                combination->rotationOffset = (Vec2D){ 0.f, 0.f };
+                combination->rotationOffset = (Point){ 0.f, 0.f };
                 combination->rotationTouched = true;
                 rotation_combinations[rotationCombinationCount++] = combinationIndex;
             }
@@ -379,7 +379,7 @@ void applyGroupCombinationRotation(void) {
             float x = objects.x[object];
             float y = objects.y[object];
 
-            Vec2D transformed = affineTransformPoint(combination->rotationMatrix, combination->rotationOffset, (Vec2D){ x, y });
+            Point transformed = affineTransformPoint(combination->rotationMatrix, combination->rotationOffset, (Point){ x, y });
             objects.x[object] = transformed.x;
             objects.y[object] = transformed.y;
 
@@ -388,7 +388,7 @@ void applyGroupCombinationRotation(void) {
         }
 
         combination->rotationMatrix = matrix2x2Identity();
-        combination->rotationOffset = (Vec2D){ 0.f, 0.f };
+        combination->rotationOffset = (Point){ 0.f, 0.f };
         combination->rotationTouched = false;
     }
     rotationCombinationCount = 0;
@@ -408,7 +408,7 @@ void getGroupObjectPosition(int object, float *x, float *y) {
 
         float currentX = *x;
         float currentY = *y;
-        Vec2D transformed = affineTransformPoint(combination->rotationMatrix, combination->rotationOffset, (Vec2D){ currentX, currentY });
+        Point transformed = affineTransformPoint(combination->rotationMatrix, combination->rotationOffset, (Point){ currentX, currentY });
         *x = transformed.x;
         *y = transformed.y;
         return;
@@ -422,8 +422,8 @@ void getGroupObjectPosition(int object, float *x, float *y) {
     bool canMoveX = (objects.flags[object] & static_cast<int>(ObjectFlags::FlagCanBeXMoved)) != 0;
 
     Matrix2x2 matrix = canMoveX ? combination->deferredMatrix : combination->deferredNoXMatrix;
-    Vec2D offset = canMoveX ? combination->deferredOffset : combination->deferredNoXOffset;
-    Vec2D transformed = applyDeferredTransform(&matrix, offset, (Vec2D){ currentX, currentY });
+    Point offset = canMoveX ? combination->deferredOffset : combination->deferredNoXOffset;
+    Point transformed = applyDeferredTransform(&matrix, offset, (Point){ currentX, currentY });
     *x = transformed.x;
     *y = transformed.y;
 }
@@ -444,19 +444,19 @@ void flushGroupCombinationVisualMoves(void) {
             bool canMoveX = (objects.flags[object] & static_cast<int>(ObjectFlags::FlagCanBeXMoved)) != 0;
 
             Matrix2x2 matrix = canMoveX ? combination->deferredMatrix : combination->deferredNoXMatrix;
-            Vec2D offset = canMoveX ? combination->deferredOffset : combination->deferredNoXOffset;
-            Vec2D transformed = applyDeferredTransform(&matrix, offset, (Vec2D){ x, y });
+            Point offset = canMoveX ? combination->deferredOffset : combination->deferredNoXOffset;
+            Point transformed = applyDeferredTransform(&matrix, offset, (Point){ x, y });
             objects.x[object] = transformed.x;
             objects.y[object] = transformed.y;
 
             if ((int)(objects.x[object] / SECTION_SIZE) != oldSx || (int)(objects.y[object] / SECTION_SIZE) != oldSy)
                 updateObjectSection(object);
         }
-        combination->deferredOffset = (Vec2D){ 0.f, 0.f };
+        combination->deferredOffset = (Point){ 0.f, 0.f };
         combination->deferredMatrix = matrix2x2Identity();
         combination->deferredTouched = false;
         combination->deferredNoXMatrix = matrix2x2Identity();
-        combination->deferredNoXOffset = (Vec2D){ 0.f, 0.f };
+        combination->deferredNoXOffset = (Point){ 0.f, 0.f };
     }
     deferredCombinationCount = 0;
 }
@@ -464,11 +464,11 @@ void flushGroupCombinationVisualMoves(void) {
 void discardGroupCombinationVisualMoves(void) {
     for (int i = 0; i < deferredCombinationCount; i++) {
         GroupCombination *combination = &group_combinations[deferred_combinations[i]];
-        combination->deferredOffset = (Vec2D){ 0.f, 0.f };
+        combination->deferredOffset = (Point){ 0.f, 0.f };
         combination->deferredMatrix = matrix2x2Identity();
         combination->deferredTouched = false;
         combination->deferredNoXMatrix = matrix2x2Identity();
-        combination->deferredNoXOffset = (Vec2D){ 0.f, 0.f };
+        combination->deferredNoXOffset = (Point){ 0.f, 0.f };
     }
     deferredCombinationCount = 0;
 }

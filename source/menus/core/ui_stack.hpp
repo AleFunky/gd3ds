@@ -1,9 +1,9 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include "main.hpp"
+#include "../../main.hpp"
 #include "ui_screen.hpp"
-#include "graphics.hpp"
+#include "../../graphics.hpp"
 
 namespace gd3ds
 {

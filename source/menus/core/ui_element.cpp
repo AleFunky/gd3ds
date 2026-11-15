@@ -1,6 +1,7 @@
 #include <algorithm>
 #include "ui_element.hpp"
 #include "ui_screen.hpp"
+#include "menus/core/common_setters.hpp"
 
 namespace gd3ds
 {

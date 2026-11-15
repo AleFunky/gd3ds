@@ -1,7 +1,6 @@
 #include "state.hpp"
 #include <string.h>
 #include "player/player.hpp"
-#include "player/robot_anim_data.hpp"
 #include "main.hpp"
 #include "math_helpers.hpp"
 #include "player/slope.hpp"
@@ -11,14 +10,16 @@
 #include "particles/particles.hpp"
 #include "menus/settings_hub/settings.hpp"
 #include "menus/icon_kit.hpp"
-#include "practice.hpp"
 #include "sounds.hpp"
-#include "utils/json_config.hpp"
 #include "level/main_levels.hpp"
 #include "level_loading.hpp"
 #include "menus/level_select.hpp"
 #include "save/saving.hpp"
 #include "particles/divorce_effect.hpp"
+
+#include "constants.hpp"
+#include "triggers.hpp"
+#include "game/game_manager.hpp"
 
 #include "new_best.hpp"
 #include "endwall.hpp"
@@ -26,7 +27,7 @@
 
 #define FIRST_ATTEMPT_CAMERA_OFFSET 15
 #define PLAYER_CAMERA_X_OFFSET 125.0f
-#define PLAYER_CAMERA_X_OFFSET_BOT (PLAYER_CAMERA_X_OFFSET * (SCREEN_BOT_WIDTH / (float)SCREEN_WIDTH))
+#define PLAYER_CAMERA_X_OFFSET_BOT (PLAYER_CAMERA_X_OFFSET * (constants::ScreenBotWidth / (float)constants::ScreenWidth))
 
 namespace gd3ds
 {
@@ -311,9 +312,9 @@ void initState() {
 
     state.showPlayer = true;
 
-    inLevelComplete = false;
+    GameManager::get()->inLevelComplete = false;
 
-    cheated = false;
+    GameManager::get()->cheated = false;
     for (int i = 0; i < static_cast<int>(Cheats::CheatCount); i++) {
         cheatsUsed[i] = false;
     }
@@ -417,7 +418,7 @@ void initTrails(int trail) {
 }
 
 void initVariables() {
-    levelFrame = 0;
+    GameManager::get()->levelFrame = 0;
    
     initTrails(selectedTrail);
     initWaveTrails();
@@ -446,7 +447,7 @@ void initVariables() {
 void handleDeath(Player *player, bool pauseSong) {
     state.deathPlayer = state.player;
     playSfx(&explodeSound, 1);
-    if (songLoaded && pauseSong) {
+    if (GameManager::get()->songLoaded && pauseSong) {
         if (!state.practiceMode) {
             pausePlaybackMP3();
             seekMP3(levelInfo.songOffset);
@@ -553,9 +554,9 @@ void playLevelSong(float seek) {
         size_t sz = 0;
         void *buf = loadUserSong(levelInfo.customSongID, &sz);
         if (buf) {
-            songLoaded = playMP3Buf(buf, sz, false, seek, false);
+            GameManager::get()->songLoaded = playMP3Buf(buf, sz, false, seek, false);
         } else {
-            songLoaded = false;
+            GameManager::get()->songLoaded = false;
         }
     } else {
         size_t songID = currLevelID;
@@ -563,9 +564,9 @@ void playLevelSong(float seek) {
         if (state.customLevel) songID = levelInfo.songID;
 
         if (songID < currentMainLevelPack->count) {
-            songLoaded = playMP3(currentMainLevelPack->levels[songID].songPath, false, seek);
+            GameManager::get()->songLoaded = playMP3(currentMainLevelPack->levels[songID].songPath, false, seek);
         } else {
-            songLoaded = false;
+            GameManager::get()->songLoaded = false;
         }
     }
 }

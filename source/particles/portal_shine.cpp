@@ -1,12 +1,15 @@
 #include "portal_shine.hpp"
-#include "menus/settings_hub/settings.hpp"
+
+#include "game/game_manager.hpp"
 #include "graphics.hpp"
-#include "main.hpp"
 #include "state.hpp"
 #include "utils/gfx.hpp"
 #include "math_helpers.hpp"
 #include "level_loading.hpp"
+#include "constants.hpp"
 #include <deque>
+
+#include "menus/settings_hub/settings.hpp"
 
 namespace gd3ds {
 
@@ -44,7 +47,7 @@ PortalShine::PortalShine(ShineType type, int obj){
 }
 
 void PortalShine::updateShine(){
-    m_time += delta;
+    m_time += GameManager::get()->deltaTime;
 }
 
 //This is offset locally in the X direction for some reason please help
@@ -65,7 +68,7 @@ void PortalShine::drawShine(bool front){
     C2D_PlainImageTint(&tint, color, 1.0f);
 
     float calcX = objects.x[m_obj] - state.cameraX;
-    float calcY = SCREEN_HEIGHT - (objects.y[m_obj] - state.cameraY);
+    float calcY = constants::ScreenHeight - (objects.y[m_obj] - state.cameraY);
     float fadeVal = objEdgeFade(calcX, GAMEPLAY_SCREEN_WIDTH_AREA);
     
     float fadeX = 0;

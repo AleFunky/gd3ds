@@ -1,6 +1,6 @@
 
 #include <citro2d.h>
-#include "main.hpp"
+#include "macros.hpp"
 #include "menus/core/ui_screen.hpp"
 #include "menus/core/ui_props.hpp"
 

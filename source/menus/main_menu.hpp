@@ -1,5 +1,5 @@
 #pragma once
-#include "menus/core/ui_stack.hpp"
+#include "../menus/core/ui_stack.hpp"
 
 extern bool inInfoCard;
 

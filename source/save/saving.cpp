@@ -1,12 +1,11 @@
+#include <3ds.h>
 #include "saving.hpp"
 #include "3ds/thread.h"
+#include "game/platform.hpp"
 #include "json-c/json_object.h"
 #include "json-c/json_tokener.h"
-#include "json-c/json_types.h"
-#include "json-c/json_util.h"
 #include "level_loading.hpp"
 #include "main.hpp"
-#include "menus/creator_menu/search_menu.hpp"
 #include "save/config.hpp"
 #include "utils/folders.hpp"
 #include "utils/json_config.hpp"
@@ -22,7 +21,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "math_helpers.hpp"
 #include "utils/server_utils.hpp"
 #include "utils/utils.hpp"
 
@@ -115,7 +113,7 @@ LevelDataEntry *getOnlineLevelData(int levelID) {
     snprintf(file, sizeof(file), "%d", levelID);
     char tmp[17];
     snprintf(tmp, sizeof(tmp), "%016llX", fnv1a64(file));
-    return levelDataListFind(&currentServerFile->onlineLevels, tmp);
+    return levelDataListFind(&platform::currentServerFile->onlineLevels, tmp);
 }
 
 SavedLevelDataEntry *getSavedLevelData(int levelID) {
@@ -123,7 +121,7 @@ SavedLevelDataEntry *getSavedLevelData(int levelID) {
     snprintf(file, sizeof(file), "%d", levelID);
     char tmp[17]; 
     snprintf(tmp, sizeof(tmp), "%016llX", fnv1a64(file));
-    return savedLevelDataListFind(&currentServerFile->savedLevels, tmp);
+    return savedLevelDataListFind(&platform::currentServerFile->savedLevels, tmp);
 }
 
 static void calculateStatsLevelList(LevelDataList *list, bool isMainLevel, const MainLevelPack *pack) {
@@ -185,22 +183,22 @@ void calculateStats() {
     completedExternalLevels = 0;
 
     // Calculate stats
-    calculateStatsLevelList(&gdServerFile.mainLevels, true, &robtopLevels);
-    calculateStatsLevelList(&gdServerFile.onlineLevels, false, NULL);
+    calculateStatsLevelList(&platform::gdServerFile.mainLevels, true, &robtopLevels);
+    calculateStatsLevelList(&platform::gdServerFile.onlineLevels, false, NULL);
     
-    calculateStatsLevelList(&gdpsFile.mainLevels, true, &gdpsLevels);
-    calculateStatsLevelList(&gdpsFile.onlineLevels, false, NULL);
+    calculateStatsLevelList(&platform::gdpsFile.mainLevels, true, &gdpsLevels);
+    calculateStatsLevelList(&platform::gdpsFile.onlineLevels, false, NULL);
 
-    calculateStatsLevelList(&externalFile.externalLevels, false, NULL);
+    calculateStatsLevelList(&platform::externalFile.externalLevels, false, NULL);
 
-    totalUserCoins += countListUserCoins(&gdServerFile.onlineLevels);
-    totalUserCoins += countListUserCoins(&gdpsFile.onlineLevels);
+    totalUserCoins += countListUserCoins(&platform::gdServerFile.onlineLevels);
+    totalUserCoins += countListUserCoins(&platform::gdpsFile.onlineLevels);
 }
 
 // New save file format
 
-static struct json_object *makeLevelDataListJSON(const LevelDataList *levelData) {
-    struct json_object *object = json_object_new_object();
+static json_object *makeLevelDataListJSON(const LevelDataList *levelData) {
+    json_object *object = json_object_new_object();
     if (!object) {
         return NULL;
     }
@@ -208,7 +206,7 @@ static struct json_object *makeLevelDataListJSON(const LevelDataList *levelData)
     for (size_t i = 0; i < levelData->count; i++) {
         const LevelDataEntry *entry = &levelData->list[i];
 
-        struct json_object *data = json_object_new_object();
+        json_object *data = json_object_new_object();
         if (!data) {
             json_object_put(object);
             return NULL;
@@ -261,8 +259,8 @@ static struct json_object *makeLevelDataListJSON(const LevelDataList *levelData)
 }
 
 
-static struct json_object *searchEntryToJSON(const SearchEntry *entry) {
-    struct json_object *obj = json_object_new_object();
+static json_object *searchEntryToJSON(const SearchEntry *entry) {
+    json_object *obj = json_object_new_object();
     if (!obj)
         return NULL;
 
@@ -369,8 +367,8 @@ static struct json_object *searchEntryToJSON(const SearchEntry *entry) {
     return obj;
 }
 
-static struct json_object *creatorEntryToJSON(const CreatorEntry *entry) {
-    struct json_object *obj = json_object_new_object();
+static json_object *creatorEntryToJSON(const CreatorEntry *entry) {
+    json_object *obj = json_object_new_object();
     if (!obj)
         return NULL;
 
@@ -389,8 +387,8 @@ static struct json_object *creatorEntryToJSON(const CreatorEntry *entry) {
     return obj;
 }
 
-static struct json_object *songEntryToJSON(const SongEntry *entry) {
-    struct json_object *obj = json_object_new_object();
+static json_object *songEntryToJSON(const SongEntry *entry) {
+    json_object *obj = json_object_new_object();
     if (!obj)
         return NULL;
 
@@ -417,8 +415,8 @@ static struct json_object *songEntryToJSON(const SongEntry *entry) {
     return obj;
 }
 
-static struct json_object *levelEntryToJSON(const LevelEntry *entry) {
-    struct json_object *obj = json_object_new_object();
+static json_object *levelEntryToJSON(const LevelEntry *entry) {
+    json_object *obj = json_object_new_object();
     if (!obj)
         return NULL;
 
@@ -433,8 +431,8 @@ static struct json_object *levelEntryToJSON(const LevelEntry *entry) {
 }
 
 
-static struct json_object *makeSavedLevelDataListJSON(const SavedLevelDataList *levelData) {
-    struct json_object *object = json_object_new_object();
+static json_object *makeSavedLevelDataListJSON(const SavedLevelDataList *levelData) {
+    json_object *object = json_object_new_object();
     if (!object) {
         return NULL;
     }
@@ -442,17 +440,17 @@ static struct json_object *makeSavedLevelDataListJSON(const SavedLevelDataList *
     for (size_t i = 0; i < levelData->count; i++) {
         const SavedLevelDataEntry *entry = &levelData->list[i];
 
-        struct json_object *data = json_object_new_object();
+        json_object *data = json_object_new_object();
         if (!data) {
             json_object_put(object);
             return NULL;
         }
 
-        struct json_object *search = searchEntryToJSON(&entry->searchEntry);
-        struct json_object *creator = creatorEntryToJSON(&entry->creatorEntry);
+        json_object *search = searchEntryToJSON(&entry->searchEntry);
+        json_object *creator = creatorEntryToJSON(&entry->creatorEntry);
         
-        struct json_object *song = NULL;
-        struct json_object *level = NULL;
+        json_object *song = NULL;
+        json_object *level = NULL;
         if (entry->songEntry.ngSongId >= 0) song = songEntryToJSON(&entry->songEntry);
         if (true) level = levelEntryToJSON(&entry->levelEntry);
 
@@ -501,7 +499,7 @@ static void freeSavedLevelDataList(SavedLevelDataList *levelData) {
     levelData->capacity = 0;
 }
 
-static bool parseLevelDataList(LevelDataList *levelData, struct json_object *object) {
+static bool parseLevelDataList(LevelDataList *levelData, json_object *object) {
     size_t count = json_object_object_length(object);
 
     levelData->list = (LevelDataEntry *)calloc(count, sizeof(LevelDataEntry));
@@ -514,16 +512,16 @@ static bool parseLevelDataList(LevelDataList *levelData, struct json_object *obj
 
     json_object_object_foreach(object, key, value)
     {
-        struct json_object *levelID = NULL;
-        struct json_object *attempts = NULL;
-        struct json_object *jumps = NULL;
-        struct json_object *normalProgress = NULL;
-        struct json_object *practiceProgress = NULL;
-        struct json_object *stars = NULL;
-        struct json_object *coin1 = NULL;
-        struct json_object *coin2 = NULL;
-        struct json_object *coin3 = NULL;
-        struct json_object *lowDetail = NULL;
+        json_object *levelID = NULL;
+        json_object *attempts = NULL;
+        json_object *jumps = NULL;
+        json_object *normalProgress = NULL;
+        json_object *practiceProgress = NULL;
+        json_object *stars = NULL;
+        json_object *coin1 = NULL;
+        json_object *coin2 = NULL;
+        json_object *coin3 = NULL;
+        json_object *lowDetail = NULL;
 
         LevelDataEntry *entry = &levelData->list[levelData->count];
 
@@ -582,7 +580,7 @@ static bool parseLevelDataList(LevelDataList *levelData, struct json_object *obj
     return true;
 }
 
-static bool parseSavedLevelDataList(SavedLevelDataList *levelData, struct json_object *object) {
+static bool parseSavedLevelDataList(SavedLevelDataList *levelData, json_object *object) {
     size_t count = json_object_object_length(object);
 
     levelData->list = (SavedLevelDataEntry *)calloc(count, sizeof(SavedLevelDataEntry));
@@ -595,11 +593,11 @@ static bool parseSavedLevelDataList(SavedLevelDataList *levelData, struct json_o
 
     json_object_object_foreach(object, key, value)
     {
-        struct json_object *version = NULL;
-        struct json_object *search = NULL;
-        struct json_object *creator = NULL;
-        struct json_object *song = NULL;
-        struct json_object *level = NULL;
+        json_object *version = NULL;
+        json_object *search = NULL;
+        json_object *creator = NULL;
+        json_object *song = NULL;
+        json_object *level = NULL;
 
         SavedLevelDataEntry *entry = &levelData->list[levelData->count];
 
@@ -622,31 +620,31 @@ static bool parseSavedLevelDataList(SavedLevelDataList *levelData, struct json_o
 
         // Level entry
         if (json_object_object_get_ex(value, "search", &search)) {
-            struct json_object *name = NULL;
-            struct json_object *description = NULL;
-            struct json_object *levelID = NULL;
-            struct json_object *creator_id = NULL;
-            struct json_object *songID = NULL;
-            struct json_object *main_song_id = NULL;
-            struct json_object *length_num = NULL;
-            struct json_object *downloads = NULL;
-            struct json_object *likes = NULL;
-            struct json_object *stars = NULL;
-            struct json_object *req_stars = NULL;
-            struct json_object *difficulty = NULL;
-            struct json_object *objCount = NULL;
-            struct json_object *level_version = NULL;
-            struct json_object *game_version = NULL;
-            struct json_object *epic = NULL;
-            struct json_object *feature_score = NULL;
-            struct json_object *original_id = NULL;
-            struct json_object *is_two_player = NULL;
-            struct json_object *is_demon = NULL;
-            struct json_object *is_auto = NULL;
-            struct json_object *creatorIndex = NULL;
-            struct json_object *songIndex = NULL;
-            struct json_object *coins = NULL;
-            struct json_object *verified_coins = NULL;
+            json_object *name = NULL;
+            json_object *description = NULL;
+            json_object *levelID = NULL;
+            json_object *creator_id = NULL;
+            json_object *songID = NULL;
+            json_object *main_song_id = NULL;
+            json_object *length_num = NULL;
+            json_object *downloads = NULL;
+            json_object *likes = NULL;
+            json_object *stars = NULL;
+            json_object *req_stars = NULL;
+            json_object *difficulty = NULL;
+            json_object *objCount = NULL;
+            json_object *level_version = NULL;
+            json_object *game_version = NULL;
+            json_object *epic = NULL;
+            json_object *feature_score = NULL;
+            json_object *original_id = NULL;
+            json_object *is_two_player = NULL;
+            json_object *is_demon = NULL;
+            json_object *is_auto = NULL;
+            json_object *creatorIndex = NULL;
+            json_object *songIndex = NULL;
+            json_object *coins = NULL;
+            json_object *verified_coins = NULL;
 
             if (json_object_object_get_ex(search, "name", &name))
                 snprintf(entry->searchEntry.name, sizeof(entry->searchEntry.name), "%s", json_object_get_string(name));
@@ -733,9 +731,9 @@ static bool parseSavedLevelDataList(SavedLevelDataList *levelData, struct json_o
 
         // Creator entry
         if (json_object_object_get_ex(value, "creator", &creator)) {
-            struct json_object *user_id = NULL;
-            struct json_object *creatorName = NULL;
-            struct json_object *account_id = NULL;
+            json_object *user_id = NULL;
+            json_object *creatorName = NULL;
+            json_object *account_id = NULL;
 
             if (json_object_object_get_ex(creator, "userId", &user_id))
                 entry->creatorEntry.userId = json_object_get_int(user_id);
@@ -749,11 +747,11 @@ static bool parseSavedLevelDataList(SavedLevelDataList *levelData, struct json_o
 
         // Song entry
         if (json_object_object_get_ex(value, "song", &song)) {
-            struct json_object *ng_song_id = NULL;
-            struct json_object *song_title = NULL;
-            struct json_object *artist_name = NULL;
-            struct json_object *song_size = NULL;
-            struct json_object *song_link = NULL;
+            json_object *ng_song_id = NULL;
+            json_object *song_title = NULL;
+            json_object *artist_name = NULL;
+            json_object *song_size = NULL;
+            json_object *song_link = NULL;
 
             if (json_object_object_get_ex(song, "ngSongId", &ng_song_id))
                 entry->songEntry.ngSongId = json_object_get_int(ng_song_id);
@@ -775,8 +773,8 @@ static bool parseSavedLevelDataList(SavedLevelDataList *levelData, struct json_o
 
         // Level entry
         if (json_object_object_get_ex(value, "level", &level)) {
-            struct json_object *upload_date = NULL;
-            struct json_object *update_date = NULL;
+            json_object *upload_date = NULL;
+            json_object *update_date = NULL;
             if (json_object_object_get_ex(level, "uploadDate", &upload_date))
                 snprintf(entry->levelEntry.uploadDate, sizeof(entry->levelEntry.uploadDate), "%s", json_object_get_string(upload_date));
 
@@ -975,7 +973,7 @@ bool removeSavedLevel(int levelID, bool gdps) {
     char biggerTmp[256];
     snprintf(tmp, sizeof(tmp), "%d", levelID);
     snprintf(biggerTmp, sizeof(biggerTmp), "%016llX", fnv1a64(tmp));
-    savedLevelDataListRemove((gdps ? &gdpsFile.savedLevels : &gdServerFile.savedLevels), biggerTmp);
+    savedLevelDataListRemove((gdps ? &platform::gdpsFile.savedLevels : &platform::gdServerFile.savedLevels), biggerTmp);
 
 
     snprintf(tmp, sizeof(tmp), "%d_%d", levelID, (int) gdps);
@@ -1040,7 +1038,7 @@ bool loadSaveFile(const char *path, ServerFile *saveData) {
 
     free(file);
 
-    struct json_object *root = json_tokener_parse(decompressed);
+    json_object *root = json_tokener_parse(decompressed);
     if (!root) {
         free(decompressed);
         return false;
@@ -1048,7 +1046,7 @@ bool loadSaveFile(const char *path, ServerFile *saveData) {
 
     free(decompressed);
 
-    struct json_object *online = NULL;
+    json_object *online = NULL;
 
     if (!json_object_object_get_ex(root, SAVE_ONLINE_KEY, &online)) {
         json_object_put(root);
@@ -1060,7 +1058,7 @@ bool loadSaveFile(const char *path, ServerFile *saveData) {
         return false;
     }
 
-    struct json_object *mainLevels = NULL;
+    json_object *mainLevels = NULL;
 
     if (!json_object_object_get_ex(root, SAVE_MAIN_LEVEL_KEY, &mainLevels)) {
         json_object_put(root);
@@ -1072,7 +1070,7 @@ bool loadSaveFile(const char *path, ServerFile *saveData) {
         return false;
     }
 
-    struct json_object *savedLevels = NULL;
+    json_object *savedLevels = NULL;
 
     if (json_object_object_get_ex(root, SAVE_SAVED_LEVEL_KEY, &savedLevels)) {
         if (!parseSavedLevelDataList(&saveData->savedLevels, savedLevels)) {
@@ -1106,7 +1104,7 @@ bool loadExternalFile(const char *path, ExternalLevelFile *saveData) {
 
     free(file);
     
-    struct json_object *root = json_tokener_parse(decompressed);
+    json_object *root = json_tokener_parse(decompressed);
     if (!root) {
         free(decompressed);
         return false;
@@ -1114,7 +1112,7 @@ bool loadExternalFile(const char *path, ExternalLevelFile *saveData) {
     
     free(decompressed);
 
-    struct json_object *external = NULL;
+    json_object *external = NULL;
 
     if (!json_object_object_get_ex(root, SAVE_EXTERNAL_KEY, &external)) {
         json_object_put(root);
@@ -1132,12 +1130,12 @@ bool loadExternalFile(const char *path, ExternalLevelFile *saveData) {
 }
 
 SavingError saveSaveFile(const char *path, const ServerFile *saveData) {
-    struct json_object *root = json_object_new_object();
+    json_object *root = json_object_new_object();
     if (!root) {
         return SavingError::SaveErrorJsonFail;
     }
 
-    struct json_object *online = makeLevelDataListJSON(&saveData->onlineLevels);
+    json_object *online = makeLevelDataListJSON(&saveData->onlineLevels);
     if (!online) {
         json_object_put(root);
         return SavingError::SaveErrorMakeDataList;
@@ -1145,7 +1143,7 @@ SavingError saveSaveFile(const char *path, const ServerFile *saveData) {
 
     json_object_object_add(root, SAVE_ONLINE_KEY, online);
 
-    struct json_object *mainLevels = makeLevelDataListJSON(&saveData->mainLevels);
+    json_object *mainLevels = makeLevelDataListJSON(&saveData->mainLevels);
 
     if (!mainLevels) {
         json_object_put(root);
@@ -1154,7 +1152,7 @@ SavingError saveSaveFile(const char *path, const ServerFile *saveData) {
 
     json_object_object_add(root, SAVE_MAIN_LEVEL_KEY, mainLevels);
 
-    struct json_object *savedLevels = makeSavedLevelDataListJSON(&saveData->savedLevels);
+    json_object *savedLevels = makeSavedLevelDataListJSON(&saveData->savedLevels);
 
     if (!savedLevels) {
         json_object_put(root);
@@ -1164,7 +1162,7 @@ SavingError saveSaveFile(const char *path, const ServerFile *saveData) {
     json_object_object_add(root, SAVE_SAVED_LEVEL_KEY, savedLevels);
 
 
-    SaveType type = (saveData == &gdpsFile ? SaveType::Save1p9Gdps : SaveType::SaveRobtop);
+    SaveType type = (saveData == &platform::gdpsFile ? SaveType::Save1p9Gdps : SaveType::SaveRobtop);
 
     SavingTask *task = &tasks[static_cast<int>(type)];
 
@@ -1183,12 +1181,12 @@ SavingError saveSaveFile(const char *path, const ServerFile *saveData) {
 }
 
 SavingError saveExternalFile(const char *path, const ExternalLevelFile *saveData) {
-    struct json_object *root = json_object_new_object();
+    json_object *root = json_object_new_object();
     if (!root) {
         return SavingError::SaveErrorJsonFail;
     }
 
-    struct json_object *external = makeLevelDataListJSON(&saveData->externalLevels);
+    json_object *external = makeLevelDataListJSON(&saveData->externalLevels);
     if (!external) {
         json_object_put(root);
         return SavingError::SaveErrorMakeDataList;
@@ -1213,14 +1211,16 @@ SavingError saveExternalFile(const char *path, const ExternalLevelFile *saveData
 }
 
 void saveCurrentSaveFile(LevelListType type) {
-    const char *path = (gdps ? SAVE_1P9_SERVER_FILE : SAVE_ROBTOP_SERVER_FILE);
+    const char *path = (GameManager::get()->platformState.isGDPS
+        ? SAVE_1P9_SERVER_FILE
+        : SAVE_ROBTOP_SERVER_FILE);
     switch (type) {
         case LevelListType::LevelListMainLevels:
         case LevelListType::LevelListOnline:
-            saveSaveFile(path, currentServerFile);
+            saveSaveFile(path, platform::currentServerFile);
             break;
         case LevelListType::LevelListExternal:
-            saveExternalFile(SAVE_EXTERNAL_LEVELS_FILE, &externalFile);
+            saveExternalFile(SAVE_EXTERNAL_LEVELS_FILE, &platform::externalFile);
             break;
     }
 }
@@ -1236,7 +1236,7 @@ static bool loadOldLevelFile(const char *path, LevelData *data) {
         return false;
     }
 
-    struct json_object *root = json_tokener_parse(file);
+    json_object *root = json_tokener_parse(file);
 
     free(file);
 
@@ -1244,14 +1244,14 @@ static bool loadOldLevelFile(const char *path, LevelData *data) {
         return false;
     }
 
-    struct json_object *attempts;
-    struct json_object *jumps;
-    struct json_object *normal;
-    struct json_object *practice;
-    struct json_object *stars;
-    struct json_object *coin1;
-    struct json_object *coin2;
-    struct json_object *coin3;
+    json_object *attempts;
+    json_object *jumps;
+    json_object *normal;
+    json_object *practice;
+    json_object *stars;
+    json_object *coin1;
+    json_object *coin2;
+    json_object *coin3;
 
     // Billion keys
     bool valid =
@@ -1383,20 +1383,20 @@ bool migrateOldData() {
             bool mainLevel = isMainLevel(filename);
             if (mainGdpsLevel) {
                 // Main gdps levels go to 1p9 gdps server
-                if (!levelDataListAdd(&gdpsFile.mainLevels, hash, data)) {
+                if (!levelDataListAdd(&platform::gdpsFile.mainLevels, hash, data)) {
                     free(hash);
                     closedir(dir);
                     return false;
                 }
             } else if (mainLevel) {
                 // Main levels go to robtop server
-                if (!levelDataListAdd(&gdServerFile.mainLevels, hash, data)) {
+                if (!levelDataListAdd(&platform::gdServerFile.mainLevels, hash, data)) {
                     free(hash);
                     closedir(dir);
                     return false;
                 }
             } else {
-                if (!levelDataListAdd(&externalFile.externalLevels, hash, data)) {
+                if (!levelDataListAdd(&platform::externalFile.externalLevels, hash, data)) {
                     free(hash);
                     closedir(dir);
                     return false;
@@ -1409,21 +1409,21 @@ bool migrateOldData() {
         closedir(dir);
         
         
-        SavingError errorCode = saveSaveFile(SAVE_ROBTOP_SERVER_FILE, &gdServerFile);
+        SavingError errorCode = saveSaveFile(SAVE_ROBTOP_SERVER_FILE, &platform::gdServerFile);
         if (errorCode != SavingError::SaveErrorNone) {
-            outputLog("Failed to migrate robtop: %x\n", static_cast<int>(errorCode));
+            platform::outputLog("Failed to migrate robtop: %x\n", static_cast<int>(errorCode));
             return false;
         }
 
-        errorCode = saveSaveFile(SAVE_1P9_SERVER_FILE, &gdpsFile);
+        errorCode = saveSaveFile(SAVE_1P9_SERVER_FILE, &platform::gdpsFile);
         if (errorCode != SavingError::SaveErrorNone) {
-            outputLog("Failed to migrate gdps: %x\n", static_cast<int>(errorCode));
+            platform::outputLog("Failed to migrate gdps: %x\n", static_cast<int>(errorCode));
             return false;
         }
         
-        errorCode = saveExternalFile(SAVE_EXTERNAL_LEVELS_FILE, &externalFile);
+        errorCode = saveExternalFile(SAVE_EXTERNAL_LEVELS_FILE, &platform::externalFile);
         if (errorCode != SavingError::SaveErrorNone) {
-            outputLog("Failed to migrate external: %x\n", static_cast<int>(errorCode));
+            platform::outputLog("Failed to migrate external: %x\n", static_cast<int>(errorCode));
             return false;
         }
 
@@ -1474,7 +1474,7 @@ static SavingError writeSave(SavingTask *task) {
 
     if (remove(task->file) != 0) {
         if (errno != ENOENT) {
-            outputLog(
+            platform::outputLog(
                 "Failed to remove %s: errno=%d (%s)\n",
                 task->file,
                 errno,
@@ -1487,7 +1487,7 @@ static SavingError writeSave(SavingTask *task) {
 
     int result = rename(task->tmpFile, task->file);
     if (result != 0) {
-        outputLog(
+        platform::outputLog(
             "Failed to rename %s -> %s: result=%d, errno=%d\n",
             task->tmpFile,
             task->file,
@@ -1523,7 +1523,7 @@ void processSaving() {
         task->running = false;
 
         if (error != SavingError::SaveErrorNone) {
-            outputLog("An error has occured while saving: %d\n", static_cast<int>(error));
+            platform::outputLog("An error has occured while saving: %d\n", static_cast<int>(error));
         }
     }
 }
@@ -1569,7 +1569,7 @@ void beginSaving(SaveType type) {
             &tasks[static_cast<int>(type)],
             32 * 1024,
             priority,
-            (isN3Ds ? 2 : 0),
+            (GameManager::get()->platformState.isN3Ds ? 2 : 0),
             false
         );
     }

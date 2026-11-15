@@ -26,13 +26,18 @@
 #include "menus/settings_hub/settings.hpp"
 #include "menus/gameplay.hpp"
 
+#include "game/game_manager.hpp"
+#include "game/input.hpp"
+
 #include "practice.hpp"
 #include "save/saving.hpp"
+
+#include "game/game_manager.hpp"
+#include "game/audio_manager.hpp"
 
 namespace gd3ds
 {
 
-bool gamePaused, inLevelComplete = false;
 static float animTime, targetPos, currentPos;
 static bool hidePauseMenu = false;
 
@@ -152,8 +157,8 @@ void pauseGame() {
     if (state.endWallAnimPlaying) return;
 
     updateProgressBars();
-    gamePaused = true;
-    if (songLoaded || state.practiceMode) pausePlaybackMP3();
+    GameManager::get()->gamePaused = true;
+    if (GameManager::get()->songLoaded || state.practiceMode) pausePlaybackMP3();
     int coinCount = getLevelCoinCount();
     if (coinCount > 3) coinCount = 3;
 
@@ -188,20 +193,20 @@ static void applyPauseMenuOffset(float offset) {
     if (pauseHideBtn) {
         float y = pauseHideBtnY + offset;
 
-        pauseHideBtn->y = (y > SCREEN_HEIGHT - 20.f) ? SCREEN_HEIGHT - 20.f : y;
+        pauseHideBtn->y = (y > constants::ScreenHeight - 20.f) ? constants::ScreenHeight - 20.f : y;
     }
 }
 
-static void handleHideAnimation(float delta) {
+static void handleHideAnimation(float dt) {
     if (settingsState.swapGameplayScreens) {
-        float targetOffset = hidePauseMenu ? SCREEN_HEIGHT : 0.f;
+        float targetOffset = hidePauseMenu ? constants::ScreenHeight : 0.f;
 
         if (pauseHideOffset == targetOffset) return;
 
         pauseHideOffset = easeValue(EaseTypes::QuadIn, pauseHideOffset, targetOffset, animTime, 4.f, 1.f);
         applyPauseMenuOffset(pauseHideOffset);
 
-        animTime += delta;
+        animTime += dt;
         return;
     }
 
@@ -214,25 +219,25 @@ static void handleHideAnimation(float delta) {
     if (pauseWindow->base.y == targetPos) return;
     
     currentPos = easeValue(EaseTypes::QuadIn, pauseWindow->base.y, targetPos, animTime, 4.f, 1.f);
-    uiElementSetPosition((UIElement *) pauseWindow, (float)SCREEN_WIDTH / 2.f, currentPos);
+    uiElementSetPosition((UIElement *) pauseWindow, (float)constants::ScreenWidth / 2.f, currentPos);
     
-    animTime += delta;
+    animTime += dt;
 }
 
 void unpauseGame() {
-    gamePaused = false;
+    GameManager::get()->gamePaused = false;
     hidePauseMenu = false;
     uiImageSetTint((UIImage *) uiGetElementByTag(screen, "hide_btn"), C2D_Color32(255, 255, 255, 170));
 
-    uiElementSetPosition((UIElement *) pauseWindow, (float)SCREEN_WIDTH / 2.f, (float)SCREEN_HEIGHT / 2.f);
+    uiElementSetPosition((UIElement *) pauseWindow, (float)constants::ScreenWidth / 2.f, (float)constants::ScreenHeight / 2.f);
 
     pauseHideOffset = 0.f;
     applyPauseMenuOffset(0.f);
 
     if (piEnabled) {
-        syncPreciseInput(true);
+        input::syncPreciseInput(true);
     }
-    if (state.deathTimer <= 0 && (songLoaded || state.practiceMode)) {
+    if (state.deathTimer <= 0 && (GameManager::get()->songLoaded || state.practiceMode)) {
         unpausePlaybackMP3();
     }
     uiRunFuncOnTag(screenTop, "coin_1", uiDisableElement);
@@ -256,8 +261,8 @@ void unpauseGame() {
 }
 
 static void exitLevel() {
-    if (gamePaused){
-        exitingLevel = true;
+    if (GameManager::get()->gamePaused){
+        GameManager::get()->exitingLevel = true;
         uiStackPushGameState(static_cast<int>(GameState::Menu));
     }
 }
@@ -276,7 +281,7 @@ static void restartLevel() {
         } else if (settingsState.practiceMusicSync) {
             seekMP3(levelInfo.songOffset);
         }
-    } else if (songLoaded) seekMP3(levelInfo.songOffset);
+    } else if (GameManager::get()->songLoaded) seekMP3(levelInfo.songOffset);
 
     resetCoins();
 
@@ -420,13 +425,13 @@ void gameplayInit(UIScreen *s) {
     musicSliderBar = (UISlider*) uiGetElementByTag(s, "music_slider");
     soundSliderBar = (UISlider*) uiGetElementByTag(s, "sound_slider");
 
-    if (musicSliderBar) musicSliderBar->value = musicVolume;
-    if (soundSliderBar) soundSliderBar->value = soundVolume;
+    if (musicSliderBar) musicSliderBar->value = AudioManager::get()->musicVolume;
+    if (soundSliderBar) soundSliderBar->value = AudioManager::get()->soundVolume;
 }
 
 void gameplayUpdateTop(UIScreen *s, UIInput *touch) { 
     decimal = 0;
-    float cpuFPS = 1000.f / (delta * 1000);
+    float cpuFPS = 1000.f / (GameManager::get()->deltaTime * 1000);
     float gpuFPS = (16.667f / C3D_GetDrawingTime()) * 60;
     // float gpu_fps = 351.f;
     fps = settingsState.vsync ? cpuFPS : MIN(cpuFPS, gpuFPS);
@@ -446,7 +451,7 @@ void gameplayUpdateTop(UIScreen *s, UIInput *touch) {
         percent->base.scaleY = 0.45f;
     };
     // update fps counter but only when game isnt paused cuz otherwise it shows like a bajillion frame per sec ond
-    if(!gamePaused) snprintf(fpsLabel->text, 32, "<#FFFFFF55>FPS: %.*f</>", 0, fps);
+    if(!GameManager::get()->gamePaused) snprintf(fpsLabel->text, 32, "<#FFFFFF55>FPS: %.*f</>", 0, fps);
 
     progressBar->value = state.levelProgress;
     snprintf(percent->text, 32, "%.*f%%", decimal, state.levelProgress);
@@ -471,7 +476,7 @@ void gameplayUpdateTop(UIScreen *s, UIInput *touch) {
         uiRunFuncOnTag(s, "fps", uiEnableElement);
     }
 
-    handleHideAnimation(delta);
+    handleHideAnimation(GameManager::get()->deltaTime);
 }
 
 void gameplayUpdate(UIScreen *s, UIInput *touch) {
@@ -482,7 +487,7 @@ void gameplayUpdate(UIScreen *s, UIInput *touch) {
     coinsGot[2] = state.currentData.coin3 && !levelDataSel->coin3;
 
     for(int i = 0; i < 3; i++){
-        if(coinsGot[i] && !gamePaused){
+        if(coinsGot[i] && !GameManager::get()->gamePaused){
             float scale = easeValue(EaseTypes::BounceOut, 2.f, state.customLevel ? COIN_BIG_USER_SCALE : 0.65f, coinAnims[i], 0.35f, 1.f);
             float opacity = easeValue(EaseTypes::EaseLinear, 0.f, 1.f, coinAnims[i], 0.1f, 1.f);
 
@@ -506,15 +511,15 @@ void gameplayUpdate(UIScreen *s, UIInput *touch) {
                 }
             }
 
-            coinAnims[i] += delta;
+            coinAnims[i] += GameManager::get()->deltaTime;
         }
     }
 
-    if (gamePaused) {
-        if (musicSliderBar) musicVolume = musicSliderBar->value;
-        if (soundSliderBar) soundVolume = soundSliderBar->value;
+    if (GameManager::get()->gamePaused) {
+        if (musicSliderBar) AudioManager::get()->musicVolume = musicSliderBar->value;
+        if (soundSliderBar) AudioManager::get()->soundVolume = soundSliderBar->value;
 
-        applyVolumeSettings();
+        AudioManager::get()->applyVolumeSettings();
     }
 
     //level end buttons retraction animation
@@ -522,9 +527,9 @@ void gameplayUpdate(UIScreen *s, UIInput *touch) {
     float completeYOffset = easeValue(EaseTypes::EaseIn, 20.f, -20.f, cutsceneTimer, 0.3f, 1.3f);
     float completeYOffsetPractice = easeValue(EaseTypes::EaseIn, 200.f, 270.f, cutsceneTimer, 0.3f, 1.8f);
 
-    bool swapCoins = settingsState.swapGameplayScreens && !inLevelComplete;
-    float coinX = swapCoins ? 20.f - SWAP_SIDE_OFFSET_X : 20.f;
-    float coinY = swapCoins ? SCREEN_HEIGHT - completeYOffset : completeYOffset;
+    bool swapCoins = settingsState.swapGameplayScreens && !GameManager::get()->inLevelComplete;
+    float coinX = swapCoins ? 20.f - constants::SwapSizeOffsetX : 20.f;
+    float coinY = swapCoins ? constants::ScreenHeight - completeYOffset : completeYOffset;
     UIImage *coinSlots[3] = { coin1, coin2, coin3 };
 
     for (int i = 0; i < 3; i++) {

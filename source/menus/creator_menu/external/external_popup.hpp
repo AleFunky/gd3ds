@@ -1,4 +1,5 @@
 #pragma once
+#include "menus/core/ui_screen.hpp"
 #include <3ds.h>
 
 #define MAX_STARS 10

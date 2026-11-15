@@ -5,6 +5,7 @@
 #include "3ds/types.h"
 
 #include "level_loading.hpp"
+#include "macros.hpp"
 #include "main.hpp"
 #include "menus/core/ui_element.hpp"
 #include "mp3_player.hpp"
@@ -36,6 +37,10 @@
 #include "fonts/goldFont.hpp"
 #include "utils/utils.hpp"
 #include "wav_player.hpp"
+#include "game/game_manager.hpp"
+#include "game/platform.hpp"
+
+#include "menus/core/common_setters.hpp"
 
 #define EASY_DEMON_FACE_1 259
 #define MEDIUM_DEMON_FACE_1 261
@@ -81,7 +86,7 @@ int getSavedLevel(GenericTask *task) {
     if (loaded_level_string && loaded_level_string != currLevelString) {
         free(loaded_level_string);
     }
-    loaded_level_string = loadSavedLevel(onlineMenuLevelID, gdps, &outSize);
+    loaded_level_string = loadSavedLevel(onlineMenuLevelID, GameManager::get()->platformState.isGDPS, &outSize);
     return loaded_level_string == NULL;
 }
 
@@ -261,7 +266,7 @@ void checkWarningsAndPlay(){
         while(warningStep <= (int)WarningPopupStep::WarningDone){
             switch(warningStep){
                 case static_cast<int>(WarningPopupStep::WarningHighObject): {
-                    int objCount = (isN3Ds ? 44000 : 14000);
+                    int objCount = (GameManager::get()->platformState.isN3Ds ? 44000 : 14000);
                     shouldWarn = currentSearchEntry->objCount >= objCount;
                     break;
                 }
@@ -302,7 +307,7 @@ static void actionOpenInfo(UIElement *e, const UIPropertyList *args) {
 }
 
 void deleteLevel(){
-   removeSavedLevel(onlineMenuLevelID, gdps);
+   removeSavedLevel(onlineMenuLevelID, GameManager::get()->platformState.isGDPS);
 }
 
 static void actionOpenDeleteLevel(UIElement *e, const UIPropertyList *args){
@@ -338,6 +343,8 @@ static void populateLevelInfo(int levelID) {
     SearchEntry *entrySrch = currentSearchEntry;
     CreatorEntry *entryC = currentCreatorEntry;
     SongEntry *entrySng = currentSongEntry;
+
+    bool gdps = GameManager::get()->platformState.isGDPS;
 
     char *downloads = truncateNumber(entrySrch->downloads);
     uiLabelSetText(downloadsLabel, downloads);
@@ -477,7 +484,7 @@ static void populateLevelInfo(int levelID) {
     }
 
     // High object count icon
-    bool highObjCount = entrySrch->objCount >= (isN3Ds ? 44000 : 14000);
+    bool highObjCount = entrySrch->objCount >= (GameManager::get()->platformState.isN3Ds ? 44000 : 14000);
     if (highObjCount) {
         uiElementSetPosition((UIElement *)highObjIconImage, 200 + halfCreatorLength + 24 + (isCopy ? 13 : 0), highObjIconImage->base.y);
     } else {
@@ -487,7 +494,7 @@ static void populateLevelInfo(int levelID) {
     char key[16];
     snprintf(key, sizeof(key), "%d", entrySrch->levelId);
     
-    currentLevelEntry = getOrAddLevelToServerFile(currentServerFile, key, LevelListType::LevelListOnline);
+    currentLevelEntry = getOrAddLevelToServerFile(platform::currentServerFile, key, LevelListType::LevelListOnline);
     currentLevelList = LevelListType::LevelListOnline;
 
     currentLevelEntry->data.levelID = entrySrch->levelId;
@@ -676,6 +683,8 @@ static void onlineLevelInit (UIScreen *s) {
 
     screen = s;
 
+    bool gdps = GameManager::get()->platformState.isGDPS;
+
     if(gdps) uiDisableElement(uiGetElementByTag(s, "garage"));
 
     // Bottom screen elements
@@ -714,9 +723,9 @@ static void onlineLevelInit (UIScreen *s) {
         int creatorIndex = currentSearchEntry->creatorIndex;
         currentCreatorEntry = (creatorIndex >= 0 ? &creatorEntries[creatorIndex] : NULL);
         currentSongEntry = (currentSearchEntry->songId >= 0 ? &songEntries[currentSearchEntry->songIndex] : NULL);
-        bool couldSave = saveLevelToServerFile(currentServerFile, onlineMenuLevelID, currentSearchEntry, currentCreatorEntry, currentSongEntry);
+        bool couldSave = saveLevelToServerFile(platform::currentServerFile, onlineMenuLevelID, currentSearchEntry, currentCreatorEntry, currentSongEntry);
         if (!couldSave) {
-            outputLog("Oops, couldn't save da level!\n");
+            platform::outputLog("Oops, couldn't save da level!\n");
         }
     }
 
@@ -748,9 +757,9 @@ static void onlineLevelMenuUpdate(UIScreen *s, UIInput *i) {
         showLevelLoadErrorMessage();
     }
 
-    if (exitingLevel) {
+    if (GameManager::get()->exitingLevel) {
         updateProgressBars();
-        exitingLevel = false;
+        GameManager::get()->exitingLevel = false;
     }
 
     if (songDataTask.finished) {
@@ -764,7 +773,7 @@ static void onlineLevelMenuUpdate(UIScreen *s, UIInput *i) {
 
             // enter exclusive mode, disable sleep mode and begin download 
             aptSetSleepAllowed(false);
-            enterExclusiveState();
+            platform::enterExclusiveState();
             songThread = createFileDownloadThread(&songTask);
         } else { handleSongDataErrors(songDataResult); }
     }
@@ -784,7 +793,7 @@ static void onlineLevelMenuUpdate(UIScreen *s, UIInput *i) {
     if (songTask.finished) {
         // Handle result
         handleSongCodes(songTask.result);
-        exitExclusiveState(false);
+        platform::exitExclusiveState(false);
         aptSetSleepAllowed(true);
         songTask.finished = false;
     }
@@ -850,7 +859,7 @@ static void onlineLevelMenuExit(UIScreen *s) {
 
     if (songTask.running) {
         songTask.cancelled = true;
-        exitExclusiveState(false);
+        platform::exitExclusiveState(false);
         aptSetSleepAllowed(true);
         threadJoin(songThread, U64_MAX);
     }

@@ -1,7 +1,7 @@
 #pragma once
 #include <citro2d.h>
-#include "triggers.hpp"
-#include "player/collision.hpp"
+#include "level_loading.hpp"
+#include "types.hpp"
 
 #define RGB8(r, g, b) (u32)(r | (g << (u32)8) | (b << (u32)16))
 #define RGBA8(r, g, b, a) (u32)(a | (b << (u32)8) | (g << (u32)16) | (r << (u32)24))
@@ -34,19 +34,19 @@ struct Matrix2x2 {
 Matrix2x2 matrix2x2Identity(void);
 Matrix2x2 matrix2x2Rotation(float radians);
 Matrix2x2 matrix2x2Multiply(Matrix2x2 a, Matrix2x2 b);
-Vec2D matrix2x2Transform(Matrix2x2 matrix, Vec2D vector);
-Vec2D affineTransformPoint(Matrix2x2 matrix, Vec2D offset, Vec2D point);
-void composeAffineTransform(Matrix2x2 *currentMatrix, Vec2D *currentOffset, Matrix2x2 nextMatrix, Vec2D nextOffset);
+Point matrix2x2Transform(Matrix2x2 matrix, Point vector);
+Point affineTransformPoint(Matrix2x2 matrix, Point offset, Point point);
+void composeAffineTransform(Matrix2x2 *currentMatrix, Point *currentOffset, Matrix2x2 nextMatrix, Point nextOffset);
 
 // Vector math
-Vec2D addVec(Vec2D a, Vec2D b);
-Vec2D subVec(Vec2D a, Vec2D b);
-Vec2D multiplyVec(Vec2D v, float val);
-Vec2D normalize(Vec2D v);
-float lenVec(Vec2D v);
-float dotVec(Vec2D a, Vec2D b);
-Vec2D perpendicular(Vec2D v);
-float squareDistVec(const Vec2D* a, const Vec2D* b);
+Point addVec(Point a, Point b);
+Point subVec(Point a, Point b);
+Point multiplyVec(Point v, float val);
+Point normalize(Point v);
+float lenVec(Point v);
+float dotVec(Point a, Point b);
+Point perpendicular(Point v);
+float squareDistVec(const Point* a, const Point* b);
 
 
 float clampf(float d, float min, float max);

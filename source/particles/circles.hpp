@@ -1,6 +1,6 @@
 #pragma once
 #include <3ds.h>
-#include "easing.hpp"
+#include "../easing.hpp"
 
 #define MAX_USE_EFFECTS 32
 #define MAX_UI_USE_EFFECTS 32

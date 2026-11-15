@@ -2,7 +2,11 @@
 #include <citro2d.h>
 #include <stdlib.h>
 
+#include "constants.hpp"
+#include "game/game.hpp"
+
 #include "icons.hpp"
+#include "macros.hpp"
 #include "math_helpers.hpp"
 #include "main.hpp"
 #include "graphics.hpp"
@@ -10,6 +14,10 @@
 #include "state.hpp"
 #include "triggers.hpp"
 #include "utils/utils.hpp"
+
+#include "player/collision.hpp"
+
+#include "game/game_manager.hpp"
 
 #include "menus/core/ui_screen.hpp"
 #include "menus/components/ui_list.hpp"
@@ -128,7 +136,7 @@ void resetPlayers() {
     titleScreenPlayer.playerIcons.p1Color = p1;
     titleScreenPlayer.playerIcons.p2Color = p2;
     
-    initParticles(p1, p2);
+    game::initParticles(p1, p2);
     initTrails(0);
     
     trailP1.color = (randomInt(0, 1) ? p1 : p2);
@@ -209,7 +217,7 @@ static void mainMenuInit(UIScreen *s){
     playMenuSong();
 
     quitGameButton = (UIButton *)uiGetElementByTag(s, "quitbutton");
-    if (!is3Dsx) uiDisableElement((UIElement *)quitGameButton);
+    if (!GameManager::get()->platformState.is3Dsx) uiDisableElement((UIElement *)quitGameButton);
 
     mainMenuColorIndex = 0;
     u32 color = defaultLvlColors[mainMenuColorIndex % numMenuColors];
@@ -235,7 +243,7 @@ static void mainMenuInit(UIScreen *s){
     getBuffer(static_cast<int>(ColorChannelIDs::ChannelGround2))->active = false;
     getBuffer(static_cast<int>(ColorChannelIDs::ChannelLine))->active = false;
 
-    allocateParticles();
+    game::allocateParticles();
     initVariables();
     resetPlayers();
 
@@ -246,7 +254,7 @@ static void mainMenuInit(UIScreen *s){
     oldWide = settingsState.wideEnabled;
     oldStereo = settingsState.stereoEnabled;
 
-    if (!isN3Ds && is3Dsx) {
+    if (!GameManager::get()->platformState.isN3Ds && GameManager::get()->platformState.is3Dsx) {
       InfoCardData *warningData = (InfoCardData *)malloc(sizeof(InfoCardData));
       if (!warningData)
         return;
@@ -264,7 +272,7 @@ static void mainMenuInit(UIScreen *s){
 static void mainMenuInitTop(UIScreen *s){
     UIImage *title = (UIImage *) uiGetElementByTag(s, "title");
 
-    if (title && altTitleScreen) {
+    if (title && GameManager::get()->altTitleScreen) {
         uiImageSetImage(title, 3, 1);
     }
 }
@@ -329,13 +337,15 @@ static void mainMenuUpdate(UIScreen *s, UIInput *input){
         }
     }
 
+    float delta = GameManager::get()->deltaTime;
+
     motionTrailUpdate(&trailP1, delta);
     motionTrailUpdateWaveTrail(&waveTrailP1, delta);
-    updatePlayerEffects(delta);
+    game::updatePlayerEffects(delta);
     updateUseEffects(delta, getUseEffectArrayPtr(GFX_TOP));
 
     float touch_x = input->touchPos.px/SCALE;
-    float touch_y = SCREEN_HEIGHT - input->touchPos.py/SCALE;
+    float touch_y = constants::ScreenHeight - input->touchPos.py/SCALE;
 
     bool kill = (hidKeysDown() & KEY_TOUCH) && intersect(
         titleScreenPlayer.x, titleScreenPlayer.y, titleScreenPlayer.width, titleScreenPlayer.height, 0,
@@ -378,7 +388,7 @@ static void mainMenuUpdate(UIScreen *s, UIInput *input){
 static void mainMenuDraw(UIScreen *s, UIDrawPhase phase){
     if(phase == UIDrawPhase::UiDrawAfter) return;
 
-    drawBackground(bgScroll / 8, SCREEN_HEIGHT);
+    drawBackground(bgScroll / 8, constants::ScreenHeight);
 
     C2D_ViewScale(SCALE, SCALE);
     state.cameraX = 0;
@@ -424,7 +434,7 @@ static void mainMenuDrawTop(UIScreen *s, UIDrawPhase phase){
 }
 
 static void mainMenuExit(UIScreen *s) {
-    freeParticles();
+    game::freeParticles();
 }
 
 const UIActionDef mainMenuActions[] = {

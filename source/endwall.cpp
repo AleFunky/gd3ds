@@ -1,5 +1,7 @@
 #include "level_loading.hpp"
 #include "main.hpp"
+#include "constants.hpp"
+#include "menus/level_select.hpp"
 #include "sounds.hpp"
 #include "state.hpp"
 #include "math_helpers.hpp"
@@ -13,8 +15,13 @@
 #include "menus/core/ui_screen.hpp"
 #include "menus/level_complete.hpp"
 #include "practice.hpp"
-#include "menus/level_select.hpp"
+#include "game/game_manager.hpp"
 #include "wav_player.hpp"
+#include "triggers.hpp"
+
+#include "level/main_levels.hpp"
+
+#include "save/saving.hpp"
 
 namespace gd3ds
 {
@@ -52,8 +59,8 @@ static void initLevelCompletePopup();
 static LevelCompletePopup levelCompletePopup;
 
 int handleWallCutscene(float delta, UIInput *touch) {
-    if(!exitingLevel){
-        bool practiceModeEndWall = state.practiceMode || cheated;
+    if(!GameManager::get()->exitingLevel){
+        bool practiceModeEndWall = state.practiceMode || GameManager::get()->cheated;
         // Init wall variables
         if (completionTimer == 0) {
             fireworksSpawned = 0;
@@ -115,7 +122,7 @@ int handleWallCutscene(float delta, UIInput *touch) {
 
                 // Pop up circle
                 float calcX = state.cameraX + (SCREEN_WIDTH_AREA / 2);
-                float calcY = state.cameraY + (SCREEN_HEIGHT - (SCREEN_HEIGHT_AREA / 2));
+                float calcY = state.cameraY + (constants::ScreenHeight - (SCREEN_HEIGHT_AREA / 2));
                 UseEffect *effect2 = addUseEffect(calcX, calcY, USE_EFFECT_OBJ_NOTHING, &endWallFilledTitle, getUseEffectArrayPtr(GFX_TOP_BUT_ABOVE_LEVEL));
                 if (effect2) {
                     Color p1White = getWhiteIfBlack(p1Color);
@@ -139,7 +146,7 @@ int handleWallCutscene(float delta, UIInput *touch) {
             if (!practiceModeEndWall && completionTimer >= FIREWORK_SPAWN_TIME + (fireworksSpawned * FIREWORK_SPAWN_DELAY)) {
                 float calcX = state.cameraX + 100 + randomFloat(0, SCREEN_WIDTH_AREA - 200);
                 float y = randomFloat(0, SCREEN_HEIGHT_AREA);
-                float calcY = state.cameraY + (SCREEN_HEIGHT - y);
+                float calcY = state.cameraY + (constants::ScreenHeight - y);
                 UseEffect *effect = addUseEffect(calcX, calcY, USE_EFFECT_OBJ_NOTHING, &endWallFireworkCircle, getUseEffectArrayPtr(GFX_TOP_BUT_ABOVE_LEVEL));
                 if (effect) {
                     Color p2White = getWhiteIfBlack(p2Color);
@@ -171,7 +178,7 @@ int handleWallCutscene(float delta, UIInput *touch) {
 
         if(status){
             LevelData *levelDataSel = &currentLevelEntry->data;
-            if (!cheated) {
+            if (!GameManager::get()->cheated) {
                 if (state.practiceMode) {
                     state.currentData.maxPractice = 100;
                     levelDataSel->practiceProgress = 100;
@@ -250,7 +257,7 @@ int handleWallCutscene(float delta, UIInput *touch) {
                     stopMP3();
                     playLevelSong(levelInfo.songOffset);
                 } else {
-                    if (songLoaded) seekMP3(levelInfo.songOffset);
+                    if (GameManager::get()->songLoaded) seekMP3(levelInfo.songOffset);
                 }
 
                 unpausePlaybackMP3();

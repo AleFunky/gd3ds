@@ -3,21 +3,10 @@
 #include <stdlib.h>
 
 #include "main.hpp"
-#include "save/saving.hpp"
-#include "state.hpp"
-
 #include "menus/core/ui_screen.hpp"
 #include "menus/components/ui_list.hpp"
-#include "menus/components/ui_image.hpp"
-#include "menus/components/ui_label.hpp"
-#include "menus/components/ui_progress_bar.hpp"
-#include "menus/components/ui_darken.hpp"
 
-#include "menus/main_menu.hpp"
-#include "menus/settings_hub/how_to_play.hpp"
-#include "menus/settings_hub/settings.hpp"
-#include "menus/settings_hub/credits.hpp"
-#include "menus/settings_hub/songs.hpp"
+#include "game/audio_manager.hpp"
 
 namespace gd3ds
 {
@@ -29,14 +18,14 @@ static void settingsHubInit(UIScreen *s) {
     musicSliderBar = (UISlider*) uiGetElementByTag(s, "music_slider");
     soundSliderBar = (UISlider*) uiGetElementByTag(s, "sound_slider");
 
-    if (musicSliderBar) musicSliderBar->value = musicVolume;
-    if (soundSliderBar) soundSliderBar->value = soundVolume;
+    if (musicSliderBar) musicSliderBar->value = AudioManager::get()->musicVolume;
+    if (soundSliderBar) soundSliderBar->value = AudioManager::get()->soundVolume;
 }
 
 static void settingsHubUpdate(UIScreen *s, UIInput *touch) {
-    if (musicSliderBar) musicVolume = musicSliderBar->value;
-    if (soundSliderBar) soundVolume = soundSliderBar->value;
-    applyVolumeSettings();
+    if (musicSliderBar) AudioManager::get()->musicVolume = musicSliderBar->value;
+    if (soundSliderBar) AudioManager::get()->soundVolume = soundSliderBar->value;
+    AudioManager::get()->applyVolumeSettings();
 }
 
 extern const UIScreenDefPair settingsHubDef = {

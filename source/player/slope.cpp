@@ -8,12 +8,7 @@
 #include <math.h>
 #include "state.hpp"
 #include <citro3d.h>
-#include "graphics.hpp"
-#include "text.hpp"
-#include "fonts/bigFont.hpp"
-#include "menus/core/ui_screen.hpp"
 #include "math_helpers.hpp"
-#include "main.hpp"
 
 namespace gd3ds
 {

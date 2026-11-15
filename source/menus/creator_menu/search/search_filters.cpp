@@ -1,23 +1,21 @@
 #include <3ds.h>
 #include <citro2d.h>
 
+#include "macros.hpp"
 #include "menus/core/ui_screen.hpp"
-#include "menus/components/ui_label.hpp"
 #include "menus/components/ui_checkbox.hpp"
 #include "menus/creator_menu/search_menu.hpp"
 #include "menus/creator_menu/search/search_filters.hpp"
-#include "menus/creator_menu/search/length_filter.hpp"
-#include "menus/creator_menu/search/song_filter.hpp"
+
+#include "game/game_manager.hpp"
 
 #include "utils/server_utils.hpp"
-#include "save/config.hpp"
-#include "save/saving.hpp"
 
 namespace gd3ds
 {
 
 static void toggleGdps(UIScreen *s){
-    if(gdps){
+    if(GameManager::get()->platformState.isGDPS){
         uiRunFuncOnTag(s, "gdps", uiEnableElement);
         uiRunFuncOnTag(s, "no_gdps", uiDisableElement);
     } else{

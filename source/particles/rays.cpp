@@ -1,15 +1,17 @@
 #include "rays.hpp"
 #include "math_helpers.hpp"
-#include "main.hpp"
 #include "state.hpp"
 #include "utils/gfx.hpp"
 #include "easing.hpp"
+#include "types.hpp"
+#include "constants.hpp"
+#include "triggers.hpp"
 
 namespace gd3ds
 {
 
 struct RayData {
-    Vec2D position;
+    Point position;
     
     float startDelay;
     float timer;
@@ -75,7 +77,7 @@ static void drawRay(float x, float y, float length, float startWidth, float endW
     float cosA = cosf(DegToRad(angle));
     float sinA = sinf(DegToRad(angle));
 
-    Vec2D verts[4];
+    Point verts[4];
 
     // Start side
     verts[0].x = x;
@@ -104,7 +106,7 @@ static void drawRay(float x, float y, float length, float startWidth, float endW
 
         verts[i].x = verts[i].x - state.cameraX;
 
-        verts[i].y = SCREEN_HEIGHT - (verts[i].y - state.cameraY);
+        verts[i].y = constants::ScreenHeight - (verts[i].y - state.cameraY);
 
         verts[i].x = getMirrorX(verts[i].x, state.mirrorFactor);
     }

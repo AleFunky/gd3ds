@@ -1,4 +1,5 @@
 #include "player.hpp"
+#include "game/game_manager.hpp"
 #include "level_loading.hpp"
 #include "particles/circles.hpp"
 #include "player/trail.hpp"
@@ -26,6 +27,10 @@
 
 #include "easing.hpp"
 #include <stdint.h>
+
+#include "triggers.hpp"
+#include "constants.hpp"
+#include "types.hpp"
 
 #define SPIDER_DASH_SCALE_DURATION 0.45f
 #define SPIDER_DASH_SCALE_START 0.4f
@@ -211,7 +216,7 @@ float convertToClosestRotation(float rotation, float angle) {
 void cubeGamemode(Player *player) {
     int mult = player->rotationDirection;
     
-    trail->positionR = (Vec2D){player->x, player->y};  
+    trail->positionR = {player->x, player->y};  
     trail->startingPositionInitialized = true;
 
     player->gravity = cubeAccelerations[state.speed];
@@ -393,10 +398,10 @@ void shipGamemode(Player *player) {
     float x = player->x + rotX * scale;
     float y = player->y + rotY * scale;
     
-    trail->positionR = (Vec2D){x, y};  
+    trail->positionR = {x, y};  
     trail->startingPositionInitialized = true;
     float calcX = player->x - state.cameraX;
-    float calcY = SCREEN_HEIGHT - (fabsf(gravBottom(player)) - state.cameraY);
+    float calcY = constants::ScreenHeight - (fabsf(gravBottom(player)) - state.cameraY);
 
     shipFireParticles[state.currentPlayer].emitterX = x;
     shipFireParticles[state.currentPlayer].emitterY = y;
@@ -489,7 +494,7 @@ static float ballJumpHeights[static_cast<int>(PlayerSpeeds::SpeedCount)] = {
 };
 
 void ballGamemode(Player *player) {
-    trail->positionR = (Vec2D){player->x, player->y};  
+    trail->positionR = {player->x, player->y};  
     trail->startingPositionInitialized = true;
 
     int mult = (player->upsideDown ? -1 : 1);
@@ -576,9 +581,9 @@ void ufoGamemode(Player *player) {
     float y = player->y + rotY * scale;
     
     float calcX = player->x - state.cameraX;
-    float calcY = SCREEN_HEIGHT - (fabsf(gravBottom(player)) - state.cameraY);
+    float calcY = constants::ScreenHeight - (fabsf(gravBottom(player)) - state.cameraY);
 
-    trail->positionR = (Vec2D){x, y};  
+    trail->positionR = {x, y};  
     trail->startingPositionInitialized = true;
 
     secondaryParticles[state.currentPlayer].emitterX = player->x;
@@ -662,7 +667,7 @@ void waveGamemode(Player *player) {
     float x = player->x + rotX * scale;
     float y = player->y + rotY * scale;
     
-    trail->positionR = (Vec2D){x, y};  
+    trail->positionR = {x, y};  
     trail->startingPositionInitialized = true;
  
     if (gameState == static_cast<int>(GameState::Game) && player->cutsceneTimer == 0 && !state.mirroring) waveTrail->opacity = 1.f;
@@ -716,7 +721,7 @@ static void updateRobotFire(Player *player) {
 }
 
 void robotGamemode(Player *player) {
-    trail->positionR = (Vec2D){player->x, player->y};
+    trail->positionR = {player->x, player->y};
     trail->startingPositionInitialized = true;
 
     player->minVel = -810;
@@ -1054,11 +1059,11 @@ void spiderTestJump(Player *player, bool isRetry) {
     clearSlopeData(player);
     
     motionTrailClear(trail);
-    trail->positionR = (Vec2D){player->x, player->y};
+    trail->positionR = {player->x, player->y};
 }
 
 void spiderGamemode(Player *player) {
-    trail->positionR = (Vec2D){player->x, player->y};
+    trail->positionR = {player->x, player->y};
     trail->startingPositionInitialized = true;
 
     player->minVel = -810;
@@ -1335,7 +1340,7 @@ void runPlayer(Player *player) {
 
     // Handle wave trail point adding
     if (player->gamemode == static_cast<int>(IconGamemode::GamemodeWave) && !state.mirroring) {
-        waveTrail->positionR = (Vec2D){player->x, player->y};  
+        waveTrail->positionR = {player->x, player->y};  
         waveTrail->startingPositionInitialized = true;
         if (player->velY != state.oldPlayer.velY || player->onGround != state.oldPlayer.onGround || player->onCeiling != state.oldPlayer.onCeiling) {
             motionTrailAddWavePoint(waveTrail);
@@ -1593,6 +1598,8 @@ void updateP1Trail(Player *player, int playerID) {
         }
     }
 
+    float delta = GameManager::get()->deltaTime;
+
     p1TrailTimer -= delta;
 
     for (size_t i = 0; i < P1_TRAIL_LENGTH; i++) {
@@ -1617,7 +1624,7 @@ void drawP1Trail(Player *player, int playerID) {
 
         if (trailData->active) {
             float calcX = ((trailData->x - state.cameraX));
-            float calcY = SCREEN_HEIGHT - ((trailData->y - state.cameraY));
+            float calcY = constants::ScreenHeight - ((trailData->y - state.cameraY));
             bool flipX = (state.mirrorMult < 0);
 
             u32 color = (playerID == 1) ? C2D_Color32(p2Color.r, p2Color.g, p2Color.b, trailData->opacity * 255) : C2D_Color32(p1Color.r, p1Color.g, p1Color.b, trailData->opacity * 255);
@@ -1652,7 +1659,7 @@ void drawPlayer(Player *player) {
     if (state.respawnEffectData.active && state.respawnEffectData.hidePlayer) return;
 
     float calcX = ((player->x - state.cameraX));
-    float calcY = SCREEN_HEIGHT - ((player->y - state.cameraY));
+    float calcY = constants::ScreenHeight - ((player->y - state.cameraY));
 
     Color p1Color = player->playerIcons.p1Color;
     Color p2Color = player->playerIcons.p2Color;
@@ -1825,11 +1832,11 @@ void drawPlayer(Player *player) {
     }
 }
 
-extern void getCorners(float cx, float cy, float w, float h, float angle, Vec2D out[4]);
+extern void getCorners(float cx, float cy, float w, float h, float angle, Point out[4]);
 
 
-void drawTriangleFromRect(Vec2D rect[4], int skipIndex, uint32_t color, uint32_t hypoColor, float depth) {
-    Vec2D tri[3];
+void drawTriangleFromRect(Point rect[4], int skipIndex, uint32_t color, uint32_t hypoColor, float depth) {
+    Point tri[3];
     u32 col[3];
     int ti = 0;
 
@@ -1849,8 +1856,8 @@ void drawTriangleFromRect(Vec2D rect[4], int skipIndex, uint32_t color, uint32_t
     drawPolygonInwardMitered(tri, 3, 2.f, col, depth);
 }
 
-void drawSquare(Vec2D rect[4], uint32_t color, float depth) {
-    Vec2D center = {
+void drawSquare(Point rect[4], uint32_t color, float depth) {
+    Point center = {
         (rect[0].x + rect[1].x + rect[2].x + rect[3].x) / 4.f,
         (rect[0].y + rect[1].y + rect[2].y + rect[3].y) / 4.f
     };
@@ -1882,7 +1889,7 @@ void drawHitbox(int obj) {
     int id = objects.id[obj];
     if (!isValidObject(id)) return;
 
-    Vec2D rect[4];
+    Point rect[4];
     if (isTriggerObject(id) && objects.touchTriggered[obj]) {
         getCorners(objects.x[obj], objects.y[obj], objects.width[obj], objects.height[obj], objects.rotation[obj], rect);
         drawSquare(rect, C2D_Color32(0x00, 0xff, 0xff, 0xff), 3.f);
@@ -1962,7 +1969,7 @@ void drawHitbox(int obj) {
 }
 
 void drawPlayerHitbox(Player *player) {
-    Vec2D rect[4];
+    Point rect[4];
 
     // Unrotated hitbox
     getCorners(player->x, player->y, player->width, player->height, 0, rect);
@@ -1972,7 +1979,7 @@ void drawPlayerHitbox(Player *player) {
 
 void drawInternalHitbox(Player *player) {
     InternalHitbox internal = player->internalHitbox;
-    Vec2D rect[4];
+    Point rect[4];
     // Internal hitbox
     getCorners(player->x, player->y, internal.width, internal.height, 0, rect);
 
@@ -1980,7 +1987,7 @@ void drawInternalHitbox(Player *player) {
 }
 
 void drawRotatedHitbox(Player *player) {
-    Vec2D rect[4];
+    Point rect[4];
     // Rotated hitbox
     getCorners(player->x, player->y, player->width, player->height, player->rotation, rect);
 

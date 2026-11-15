@@ -4,7 +4,6 @@
 #include <string.h>
 #include "groups.hpp"
 #include "level_loading.hpp"
-#include "main.hpp"
 #include "graphics.hpp"
 #include "player/player.hpp"
 #include "player/collision.hpp"
@@ -15,11 +14,13 @@
 #include "utils/gfx.hpp"
 #include "menus/settings_hub/settings.hpp"
 
-// needed to re-create the runtime trigger buffers
-// after reload_level() frees them
+#include "constants.hpp"
+
 namespace gd3ds
 {
 
+// needed to re-create the runtime trigger buffers
+// after reload_level() frees them    
 extern int alphaTriggerCapacity;
 extern int moveTriggerCapacity;
 extern int spawnTriggerCapacity;
@@ -1180,10 +1181,10 @@ void drawCheckpoints() {
         CheckpointData *currCheckpoint = &checkpoints[index];
 
         float calcX = (currCheckpoint->p1.x - state.cameraX);
-        float calcY = SCREEN_HEIGHT - ((currCheckpoint->p1.y - state.cameraY));  
+        float calcY = constants::ScreenHeight - ((currCheckpoint->p1.y - state.cameraY));  
 
-        if (calcX < -60 || calcX >= (SCREEN_WIDTH / SCALE) + 60) continue;
-        if (calcY < -60 || calcY >= (SCREEN_HEIGHT / SCALE) + 60) continue;
+        if (calcX < -60 || calcX >= (constants::ScreenWidth / SCALE) + 60) continue;
+        if (calcY < -60 || calcY >= (constants::ScreenHeight / SCALE) + 60) continue;
 
         drawCheckpoint(calcX, calcY);
     }

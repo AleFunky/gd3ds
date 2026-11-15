@@ -1,5 +1,5 @@
 #pragma once
-#include "menus/core/ui_screen.hpp"
+#include "../menus/core/ui_screen.hpp"
 
 #define MAX_DECIMAL_PERCENT 17
 

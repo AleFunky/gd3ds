@@ -1,11 +1,4 @@
-#include "main.hpp"
-
 #include <citro2d.h>
-#include "ui_image.hpp"
-#include "text.hpp"
-#include "fonts/bigFont.hpp"
-#include "ui_button.hpp"
-#include "easing.hpp"
 #include "math_helpers.hpp"
 #include "menus/core/ui_screen.hpp"
 #include "menus/core/ui_props.hpp"

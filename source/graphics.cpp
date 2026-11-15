@@ -1,4 +1,5 @@
 #include "graphics.hpp"
+#include "game/game_manager.hpp"
 #include "level_loading.hpp"
 #include "objects.hpp"
 #include "animations.hpp"
@@ -28,8 +29,6 @@
 #include "particles/coin_effect.hpp"
 #include "particles/collectable_effect.hpp"
 
-#include "particles/gravity_sweep.hpp"
-#include "particles/divorce_effect.hpp"
 #include "particles/portal_shine.hpp"
 
 #include "menus/settings_hub/settings.hpp"
@@ -42,6 +41,9 @@
 #include "particles/rays.hpp"
 #include "practice.hpp"
 
+#include "constants.hpp"
+#include "game/audio_manager.hpp"
+
 namespace gd3ds
 {
 
@@ -52,7 +54,7 @@ extern const Color white = { 255, 255, 255 };
 #define COLLECTABLE_FLOAT_BASE 0.0f
 
 static inline float collectableFloatOffset(void) {
-    return COLLECTABLE_FLOAT_BASE + COLLECTABLE_FLOAT_AMP * lutSin(6.2831853f * (frameTimer / COLLECTABLE_FLOAT_PERIOD));
+    return COLLECTABLE_FLOAT_BASE + COLLECTABLE_FLOAT_AMP * lutSin(6.2831853f * (GameManager::get()->frameTimer / COLLECTABLE_FLOAT_PERIOD));
 }
 
 static const HSV lighterHSV = {
@@ -547,7 +549,7 @@ int getGlowChannel(int obj) {
 }
 
 int getCoinTexture(int tex, int ticks) {
-    return tex + ((levelFrame / ticks) & 0b11);;
+    return tex + ((GameManager::get()->levelFrame / ticks) & 0b11);;
 }
 
 // Some objects have a randomized texture at level load, get those
@@ -678,7 +680,7 @@ float getRotationSpeed(int obj) {
 // Map amplitude pulsing to ranges
 float getObjectPulse(float amplitude, int id, int layer) {
      // No pulse if one of those is 0
-    amplitude *= musicVolume > 0 && globalVolume > 0;
+    amplitude *= AudioManager::get()->musicVolume > 0 && AudioManager::get()->globalVolume > 0;
     amplitude = MAX(0.1f, amplitude); // Cap at 0.1
     switch (id) {
         case YELLOW_ORB:
@@ -772,7 +774,7 @@ void spawnObjectAt(
     if (obj->animationType == static_cast<int>(AnimationType::AnimationMovement) && obj->groupCount > 0) {
         const Animation* anim = getAnimationForObject(id);
         if (anim && anim->frameCount > 0) {
-            float time = frameTimer * anim->fps;
+            float time = GameManager::get()->frameTimer * anim->fps;
             anim_keyframe = &anim->frames[(int)time % anim->frameCount];
         }
     }
@@ -862,7 +864,7 @@ void spawnObjectAt(
         if (obj->animationType == static_cast<int>(AnimationType::AnimationFrameSwap) && obj->frameCount > 0) {
             const SlotFrames* slotFrames = findSlotFrames(obj, 0);
             if (slotFrames) {
-                float time = frameTimer * slotFrames->fps;
+                float time = GameManager::get()->frameTimer * slotFrames->fps;
                 int index = (int)time % slotFrames->count;
                 const SwapFrame* swapFrame = &obj->swapFrames[slotFrames->start + index];
 
@@ -1000,7 +1002,7 @@ void spawnObjectAt(
             if (obj->animationType == static_cast<int>(AnimationType::AnimationFrameSwap) && obj->frameCount > 0) {
                 const SlotFrames* slotFrames = findSlotFrames(obj, i + 1);
                 if (slotFrames) {
-                    float time = frameTimer * slotFrames->fps;
+                    float time = GameManager::get()->frameTimer * slotFrames->fps;
                     int index = (int)time % slotFrames->count;
                     const SwapFrame* swapFrame = &obj->swapFrames[slotFrames->start + index];
 
@@ -1258,14 +1260,14 @@ int getObjOpacity(int obj, float x) {
 void handleSpecialFading(int obj, float calcX, float calcY) {
     switch (currentFadingEffect) {
         case static_cast<int>(FadingEffects::FadeInwards):
-            if (calcY > (SCREEN_HEIGHT / SCALE / 2)) {
+            if (calcY > (constants::ScreenHeight / SCALE / 2)) {
                 objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeUp);
             } else {
                 objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeDown);
             }
             break;
         case static_cast<int>(FadingEffects::FadeOutwards):
-            if (calcY > (SCREEN_HEIGHT / SCALE / 2)) {
+            if (calcY > (constants::ScreenHeight / SCALE / 2)) {
                 objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeDown);
             } else {
                 objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeUp);
@@ -1273,13 +1275,13 @@ void handleSpecialFading(int obj, float calcX, float calcY) {
             break;
         case static_cast<int>(FadingEffects::FadeCircleLeft):
             if (calcX > (GAMEPLAY_SCREEN_WIDTH_AREA / 2)) {
-                if (calcY > (SCREEN_HEIGHT / SCALE / 2)) {
+                if (calcY > (constants::ScreenHeight / SCALE / 2)) {
                     objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeUpStationary);
                 } else {
                     objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeDownStationary);
                 }
             } else {
-                if (calcY > (SCREEN_HEIGHT / SCALE / 2)) {
+                if (calcY > (constants::ScreenHeight / SCALE / 2)) {
                     objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeUpSlowLeft);
                 } else {
                     objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeDownSlowLeft);
@@ -1288,13 +1290,13 @@ void handleSpecialFading(int obj, float calcX, float calcY) {
             break;
         case static_cast<int>(FadingEffects::FadeCircleRight):
             if (calcX > (GAMEPLAY_SCREEN_WIDTH_AREA / 2)) {
-                if (calcY > (SCREEN_HEIGHT / SCALE / 2)) {
+                if (calcY > (constants::ScreenHeight / SCALE / 2)) {
                     objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeUpSlowRight);
                 } else {
                     objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeDownSlowRight);
                 }
             } else {
-                if (calcY > (SCREEN_HEIGHT / SCALE / 2)) {
+                if (calcY > (constants::ScreenHeight / SCALE / 2)) {
                     objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeUpStationary);
                 } else {
                     objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeDownStationary);
@@ -1469,8 +1471,8 @@ void drawGround(float camX, float camY, float y, bool isCeiling, int screenWidth
 
     // First draw the ground
     float calcX = 0 - positiveFmodf(camX, GROUND_SIZE);
-    float calcY = SCREEN_HEIGHT - ((y - camY));
-    float groundCalcY = SCREEN_HEIGHT - ((gY - camY));
+    float calcY = constants::ScreenHeight - ((y - camY));
+    float groundCalcY = constants::ScreenHeight - ((gY - camY));
 
     for (float i = -GROUND_SIZE; i < (screenWidth / SCALE) + GROUND_SIZE; i += GROUND_SIZE) {
         C2D_SpriteSetPos(&ground, calcX + i, groundCalcY);
@@ -1489,7 +1491,7 @@ void drawGround(float camX, float camY, float y, bool isCeiling, int screenWidth
         float g2Y = y;
         if (isCeiling) g2Y -= GROUND_SIZE - ground2.image.subtex->height;
 
-        groundCalcY = SCREEN_HEIGHT - ((g2Y - camY));
+        groundCalcY = constants::ScreenHeight - ((g2Y - camY));
         for (float i = -GROUND_SIZE; i < (screenWidth / SCALE) + GROUND_SIZE; i += GROUND_SIZE) {
             C2D_SpriteSetPos(&ground2, calcX + i, groundCalcY);
             C2D_SpriteSetScale(&ground2, 1.f, mult);
@@ -1576,7 +1578,7 @@ void drawAttemptText() {
     int attempts = state.currentData.attempts;
 
     float calcX = (state.attemptTextPos.x - state.cameraX);
-    float calcY = SCREEN_HEIGHT - ((state.attemptTextPos.y - state.cameraY));  
+    float calcY = constants::ScreenHeight - ((state.attemptTextPos.y - state.cameraY));  
 
     if (calcX > -200) {
         C2D_SpriteSheet *fontSheet = levelFontSheet ? &levelFontSheet : &bigFontSheet;
@@ -1616,14 +1618,14 @@ static void loadCurrentObject(void) {
                 int obj = sec->objects[i];
 
                 float calcX = objects.x[obj] - state.cameraX;
-                float calcY = SCREEN_HEIGHT - (objects.y[obj] - state.cameraY);
+                float calcY = constants::ScreenHeight - (objects.y[obj] - state.cameraY);
                 
                 int margin = getMargin(objects.id[obj]);
 
                 float xMargin = margin * objects.scaleX[obj];
                 float yMargin = margin * objects.scaleY[obj];
 
-                if (calcX < -xMargin || calcX >= SCREEN_WIDTH / SCALE + xMargin || calcY < -yMargin || calcY >= SCREEN_HEIGHT / SCALE + yMargin) 
+                if (calcX < -xMargin || calcX >= constants::ScreenWidth / SCALE + xMargin || calcY < -yMargin || calcY >= constants::ScreenHeight / SCALE + yMargin) 
                     continue;
 
                 if (!isValidObject(objects.id[obj]) || objects.flags[obj] & static_cast<int>(ObjectFlags::FlagToggled))
@@ -1651,20 +1653,20 @@ static void updateCurrentObjects(void) {
         }
 
         float calcX = objects.x[obj] - state.cameraX;
-        float calcY = SCREEN_HEIGHT - (objects.y[obj] - state.cameraY);
+        float calcY = constants::ScreenHeight - (objects.y[obj] - state.cameraY);
 
         float fadeVal = objEdgeFade(calcX, GAMEPLAY_SCREEN_WIDTH_AREA);
         if (fadeVal == 255) {
             objects.transitionApplied[obj] = static_cast<int>(FadingEffects::FadeNone);
         } else if (objects.transitionApplied[obj] == static_cast<int>(FadingEffects::FadeNone)) {
-            float calcY = SCREEN_HEIGHT - (objects.y[obj] - state.cameraY);
+            float calcY = constants::ScreenHeight - (objects.y[obj] - state.cameraY);
             handleSpecialFading(obj, calcX, calcY);
         }
         
         // The rotating objects need to be recalculated
         float rotationSpeed = getRotationSpeed(obj);
         if (rotationSpeed != 0) {
-            objects.visualRotation[obj] += ((objects.random[obj] & 1) ? -rotationSpeed : rotationSpeed) * delta;
+            objects.visualRotation[obj] += ((objects.random[obj] & 1) ? -rotationSpeed : rotationSpeed) * GameManager::get()->deltaTime;
         }
 
         spawnObjectParticles(obj);
@@ -1999,7 +2001,7 @@ void drawDashFire(Player *player) {
     dashFireState(player, &localX, &localY, &sx, &sy, &color);
 
     float calcX = player->x - state.cameraX;
-    float calcY = SCREEN_HEIGHT - (player->y - state.cameraY);
+    float calcY = constants::ScreenHeight - (player->y - state.cameraY);
 
     float rotation = -player->dashAngle;
     float rad = C3D_AngleFromDegrees(rotation);
@@ -2117,9 +2119,9 @@ void drawDashBooms(void) {
 
     if (!playerEffectsSheet) return;
 
-    if (frameCounter != lastFrame) {
-        updateDashBooms(delta);
-        lastFrame = frameCounter;
+    if (GameManager::get()->frameCounter != lastFrame) {
+        updateDashBooms(GameManager::get()->deltaTime);
+        lastFrame = GameManager::get()->frameCounter;
     }
 
     for (int i = 0; i < MAX_DASH_FX; i++) {
@@ -2132,7 +2134,7 @@ void drawDashBooms(void) {
         }
 
         float x = getMirrorX(fx->x - state.cameraX, state.mirrorFactor);
-        float y = SCREEN_HEIGHT - (fx->y - state.cameraY);
+        float y = constants::ScreenHeight - (fx->y - state.cameraY);
         float sx, sy;
         float alpha;
         int frame;
@@ -2248,7 +2250,7 @@ static void drawSpiderDashEffects(void) {
 
     if (!playerEffectsSheet) return;
 
-    if (frameCounter != lastFrame) {
+    if (GameManager::get()->frameCounter != lastFrame) {
         for (int i = 0; i < MAX_SPIDER_DASH_FX; i++) {
             SpiderDashEffect *fx = &spiderDashEffects[i];
             if (!fx->active) continue;
@@ -2256,7 +2258,7 @@ static void drawSpiderDashEffects(void) {
             fx->elapsed += 1.f / 60.f;
             if (fx->elapsed >= SPIDER_DASH_LIFETIME) fx->active = false;
         }
-        lastFrame = frameCounter;
+        lastFrame = GameManager::get()->frameCounter;
     }
 
     for (int i = 0; i < MAX_SPIDER_DASH_FX; i++) {
@@ -2269,7 +2271,7 @@ static void drawSpiderDashEffects(void) {
         }
 
         float x = getMirrorX(fx->x - state.cameraX, state.mirrorFactor);
-        float y = SCREEN_HEIGHT - (fx->y - state.cameraY);
+        float y = constants::ScreenHeight - (fx->y - state.cameraY);
 
         int frame = (int)(fx->elapsed / SPIDER_DASH_FRAME_TIME);
         if (frame >= SPIDER_DASH_FRAME_COUNT) frame = SPIDER_DASH_FRAME_COUNT - 1;
@@ -2449,11 +2451,11 @@ void updateTouchEffect(float delta) {
 
     touchDragParticles.emitting = false;
 
-    bool tapEffectEnabled = (gameState == static_cast<int>(GameState::Game) && !gamePaused) ? settingsState.gameplayTapEffect : settingsState.touchEffectEverywhere;
+    bool tapEffectEnabled = (gameState == static_cast<int>(GameState::Game) && !GameManager::get()->gamePaused) ? settingsState.gameplayTapEffect : settingsState.touchEffectEverywhere;
 
     if (tapEffectEnabled && (kHeld & KEY_TOUCH)) {
         // Flipped for particles
-        float flippedY = SCREEN_HEIGHT - pos.py;
+        float flippedY = constants::ScreenHeight - pos.py;
 
         // Use effect
         if (kDown & KEY_TOUCH) {
@@ -2507,7 +2509,7 @@ void updateBottomParticles(float delta) {
     if (state.dual) flyingGamemode = flyingGamemode || (state.player2.gamemode == static_cast<int>(IconGamemode::GamemodeShip) || state.player2.gamemode == static_cast<int>(IconGamemode::GamemodeUfo) || state.player2.gamemode == static_cast<int>(IconGamemode::GamemodeWave));
 
     // If in game and not paused and not fading, update the particles spawning
-    if (((gameState == static_cast<int>(GameState::Game) && !gamePaused))) {
+    if (((gameState == static_cast<int>(GameState::Game) && !GameManager::get()->gamePaused))) {
         if (flyingGamemode) {
             glitterParticlesBottom.emitterX = state.cameraXMiddle;
             glitterParticlesBottom.emitterY = 240/2;

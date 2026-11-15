@@ -1,4 +1,4 @@
-#include "menus/core/common_setters.hpp"
+#include "macros.hpp"
 
 #include <citro2d.h>
 #include "text.hpp"
@@ -8,6 +8,7 @@
 #include "menus/components/ui_button.hpp"
 #include "menus/settings_hub/settings.hpp"
 #include "menus/core/ui_props.hpp"
+#include "game/game_manager.hpp"
 
 #include "main.hpp"
 #include "ui_slider.hpp"
@@ -30,7 +31,7 @@ void uiButtonUpdate(UIElement* e, UIInput* touch, UITransform *transform) {
     //Keybinds logic
     u32 validKeybinds = button->keyBinds;
 
-    if(settingsState.enableDebugBindings && gameState == static_cast<int>(GameState::Game) && !gamePaused && !inLevelComplete){
+    if(settingsState.enableDebugBindings && gameState == static_cast<int>(GameState::Game) && !GameManager::get()->gamePaused && !GameManager::get()->inLevelComplete){
         validKeybinds &= ~(KEY_B | KEY_X | KEY_L | KEY_R);
     }
 
@@ -58,10 +59,10 @@ void uiButtonUpdate(UIElement* e, UIInput* touch, UITransform *transform) {
         case ButtonAnimType::ButtonAnimNormal:
             EaseTypes bounceType;
             if (button->hovered) {
-                button->hoverTimer += DT * (button->keyPressTimer > 0 ? 2 : 1);
+                button->hoverTimer += GameManager::get()->deltaTime * (button->keyPressTimer > 0 ? 2 : 1);
                 bounceType = (button->keyPressTimer > 0 ? EaseTypes::EaseOut : EaseTypes::BounceOut);
             } else {
-                button->hoverTimer -= DT;
+                button->hoverTimer -= GameManager::get()->deltaTime;
                 // As the animation plays in reverse, we just use bounce in
                 bounceType = EaseTypes::BounceIn;
             }
@@ -74,9 +75,9 @@ void uiButtonUpdate(UIElement* e, UIInput* touch, UITransform *transform) {
             break;
         case ButtonAnimType::ButtonAnimPull:
             if (button->hovered) {
-                button->hoverTimer += DT;
+                button->hoverTimer += GameManager::get()->deltaTime;
             } else {
-                button->hoverTimer -= DT;
+                button->hoverTimer -= GameManager::get()->deltaTime;
             }
 
             button->hoverTimer = clampf(button->hoverTimer, 0.f, 0.2f);

@@ -4,9 +4,11 @@
 #include "triggers.hpp"
 #include "particles/particles.hpp"
 #include "state.hpp"
-#include "main.hpp"
+#include "graphics.hpp"
 #include "player/collision.hpp"
 #include "math_helpers.hpp"
+
+#include "constants.hpp"
 
 namespace gd3ds
 {
@@ -136,10 +138,10 @@ static void removeOffscreenObjectParticles() {
 
             if (!objectParticle[i].ps.stationary) {
                 x = ((x - state.cameraX));
-                y = SCREEN_HEIGHT - ((y - state.cameraY));  
+                y = constants::ScreenHeight - ((y - state.cameraY));  
             }
 
-            if (x < -60 || x >= (SCREEN_WIDTH / SCALE) + 60 || y < -60 || y >= (SCREEN_HEIGHT / SCALE) + 60) {
+            if (x < -60 || x >= (constants::ScreenWidth / SCALE) + 60 || y < -60 || y >= (constants::ScreenHeight / SCALE) + 60) {
                 objectParticle[i].occupied = false;
                 objectParticle[i].colorApplied = false;
                 freeParticleData(&objectParticle[i].ps.data);
@@ -224,7 +226,7 @@ void drawObjectParticles() {
             float fadeScale = 1.f;
             getFadeVars(obj, calcX, &fadeX, &fadeY, &fadeScale);
 
-            float fadeVal = objEdgeFade(calcX, SCREEN_WIDTH / SCALE);
+            float fadeVal = objEdgeFade(calcX, constants::ScreenWidth / SCALE);
 
             // Calculate stationary fade positions
             fadeX += getSpecialFadingVars(obj, fadeVal);

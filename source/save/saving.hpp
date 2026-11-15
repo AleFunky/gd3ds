@@ -1,9 +1,8 @@
 #pragma once
 
 #include <stdbool.h>
-#include "json-c/json.h"
-#include "level/main_levels.hpp"
-#include "utils/server_utils.hpp"
+#include "../utils/server_utils.hpp"
+#include <cstddef>
 
 #define DATA_ATTEMPTS "attempts"
 #define DATA_JUMPS "jumps"
@@ -22,6 +21,8 @@
 #define SAVE_MAIN_LEVEL_KEY "main_levels"
 #define SAVE_EXTERNAL_KEY "external_levels"
 #define SAVE_SAVED_LEVEL_KEY "saved_levels"
+
+struct json_object;
 
 namespace gd3ds
 {
@@ -107,7 +108,7 @@ enum class SavingError {
 };
 
 struct SavingTask {
-    struct json_object *root;
+    json_object *root;
     unsigned char *data;
     size_t dataLen;
     SavingError error;

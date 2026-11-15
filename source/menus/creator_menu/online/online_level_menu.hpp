@@ -1,6 +1,6 @@
 #pragma once
-#include "menus/core/ui_stack.hpp"
-#include "menus/level_options.hpp"
+
+#include "menus/core/ui_screen.hpp"
 #include "utils/server_utils.hpp"
 
 namespace gd3ds

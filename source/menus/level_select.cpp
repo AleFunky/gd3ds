@@ -2,28 +2,28 @@
 #include <3ds.h>
 #include <citro2d.h>
 #include "level_loading.hpp"
+#include "macros.hpp"
 #include "menus/core/common_setters.hpp"
 
 #include "menus/core/ui_screen.hpp"
 #include "math_helpers.hpp"
 #include "menus/components/ui_list.hpp"
-#include "menus/components/ui_window.hpp"
+#include "game/game_manager.hpp"
 #include "menus/components/ui_window_button.hpp"
 #include "menus/components/ui_image.hpp"
 #include "menus/components/ui_label.hpp"
 #include "menus/components/ui_progress_bar.hpp"
-#include "fonts/bigFont.hpp"
 #include "main.hpp"
 #include "easing.hpp"
 #include "triggers.hpp"
 #include "mp3_player.hpp"
-#include "graphics.hpp"
 #include "level_select.hpp"
 
 #include "level/main_levels.hpp"
 #include "save/saving.hpp"
+#include "game/platform.hpp"
 
-#include "menus/gameplay.hpp"
+#include "constants.hpp"
 
 #include "state.hpp"
 
@@ -112,7 +112,7 @@ UIScreen *btm_screen = NULL;
 
 #define DOTS_SCALE 0.75f
 
-#define DOTS_X (SCREEN_WIDTH / 2)
+#define DOTS_X (constants::ScreenWidth / 2)
 #define DOTS_Y 232
 #define DOTS_WIDTH 8
 #define DOTS_MARGIN 8
@@ -120,7 +120,7 @@ UIScreen *btm_screen = NULL;
 static void updateCurrentLevel(int level) {
     char key[18];
     snprintf(key, sizeof(key), "main_%d", level);
-    currentLevelEntry = getOrAddLevelToServerFile(currentServerFile, key, LevelListType::LevelListMainLevels);
+    currentLevelEntry = getOrAddLevelToServerFile(platform::currentServerFile, key, LevelListType::LevelListMainLevels);
     currentLevelList = LevelListType::LevelListMainLevels;
     currentLevelEntry->data.stars = currentMainLevelPack->levels[level].stars;
 }
@@ -136,7 +136,7 @@ static void drawDots(int levelID) {
 
     C2D_PlainImageTint(&tint, C2D_Color32(125, 125, 125, 255), 1.f);
 
-    int leftSide = DOTS_X - ((DOTS_WIDTH * (int)currentMainLevelPack->count) + (DOTS_MARGIN * ((int)currentMainLevelPack->count - 1))) * DOTS_SCALE / 2;
+    float leftSide = (float)constants::ScreenWidth / 2.0f - ((DOTS_WIDTH * (int)currentMainLevelPack->count) + (DOTS_MARGIN * ((int)currentMainLevelPack->count - 1))) * DOTS_SCALE / 2.0f;
 
     for (int i = 0; i < (int)currentMainLevelPack->count; i++) {
         C2D_SpriteSetPos(&spr, leftSide + i * (DOTS_WIDTH + DOTS_MARGIN) * DOTS_SCALE, DOTS_Y);
@@ -487,7 +487,7 @@ void levelSelectInitTop(UIScreen *s){
 }
 
 void levelSelectUpdate(UIScreen *s, UIInput *input){
-    if (exitingLevel) {
+    if (GameManager::get()->exitingLevel) {
         //make sure the color immediately sets when the level is exited
         scrollDir = 0;
         dragging = false;
@@ -496,7 +496,7 @@ void levelSelectUpdate(UIScreen *s, UIInput *input){
         uploadColorToBuffer(static_cast<int>(ColorChannelIDs::ChannelBg), defaultLvlColors[currLevelID % numMenuColors], 0);
         updateLevelTop(currLevelID);
     }
-    exitingLevel = false;
+    GameManager::get()->exitingLevel = false;
     
     if(!scrollDir && !dragging){
         uploadColorToBuffer(static_cast<int>(ColorChannelIDs::ChannelBg), defaultLvlColors[currLevelID % numMenuColors], 0);

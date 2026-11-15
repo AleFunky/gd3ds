@@ -1,6 +1,9 @@
 #include <3ds.h>
 #include <citro2d.h>
 #include "3ds/services/cfgu.h"
+#include "game/platform.hpp"
+#include "game/game.hpp"
+#include "macros.hpp"
 #include "main.hpp"
 #include "mp3_player.hpp"
 #include "save/config.hpp"
@@ -55,7 +58,7 @@ const char *categoryNames[] = {
 bool conditionSupportsWide() {
     u8 model = getModel();
 
-    return model != CFG_MODEL_2DS && !isCitra();
+    return model != CFG_MODEL_2DS && !platform::isCitra();
 }
 
 bool conditionSupports3D() {
@@ -519,7 +522,7 @@ void wideSetting(bool checked) {
 
 void stereoSetting(bool checked) {
     if (!checked) return;
-    if (!threeDWarningPassed) {
+    if (!GameManager::get()->platformState.has3DWarningPassed) {
         TwoOptionPopupData *threeDWarningData = (TwoOptionPopupData *)malloc(sizeof(TwoOptionPopupData));
         if (!threeDWarningData) return;
         
@@ -529,7 +532,7 @@ void stereoSetting(bool checked) {
         threeDWarningData->cancelText = strdup("Disable");
         uiStackPush(&threeDWarningPopUpDef, UIAnimation::AnimZoom, UIAnimation::AnimZoom, UIStackPushType::PushNext);
         uiStackPushData(threeDWarningData);
-        threeDWarningPassed = true;
+        GameManager::get()->platformState.has3DWarningPassed = true;
     }
 
     // No 3D on this console, so don't let the box stay ticked

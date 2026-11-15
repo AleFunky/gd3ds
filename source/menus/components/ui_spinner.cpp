@@ -7,6 +7,8 @@
 #include "ui_image.hpp"
 #include "math_helpers.hpp"
 
+#include "game/game_manager.hpp"
+
 namespace gd3ds
 {
 
@@ -14,7 +16,7 @@ static void uiSpinnerDraw(UIElement* e, UITransform *transform) {
     UIImage *image = (UIImage *) e;
     UISpinner *spinner = (UISpinner *) image;
     
-    C2D_SpriteRotate(&image->image.sprite, C3D_AngleFromDegrees(spinner->rotationSpeed * DT)); // Cloud pls save us all and do screen rewrite //Why would that help this
+    C2D_SpriteRotate(&image->image.sprite, C3D_AngleFromDegrees(spinner->rotationSpeed * GameManager::get()->deltaTime)); // Cloud pls save us all and do screen rewrite //Why would that help this
     
     changeBlending(spinner->blending);
     uiImageDraw(e, transform);

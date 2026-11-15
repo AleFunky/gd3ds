@@ -1,5 +1,6 @@
 #pragma once
-#include "menus/core/ui_screen.hpp"
+#include "../menus/core/ui_screen.hpp"
+#include "utils/utils.hpp"
 
 namespace gd3ds
 {

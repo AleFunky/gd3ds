@@ -2,7 +2,7 @@
 
 #include <stdbool.h>
 #include "player/player.hpp"
-#include "graphics.hpp"
+#include "types.hpp"
 
 #define MAX_LEVEL_HEIGHT 2400.f
 #define HITBOX_TRAIL_SIZE 64
@@ -137,7 +137,7 @@ struct GamePlayState {
     Player player;
     Player player2;
 
-    Vec2D attemptTextPos;
+    Point attemptTextPos;
 
     unsigned char currentPlayer;
 

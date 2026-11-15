@@ -1,5 +1,6 @@
 #include "level_options.hpp"
 
+#include "macros.hpp"
 #include "main.hpp"
 #include "menus/core/ui_element.hpp"
 #include "menus/core/ui_screen.hpp"

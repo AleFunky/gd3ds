@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <float.h>
+#include "types.hpp"
 
 namespace gd3ds
 {
@@ -27,53 +28,53 @@ Matrix2x2 matrix2x2Multiply(Matrix2x2 a, Matrix2x2 b) {
     return result;
 }
 
-Vec2D matrix2x2Transform(Matrix2x2 matrix, Vec2D vector) {
-    return (Vec2D){
+Point matrix2x2Transform(Matrix2x2 matrix, Point vector) {
+    return (Point){
         matrix.m[0][0] * vector.x + matrix.m[0][1] * vector.y,
         matrix.m[1][0] * vector.x + matrix.m[1][1] * vector.y
     };
 }
 
-Vec2D affineTransformPoint(Matrix2x2 matrix, Vec2D offset, Vec2D point) {
+Point affineTransformPoint(Matrix2x2 matrix, Point offset, Point point) {
     return addVec(matrix2x2Transform(matrix, point), offset);
 }
 
-void composeAffineTransform(Matrix2x2 *currentMatrix, Vec2D *currentOffset, Matrix2x2 nextMatrix, Vec2D nextOffset) {
+void composeAffineTransform(Matrix2x2 *currentMatrix, Point *currentOffset, Matrix2x2 nextMatrix, Point nextOffset) {
     *currentOffset = addVec(matrix2x2Transform(nextMatrix, *currentOffset), nextOffset);
     *currentMatrix = matrix2x2Multiply(nextMatrix, *currentMatrix);
 }
 
-Vec2D addVec(Vec2D a, Vec2D b) {
-    return (Vec2D) { a.x + b.x, a.y + b.y};
+Point addVec(Point a, Point b) {
+    return (Point) { a.x + b.x, a.y + b.y};
 }
 
-Vec2D subVec(Vec2D a, Vec2D b) {
-    return (Vec2D) { a.x - b.x, a.y - b.y};
+Point subVec(Point a, Point b) {
+    return (Point) { a.x - b.x, a.y - b.y};
 }
 
-Vec2D multiplyVec(Vec2D v, float val) {
-    return (Vec2D) { v.x * val, v.y * val};
+Point multiplyVec(Point v, float val) {
+    return (Point) { v.x * val, v.y * val};
 }
 
-float lenVec(Vec2D v) {
+float lenVec(Point v) {
     return sqrtf(v.x*v.x + v.y*v.y);
 }
 
-Vec2D normalize(Vec2D v) {
+Point normalize(Point v) {
     float len = lenVec(v);
     if (len < 0.0001f) len = 1.f;
-    return (Vec2D){ v.x / len, v.y / len };
+    return (Point){ v.x / len, v.y / len };
 }
 
-float dotVec(Vec2D a, Vec2D b) {
+float dotVec(Point a, Point b) {
     return a.x * b.x + a.y * b.y;
 }
 
-Vec2D perpendicular(Vec2D v) {
-    return (Vec2D){ -v.y, v.x };
+Point perpendicular(Point v) {
+    return (Point){ -v.y, v.x };
 }
 
-float squareDistVec(const Vec2D* a, const Vec2D* b) {
+float squareDistVec(const Point* a, const Point* b) {
     float dx = a->x - b->x;
     float dy = a->y - b->y;
     return dx*dx + dy*dy;

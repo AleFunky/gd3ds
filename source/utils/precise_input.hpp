@@ -6,9 +6,9 @@ namespace gd3ds
 {
 
 enum class PreciseInputPlayer {
-    PiPlayer1,
-    PiPlayer2,
-    PiPlayerCount
+    Player1,
+    Player2,
+    Count
 };
 
 struct PreciseInputEvent {

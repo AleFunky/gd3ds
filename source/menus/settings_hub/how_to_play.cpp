@@ -1,6 +1,7 @@
 #include <3ds.h>
 #include <citro2d.h>
 
+#include "macros.hpp"
 #include "menus/core/ui_screen.hpp"
 #include "menus/components/ui_button.hpp"
 

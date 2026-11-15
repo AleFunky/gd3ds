@@ -1,10 +1,10 @@
-
-#include "main.hpp"
 #include "particles/particle_definitions.hpp"
 #include <citro2d.h>
 #include "menus/core/ui_screen.hpp"
 #include "menus/core/ui_props.hpp"
 #include "graphics.hpp"
+
+#include "game/game_manager.hpp"
 
 namespace gd3ds
 {
@@ -28,7 +28,7 @@ static void uiParticleUpdate(UIElement* e, UIInput* touch, UITransform *transfor
     UIParticle *particle = (UIParticle *) e;
     ParticleSystem *p = &(particle->particle);
 
-    updateParticleSystem(p, delta);
+    updateParticleSystem(p, GameManager::get()->deltaTime);
 }
 
 static void uiParticleDraw(UIElement* e, UITransform *transform) {

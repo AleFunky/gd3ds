@@ -60,14 +60,14 @@ void dump_leaks() {
     Allocation *a = head;
 
     if (!a) {
-        outputLog("No leaks!\n");
+        platform::outputLog("No leaks!\n");
         return;
     }
 
-    outputLog("Leaks:\n");
+    platform::outputLog("Leaks:\n");
 
     while (a) {
-        outputLog("Gen %d :LEAK: %p (%u bytes) caller=%p\n",
+        platform::outputLog("Gen %d :LEAK: %p (%u bytes) caller=%p\n",
             a->generation,
             a->ptr,
             (unsigned)a->size,

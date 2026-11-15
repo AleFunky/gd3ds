@@ -2,7 +2,6 @@
 #include "arena.hpp"
 #include "objects.hpp"
 #include "text.hpp"
-#include "utils/server_utils.hpp"
 #include <3ds.h>
 
 #define MAX_GROUPS_PER_OBJECT 20

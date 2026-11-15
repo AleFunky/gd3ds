@@ -1,10 +1,10 @@
 #include <3ds.h>
 #include <citro2d.h>
 #include <stdlib.h>
-#include "main.hpp"
 #include "icons.hpp"
 #include "fonts/chatFont.hpp"
 #include "fonts/goldFont.hpp"
+#include "macros.hpp"
 #include "utils/folders.hpp"
 #include "utils/server_utils.hpp"
 
@@ -18,10 +18,12 @@
 #include "menus/components/ui_icon.hpp"
 #include "menus/creator_menu/external/external_popup.hpp"
 #include "menus/icon_kit.hpp"
-#include "menus/creator_menu/search_menu.hpp"
+#include "menus/core/common_setters.hpp"
 #include "menus/palette_kit.hpp"
 
 #include "utils/utils.hpp"
+
+#include "game/game_manager.hpp"
 
 namespace gd3ds
 {
@@ -85,6 +87,9 @@ static void handleCommentErrors(int code) {
 void populateComments() {
     uiListReset(list);
     uiDisableElement((UIElement *) spinner);
+
+    bool gdps = GameManager::get()->platformState.isGDPS;
+
     for (int i = 0; i < commentEntriesLength; i++) {
         char username[36] = "-";
         snprintf(username, sizeof(username), "<#%s>%s</>", (commentEntries[i].authorAccountId == 0) ? "5AFFFF" : "FFFFFF", commentEntries[i].name);

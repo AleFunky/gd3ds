@@ -29,6 +29,7 @@
 
 #include "menus/creator_menu/online/online_level_menu.hpp"
 #include "save/saving.hpp"
+#include "game/platform.hpp"
 
 namespace gd3ds
 {
@@ -309,20 +310,20 @@ void updateObjectSection(int obj) {
 char *readFile(const char *filepath, size_t *outSize) {
     FILE *f = fopen(filepath, "rb");
     if (!f) {
-        outputLog("Failed to open file: %s (%d)\n", filepath, errno);
+        platform::outputLog("Failed to open file: %s (%d)\n", filepath, errno);
         return NULL;
     }
     fseek(f, 0, SEEK_END);
     long size = ftell(f);
     if (size < 0) {
-        outputLog("Failed to ftell file: %s (%d)\n", filepath, errno);
+        platform::outputLog("Failed to ftell file: %s (%d)\n", filepath, errno);
         return NULL;
     }
     rewind(f);
 
     char *buffer = (char *)malloc(size + 1);
     if (!buffer) {
-        outputLog("Failed to allocate file\n");
+        platform::outputLog("Failed to allocate file\n");
         fclose(f);
         return NULL;
     }
@@ -337,20 +338,20 @@ char *readFile(const char *filepath, size_t *outSize) {
 char *readFileArena(Arena *arena, const char *filepath, size_t *outSize) {
     FILE *f = fopen(filepath, "rb");
     if (!f) {
-        outputLog("Failed to open file: %s (%d)\n", filepath, errno);
+        platform::outputLog("Failed to open file: %s (%d)\n", filepath, errno);
         return NULL;
     }
     fseek(f, 0, SEEK_END);
     long size = ftell(f);
     if (size < 0) {
-        outputLog("Failed to ftell file: %s (%d)\n", filepath, errno);
+        platform::outputLog("Failed to ftell file: %s (%d)\n", filepath, errno);
         return NULL;
     }
     rewind(f);
 
     char *buffer = (char *)arenaAlloc(arena, size + 1);
     if (!buffer) {
-        outputLog("Failed to allocate file\n");
+        platform::outputLog("Failed to allocate file\n");
         fclose(f);
         return NULL;
     }
@@ -384,7 +385,7 @@ static const char *findGMDValue(const char *data, const char *key, const char *t
 
     // Confirm that the type start tag is here
     if (strncmp(start, typeStartTag, strlen(typeStartTag)) != 0) {
-        outputLog("Expected start tag '%s' not found after key\n", typeStartTag);
+        platform::outputLog("Expected start tag '%s' not found after key\n", typeStartTag);
         return NULL;
     }
 
@@ -396,7 +397,7 @@ static const char *findGMDValue(const char *data, const char *key, const char *t
     snprintf(typeEndTag, sizeof(typeEndTag), "</%s>", type);
     const char *end = strstr(start, typeEndTag);
     if (!end) {
-        outputLog("Could not find end tag '%s'\n", typeEndTag);
+        platform::outputLog("Could not find end tag '%s'\n", typeEndTag);
         return NULL;
     }
 
@@ -415,7 +416,7 @@ char *extractGMDKey(const char *data, const char *key, const char *type) {
     int len = end - start;
     char *value = (char *)malloc(len + 1);
     if (!value) {
-        outputLog("malloc for gmd key %s failed\n", key);
+        platform::outputLog("malloc for gmd key %s failed\n", key);
         return NULL;
     }
     strncpy(value, start, len);
@@ -531,7 +532,7 @@ char *decompressOnlineLevel(char *data, int *outCode) {
     
     int decodedLen = base64Decode(data, decoded);
     if (decodedLen <= 0) {
-        outputLog("Failed to decode base64\n");
+        platform::outputLog("Failed to decode base64\n");
         *outCode = static_cast<int>(LevelLoadError::LoadInvalidBase64);
         return NULL;
     }
@@ -539,7 +540,7 @@ char *decompressOnlineLevel(char *data, int *outCode) {
     size_t decompressedLen;
     char *decompressed = decompressDataLevel(decoded, decodedLen, &decompressedLen, outCode);
     if (!decompressed) {
-        outputLog("Decompression failed (check zlib error above)\n");
+        platform::outputLog("Decompression failed (check zlib error above)\n");
         return NULL;
     }
     
@@ -571,7 +572,7 @@ char *decompressLevel(char *data, int *outCode) {
     }
     int decodedLen = base64Decode(b64, decoded);
     if (decodedLen <= 0) {
-        outputLog("Failed to decode base64\n");
+        platform::outputLog("Failed to decode base64\n");
         free(b64);
         *outCode = static_cast<int>(LevelLoadError::LoadOutOfMemory);
         return NULL;
@@ -580,7 +581,7 @@ char *decompressLevel(char *data, int *outCode) {
     size_t decompressedLen;
     char *decompressed = decompressDataLevel(decoded, decodedLen, &decompressedLen, outCode);
     if (!decompressed) {
-        outputLog("Decompression failed (check zlib error above)\n");
+        platform::outputLog("Decompression failed (check zlib error above)\n");
         free(b64);
         return NULL;
     }
@@ -780,7 +781,7 @@ void parseColorChannel(GDColorChannel *channels, int i, char *channelString) {
 int parseOldChannels(char *levelString, GDColorChannel **outArray, int *outCode) {
     GDColorChannel *channels = (GDColorChannel *)malloc(sizeof(GDColorChannel) * 2);
     if (!channels) {
-        outputLog("Couldn't alloc initial pre 2.0 color channels\n");
+        platform::outputLog("Couldn't alloc initial pre 2.0 color channels\n");
         *outCode = static_cast<int>(LevelLoadError::LoadOutOfMemory);
         return 0;
     }
@@ -1068,7 +1069,7 @@ int parseColorChannels(const char *colorString, GDColorChannel **outArray, int *
 
     GDColorChannel *channels = (GDColorChannel *)malloc(sizeof(GDColorChannel) * count);
     if (!channels) {
-        outputLog("Couldn't alloc color channels\n");
+        platform::outputLog("Couldn't alloc color channels\n");
         freeStringArray(entries, count);
         *outCode = static_cast<int>(LevelLoadError::LoadOutOfMemory);
         return 0;
@@ -2559,7 +2560,7 @@ int parseString(char *levelString, int extraSlots, int *outObjectCount) {
     }
 
     if (sectionCount < 1) {
-        outputLog("Level string missing sections!\n");
+        platform::outputLog("Level string missing sections!\n");
         return static_cast<int>(LevelLoadError::LoadLevelStringMissingSections);
     }
     
@@ -2569,7 +2570,7 @@ int parseString(char *levelString, int extraSlots, int *outObjectCount) {
 
     if (!initArrays(allocCount)) {
         freeArrays();
-        outputLog("Failed to allocate object array\n");
+        platform::outputLog("Failed to allocate object array\n");
         return static_cast<int>(LevelLoadError::LoadOutOfMemory);
     }
 
@@ -2594,7 +2595,7 @@ int parseString(char *levelString, int extraSlots, int *outObjectCount) {
                     // Parse
                     int parsed = parseGdObject(sectionStart, cursor, objectIndex, parseCapacity);
                     if (parsed == -2) {
-                        outputLog("Object capacity exceeded\n");
+                        platform::outputLog("Object capacity exceeded\n");
                         freeArrays();
                         return static_cast<int>(LevelLoadError::LoadOutOfMemory);
                     }
@@ -2602,7 +2603,7 @@ int parseString(char *levelString, int extraSlots, int *outObjectCount) {
                         assignObjectToSection(objectIndex);
                         objectIndex++;
                     } else if (!parsed) {
-                        outputLog("Failed to parse object %d\n", objectIndex);
+                        platform::outputLog("Failed to parse object %d\n", objectIndex);
                         freeArrays();
                         return static_cast<int>(LevelLoadError::LoadCouldntParseObjects);
                     }
@@ -2793,12 +2794,12 @@ static int parseStreamSection(LevelStreamParser *parser) {
     if (parser->sectionCount > 0) {
         int parsed = parseGdObject(parser->section, parser->section + parser->sectionLen, parser->objectIndex, parser->parseCapacity);
         if (parsed == -2) {
-            outputLog("Object capacity exceeded\n");
+            platform::outputLog("Object capacity exceeded\n");
             return static_cast<int>(LevelLoadError::LoadOutOfMemory);
         }
         
         if (parsed == 0) {
-            outputLog("Failed to parse object %d\n", parser->objectIndex);
+            platform::outputLog("Failed to parse object %d\n", parser->objectIndex);
             return static_cast<int>(LevelLoadError::LoadCouldntParseObjects);
         }
 
@@ -2837,7 +2838,7 @@ static int parseLevelChunk(const unsigned char *data, size_t len, void *context)
 
 static int parseLevelStream(const LevelStreamInput *input, const LevelStreamScan *scan, int *outObjectCount) {
     if (scan->sectionCount < 1) {
-        outputLog("Level string missing sections!\n");
+        platform::outputLog("Level string missing sections!\n");
         return static_cast<int>(LevelLoadError::LoadLevelStringMissingSections);
     }
 
@@ -2847,7 +2848,7 @@ static int parseLevelStream(const LevelStreamInput *input, const LevelStreamScan
     int allocCount = parseCapacity + scan->extraSlots;
     if (allocCount < 0 || !initArrays((size_t)allocCount)) {
         freeArrays();
-        outputLog("Failed to allocate object array\n");
+        platform::outputLog("Failed to allocate object array\n");
         return static_cast<int>(LevelLoadError::LoadOutOfMemory);
     }
 
@@ -2922,7 +2923,7 @@ static int loadLevelStream(const LevelStreamInput *input, char *gmdData, bool on
     scan.sectionLen = 0;
     if (scan.sectionCount < 1) {
         freeLevelStreamScan(&scan);
-        outputLog("Level string missing sections!\n");
+        platform::outputLog("Level string missing sections!\n");
         return static_cast<int>(LevelLoadError::LoadLevelStringMissingSections);
     }
 
@@ -2958,7 +2959,7 @@ static int loadLevelStream(const LevelStreamInput *input, char *gmdData, bool on
     generateOrangePortals(orangeStart);
 
     if (!buildGroupCombinations()) {
-        outputLog("Failed to build group combinations\n");
+        platform::outputLog("Failed to build group combinations\n");
         return static_cast<int>(LevelLoadError::LoadOutOfMemory);
     }
 
@@ -3267,7 +3268,7 @@ int loadOnlineLevel(char *levelString) {
         }
 
         if (decodedLen <= 0) {
-            outputLog("Failed to decode base64\n");
+            platform::outputLog("Failed to decode base64\n");
             return static_cast<int>(LevelLoadError::LoadInvalidBase64);
         }
         input.compressedData = decoded;
@@ -3388,7 +3389,7 @@ int loadLevel(const char *path) {
 
             int decodedLen = base64Decode(b64, decoded);
             if (decodedLen <= 0) {
-                outputLog("Failed to decode base64\n");
+                platform::outputLog("Failed to decode base64\n");
                 if (inArena) free(info);
                 else free(level);
                 return static_cast<int>(LevelLoadError::LoadInvalidBase64);
@@ -3463,7 +3464,7 @@ int loadLevel(const char *path) {
     generateOrangePortals(orangeStart);
     
     if (!buildGroupCombinations()) {
-        outputLog("Failed to build group combinations\n");
+        platform::outputLog("Failed to build group combinations\n");
         return static_cast<int>(LevelLoadError::LoadOutOfMemory);
     }
 
@@ -3535,8 +3536,8 @@ void reloadLevel() {
         }
     }
 
-    accumulator = 0.f;
-    fixedDt = true;
+    GameManager::get()->accumulator = 0.f;
+    GameManager::get()->fixedDt = true;
 
     initColChannels();
     setColorChannels();
@@ -3600,7 +3601,7 @@ char *convertIfGdlvl(char *gmd, const char *path) {
         fixBase64URL(gmd);
         int decodedLen = base64Decode(gmd, decoded);
         if (decodedLen <= 0) {
-            outputLog("Failed to decode base64\n");
+            platform::outputLog("Failed to decode base64\n");
             free(gmd);
             free(decoded);
             return NULL;
@@ -3610,7 +3611,7 @@ char *convertIfGdlvl(char *gmd, const char *path) {
         int outCode;
         char *decompressed = decompressData(decoded, decodedLen, &decompressedLen, &outCode);
         if (!decompressed) {
-            outputLog("Decompression failed (check zlib error above)\n");
+            platform::outputLog("Decompression failed (check zlib error above)\n");
             free(gmd);
             free(decoded);
             return NULL;

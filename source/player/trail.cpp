@@ -1,19 +1,15 @@
 // Adapted from OpenGD
 
 #include <string.h>
-#include <stdio.h>
 #include <math.h>
-
 #include "math.h"
 #include "trail.hpp"
-
-#include "main.hpp"
-
 #include "state.hpp"
-
-#include "mp3_player.hpp"
 #include "math_helpers.hpp"
+#include "types.hpp"
 #include "utils/gfx.hpp"
+
+#include "constants.hpp"
 
 #include "menus/settings_hub/settings.hpp"
 
@@ -60,14 +56,14 @@ extern const MotionTrailConfig trailProperties[TRAIL_COUNT] = {
 void motionTrailUpdateStationaryUVs(MotionTrail* trail, float offset);
 
 // Adds "thickness" to a line strip by generating a triangle strip
-void ccVertexLineToPolygon(const Vec2D* points, float stroke, Vec2D* outVerts, int offset, int count) {
+void ccVertexLineToPolygon(const Point* points, float stroke, Point* outVerts, int offset, int count) {
     if (count < 2) return;
 
     float halfStroke = stroke * 0.5f;
 
     for (int i = offset; i < count; ++i) {
-        Vec2D p = points[i];
-        Vec2D dir;
+        Point p = points[i];
+        Point dir;
 
         // Get direction
         if (i == 0) {
@@ -82,7 +78,7 @@ void ccVertexLineToPolygon(const Vec2D* points, float stroke, Vec2D* outVerts, i
         dir = normalize(dir);
 
         // Perpendicular vector
-        Vec2D perp = perpendicular(dir);
+        Point perp = perpendicular(dir);
 
         // Offset left and right
         outVerts[i * 2]     = addVec(p, multiplyVec(perp, halfStroke));
@@ -90,18 +86,18 @@ void ccVertexLineToPolygon(const Vec2D* points, float stroke, Vec2D* outVerts, i
     }
 }
 // Adds "vertical thickness" to a line strip by generating a triangle strip
-void ccVertexLineToPolygonWave(const Vec2D* points, float stroke, Vec2D* outVerts, int offset, int count) {
+void ccVertexLineToPolygonWave(const Point* points, float stroke, Point* outVerts, int offset, int count) {
     if (count < 2) return;
 
     float halfStroke = stroke * 0.5f;
 
     for (int i = offset; i < count; ++i) {
-        Vec2D p = points[i];
+        Point p = points[i];
 
-        Vec2D perp;
+        Point perp;
 
         if (i == 0) {
-            Vec2D dir = subVec(points[1], p);
+            Point dir = subVec(points[1], p);
 
             dir = normalize(dir);
             perp = perpendicular(dir);
@@ -109,7 +105,7 @@ void ccVertexLineToPolygonWave(const Vec2D* points, float stroke, Vec2D* outVert
             outVerts[i * 2]     = addVec(p, multiplyVec(perp, halfStroke));
             outVerts[i * 2 + 1] = subVec(p, multiplyVec(perp, halfStroke));
         } else if (i == count - 1) {
-            Vec2D dir = subVec(p, points[i - 1]);
+            Point dir = subVec(p, points[i - 1]);
 
             dir = normalize(dir);
             perp = perpendicular(dir);
@@ -118,18 +114,18 @@ void ccVertexLineToPolygonWave(const Vec2D* points, float stroke, Vec2D* outVert
             outVerts[i * 2 + 1] = subVec(p, multiplyVec(perp, halfStroke));
         } else {
             // Previous segment direction
-            Vec2D dirA = subVec(p, points[i - 1]); 
+            Point dirA = subVec(p, points[i - 1]); 
 
             // Next segment direction
-            Vec2D dirB = subVec(points[i + 1], p);
+            Point dirB = subVec(points[i + 1], p);
 
             // Normalize
             dirA = normalize(dirA);
             dirB = normalize(dirB);
 
             // Normals
-            Vec2D nA = perpendicular(dirA);
-            Vec2D nB = perpendicular(dirB);
+            Point nA = perpendicular(dirA);
+            Point nB = perpendicular(dirB);
 
             // Average normals
             perp.x = nA.x + nB.x;
@@ -171,7 +167,7 @@ void motionTrailClear(MotionTrail *trail) {
 }
 
 void motionTrailInit(MotionTrail* trail, int player, float fade, bool alwaysOn, float stroke, bool waveTrail, bool blending, bool stationary, Color color, C2D_Image tex) {
-    memset(trail, 0, sizeof(MotionTrail));
+    memset((void*)trail, 0, sizeof(MotionTrail));
     trail->image = tex;  
     trail->maxPoints = MAX_TRAIL_POINTS;
     trail->fadeDelta = 1.0f / fade;
@@ -334,7 +330,7 @@ void motionTrailUpdateStationaryUVs(MotionTrail* trail, float offset) {
 
     for (unsigned int i = 0; i < trail->nuPoints; i++) {
         if (i > 0) {
-            Vec2D d = subVec(
+            Point d = subVec(
                 trail->pointVertexes[i],
                 trail->pointVertexes[i - 1]
             );
@@ -445,18 +441,18 @@ void motionTrailDraw(MotionTrail* trail) {
         int i1 = i + 1;
         int i2 = i + 2;
 
-        Vec2D p0 = trail->vertices[i0];
-        Vec2D p1 = trail->vertices[i1];
-        Vec2D p2 = trail->vertices[i2];
+        Point p0 = trail->vertices[i0];
+        Point p1 = trail->vertices[i1];
+        Point p2 = trail->vertices[i2];
 
         float x0 = getMirrorX((p0.x - state.cameraX), state.mirrorFactor);
-        float y0 = SCREEN_HEIGHT - ((p0.y - state.cameraY));
+        float y0 = constants::ScreenHeight - ((p0.y - state.cameraY));
 
         float x1 = getMirrorX((p1.x - state.cameraX), state.mirrorFactor);
-        float y1 = SCREEN_HEIGHT - ((p1.y - state.cameraY));
+        float y1 = constants::ScreenHeight - ((p1.y - state.cameraY));
 
         float x2 = getMirrorX((p2.x - state.cameraX), state.mirrorFactor);
-        float y2 = SCREEN_HEIGHT - ((p2.y - state.cameraY));
+        float y2 = constants::ScreenHeight - ((p2.y - state.cameraY));
 
         Tex2F t0 = trail->texCoords[i0];
         Tex2F t1 = trail->texCoords[i1];
@@ -513,18 +509,18 @@ void motionTrailDrawWaveTrail(MotionTrail *trail) {
         int i1 = i + 1;
         int i2 = i + 2;
 
-        Vec2D p0 = trail->vertices[i0];
-        Vec2D p1 = trail->vertices[i1];
-        Vec2D p2 = trail->vertices[i2];
+        Point p0 = trail->vertices[i0];
+        Point p1 = trail->vertices[i1];
+        Point p2 = trail->vertices[i2];
 
         float x0 = getMirrorX((p0.x - state.cameraX), state.mirrorFactor);
-        float y0 = SCREEN_HEIGHT - ((p0.y - state.cameraY));
+        float y0 = constants::ScreenHeight - ((p0.y - state.cameraY));
 
         float x1 = getMirrorX((p1.x - state.cameraX), state.mirrorFactor);
-        float y1 = SCREEN_HEIGHT - ((p1.y - state.cameraY));
+        float y1 = constants::ScreenHeight - ((p1.y - state.cameraY));
 
         float x2 = getMirrorX((p2.x - state.cameraX), state.mirrorFactor);
-        float y2 = SCREEN_HEIGHT - ((p2.y - state.cameraY));
+        float y2 = constants::ScreenHeight - ((p2.y - state.cameraY));
 
         C2D_DrawTriangle(
             x0, y0, C2D_Color32(color.r, color.g, color.b, opacity),
@@ -542,18 +538,18 @@ void motionTrailDrawWaveTrail(MotionTrail *trail) {
         int i1 = i + 1;
         int i2 = i + 2;
 
-        Vec2D p0 = trail->centerVertices[i0];
-        Vec2D p1 = trail->centerVertices[i1];
-        Vec2D p2 = trail->centerVertices[i2];
+        Point p0 = trail->centerVertices[i0];
+        Point p1 = trail->centerVertices[i1];
+        Point p2 = trail->centerVertices[i2];
 
         float x0 = getMirrorX((p0.x - state.cameraX), state.mirrorFactor);
-        float y0 = SCREEN_HEIGHT - ((p0.y - state.cameraY));
+        float y0 = constants::ScreenHeight - ((p0.y - state.cameraY));
 
         float x1 = getMirrorX((p1.x - state.cameraX), state.mirrorFactor);
-        float y1 = SCREEN_HEIGHT - ((p1.y - state.cameraY));
+        float y1 = constants::ScreenHeight - ((p1.y - state.cameraY));
 
         float x2 = getMirrorX((p2.x - state.cameraX), state.mirrorFactor);
-        float y2 = SCREEN_HEIGHT - ((p2.y - state.cameraY));
+        float y2 = constants::ScreenHeight - ((p2.y - state.cameraY));
 
         C2D_DrawTriangle(
             x0, y0, C2D_Color32(165, 165, 165, opacity),

@@ -1,3 +1,4 @@
+#include "macros.hpp"
 #include "menus/components/ui_button.hpp"
 
 #include <citro2d.h>
@@ -6,7 +7,6 @@
 #include "menus/core/ui_screen.hpp"
 #include "menus/core/ui_props.hpp"
 
-#include "main.hpp"
 #include "utils/gfx.hpp"
 
 namespace gd3ds

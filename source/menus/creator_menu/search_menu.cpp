@@ -2,34 +2,27 @@
 #include <citro2d.h>
 #include <stdlib.h>
 
-#include "main.hpp"
-#include "graphics.hpp"
+#include "macros.hpp"
 
 #include "menus/core/ui_element.hpp"
 #include "utils/server_utils.hpp"
 
-#include "save/saving.hpp"
 #include "save/config.hpp"
 
 #include "menus/core/ui_screen.hpp"
-#include "menus/components/ui_image.hpp"
-#include "menus/components/ui_label.hpp"
 #include "menus/components/ui_button.hpp"
 #include "menus/creator_menu/search_menu.hpp"
 #include "menus/creator_menu/online/online_menu.hpp"
-#include "menus/creator_menu/search/server_switcher.hpp"
-#include "menus/creator_menu/search/search_filters.hpp"
-#include "menus/creator_menu/search/clear_search_filters.hpp"
-#include "menus/creator_menu/search/song_filter.hpp"
+
+#include "game/game_manager.hpp"
 
 namespace gd3ds
 {
 
 bool searchNeedsRefresh = true;
-bool gdps = false;
 
 bool userCoinsCounterVisible(void) {
-    return !gdps;
+    return !GameManager::get()->platformState.isGDPS;
 }
 
 static UIScreen *btm_screen = NULL;
@@ -40,7 +33,7 @@ static void updateDifficultyTint(UIElement *e){
 }
 
 void enableDemons(UIScreen *s){
-    if(gdps) return;
+    if (GameManager::get()->platformState.isGDPS) return;
 
     uiButtonSetImage(((UIButton *)uiGetElementByTag(s, "easy")), 259, 0);
     uiButtonSetImage(((UIButton *)uiGetElementByTag(s, "normal")), 261, 0);
@@ -114,8 +107,10 @@ static void actionSetDifficulty(UIElement *e, const UIPropertyList *args){
     filters.isAuto = false;
     int difficultyVal = uiPropInt(&e->customProperties, "diffValue", 0);
 
-    if(filters.isDemon && !gdps) filters.difficultyFilters &= difficultyVal;
-    else filters.isDemon = false;
+    if (filters.isDemon && !GameManager::get()->platformState.isGDPS)
+        filters.difficultyFilters &= difficultyVal;
+    else
+        filters.isDemon = false;
 
     filters.difficultyFilters ^= difficultyVal;
     updateDifficultyTints(e->screen);

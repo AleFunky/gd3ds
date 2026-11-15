@@ -8,8 +8,10 @@
 #include <unistd.h>
 #include "menus/settings_hub/settings.hpp"
 #include "state.hpp"
+#include "game/platform.hpp"
+#include "game/audio_manager.hpp"
 
-#define THREAD_AFFINITY (isN3Ds ? 2 : 0)
+#define THREAD_AFFINITY (GameManager::get()->platformState.isN3Ds ? 2 : 0)
 #define THREAD_STACK_SZ 32 * 1024    // 32kB stack for audio thread
 
 #define MUSIC_CHANNEL 0
@@ -95,7 +97,7 @@ void audioInit() {
         waveBuf[i].data_vaddr = pcmSlot(i);
     }
 
-    applyVolumeSettings();
+    AudioManager::get()->applyVolumeSettings();
 }
 
 void audioExit() {
@@ -162,7 +164,7 @@ bool mp3Init(const char *file) {
     int encoding = 0;
 
     if ((mh = mpg123_new(NULL, &err)) == NULL) {
-        outputLog("Couldn't new it\n");
+        platform::outputLog("Couldn't new it\n");
         return 0;
     }
 
@@ -179,18 +181,18 @@ bool mp3Init(const char *file) {
         mpg123_replace_reader_handle(mh, readMem, seekMem, NULL);
 
         if (mpg123_open_handle(mh, NULL) != MPG123_OK) {
-            outputLog("Couldn't open memory stream\n");
+            platform::outputLog("Couldn't open memory stream\n");
             return 0;
         }
     } else {
         if (mpg123_open(mh, file) != MPG123_OK) {
-            outputLog("Couldn't open file\n");
+            platform::outputLog("Couldn't open file\n");
             return 0;
         }
     }
 
     if (mpg123_getformat(mh, (long *)&rate, &audioChannels, &encoding) != MPG123_OK) {
-        outputLog("Couldn't get format\n");
+        platform::outputLog("Couldn't get format\n");
         return 0;
     }
 
@@ -419,7 +421,7 @@ void seekMP3(float time) {
         LightLock_Unlock(&decoderLock);
         ndspChnSetPaused(MUSIC_CHANNEL, oldstate); //once the seeking is done, playback can continue.
 
-        applyVolumeSettings();
+        AudioManager::get()->applyVolumeSettings();
         
         restartRequested = true;
         LightEvent_Signal(&seekEvent);

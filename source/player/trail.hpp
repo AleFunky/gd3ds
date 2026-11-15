@@ -3,11 +3,10 @@
 #pragma once
 
 #include <citro2d.h>
-#include "objects.hpp"
-#include "triggers.hpp"
-#include "main.hpp"
+#include "level_loading.hpp"
+#include "types.hpp"
 
-#include "icons.hpp"
+#include "../icons.hpp"
 
 #define MAX_TRAIL_POINTS 128
 #define TRAIL_CLEAR_DISTANCE 30.f
@@ -41,20 +40,20 @@ struct MotionTrail {
 
     float uvOffset;
 
-    Vec2D positionR;
+    Point positionR;
     Color color;
 
     C2D_Image image;
 
     float pointState[MAX_TRAIL_POINTS];
-    Vec2D pointVertexes[MAX_TRAIL_POINTS];
-    Vec2D vertices[MAX_TRAIL_POINTS * 2];
+    Point pointVertexes[MAX_TRAIL_POINTS];
+    Point vertices[MAX_TRAIL_POINTS * 2];
     u8 opacities[MAX_TRAIL_POINTS * 2];
     Tex2F texCoords[MAX_TRAIL_POINTS * 2];
     
-    Vec2D centerVertices[MAX_TRAIL_POINTS * 2];
+    Point centerVertices[MAX_TRAIL_POINTS * 2];
 
-    Vec2D lastStopPosition;
+    Point lastStopPosition;
 
     int player;
 

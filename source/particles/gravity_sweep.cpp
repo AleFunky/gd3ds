@@ -1,9 +1,12 @@
 #include "gravity_sweep.hpp"
+
 #include "main.hpp"
 #include "math_helpers.hpp"
 #include "graphics.hpp"
 #include "menus/settings_hub/settings.hpp"
-#include <array>
+#include "game/game_manager.hpp"
+
+#include "constants.hpp"
 
 namespace gd3ds
 {
@@ -15,12 +18,12 @@ GravitySweep::GravitySweep(bool down){
 
 void GravitySweep::updateSweepTimer(){
     if(done()) return;
-    m_time += delta;
+    m_time += GameManager::get()->deltaTime;
 }
 
 void GravitySweep::startSweep(){
     m_time = 0.0f;
-    float spacing = (SCREEN_WIDTH - 30.0f) / 22.0f;
+    float spacing = (constants::ScreenWidth - 30.0f) / 22.0f;
     for(int i = 0; i < 22; i++){
         GravityLine* l = &this->m_lines[i];
         l->x = (i * spacing) + (CCRANDOM_0_1() * spacing) + 15.0f;
@@ -40,9 +43,9 @@ void GravitySweep::renderSweep(){
 
     float yOffset;
     if(m_down){
-        yOffset = t * ((SCREEN_HEIGHT / 2.0f) + 95.0f) + ti * ((-SCREEN_HEIGHT / 2.0f) - 95.0f);
+        yOffset = t * ((constants::ScreenHeight / 2.0f) + 95.0f) + ti * ((-constants::ScreenHeight / 2.0f) - 95.0f);
     } else{
-        yOffset = ti * ((SCREEN_HEIGHT / 2.0f) + 95.0f) + t * ((-SCREEN_HEIGHT / 2.0f) - 95.0f);
+        yOffset = ti * ((constants::ScreenHeight / 2.0f) + 95.0f) + t * ((-constants::ScreenHeight / 2.0f) - 95.0f);
     }
 
     for(const auto& l : m_lines){

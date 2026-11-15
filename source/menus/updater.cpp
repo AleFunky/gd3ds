@@ -2,7 +2,10 @@
 #include <citro2d.h>
 #include <stdlib.h>
 
-#include "main.hpp"
+#include "game/game.hpp"
+#include "macros.hpp"
+#include "menus/core/common_setters.hpp"
+#include "game/platform.hpp"
 #include "menus/core/ui_screen.hpp"
 #include "text.hpp"
 
@@ -37,7 +40,7 @@ Thread updaterThread;
 bool checkedForUpdate = false;
 
 static void actionUpdate(UIElement *e, const UIPropertyList *p) {
-    if (is3Dsx && isCitra() && !threeDsxPath) {
+    if (GameManager::get()->platformState.is3Dsx && platform::isCitra() && !GameManager::get()->platformState._3dsxPath) {
         InfoCardData *data = (InfoCardData *)malloc(sizeof(InfoCardData));
         if (!data) return;
 
@@ -250,7 +253,7 @@ static void updaterUpdate(UIScreen *s, UIInput *i) {
                 checkedForUpdate = true;
             }
         } else {
-            outputLog(handleUpdaterErrorCodes(updaterTask.result));
+            platform::outputLog(handleUpdaterErrorCodes(updaterTask.result));
             uiLabelSetText(errorLabel, handleUpdaterErrorCodes(updaterTask.result));
         }
         updaterTask.finished = false;
