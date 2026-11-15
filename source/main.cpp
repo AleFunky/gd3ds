@@ -1326,12 +1326,6 @@ void gameLoop() {
                     initVariables();
                     reloadLevel(); 
 
-                    /*
-                    resetLightnings();
-                    resetDivorces();
-                    resetShines();
-                    resetGravitySweeps();
-                    */
                     //resets UI coins on gameplay screen
                     resetCoins();
 
