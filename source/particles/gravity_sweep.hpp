@@ -17,7 +17,7 @@ class GravitySweep {
 public:
     GravitySweep(bool down);
 
-    void updateSweepTimer();
+    void updateSweepTimer(float delta);
     void startSweep();
     void renderSweep();
     bool done();
@@ -28,7 +28,7 @@ private:
 };
 
 void startGravitySweep(bool down);
-void updateGravitySweeps();
+void updateGravitySweeps(float delta);
 void drawGravitySweeps();
 void resetGravitySweeps();
 }

@@ -68,7 +68,7 @@ std::vector<LightningSegment> Lightning::generateLightingRecursive(
     }
 }
 
-void Lightning::updateLightningTimer(){
+void Lightning::updateLightning(float delta){
     m_time += delta;
 }
 
@@ -111,6 +111,8 @@ Lightning::Lightning(float startX, float startY, float endX, float endY, Lightni
             break;
     }
 
+    m_time = 0.0f;
+
     std::vector<LightningPoint> segmentPoints = {
         (LightningPoint){
             startX, startY
@@ -123,15 +125,11 @@ Lightning::Lightning(float startX, float startY, float endX, float endY, Lightni
     m_segments = generateLightingRecursive(segmentPoints, 160, type, rand());
 }
 
-std::deque<Lightning> lightningBolts;
+std::vector<Lightning> lightningBolts;
 
-void updateAllLightning(){
-    while (!lightningBolts.empty() && lightningBolts.front().done()) {
-        lightningBolts.pop_front();
-    }
-
+void updateAllLightning(float delta){
     for(auto& bolt : lightningBolts){
-        bolt.updateLightningTimer();
+        bolt.updateLightning(delta);
     }
 }
 
@@ -142,6 +140,12 @@ void drawAllLightning(){
 }
 
 void addLightning(float start_x, float start_y, float end_x, float end_y, LightningType type){
+    for(auto& bolt : lightningBolts){
+        if(bolt.done()) {
+            bolt = Lightning(start_x, start_y, end_x, end_y, type);
+            return;
+        }
+    }
     lightningBolts.push_back(Lightning(start_x, start_y, end_x, end_y, type));
 }
 

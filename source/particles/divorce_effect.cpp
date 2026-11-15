@@ -17,6 +17,7 @@ DivorceEffect::DivorceEffect(int player, int gamemode, float x, float y, float r
     m_scale = scale;
     m_mirrored = (state.mirrorMult < 0);
     m_flipY = flipY;
+    m_time = 0.0f;
 
     const UseEffectDefinition divorceEffect = {
         .colorR = p1Color.r / 255.0f, 
@@ -41,7 +42,7 @@ DivorceEffect::DivorceEffect(int player, int gamemode, float x, float y, float r
     m_circle.stationary = true;
 }
 
-void DivorceEffect::updateDivorce(){
+void DivorceEffect::updateDivorce(float delta){
     m_time += delta;
 
     //it only moves relative to 1x speed for some reason
@@ -124,15 +125,11 @@ DivorceEffect::~DivorceEffect() {
     }
 }
 
-std::deque<DivorceEffect> divorces;
+std::vector<DivorceEffect> divorces;
 
-void updateDivorces(){
-    while (!divorces.empty() && divorces.front().done()) {
-        divorces.pop_front();
-    }
-
+void updateDivorces(float delta){
     for(auto& divorce : divorces){
-        divorce.updateDivorce();
+        divorce.updateDivorce(delta);
     }
 }
 
@@ -143,6 +140,12 @@ void drawDivorces(){
 }
 
 void addDivorce(int player, int gamemode, float x, float y, float rotation, float scale, bool flipY){
+    for(auto& divorce : divorces){
+        if(divorce.done()) {
+            divorce = DivorceEffect(player, gamemode, x, y, rotation, scale, flipY);
+            return;
+        }
+    }
     divorces.push_back(DivorceEffect(player, gamemode, x, y, rotation, scale, flipY));
 }
 

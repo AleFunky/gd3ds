@@ -475,18 +475,20 @@ void handleDeath(Player *player, bool pauseSong) {
         spawnMultipleParticles(&explosionParticles[state.currentPlayer], 90);
     }
 
-    int dualPlayer = !state.currentPlayer;
-    Player * otherPlayer = dualPlayer ? &state.player2 : &state.player;
+    if(state.dual) {
+        int dualPlayer = !state.currentPlayer;
+        Player * otherPlayer = dualPlayer ? &state.player2 : &state.player;
 
-    addDivorce(
-        dualPlayer, 
-        otherPlayer->gamemode, 
-        otherPlayer->x, 
-        otherPlayer->y, 
-        otherPlayer->rotation, 
-        otherPlayer->mini ? 0.6f : 1.0f, 
-        otherPlayer->upsideDown
-    );    
+        addDivorce(
+            dualPlayer, 
+            otherPlayer->gamemode, 
+            otherPlayer->x, 
+            otherPlayer->y, 
+            otherPlayer->rotation, 
+            otherPlayer->mini ? 0.6f : 1.0f, 
+            otherPlayer->upsideDown
+        );    
+    }
 
     if (!state.practiceMode) startShake(0.15f, 1.f);
     
