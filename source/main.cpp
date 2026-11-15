@@ -1325,10 +1325,7 @@ void gameLoop() {
                 if (state.deathTimer <= 0.f) {
                     initVariables();
                     reloadLevel(); 
-                    resetLightnings();
-                    resetDivorces();
-                    resetShines();
-                    resetGravitySweeps();
+
                     //resets UI coins on gameplay screen
                     resetCoins();
 
@@ -1400,10 +1397,10 @@ void gameLoop() {
             u64 startPart = svcGetSystemTick();
             updatePlayerEffects(delta);
 
-            updateAllLightning();
-            updateGravitySweeps();
-            updateDivorces();
-            updateShines();
+            updateAllLightning(delta);
+            updateGravitySweeps(delta);
+            updateDivorces(delta);
+            updateShines(delta);
 
             updateRays(delta);
 

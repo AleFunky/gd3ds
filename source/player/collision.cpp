@@ -987,12 +987,10 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                 if (player->mini) {
                     startBgFlash();
 
-                    lightningBolts.push_back(
-                        Lightning(
-                            objects.x[obj] + randomInt(-25.0f, 25.0f) + 25.0f, state.cameraY + 50.0f + SCREEN_HEIGHT, 
-                            objects.x[obj], objects.y[obj], 
-                            LightningType::SizeNormal
-                        )
+                    addLightning(
+                        objects.x[obj] + randomInt(-25.0f, 25.0f) + 25.0f, state.cameraY + 50.0f + SCREEN_HEIGHT, 
+                        objects.x[obj], objects.y[obj], 
+                        LightningType::SizeNormal
                     );
 
                     setMini(player, false);
@@ -1025,12 +1023,10 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                 if (!player->mini){
                     startBgFlash();
 
-                    lightningBolts.push_back(
-                        Lightning(
-                            objects.x[obj] + randomInt(-25.0f, 25.0f) + 25.0f, state.cameraY + 50.0f + SCREEN_HEIGHT, 
-                            objects.x[obj], objects.y[obj], 
-                            LightningType::SizeMini
-                        )
+                    addLightning(
+                        objects.x[obj] + randomInt(-25.0f, 25.0f) + 25.0f, state.cameraY + 50.0f + SCREEN_HEIGHT, 
+                        objects.x[obj], objects.y[obj], 
+                        LightningType::SizeMini
                     );
 
                     setMini(player, true);
@@ -1257,17 +1253,16 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case BLUE_TP_PORTAL: {
             if (GET_ACTIVATED(obj)) break;
+            addShine(ShineType::Teleport, obj);
+            
             int oi = objects.childObject[obj];
             if (oi >= 0) {
-                lightningBolts.push_back(
-                    Lightning(
-                        objects.x[obj], objects.y[obj],
-                        objects.x[oi], objects.y[oi], 
-                        LightningType::Teleport
-                    )
+                addLightning(
+                    objects.x[obj], objects.y[obj],
+                    objects.x[oi], objects.y[oi], 
+                    LightningType::Teleport
                 );
 
-                addShine(ShineType::Teleport, obj);
                 addShine(ShineType::Teleport, oi);
 
                 player->y = objects.y[oi];
