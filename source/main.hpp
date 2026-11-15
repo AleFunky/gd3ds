@@ -64,9 +64,9 @@ extern bool isNightly;
 
 extern bool queuedRestart;
 
-extern bool threeDWarningPassed;
+extern bool has3DWarningPassed;
 
-extern char *threeDsxPath;
+extern char *_3dsxPath;
 
 extern float globalVolume;
 extern float musicVolume;
@@ -100,9 +100,9 @@ extern Arena levelArena;
 #define SWAP_SIDE_OFFSET_X ((SCREEN_WIDTH - SCREEN_BOT_WIDTH) / 2.f)
 
 enum class GameState {
-    StateMenu,
-    StateGame,
-    StateExit
+    Menu,
+    Game,
+    Exit
 };
 
 enum class Cheats {

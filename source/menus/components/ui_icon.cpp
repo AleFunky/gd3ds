@@ -64,10 +64,7 @@ static void uiIconDraw(UIElement* e, UITransform *transform) {
 }
 
 static void uiIconDestroy(UIElement *e) {
-    if (e) {
-        delete (UIIcon *)e;
-        e = NULL;
-    }
+    (void)e;
 }
 
 void uiIconSetSelected(UIIcon *e, bool selected) {
@@ -102,11 +99,10 @@ void uiIconSetGlow(UIIcon *e, u32 color) {
 }
 
 UIIcon *uiCreateIcon(UIScreen *screen) {
-    UIIcon *e = new UIIcon{};
+    auto e = std::make_unique<UIIcon>();
 
-    if (!e) return NULL;
-
-    UIButton *button = (UIButton *) e;
+    UIIcon *result = e.get();
+    UIButton *button = (UIButton *) result;
 
     button->base.type = UIElementType::UiIcon;
     button->base.enabled = true;
@@ -125,7 +121,7 @@ UIIcon *uiCreateIcon(UIScreen *screen) {
     C2D_SpriteFromSheet(&button->image.sprite, uiSheet, 175);
     C3D_TexSetFilter(button->image.sprite.image.tex, GPU_LINEAR, GPU_LINEAR);
 
-    return e;
+    return e.release();
 }
 
 UIElement *uiCreateIconFromProps(UIScreen *screen, const UIPropertyList *props) {

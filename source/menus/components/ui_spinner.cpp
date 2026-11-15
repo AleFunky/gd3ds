@@ -22,19 +22,15 @@ static void uiSpinnerDraw(UIElement* e, UITransform *transform) {
 }
 
 void uiSpinnerDestroy(UIElement *e) {
-    if (e) {
-        delete (UISpinner *)e;
-        e = NULL;
-    }
+    (void)e;
 }
 
 
 UISpinner *uiCreateSpinner(UIScreen *s) {
-    UISpinner *e = new UISpinner{};
+    auto e = std::make_unique<UISpinner>();
 
-    if (!e) return NULL;
-
-    UIImage *image = (UIImage *) e;
+    UISpinner *result = e.get();
+    UIImage *image = (UIImage *) result;
 
     image->base.type = UIElementType::UiImage;
     image->base.enabled = true;
@@ -44,12 +40,12 @@ UISpinner *uiCreateSpinner(UIScreen *s) {
     uiImageClearTint(image);
     uiImageSetImage(image, 53, 1);
 
-    e->blending = true;
+    result->blending = true;
 
     image->base.draw = uiSpinnerDraw;
     image->base.destroy = uiSpinnerDestroy;
 
-    return e;
+    return e.release();
 }
 
 UIElement *uiCreateSpinnerFromProps(UIScreen *s, const UIPropertyList *props) {

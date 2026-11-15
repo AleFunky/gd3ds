@@ -68,10 +68,7 @@ static void uiProgressBarDraw(UIElement* e, UITransform *transform) {
 }
 
 static void uiProgressBarDestroy(UIElement *e) {
-    if (e) {
-        delete (UIProgressBar *)e;
-        e = NULL;
-    }
+    (void)e;
 }
 
 void uiProgressBarSetTint(UIProgressBar* e, u32 color) {
@@ -133,23 +130,23 @@ void uiProgressBarSetImages(UIProgressBar *e, int style) {
 }
 
 UIProgressBar *uiCreateProgressBar(UIScreen *screen) {
-    UIProgressBar *e = new UIProgressBar{};
+    auto e = std::make_unique<UIProgressBar>();
 
-    if (!e) return NULL;
+    UIProgressBar *result = e.get();
 
-    e->base.type = UIElementType::UiProgressBar;
-    e->base.enabled = true;
-    e->useTint = false;
+    result->base.type = UIElementType::UiProgressBar;
+    result->base.enabled = true;
+    result->useTint = false;
 
-    uiElementApplyDefaultProperties(&e->base, screen);
+    uiElementApplyDefaultProperties(&result->base, screen);
 
-    e->value = 0;
-    e->maxValue = 100;
+    result->value = 0;
+    result->maxValue = 100;
 
-    e->base.draw = uiProgressBarDraw;
-    e->base.destroy = uiProgressBarDestroy;
+    result->base.draw = uiProgressBarDraw;
+    result->base.destroy = uiProgressBarDestroy;
 
-    return e;
+    return e.release();
 }
 
 UIElement *uiCreateProgressBarFromProps(UIScreen *screen, const UIPropertyList *props) {

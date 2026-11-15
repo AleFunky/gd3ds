@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "ui_element.hpp"
 #include "ui_screen.hpp"
 
@@ -5,7 +6,7 @@ namespace gd3ds
 {
 
 static_assert(
-    offsetof(UIElement, update) == 0xFC,
+    offsetof(UIElement, update) == 264,
     "Unexpected UIElement layout!"
 );
 
@@ -76,15 +77,12 @@ void uiDrawTree(UIElement *e, UITransform *parent) {
 
 // Destroys an element and its children
 void uiDestroyTree(UIElement *e) {
-    UIElement *child = e->firstChild;
+    if (!e) return;
 
-    while (child) {
-        UIElement *next = child->nextSibling;
-
-        uiDestroyTree(child);
-
-        child = next;
+    for (auto &child : e->ownedChildren) {
+        uiDestroyTree(child.get());
     }
+    e->ownedChildren.clear();
 
     if (e->userdata && e->userdataDestroy) e->userdataDestroy(e->userdata);
 
@@ -97,7 +95,9 @@ void uiDestroyTree(UIElement *e) {
 
     uiDestroyProplist(&e->customProperties);
     
-    e->destroy(e);
+    if (e->destroy) {
+        e->destroy(e);
+    }
 }
 
 void uiEnableElement(UIElement *e) { 
@@ -119,6 +119,7 @@ void uiDisableElement(UIElement *e) {
 void uiElementAddChild(UIElement *parent, UIElement *child) {
     if (!parent || !child) return;
 
+    parent->ownedChildren.emplace_back(child);
     child->parent = parent;
 
     child->nextSibling = NULL;
@@ -146,6 +147,14 @@ void uiElementRemove(UIElement *element) {
         element->nextSibling->prevSibling = element->prevSibling;
     else
         parent->lastChild = element->prevSibling;
+
+    auto it = std::find_if(parent->ownedChildren.begin(), parent->ownedChildren.end(),
+        [element](const std::unique_ptr<UIElement>& child) {
+            return child.get() == element;
+        });
+    if (it != parent->ownedChildren.end()) {
+        parent->ownedChildren.erase(it);
+    }
 
     element->parent = NULL;
     element->nextSibling = NULL;

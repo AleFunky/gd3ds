@@ -1,5 +1,7 @@
 #pragma once
 #include <stdbool.h>
+#include <memory>
+#include <vector>
 #include <3ds.h>
 #include <citro2d.h>
 #include "particles/circles.hpp"
@@ -135,6 +137,7 @@ struct UIElement {
     
     struct UIElement *parent = nullptr;
 
+    std::vector<std::unique_ptr<UIElement>> ownedChildren;
     struct UIElement *firstChild = nullptr;
     struct UIElement *lastChild = nullptr;
 

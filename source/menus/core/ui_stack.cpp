@@ -34,7 +34,9 @@ static size_t uiStackNextIndex() {
 }
 
 static void unloadScreenpair(int index){
-    UIScreenPair *pair = stack->screenStack[index];
+    if (index < 0 || (size_t)index >= stack->screenStack.size()) return;
+
+    UIScreenPair *pair = stack->screenStack[index].get();
 
     if(!pair) return;
 
@@ -49,15 +51,16 @@ static void unloadScreenpair(int index){
         uiUnloadScreen(screen);
     }
 
-    free(pair);
-    stack->screenStack[index] = NULL;
+    stack->screenStack[index].reset();
 }
 
 static void openRoot(){
     //unload all active layers below new root
     for(size_t i = uiStackMinIndex(); i <= uiStackMaxIndex(); i++){
+        if (i >= stack->screenStack.size()) continue;
         //basic unload of previous screens (do not unload entire screenpair)
-        UIScreenPair *pair = stack->screenStack[i];
+        UIScreenPair *pair = stack->screenStack[i].get();
+        if (!pair) continue;
         for(int j = 0; j < 2; j++){
             UIScreen *screen = &pair->screens[j];
             uiUnloadScreen(screen);
@@ -81,14 +84,16 @@ static void closeRoot(){
     //find previous root
     size_t newRoot = 0;
     for(size_t i = stack->currentRoot; i-- > 0; ){
-        if(stack->screenStack[i]->root){
+        UIScreenPair *pair = stack->screenStack[i].get();
+        if(pair && pair->root){
             newRoot = i;
             break;
         }
     }
 
     for(size_t i = newRoot; i < stack->currentRoot; i++){
-        UIScreenPair *pair = stack->screenStack[i];
+        UIScreenPair *pair = stack->screenStack[i].get();
+        if (!pair) continue;
         for(int j = 0; j < 2; j++){
             UIScreen *screen = &pair->screens[j];
             uiLoadScreen(screen);
@@ -116,15 +121,7 @@ static bool resizeStack(size_t newCapacity){
         capacity += 4;
     }
 
-    UIScreenPair **temp = (UIScreenPair **)realloc(stack->screenStack, sizeof(UIScreenPair *) * capacity);
-
-    if(!temp){
-        return false;
-    }
-
-    memset(temp + stack->stackCapacity, 0, sizeof(UIScreenPair *) * (capacity - stack->stackCapacity));
-
-    stack->screenStack = temp;
+    stack->screenStack.resize(capacity);
     stack->stackCapacity = capacity;
 
     return true;
@@ -142,16 +139,15 @@ static UIScreenPair *uiStackOpen(const UIScreenDefPair *defs){
         return NULL;
     }
 
-    UIScreenPair *pair = (UIScreenPair *)calloc(1, sizeof(UIScreenPair));
+    auto pair = std::make_unique<UIScreenPair>();
+    UIScreenPair *result = pair.get();
 
-    if(!pair) return NULL;
+    stack->screenStack[index] = std::move(pair);
 
-    stack->screenStack[index] = pair;
+    result->name = defs->name;
 
-    pair->name = defs->name;
-
-    UIScreen *top = &pair->screens[static_cast<int>(Screens::ScreenTop)];
-    UIScreen *btm = &pair->screens[static_cast<int>(Screens::ScreenBtm)];
+    UIScreen *top = &result->screens[static_cast<int>(Screens::ScreenTop)];
+    UIScreen *btm = &result->screens[static_cast<int>(Screens::ScreenBtm)];
 
     *top = (UIScreen){ 0 };
     *btm = (UIScreen){ 0 };
@@ -161,10 +157,10 @@ static UIScreenPair *uiStackOpen(const UIScreenDefPair *defs){
     top->def = &defs->top;
     btm->def = &defs->btm;
 
-    top->pair = pair;
-    btm->pair = pair;
+    top->pair = result;
+    btm->pair = result;
 
-    return pair;
+    return result;
 }
 
 void uiStackPush(
@@ -255,7 +251,7 @@ void uiStackPop(){
 
     if(stack->activeCount == 0) return;
 
-    UIScreenPair *pair = stack->screenStack[uiStackMaxIndex()];
+    UIScreenPair *pair = stack->screenStack[uiStackMaxIndex()].get();
     if(pair->root){
        stack->rootTransition = UITransitionState::UiTransitionClosing;
        stack->fade = FadeStatus::FadeStatusIn;
@@ -275,8 +271,10 @@ void uiStackPopContext(){
     }
 
     for(size_t i = uiStackMinIndex() + 1; i < uiStackMaxIndex(); i++){
+        UIScreenPair *pair = stack->screenStack[i].get();
+        if(!pair) continue;
         for(int j = 0; j < 2; j++){
-            UIScreen *screen = &stack->screenStack[i]->screens[j];
+            UIScreen *screen = &pair->screens[j];
             uiScreenClose(screen);
         }
     }
@@ -338,7 +336,7 @@ static void updateOpening(){
 }
 
 static void updateClosing(){
-    UIScreenPair *pair = stack->screenStack[uiStackMaxIndex()];
+    UIScreenPair *pair = stack->screenStack[uiStackMaxIndex()].get();
 
     if(!pair) return;
 
@@ -422,7 +420,7 @@ void uiStackUpdate(UIInput *input){
 
     if(stack->activeCount > 0){
         for(size_t i = uiStackMinIndex(); i <= uiStackMaxIndex(); i++){
-            UIScreenPair *pair = stack->screenStack[i];
+            UIScreenPair *pair = stack->screenStack[i].get();
 
             if(!pair) continue;
 
@@ -446,7 +444,8 @@ void uiStackUpdate(UIInput *input){
 bool uiStackCheckLoadedRoot(const UIScreenDefPair *screen) {
     if (!screen) return false; 
 
-    UIScreenPair *pair = stack->screenStack[stack->currentRoot];
+    UIScreenPair *pair = stack->screenStack[stack->currentRoot].get();
+    if(!pair) return false;
 
     if (strcmp(screen->name, pair->name) == 0) {
         return true;
@@ -458,7 +457,8 @@ bool uiStackCheckLoadedScreenInRoot(const UIScreenDefPair *screen) {
     if (!screen) return false; 
     
     for (size_t i = uiStackMinIndex() + 1; i <= uiStackMaxIndex(); i++) {
-        UIScreenPair *pair = stack->screenStack[i];
+        UIScreenPair *pair = stack->screenStack[i].get();
+        if(!pair) continue;
         if (strcmp(screen->name, pair->name) == 0) {
             return true;
         }
@@ -470,7 +470,8 @@ UIScreenPair *uiStackGetLoadedScreen(const UIScreenDefPair *screen) {
     if (!screen) return NULL; 
 
     for (size_t i = 0; i <= uiStackMaxIndex(); i++) {
-        UIScreenPair *pair = stack->screenStack[i];
+        UIScreenPair *pair = stack->screenStack[i].get();
+        if(!pair) continue;
         if (strcmp(screen->name, pair->name) == 0) {
             return pair;
         }
@@ -483,7 +484,7 @@ void drawStackDebug(){
     size_t pos = 0;
 
     for (size_t i = 0; i <= uiStackMaxIndex(); i++) {
-        UIScreenPair *pair = stack->screenStack[i];
+        UIScreenPair *pair = stack->screenStack[i].get();
 
         if(!pair) continue;
 
@@ -542,7 +543,7 @@ void uiStackDraw(Screens target){
     if(stack->activeCount == 0) return;
 
     for(size_t i = uiStackMinIndex(); i <= uiStackMaxIndex(); i++){
-        UIScreenPair *pair = stack->screenStack[i];
+        UIScreenPair *pair = stack->screenStack[i].get();
 
         if(!pair) continue;
 
@@ -558,15 +559,14 @@ void uiStackClear(){
         unloadScreenpair(i);
     }
 
-    free(stack->screenStack);
-    *stack = (UIStack){ 0 };
+    *stack = UIStack{};
 }
 
 UIScreen *uiStackGetScreen(const char *name, Screens screen) {
     UIScreenPair *pair = NULL;
 
     for(size_t i = uiStackMinIndex(); i <= uiStackMaxIndex(); i++){
-        UIScreenPair *pair1 = stack->screenStack[i];
+        UIScreenPair *pair1 = stack->screenStack[i].get();
 
         if(!pair1) continue;
 
@@ -585,7 +585,11 @@ FadeStatus uiStackGetFadeStatus(){
 }
 
 const char *uiStackGetCurrentScreenName() {
-    return stack->screenStack[uiStackMaxIndex()]->name;
+    if(stack->activeCount == 0 || uiStackMaxIndex() >= stack->screenStack.size()) {
+        return "";
+    }
+    UIScreenPair *pair = stack->screenStack[uiStackMaxIndex()].get();
+    return pair ? pair->name : "";
 }
 
 }

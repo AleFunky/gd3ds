@@ -72,7 +72,7 @@ static void openLevel(UIElement *e, const UIPropertyList *args) {
 
     stopMP3();
     playingMenuLoop = false;
-    uiStackPushGameState(static_cast<int>(GameState::StateGame));
+    uiStackPushGameState(static_cast<int>(GameState::Game));
 }
 
 static UIActionDef externalPopupActions[] = {

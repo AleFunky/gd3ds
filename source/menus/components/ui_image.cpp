@@ -17,10 +17,7 @@ void uiImageDraw(UIElement* e, UITransform *transform) {
 }
 
 static void uiImageDestroy(UIElement* e) {
-    if (e) {
-        delete (UIImage *)e;
-        e = NULL;
-    }
+    (void)e;
 }
 
 void uiImageSetTint(UIImage* e, u32 color) {
@@ -46,21 +43,21 @@ void uiImageSetImage(UIImage *e, int spriteIndex, int sheet) {
 }
 
 UIImage *uiCreateImage(UIScreen *screen) {
-    UIImage *e = new UIImage{};
+    auto e = std::make_unique<UIImage>();
 
-    if (!e) return NULL;
+    UIImage *result = e.get();
 
-    e->base.type = UIElementType::UiImage;
-    e->base.enabled = true;
+    result->base.type = UIElementType::UiImage;
+    result->base.enabled = true;
 
-    uiElementApplyDefaultProperties(&e->base, screen);
+    uiElementApplyDefaultProperties(&result->base, screen);
 
-    uiImageClearTint(e);
+    uiImageClearTint(result);
 
-    e->base.draw = uiImageDraw;
-    e->base.destroy = uiImageDestroy;
+    result->base.draw = uiImageDraw;
+    result->base.destroy = uiImageDestroy;
 
-    return e;
+    return e.release();
 }
 
 UIElement *uiCreateImageFromProps(UIScreen *screen, const UIPropertyList *props) {

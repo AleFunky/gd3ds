@@ -51,29 +51,26 @@ static void uiTextboxDraw(UIElement* e, UITransform *transform) {
 }
 
 static void uiTextboxDestroy(UIElement *e) {
-    if (e) {
-        delete (UITextbox *)e;
-        e = NULL;
-    }
+    (void)e;
 }
 
 UITextbox *uiCreateTextbox(UIScreen *screen) {
-    UITextbox *e = new UITextbox{};
+    auto e = std::make_unique<UITextbox>();
 
-    if (!e) return NULL;
+    UITextbox *result = e.get();
 
-    e->base.type = UIElementType::UiTextbox;
-    e->base.enabled = true;
-    e->base.update = uiTextboxUpdate;
-    e->base.draw = uiTextboxDraw;
-    e->base.destroy = uiTextboxDestroy;
+    result->base.type = UIElementType::UiTextbox;
+    result->base.enabled = true;
+    result->base.update = uiTextboxUpdate;
+    result->base.draw = uiTextboxDraw;
+    result->base.destroy = uiTextboxDestroy;
     
-    uiElementApplyDefaultProperties(&e->base, screen);
+    uiElementApplyDefaultProperties(&result->base, screen);
 
-    e->atlas = C2D_SpriteSheetGetImage(windowSheet, TEXTBOX_STYLE);
-    e->border = e->atlas.subtex->width / 3;
+    result->atlas = C2D_SpriteSheetGetImage(windowSheet, TEXTBOX_STYLE);
+    result->border = result->atlas.subtex->width / 3;
 
-    return e;
+    return e.release();
 }
 
 UIElement *uiCreateTextboxFromProps(UIScreen *screen, const UIPropertyList *props) {
