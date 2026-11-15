@@ -22,11 +22,11 @@ constexpr std::array<int, static_cast<int>(ShineType::Count) * 2> kShineSheetInd
     14, 15, //dual
     16, 17, //teleport
     //speed portals
+    2, 0,
     3, 0,
     4, 0,
     5, 0,
-    6, 0,
-    7, 0
+    6, 0
 };
 
 static int getShineSheetIndex(ShineType type, bool front){
@@ -44,13 +44,13 @@ static bool hasFront(ShineType type){
 PortalShine::PortalShine(ShineType type, int obj){
     m_type = type;
     m_obj = obj;
+    m_time = 0.0f;
 }
 
 void PortalShine::updateShine(){
     m_time += GameManager::get()->deltaTime;
 }
 
-//This is offset locally in the X direction for some reason please help
 void PortalShine::drawShine(bool front){
     if(front && !hasFront(m_type)) return;
 
@@ -126,17 +126,14 @@ bool PortalShine::done(){
     return m_time >= 0.05f + 0.4f;
 };
 
-std::deque<PortalShine> shines;
+std::vector<PortalShine> shines;
 
-void updateShines(){
-    while (!shines.empty() && shines.front().done()) {
-        shines.pop_front();
-    }
-
+void updateShines(float delta){
     for(auto& shine : shines){
-        shine.updateShine();
+        shine.updateShine(delta);
     }
 }
+
 void drawShines(bool front){
     for(auto& shine : shines){
         shine.drawShine(front);
@@ -144,6 +141,12 @@ void drawShines(bool front){
 }
 
 void addShine(ShineType type, int obj){
+    for(auto& shine : shines){
+        if(shine.done()) {
+            shine = PortalShine(type, obj);
+            return;
+        }
+    }
     shines.push_back(PortalShine(type, obj));
 }
 

@@ -16,7 +16,7 @@ GravitySweep::GravitySweep(bool down){
     m_time = 9999.0f;
 };
 
-void GravitySweep::updateSweepTimer(){
+void GravitySweep::updateSweepTimer(float delta){
     if(done()) return;
     m_time += GameManager::get()->deltaTime;
 }
@@ -91,10 +91,10 @@ void startGravitySweep(bool down){
     }
 }
 
-void updateGravitySweeps(){
+void updateGravitySweeps(float delta){
     for(int i = 0; i < 2; i++){
-        upSweeps[i].updateSweepTimer();
-        downSweeps[i].updateSweepTimer();
+        upSweeps[i].updateSweepTimer(delta);
+        downSweeps[i].updateSweepTimer(delta);
     }
 }
 

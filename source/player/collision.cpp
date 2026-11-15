@@ -1214,17 +1214,16 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
         }
         case BLUE_TP_PORTAL: {
             if (GET_ACTIVATED(obj)) break;
+            addShine(ShineType::Teleport, obj);
+            
             int oi = objects.childObject[obj];
             if (oi >= 0) {
-                lightningBolts.push_back(
-                    Lightning(
-                        objects.x[obj], objects.y[obj],
-                        objects.x[oi], objects.y[oi], 
-                        LightningType::Teleport
-                    )
+                addLightning(
+                    objects.x[obj], objects.y[obj],
+                    objects.x[oi], objects.y[oi], 
+                    LightningType::Teleport
                 );
 
-                addShine(ShineType::Teleport, obj);
                 addShine(ShineType::Teleport, oi);
 
                 player->y = objects.y[oi];

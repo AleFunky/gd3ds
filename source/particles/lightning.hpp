@@ -1,6 +1,5 @@
 #pragma once
 #include "3ds/types.h"
-#include <deque>
 #include <vector>
 
 namespace gd3ds
@@ -27,7 +26,7 @@ struct LightningSegment {
 class Lightning {
 public:
     Lightning(float startX, float startY, float endX, float endY, LightningType type);
-    void updateLightningTimer();
+    void updateLightning(float delta);
     void renderLightning();
     bool done();
 private:
@@ -43,8 +42,7 @@ private:
     );
 };
 
-extern std::deque<Lightning> lightningBolts;
-void updateAllLightning();
+void updateAllLightning(float delta);
 void drawAllLightning();
 void addLightning(float start_x, float start_y, float end_x, float end_y, LightningType type);
 void resetLightnings();
