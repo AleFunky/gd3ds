@@ -133,7 +133,7 @@ void cfgInit() {
     gotSogged = configGetBool(&cfg, CONFIG_FLAGS "sogged", false);
     gdps = configGetBool(&cfg, CONFIG_FLAGS "gdps", false);
     strcpy(menuLoopPath, gdps ? "romfs:/songs/menuLoopGDPS.mp3" : "romfs:/songs/menuLoop.mp3");
-    threeDWarningPassed = configGetBool(&cfg, CONFIG_FLAGS "3dWarningPassed", false);
+    has3DWarningPassed = configGetBool(&cfg, CONFIG_FLAGS "3dWarningPassed", false);
 
     playersDestroyed = configGetInt(&cfg, CONFIG_VALUES "playersDestroyed", 0);
     musicVolume = configGetFloat(&cfg, CONFIG_VALUES "music_volume", 1);
@@ -182,7 +182,7 @@ void cfgSave() {
     configSetBool(&cfg, CONFIG_FLAGS "nightlyUpdates", useNightlyBranch);
     configSetBool(&cfg, CONFIG_FLAGS "sogged", gotSogged);
     configSetBool(&cfg, CONFIG_FLAGS "gdps", gdps);
-    configSetBool(&cfg, CONFIG_FLAGS "3dWarningPassed", threeDWarningPassed);
+    configSetBool(&cfg, CONFIG_FLAGS "3dWarningPassed", has3DWarningPassed);
 
     configSetInt(&cfg, CONFIG_VALUES "playersDestroyed", playersDestroyed);
     configSetFloat(&cfg, CONFIG_VALUES "music_volume", musicVolume);

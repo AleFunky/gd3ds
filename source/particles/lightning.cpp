@@ -81,7 +81,7 @@ void Lightning::renderLightning(){
 
         alpha = clampf(alpha, 0.0f, 1.0f);
 
-        u32 color = (m_color & 0x00FFFFFF) | ((u32)(alpha * (u32)255) << 24);
+        u32 color = m_color & (((u32)(alpha * (u32)255) << 24) | 0x00FFFFFF);
 
         float topX = s.startX - state.cameraX;
         float btmX = s.endX - state.cameraX;

@@ -47,7 +47,6 @@ void PortalShine::updateShine(){
     m_time += delta;
 }
 
-//This is offset locally in the X direction for some reason please help
 void PortalShine::drawShine(bool front){
     if(front && !hasFront(m_type)) return;
 

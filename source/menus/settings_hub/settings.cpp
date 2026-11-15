@@ -519,7 +519,7 @@ void wideSetting(bool checked) {
 
 void stereoSetting(bool checked) {
     if (!checked) return;
-    if (!threeDWarningPassed) {
+    if (!has3DWarningPassed) {
         TwoOptionPopupData *threeDWarningData = (TwoOptionPopupData *)malloc(sizeof(TwoOptionPopupData));
         if (!threeDWarningData) return;
         
@@ -529,7 +529,7 @@ void stereoSetting(bool checked) {
         threeDWarningData->cancelText = strdup("Disable");
         uiStackPush(&threeDWarningPopUpDef, UIAnimation::AnimZoom, UIAnimation::AnimZoom, UIStackPushType::PushNext);
         uiStackPushData(threeDWarningData);
-        threeDWarningPassed = true;
+        has3DWarningPassed = true;
     }
 
     // No 3D on this console, so don't let the box stay ticked
