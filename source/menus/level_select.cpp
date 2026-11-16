@@ -342,7 +342,7 @@ void actionOpenLevel(UIElement* e, const UIPropertyList *args) {
     recenter();
     stopMP3();
     playingMenuLoop = false;
-    uiStackPushGameState(static_cast<int>(GameState::Game));
+    uiStackPushGameState(static_cast<int>(GameState::StateGame));
 }
 
 void actionMoveRight(UIElement* e, const UIPropertyList *args) { 

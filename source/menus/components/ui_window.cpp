@@ -34,26 +34,29 @@ static void uiWindowDraw(UIElement* e, UITransform *transform) {
 }
 
 static void uiWindowDestroy(UIElement *e) {
-    (void)e;
+    if (e) {
+        delete (UIWindow *)e;
+        e = NULL;
+    }
 }
 
 UIWindow *uiCreateWindow(UIScreen *screen) {
-    auto e = std::make_unique<UIWindow>();
+    UIWindow *e = new UIWindow{};
 
-    UIWindow *result = e.get();
+    if (!e) return NULL;
 
-    result->base.type = UIElementType::UiWindow;
-    result->base.enabled = true;
+    e->base.type = UIElementType::UiWindow;
+    e->base.enabled = true;
 
-    result->base.draw = uiWindowDraw;
-    result->base.destroy = uiWindowDestroy;
+    e->base.draw = uiWindowDraw;
+    e->base.destroy = uiWindowDestroy;
     
-    uiElementApplyDefaultProperties(&result->base, screen);
+    uiElementApplyDefaultProperties(&e->base, screen);
 
-    uiWindowSetAtlas(result, 0);
-    uiWindowSetTint(result, C2D_Color32(255, 255, 255, 255));
+    uiWindowSetAtlas(e, 0);
+    uiWindowSetTint(e, C2D_Color32(255, 255, 255, 255));
 
-    return e.release();
+    return e;
 }
 
 UIElement *uiCreateWindowFromProps(UIScreen *screen, const UIPropertyList *props) {

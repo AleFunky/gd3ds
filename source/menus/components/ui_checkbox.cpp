@@ -47,7 +47,10 @@ static void uiCheckboxDraw(UIElement* e, UITransform *transform) {
 }
 
 static void uiCheckboxDestroy(UIElement *e) {
-    (void)e;
+    if (e) {
+        delete (UICheckBox *)e;
+        e = NULL;
+    }
 }
 
 static void uiCheckboxPreAction(UIElement *e, const UIPropertyList *args) {
@@ -65,10 +68,11 @@ static void uiCheckboxOnDisable(UIElement *e) {
 }
 
 UICheckBox *uiCreateCheckbox(UIScreen *screen) {
-    auto e = std::make_unique<UICheckBox>();
+    UICheckBox *e = new UICheckBox{};
 
-    UICheckBox *result = e.get();
-    UIButton *button = (UIButton* ) result;
+    if (!e) return NULL;
+
+    UIButton *button = (UIButton* ) e;
     
     button->base.type = UIElementType::UiCheckbox;
     button->base.enabled = true;
@@ -87,9 +91,9 @@ UICheckBox *uiCreateCheckbox(UIScreen *screen) {
     button->hoverProgress = 1;
     button->hoverFactor = 1;
 
-    setCheckboxTexture(result, result->checked);
+    setCheckboxTexture(e, e->checked);
 
-    return e.release();
+    return e;
 }
 
 UIElement *uiCreateCheckboxFromProps(UIScreen *screen, const UIPropertyList *props) {

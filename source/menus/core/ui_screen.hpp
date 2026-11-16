@@ -1,6 +1,4 @@
 #pragma once
-#include <memory>
-#include <vector>
 #include "menus/core/ui_element.hpp"
 #include "text.hpp"
 #include "common_setters.hpp"
@@ -85,7 +83,7 @@ struct UIScreen {
     UIScreenPair *pair;
     const UIScreenDefinition *def;
 
-    std::vector<std::unique_ptr<UIElement>> elements;
+    UIElement **elements;
     size_t count;
     size_t capacity;
 

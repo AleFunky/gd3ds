@@ -665,7 +665,7 @@ void waveGamemode(Player *player) {
     trail->positionR = (Vec2D){x, y};  
     trail->startingPositionInitialized = true;
  
-    if (gameState == static_cast<int>(GameState::Game) && player->cutsceneTimer == 0 && !state.mirroring) waveTrail->opacity = 1.f;
+    if (gameState == static_cast<int>(GameState::StateGame) && player->cutsceneTimer == 0 && !state.mirroring) waveTrail->opacity = 1.f;
 
     if (player->bufferingState == static_cast<int>(BufferingState::BufferReady)) player->bufferingState = static_cast<int>(BufferingState::BufferEnd);
 

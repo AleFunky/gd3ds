@@ -2449,7 +2449,7 @@ void updateTouchEffect(float delta) {
 
     touchDragParticles.emitting = false;
 
-    bool tapEffectEnabled = (gameState == static_cast<int>(GameState::Game) && !gamePaused) ? settingsState.gameplayTapEffect : settingsState.touchEffectEverywhere;
+    bool tapEffectEnabled = (gameState == static_cast<int>(GameState::StateGame) && !gamePaused) ? settingsState.gameplayTapEffect : settingsState.touchEffectEverywhere;
 
     if (tapEffectEnabled && (kHeld & KEY_TOUCH)) {
         // Flipped for particles
@@ -2507,7 +2507,7 @@ void updateBottomParticles(float delta) {
     if (state.dual) flyingGamemode = flyingGamemode || (state.player2.gamemode == static_cast<int>(IconGamemode::GamemodeShip) || state.player2.gamemode == static_cast<int>(IconGamemode::GamemodeUfo) || state.player2.gamemode == static_cast<int>(IconGamemode::GamemodeWave));
 
     // If in game and not paused and not fading, update the particles spawning
-    if (((gameState == static_cast<int>(GameState::Game) && !gamePaused))) {
+    if (((gameState == static_cast<int>(GameState::StateGame) && !gamePaused))) {
         if (flyingGamemode) {
             glitterParticlesBottom.emitterX = state.cameraXMiddle;
             glitterParticlesBottom.emitterY = 240/2;

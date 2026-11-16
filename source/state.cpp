@@ -440,7 +440,7 @@ void initVariables() {
     p1Trail = false;
 
     clearBgFlash();
-    if (gameState == static_cast<int>(GameState::Game) && state.currentData.attempts != 1) startRespawnEffect();
+    if (gameState == static_cast<int>(GameState::StateGame) && state.currentData.attempts != 1) startRespawnEffect();
 }
 
 void handleDeath(Player *player, bool pauseSong) {

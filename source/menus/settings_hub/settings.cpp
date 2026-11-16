@@ -555,7 +555,7 @@ void practiceMusicSyncSetting(bool checked) {
 }
 
 void menuMusicSetting(bool checked) {
-    if (gameState != static_cast<int>(GameState::Menu)) return;
+    if (gameState != static_cast<int>(GameState::StateMenu)) return;
 
     if (!checked) {
         if (playingMenuLoop) {

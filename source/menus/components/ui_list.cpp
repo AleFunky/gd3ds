@@ -173,26 +173,29 @@ static void uiListDraw(UIElement* e, UITransform *transform) {
 }
 
 static void uiListDestroy(UIElement *e) {
-    (void)e;
+    if (e) {
+        delete (UIList *)e;
+        e = NULL;
+    }
 }
 
 UIList *uiCreateList(UIScreen *screen) {
-    auto e = std::make_unique<UIList>();
+    UIList *e = new UIList{};
 
-    UIList *result = e.get();
+    if (!e) return NULL;
 
-    result->base.type = UIElementType::UiList;
-    result->base.enabled = true;
+    e->base.type = UIElementType::UiList;
+    e->base.enabled = true;
 
-    result->base.update = uiListUpdate;
-    result->base.draw = uiListDraw;
-    result->base.destroy = uiListDestroy;
+    e->base.update = uiListUpdate;
+    e->base.draw = uiListDraw;
+    e->base.destroy = uiListDestroy;
 
-    result->base.drawsChildren = true;
+    e->base.drawsChildren = true;
     
-    uiListReset(result);
+    uiListReset(e);
 
-    return e.release();
+    return e;
 }
 
 UIElement *uiCreateListFromProps(UIScreen *screen, const UIPropertyList *props) {

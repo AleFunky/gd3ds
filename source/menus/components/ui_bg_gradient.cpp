@@ -22,34 +22,37 @@ static void uiBgGradientDraw(UIElement* e, UITransform *transform) {
 }
 
 static void uiBgGradientDestroy(UIElement *e) {
-    (void)e;
+    if (e) {
+        delete (UIImage *)e;
+        e = NULL;
+    }
 }
 
 UIImage *uiCreateBgGradient(UIScreen *screen) {
-    auto e = std::make_unique<UIImage>();
+    UIImage *e = new UIImage{};
 
-    UIImage *result = e.get();
+    if (!e) return NULL;
 
-    result->base.type = UIElementType::UiImage;
-    result->base.x = 0;
-    result->base.y = 0;
-    result->base.enabled = true;
+    e->base.type = UIElementType::UiImage;
+    e->base.x = 0;
+    e->base.y = 0;
+    e->base.enabled = true;
     
-    uiElementApplyDefaultProperties(&result->base, screen);
+    uiElementApplyDefaultProperties(&e->base, screen);
 
-    C2D_SpriteFromSheet(&result->image.sprite, bgGradientSheet, 0);
+    C2D_SpriteFromSheet(&e->image.sprite, bgGradientSheet, 0);
 
-    uiElementSetScaleXy((UIElement *) result, BG_GRADIENT_XSCALE, BG_GRADIENT_YSCALE);
+    uiElementSetScaleXy((UIElement *) e, BG_GRADIENT_XSCALE, BG_GRADIENT_YSCALE);
 
-    result->base.w = result->image.sprite.image.subtex->width;
-    result->base.h = result->image.sprite.image.subtex->height;
+    e->base.w = e->image.sprite.image.subtex->width;
+    e->base.h = e->image.sprite.image.subtex->height;
 
-    uiImageClearTint(result);
+    uiImageClearTint(e);
 
-    result->base.draw = uiBgGradientDraw;
-    result->base.destroy = uiBgGradientDestroy;
+    e->base.draw = uiBgGradientDraw;
+    e->base.destroy = uiBgGradientDestroy;
 
-    return e.release();
+    return e;
 }
 
 UIElement *uiCreateBgGradientFromProps(UIScreen *screen, const UIPropertyList *props) {

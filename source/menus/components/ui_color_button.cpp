@@ -51,14 +51,18 @@ void uiColorButtonSetIndex(UIColor *e, int index, int colorIndex) {
 }
 
 static void uiColorButtonDestroy(UIElement *e) {
-    (void)e;
+    if (e) {
+        delete (UIColor *)e;
+        e = NULL;
+    }
 }
 
 UIColor *uiCreateColorButton(UIScreen *screen) {
-    auto e = std::make_unique<UIColor>();
+    UIColor *e = new UIColor{};
 
-    UIColor *result = e.get();
-    UIButton *button = (UIButton *) result;
+    if (!e) return NULL;
+    
+    UIButton *button = (UIButton *) e;
 
     button->base.type = UIElementType::UiColorButton;
     button->base.enabled = true;
@@ -72,13 +76,13 @@ UIColor *uiCreateColorButton(UIScreen *screen) {
     button->hoverProgress = 1;
     button->hoverFactor = 1;
 
-    C2D_SpriteFromSheet(&result->image.sprite, uiSheet, 175);
-    C3D_TexSetFilter(result->image.sprite.image.tex, GPU_LINEAR, GPU_LINEAR);
+    C2D_SpriteFromSheet(&e->image.sprite, uiSheet, 175);
+    C3D_TexSetFilter(e->image.sprite.image.tex, GPU_LINEAR, GPU_LINEAR);
     
     C2D_SpriteFromSheet(&button->image.sprite, uiSheet, 35);
     C3D_TexSetFilter(button->image.sprite.image.tex, GPU_LINEAR, GPU_LINEAR);
 
-    return e.release();
+    return e;
 }
 
 UIElement *uiCreateColorButtonFromProps(UIScreen *screen, const UIPropertyList *props) {
