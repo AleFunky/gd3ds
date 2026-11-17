@@ -43,6 +43,10 @@ static void uiParticleDestroy(UIElement *e) {
     if (e) {
         UIParticle *particle = (UIParticle *) e;
         freeParticleData(&particle->particle.data);
+        delete (UIParticle *)e;
+
+        particle = NULL;
+        e = NULL;
     }
 }
 
@@ -56,20 +60,20 @@ void uiInitParticleDefinition(UIParticle *e, const ParticleDefinition *def) {
 }
 
 UIParticle *uiCreateParticle(UIScreen *screen) {
-    auto e = std::make_unique<UIParticle>();
+    UIParticle *e = new UIParticle{};
 
-    UIParticle *result = e.get();
+    if (!e) return NULL;
 
-    result->base.type = UIElementType::UiParticle;
-    result->base.enabled = true;
+    e->base.type = UIElementType::UiParticle;
+    e->base.enabled = true;
 
-    result->base.update = uiParticleUpdate;
-    result->base.draw = uiParticleDraw;
-    result->base.destroy = uiParticleDestroy;
+    e->base.update = uiParticleUpdate;
+    e->base.draw = uiParticleDraw;
+    e->base.destroy = uiParticleDestroy;
     
-    uiElementApplyDefaultProperties(&result->base, screen);
+    uiElementApplyDefaultProperties(&e->base, screen);
 
-    return e.release();
+    return e;
 }
 
 UIElement *uiCreateParticleFromProps(UIScreen *screen, const UIPropertyList *props) {

@@ -1,5 +1,4 @@
 #pragma once
-#include <array>
 
 namespace gd3ds {
 

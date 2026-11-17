@@ -1,6 +1,5 @@
 #pragma once
 #include "circles.hpp"
-#include <deque>
 namespace gd3ds {
 
 class DivorceEffect {

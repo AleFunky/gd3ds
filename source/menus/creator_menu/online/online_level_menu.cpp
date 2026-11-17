@@ -249,7 +249,7 @@ static void playLevel() {
         currLevelString = levelEntry->levelString;
     }
 
-    uiStackPushGameState(static_cast<int>(GameState::Game));
+    uiStackPushGameState(static_cast<int>(GameState::StateGame));
 }
 
 void checkWarningsAndPlay(){
@@ -626,6 +626,8 @@ static void handleSongDataErrors(int code) {
 }
 
 static void actionRefreshLevel(UIElement *e, const UIPropertyList *props) {
+    if(refresh) return; //don't attempt refresh whilst already refreshing
+
     result = -2;
     refresh = true;
     uiEnableElement((UIElement *)spinner);
@@ -738,6 +740,7 @@ static void onlineLevelInit (UIScreen *s) {
             savedLevelThread = createGenericThread(&savedLevelTask);
         } else {
             hasSavedLevel = false;
+            refresh = true;
             levelThread = createGenericThread(&levelTask);
         }
     }

@@ -1,6 +1,4 @@
 #pragma once
-#include <memory>
-#include <vector>
 #include "main.hpp"
 #include "ui_screen.hpp"
 #include "graphics.hpp"
@@ -37,8 +35,8 @@ struct UIStackPush {
 };
 
 struct UIStack {
-    //array of owning screen pairs
-    std::vector<std::unique_ptr<UIScreenPair>> screenStack;
+    //array of pointers to UIScreenPairs
+    UIScreenPair **screenStack;
     size_t stackCapacity;
 
     //"root" ScreenPairs represent the lowest layer of the current UI context, such as the main menu, creator menu, or level select (as opposed to popups like settings, the color select, etc)

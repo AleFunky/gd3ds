@@ -1056,7 +1056,7 @@ static inline uint32_t makeSortKey(SpriteObject *s)
     if (obj == kPlaceholderPlayer) {
         return ((4 + 8) << 18) | (2 << 16) | (255 << 8) | 128;
     } else if (obj == kPlaceholderShineBack) {
-        return ((4 + 8) << 18) | (2 << 16) | (255 << 8) | 128;
+        return ((4 + 8) << 18) | (2 << 16) | (254 << 8) | 128;
     } else if (obj == kPlaceholderShineFront) {
         return ((5 + 8) << 18) | (2 << 16) | (255 << 8) | 128;
     }
@@ -2449,7 +2449,7 @@ void updateTouchEffect(float delta) {
 
     touchDragParticles.emitting = false;
 
-    bool tapEffectEnabled = (gameState == static_cast<int>(GameState::Game) && !gamePaused) ? settingsState.gameplayTapEffect : settingsState.touchEffectEverywhere;
+    bool tapEffectEnabled = (gameState == static_cast<int>(GameState::StateGame) && !gamePaused) ? settingsState.gameplayTapEffect : settingsState.touchEffectEverywhere;
 
     if (tapEffectEnabled && (kHeld & KEY_TOUCH)) {
         // Flipped for particles
@@ -2507,7 +2507,7 @@ void updateBottomParticles(float delta) {
     if (state.dual) flyingGamemode = flyingGamemode || (state.player2.gamemode == static_cast<int>(IconGamemode::GamemodeShip) || state.player2.gamemode == static_cast<int>(IconGamemode::GamemodeUfo) || state.player2.gamemode == static_cast<int>(IconGamemode::GamemodeWave));
 
     // If in game and not paused and not fading, update the particles spawning
-    if (((gameState == static_cast<int>(GameState::Game) && !gamePaused))) {
+    if (((gameState == static_cast<int>(GameState::StateGame) && !gamePaused))) {
         if (flyingGamemode) {
             glitterParticlesBottom.emitterX = state.cameraXMiddle;
             glitterParticlesBottom.emitterY = 240/2;

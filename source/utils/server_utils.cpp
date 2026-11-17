@@ -1220,7 +1220,7 @@ int installUpdateInternal(const char *updatePath) {
     
     if (is3Dsx) {
         // ensure 3dsx path is present
-        if (!_3dsxPath) return -1;
+        if (!threeDsxPath) return -1;
         
         Result res = 0;
 
@@ -1232,11 +1232,11 @@ int installUpdateInternal(const char *updatePath) {
         }
 
         // filesystem operations
-        if (remove(_3dsxPath) != 0) {
+        if (remove(threeDsxPath) != 0) {
             outputLog("failed to remove current .3dsx\n");
             return -1;
         }
-        if (rename(updatePath, _3dsxPath) != 0) {
+        if (rename(updatePath, threeDsxPath) != 0) {
             outputLog("failed to move target .3dsx.\n");
             return -1;
         }

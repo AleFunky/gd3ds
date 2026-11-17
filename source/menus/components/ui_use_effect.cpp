@@ -64,37 +64,40 @@ static void uiUseEffectDraw(UIElement* e, UITransform *transform) {
 static void uiUseEffectDestroy(UIElement *e) {
     if (e) {
         UIUseEffect *useEffect = (UIUseEffect *) e;
+        // Free pool
         if (useEffect->useEffects.pool) {
             free(useEffect->useEffects.pool);
-            useEffect->useEffects.pool = NULL;
         }
+
+        delete useEffect;
+        e = NULL;
     }
 }
 
 UIUseEffect *uiCreateUseEffect(UIScreen *screen) {
-    auto e = std::make_unique<UIUseEffect>();
+    UIUseEffect *e = new UIUseEffect{};
 
-    UIUseEffect *result = e.get();
+    if (!e) return NULL;
 
-    UseEffectPool *pool = &(result->useEffects);
+    UseEffectPool *pool = &(e->useEffects);
     initUseEffectPool(pool, MAX_UI_USE_EFFECTS);
     pool->stationary = true;
     for (size_t i = 0; i < pool->capacity; i++) {
         pool->pool[i].active = false;
-        result->xPos[i] = 0;
-        result->yPos[i] = 0;
+        e->xPos[i] = 0;
+        e->yPos[i] = 0;
     }
     
-    uiElementApplyDefaultProperties(&result->base, screen);
+    uiElementApplyDefaultProperties(&e->base, screen);
 
-    result->base.type = UIElementType::UiUseEffect;
-    result->base.enabled = true;
+    e->base.type = UIElementType::UiUseEffect;
+    e->base.enabled = true;
 
-    result->base.update = uiUseEffectUpdate;
-    result->base.draw = uiUseEffectDraw;
-    result->base.destroy = uiUseEffectDestroy;
+    e->base.update = uiUseEffectUpdate;
+    e->base.draw = uiUseEffectDraw;
+    e->base.destroy = uiUseEffectDestroy;
 
-    return e.release();
+    return e;
 }
 
 UIElement *uiCreateUseEffectFromProps(UIScreen *screen, const UIPropertyList *props) {

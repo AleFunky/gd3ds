@@ -1517,7 +1517,7 @@ void processSaving() {
 
         SavingError error = task->error != SavingError::SaveErrorNone ? task->error : writeSave(task);
 
-        free(task->data);
+        if(task->data) free(task->data);
         task->data = NULL;
         task->ready = false;
         task->running = false;

@@ -58,7 +58,7 @@ static void actionExit(UIElement *e, const UIPropertyList *p) {
 
 static void actionFinishUpdate(UIElement *e, const UIPropertyList *p) {
     if (updateResult == 0) {
-        uiStackPushGameState(static_cast<int>(GameState::Exit));
+        uiStackPushGameState(static_cast<int>(GameState::StateExit));
         stopMP3();
         return;
     }

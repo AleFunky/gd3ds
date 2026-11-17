@@ -29,25 +29,28 @@ static void uiRectangleDraw(UIElement* e, UITransform *transform) {
 }
 
 static void uiRectangleDestroy(UIElement *e) {
-    (void)e;
+    if (e) {
+        delete (UIRectangle *)e;
+        e = NULL;
+    }
 }
 
 UIRectangle *uiCreateRectangle(UIScreen *screen) {
-    auto e = std::make_unique<UIRectangle>();
+    UIRectangle *e = new UIRectangle{};
 
-    UIRectangle *result = e.get();
+    if (!e) return NULL;
 
-    result->base.type = UIElementType::UiRectangle;
-    result->base.enabled = true;
+    e->base.type = UIElementType::UiRectangle;
+    e->base.enabled = true;
     
-    uiElementApplyDefaultProperties(&result->base, screen);
+    uiElementApplyDefaultProperties(&e->base, screen);
 
-    uiRectangleClearColor(result);
+    uiRectangleClearColor(e);
 
-    result->base.draw = uiRectangleDraw;
-    result->base.destroy = uiRectangleDestroy;
+    e->base.draw = uiRectangleDraw;
+    e->base.destroy = uiRectangleDestroy;
 
-    return e.release();
+    return e;
 }
 
 UIElement *uiCreateRectangleFromProps(UIScreen *screen, const UIPropertyList *props) {

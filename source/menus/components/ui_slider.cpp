@@ -148,7 +148,10 @@ static void uiSliderDraw(UIElement* e, UITransform *transform) {
 }
 
 static void uiSliderDestroy(UIElement *e) {
-    (void)e;
+    if (e) {
+        delete (UISlider *)e;
+        e = NULL;
+    }
 }
 
 static void uiSliderInitGraphics(UISlider *e) {
@@ -166,25 +169,25 @@ static void uiSliderInitGraphics(UISlider *e) {
 }
 
 UISlider *uiCreateSlider(UIScreen *screen) {
-    auto e = std::make_unique<UISlider>();
+    UISlider *e = new UISlider{};
 
-    UISlider *result = e.get();
+    if (!e) return NULL;
 
-    result->base.type = UIElementType::UiSlider;
-    result->base.enabled = true;
+    e->base.type = UIElementType::UiSlider;
+    e->base.enabled = true;
     
-    uiElementApplyDefaultProperties(&result->base, screen);
+    uiElementApplyDefaultProperties(&e->base, screen);
 
-    uiSliderInitGraphics(result);
+    uiSliderInitGraphics(e);
 
-    result->value = 1;
-    result->maxValue = 1;
+    e->value = 1;
+    e->maxValue = 1;
 
-    result->base.update = uiSliderUpdate;
-    result->base.draw = uiSliderDraw;
-    result->base.destroy = uiSliderDestroy;
+    e->base.update = uiSliderUpdate;
+    e->base.draw = uiSliderDraw;
+    e->base.destroy = uiSliderDestroy;
 
-    return e.release();
+    return e;
 }
 
 UIElement *uiCreateSliderFromProps(UIScreen *screen, const UIPropertyList *props) {

@@ -37,7 +37,7 @@ Thread updaterThread;
 bool checkedForUpdate = false;
 
 static void actionUpdate(UIElement *e, const UIPropertyList *p) {
-    if (is3Dsx && isCitra() && !_3dsxPath) {
+    if (is3Dsx && isCitra() && !threeDsxPath) {
         InfoCardData *data = (InfoCardData *)malloc(sizeof(InfoCardData));
         if (!data) return;
 

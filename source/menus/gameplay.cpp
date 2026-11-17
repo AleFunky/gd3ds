@@ -258,7 +258,7 @@ void unpauseGame() {
 static void exitLevel() {
     if (gamePaused){
         exitingLevel = true;
-        uiStackPushGameState(static_cast<int>(GameState::Menu));
+        uiStackPushGameState(static_cast<int>(GameState::StateMenu));
     }
 }
 
