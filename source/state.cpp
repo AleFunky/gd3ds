@@ -24,7 +24,7 @@
 #include "endwall.hpp"
 #include "wav_player.hpp"
 
-#define FIRST_ATTEMPT_CAMERA_OFFSET 15
+#define FIRST_ATTEMPT_CAMERA_OFFSET 16
 #define PLAYER_CAMERA_X_OFFSET 125.0f
 #define PLAYER_CAMERA_X_OFFSET_BOT (PLAYER_CAMERA_X_OFFSET * (SCREEN_BOT_WIDTH / (float)SCREEN_WIDTH))
 
@@ -384,6 +384,8 @@ void firstLoadInitVariables() {
     state.currentData.timeStart = svcGetSystemTick() / (CPU_TICKS_PER_MSEC * 1000);
     state.currentData.maxNormal = levelDataSel->normalProgress;
     state.currentData.maxPractice = levelDataSel->practiceProgress;
+
+    state.levelProgress = 0.0f;
 }
 
 void initWaveTrails() {

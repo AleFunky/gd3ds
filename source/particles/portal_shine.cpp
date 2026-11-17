@@ -6,7 +6,8 @@
 #include "utils/gfx.hpp"
 #include "math_helpers.hpp"
 #include "level_loading.hpp"
-#include <deque>
+#include <vector>
+#include <array>
 
 namespace gd3ds {
 
@@ -19,11 +20,11 @@ constexpr std::array<int, static_cast<int>(ShineType::Count) * 2> kShineSheetInd
     14, 15, //dual
     16, 17, //teleport
     //speed portals
+    1, 0,
     2, 0,
     3, 0,
     4, 0,
-    5, 0,
-    6, 0
+    5, 0
 };
 
 static int getShineSheetIndex(ShineType type, bool front){
@@ -59,10 +60,7 @@ void PortalShine::drawShine(bool front){
     }
 
     fade = C2D_Clamp(fade, 0.0f, 1.0f);
-    u32 color = C2D_Color32f(1.0f, 1.0f, 1.0f, fade);
-
-    C2D_ImageTint tint;
-    C2D_PlainImageTint(&tint, color, 1.0f);
+    float alpha = fade * objects.opacity[m_obj] * objects.alphaTriggerOpacity[m_obj];
 
     float calcX = objects.x[m_obj] - state.cameraX;
     float calcY = SCREEN_HEIGHT - (objects.y[m_obj] - state.cameraY);
@@ -83,6 +81,9 @@ void PortalShine::drawShine(bool front){
     bool flipY = objects.flippedV[m_obj];
     float scale = fadeScale;
 
+    float objScaleX = objects.scaleX[m_obj];
+    float objScaleY = objects.scaleY[m_obj];
+
     const GameObject* obj = (const GameObject*)&gameObjects[objects.id[m_obj]];
 
     float rad = C3D_AngleFromDegrees(adjustAngle(deg, 0, state.mirrorMult < 0));
@@ -97,24 +98,40 @@ void PortalShine::drawShine(bool front){
     float m10 = sinR;
     float m11 = -cosR;
 
-    float objScaleX = objects.scaleX[m_obj];
-    float objScaleY = objects.scaleY[m_obj];
-
     float sx = scale * flipXMult * objScaleX;
     float sy = scale * flipYMult * objScaleY;
 
     float localX = obj->x * flipXMult;
     float localY = obj->y * flipYMult;
 
+    //get child values
+    if(hasFront(m_type) && !front){
+       const ChildSprite* c = &obj->children[0];
+       localX = c->x * flipXMult;
+       localY = c->y * flipYMult;
+    }
+
+    C2D_Image image = C2D_SpriteSheetGetImage(miscFXSheet, getShineSheetIndex(m_type, front));
+    if(flipX){
+        localX -= image.subtex->width;
+    }
+    if(flipY){
+        localY -= image.subtex->width;
+    }
+
     float rotX = localX * m00 + localY * m01;
     float rotY = localX * m10 + localY * m11;
 
     float pX = x + rotX * scale * objScaleX;
     float pY = y + rotY * scale * objScaleY;
-    
+
+    u32 color = C2D_Color32f(1.0f, 1.0f, 1.0f, alpha);
+
+    C2D_ImageTint tint;
+    C2D_PlainImageTint(&tint, color, 1.0f);
+
     C2D_DrawImageAtRotated(
-        C2D_SpriteSheetGetImage(miscFXSheet, getShineSheetIndex(m_type, front)), 
-        pX, pY, 0.0f, rad,&tint, sx, sy
+        image, pX, pY, 0.0f, rad, &tint, sx, sy
     );
 }
 

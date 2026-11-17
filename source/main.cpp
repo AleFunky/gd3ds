@@ -1957,6 +1957,11 @@ int main(int argc, char* argv[]) {
     bool exit = false;
     
     while (aptMainLoop() && !exit) {
+        resetLightnings();
+        resetDivorces();
+        resetGravitySweeps();
+        resetShines();
+
         slowSpeedParticlesBottom.cfg.startColorRed = 255 / 255.f;
         slowSpeedParticlesBottom.cfg.startColorGreen = 255 / 255.f;
         slowSpeedParticlesBottom.cfg.startColorBlue = 0 / 255.f;
@@ -2002,11 +2007,6 @@ int main(int argc, char* argv[]) {
 
     freeCachedSprites();
     iconCacheShutdown();
-
-    resetLightnings();
-    resetDivorces();
-    resetGravitySweeps();
-    resetShines();
 
     // Delete graphics
     C2D_SpriteSheetFree(spriteSheet);

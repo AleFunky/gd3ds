@@ -896,6 +896,8 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                     flipOtherPlayer(state.currentPlayer);
                     player->leftGround = true;
                     
+                    startGravitySweep(true);
+                    
                     UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
                     if (effect) {
                         effect->def.colorR = 0 / 255.f;
@@ -927,6 +929,9 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
                         
                     flipOtherPlayer(state.currentPlayer);
                     player->leftGround = true;
+
+                    startGravitySweep(false);
+
                     UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &portalUseEffect, getUseEffectArrayPtr(GFX_TOP));
                     if (effect) {
                         effect->def.colorR = 255 / 255.f;

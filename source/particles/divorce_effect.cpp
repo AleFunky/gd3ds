@@ -5,6 +5,8 @@
 #include "state.hpp"
 #include "player/robot_anim_data.hpp"
 #include "player/spider_anim_data.hpp"
+#include <vector>
+#include <memory>
 namespace gd3ds {
 
 DivorceEffect::DivorceEffect(int player, int gamemode, float x, float y, float rotation, float scale, bool flipY){
@@ -48,9 +50,11 @@ void DivorceEffect::updateDivorce(float delta){
     //it only moves relative to 1x speed for some reason
     m_x -= m_mirrored ? -playerSpeeds[1] * delta : playerSpeeds[1] * delta;
 
-    m_circle.pool[0].x = m_x;
-    m_circle.pool[0].y = m_y;
-
+    if(m_circle.pool){
+        m_circle.pool[0].x = m_x;
+        m_circle.pool[0].y = m_y;
+    }
+    
     updateUseEffects(delta, &m_circle);
 }
 
@@ -125,28 +129,28 @@ DivorceEffect::~DivorceEffect() {
     }
 }
 
-std::vector<DivorceEffect> divorces;
+std::vector<std::unique_ptr<DivorceEffect>> divorces;
 
 void updateDivorces(float delta){
     for(auto& divorce : divorces){
-        divorce.updateDivorce(delta);
+        divorce->updateDivorce(delta);
     }
 }
 
 void drawDivorces(){
     for(auto& divorce : divorces){
-        divorce.drawDivorce();
+        divorce->drawDivorce();
     }
 }
 
 void addDivorce(int player, int gamemode, float x, float y, float rotation, float scale, bool flipY){
     for(auto& divorce : divorces){
-        if(divorce.done()) {
-            divorce = DivorceEffect(player, gamemode, x, y, rotation, scale, flipY);
+        if(divorce->done()) {
+            divorce = std::make_unique<DivorceEffect>(player, gamemode, x, y, rotation, scale, flipY);
             return;
         }
     }
-    divorces.push_back(DivorceEffect(player, gamemode, x, y, rotation, scale, flipY));
+    divorces.push_back(std::make_unique<DivorceEffect>(player, gamemode, x, y, rotation, scale, flipY));
 }
 
 void resetDivorces(){
