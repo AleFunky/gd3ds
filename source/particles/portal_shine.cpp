@@ -112,11 +112,11 @@ void PortalShine::drawShine(bool front){
     }
 
     C2D_Image image = C2D_SpriteSheetGetImage(miscFXSheet, getShineSheetIndex(m_type, front));
-    if(flipX){
+    if(flipX && !flipY){
         localX -= image.subtex->width;
     }
-    if(flipY){
-        localY -= image.subtex->width;
+    if(flipY && !flipX){
+        localY += image.subtex->height;
     }
 
     float rotX = localX * m00 + localY * m01;

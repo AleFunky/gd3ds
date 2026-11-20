@@ -1056,9 +1056,9 @@ static inline uint32_t makeSortKey(SpriteObject *s)
     if (obj == kPlaceholderPlayer) {
         return ((4 + 8) << 18) | (2 << 16) | (255 << 8) | 128;
     } else if (obj == kPlaceholderShineBack) {
-        return ((4 + 8) << 18) | (2 << 16) | (254 << 8) | 128;
+        return ((4 + 8) << 18) | (1 << 16) | (255 << 8) | 128;
     } else if (obj == kPlaceholderShineFront) {
-        return ((5 + 8) << 18) | (2 << 16) | (255 << 8) | 128;
+        return ((5 + 8) << 18) | (1 << 16) | (255 << 8) | 128;
     }
 
     const int id = objects.id[obj];
