@@ -50,7 +50,7 @@ void PortalShine::updateShine(float delta){
 }
 
 void PortalShine::drawShine(bool front){
-    if(front && !hasFront(m_type)) return;
+    if((front && !hasFront(m_type)) || objects.opacity[m_obj] <= 0.f) return;
 
     float fade = 0.0f;
     if(m_time <= 0.05f){
@@ -60,7 +60,6 @@ void PortalShine::drawShine(bool front){
     }
 
     fade = C2D_Clamp(fade, 0.0f, 1.0f);
-    float alpha = fade * objects.opacity[m_obj] * objects.alphaTriggerOpacity[m_obj];
 
     float calcX = objects.x[m_obj] - state.cameraX;
     float calcY = SCREEN_HEIGHT - (objects.y[m_obj] - state.cameraY);
@@ -125,7 +124,7 @@ void PortalShine::drawShine(bool front){
     float pX = x + rotX * scale * objScaleX;
     float pY = y + rotY * scale * objScaleY;
 
-    u32 color = C2D_Color32f(1.0f, 1.0f, 1.0f, alpha);
+    u32 color = C2D_Color32f(1.0f, 1.0f, 1.0f, fade);
 
     C2D_ImageTint tint;
     C2D_PlainImageTint(&tint, color, 1.0f);
