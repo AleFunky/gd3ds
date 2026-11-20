@@ -425,6 +425,13 @@ static int progressCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow,
     task->progress = progress;
     return 0;
 }
+// change the buffer size to hopefully speed up downloads
+int sockoptCallback(void *userdata, curl_socket_t socket, curlsocktype)
+{   const int size = 48 * 1024;
+    setsockopt(socket, SOL_SOCKET, SO_RCVBUF, &size, sizeof(size));
+    setsockopt(socket, SOL_SOCKET, SO_SNDBUF, &size, sizeof(size));
+    return CURL_SOCKOPT_OK;
+}
 
 static int downloadFile(DownloadTask *task) {
     const char *path = task->path;
@@ -445,7 +452,12 @@ static int downloadFile(DownloadTask *task) {
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, task);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, progressCallback);
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0l); // Enable progress data
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+        curl_easy_setopt(curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
+        curl_easy_setopt(curl, CURLOPT_BUFFERSIZE, 131072L);
+        curl_easy_setopt(curl, CURLOPT_SOCKOPTFUNCTION, sockoptCallback);
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_DURATION);
 
         char tmpFile[273];
