@@ -68,7 +68,7 @@ Setting settings[] = {
     {
         .id = "wideEnabled",
         .label = "800 px res",
-        .additionalInfo = "Doubles the top screen's horizontal\nresolution.",
+        .additionalInfo = "Doubles the top screen's horizontal resolution.",
         .page = SettingPage::PageGraphics,
 
         .defaultValue = false,
@@ -83,7 +83,7 @@ Setting settings[] = {
     {
         .id = "stereoEnabled",
         .label = "Stereoscopic 3D",
-        .additionalInfo = "Adds depth to the top screen.\nUse the 3D slider, costs some FPS.",
+        .additionalInfo = "Adds depth to the top screen. Use the 3D slider, costs some FPS.",
         .page = SettingPage::PageGraphics,
 
         .defaultValue = false,
@@ -137,7 +137,7 @@ Setting settings[] = {
     {
         .id = "vsyncEnabled",
         .label = "V-Sync",
-        .additionalInfo = "Prevents screen tearing at the cost\nof some performance.\nCaps FPS at 60.",
+        .additionalInfo = "Prevents screen tearing at the cost of some performance. Caps FPS at 60.",
         .page = SettingPage::PageGraphics,
 
         .defaultValue = true,
@@ -177,7 +177,7 @@ Setting settings[] = {
     {
         .id = "enableDebugBindings",
         .label = "Enable debug keys",
-        .additionalInfo = "Enables debug key shortcuts.\n(B + L, B + R, X)",
+        .additionalInfo = "Enables debug key shortcuts. (B + L, B + R, X)",
         .page = SettingPage::PageInput,
 
         .defaultValue = false,
@@ -187,7 +187,7 @@ Setting settings[] = {
     {
         .id = "preciseInput",
         .label = "240Hz input (CBF)",
-        .additionalInfo = "Registers jumps on the exact 240Hz\nphysics tick they were pressed on.\nPrecision is reduced below 30fps.",
+        .additionalInfo = "Registers jumps on the exact 240Hz physics tick they were pressed on. Precision is reduced below 30fps.",
         .page = SettingPage::PageInput,
 
         .defaultValue = false,
@@ -197,7 +197,7 @@ Setting settings[] = {
     {
         .id = "hitboxesEnabled",
         .label = "Show hitboxes",
-        .additionalInfo = "Shows object hitboxes while in a level.\nWARNING: AFFECTS PERFOMANCE!",
+        .additionalInfo = "Shows object hitboxes while in a level. WARNING: AFFECTS PERFOMANCE!",
         .page = SettingPage::PageMisc,
 
         .defaultValue = false,
@@ -216,7 +216,7 @@ Setting settings[] = {
     },
     {
         .id = "hitboxesOnDeath",
-        .label = "Show hitboxes\non death",
+        .label = "Show hitboxes on death",
         .additionalInfo = NULL,
         .page = SettingPage::PageMisc,
 
@@ -227,7 +227,7 @@ Setting settings[] = {
     {
         .id = "doNot",
         .label = "Do not",
-        .additionalInfo = "Doesn't do anything...\nWell, nothing useful.",
+        .additionalInfo = "Doesn't do anything... Well, nothing useful.",
         .page = SettingPage::PageMisc,
 
         .defaultValue = false,
@@ -261,7 +261,7 @@ Setting settings[] = {
     {
         .id = "fastMenu",
         .label = "Fast Menu",
-        .additionalInfo = "Makes transitions between\nmenu pages faster.",
+        .additionalInfo = "Makes transitions between menu pages faster.",
         .page = SettingPage::PageMisc,
 
         .defaultValue = false,
@@ -271,7 +271,7 @@ Setting settings[] = {
     {
         .id = "skipHighObjWarning",
         .label = "Disable object alert",
-        .additionalInfo = "Disables the high object alert for\ncustom levels.",
+        .additionalInfo = "Disables the high object alert for custom levels.",
         .page = SettingPage::PageMisc,
 
         .defaultValue = false,
@@ -281,7 +281,7 @@ Setting settings[] = {
     {
         .id = "skipVersionWarning",
         .label = "Disable version alert",
-        .additionalInfo = "Disables the incompatible\nGeometry Dash version alert for\ncustom levels.",
+        .additionalInfo = "Disables the incompatible Geometry Dash version alert for custom levels.",
         .page = SettingPage::PageMisc,
 
         .defaultValue = false,
@@ -291,7 +291,7 @@ Setting settings[] = {
     {
         .id = "skipSongWarning",
         .label = "Disable song alert",
-        .additionalInfo = "Disables the missing song alert for\ncustom levels.",
+        .additionalInfo = "Disables the missing song alert for custom levels.",
         .page = SettingPage::PageMisc,
 
         .defaultValue = false,
@@ -331,7 +331,7 @@ Setting settings[] = {
     {
         .id = "ultraDecimalPercent",
         .label = "Ultra percentage",
-        .additionalInfo = "But mom, I want more decimals!!!!\n(Why would you want to use this?)",
+        .additionalInfo = "But mom, I want more decimals!!!! (Why would you want to use this?)",
         .page = SettingPage::PageGameplay,
 
         .defaultValue = false,
@@ -341,7 +341,7 @@ Setting settings[] = {
     {
         .id = "goldenBest",
         .label = "Golden best",
-        .additionalInfo = "Changes the percentage counter to\nbe gold when you pass\nyour previous best.",
+        .additionalInfo = "Changes the percentage counter to be gold when you pass your previous best.",
         .page = SettingPage::PageGameplay,
 
         .defaultValue = false,
@@ -381,7 +381,7 @@ Setting settings[] = {
     {
         .id = "hidePracticeButtons",
         .label = "Hide Practice Buttons",
-        .additionalInfo = "Hides the checkpoint buttons\nshown in practice mode.",
+        .additionalInfo = "Hides the checkpoint buttons shown in practice mode.",
         .page = SettingPage::PageGameplay,
 
         .defaultValue = false,
@@ -390,7 +390,7 @@ Setting settings[] = {
     },
     {
         .id = "swapGameplayScreens",
-        .label = "Switch gameplay\nto bottom screen",
+        .label = "Switch gameplay to bottom screen",
         .additionalInfo = NULL,
         .page = SettingPage::PageGameplay,
 
@@ -401,7 +401,7 @@ Setting settings[] = {
     {
         .id = "defaultMiniIcon",
         .label = "Default mini icon",
-        .additionalInfo = "Uses default player icon in\nmini mode.",
+        .additionalInfo = "Uses default player icon in mini mode.",
         .page = SettingPage::PageCosmetic,
 
         .defaultValue = false,
@@ -411,7 +411,7 @@ Setting settings[] = {
     {
         .id = "switchTrailColor",
         .label = "Switch trail color",
-        .additionalInfo = "Makes the player trail use P1\ninstead of P2.",
+        .additionalInfo = "Makes the player trail use P1 instead of P2.",
         .page = SettingPage::PageCosmetic,
 
         .defaultValue = false,
@@ -420,8 +420,8 @@ Setting settings[] = {
     },
     {
         .id = "switchWaveTrailColor",
-        .label = "Switch wave\ntrail color",
-        .additionalInfo = "Makes the wave trail use P1\ninstead of P2.",
+        .label = "Switch wave trail color",
+        .additionalInfo = "Makes the wave trail use P1 instead of P2.",
         .page = SettingPage::PageCosmetic,
 
         .defaultValue = false,
@@ -523,7 +523,7 @@ void stereoSetting(bool checked) {
         TwoOptionPopupData *threeDWarningData = (TwoOptionPopupData *)malloc(sizeof(TwoOptionPopupData));
         if (!threeDWarningData) return;
         
-        threeDWarningData->text = strdup("3D can significantly lower performance.\nAre you sure you want to keep it on?");
+        threeDWarningData->text = strdup("3D can significantly lower performance. Are you sure you want to keep it on?");
         threeDWarningData->title = strdup("Disclaimer");
         threeDWarningData->proceedText = strdup("Enable");
         threeDWarningData->cancelText = strdup("Disable");

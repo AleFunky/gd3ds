@@ -1,12 +1,12 @@
 #include <3ds.h>
 #include <citro2d.h>
 
+#include "menus/core/ui_screen.hpp"
 #include "mp3_player.hpp"
-#include "save/saving.hpp"
 
 #include "menus/core/ui_screen.hpp"
 #include "menus/components/ui_label.hpp"
-#include "menus/components/ui_window_button.hpp"
+#include "menus/components/ui_button.hpp"
 #include "menus/creator_menu/online/online_level_menu.hpp"
 #include "menus/creator_menu/online/two_option_pop_up.hpp"
 #include "menus/settings_hub/settings.hpp"
@@ -14,32 +14,53 @@
 #include "fonts/goldFont.hpp"
 #include "save/config.hpp"
 
+#include "fonts/chatFont.hpp"
+#include "fonts/goldFont.hpp"
+#include "text.hpp"
+
 namespace gd3ds
 {
 
 static void twoOptionPopUpInit(UIScreen *s) {
-    TwoOptionPopupData *popUpData = (TwoOptionPopupData *)s->pair->data;
-    if(!popUpData) return;
+    TwoOptionPopupData *pop_up_data = (TwoOptionPopupData *)s->pair->data;
+    if(!pop_up_data) return;
 
+    UIWindow *window = (UIWindow *) uiGetElementByTag(s, "window");
     UILabel *title = (UILabel *) uiGetElementByTag(s, "title");
     UILabel *content = (UILabel *) uiGetElementByTag(s, "content");
-    UIWindowButton *yesButton = (UIWindowButton *) uiGetElementByTag(s, "yesbutton");
-    UIWindowButton *noButton = (UIWindowButton *) uiGetElementByTag(s, "nobutton");
+    UIWindowButton *yes_button = (UIWindowButton *) uiGetElementByTag(s, "yesbutton");
+    UIWindowButton *no_button = (UIWindowButton *) uiGetElementByTag(s, "nobutton");
 
-    uiLabelSetText(title, popUpData->title);
-    uiLabelSetText(content, popUpData->text);
+    int textMarginX = 15.f;
+    float textScale = content->base.scaleX;
+    float buttonOffset = 30.f;
+    float titleOffset = 28.f;
+    
+    char *buf = wrapText(&chatFontFontCharset, textScale, pop_up_data->text, window->base.w - 2 * textMarginX);
+    float textHeight = getTextHeight(&chatFontFontCharset, &chatFontSheet, textScale, true, buf);
 
-    uiButtonSetText((UIButton *)yesButton, popUpData->proceedText);
-    uiButtonSetText((UIButton *)noButton, popUpData->cancelText);
+    float windowHeight = 90.f + textHeight;
 
-    float yesButtonTextWidth = getTextLength(&goldFontFontCharset, yesButton->base.textScale, false, yesButton->base.text) + 20;
-    float noButtonTextWidth = getTextLength(&goldFontFontCharset, noButton->base.textScale, false, noButton->base.text) + 20;
+    window->base.h = windowHeight;
 
-    yesButton->base.base.w = yesButtonTextWidth;
-    yesButton->base.base.x = 0 + (((yesButtonTextWidth / 2) + (noButtonTextWidth / 2)) / 2) - 4;
+    yes_button->base.base.y = (windowHeight / 2) - buttonOffset;
+    no_button->base.base.y = (windowHeight / 2) - buttonOffset;
+    title->base.y = -(windowHeight / 2) + titleOffset;
 
-    noButton->base.base.w = noButtonTextWidth;
-    noButton->base.base.x = 0 - (((yesButtonTextWidth / 2) + (noButtonTextWidth / 2)) / 2) + 4;
+    uiLabelSetText(content, buf);
+    uiLabelSetText(title, pop_up_data->title);
+
+    uiButtonSetText((UIButton *)yes_button, pop_up_data->proceedText);
+    uiButtonSetText((UIButton *)no_button, pop_up_data->cancelText);
+
+    float yes_button_text_width = getTextLength(&goldFontFontCharset, yes_button->base.textScale, false, yes_button->base.text) + 20;
+    float no_button_text_width = getTextLength(&goldFontFontCharset, no_button->base.textScale, false, no_button->base.text) + 20;
+
+    yes_button->base.base.w = yes_button_text_width;
+    yes_button->base.base.x = 0 + (((yes_button_text_width / 2) + (no_button_text_width / 2)) / 2) - 4;
+
+    no_button->base.base.w = no_button_text_width;
+    no_button->base.base.x = 0 - (((yes_button_text_width / 2) + (no_button_text_width / 2)) / 2) + 4;
 }
 
 static void twoOptionPopUpFreeData(void *data){
@@ -49,7 +70,7 @@ static void twoOptionPopUpFreeData(void *data){
     free((void *)popUpData->title);
     free((void *)popUpData->proceedText);
     free((void *)popUpData->cancelText);
-    free(popUpData);
+    free((void *)popUpData);
 }
 
 extern const UIScreenDefPair twoOptionPopUpDef = {

@@ -801,7 +801,7 @@ void uiLoop(){
                     if (!autoupdateData)
                         return;
 
-                    autoupdateData->text = strdup("Updates were found for the game.\nOpen the updater?");
+                    autoupdateData->text = strdup("Updates were found for the game. Open the updater?");
                     autoupdateData->title = strdup("Updates Found");
                     autoupdateData->proceedText = strdup("Open");
                     autoupdateData->cancelText = strdup("Later");
@@ -822,7 +822,7 @@ void uiLoop(){
             if (!threeDWarningData)
                 return;
 
-            threeDWarningData->text = strdup("Stereoscopic 3D can significantly lower performance.\nAre you sure you want to keep it enabled?");
+            threeDWarningData->text = strdup("Stereoscopic 3D can significantly lower performance. Are you sure you want to keep it enabled?");
             threeDWarningData->title = strdup("Disclaimer");
             threeDWarningData->proceedText = strdup("Enable");
             threeDWarningData->cancelText = strdup("Cancel");
@@ -1499,7 +1499,7 @@ void gameLoop() {
             TwoOptionPopupData *threeDWarningData = (TwoOptionPopupData *)malloc(sizeof(TwoOptionPopupData));
             if (!threeDWarningData) return;
 
-            threeDWarningData->text = strdup("3D can significantly lower performance.\nAre you sure you want to keep it on?");
+            threeDWarningData->text = strdup("3D can significantly lower performance. Are you sure you want to keep it on?");
             threeDWarningData->title = strdup("Disclaimer");
             threeDWarningData->proceedText = strdup("Enable");
             threeDWarningData->cancelText = strdup("Disable");

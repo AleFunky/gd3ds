@@ -172,9 +172,9 @@ const char* warningTitles[] = {
 };
 
 const char* warnings[] = {
-    "This level has a <#ffa54b>high object</> count\nand might not be <#ff5a5a>fully playable</>.",
-    "This level was made or updated in an\n<#ffa54b>incompatible game version</>. It might\nnot be <#ff5a5a>fully playable</>.",
-    "This level uses a <#4c8cc7>custom song</> that\nhas not been <#36c244>downloaded</> yet. Play\nwithout music?"
+    "This level has a <#ffa54b>high object</> count and might not be <#ff5a5a>fully playable</>.",
+    "This level was made or updated in an <#ffa54b>incompatible game version</>. It might not be <#ff5a5a>fully playable</>.",
+    "This level uses a <#4c8cc7>custom song</> that has not been <#36c244>downloaded</> yet. Play without music?"
 };
 
 static void updateDownloadButton(SearchEntry *entry){
@@ -310,7 +310,7 @@ static void actionOpenDeleteLevel(UIElement *e, const UIPropertyList *args){
         TwoOptionPopupData *deleteLevelData = (TwoOptionPopupData *)malloc(sizeof(TwoOptionPopupData));
         if(!deleteLevelData) return;
 
-        deleteLevelData->text = strdup("Are you sure you want to\ndelete this level?");
+        deleteLevelData->text = strdup("Are you sure you want to delete this level?");
         deleteLevelData->title = strdup("Delete Level");
         deleteLevelData->proceedText = strdup("Yes");
         deleteLevelData->cancelText = strdup("No");
@@ -528,7 +528,7 @@ static void handleErrors(int code) {
             snprintf(errorMessage, sizeof(errorMessage), "%s", "An unknown error has occured.");
             break;
         case -1:
-            snprintf(errorMessage, sizeof(errorMessage), "%s", "Failed to download level!\nPlease try again later.");
+            snprintf(errorMessage, sizeof(errorMessage), "%s", "Failed to download level! Please try again later.");
             break;
         case 6:
         case 7:
@@ -540,7 +540,7 @@ static void handleErrors(int code) {
         case 42:
             break;
         default:
-            snprintf(errorMessage, sizeof(errorMessage), "An unknown error has occurred.\nError code: %d", code);
+            snprintf(errorMessage, sizeof(errorMessage), "An unknown error has occurred. Error code: %d", code);
             break;
     }
     InfoCardData *data = (InfoCardData *)malloc(sizeof(InfoCardData));

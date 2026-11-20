@@ -149,9 +149,9 @@ static void actionVersionWarning(UIElement* e, const UIPropertyList *args){
 
     char buffer[256];
     if (eData->wasUpdated) {
-        snprintf(buffer, sizeof(buffer), "This level was uploaded <#60abef>before or in</> %.1f,\nbut was updated in a later version. It\n<#ffa54b>might not be playable</>.", GD_VERSION);
+        snprintf(buffer, sizeof(buffer), "This level was uploaded <#60abef>before or in</> %.1f, but was updated in a later version. It <#ffa54b>might not be playable</>.", GD_VERSION);
     } else {
-        snprintf(buffer, sizeof(buffer), "This level was uploaded <#60abef>after</> %.1f.\nIt will most likely <#f25149>not be playable</>.", GD_VERSION);
+        snprintf(buffer, sizeof(buffer), "This level was uploaded <#60abef>after</> %.1f. It will most likely <#f25149>not be playable</>.", GD_VERSION);
     }
 
     InfoCardData *data = (InfoCardData *)malloc(sizeof(InfoCardData));

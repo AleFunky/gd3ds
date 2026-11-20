@@ -251,7 +251,7 @@ static void mainMenuInit(UIScreen *s){
       if (!warningData)
         return;
 
-      warningData->text = strdup("The .3dsx release lacks RAM\non non-New 3DS hardware.\nPlease install the .cia.");
+      warningData->text = strdup("The .3dsx release lacks RAM on non-New 3DS hardware. Please install the .cia.");
       warningData->title = strdup("Warning");
       warningData->copied = true;
       uiStackPush(&infoCardDef, UIAnimation::AnimZoom, UIAnimation::AnimZoom, UIStackPushType::PushNext);
