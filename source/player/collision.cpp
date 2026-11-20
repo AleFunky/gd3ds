@@ -1065,11 +1065,13 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
             if (!GET_ACTIVATED(obj)) {
                 SET_ACTIVATED(obj, true);
                 addShine(ShineType::SpeedSlow, obj);
-                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &speedCollideEffect, getUseEffectArrayPtr(GFX_TOP));
-                if (effect) {
-                    effect->def.colorR = 255 / 255.f;
-                    effect->def.colorG = 255 / 255.f;
-                    effect->def.colorB = 0 / 255.f;
+                if (objects.alphaTriggerOpacity[obj] > 0) { 
+                    UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &speedCollideEffect, getUseEffectArrayPtr(GFX_TOP));
+                    if (effect) {
+                        effect->def.colorR = 255 / 255.f;
+                        effect->def.colorG = 255 / 255.f;
+                        effect->def.colorB = 0 / 255.f;
+                    }
                 }
                 if (state.speed != static_cast<int>(PlayerSpeeds::SpeedSlow)) {
                     state.speed = static_cast<int>(PlayerSpeeds::SpeedSlow);
@@ -1082,11 +1084,13 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
             if (!GET_ACTIVATED(obj)) {
                 SET_ACTIVATED(obj, true);
                 addShine(ShineType::SpeedNormal, obj);
-                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &speedCollideEffect, getUseEffectArrayPtr(GFX_TOP));
-                if (effect) {
+                if (objects.alphaTriggerOpacity[obj] > 0) { 
+                    UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &speedCollideEffect, getUseEffectArrayPtr(GFX_TOP));
+                    if (effect) {
                     effect->def.colorR = 0 / 255.f;
                     effect->def.colorG = 190 / 255.f;
                     effect->def.colorB = 255 / 255.f;
+                    }
                 }
                 if (state.speed != static_cast<int>(PlayerSpeeds::SpeedNormal)) {
                     state.speed = static_cast<int>(PlayerSpeeds::SpeedNormal);
@@ -1099,11 +1103,13 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
             if (!GET_ACTIVATED(obj)) {
                 SET_ACTIVATED(obj, true);
                 addShine(ShineType::SpeedFast, obj);
+                if (objects.alphaTriggerOpacity[obj] > 0) { 
                 UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &speedCollideEffect, getUseEffectArrayPtr(GFX_TOP));
-                if (effect) {
-                    effect->def.colorR = 0 / 255.f;
-                    effect->def.colorG = 255 / 255.f;
-                    effect->def.colorB = 0 / 255.f;
+                    if (effect) {
+                        effect->def.colorR = 0 / 255.f;
+                        effect->def.colorG = 255 / 255.f;
+                        effect->def.colorB = 0 / 255.f;
+                    }
                 }
                 if (state.speed != static_cast<int>(PlayerSpeeds::SpeedFast)){
                     state.speed = static_cast<int>(PlayerSpeeds::SpeedFast);
@@ -1116,12 +1122,14 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
             if (!GET_ACTIVATED(obj)) {
                 SET_ACTIVATED(obj, true);
                 addShine(ShineType::SpeedFaster, obj);
+                if (objects.alphaTriggerOpacity[obj] > 0) { 
                 UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &speedCollideEffect, getUseEffectArrayPtr(GFX_TOP));
-                if (effect) {
-                    effect->def.colorR = 230 / 255.f;
-                    effect->def.colorG = 65  / 255.f;
-                    effect->def.colorB = 255 / 255.f;
-                }
+                    if (effect) {
+                        effect->def.colorR = 230 / 255.f;
+                        effect->def.colorG = 65  / 255.f;
+                        effect->def.colorB = 255 / 255.f;
+                    }
+                }   
                 
                 if (state.speed != static_cast<int>(PlayerSpeeds::SpeedFaster)) {
                     state.speed = static_cast<int>(PlayerSpeeds::SpeedFaster);
@@ -1134,13 +1142,14 @@ void handleSpecialHitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
             if (!GET_ACTIVATED(obj)) {
                 SET_ACTIVATED(obj, true);
                 addShine(ShineType::SpeedFastest, obj);
-                UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &speedCollideEffect, getUseEffectArrayPtr(GFX_TOP));
-                if (effect) {
-                    effect->def.colorR = 255 / 255.f;
-                    effect->def.colorG = 65  / 255.f;
-                    effect->def.colorB = 65  / 255.f;
+                if (objects.alphaTriggerOpacity[obj] > 0) { 
+                    UseEffect *effect = addUseEffect(objects.x[obj], objects.y[obj], obj, &speedCollideEffect, getUseEffectArrayPtr(GFX_TOP));
+                    if (effect) {
+                        effect->def.colorR = 255 / 255.f;
+                        effect->def.colorG = 65  / 255.f;
+                        effect->def.colorB = 65  / 255.f;
+                    }
                 }
-
                 if (state.speed != static_cast<int>(PlayerSpeeds::SpeedFastest)) {
                     state.speed = static_cast<int>(PlayerSpeeds::SpeedFastest);
                     fastestSpeedParticlesTimer = 0.7f;
