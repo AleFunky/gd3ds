@@ -43,7 +43,6 @@ namespace gd3ds
 static bool yesExit = false;
 static bool restart = false;
 static bool init = false;
-static bool checkpoint_restart_flag = false;
 
 static bool animatingDown = false;
 static bool animatingReward = false;

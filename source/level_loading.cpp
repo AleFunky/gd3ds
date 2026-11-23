@@ -3154,6 +3154,12 @@ void loadLevelStringInfo(char *levelString) {
         free(fontData);
     }
 
+    char *lineData = getMetadataValue(levelString, "kA17");
+    if(lineData){
+        levelInfo.line = static_cast<u8>(atoi(lineData));
+        free(lineData);
+    }
+
     if (loadedLevelFont != fontIndex) {
         if (levelFontSheet) {
             C2D_SpriteSheetFree(levelFontSheet);
