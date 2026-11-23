@@ -262,6 +262,7 @@ typedef struct {
     bool completing;
     int background_id;
     int ground_id;
+    u8 line;
     int initial_gamemode;
     bool initial_mini;
     unsigned char initial_speed;

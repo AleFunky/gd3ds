@@ -2413,6 +2413,12 @@ void load_level_string_info(char *level_string) {
         free(font_data);
     }
 
+    char *line_data = get_metadata_value(level_string, "kA17");
+    if(line_data){
+        level_info.line = static_cast<u8>(atoi(line_data));
+        free(line_data);
+    }
+
     if (loaded_level_font != font_index) {
         if (level_font_sheet) {
             C2D_SpriteSheetFree(level_font_sheet);
