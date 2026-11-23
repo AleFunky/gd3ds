@@ -1497,6 +1497,37 @@ void drawGround(float camX, float camY, float y, bool isCeiling, int screenWidth
         }
     }
 
+    //--LINE--
+    int line_chan = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelLine));
+    // Then draw the line
+    if (channels[line_chan].blending) {
+        changeBlending(true);
+    }
+
+    col = channels[line_chan].color;
+    C2D_PlainImageTint(&tint, C2D_Color32(col.r, col.g, col.b, 255), 1.f);
+
+    float line_offset = -(GROUND_SIZE / 2) * mult;
+    C2D_Sprite line = { 0 };
+    C2D_SpriteFromSheet(&line, groundSheet, 0);
+    C3D_TexSetFilter(line.image.tex, GPU_LINEAR, GPU_LINEAR);
+    C2D_SpriteSetCenter(&line, 0.5f, 0.0f);
+    C2D_SpriteSetPos(&line, screenWidth / SCALE / 2, (GROUND_SIZE / 2) + calcY + line_offset);
+
+    //line style
+    if(levelInfo.line == 2){
+        C2D_SpriteSetScale(&line, 200.0f, 6.0f / 4.0f);
+    } else if(levelInfo.line == 3){
+        C2D_SpriteSetScale(&line, 200.0f, 10.0f / 4.0f);
+    }
+
+    C2D_DrawSpriteTinted(&line, &tint);
+
+    if (channels[line_chan].blending) {
+        changeBlending(false);
+    }
+
+    //--SHADOW--
     C2D_PlainImageTint(&tint, C2D_Color32(0, 0, 0, 100), 1.f);
     C2D_Sprite groundShadow = { 0 };
 
@@ -1513,27 +1544,6 @@ void drawGround(float camX, float camY, float y, bool isCeiling, int screenWidth
     C2D_SpriteSetCenter(&groundShadow, 1.f, 0.f);
     C2D_SpriteSetScale(&groundShadow, -1.f, 1.f);
     C2D_DrawSpriteTinted(&groundShadow, &tint);
-
-    int lineChan = getColChannelIndex(static_cast<int>(ColorChannelIDs::ChannelLine));
-    // Then draw the line
-    if (channels[lineChan].blending) {
-        changeBlending(true);
-    }
-
-    col = channels[lineChan].color;
-    C2D_PlainImageTint(&tint, C2D_Color32(col.r, col.g, col.b, 255), 1.f);
-
-    float lineOffset = -((GROUND_SIZE / 2) - (LINE_HEIGHT / 2)) * mult;
-    C2D_Sprite line = { 0 };
-    C2D_SpriteFromSheet(&line, groundSheet, 0);
-    C3D_TexSetFilter(line.image.tex, GPU_LINEAR, GPU_LINEAR);
-    C2D_SpriteSetCenter(&line, 0.5f, 0.5f);
-    C2D_SpriteSetPos(&line, screenWidth / SCALE / 2, (GROUND_SIZE / 2) + calcY + lineOffset);
-    C2D_DrawSpriteTinted(&line, &tint);
-
-    if (channels[lineChan].blending) {
-        changeBlending(false);
-    }
 }
 
 float completeTextElapsed = 0;

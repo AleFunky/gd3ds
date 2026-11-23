@@ -356,6 +356,7 @@ struct LoadedLevelInfo {
     bool completing;
     int backgroundID;
     int groundID;
+    u8 line;
     int initialGamemode;
     bool initialMini;
     unsigned char initialSpeed;

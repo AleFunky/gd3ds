@@ -14,6 +14,8 @@
 #include "menus/level_complete.hpp"
 #include "practice.hpp"
 #include "menus/level_select.hpp"
+#include "menus/settings_hub/settings.hpp"
+#include "menus/gameplay.hpp"
 #include "wav_player.hpp"
 
 namespace gd3ds

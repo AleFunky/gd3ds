@@ -13,6 +13,7 @@
 #include "state.hpp"
 #include "level_loading.hpp"
 #include "particles/circles.hpp"
+#include "practice.hpp"
 
 #include "menus/components/ui_darken.hpp"
 #include "menus/components/ui_list.hpp"
@@ -42,6 +43,7 @@ namespace gd3ds
 static bool yesExit = false;
 static bool restart = false;
 static bool init = false;
+static bool checkpoint_restart_flag = false;
 
 static bool animatingDown = false;
 static bool animatingReward = false;
@@ -183,7 +185,8 @@ const char *doNotCompletionTexts[] = {
     "YOU WIN!",
     "You've just beaten Stereo Madness",
     "Your dids it!",
-    "your winner!"
+    "your winner!",
+    "You can now play as Luigi!"
 };
 
 const char *completionTexts[] = {
