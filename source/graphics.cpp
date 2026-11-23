@@ -1507,19 +1507,28 @@ void drawGround(float camX, float camY, float y, bool isCeiling, int screenWidth
     col = channels[line_chan].color;
     C2D_PlainImageTint(&tint, C2D_Color32(col.r, col.g, col.b, 255), 1.f);
 
-    float line_offset = -(GROUND_SIZE / 2) * mult;
+    float line_thickness = 0.0f;
+    if(levelInfo.line == 2){
+        line_thickness = 5.5f / 4.0f;
+    } else if(levelInfo.line == 3){
+        line_thickness = 7.0f / 4.0f;
+    }
+
     C2D_Sprite line = { 0 };
+
     C2D_SpriteFromSheet(&line, groundSheet, 0);
     C3D_TexSetFilter(line.image.tex, GPU_LINEAR, GPU_LINEAR);
-    C2D_SpriteSetCenter(&line, 0.5f, 0.0f);
-    C2D_SpriteSetPos(&line, screenWidth / SCALE / 2, (GROUND_SIZE / 2) + calcY + line_offset);
 
     //line style
-    if(levelInfo.line == 2){
-        C2D_SpriteSetScale(&line, 200.0f, 6.0f / 4.0f);
-    } else if(levelInfo.line == 3){
-        C2D_SpriteSetScale(&line, 200.0f, 10.0f / 4.0f);
+    if(levelInfo.line > 1){
+        C2D_SpriteSetScale(&line, 200.0f, line_thickness);
     }
+
+    float line_offset_height = isCeiling ? (LINE_HEIGHT * line_thickness) : 0.0f;
+    float lineOffset = -((GROUND_SIZE / 2) - line_offset_height) * mult;
+
+    C2D_SpriteSetCenter(&line, 0.5f, 0.0f);
+    C2D_SpriteSetPos(&line, screenWidth / SCALE / 2, (GROUND_SIZE / 2) + calcY + lineOffset);
 
     C2D_DrawSpriteTinted(&line, &tint);
 
