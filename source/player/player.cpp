@@ -231,7 +231,7 @@ void cubeGamemode(Player *player) {
     }
 
     // Do cube rotation
-    if (player->slopeData.slopeID < 0 && !player->onGround && !player->dashing) {
+    if (player->slopeData.slopeID < 0 && !player->onGround && !player->dashing && player->cutsceneTimer == 0.0f) {
         if (player->inverseRotation) {
             player->rotation -= (cubeRotationSpeed[player->mini] / 2) * STEPS_DT * mult;
         } else {
@@ -1595,7 +1595,7 @@ void updateP1Trail(Player *player, int playerID) {
 
     p1TrailTimer -= delta;
 
-    for (size_t i = 0; i < P1_TRAIL_LENGTH; i++) {
+    for (int i = 0; i < P1_TRAIL_LENGTH; i++) {
         P1Trail *trailData = &state.p1TrailData[playerID][i];
 
         if (trailData->active) {

@@ -25,8 +25,6 @@ std::vector<LightningSegment> Lightning::generateLightingRecursive(
 ){
     std::vector<LightningPoint> nextPoints;
 
-    segmentLength /= 2;
-
     float xRand = ((lightningRand(seed) % 101) / 100.0f - 0.5f) * segmentLength;
     float yRand = ((lightningRand(seed) % 101) / 100.0f - 0.5f) * segmentLength;
 
@@ -48,7 +46,9 @@ std::vector<LightningSegment> Lightning::generateLightingRecursive(
     }
     nextPoints.push_back(points.back());
 
-    if(segmentLength > 8){
+    segmentLength /= 2;
+
+    if(segmentLength >= 8){
         return generateLightingRecursive(nextPoints, segmentLength, type, seed);
     } else{
         //generate lightning
